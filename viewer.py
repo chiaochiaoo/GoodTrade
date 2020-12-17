@@ -18,9 +18,10 @@ def getinfo(symbol):
 		r= requests.get(p,allow_redirects=False,stream=True)
 
 		time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
-		price=find_between(r.text, "MidPrice=\"", "\"")
-		print(time,price)
-		return "Connected",time,price
+		Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
+		Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
+		#print(time,price)
+		return "Connected",time,(Bidprice+Askprice)/2
     # p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
     # r= requests.get(p,allow_redirects=False,stream=True)
 	except:
@@ -632,9 +633,11 @@ class symbol_manager:
 			self.lock[symbol] = True
 
 			stat,time,midprice = getinfo(symbol)
+
+			#I need to make sure that label still exist. 
 			#status["text"],timestamp["text"],price["text"]= self.count,self.count,self.count
 			if stat =="Connected":
-				status["background"] = "green"
+				status["background"] = "#83FF33"
 				status["text"],timestamp["text"],price["text"]= "connected",time,midprice
 			else:
 				status["background"] = "red"
