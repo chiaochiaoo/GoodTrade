@@ -10,19 +10,22 @@ import threading
 import requests 
 
 def getinfo(symbol):
-    p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
-    r= requests.get(p,allow_redirects=False,stream=True)
-    
-    p="http://localhost:8080/GetLv1?symbol="+symbol
-    r= requests.get(p,allow_redirects=False,stream=True)
-    time=find_between(r.text, "MarketTime=", " ")[:-4]
-    price=find_between(r.text, "MinPrice=", " ")
+	try:
+	    p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
+	    r= requests.get(p,allow_redirects=False,stream=True)
+	    
+	    p="http://localhost:8080/GetLv1?symbol="+symbol
+	    r= requests.get(p,allow_redirects=False,stream=True)
 
+	    time=find_between(r.text, "MarketTime=", " ")[:-4]
+	    price=find_between(r.text, "MinPrice=", " ")
+	    print(time,price)
+    	return "Connected",time,price
     # p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
     # r= requests.get(p,allow_redirects=False,stream=True)
+    except:
+    	return "Disconnected","",""
 
-    print(time,price)
-    return time,price
 
 
 def find_between(data, first, last):
@@ -612,7 +615,7 @@ class symbol_manager:
 					#self.update_symbol(self.symbols[i],status,timestamp,price)
 					fetch = threading.Thread(target=self.update_symbol, args=(self.symbols[i],status,timestamp,price,), daemon=True)
 					fetch.start()
-			time.sleep(2)
+			time.sleep(5)
 
 
 	#a single thread 
@@ -620,9 +623,15 @@ class symbol_manager:
 
 		#get the info. and, update!!!
 
-		time,midprice = getinfo(symbol)
+		stat,time,midprice = getinfo(symbol)
 		#status["text"],timestamp["text"],price["text"]= self.count,self.count,self.count
-		status["text"],timestamp["text"],price["text"]= "connected",time,midprice
+		if stat =="Connected":
+			status["color"] = "green"
+			status["text"],timestamp["text"],price["text"]= "connected",time,midprice
+		else:
+			status["color"] = "red"
+			status["text"] = "Disconnected"
+
 
 
 # test = ["SPY.AM","QQQ.NQ"]
