@@ -24,7 +24,8 @@ def getinfo(symbol):
 		return "Connected",time,round((Bidprice+Askprice)/2,4)
     # p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
     # r= requests.get(p,allow_redirects=False,stream=True)
-	except:
+	except Exception as e:
+		print(e)
 		return "Disconnected","",""
 
 
