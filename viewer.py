@@ -15,12 +15,13 @@ def getinfo(symbol):
     
     p="http://localhost:8080/GetLv1?symbol="+symbol
     r= requests.get(p,allow_redirects=False,stream=True)
-    time=find_between(r.text, "MarketTime=", " ")[:-3]
-    price=find_between(r.text, "BidPrice=", " ")
+    time=find_between(r.text, "MarketTime=", " ")[:-4]
+    price=find_between(r.text, "MinPrice=", " ")
 
     # p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
     # r= requests.get(p,allow_redirects=False,stream=True)
 
+    print(time,price)
     return time,price
 
 
