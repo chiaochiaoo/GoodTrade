@@ -561,6 +561,9 @@ class symbol_manager:
 		self.last_update = {}
 		self.last_price = {}
 
+
+		self.lock = {}
+
 		# self.price = 0
 		# self.volume = 
 		self.open = {}
@@ -614,6 +617,7 @@ class symbol_manager:
 					
 					#self.update_symbol(self.symbols[i],status,timestamp,price)
 					fetch = threading.Thread(target=self.update_symbol, args=(self.symbols[i],status,timestamp,price,), daemon=True)
+					#only start when the last one has returned. 
 					fetch.start()
 			time.sleep(5)
 
@@ -622,15 +626,21 @@ class symbol_manager:
 	def update_symbol(self,symbol,status,timestamp,price):
 
 		#get the info. and, update!!!
+		if self.lock[symbol]==False:
+			self.lock[symbol] = True
 
-		stat,time,midprice = getinfo(symbol)
-		#status["text"],timestamp["text"],price["text"]= self.count,self.count,self.count
-		if stat =="Connected":
-			status["color"] = "green"
-			status["text"],timestamp["text"],price["text"]= "connected",time,midprice
+			stat,time,midprice = getinfo(symbol)
+			#status["text"],timestamp["text"],price["text"]= self.count,self.count,self.count
+			if stat =="Connected":
+				status["color"] = "green"
+				status["text"],timestamp["text"],price["text"]= "connected",time,midprice
+			else:
+				status["color"] = "red"
+				status["text"] = "Disconnected"
+
+			self.lock[symbol] = False
 		else:
-			status["color"] = "red"
-			status["text"] = "Disconnected"
+			print("symbol already requested")
 
 
 
