@@ -620,9 +620,9 @@ class symbol_manager:
 
 		#get the info. and, update!!!
 
-		time,price = getinfo(symbol)
+		time,midprice = getinfo(symbol)
 		#status["text"],timestamp["text"],price["text"]= self.count,self.count,self.count
-		status["text"],timestamp["text"],price["text"]= "connected",time,price
+		status["text"],timestamp["text"],price["text"]= "connected",time,midprice
 
 
 # test = ["SPY.AM","QQQ.NQ"]
