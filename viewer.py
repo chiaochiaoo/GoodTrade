@@ -619,7 +619,7 @@ class symbol_manager:
 					fetch = threading.Thread(target=self.update_symbol, args=(self.symbols[i],status,timestamp,price,), daemon=True)
 					#only start when the last one has returned. 
 					fetch.start()
-			time.sleep(5)
+			time.sleep(1)
 
 
 	#a single thread 
@@ -640,7 +640,7 @@ class symbol_manager:
 
 			self.lock[symbol] = False
 		else:
-			print("symbol already requested")
+			print("symbol already requested. Pass.")
 
 
 
