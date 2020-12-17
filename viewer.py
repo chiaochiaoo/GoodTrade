@@ -17,8 +17,8 @@ def getinfo(symbol):
 	    p="http://localhost:8080/GetLv1?symbol="+symbol
 	    r= requests.get(p,allow_redirects=False,stream=True)
 
-	    time=find_between(r.text, "MarketTime=", " ")[:-4]
-	    price=find_between(r.text, "MinPrice=", " ")
+	    time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
+	    price=find_between(r.text, "MidPrice=\"", "\"")
 	    print(time,price)
     	return "Connected",time,price
     # p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
