@@ -12,6 +12,7 @@ import requests
 reg_count = 0
 
 def register(symbol):
+	return True
 	global reg_count
 	try:
 		p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
@@ -24,6 +25,7 @@ def register(symbol):
 		return False
 
 def deregister(symbol):
+	return True
 	global reg_count
 	try:
 		p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
@@ -168,7 +170,7 @@ class viewer:
 
 		width = [8,10,12,10,10,12,10,10]
 		info = [symbol,"Connecting","","","","",""]
-
+		register(symbol)
 		self.tickers_labels.append([])
 		for j in range(len(info)):
 			if j != (len(info)-1):
@@ -207,7 +209,7 @@ class viewer:
 
 			self.lm.add(symbol)
 			self.add_symbol_label(symbol)
-			register(symbol)
+			
 
 	def add_symbol(self,symbol):
 
