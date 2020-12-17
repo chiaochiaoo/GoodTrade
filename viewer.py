@@ -223,7 +223,7 @@ class viewer:
 	def __init__(self, root=None):
 
 		self.listening = ttk.LabelFrame(root,text="Listener") 
-		self.listening.place(relx=0.05,rely=0.05,relheight=0.4,relwidth=.9)
+		self.listening.place(relx=0.41,rely=0.05,relheight=1,relwidth=0.6)
 
 		self.tabControl = ttk.Notebook(self.listening) 
 
@@ -248,7 +248,7 @@ class viewer:
 		#add a new symbol.
 		#symbol list.
 		self.Entry1 = tk.Entry(self.tab1)
-		self.Entry1.place(relx=0.005, rely=0.05, relheight=0.08, relwidth=0.1, bordermode='ignore')
+		self.Entry1.place(relx=0.005, rely=0.025, height=30, width=80, bordermode='ignore')
 		self.Entry1.configure(background="white")
 		self.Entry1.configure(cursor="fleur")
 		self.Entry1.configure(disabledforeground="#a3a3a3")
@@ -258,7 +258,7 @@ class viewer:
 
 		self.symbol = tk.Button(self.tab1,command= lambda: self.add_symbol_reg_list(self.Entry1.get().upper())) #,command=self.loadsymbol
 		#self.Data = tk.Button(self.Labelframe1,command=lambda: self.test(2))
-		self.symbol.place(relx=0.12, rely=0.05, relheight=0.08, width=80, bordermode='ignore')
+		self.symbol.place(relx=0.12, rely=0.025, height=30, width=80, bordermode='ignore')
 		self.symbol.configure(activebackground="#ececec")
 		self.symbol.configure(activeforeground="#000000")
 		self.symbol.configure(background="#d9d9d9")
@@ -277,7 +277,7 @@ class viewer:
 		self.lm = list_manager()
 
 		self.tm = ttk.LabelFrame(self.tab1) 
-		self.tm.place(relx=0, rely=0.15, relheight=0.85, relwidth=1)
+		self.tm.place(relx=0, rely=0.08, relheight=0.85, relwidth=1)
 
 		self.tmcanvas = tk.Canvas(self.tm)
 		self.tmcanvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
@@ -322,7 +322,7 @@ class viewer:
 		#############################  SCANNER  ################################################
 
 		self.setting = ttk.LabelFrame(root,text="Settings") 
-		self.setting.place(relx=0.05, rely=0.45, relheight=0.55, relwidth=0.9)
+		self.setting.place(relx=0.05, rely=0.05, relheight=1, relwidth=0.35)
 
 		self.refresh = ttk.Button(self.setting,  
 			text ="Fetch Data",command=self.refresh).place(relx=0.8, rely=0.01, height=50, width=70)   
@@ -362,7 +362,7 @@ class viewer:
 
 		self.tab = ttk.LabelFrame(self.setting,text="Scanner") 
 
-		self.tab.place(relx=0, rely=0.15, relheight=0.85, relwidth=1)
+		self.tab.place(relx=0, rely=0.12, relheight=0.85, relwidth=1)
 
 		self.mycanvas = tk.Canvas(self.tab)
 		self.mycanvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
@@ -688,9 +688,9 @@ class symbol_manager:
 
 root = tk.Tk() 
 root.title("GoodTrade") 
-root.geometry("500x700")
-root.minsize(800, 700)
-root.maxsize(1500, 800)
+root.geometry("1400x700")
+root.minsize(1200, 600)
+root.maxsize(3000, 1500)
 view = viewer(root)
 
 sm = symbol_manager(view)
