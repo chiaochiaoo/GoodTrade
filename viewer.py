@@ -6,6 +6,30 @@ import numpy as np
 from os import path
 import os 
 import time
+import threading
+
+def getinfo(symbol):
+    p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
+    r= requests.get(p,allow_redirects=False,stream=True)
+    
+    p="http://localhost:8080/GetLv1?symbol="+symbol
+    r= requests.get(p,allow_redirects=False,stream=True)
+    time=find_between(r.text, "MarketTime=", " ")[:-3]
+    price=find_between(r.text, "BidPrice=", " ")
+
+    # p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
+    # r= requests.get(p,allow_redirects=False,stream=True)
+
+    return time,price
+
+
+def find_between(data, first, last):
+    try:
+        start = data.index(first) + len(first)
+        end = data.index(last, start)
+        return data[start:end]
+    except ValueError:
+        return data
 
 class list_manager:	
 
@@ -508,6 +532,95 @@ class viewer:
 	  	# stock_list2.to_csv("NASDAQ_stock_own.csv")
 
 
+#a seperate thread on its own. 
+class symbol_manager:
+
+	#A big manager. Who has access to all the corresponding grids in the labels. 
+	#update each symbols per, 39 seconds? 
+
+
+	#run every ten seconds. 
+	def __init__(self,v: viewer):
+		#need to track. 1 min range/ volume. 5 min range/volume.
+
+		#self.depositLabel['text'] = 'change the value'
+		#fetch this 
+		self.price_list = []
+		self.volume_list = []
+
+		self.symbols = v.tickers
+		self.symbols_labels = v.tickers_labels
+		self.symbols_index = v.ticker_index
+
+		#time
+		self.last_update = {}
+		self.last_price = {}
+
+		# self.price = 0
+		# self.volume = 
+		self.open = {}
+		self.high = {}
+		self.low = {}
+
+		self.open_high = 0
+		self.high_low = 0
+		self.open_low = 0
+
+		self.count = 0
+
+		self.init_info()
+
+
+		#repeat this every 5 seconds.
+
+
+	def init_info(self):
+		info = ["Connecting","/","/","/","/"]
+		for i in range(len(self.symbols_labels)):
+			for j in range(1,len(self.symbols_labels[i])-1):
+				self.symbols_labels[i][j]["text"]= info[j-1]
+
+	def add_symbol():
+		return True 
+	def delete_symbol():
+		return True
+	
+	def start(self):
+
+		print("Console (PT): Thread created, ready to start")
+		t1 = threading.Thread(target=self.update_info, daemon=True)
+		t1.start()
+		print("Console (PT): Thread running. Continue:")
+
+	def update_info(self):
+		#fetch every 1 minute. ?
+		#better do all together. 
+
+		while True:
+			print("symbols:",self.symbols)
+			self.count+=1
+			for i in range(len(self.symbols_labels)):
+				for j in range(1,len(self.symbols_labels[i])-1):
+
+					status = self.symbols_labels[i][1]
+					timestamp = self.symbols_labels[i][2]
+					price = self.symbols_labels[i][3]
+					#self.symbols_labels[i][j]["text"]= self.count
+					
+					#self.update_symbol(self.symbols[i],status,timestamp,price)
+					fetch = threading.Thread(target=self.update_symbol, args=(self.symbols[i],status,timestamp,price,), daemon=True)
+					fetch.start()
+			time.sleep(2)
+
+
+	#a single thread 
+	def update_symbol(self,symbol,status,timestamp,price):
+
+		#get the info. and, update!!!
+
+		time,price = getinfo(symbol)
+		#status["text"],timestamp["text"],price["text"]= self.count,self.count,self.count
+		status["text"],timestamp["text"],price["text"]= "connected",time,price
 
 
 # test = ["SPY.AM","QQQ.NQ"]
@@ -519,11 +632,13 @@ class viewer:
 
 
 root = tk.Tk() 
-root.title("Stocks Scanner") 
+root.title("GoodTrade") 
 root.geometry("500x700")
 root.minsize(800, 700)
 root.maxsize(1500, 800)
 view = viewer(root)
 
+sm = symbol_manager(view)
+sm.start()
 
 root.mainloop()
