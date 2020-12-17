@@ -7,6 +7,7 @@ from os import path
 import os 
 import time
 import threading
+import requests 
 
 def getinfo(symbol):
     p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
