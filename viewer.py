@@ -11,20 +11,20 @@ import requests
 
 def getinfo(symbol):
 	try:
-	    p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
-	    r= requests.get(p,allow_redirects=False,stream=True)
-	    
-	    p="http://localhost:8080/GetLv1?symbol="+symbol
-	    r= requests.get(p,allow_redirects=False,stream=True)
+		p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
+		r= requests.get(p,allow_redirects=False,stream=True)
 
-	    time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
-	    price=find_between(r.text, "MidPrice=\"", "\"")
-	    print(time,price)
-    	return "Connected",time,price
+		p="http://localhost:8080/GetLv1?symbol="+symbol
+		r= requests.get(p,allow_redirects=False,stream=True)
+
+		time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
+		price=find_between(r.text, "MidPrice=\"", "\"")
+		print(time,price)
+		return "Connected",time,price
     # p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
     # r= requests.get(p,allow_redirects=False,stream=True)
-    except:
-    	return "Disconnected","",""
+	except:
+		return "Disconnected","",""
 
 
 
@@ -626,21 +626,21 @@ class symbol_manager:
 	def update_symbol(self,symbol,status,timestamp,price):
 
 		#get the info. and, update!!!
+		if symbol not in self.lock:
+			 self.lock[symbol] = False
 		if self.lock[symbol]==False:
 			self.lock[symbol] = True
 
 			stat,time,midprice = getinfo(symbol)
 			#status["text"],timestamp["text"],price["text"]= self.count,self.count,self.count
 			if stat =="Connected":
-				status["color"] = "green"
+				status["background"] = "green"
 				status["text"],timestamp["text"],price["text"]= "connected",time,midprice
 			else:
-				status["color"] = "red"
+				status["background"] = "red"
 				status["text"] = "Disconnected"
 
 			self.lock[symbol] = False
-		else:
-			print("symbol already requested. Pass.")
 
 
 
