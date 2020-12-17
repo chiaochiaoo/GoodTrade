@@ -21,7 +21,7 @@ def getinfo(symbol):
 		Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
 		Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
 		#print(time,price)
-		return "Connected",time,round((Bidprice+Askprice)/2,3)
+		return "Connected",time,round((Bidprice+Askprice)/2,4)
     # p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
     # r= requests.get(p,allow_redirects=False,stream=True)
 	except:
@@ -606,7 +606,7 @@ class symbol_manager:
 		#better do all together. 
 
 		while True:
-			print("symbols:",self.symbols)
+			#print("symbols:",self.symbols)
 			self.count+=1
 			for i in range(len(self.symbols_labels)):
 				for j in range(1,len(self.symbols_labels[i])-1):
@@ -636,12 +636,14 @@ class symbol_manager:
 
 			#I need to make sure that label still exist. 
 			#status["text"],timestamp["text"],price["text"]= self.count,self.count,self.count
-			if stat =="Connected":
-				status["background"] = "#83FF33"
-				status["text"],timestamp["text"],price["text"]= "connected",time,midprice
-			else:
-				status["background"] = "red"
-				status["text"] = "Disconnected"
+
+			if symbol in self.symbols:
+				if stat =="Connected":
+					status["background"] = "#83FF33"
+					status["text"],timestamp["text"],price["text"]= "connected",time,midprice
+				else:
+					status["background"] = "red"
+					status["text"] = "Disconnected"
 
 			self.lock[symbol] = False
 
