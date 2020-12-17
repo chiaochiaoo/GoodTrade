@@ -17,7 +17,7 @@ def register(symbol):
 		p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
 		r= requests.get(p)
 		reg_count+=1
-		print(symbol,"register",total:reg_count)
+		print(symbol,"registerd ","total:",reg_count)
 		return True
 	except Exception as e:
 		print(e)
@@ -29,7 +29,7 @@ def deregister(symbol):
 		p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
 		r= requests.get(p)
 		reg_count-=1
-		print(symbol,"deregister",total:reg_count)
+		print(symbol,"deregister","total:",reg_count)
 		return True
 	except Exception as e:
 		print(e)
