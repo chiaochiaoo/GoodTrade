@@ -21,7 +21,7 @@ def getinfo(symbol):
 		Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
 		Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
 		#print(time,price)
-		return "Connected",time,(Bidprice+Askprice)/2
+		return "Connected",time,round((Bidprice+Askprice)/2,3)
     # p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
     # r= requests.get(p,allow_redirects=False,stream=True)
 	except:
