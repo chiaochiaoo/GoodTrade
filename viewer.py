@@ -9,13 +9,36 @@ import time
 import threading
 import requests 
 
-def getinfo(symbol):
+reg_count = 0
+
+def register(symbol):
+	global reg_count
 	try:
 		p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
-		r= requests.get(p,allow_redirects=False,stream=True)
+		r= requests.get(p)
+		reg_count+=1
+		print(symbol,"register",total:reg_count)
+		return True
+	except Exception as e:
+		print(e)
+		return False
 
+def deregister(symbol):
+	global reg_count
+	try:
+		p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
+		r= requests.get(p)
+		reg_count-=1
+		print(symbol,"deregister",total:reg_count)
+		return True
+	except Exception as e:
+		print(e)
+		return False
+
+def getinfo(symbol):
+	try:
 		p="http://localhost:8080/GetLv1?symbol="+symbol
-		r= requests.get(p,allow_redirects=False,stream=True)
+		r= requests.get(p)
 
 		time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
 		Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
@@ -122,6 +145,8 @@ class viewer:
 
 
 			self.ticker_count -= 1
+
+			deregister(symbol)
 			print("index",index)
 			print("ticker",len(self.tickers))
 			print("labels",len(self.tickers_labels))
@@ -182,6 +207,7 @@ class viewer:
 
 			self.lm.add(symbol)
 			self.add_symbol_label(symbol)
+			register(symbol)
 
 	def add_symbol(self,symbol):
 
