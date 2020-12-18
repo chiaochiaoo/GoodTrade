@@ -206,7 +206,8 @@ class ticker_manager(pannel):
 			self.ticker_count -= 1
 			self.ticker_stats["text"] = "Current Registered Tickers: "+str(self.ticker_count)
 
-			deregister(symbol)
+			dereg = threading.Thread(target=deregister,args=(symbol,), daemon=True)
+			dereg.start()
 			print("index",index)
 			print("ticker",len(self.tickers))
 			print("labels",len(self.tickers_labels))
@@ -226,7 +227,10 @@ class ticker_manager(pannel):
 
 		width = [8,10,12,10,10,12,10,10]
 		info = [symbol,"Connecting","","","","",""]
-		register(symbol)
+
+		reg = threading.Thread(target=register,args=(symbol,), daemon=True)
+		reg.start()
+
 		self.tickers_labels.append([])
 
 		#add in tickers.
