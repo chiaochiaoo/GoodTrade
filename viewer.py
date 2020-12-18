@@ -86,6 +86,56 @@ class pannel:
 		label.configure(highlightbackground="#d9d9d9")
 		label.configure(highlightcolor="black")
 
+	def find_between(data, first, last):
+	    try:
+	        start = data.index(first) + len(first)
+	        end = data.index(last, start)
+	        return data[start:end]
+	    except ValueError:
+	        return data
+
+	def register(symbol):
+		global reg_count
+		try:
+			p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
+			r= requests.get(p)
+			reg_count+=1
+			print(symbol,"registerd ","total:",reg_count)
+			return True
+		except Exception as e:
+			print(e)
+			return False
+
+	def deregister(symbol):
+		global reg_count
+		try:
+			p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
+			r= requests.get(p)
+			reg_count-=1
+			print(symbol,"deregister","total:",reg_count)
+			return True
+		except Exception as e:
+			print(e)
+			return False
+
+	def getinfo(symbol):
+		try:
+			p="http://localhost:8080/GetLv1?symbol="+symbol
+			r= requests.get(p)
+			if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
+				print("No symbol found")
+				return "Unfound","time",""
+			time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
+			Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
+			Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
+			#print(time,price)
+			return "Connected",time,round((Bidprice+Askprice)/2,4)
+	    # p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
+	    # r= requests.get(p,allow_redirects=False,stream=True)
+		except Exception as e:
+			print(e)
+			return "Disconnected","",""
+
 class ticker_manager(pannel):
 	def __init__(self,frame):
 
@@ -204,7 +254,7 @@ class ticker_manager(pannel):
 			self.ticker_count -= 1
 			self.ticker_stats["text"] = "Current Registered Tickers: "+str(self.ticker_count)
 
-			deregister(symbol)
+			super().deregister(symbol)
 			print("index",index)
 			print("ticker",len(self.tickers))
 			print("labels",len(self.tickers_labels))
@@ -224,7 +274,7 @@ class ticker_manager(pannel):
 
 		width = [8,10,12,10,10,12,10,10]
 		info = [symbol,"Connecting","","","","",""]
-		register(symbol)
+		super().register(symbol)
 		self.tickers_labels.append([])
 
 		#add in tickers.
@@ -699,57 +749,7 @@ class highlow:
 # np.savetxt('list.txt',test, delimiter=",", fmt="%s")  
 
 reg_count = 0
-def find_between(data, first, last):
-    try:
-        start = data.index(first) + len(first)
-        end = data.index(last, start)
-        return data[start:end]
-    except ValueError:
-        return data
 
-def register(symbol):
-	return True
-	global reg_count
-	try:
-		p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
-		r= requests.get(p)
-		reg_count+=1
-		print(symbol,"registerd ","total:",reg_count)
-		return True
-	except Exception as e:
-		print(e)
-		return False
-
-def deregister(symbol):
-	return True
-	global reg_count
-	try:
-		p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
-		r= requests.get(p)
-		reg_count-=1
-		print(symbol,"deregister","total:",reg_count)
-		return True
-	except Exception as e:
-		print(e)
-		return False
-
-def getinfo(symbol):
-	try:
-		p="http://localhost:8080/GetLv1?symbol="+symbol
-		r= requests.get(p)
-		if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
-			print("No symbol found")
-			return "Unfound","time",""
-		time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
-		Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
-		Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
-		#print(time,price)
-		return "Connected",time,round((Bidprice+Askprice)/2,4)
-    # p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
-    # r= requests.get(p,allow_redirects=False,stream=True)
-	except Exception as e:
-		print(e)
-		return "Disconnected","",""
 
 root = tk.Tk() 
 root.title("GoodTrade") 
