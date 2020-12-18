@@ -1,6 +1,10 @@
 import tkinter as tk                     
 from tkinter import ttk 
-from finviz.screener import Screener
+try:
+    from finviz.screener import Screener
+except ImportError:
+    pip.main(['install', 'finviz'])
+    from finviz.screener import Screener
 import pandas as pd
 import numpy as np
 from os import path
