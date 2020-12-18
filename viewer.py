@@ -9,59 +9,25 @@ import time
 import threading
 import requests 
 
-reg_count = 0
 
-def register(symbol):
-	return True
-	global reg_count
-	try:
-		p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
-		r= requests.get(p)
-		reg_count+=1
-		print(symbol,"registerd ","total:",reg_count)
-		return True
-	except Exception as e:
-		print(e)
-		return False
+#Symbol="AAPL.NQ"
+# BidPrice="128.710" 
+# AskPrice="128.720" 
+# BidSize="3460" 
+# AskSize="400" 
+# Volume="60354388" 
+# MinPrice="127.810" 
+# MaxPrice="129.580" 
+# LowPrice="127.810" 
+# HighPrice="129.580" 
+# FirstPrice="128.900" 
+# OpenPrice="128.900" 
+# ClosePrice="127.810" 
 
-def deregister(symbol):
-	return True
-	global reg_count
-	try:
-		p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
-		r= requests.get(p)
-		reg_count-=1
-		print(symbol,"deregister","total:",reg_count)
-		return True
-	except Exception as e:
-		print(e)
-		return False
-
-def getinfo(symbol):
-	try:
-		p="http://localhost:8080/GetLv1?symbol="+symbol
-		r= requests.get(p)
-
-		time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
-		Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
-		Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
-		#print(time,price)
-		return "Connected",time,round((Bidprice+Askprice)/2,4)
-    # p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
-    # r= requests.get(p,allow_redirects=False,stream=True)
-	except Exception as e:
-		print(e)
-		return "Disconnected","",""
-
-
-
-def find_between(data, first, last):
-    try:
-        start = data.index(first) + len(first)
-        end = data.index(last, start)
-        return data[start:end]
-    except ValueError:
-        return data
+# MaxPermittedPrice="0" 
+# MinPermittedPrice="0" 
+# LotSize="10" 
+# LastPrice="128.789"
 
 class list_manager:	
 
@@ -99,13 +65,100 @@ class list_manager:
 	def get_count(self):
 		return len(self.list)
 
-class viewer:
+class pannel:
+	def rebind(self,canvas,frame):
+		# self.scanner_canvas.update_idletasks()
+		# self.scanner_canvas.config(scrollregion=self.tab2.bbox())
+
+		canvas.update_idletasks()
+		canvas.config(scrollregion=frame.bbox()) 
+	def label_default_configure(self,label):
+		label.configure(activebackground="#f9f9f9")
+		label.configure(activeforeground="black")
+		label.configure(background="#d9d9d9")
+		label.configure(disabledforeground="#a3a3a3")
+		label.configure(relief="ridge")
+		label.configure(foreground="#000000")
+		label.configure(highlightbackground="#d9d9d9")
+		label.configure(highlightcolor="black")
+
+class ticker_manager(pannel):
+	def __init__(self,frame):
+
+		self.Entry1 = tk.Entry(frame)
+		self.Entry1.place(x=5, y=5, height=30, width=80, bordermode='ignore')
+		self.Entry1.configure(background="white")
+		self.Entry1.configure(cursor="fleur")
+		self.Entry1.configure(disabledforeground="#a3a3a3")
+		self.Entry1.configure(font="TkFixedFont")
+		self.Entry1.configure(foreground="#000000")
+		self.Entry1.configure(insertbackground="black")
+
+		self.symbol = tk.Button(frame,command= lambda: self.add_symbol_reg_list(self.Entry1.get().upper())) #,command=self.loadsymbol
+		#self.Data = tk.Button(self.Labelframe1,command=lambda: self.test(2))
+		self.symbol.place(x=105, y=5, height=30, width=80, bordermode='ignore')
+		self.symbol.configure(activebackground="#ececec")
+		self.symbol.configure(activeforeground="#000000")
+		self.symbol.configure(background="#d9d9d9")
+		self.symbol.configure(disabledforeground="#a3a3a3")
+		self.symbol.configure(foreground="#000000")
+		self.symbol.configure(highlightbackground="#d9d9d9")
+		self.symbol.configure(highlightcolor="black")
+		self.symbol.configure(pady="0")
+		self.symbol.configure(text='''Add Symbol''')
 
 
-	#only run the first time.
+		self.tickers = []
+		self.tickers_labels = []
+		self.ticker_count = 0
+		self.ticker_index = {}
+
+		self.ticker_stats = ttk.Label(frame, text="Current Registered Tickers: "+str(self.ticker_count))
+		self.ticker_stats.place(x = 200, y =12)
+
+		#############Registration Window ####################
+
+		self.lm = list_manager()
+
+		self.tm = ttk.LabelFrame(frame) 
+		self.tm.place(x=0, y=40, relheight=0.85, relwidth=1)
+
+		self.tmcanvas = tk.Canvas(self.tm)
+		self.tmcanvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
+
+		self.scroll2 = tk.Scrollbar(self.tm)
+		self.scroll2.config(orient=tk.VERTICAL, command=self.tmcanvas.yview)
+		self.scroll2.pack(side=tk.RIGHT,fill="y")
+
+		self.tmcanvas.configure(yscrollcommand=self.scroll2.set)
+		#self.scanner_canvas.bind('<Configure>', lambda e: self.scanner_canvas.configure(scrollregion = self.scanner_canvas.bbox('all')))
+
+		self.tmframe = tk.Frame(self.tmcanvas)
+		self.tmframe.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
+
+		self.tmcanvas.create_window(0, 0, window=self.tmframe, anchor=tk.NW)
+
+		width = [8,10,12,10,10,12,10,10]
+		labels = ["Ticker","Status","Last update","Price","Last Alert","Last Alert time","Remove"]
+
+
+
+		#init the labels. 
+		for i in range(len(labels)): #Rows
+			self.b = tk.Button(self.tmframe, text=labels[i],width=width[i])#command=self.rank
+			self.b.configure(activebackground="#f9f9f9")
+			self.b.configure(activeforeground="black")
+			self.b.configure(background="#d9d9d9")
+			self.b.configure(disabledforeground="#a3a3a3")
+			self.b.configure(relief="ridge")
+			self.b.configure(foreground="#000000")
+			self.b.configure(highlightbackground="#d9d9d9")
+			self.b.configure(highlightcolor="black")
+			self.b.grid(row=1, column=i)
+
+		self.init_reg_list()
 	def init_reg_list(self):
 
-		
 		#current_count = self.ticker_count
 		#self.ticker_count = self.lm.get_count()
 		#self.tickers_labels = []
@@ -118,9 +171,7 @@ class viewer:
 			self.add_symbol_label(ticks[i])
 
 		self.tickers = self.lm.get_list()
-		self.rebind_lm()
-		#print(self.ticker_index)
-
+		super().rebind(self.tmcanvas,self.tmframe)
 
 	def delete_symbol_reg_list(self,symbol):
 
@@ -147,6 +198,7 @@ class viewer:
 
 
 			self.ticker_count -= 1
+			self.ticker_stats["text"] = "Current Registered Tickers: "+str(self.ticker_count)
 
 			deregister(symbol)
 			print("index",index)
@@ -160,45 +212,33 @@ class viewer:
 
 		return True
 
-	###Checking: 1. Symbol exist. 2. Symbol repeat. 
 
 	def add_symbol_label(self,symbol):
 
 		self.ticker_index[symbol] = self.ticker_count 
-
 		i = self.ticker_count
 
 		width = [8,10,12,10,10,12,10,10]
 		info = [symbol,"Connecting","","","","",""]
 		register(symbol)
 		self.tickers_labels.append([])
+
+		#add in tickers.
 		for j in range(len(info)):
 			if j != (len(info)-1):
 				self.tickers_labels[i].append(tk.Label(self.tmframe ,text=info[j],width=width[j]))
-				self.tickers_labels[i][j].configure(activebackground="#f9f9f9")
-				self.tickers_labels[i][j].configure(activeforeground="black")
-				self.tickers_labels[i][j].configure(background="#d9d9d9")
-				self.tickers_labels[i][j].configure(disabledforeground="#a3a3a3")
-				self.tickers_labels[i][j].configure(relief="ridge")
-				self.tickers_labels[i][j].configure(foreground="#000000")
-				self.tickers_labels[i][j].configure(highlightbackground="#d9d9d9")
-				self.tickers_labels[i][j].configure(highlightcolor="black")
+				super().label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= i+2, column=j,padx=0)
 			else:
 				self.tickers_labels[i].append(tk.Button(self.tmframe ,text=info[j],width=width[j],command = lambda s=symbol: self.delete_symbol_reg_list(s)))
-				self.tickers_labels[i][j].configure(activebackground="#f9f9f9")
-				self.tickers_labels[i][j].configure(activeforeground="black")
-				self.tickers_labels[i][j].configure(background="#d9d9d9")
-				self.tickers_labels[i][j].configure(disabledforeground="#a3a3a3")
-				self.tickers_labels[i][j].configure(relief="ridge")
-				self.tickers_labels[i][j].configure(foreground="#000000")
-				self.tickers_labels[i][j].configure(highlightbackground="#d9d9d9")
-				self.tickers_labels[i][j].configure(highlightcolor="black")
+				super().label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= i+2, column=j,padx=0)
 
 		self.ticker_count +=1
 
-		self.rebind_lm()
+		self.ticker_stats["text"] = "Current Registered Tickers: "+str(self.ticker_count)
+
+		self.rebind(self.tmcanvas,self.tmframe)
 		#print(self.ticker_index)
 
 		#print(self.tickers)
@@ -209,120 +249,15 @@ class viewer:
 
 			self.lm.add(symbol)
 			self.add_symbol_label(symbol)
-			
 
-	def add_symbol(self,symbol):
+class scanner(pannel):
 
-		#1. add it to our lm. 
-		#2. add it to our list. 
-		#3. refresh_display? 
-		return True
+	def __init__(self,root,tickers_manager):
 
-
-
-	def __init__(self, root=None):
-
-		self.listening = ttk.LabelFrame(root,text="Listener") 
-		self.listening.place(relx=0.41,rely=0.05,relheight=1,relwidth=0.6)
-
-		self.tabControl = ttk.Notebook(self.listening) 
-
-		self.tab1 = tk.Canvas(self.tabControl) 
-		self.tab2 = tk.Canvas(self.tabControl) 
-		self.tab3 = tk.Canvas(self.tabControl)
-		self.tab4 = tk.Canvas(self.tabControl) 
-		self.tab5 = tk.Canvas(self.tabControl)
-		self.tab6 = tk.Canvas(self.tabControl)
-		self.tab7 = tk.Canvas(self.tabControl)
-
-		self.tabControl.add(self.tab1, text ='Tickers Management') 
-		self.tabControl.add(self.tab2, text ='Extreme Range') 
-		self.tabControl.add(self.tab3, text ='Extreme Volume') 
-		self.tabControl.add(self.tab4, text ='First five minutes')
-		self.tabControl.add(self.tab5, text ='High-Low')
-		self.tabControl.add(self.tab6, text ='Open-High')
-		self.tabControl.add(self.tab7, text ='Open-Low')
-		self.tabControl.pack(expand = 1, fill ="both") 
-
-		#Ticker Management.
-		#add a new symbol.
-		#symbol list.
-		self.Entry1 = tk.Entry(self.tab1)
-		self.Entry1.place(relx=0.005, rely=0.025, height=30, width=80, bordermode='ignore')
-		self.Entry1.configure(background="white")
-		self.Entry1.configure(cursor="fleur")
-		self.Entry1.configure(disabledforeground="#a3a3a3")
-		self.Entry1.configure(font="TkFixedFont")
-		self.Entry1.configure(foreground="#000000")
-		self.Entry1.configure(insertbackground="black")
-
-		self.symbol = tk.Button(self.tab1,command= lambda: self.add_symbol_reg_list(self.Entry1.get().upper())) #,command=self.loadsymbol
-		#self.Data = tk.Button(self.Labelframe1,command=lambda: self.test(2))
-		self.symbol.place(relx=0.12, rely=0.025, height=30, width=80, bordermode='ignore')
-		self.symbol.configure(activebackground="#ececec")
-		self.symbol.configure(activeforeground="#000000")
-		self.symbol.configure(background="#d9d9d9")
-		self.symbol.configure(disabledforeground="#a3a3a3")
-		self.symbol.configure(foreground="#000000")
-		self.symbol.configure(highlightbackground="#d9d9d9")
-		self.symbol.configure(highlightcolor="black")
-		self.symbol.configure(pady="0")
-		self.symbol.configure(text='''Add Symbol''')
-
-
-
-		#############Registration Window ####################
-
-		self.lock = False
-		self.lm = list_manager()
-
-		self.tm = ttk.LabelFrame(self.tab1) 
-		self.tm.place(relx=0, rely=0.08, relheight=0.85, relwidth=1)
-
-		self.tmcanvas = tk.Canvas(self.tm)
-		self.tmcanvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
-
-		self.scroll2 = tk.Scrollbar(self.tm)
-		self.scroll2.config(orient=tk.VERTICAL, command=self.tmcanvas.yview)
-		self.scroll2.pack(side=tk.RIGHT,fill="y")
-
-		self.tmcanvas.configure(yscrollcommand=self.scroll2.set)
-		#self.mycanvas.bind('<Configure>', lambda e: self.mycanvas.configure(scrollregion = self.mycanvas.bbox('all')))
-
-		self.tmframe = tk.Frame(self.tmcanvas)
-		self.tmframe.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
-
-		self.tmcanvas.create_window(0, 0, window=self.tmframe, anchor=tk.NW)
-
-		width = [8,10,12,10,10,12,10,10]
-		labels = ["Ticker","Status","Last update","Price","Last Alert","Last Alert time","Remove"]
-
-		self.tickers = []
-		self.tickers_labels = []
-		self.ticker_count = 0
-		self.ticker_index = {}
-
-		#init the labels. 
-		for i in range(len(labels)): #Rows
-			self.b = tk.Button(self.tmframe, text=labels[i],width=width[i])#command=self.rank
-			self.b.configure(activebackground="#f9f9f9")
-			self.b.configure(activeforeground="black")
-			self.b.configure(background="#d9d9d9")
-			self.b.configure(disabledforeground="#a3a3a3")
-			self.b.configure(relief="ridge")
-			self.b.configure(foreground="#000000")
-			self.b.configure(highlightbackground="#d9d9d9")
-			self.b.configure(highlightcolor="black")
-			self.b.grid(row=1, column=i)
-
-		self.init_reg_list()
-
-
-
-		#############################  SCANNER  ################################################
+		self.tickers_manager = tickers_manager
 
 		self.setting = ttk.LabelFrame(root,text="Settings") 
-		self.setting.place(relx=0.05, rely=0.05, relheight=1, relwidth=0.35)
+		self.setting.place(relx=0.01, rely=0.05, relheight=1, width=480)
 
 		self.refresh = ttk.Button(self.setting,  
 			text ="Fetch Data",command=self.refresh).place(relx=0.8, rely=0.01, height=50, width=70)   
@@ -362,22 +297,22 @@ class viewer:
 
 		self.tab = ttk.LabelFrame(self.setting,text="Scanner") 
 
-		self.tab.place(relx=0, rely=0.12, relheight=0.85, relwidth=1)
+		self.tab.place(x=0, y=60, relheight=0.85, relwidth=1)
 
-		self.mycanvas = tk.Canvas(self.tab)
-		self.mycanvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
+		self.scanner_canvas = tk.Canvas(self.tab)
+		self.scanner_canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
 
 		self.scroll = tk.Scrollbar(self.tab)
-		self.scroll.config(orient=tk.VERTICAL, command=self.mycanvas.yview)
+		self.scroll.config(orient=tk.VERTICAL, command=self.scanner_canvas.yview)
 		self.scroll.pack(side=tk.RIGHT,fill="y")
 
-		self.mycanvas.configure(yscrollcommand=self.scroll.set)
-		#self.mycanvas.bind('<Configure>', lambda e: self.mycanvas.configure(scrollregion = self.mycanvas.bbox('all')))
+		self.scanner_canvas.configure(yscrollcommand=self.scroll.set)
+		#self.scanner_canvas.bind('<Configure>', lambda e: self.scanner_canvas.configure(scrollregion = self.scanner_canvas.bbox('all')))
 
-		self.tab2 = tk.Frame(self.mycanvas)
-		self.tab2.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
+		self.scanner_frame = tk.Frame(self.scanner_canvas)
+		self.scanner_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
 
-		self.mycanvas.create_window(0, 0, window=self.tab2, anchor=tk.NW)
+		self.scanner_canvas.create_window(0, 0, window=self.scanner_frame, anchor=tk.NW)
 
 		labels = ["Symbol","Rel.V","Price","Change","Perf Week","MCap","Inst own",\
 		"Inst tran","Insi own","Insi tran","Short float","Short Ratio","Prem Low","Prem high","Prem Avg","Status"]
@@ -389,7 +324,7 @@ class viewer:
 		self.info = []
 
 		for i in range(len(labels)): #Rows
-			self.b = tk.Button(self.tab2, text=labels[i],width=width[i])#,command=self.rank
+			self.b = tk.Button(self.scanner_frame, text=labels[i],width=width[i])#,command=self.rank
 			self.b.configure(activebackground="#f9f9f9")
 			self.b.configure(activeforeground="black")
 			self.b.configure(background="#d9d9d9")
@@ -400,14 +335,7 @@ class viewer:
 			self.b.configure(highlightcolor="black")
 			self.b.grid(row=1, column=i)
 
-
-	def rebind(self):
-		self.mycanvas.update_idletasks()
-		self.mycanvas.config(scrollregion=self.tab2.bbox())
-
-	def rebind_lm(self):
-		self.tmcanvas.update_idletasks()
-		self.tmcanvas.config(scrollregion=self.tmframe.bbox())
+		super().rebind(self.scanner_canvas,self.scanner_frame)
 
 
 	def market_suffix(self):
@@ -431,7 +359,6 @@ class viewer:
 
 		#d= readstocks()
 		#read the corresponding list. 
-
 		width = [8,12,10,6,10,10]
 		labels = ["Ticker","Cur.V","Avg.V","Rel.V","%"+"since close","Add to list"]
 		#append it to the view.
@@ -444,8 +371,6 @@ class viewer:
 
 		suffix = self.market_suffix()
 
-
-
 		for i in range(len(d)):
 			#info = [d.iloc[i]["Ticker"],d.iloc[i]["Volume"],d.iloc[i]["Avg Volume"],d.iloc[i]["Rel Volume"],\d.iloc[i]["Change"],"","","",""]
 			info = [d[i]["Ticker"],d[i]["Volume"],d[i]["Avg Volume"],d[i]["Rel Volume"],\
@@ -453,49 +378,25 @@ class viewer:
 			self.info.append([])
 			for j in range(len(labels)):
 				if j!= len(labels)-1:
-					self.info[i].append(tk.Label(self.tab2 ,text=info[j],width=width[j]))
-					self.info[i][j].configure(activebackground="#f9f9f9")
-					self.info[i][j].configure(activeforeground="black")
-					self.info[i][j].configure(background="#d9d9d9")
-					self.info[i][j].configure(disabledforeground="#a3a3a3")
-					self.info[i][j].configure(relief="ridge")
-					self.info[i][j].configure(foreground="#000000")
-					self.info[i][j].configure(highlightbackground="#d9d9d9")
-					self.info[i][j].configure(highlightcolor="black")
+					self.info[i].append(tk.Label(self.scanner_frame ,text=info[j],width=width[j]))
+					self.label_default_configure(self.info[i][j])
 					self.info[i][j].grid(row=i+2, column=j,padx=0)
 				else:
-					self.info[i].append(tk.Button(self.tab2 ,text=info[j],width=width[j],command= lambda k=i: self.add_symbol_reg_list(d[k]["Ticker"]+suffix)))
-					self.info[i][j].configure(activebackground="#f9f9f9")
-					self.info[i][j].configure(activeforeground="black")
-					self.info[i][j].configure(background="#d9d9d9")
-					self.info[i][j].configure(disabledforeground="#a3a3a3")
-					self.info[i][j].configure(relief="ridge")
-					self.info[i][j].configure(foreground="#000000")
-					self.info[i][j].configure(highlightbackground="#d9d9d9")
-					self.info[i][j].configure(highlightcolor="black")
+					self.info[i].append(tk.Button(self.scanner_frame ,text=info[j],width=width[j],command= lambda k=i: self.tickers_manager.add_symbol_reg_list(d[k]["Ticker"]+suffix)))
+					self.label_default_configure(self.info[i][j])
 					self.info[i][j].grid(row=i+2, column=j,padx=0)
 
-		self.rebind()
-		self.rebind_lm()
-
-
-					# labels = ["Symbol","Rel.V","Price","Change","Perf Week","MCap","Inst own",\
-		# "Inst tran","Insi own","Insi tran","Short float","Short Ratio","Prem Low","Prem high","Prem Avg","Status"]
-		# width = [8,6,6,6,8,8,8,8,8,8,10,10,10,10,10,10]
-
+		
+		super().rebind(self.scanner_canvas,self.scanner_frame)
 
 	def rank(self):
 		for i in range(len(self.info_nas)):
 			for j in range(len(self.info_nas[i])):
 				self.info_nas[i][j].grid(row=len(self.info_nas)-i+1, column=j,padx=0)
 
-
-
 	#add it to it .
 
-
 	def refreshstocks(self):
-
 
 		market = ''
 		cond = "sh_relvol_o"+self.relv.get()
@@ -566,16 +467,80 @@ class viewer:
 	  	# stock_list2 = Screener(filters=filters, table='Ownership', signal=signal) #,order='-relativevolume'
 	  	# stock_list2.to_csv("NASDAQ_stock_own.csv")
 
+class viewer:
+
+
+	def __init__(self, root=None):
+
+		self.listening = ttk.LabelFrame(root,text="Listener") 
+		self.listening.place(relx=0.41,rely=0.05,relheight=1,width=650)
+
+		self.tabControl = ttk.Notebook(self.listening) 
+		self.tab1 = tk.Canvas(self.tabControl) 
+		self.tab2 = tk.Canvas(self.tabControl) 
+		self.tab3 = tk.Canvas(self.tabControl)
+		self.tab4 = tk.Canvas(self.tabControl) 
+		self.tab5 = tk.Canvas(self.tabControl)
+		self.tab6 = tk.Canvas(self.tabControl)
+		self.tab7 = tk.Canvas(self.tabControl)
+
+		self.tabControl.add(self.tab1, text ='Tickers Management') 
+		self.tabControl.add(self.tab2, text ='Extreme Range') 
+		self.tabControl.add(self.tab3, text ='Extreme Volume') 
+		self.tabControl.add(self.tab4, text ='First five minutes')
+		self.tabControl.add(self.tab5, text ='High-Low')
+		self.tabControl.add(self.tab6, text ='Open-High')
+		self.tabControl.add(self.tab7, text ='Open-Low')
+		self.tabControl.pack(expand = 1, fill ="both") 
+
+		#self.ticker_management_init(self.tab1)
+
+		self.tm = ticker_manager(self.tab1)
+		
+		self.scanner_pannel = scanner(root,self.tm)
+		self.high_low_pannel = highlow(self.tab5)
+		self.Open_High_init(self.tab6)
+		self.Open_Low_init(self.tab7)
+
+
+		
+
+		sm = symbol_manager(self.tm)
+		sm.start()
+
+		#############################  SCANNER  ################################################
+
+
+	def High_Low_init(self,frame):
+
+		return True
+
+	def Open_High_init(self,frame):
+
+		return True
+
+	def Open_Low_init(self,frame):
+
+		return True
+
+
+
+
+
+					# labels = ["Symbol","Rel.V","Price","Change","Perf Week","MCap","Inst own",\
+		# "Inst tran","Insi own","Insi tran","Short float","Short Ratio","Prem Low","Prem high","Prem Avg","Status"]
+		# width = [8,6,6,6,8,8,8,8,8,8,10,10,10,10,10,10]
+
+
+
 
 #a seperate thread on its own. 
 class symbol_manager:
 
 	#A big manager. Who has access to all the corresponding grids in the labels. 
 	#update each symbols per, 39 seconds? 
-
-
 	#run every ten seconds. 
-	def __init__(self,v: viewer):
+	def __init__(self,v: ticker_manager):
 		#need to track. 1 min range/ volume. 5 min range/volume.
 
 		#self.depositLabel['text'] = 'change the value'
@@ -590,6 +555,15 @@ class symbol_manager:
 		#time
 		self.last_update = {}
 		self.last_price = {}
+
+
+		self.lowhigh_cur = {}
+		self.openhigh_cur = {}
+		self.openlow_cur = {}
+
+		self.lowhigh ={}
+		self.openlow ={}
+		self.openhigh = {}
 
 
 		self.lock = {}
@@ -608,10 +582,7 @@ class symbol_manager:
 
 		self.init_info()
 
-
 		#repeat this every 5 seconds.
-
-
 	def init_info(self):
 		info = ["Connecting","/","/","/","/"]
 		for i in range(len(self.symbols_labels)):
@@ -669,31 +640,118 @@ class symbol_manager:
 			if symbol in self.symbols:
 				if stat =="Connected":
 					status["background"] = "#83FF33"
-					status["text"],timestamp["text"],price["text"]= "connected",time,midprice
+					status["text"],timestamp["text"],price["text"]= stat,time,midprice
 				else:
 					status["background"] = "red"
-					status["text"] = "Disconnected"
+					status["text"] = stat
 
 			self.lock[symbol] = False
 
+class highlow:
 
+	def __init__(self,frame):
+
+		self.hlframe = ttk.LabelFrame(frame) 
+		self.hlframe.place(x=0, y=40, relheight=0.85, relwidth=1)
+
+		self.hlcanvas = tk.Canvas(self.hlframe)
+		self.hlcanvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
+
+		self.hlscroll = tk.Scrollbar(self.hlframe)
+		self.hlscroll.config(orient=tk.VERTICAL, command=self.hlcanvas.yview)
+		self.hlscroll.pack(side=tk.RIGHT,fill="y")
+
+		self.hlcanvas.configure(yscrollcommand=self.hlscroll.set)
+		#self.scanner_canvas.bind('<Configure>', lambda e: self.scanner_canvas.configure(scrollregion = self.scanner_canvas.bbox('all')))
+
+		self.hlframe_ = tk.Frame(self.hlcanvas)
+		self.hlframe_.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
+
+		self.hlcanvas.create_window(0, 0, window=self.hlframe_, anchor=tk.NW)
+
+		width = [8,10,12,10,10,12,10,10]
+		labels = ["Ticker","Status","Range","Average","Current"]
+
+		#init the labels. 
+		for i in range(len(labels)): #Rows
+			self.b = tk.Button(self.hlframe_, text=labels[i],width=width[i])#command=self.rank
+			self.b.configure(activebackground="#f9f9f9")
+			self.b.configure(activeforeground="black")
+			self.b.configure(background="#d9d9d9")
+			self.b.configure(disabledforeground="#a3a3a3")
+			self.b.configure(relief="ridge")
+			self.b.configure(foreground="#000000")
+			self.b.configure(highlightbackground="#d9d9d9")
+			self.b.configure(highlightcolor="black")
+			self.b.grid(row=1, column=i)
+
+	def add_symbol(self,symbol):
+		return True
+	def delete_symbol(self,symbol):
+		return True
 
 # test = ["SPY.AM","QQQ.NQ"]
 # test = np.array(test)
 # np.savetxt('list.txt',test, delimiter=",", fmt="%s")  
 
+reg_count = 0
+def find_between(data, first, last):
+    try:
+        start = data.index(first) + len(first)
+        end = data.index(last, start)
+        return data[start:end]
+    except ValueError:
+        return data
 
+def register(symbol):
+	return True
+	global reg_count
+	try:
+		p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
+		r= requests.get(p)
+		reg_count+=1
+		print(symbol,"registerd ","total:",reg_count)
+		return True
+	except Exception as e:
+		print(e)
+		return False
 
+def deregister(symbol):
+	return True
+	global reg_count
+	try:
+		p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
+		r= requests.get(p)
+		reg_count-=1
+		print(symbol,"deregister","total:",reg_count)
+		return True
+	except Exception as e:
+		print(e)
+		return False
 
+def getinfo(symbol):
+	try:
+		p="http://localhost:8080/GetLv1?symbol="+symbol
+		r= requests.get(p)
+		if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
+			print("No symbol found")
+			return "Unfound","time",""
+		time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
+		Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
+		Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
+		#print(time,price)
+		return "Connected",time,round((Bidprice+Askprice)/2,4)
+    # p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
+    # r= requests.get(p,allow_redirects=False,stream=True)
+	except Exception as e:
+		print(e)
+		return "Disconnected","",""
 
 root = tk.Tk() 
 root.title("GoodTrade") 
-root.geometry("1400x700")
-root.minsize(1200, 600)
+root.geometry("1200x700")
+root.minsize(1000, 600)
 root.maxsize(3000, 1500)
 view = viewer(root)
-
-sm = symbol_manager(view)
-sm.start()
 
 root.mainloop()
