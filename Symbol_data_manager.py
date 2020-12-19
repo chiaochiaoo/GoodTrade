@@ -126,6 +126,8 @@ class price_updater:
 		self.symbols = s.get_list()
 
 		self.data = s
+		self.lock = {}
+		self.count = 0
 
 		#Won't need these no more.
 		# self.symbols_labels = v.tickers_labels
@@ -143,7 +145,7 @@ class price_updater:
 		# self.openlow ={}
 		# self.openhigh = {}
 
-		# self.lock = {}
+		
 		# self.open = {}
 		# self.high = {}
 		# self.low = {}
@@ -152,7 +154,7 @@ class price_updater:
 		# self.high_low = 0
 		# self.open_low = 0
 
-		self.count = 0
+		
 
 		self.init_info()
 
