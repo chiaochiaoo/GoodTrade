@@ -2,6 +2,7 @@
 from tkinter import *
 import numpy as np
 from os import path
+import threading
 #Symbol="AAPL.NQ"
 # BidPrice="128.710" 
 # AskPrice="128.720" 
@@ -70,11 +71,17 @@ class Symbol_data_manager:
 		self.symbols.append(symbol)
 		self.save()
 
+		reg = threading.Thread(target=register,args=(symbol,), daemon=True)
+		reg.start()
+
 
 	def delete(self,symbol):
 		if symbol in self.symbols:
 			self.symbols.remove(symbol)
 		self.save()
+
+		dereg = threading.Thread(target=deregister,args=(symbol,), daemon=True)
+		dereg.start()
 
 	def save(self):
 		np.savetxt('list.txt',self.symbols, delimiter=",", fmt="%s")   
@@ -83,3 +90,29 @@ class Symbol_data_manager:
 
 	def get_count(self):
 		return len(self.symbols)
+
+
+
+def register(symbol):
+	global reg_count
+	try:
+		p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
+		r= requests.get(p)
+		reg_count+=1
+		print(symbol,"registerd ","total:",reg_count)
+		return True
+	except Exception as e:
+		print(e)
+		return False
+
+def deregister(symbol):
+	global reg_count
+	try:
+		p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
+		r= requests.get(p)
+		reg_count-=1
+		print(symbol,"deregister","total:",reg_count)
+		return True
+	except Exception as e:
+		print(e)
+		return False

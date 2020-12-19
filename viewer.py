@@ -176,8 +176,7 @@ class ticker_manager(pannel):
 			self.ticker_count -= 1
 			self.ticker_stats["text"] = "Current Registered Tickers: "+str(self.ticker_count)
 
-			# dereg = threading.Thread(target=deregister,args=(symbol,), daemon=True)
-			# dereg.start()
+
 
 			print("index",index)
 			print("ticker",len(self.tickers))
@@ -219,8 +218,7 @@ class ticker_manager(pannel):
 				"",
 				""]
 
-		# reg = threading.Thread(target=register,args=(symbol,), daemon=True)
-		# reg.start()
+
 
 		self.tickers_labels.append([])
 
@@ -429,29 +427,7 @@ def find_between(data, first, last):
     except ValueError:
         return data
 
-def register(symbol):
-	global reg_count
-	try:
-		p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
-		r= requests.get(p)
-		reg_count+=1
-		print(symbol,"registerd ","total:",reg_count)
-		return True
-	except Exception as e:
-		print(e)
-		return False
 
-def deregister(symbol):
-	global reg_count
-	try:
-		p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
-		r= requests.get(p)
-		reg_count-=1
-		print(symbol,"deregister","total:",reg_count)
-		return True
-	except Exception as e:
-		print(e)
-		return False
 
 def getinfo(symbol):
 	try:
