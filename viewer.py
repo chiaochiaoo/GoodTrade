@@ -7,7 +7,6 @@ import numpy as np
 import os 
 import time
 import threading
-import requests 
 
 from scanner import *
 from pannel import *
