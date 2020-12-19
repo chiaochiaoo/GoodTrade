@@ -94,23 +94,6 @@ class Symbol_data_manager:
 	def get_count(self):
 		return len(self.symbols)
 
-def getinfo(symbol):
-	try:
-		p="http://localhost:8080/GetLv1?symbol="+symbol
-		r= requests.get(p)
-		if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
-			print("No symbol found")
-			return "Unfound","",""
-		time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
-		Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
-		Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
-		#print(time,price)
-		return "Connected",time,round((Bidprice+Askprice)/2,4)
-    # p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
-    # r= requests.get(p,allow_redirects=False,stream=True)
-	except Exception as e:
-		print(e)
-		return "Disconnected","",""
 
 
 class price_updater:
@@ -213,6 +196,33 @@ class price_updater:
 
 
 			self.lock[symbol] = False
+
+def getinfo(symbol):
+	try:
+		p="http://localhost:8080/GetLv1?symbol="+symbol
+		r= requests.get(p)
+		if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
+			print("No symbol found")
+			return "Unfound","",""
+		time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
+		Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
+		Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
+		#print(time,price)
+		return "Connected",time,round((Bidprice+Askprice)/2,4)
+    # p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
+    # r= requests.get(p,allow_redirects=False,stream=True)
+	except Exception as e:
+		print(e)
+		return "Disconnected","",""
+
+def find_between(data, first, last):
+    try:
+        start = data.index(first) + len(first)
+        end = data.index(last, start)
+        return data[start:end]
+    except ValueError:
+        return data
+
 
 def register(symbol):
 	global reg_count
