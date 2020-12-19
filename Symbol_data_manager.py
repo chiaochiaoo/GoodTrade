@@ -41,11 +41,16 @@ class Symbol_data_manager:
 
 
 		#These filed need to be initilized. 
+
+		#basics
 		self.symbol_price = {}
 		self.symbol_status = {}
 		self.symbol_status_color = {}
-
 		self.symbol_update_time = {}
+
+		#alerts
+		self.symbol_last_alert = {}
+		self.symbol_last_alert_time ={}
 
 		self.init_data()
 
@@ -56,10 +61,15 @@ class Symbol_data_manager:
 			self.init_symbol(i)
 
 	def init_symbol(self,i):
+		#basic
 		self.symbol_status[i] = StringVar()
 		self.symbol_status_color[i] = StringVar()
 		self.symbol_price[i] = DoubleVar()
 		self.symbol_update_time[i] = StringVar()
+
+		#alert
+		self.symbol_last_alert[i] = StringVar()
+		self.symbol_last_alert_time[i] = StringVar()
 
 
 	def change_status(self,symbol,status):
@@ -223,6 +233,7 @@ def find_between(data, first, last):
     except ValueError:
         return data
 
+reg_count = 0
 
 def register(symbol):
 	global reg_count

@@ -115,8 +115,6 @@ class ticker_manager(pannel):
 		width = [8,10,12,10,10,12,10,10]
 		labels = ["Ticker","Status","Last update","Price","Last Alert","Last Alert time","Remove"]
 
-
-
 		#init the labels. 
 		for i in range(len(labels)): #Rows
 			self.b = tk.Button(self.tmframe, text=labels[i],width=width[i])#command=self.rank
@@ -171,11 +169,8 @@ class ticker_manager(pannel):
 				for i in self.tickers[index:]:
 					self.ticker_index[i] -=1
 
-
 			self.ticker_count -= 1
 			self.ticker_stats["text"] = "Current Registered Tickers: "+str(self.ticker_count)
-
-
 
 			print("index",index)
 			print("ticker",len(self.tickers))
@@ -187,15 +182,6 @@ class ticker_manager(pannel):
 
 
 		return True
-
-
-	# def set_status_color(self,symbol,color):
-
-	# 	#locate the symbol label
-
-	# 	status = self.tickers_labels[self.ticker_index[symbol]][]
-	# 	status["background"] = color
-
 
 
 	def add_symbol_label(self,symbol):
@@ -211,12 +197,13 @@ class ticker_manager(pannel):
 
 		info = [symbol,\
 				self.data.symbol_status[symbol],\
-				"",\
-				"",\
-				"",\
-				"",
+				self.data.symbol_update_time[symbol],\
+				self.data.symbol_price[symbol],\
+				self.data.symbol_last_alert[symbol],\
+				self.data.symbol_last_alert_time[symbol],
 				""]
 
+		#labels = ["Ticker","Status","Last update","Price","Last Alert","Last Alert time","Remove"]
 
 
 		self.tickers_labels.append([])
@@ -307,17 +294,6 @@ class highlow:
 		return True
 	def delete_symbol(self,symbol):
 		return True
-
-
-reg_count = 0
-def find_between(data, first, last):
-    try:
-        start = data.index(first) + len(first)
-        end = data.index(last, start)
-        return data[start:end]
-    except ValueError:
-        return data
-
 
 
 

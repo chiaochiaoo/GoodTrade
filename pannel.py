@@ -23,4 +23,4 @@ class pannel:
 		elif text.get() == "Disconnected":
 			label["background"] = "red"
 		elif text.get() == "Connected":
-			label["background"] = "green"
+			label["background"] = "#97FEA8"
