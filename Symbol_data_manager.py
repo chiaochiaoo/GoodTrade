@@ -157,7 +157,6 @@ class price_updater:
 
 
 	def init_info(self):
-
 		for i in self.symbols:
 			self.data.change_status(i, "Connecting")
 

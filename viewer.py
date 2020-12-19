@@ -194,7 +194,6 @@ class ticker_manager(pannel):
 
 		print("adding position:",symbol,":",i)
 		width = [8,10,12,10,10,12,10,10]
-
 		info = [symbol,\
 				self.data.symbol_status[symbol],\
 				self.data.symbol_update_time[symbol],\
@@ -203,6 +202,7 @@ class ticker_manager(pannel):
 				self.data.symbol_last_alert_time[symbol],
 				""]
 
+		
 		#labels = ["Ticker","Status","Last update","Price","Last Alert","Last Alert time","Remove"]
 
 
@@ -237,7 +237,7 @@ class ticker_manager(pannel):
 		self.label_count +=1
 
 		self.ticker_stats["text"] = "Current Registered Tickers: "+str(self.ticker_count)
-
+		self.data.change_status(symbol, "Connecting")
 		self.rebind(self.tmcanvas,self.tmframe)
 		#print(self.ticker_index)
 
