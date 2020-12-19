@@ -1,13 +1,12 @@
 import tkinter as tk                     
 from tkinter import ttk 
-
 import pandas as pd
 import numpy as np
-
 import os 
 import time
 import threading
 
+from alerts import *
 from scanner import *
 from pannel import *
 from Symbol_data_manager import *
@@ -41,12 +40,13 @@ class viewer:
 		self.tabControl.pack(expand = 1, fill ="both") 
 
 		#self.ticker_management_init(self.tab1)
+		self.high_low_pannel = highlow(self.tab5,self.data)
 
-		self.tm = ticker_manager(self.tab1,self.data)
+		self.tm = ticker_manager(self.tab1,self.data,[self.high_low_pannel])
 		
 		self.scanner_pannel = scanner(root,self.tm)
 
-		# self.high_low_pannel = highlow(self.tab5)
+
 		# self.Open_High_init(self.tab6)
 		# self.Open_Low_init(self.tab7)
 
@@ -55,8 +55,10 @@ class viewer:
 
 
 class ticker_manager(pannel):
-	def __init__(self,frame,data):
+	def __init__(self,frame,data,alerts):
 		super()
+
+		self.alerts = alerts
 		self.Entry1 = tk.Entry(frame)
 		self.Entry1.place(x=5, y=5, height=30, width=80, bordermode='ignore')
 		self.Entry1.configure(background="white")
@@ -97,54 +99,39 @@ class ticker_manager(pannel):
 		self.tm = ttk.LabelFrame(frame) 
 		self.tm.place(x=0, y=40, relheight=0.85, relwidth=1)
 
-		self.tmcanvas = tk.Canvas(self.tm)
-		self.tmcanvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
+		self.canvas = tk.Canvas(self.tm)
+		self.canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
 
 		self.scroll2 = tk.Scrollbar(self.tm)
-		self.scroll2.config(orient=tk.VERTICAL, command=self.tmcanvas.yview)
+		self.scroll2.config(orient=tk.VERTICAL, command=self.canvas.yview)
 		self.scroll2.pack(side=tk.RIGHT,fill="y")
 
-		self.tmcanvas.configure(yscrollcommand=self.scroll2.set)
+		self.canvas.configure(yscrollcommand=self.scroll2.set)
 		#self.scanner_canvas.bind('<Configure>', lambda e: self.scanner_canvas.configure(scrollregion = self.scanner_canvas.bbox('all')))
 
-		self.tmframe = tk.Frame(self.tmcanvas)
-		self.tmframe.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
+		self.frame = tk.Frame(self.canvas)
+		self.frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
 
-		self.tmcanvas.create_window(0, 0, window=self.tmframe, anchor=tk.NW)
+		self.canvas.create_window(0, 0, window=self.frame, anchor=tk.NW)
 
 		width = [8,10,12,10,10,12,10,10]
 		labels = ["Ticker","Status","Last update","Price","Last Alert","Last Alert time","Remove"]
 
 		#init the labels. 
-		for i in range(len(labels)): #Rows
-			self.b = tk.Button(self.tmframe, text=labels[i],width=width[i])#command=self.rank
-			self.b.configure(activebackground="#f9f9f9")
-			self.b.configure(activeforeground="black")
-			self.b.configure(background="#d9d9d9")
-			self.b.configure(disabledforeground="#a3a3a3")
-			self.b.configure(relief="ridge")
-			self.b.configure(foreground="#000000")
-			self.b.configure(highlightbackground="#d9d9d9")
-			self.b.configure(highlightcolor="black")
-			self.b.grid(row=1, column=i)
+		self.labels_creator(self.frame,labels, width)
 
 		self.init_reg_list()
 
 	def init_reg_list(self):
 
-		#current_count = self.ticker_count
-		#self.ticker_count = self.data.get_count()
-		#self.tickers_labels = []
-
 		ticks = self.data.get_list()
 		width = [8,10,12,10,12,10,10]
 
-		#print(self.tickers)
 		for i in range(len(ticks)):
 			self.add_symbol_label(ticks[i])
 
 		self.tickers = self.data.get_list()
-		super().rebind(self.tmcanvas,self.tmframe)
+		self.rebind(self.canvas,self.frame)
 
 	def delete_symbol_reg_list(self,symbol):
 
@@ -180,7 +167,7 @@ class ticker_manager(pannel):
 			print(index)
 		#3. for rest of the items - rerange the positions. 
 
-
+		self.rebind(self.canvas,self.frame)
 		return True
 
 
@@ -202,33 +189,29 @@ class ticker_manager(pannel):
 				self.data.symbol_last_alert_time[symbol],
 				""]
 
-		
-		#labels = ["Ticker","Status","Last update","Price","Last Alert","Last Alert time","Remove"]
-
-
 		self.tickers_labels.append([])
 
 		#add in tickers.
 		for j in range(len(info)):
 			if j == 0:
-				self.tickers_labels[i].append(tk.Label(self.tmframe ,text=info[j],width=width[j]))
+				self.tickers_labels[i].append(tk.Label(self.frame ,text=info[j],width=width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 
 			elif j == 1:
-				self.tickers_labels[i].append(tk.Label(self.tmframe ,textvariable=info[j],width=width[j]))
+				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=info[j],width=width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 
 				info[j].trace('w', lambda *_, text=info[j],label=self.tickers_labels[i][j]: self.status_change_color(text,label))
 			elif j != (len(info)-1):
-				self.tickers_labels[i].append(tk.Label(self.tmframe ,textvariable=info[j],width=width[j]))
+				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=info[j],width=width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 
 				
 			else:
-				self.tickers_labels[i].append(tk.Button(self.tmframe ,text=info[j],width=width[j],command = lambda s=symbol: self.delete_symbol_reg_list(s)))
+				self.tickers_labels[i].append(tk.Button(self.frame ,text=info[j],width=width[j],command = lambda s=symbol: self.delete_symbol_reg_list(s)))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 
@@ -238,7 +221,10 @@ class ticker_manager(pannel):
 
 		self.ticker_stats["text"] = "Current Registered Tickers: "+str(self.ticker_count)
 		self.data.change_status(symbol, "Connecting")
-		self.rebind(self.tmcanvas,self.tmframe)
+		self.rebind(self.canvas,self.frame)
+
+		for i in self.alerts:
+			i.add_symbol(symbol)
 		#print(self.ticker_index)
 
 		#print(self.tickers)
@@ -252,48 +238,6 @@ class ticker_manager(pannel):
 
 #a seperate thread on its own. 
 
-class highlow:
-
-	def __init__(self,frame):
-
-		self.hlframe = ttk.LabelFrame(frame) 
-		self.hlframe.place(x=0, y=40, relheight=0.85, relwidth=1)
-
-		self.hlcanvas = tk.Canvas(self.hlframe)
-		self.hlcanvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
-
-		self.hlscroll = tk.Scrollbar(self.hlframe)
-		self.hlscroll.config(orient=tk.VERTICAL, command=self.hlcanvas.yview)
-		self.hlscroll.pack(side=tk.RIGHT,fill="y")
-
-		self.hlcanvas.configure(yscrollcommand=self.hlscroll.set)
-		#self.scanner_canvas.bind('<Configure>', lambda e: self.scanner_canvas.configure(scrollregion = self.scanner_canvas.bbox('all')))
-
-		self.hlframe_ = tk.Frame(self.hlcanvas)
-		self.hlframe_.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
-
-		self.hlcanvas.create_window(0, 0, window=self.hlframe_, anchor=tk.NW)
-
-		width = [8,10,12,10,10,12,10,10]
-		labels = ["Ticker","Status","Range","Average","Current"]
-
-		#init the labels. 
-		for i in range(len(labels)): #Rows
-			self.b = tk.Button(self.hlframe_, text=labels[i],width=width[i])#command=self.rank
-			self.b.configure(activebackground="#f9f9f9")
-			self.b.configure(activeforeground="black")
-			self.b.configure(background="#d9d9d9")
-			self.b.configure(disabledforeground="#a3a3a3")
-			self.b.configure(relief="ridge")
-			self.b.configure(foreground="#000000")
-			self.b.configure(highlightbackground="#d9d9d9")
-			self.b.configure(highlightcolor="black")
-			self.b.grid(row=1, column=i)
-
-	def add_symbol(self,symbol):
-		return True
-	def delete_symbol(self,symbol):
-		return True
 
 
 

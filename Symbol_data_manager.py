@@ -5,6 +5,7 @@ from os import path
 import threading
 import time
 import requests
+import database_functions as db
 #Symbol="AAPL.NQ"
 # BidPrice="128.710" 
 # AskPrice="128.720" 
@@ -44,13 +45,28 @@ class Symbol_data_manager:
 
 		#basics
 		self.symbol_price = {}
+		self.symbol_price_high = {}
+		self.symbol_price_low = {}
+		self.symbol_price_open = {}
+		self.symbol_price_range = {}
+
+		#self.symbol_volume = {}
+		
 		self.symbol_status = {}
 		self.symbol_status_color = {}
 		self.symbol_update_time = {}
 
+
+		#data
+		self.symbol_data_openhigh = {}
+		self.symbol_data_openlow = {}
+		self.symbol_data_range = {}
+
 		#alerts
 		self.symbol_last_alert = {}
 		self.symbol_last_alert_time ={}
+
+
 
 		self.init_data()
 
@@ -65,7 +81,27 @@ class Symbol_data_manager:
 		self.symbol_status[i] = StringVar()
 		self.symbol_status_color[i] = StringVar()
 		self.symbol_price[i] = DoubleVar()
+
+
+		self.symbol_price_open[i] = DoubleVar()
+		self.symbol_price_range[i] = DoubleVar()
+		self.symbol_price_high[i] = DoubleVar()
+		self.symbol_price_low[i] = DoubleVar()
+
 		self.symbol_update_time[i] = StringVar()
+
+		#data
+
+		self.symbol_data_openhigh[i] = []
+		self.symbol_data_openlow[i] = []
+		self.symbol_data_range[i] = []
+
+		a= self.symbol_data_openhigh[i]
+		b= self.symbol_data_openlow[i]
+		c= self.symbol_data_range[i]
+
+		data = threading.Thread(target=db.fetch_high_low,args=(i,a,b,c), daemon=True)
+		data.start()
 
 		#alert
 		self.symbol_last_alert[i] = StringVar()
