@@ -6,24 +6,7 @@ import threading
 import time
 import requests
 import database_functions as db
-#Symbol="AAPL.NQ"
-# BidPrice="128.710" 
-# AskPrice="128.720" 
-# BidSize="3460" 
-# AskSize="400" 
-# Volume="60354388" 
-# MinPrice="127.810" 
-# MaxPrice="129.580" 
-# LowPrice="127.810" 
-# HighPrice="129.580" 
-# FirstPrice="128.900" 
-# OpenPrice="128.900" 
-# ClosePrice="127.810" 
 
-# MaxPermittedPrice="0" 
-# MinPermittedPrice="0" 
-# LotSize="10" 
-# LastPrice="128.789"
 
 class Symbol_data_manager:	
 
@@ -51,7 +34,7 @@ class Symbol_data_manager:
 		self.symbol_price_range = {}
 
 		#self.symbol_volume = {}
-		
+
 		self.symbol_status = {}
 		self.symbol_status_color = {}
 		self.symbol_update_time = {}
@@ -214,13 +197,21 @@ class price_updater:
 					status = self.data.symbol_status[i]
 					timestamp = self.data.symbol_update_time[i]
 					price = self.data.symbol_price[i]
-					fetch = threading.Thread(target=self.update_symbol, args=(i,status,timestamp,price,), daemon=True)
+
+					open_ = self.data.symbol_price_open[i]
+					high = self.data.symbol_price_high[i]
+					low = self.data.symbol_price_low[i]
+					range_ = self.data.symbol_price_range[i]
+
+
+
+					fetch = threading.Thread(target=self.update_symbol, args=(i,status,timestamp,price,open_,high,low,range_), daemon=True)
 					#only start when the last one has returned. 
 					fetch.start()
 			time.sleep(1)
 
 	#a single thread 
-	def update_symbol(self,symbol,status,timestamp,price):
+	def update_symbol(self,symbol,status,timestamp,price,open_,high,low,range_):
 
 		#get the info. and, update!!!
 		if symbol not in self.lock:
@@ -229,7 +220,7 @@ class price_updater:
 		if self.lock[symbol]==False:
 			self.lock[symbol] = True
 
-			stat,time,midprice = getinfo(symbol)
+			stat,time,midprice,op,hp,lp,rg = getinfo(symbol)
 
 			#I need to make sure that label still exist. 
 			#status["text"],timestamp["text"],price["text"]= self.count,self.count,self.count
@@ -238,9 +229,33 @@ class price_updater:
 				status.set(stat)
 				timestamp.set(time)
 				price.set(midprice)
+				open_.set(op)
+				high.set(hp)
+				low.set(lp)
+				range_.set(rg)
 
 
 			self.lock[symbol] = False
+
+
+#Symbol="AAPL.NQ"
+# BidPrice="128.710" 
+# AskPrice="128.720" 
+# BidSize="3460" 
+# AskSize="400" 
+# Volume="60354388" 
+# MinPrice="127.810" 
+# MaxPrice="129.580" 
+# LowPrice="127.810" 
+# HighPrice="129.580" 
+# FirstPrice="128.900" 
+# OpenPrice="128.900" 
+# ClosePrice="127.810" 
+
+# MaxPermittedPrice="0" 
+# MinPermittedPrice="0" 
+# LotSize="10" 
+# LastPrice="128.789"
 
 def getinfo(symbol):
 	try:
@@ -252,8 +267,20 @@ def getinfo(symbol):
 		time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
 		Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
 		Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
+		open_ = float(find_between(r.text, "OpenPrice=\"", "\""))
+		high_ = float(find_between(r.text, "HighPrice=\"", "\""))
+		low_ =float(find_between(r.text, "LowPrice=\"", "\""))
+		range_ = high_-low_
 		#print(time,price)
-		return "Connected",time,round((Bidprice+Askprice)/2,4)
+		return "Connected",\
+				time,\
+				round((Bidprice+Askprice)/2,4),\
+				open_,\
+				high_,\
+				low_,\
+				range_
+
+
     # p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
     # r= requests.get(p,allow_redirects=False,stream=True)
 	except Exception as e:
