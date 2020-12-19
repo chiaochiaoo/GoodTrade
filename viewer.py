@@ -264,115 +264,7 @@ class ticker_manager(pannel):
 			self.data.add(symbol)
 			self.add_symbol_label(symbol)
 
-
-
-
 #a seperate thread on its own. 
-class price_updater:
-
-	#A big manager. Who has access to all the corresponding grids in the labels. 
-	#update each symbols per, 39 seconds? 
-	#run every ten seconds. 
-	def __init__(self,s: Symbol_data_manager):
-		#need to track. 1 min range/ volume. 5 min range/volume.
-		#self.depositLabel['text'] = 'change the value'
-		#fetch this 
-		self.price_list = []
-		self.volume_list = []
-
-		self.symbols = s.get_list()
-
-		self.sdm = s
-
-		#Won't need these no more.
-		# self.symbols_labels = v.tickers_labels
-		# self.symbols_index = v.ticker_index
-
-		#time
-		# self.last_update = {}
-		# self.last_price = {}
-
-		# self.lowhigh_cur = {}
-		# self.openhigh_cur = {}
-		# self.openlow_cur = {}
-
-		# self.lowhigh ={}
-		# self.openlow ={}
-		# self.openhigh = {}
-
-		# self.lock = {}
-		# self.open = {}
-		# self.high = {}
-		# self.low = {}
-
-		# self.open_high = 0
-		# self.high_low = 0
-		# self.open_low = 0
-
-		self.count = 0
-
-		self.init_info()
-
-		#repeat this every 5 seconds.
-
-
-	def init_info(self):
-
-		for i in self.symbols:
-			self.sdm.change_status(i, "Connecting")
-
-	
-	#these three functions together update the prices per second. 
-	def start(self):
-		print("Console (PT): Thread created, ready to start")
-		t1 = threading.Thread(target=self.update_info, daemon=True)
-		#t1.start()
-		print("Console (PT): Thread running. Continue:")
-
-	def update_info(self):
-		#fetch every 1 minute. ?
-		#better do all together. 
-		while True:
-			#print("symbols:",self.symbols)
-			self.count+=1
-			for i in range(len(self.symbols_labels)):
-				for j in range(1,len(self.symbols_labels[i])-1):
-
-					status = self.symbols_labels[i][1]
-					timestamp = self.symbols_labels[i][2]
-					price = self.symbols_labels[i][3]
-					#self.symbols_labels[i][j]["text"]= self.count
-					
-					#self.update_symbol(self.symbols[i],status,timestamp,price)
-					fetch = threading.Thread(target=self.update_symbol, args=(self.symbols[i],status,timestamp,price,), daemon=True)
-					#only start when the last one has returned. 
-					fetch.start()
-			time.sleep(1)
-
-	#a single thread 
-	def update_symbol(self,symbol,status,timestamp,price):
-
-		#get the info. and, update!!!
-		if symbol not in self.lock:
-			 self.lock[symbol] = False
-		if self.lock[symbol]==False:
-			self.lock[symbol] = True
-
-			stat,time,midprice = getinfo(symbol)
-			#I need to make sure that label still exist. 
-			#status["text"],timestamp["text"],price["text"]= self.count,self.count,self.count
-
-			if symbol in self.symbols:
-				if stat =="Connected":
-					status["background"] = "#83FF33"
-					status["text"],timestamp["text"],price["text"]= stat,time,midprice
-
-					##Asert Alert list here? 
-				else:
-					status["background"] = "red"
-					status["text"] = stat
-
-			self.lock[symbol] = False
 
 class highlow:
 
@@ -429,23 +321,7 @@ def find_between(data, first, last):
 
 
 
-def getinfo(symbol):
-	try:
-		p="http://localhost:8080/GetLv1?symbol="+symbol
-		r= requests.get(p)
-		if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
-			print("No symbol found")
-			return "Unfound","time",""
-		time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
-		Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
-		Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
-		#print(time,price)
-		return "Connected",time,round((Bidprice+Askprice)/2,4)
-    # p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
-    # r= requests.get(p,allow_redirects=False,stream=True)
-	except Exception as e:
-		print(e)
-		return "Disconnected","",""
+
 
 root = tk.Tk() 
 root.title("GoodTrade") 
