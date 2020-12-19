@@ -57,7 +57,7 @@ class Symbol_data_manager:
 		self.symbol_status[i] = StringVar()
 		self.symbol_status_color[i] = StringVar()
 		self.symbol_price[i] = DoubleVar()
-		self.symbol_update_time = StringVar()
+		self.symbol_update_time[i] = StringVar()
 
 
 	def change_status(self,symbol,status):
