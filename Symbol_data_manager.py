@@ -270,7 +270,7 @@ def getinfo(symbol):
 		open_ = float(find_between(r.text, "OpenPrice=\"", "\""))
 		high_ = float(find_between(r.text, "HighPrice=\"", "\""))
 		low_ =float(find_between(r.text, "LowPrice=\"", "\""))
-		range_ = high_-low_
+		range_ = round(high_-low_,4)
 		#print(time,price)
 		return "Connected",\
 				time,\
