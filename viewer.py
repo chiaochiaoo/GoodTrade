@@ -32,42 +32,65 @@ import requests
 # MinPermittedPrice="0" 
 # LotSize="10" 
 # LastPrice="128.789"
-
-class list_manager:	
+class Symbol_data_manager:	
 
 	#if file does not exist, create an empty file. 
 	def __init__(self):
 
 		if not path.exists("list.txt"):
-			self.list = []
+			self.symbols = []
 		else:
-			self.list = np.array(np.loadtxt('list.txt',dtype="str")).tolist()
+			self.symbols = np.array(np.loadtxt('list.txt',dtype="str")).tolist()
 
-			if type(self.list) is str:
-				self.list = [self.list]
+			if type(self.symbols) is str:
+				self.symbols = [self.symbols]
 
-		print("LM initilize:",self.list)
+		print("data initilize:",self.symbols)
 
-	def save(self):
-		#print(self.list)
-		np.savetxt('list.txt',self.list, delimiter=",", fmt="%s")   
-		
+
+		#These filed need to be initilized. 
+		self.symbol_price = {}
+		self.symbol_price_str = {}
+		self.symbol_status = {}
+		self.symbol_status_color = {}
+
+		self.init_data()
+
+
+	def init_data(self):
+
+		for i in self.symbols:
+			self.symbol_status[i] = tk.StringVar()
+			self.symbol_status_color[i] = tk.StringVar()
+			self.symbol_price_str[i] = tk.StringVar()
+			self.symbol_price[i] = 0
+
+
+	def change_status(self,symbol,status):
+		self.symbol_status[symbol].set(status)
+
+	def change_status_color(self,symbol,color):
+		self.symbol_status_color[symbol].set(color)
+
 
 	def add(self,symbol):
-		self.list.append(symbol)
+		self.symbols.append(symbol)
 		self.save()
-		#print(self.list)
+
 
 	def delete(self,symbol):
-		if symbol in self.list:
-			self.list.remove(symbol)
+		if symbol in self.symbols:
+			self.symbols.remove(symbol)
 		self.save()
 
+	def save(self):
+		np.savetxt('list.txt',self.symbols, delimiter=",", fmt="%s")   
 	def get_list(self):
-		return self.list
+		return self.symbols
 
 	def get_count(self):
-		return len(self.list)
+		return len(self.symbols)
+
 
 class pannel:
 	def rebind(self,canvas,frame):
@@ -89,7 +112,7 @@ class pannel:
 
 
 class ticker_manager(pannel):
-	def __init__(self,frame):
+	def __init__(self,frame,data):
 
 		self.Entry1 = tk.Entry(frame)
 		self.Entry1.place(x=5, y=5, height=30, width=80, bordermode='ignore')
@@ -124,7 +147,7 @@ class ticker_manager(pannel):
 
 		#############Registration Window ####################
 
-		self.lm = list_manager()
+		self.data = data
 
 		self.tm = ttk.LabelFrame(frame) 
 		self.tm.place(x=0, y=40, relheight=0.85, relwidth=1)
@@ -166,17 +189,17 @@ class ticker_manager(pannel):
 	def init_reg_list(self):
 
 		#current_count = self.ticker_count
-		#self.ticker_count = self.lm.get_count()
+		#self.ticker_count = self.data.get_count()
 		#self.tickers_labels = []
 
-		ticks = self.lm.get_list()
+		ticks = self.data.get_list()
 		width = [8,10,12,10,12,10,10]
 
 		#print(self.tickers)
 		for i in range(len(ticks)):
 			self.add_symbol_label(ticks[i])
 
-		self.tickers = self.lm.get_list()
+		self.tickers = self.data.get_list()
 		super().rebind(self.tmcanvas,self.tmframe)
 
 	def delete_symbol_reg_list(self,symbol):
@@ -186,7 +209,7 @@ class ticker_manager(pannel):
 		if symbol in self.tickers:
 			
 			#1. remove it from the list.
-			self.lm.delete(symbol)
+			self.data.delete(symbol)
 
 			#2. get the index. Destory it.
 			index = self.ticker_index[symbol]
@@ -257,7 +280,7 @@ class ticker_manager(pannel):
 
 		if symbol not in self.tickers:
 
-			self.lm.add(symbol)
+			self.data.add(symbol)
 			self.add_symbol_label(symbol)
 
 class scanner(pannel):
@@ -505,7 +528,9 @@ class viewer:
 
 		#self.ticker_management_init(self.tab1)
 
-		self.tm = ticker_manager(self.tab1)
+		self.data = Symbol_data_manager()
+
+		self.tm = ticker_manager(self.tab1,self.data)
 		
 		self.scanner_pannel = scanner(root,self.tm)
 		self.high_low_pannel = highlow(self.tab5)
@@ -515,8 +540,8 @@ class viewer:
 
 		
 
-		sm = symbol_manager(self.tm)
-		sm.start()
+		# sm = symbol_manager(self.tm)
+		# sm.start()
 
 		#############################  SCANNER  ################################################
 
@@ -542,79 +567,78 @@ class viewer:
 		# width = [8,6,6,6,8,8,8,8,8,8,10,10,10,10,10,10]
 
 
-
-
 #a seperate thread on its own. 
-class symbol_manager:
+class price_updater:
 
 	#A big manager. Who has access to all the corresponding grids in the labels. 
 	#update each symbols per, 39 seconds? 
 	#run every ten seconds. 
-	def __init__(self,v: ticker_manager):
+	def __init__(self,s: Symbol_data_manager):
 		#need to track. 1 min range/ volume. 5 min range/volume.
-
 		#self.depositLabel['text'] = 'change the value'
 		#fetch this 
 		self.price_list = []
 		self.volume_list = []
 
-		self.symbols = v.tickers
-		self.symbols_labels = v.tickers_labels
-		self.symbols_index = v.ticker_index
+		self.symbols = s.get_list()
+
+		self.sdm = s
+
+		#Won't need these no more.
+		# self.symbols_labels = v.tickers_labels
+		# self.symbols_index = v.ticker_index
 
 		#time
-		self.last_update = {}
-		self.last_price = {}
+		# self.last_update = {}
+		# self.last_price = {}
 
+		# self.lowhigh_cur = {}
+		# self.openhigh_cur = {}
+		# self.openlow_cur = {}
 
-		self.lowhigh_cur = {}
-		self.openhigh_cur = {}
-		self.openlow_cur = {}
+		# self.lowhigh ={}
+		# self.openlow ={}
+		# self.openhigh = {}
 
-		self.lowhigh ={}
-		self.openlow ={}
-		self.openhigh = {}
+		# self.lock = {}
+		# self.open = {}
+		# self.high = {}
+		# self.low = {}
 
-
-		self.lock = {}
-
-		# self.price = 0
-		# self.volume = 
-		self.open = {}
-		self.high = {}
-		self.low = {}
-
-		self.open_high = 0
-		self.high_low = 0
-		self.open_low = 0
+		# self.open_high = 0
+		# self.high_low = 0
+		# self.open_low = 0
 
 		self.count = 0
 
 		self.init_info()
 
 		#repeat this every 5 seconds.
+
+
 	def init_info(self):
-		info = ["Connecting","/","/","/","/"]
-		for i in range(len(self.symbols_labels)):
-			for j in range(1,len(self.symbols_labels[i])-1):
-				self.symbols_labels[i][j]["text"]= info[j-1]
 
-	def add_symbol():
-		return True 
-	def delete_symbol():
-		return True
+
+		for i in self.symbols:
+			self.sdm.change_status(i, "Connecting")
+			self.sdm.change_status_color(i, "#white")
+		#Change all status info in the symbols to. Connecting. Color into white. 
+
+		# info = ["Connecting","/","/","/","/"]
+		# for i in range(len(self.symbols_labels)):
+		# 	for j in range(1,len(self.symbols_labels[i])-1):
+		# 		self.symbols_labels[i][j]["text"]= info[j-1]
 	
+	#these three functions together update the prices per second. 
 	def start(self):
-
 		print("Console (PT): Thread created, ready to start")
 		t1 = threading.Thread(target=self.update_info, daemon=True)
-		t1.start()
+		#t1.start()
 		print("Console (PT): Thread running. Continue:")
 
 	def update_info(self):
 		#fetch every 1 minute. ?
 		#better do all together. 
-
 		while True:
 			#print("symbols:",self.symbols)
 			self.count+=1
@@ -632,7 +656,6 @@ class symbol_manager:
 					fetch.start()
 			time.sleep(1)
 
-
 	#a single thread 
 	def update_symbol(self,symbol,status,timestamp,price):
 
@@ -643,7 +666,6 @@ class symbol_manager:
 			self.lock[symbol] = True
 
 			stat,time,midprice = getinfo(symbol)
-
 			#I need to make sure that label still exist. 
 			#status["text"],timestamp["text"],price["text"]= self.count,self.count,self.count
 
@@ -651,6 +673,8 @@ class symbol_manager:
 				if stat =="Connected":
 					status["background"] = "#83FF33"
 					status["text"],timestamp["text"],price["text"]= stat,time,midprice
+
+					##Asert Alert list here? 
 				else:
 					status["background"] = "red"
 					status["text"] = stat
@@ -699,7 +723,6 @@ class highlow:
 		return True
 	def delete_symbol(self,symbol):
 		return True
-
 
 # test = ["SPY.AM","QQQ.NQ"]
 # test = np.array(test)
