@@ -3,6 +3,7 @@ from tkinter import *
 import numpy as np
 from os import path
 import threading
+import time
 #Symbol="AAPL.NQ"
 # BidPrice="128.710" 
 # AskPrice="128.720" 
