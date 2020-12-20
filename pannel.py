@@ -1,5 +1,7 @@
 import tkinter as tk 
 class pannel:
+
+
 	def rebind(self,canvas,frame):
 		canvas.update_idletasks()
 		canvas.config(scrollregion=frame.bbox()) 

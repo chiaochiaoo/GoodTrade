@@ -96,17 +96,58 @@ class alert(pannel):
 			if cur <0.5:
 				eval_label["background"]="white"
 			elif cur>0.5 and cur<1:
-				eval_label["background"]="green"
+				eval_label["background"]="#97FEA8"
 			elif cur>1 and cur<2:
 				eval_label["background"]="yellow"
 			else:
+				### Send the alert to alert pannel.
+
+				### Set the alert to
 				eval_label["background"]="red"
 
+class all_alerts(pannel):
+	def __init__(self,frame):
+		super()
+
+		self.label_count = 0
+		self.tickers_labels = {}
+
+		self.frame_ = ttk.LabelFrame(frame) 
+		self.frame_.place(x=0, y=40, relheight=0.85, relwidth=1)
+
+		self.canvas = tk.Canvas(self.frame_)
+		self.canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
+
+		self.scroll = tk.Scrollbar(self.frame_)
+		self.scroll.config(orient=tk.VERTICAL, command=self.canvas.yview)
+		self.scroll.pack(side=tk.RIGHT,fill="y")
+
+		self.canvas.configure(yscrollcommand=self.scroll.set)
+
+		self.frame = tk.Frame(self.canvas)
+		self.frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
+
+		self.canvas.create_window(0, 0, window=self.frame, anchor=tk.NW)
+
+		self.labels = ["Ticker","Time","Alert"]
+		self.width = [8,10,24]
+		self.labels_creator(self.frame)
+
+	def add_alerts(self,symbol,time,alert):
+
+		l = self.label_count 
+		i = symbol
+
+		self.tickers_labels[i].append(tk.Label(self.frame ,text=symbol,width=width[j]))
+		self.label_default_configure(self.tickers_labels[i][j])
+		self.tickers_labels[i][j].grid(row= l+2, column=0,padx=0)
+
+		self.label_count +=1
 
 
 class highlow(alert):
 
-	def __init__(self,frame,data:Symbol_data_manager):
+	def __init__(self,frame,data:Symbol_data_manager,alert_panel:all_alerts):
 
 		super().__init__(frame,data)
 

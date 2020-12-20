@@ -20,7 +20,7 @@ class viewer:
 		self.data = Symbol_data_manager()
 
 		self.listening = ttk.LabelFrame(root,text="Listener") 
-		self.listening.place(x=500,rely=0.05,relheight=1,width=850)
+		self.listening.place(x=500,rely=0.05,relheight=1,width=950)
 
 		self.tabControl = ttk.Notebook(self.listening) 
 		self.tab1 = tk.Canvas(self.tabControl) 
@@ -45,8 +45,10 @@ class viewer:
 		self.tabControl.pack(expand = 1, fill ="both") 
 
 		#self.ticker_management_init(self.tab1)
-		self.high_low_pannel = highlow(self.tab5,self.data)
+		self.all_alerts = all_alerts(self.tab8)
+		self.high_low_pannel = highlow(self.tab5,self.data,self.all_alerts)
 
+		
 		self.tm = ticker_manager(self.tab1,self.data,[self.high_low_pannel])
 		
 		self.scanner_pannel = scanner(root,self.tm)
@@ -60,6 +62,8 @@ class viewer:
 
 		db = database(self.data)
 		db.start()
+
+
 
 
 class ticker_manager(pannel):
