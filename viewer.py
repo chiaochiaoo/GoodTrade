@@ -176,6 +176,9 @@ class ticker_manager(pannel):
 		#3. for rest of the items - rerange the positions. 
 
 		self.rebind(self.canvas,self.frame)
+
+		for i in self.alerts:
+			i.delete_symbol(symbol)
 		return True
 
 

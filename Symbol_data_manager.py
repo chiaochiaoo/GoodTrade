@@ -57,6 +57,9 @@ class Symbol_data_manager:
 		self.symbol_data_openlow_std = {}
 		self.symbol_data_range_std = {}
 
+		self.symbol_data_openhigh_eval = {}
+		self.symbol_data_openlow_eval= {}
+		self.symbol_data_range_eval = {}
 		#alerts
 		self.symbol_last_alert = {}
 		self.symbol_last_alert_time ={}
@@ -102,6 +105,11 @@ class Symbol_data_manager:
 		self.symbol_data_openhigh_std[i] = DoubleVar()
 		self.symbol_data_openlow_std[i] = DoubleVar()
 		self.symbol_data_range_std[i] = DoubleVar()
+
+		#eval
+		self.symbol_data_openhigh_eval[i] = StringVar()
+		self.symbol_data_openlow_eval[i] = StringVar()
+		self.symbol_data_range_eval[i] = StringVar()
 
 		#alert
 		self.symbol_last_alert[i] = StringVar()

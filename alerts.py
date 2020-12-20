@@ -9,11 +9,8 @@ class alert(pannel):
 
 		super()
 
-		#pannel
-		self.ticker_index = {}
 		self.label_count = 0
-		self.ticker_count = 0
-		self.tickers_labels = []
+		self.tickers_labels = {}
 
 		self.data = data
 
@@ -28,7 +25,6 @@ class alert(pannel):
 		self.scroll.pack(side=tk.RIGHT,fill="y")
 
 		self.canvas.configure(yscrollcommand=self.scroll.set)
-		#self.scanner_canvas.bind('<Configure>', lambda e: self.scanner_canvas.configure(scrollregion = self.scanner_canvas.bbox('all')))
 
 		self.frame = tk.Frame(self.canvas)
 		self.frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
@@ -37,54 +33,62 @@ class alert(pannel):
 
 		#init the labels. 
 
-
 	#any alert will need a threshold. deviation. std. 
-
-	def add_symbol(self,symbol,format,width):
-
-		self.ticker_index[symbol] = self.ticker_count 
-		i = self.ticker_count
+	def add_symbol(self,symbol,format,width,val_position,alert_position,alert_vals):
 
 		l = self.label_count
 
-		# print("adding position:",symbol,":",i)
-		# width = [8,10,12,10,10,12,10,10]
-		# info = [symbol,\
-		# 		self.data.symbol_status[symbol],\
-		# 		self.data.symbol_update_time[symbol],\
-		# 		self.data.symbol_price[symbol],\
-		# 		self.data.symbol_last_alert[symbol],\
-		# 		self.data.symbol_last_alert_time[symbol],
-		# 		""]
+		self.tickers_labels[symbol] = []
+		i = symbol
 
-		self.tickers_labels.append([])
-
-		#add in tickers.
 		for j in range(len(format)):
 
 			if j==0:
 				self.tickers_labels[i].append(tk.Label(self.frame ,text=format[j],width=width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
-			if j==1:
+			elif j==1:
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 				format[j].trace('w', lambda *_, text=format[j],label=self.tickers_labels[i][j]: self.status_change_color(text,label))
+
+			#when it is alert label creation, create a trace set for value position 
+			elif j == alert_position:
+				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=width[j]))
+				self.label_default_configure(self.tickers_labels[i][j])
+				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
+				format[val_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals: self.alert(eval_string,label,alertsvals))
 
 			elif j>1:
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 
-		self.ticker_count +=1
+		#self.ticker_count +=1
 		self.label_count +=1
 
 		self.rebind(self.canvas,self.frame)
 
+	def delete_symbol(self,symbol):
 
-	def delete_symbol(self,format,symbol):
-		return True
+		for i in self.tickers_labels[symbol]:
+			i.destroy()
+
+		self.tickers_labels.pop(symbol,None)
+
+		self.rebind(self.canvas,self.frame)
+
+
+	#alert vals: cur, mean, std.
+	def alert(self,eval_string,eval_label,alerts_vals):
+
+		#check how many std it is. 
+
+		cur = round((alerts_vals[0]-alerts_vals[1])/alerts_vals[2],3)
+
+		eval_string.set(str(cur)+" from mean")
+
 
 class highlow(alert):
 
@@ -96,7 +100,6 @@ class highlow(alert):
 		self.width = [8,10,7,7,7,7,7,9,12]
 		self.labels_creator(self.frame)
 
-
 	def add_symbol(self,symbol):
 
 		status = self.data.symbol_status[symbol]
@@ -106,11 +109,15 @@ class highlow(alert):
 		hist_avg= self.data.symbol_data_range_val[symbol]
 		hist_std = self.data.symbol_data_range_std[symbol]
 		hist_range= self.data.symbol_data_range_range[symbol]
-		eva= ""
-		labels = [symbol,status,cur_range,cur_high,cur_low,hist_avg,hist_std,hist_range,eva]
+		eva= self.data.symbol_[symbol]
+
+		value_position = 2
+		alert_position = 7
+		#cur, mean, std. 
+		alertvals= [cur_range,hist_avg,hist_std]
+		labels = [symbol,status,cur_range,cur_high,cur_low,hist_avg,hist_std,hist_range,eva,value_position,alert_position,alertvals]
 
 		#any alert will need a threshold. deviation. std. 
 		super().add_symbol(symbol, labels, self.width)
 
-	def delete_symbol(self,symbol):
-		return True
+	#find a way to bound the special checking value to. hmm. every update.
