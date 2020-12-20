@@ -83,13 +83,23 @@ class alert(pannel):
 	#alert vals: cur, mean, std.
 	def alert(self,eval_string,eval_label,alerts_vals,ready,status):
 
-		#check how many std it is. 
+		#check how many std it is. `
 
 		#attention, only do the calculation when the database is set. 
 
 		if ready.get() == True and status.get() =="Connected":
 			cur = round((alerts_vals[0].get()-alerts_vals[1].get())/alerts_vals[2].get(),3)
 			eval_string.set(str(cur)+" from mean")
+
+			#color. 
+
+			if cur <1:
+				eval_label["background"]="white"
+			elif cur>1 and cur<2:
+				eval_label["background"]="yellow"
+			else:
+				eval_label["background"]="red"
+
 
 
 class highlow(alert):
