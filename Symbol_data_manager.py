@@ -64,6 +64,7 @@ class Symbol_data_manager:
 		self.symbol_last_alert = {}
 		self.symbol_last_alert_time ={}
 
+
 		#mark this when a symbol datastructure is completely loaded. 
 		self.data_ready = {}
 

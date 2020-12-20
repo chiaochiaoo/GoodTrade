@@ -48,7 +48,6 @@ class viewer:
 		self.all_alerts = all_alerts(self.tab8)
 		self.high_low_pannel = highlow(self.tab5,self.data,self.all_alerts)
 
-		
 		self.tm = ticker_manager(self.tab1,self.data,[self.high_low_pannel])
 		
 		self.scanner_pannel = scanner(root,self.tm)
@@ -68,9 +67,10 @@ class viewer:
 
 class ticker_manager(pannel):
 	def __init__(self,frame,data,alerts):
-		super()
+		super().__init__(frame)
 
 		self.alerts = alerts
+
 		self.Entry1 = tk.Entry(frame)
 		self.Entry1.place(x=5, y=5, height=30, width=80, bordermode='ignore')
 		self.Entry1.configure(background="white")
@@ -81,7 +81,6 @@ class ticker_manager(pannel):
 		self.Entry1.configure(insertbackground="black")
 
 		self.symbol = tk.Button(frame,command= lambda: self.add_symbol_reg_list(self.Entry1.get().upper())) #,command=self.loadsymbol
-		#self.Data = tk.Button(self.Labelframe1,command=lambda: self.test(2))
 		self.symbol.place(x=105, y=5, height=30, width=80, bordermode='ignore')
 		self.symbol.configure(activebackground="#ececec")
 		self.symbol.configure(activeforeground="#000000")
@@ -93,14 +92,6 @@ class ticker_manager(pannel):
 		self.symbol.configure(pady="0")
 		self.symbol.configure(text='''Add Symbol''')
 
-
-		self.tickers = []
-		self.tickers_labels = []
-		self.ticker_count = 0
-		self.ticker_index = {}
-
-		self.label_count = 0
-
 		self.ticker_stats = ttk.Label(frame, text="Current Registered Tickers: "+str(self.ticker_count))
 		self.ticker_stats.place(x = 200, y =12)
 
@@ -108,23 +99,6 @@ class ticker_manager(pannel):
 
 		self.data = data
 
-		self.tm = ttk.LabelFrame(frame) 
-		self.tm.place(x=0, y=40, relheight=0.85, relwidth=1)
-
-		self.canvas = tk.Canvas(self.tm)
-		self.canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
-
-		self.scroll2 = tk.Scrollbar(self.tm)
-		self.scroll2.config(orient=tk.VERTICAL, command=self.canvas.yview)
-		self.scroll2.pack(side=tk.RIGHT,fill="y")
-
-		self.canvas.configure(yscrollcommand=self.scroll2.set)
-		#self.scanner_canvas.bind('<Configure>', lambda e: self.scanner_canvas.configure(scrollregion = self.scanner_canvas.bbox('all')))
-
-		self.frame = tk.Frame(self.canvas)
-		self.frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
-
-		self.canvas.create_window(0, 0, window=self.frame, anchor=tk.NW)
 
 		self.width = [8,10,12,10,10,12,10,10]
 		self.labels = ["Ticker","Status","Last update","Price","Last Alert","Last Alert time","Remove"]
@@ -147,39 +121,22 @@ class ticker_manager(pannel):
 
 	def delete_symbol_reg_list(self,symbol):
 
-		print(self.ticker_index)
-
 		if symbol in self.tickers:
 			
 			#1. remove it from the list.
 			self.data.delete(symbol)
 
-			#2. get the index. Destory it.
-			index = self.ticker_index[symbol]
 
-			for i in self.tickers_labels[index]:
+			for i in self.tickers_labels[symbol]:
 				i.destroy()
 
-			self.tickers_labels.pop(index)
-			self.ticker_index.pop(symbol)
+			self.tickers_labels.pop(symbol,None)
 
-			#update the rest of them.
-			if index <= (len(self.tickers)-1):
-				for i in self.tickers[index:]:
-					self.ticker_index[i] -=1
 
 			self.ticker_count -= 1
 			self.ticker_stats["text"] = "Current Registered Tickers: "+str(self.ticker_count)
 
-			print("index",index)
-			print("ticker",len(self.tickers))
-			print("labels",len(self.tickers_labels))
-			print(self.tickers)
-			print(self.ticker_index)
-			print(index)
-		#3. for rest of the items - rerange the positions. 
-
-		self.rebind(self.canvas,self.frame)
+			self.rebind(self.canvas,self.frame)
 
 		for i in self.alerts:
 			i.delete_symbol(symbol)
@@ -191,12 +148,9 @@ class ticker_manager(pannel):
 		# data = threading.Thread(target=self.data.data_request(symbol), daemon=True)
 		# data.start()
 
-		self.ticker_index[symbol] = self.ticker_count 
-		i = self.ticker_count
-
+		i = symbol
 		l = self.label_count
 
-		print("adding position:",symbol,":",i)
 		width = [8,10,12,10,10,12,10,10]
 		info = [symbol,\
 				self.data.symbol_status[symbol],\
@@ -206,7 +160,7 @@ class ticker_manager(pannel):
 				self.data.symbol_last_alert_time[symbol],
 				""]
 
-		self.tickers_labels.append([])
+		self.tickers_labels[i]=[]
 
 		#add in tickers.
 		for j in range(len(info)):
@@ -232,7 +186,6 @@ class ticker_manager(pannel):
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 
 		self.ticker_count +=1
-
 		self.label_count +=1
 
 		self.ticker_stats["text"] = "Current Registered Tickers: "+str(self.ticker_count)

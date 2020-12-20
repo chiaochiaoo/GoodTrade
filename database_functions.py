@@ -82,9 +82,9 @@ class database():
 
                 
                 #set the var.
-                data.symbol_data_openhigh_range[i].set(str(round(max(a),3))+"-"+str(round(min(a),3)))
-                data.symbol_data_openlow_range[i].set(str(round(max(b),3))+"-"+str(round(min(b),3)))
-                data.symbol_data_range_range[i].set(str(round(max(c),3))+"-"+str(round(min(c),3)))
+                data.symbol_data_openhigh_range[i].set(str(round(min(a),3))+"-"+str(round(max(a),3)))
+                data.symbol_data_openlow_range[i].set(str(round(min(b),3))+"-"+str(round(max(b),3)))
+                data.symbol_data_range_range[i].set(str(round(min(c),3))+"-"+str(round(max(c),3)))
 
                 data.symbol_data_openhigh_val[i].set(round(np.mean(a),3))
                 data.symbol_data_openlow_val[i].set(round(np.mean(b),3))

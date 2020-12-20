@@ -1,5 +1,31 @@
 import tkinter as tk 
+from tkinter import ttk 
 class pannel:
+
+	def __init__(self,frame):
+
+		self.tickers = []
+		self.label_count = 0
+		self.ticker_count = 0
+		self.tickers_labels = {}
+
+		self.tm = ttk.LabelFrame(frame) 
+		self.tm.place(x=0, y=40, relheight=0.85, relwidth=1)
+
+		self.canvas = tk.Canvas(self.tm)
+		self.canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
+
+		self.scroll2 = tk.Scrollbar(self.tm)
+		self.scroll2.config(orient=tk.VERTICAL, command=self.canvas.yview)
+		self.scroll2.pack(side=tk.RIGHT,fill="y")
+
+		self.canvas.configure(yscrollcommand=self.scroll2.set)
+		#self.scanner_canvas.bind('<Configure>', lambda e: self.scanner_canvas.configure(scrollregion = self.scanner_canvas.bbox('all')))
+
+		self.frame = tk.Frame(self.canvas)
+		self.frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
+
+		self.canvas.create_window(0, 0, window=self.frame, anchor=tk.NW)
 
 
 	def rebind(self,canvas,frame):

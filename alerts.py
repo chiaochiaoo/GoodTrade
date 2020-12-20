@@ -3,33 +3,44 @@ from tkinter import ttk
 from pannel import *
 from Symbol_data_manager import *
 
+class all_alerts(pannel):
+	def __init__(self,frame):
+		super().__init__(frame)
+
+		self.labels = ["Ticker","Time","Alert","Delete"]
+		self.width = [8,10,24,10]
+		self.labels_creator(self.frame)
+
+		self.alert_base = []
+
+	
+
+	#if the type and the time match, then don't add. 
+
+	#vals = symbol,time ,alert type
+	def add_alerts(self,vals):
+
+		l = self.label_count 
+		i = symbol
+
+		self.tickers_labels[i] = []
+
+		if set(vals) not in self.alert_base:
+			for i in range(len(vals)):
+				self.tickers_labels[i].append(tk.Label(self.frame ,text=vals[i],width=width[j]))
+				self.label_default_configure(self.tickers_labels[i][i])
+				self.tickers_labels[i][j].grid(row= l+2, column=0,padx=0)
+
+			self.label_count +=1
+
 class alert(pannel):
 
-	def __init__(self,frame,data:Symbol_data_manager):
+	def __init__(self,frame,data:Symbol_data_manager,alert_pannel:all_alerts):
 
-		super()
+		super().__init__(frame)
 
-		self.label_count = 0
-		self.tickers_labels = {}
-
+		self.alert_pannel=alert_pannel
 		self.data = data
-
-		self.frame_ = ttk.LabelFrame(frame) 
-		self.frame_.place(x=0, y=40, relheight=0.85, relwidth=1)
-
-		self.canvas = tk.Canvas(self.frame_)
-		self.canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
-
-		self.scroll = tk.Scrollbar(self.frame_)
-		self.scroll.config(orient=tk.VERTICAL, command=self.canvas.yview)
-		self.scroll.pack(side=tk.RIGHT,fill="y")
-
-		self.canvas.configure(yscrollcommand=self.scroll.set)
-
-		self.frame = tk.Frame(self.canvas)
-		self.frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
-
-		self.canvas.create_window(0, 0, window=self.frame, anchor=tk.NW)
 
 		#init the labels. 
 
@@ -88,68 +99,50 @@ class alert(pannel):
 		#attention, only do the calculation when the database is set. 
 
 		if ready.get() == True and status.get() =="Connected":
-			cur = round((alerts_vals[0].get()-alerts_vals[1].get())/alerts_vals[2].get(),3)
+
+			symbol= alerts_vals[0]
+			time= alerts_vals[1].get()[:5]
+			
+			cur_price= round(alerts_vals[2].get(),3)
+			mean= round(alerts_vals[3].get(),3)
+			std=  round(alerts_vals[4].get(),3)
+			alert_type = alerts_vals[5]
+
+			cur = round((cur_price-mean)/std,3)
+
 			eval_string.set(str(cur)+" from mean")
+
+			print(time)
 
 			#color. 
 
 			if cur <0.5:
 				eval_label["background"]="white"
+
 			elif cur>0.5 and cur<1:
+				alert_type = "Moderate "+alert_type
 				eval_label["background"]="#97FEA8"
+				self.alert_pannel.add_alerts([symbol,time,alert_type])
+				
 			elif cur>1 and cur<2:
+				alert_type = "High "+alert_type
 				eval_label["background"]="yellow"
+
+				self.alert_pannel.add_alerts([symbol,time,alert_type])
 			else:
 				### Send the alert to alert pannel.
-
-				### Set the alert to
+				alert_type = "Very high "+alert_type
 				eval_label["background"]="red"
 
-class all_alerts(pannel):
-	def __init__(self,frame):
-		super()
+				self.alert_pannel.add_alerts([symbol,time,alert_type])
 
-		self.label_count = 0
-		self.tickers_labels = {}
-
-		self.frame_ = ttk.LabelFrame(frame) 
-		self.frame_.place(x=0, y=40, relheight=0.85, relwidth=1)
-
-		self.canvas = tk.Canvas(self.frame_)
-		self.canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
-
-		self.scroll = tk.Scrollbar(self.frame_)
-		self.scroll.config(orient=tk.VERTICAL, command=self.canvas.yview)
-		self.scroll.pack(side=tk.RIGHT,fill="y")
-
-		self.canvas.configure(yscrollcommand=self.scroll.set)
-
-		self.frame = tk.Frame(self.canvas)
-		self.frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
-
-		self.canvas.create_window(0, 0, window=self.frame, anchor=tk.NW)
-
-		self.labels = ["Ticker","Time","Alert"]
-		self.width = [8,10,24]
-		self.labels_creator(self.frame)
-
-	def add_alerts(self,symbol,time,alert):
-
-		l = self.label_count 
-		i = symbol
-
-		self.tickers_labels[i].append(tk.Label(self.frame ,text=symbol,width=width[j]))
-		self.label_default_configure(self.tickers_labels[i][j])
-		self.tickers_labels[i][j].grid(row= l+2, column=0,padx=0)
-
-		self.label_count +=1
 
 
 class highlow(alert):
 
 	def __init__(self,frame,data:Symbol_data_manager,alert_panel:all_alerts):
 
-		super().__init__(frame,data)
+		super().__init__(frame,data,alert_panel)
 
 		self.labels = ["Ticker","Status","Cur Range","Cur High","Cur low","H. Avg","H. Std","H. Range","Evaluation"]
 		self.width = [8,10,7,7,7,7,7,9,15]
@@ -165,14 +158,18 @@ class highlow(alert):
 		hist_std = self.data.symbol_data_range_std[symbol]
 		hist_range= self.data.symbol_data_range_range[symbol]
 		eva= self.data.symbol_data_openhigh_eval[symbol]
+		time = self.data.symbol_update_time[symbol]
 
 		data_ready = self.data.data_ready[symbol]
 
 		value_position = 2
 		alert_position = 8
-		#cur, mean, std. 
-		alertvals= [cur_range,hist_avg,hist_std]
+		alert_type = "Intraday Range"
+
+		#cur, mean, std. symbol, time. 
+		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type]
 		labels = [symbol,status,cur_range,cur_high,cur_low,hist_avg,hist_std,hist_range,eva]
+
 
 		#any alert will need a threshold. deviation. std. 
 
