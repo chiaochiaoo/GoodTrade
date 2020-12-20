@@ -93,8 +93,10 @@ class alert(pannel):
 
 			#color. 
 
-			if cur <1:
+			if cur <0.5:
 				eval_label["background"]="white"
+			elif cur>0.5 and cur<1:
+				eval_label["background"]="green"
 			elif cur>1 and cur<2:
 				eval_label["background"]="yellow"
 			else:
