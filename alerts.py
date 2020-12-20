@@ -7,7 +7,7 @@ class all_alerts(pannel):
 	def __init__(self,frame):
 		super().__init__(frame)
 
-		self.labels = ["Ticker","Time","Alert","Delete"]
+		self.labels = ["Ticker","Time","Alert","Dismiss"]
 		self.width = [8,10,24,10]
 		self.labels_creator(self.frame)
 
@@ -17,6 +17,13 @@ class all_alerts(pannel):
 
 	#if the type and the time match, then don't add. 
 
+	def dismiss_alerts(self,key):
+
+		for i in self.tickers_labels[key]:
+			i.destroy()
+
+		self.rebind(self.canvas,self.frame)
+
 	#vals = symbol,time ,alert type
 	def add_alerts(self,vals):
 
@@ -24,17 +31,29 @@ class all_alerts(pannel):
 		l = self.label_count 
 
 		symbol = vals[0]
-		self.tickers_labels[symbol] = []
-
+		
 		if set(vals) not in self.alert_base:
+
+			key = str(vals)
+			self.tickers_labels[key] = []
 			for i in range(len(vals)):
-				self.tickers_labels[symbol].append(tk.Label(self.frame ,text=vals[i],width=self.width[i]))
-				self.label_default_configure(self.tickers_labels[symbol][i])
-				self.tickers_labels[symbol][i].grid(row= l+2, column=i,padx=0)
+				
+				self.tickers_labels[key].append(tk.Label(self.frame ,text=vals[i],width=self.width[i]))
+				self.label_default_configure(self.tickers_labels[key][i])
+				self.tickers_labels[key][i].grid(row= l+2, column=i,padx=0)
+
+			
+			self.tickers_labels[key].append(tk.Button(self.frame ,width=width[j],command = lambda k=key: self.dismiss_alerts(k)))
+			self.label_default_configure(self.tickers_labels[key][i])
+			self.tickers_labels[key][i].grid(row= l+2, column=i,padx=0)
+
+
 
 			self.label_count +=1
 
 			self.alert_base.append(set(vals))
+
+			self.rebind(self.canvas,self.frame)
 
 class alert(pannel):
 
