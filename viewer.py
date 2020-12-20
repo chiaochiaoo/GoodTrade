@@ -202,7 +202,6 @@ class ticker_manager(pannel):
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=info[j],width=width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
-
 				info[j].trace('w', lambda *_, text=info[j],label=self.tickers_labels[i][j]: self.status_change_color(text,label))
 			elif j != (len(info)-1):
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=info[j],width=width[j]))

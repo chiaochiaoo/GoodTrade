@@ -42,15 +42,29 @@ class Symbol_data_manager:
 
 
 		#data
-		self.symbol_data_openhigh = {}
-		self.symbol_data_openlow = {}
-		self.symbol_data_range = {}
+
+		self.symbol_data_openhigh_range = {}
+		self.symbol_data_openlow_range = {}
+		self.symbol_data_range_range = {}
+
+		self.symbol_data_openhigh_val = {}
+		self.symbol_data_openlow_val = {}
+		self.symbol_data_range_val = {}
+
+		self.symbol_data_openhigh_dis = {}
+		self.symbol_data_openlow_dis = {}
+		self.symbol_data_range_dis = {}
 
 		#alerts
 		self.symbol_last_alert = {}
 		self.symbol_last_alert_time ={}
 
 
+
+
+		#mark this when a symbol datastructure is completely loaded. 
+
+		self.symbol_loaded = []
 
 		self.init_data()
 
@@ -75,21 +89,44 @@ class Symbol_data_manager:
 		self.symbol_update_time[i] = StringVar()
 
 		#data
+		self.symbol_data_openhigh_dis[i] = []
+		self.symbol_data_openlow_dis[i] = []
+		self.symbol_data_range_dis[i] = []
 
-		self.symbol_data_openhigh[i] = []
-		self.symbol_data_openlow[i] = []
-		self.symbol_data_range[i] = []
+		self.symbol_data_openhigh_range[i] = StringVar()
+		self.symbol_data_openlow_range[i] = StringVar()
+		self.symbol_data_range_range[i] = StringVar()
 
-		a= self.symbol_data_openhigh[i]
-		b= self.symbol_data_openlow[i]
-		c= self.symbol_data_range[i]
+		self.symbol_data_openhigh_val[i] = DoubleVar()
+		self.symbol_data_openlow_val[i] = DoubleVar()
+		self.symbol_data_range_val[i] = DoubleVar()
 
-		data = threading.Thread(target=db.fetch_high_low,args=(i,a,b,c), daemon=True)
+		data = threading.Thread(target=self.init_database_info(i), daemon=True)
 		data.start()
 
 		#alert
 		self.symbol_last_alert[i] = StringVar()
 		self.symbol_last_alert_time[i] = StringVar()
+
+
+
+	def init_database_info(self,i):
+
+		a= self.symbol_data_openhigh_dis[i]
+		b= self.symbol_data_openlow_dis[i]
+		c= self.symbol_data_range_dis[i]
+		db.fetch_high_low(i,a,b,c)
+
+		#set the var.
+		self.symbol_data_openhigh_range[i].set(str(max(a))+"-"+str(min(a)))
+		self.symbol_data_openlow_range[i].set(str(max(b))+"-"+str(min(b)))
+		self.symbol_data_range_range[i].set(str(max(c))+"-"+str(min(c)))
+
+		self.symbol_data_openhigh_val[i].set(np.mean(a))
+		self.symbol_data_openlow_val[i].set(np.mean(b))
+		self.symbol_data_range_val[i].set(np.mean(c))
+
+		self.symbol_loaded.append(i)
 
 
 	def change_status(self,symbol,status):

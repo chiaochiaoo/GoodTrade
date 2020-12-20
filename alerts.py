@@ -61,9 +61,21 @@ class alert(pannel):
 
 		#add in tickers.
 		for j in range(len(format)):
-			self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=width[j]))
-			self.label_default_configure(self.tickers_labels[i][j])
-			self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
+
+			if j==0:
+				self.tickers_labels[i].append(tk.Label(self.frame ,text=format[j],width=width[j]))
+				self.label_default_configure(self.tickers_labels[i][j])
+				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
+			if j==1:
+				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=width[j]))
+				self.label_default_configure(self.tickers_labels[i][j])
+				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
+				format[j].trace('w', lambda *_, text=format[j],label=self.tickers_labels[i][j]: self.status_change_color(text,label))
+
+			elif j>1:
+				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=width[j]))
+				self.label_default_configure(self.tickers_labels[i][j])
+				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 
 		self.ticker_count +=1
 		self.label_count +=1
@@ -92,8 +104,8 @@ class highlow(alert):
 		cur_range =self.data.symbol_price_range[symbol]
 		cur_high = self.data.symbol_price_high[symbol]
 		cur_low = self.data.symbol_price_low[symbol]
-		hist_avg= self.data.symbol_data_range[symbol]
-		hist_range= 0#max(self.data.symbol_data_range[symbol]) - min(self.data.symbol_data_range[symbol])
+		hist_avg= self.data.symbol_data_range_val[symbol]
+		hist_range= self.data.symbol_data_range_range[symbol]
 		eva= ""
 		labels = [symbol,status,cur_range,cur_high,cur_low,hist_avg,hist_range,eva]
 
