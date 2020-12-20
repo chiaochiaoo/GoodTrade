@@ -21,15 +21,15 @@ class all_alerts(pannel):
 	def add_alerts(self,vals):
 
 		l = self.label_count 
-		i = vals[0]
 
-		self.tickers_labels[i] = []
+		symbol = vals[0]
+		self.tickers_labels[symbol] = []
 
 		if set(vals) not in self.alert_base:
 			for i in range(len(vals)):
-				self.tickers_labels[i].append(tk.Label(self.frame ,text=vals[i],width=self.width[j]))
+				self.tickers_labels[symbol].append(tk.Label(self.frame ,text=vals[i],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][i])
-				self.tickers_labels[i][j].grid(row= l+2, column=0,padx=0)
+				self.tickers_labels[symbol][j].grid(row= l+2, column=0,padx=0)
 
 			self.label_count +=1
 
