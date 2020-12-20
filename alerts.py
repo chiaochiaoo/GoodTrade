@@ -109,7 +109,7 @@ class highlow(alert):
 		hist_avg= self.data.symbol_data_range_val[symbol]
 		hist_std = self.data.symbol_data_range_std[symbol]
 		hist_range= self.data.symbol_data_range_range[symbol]
-		eva= self.data.symbol_[symbol]
+		eva= self.data.symbol_data_openhigh_eval[symbol]
 
 		value_position = 2
 		alert_position = 7
