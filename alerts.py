@@ -27,7 +27,6 @@ class all_alerts(pannel):
 	#vals = symbol,time ,alert type
 	def add_alerts(self,vals):
 
-		print(vals)
 		l = self.label_count 
 
 		symbol = vals[0]
@@ -43,7 +42,7 @@ class all_alerts(pannel):
 				self.tickers_labels[key][i].grid(row= l+2, column=i,padx=0)
 
 			
-			self.tickers_labels[key].append(tk.Button(self.frame ,width=width[j],command = lambda k=key: self.dismiss_alerts(k)))
+			self.tickers_labels[key].append(tk.Button(self.frame ,width=self.width[j],command = lambda k=key: self.dismiss_alerts(k)))
 			self.label_default_configure(self.tickers_labels[key][i])
 			self.tickers_labels[key][i].grid(row= l+2, column=i,padx=0)
 
