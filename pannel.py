@@ -25,9 +25,9 @@ class pannel:
 		elif text.get() == "Connected":
 			label["background"] = "#97FEA8"
 
-	def labels_creator(self,frame,labels,width):
-		for i in range(len(labels)): #Rows
-			self.b = tk.Button(frame, text=labels[i],width=width[i])#command=self.rank
+	def labels_creator(self,frame):
+		for i in range(len(self.labels)): #Rows
+			self.b = tk.Button(frame, text=self.labels[i],width=self.width[i])#command=self.rank
 			self.b.configure(activebackground="#f9f9f9")
 			self.b.configure(activeforeground="black")
 			self.b.configure(background="#d9d9d9")

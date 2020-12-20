@@ -91,26 +91,26 @@ class highlow(alert):
 	def __init__(self,frame,data:Symbol_data_manager):
 
 		super().__init__(frame,data)
-		width = [8,10,9,9,9,9,9,12]
-		labels = ["Ticker","Status","Cur Range","Cur High","Cur low","Hist Avg","Hist Range","Evaluation"]
 
-		self.labels_creator(self.frame,labels,width)
+		self.labels = ["Ticker","Status","Cur Range","Cur High","Cur low","H. Avg","H. Std","H. Range","Evaluation"]
+		self.width = [8,10,9,9,9,7,7,9,12]
+		self.labels_creator(self.frame)
 
 
 	def add_symbol(self,symbol):
-		width = [8,10,9,9,9,9,9,12]
 
 		status = self.data.symbol_status[symbol]
 		cur_range =self.data.symbol_price_range[symbol]
 		cur_high = self.data.symbol_price_high[symbol]
 		cur_low = self.data.symbol_price_low[symbol]
 		hist_avg= self.data.symbol_data_range_val[symbol]
+		hist_std = self.data.symbol_data_range_std[symbol]
 		hist_range= self.data.symbol_data_range_range[symbol]
 		eva= ""
-		labels = [symbol,status,cur_range,cur_high,cur_low,hist_avg,hist_range,eva]
+		labels = [symbol,status,cur_range,cur_high,cur_low,hist_avg,hist_std,hist_range,eva]
 
 		#any alert will need a threshold. deviation. std. 
-		super().add_symbol(symbol, labels, width)
+		super().add_symbol(symbol, labels, self.width)
 
 	def delete_symbol(self,symbol):
 		return True

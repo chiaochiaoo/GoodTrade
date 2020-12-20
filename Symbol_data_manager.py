@@ -55,6 +55,10 @@ class Symbol_data_manager:
 		self.symbol_data_openlow_dis = {}
 		self.symbol_data_range_dis = {}
 
+		self.symbol_data_openhigh_std = {}
+		self.symbol_data_openlow_std = {}
+		self.symbol_data_range_std = {}
+
 		#alerts
 		self.symbol_last_alert = {}
 		self.symbol_last_alert_time ={}
@@ -101,6 +105,10 @@ class Symbol_data_manager:
 		self.symbol_data_openlow_val[i] = DoubleVar()
 		self.symbol_data_range_val[i] = DoubleVar()
 
+		self.symbol_data_openhigh_std[i] = DoubleVar()
+		self.symbol_data_openlow_std[i] = DoubleVar()
+		self.symbol_data_range_std[i] = DoubleVar()
+
 		data = threading.Thread(target=self.init_database_info(i), daemon=True)
 		data.start()
 
@@ -118,13 +126,18 @@ class Symbol_data_manager:
 		db.fetch_high_low(i,a,b,c)
 
 		#set the var.
-		self.symbol_data_openhigh_range[i].set(str(max(a))+"-"+str(min(a)))
-		self.symbol_data_openlow_range[i].set(str(max(b))+"-"+str(min(b)))
-		self.symbol_data_range_range[i].set(str(max(c))+"-"+str(min(c)))
+		self.symbol_data_openhigh_range[i].set(str(round(max(a),3))+"-"+str(round(min(a),3)))
+		self.symbol_data_openlow_range[i].set(str(round(max(b),3))+"-"+str(round(min(b),3)))
+		self.symbol_data_range_range[i].set(str(round(max(c),3))+"-"+str(round(min(c),3)))
 
-		self.symbol_data_openhigh_val[i].set(np.mean(a))
-		self.symbol_data_openlow_val[i].set(np.mean(b))
-		self.symbol_data_range_val[i].set(np.mean(c))
+		self.symbol_data_openhigh_val[i].set(round(np.mean(a),3))
+		self.symbol_data_openlow_val[i].set(round(np.mean(b),3))
+		self.symbol_data_range_val[i].set(round(np.mean(c),3))
+
+		self.symbol_data_openhigh_std[i].set(round(np.std(a),3))
+		self.symbol_data_openlow_std[i].set(round(np.std(b),3))
+		self.symbol_data_range_std[i].set(round(np.std(c),3))
+
 
 		self.symbol_loaded.append(i)
 

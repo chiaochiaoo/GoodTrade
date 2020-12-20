@@ -114,11 +114,11 @@ class ticker_manager(pannel):
 
 		self.canvas.create_window(0, 0, window=self.frame, anchor=tk.NW)
 
-		width = [8,10,12,10,10,12,10,10]
-		labels = ["Ticker","Status","Last update","Price","Last Alert","Last Alert time","Remove"]
+		self.width = [8,10,12,10,10,12,10,10]
+		self.labels = ["Ticker","Status","Last update","Price","Last Alert","Last Alert time","Remove"]
 
 		#init the labels. 
-		self.labels_creator(self.frame,labels, width)
+		self.labels_creator(self.frame)
 
 		self.init_reg_list()
 
