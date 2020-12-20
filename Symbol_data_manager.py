@@ -285,7 +285,7 @@ def getinfo(symbol):
     # r= requests.get(p,allow_redirects=False,stream=True)
 	except Exception as e:
 		print(e)
-		return "Disconnected","",""
+		return "Disconnected","","","","","",""
 
 def find_between(data, first, last):
     try:
