@@ -78,7 +78,7 @@ class Symbol_data_manager:
 	def init_symbol(self,i):
 		#basic
 
-		self.data_ready[i] = False
+		self.data_ready[i] = BooleanVar(value=False)
 		self.symbol_status[i] = StringVar()
 		self.symbol_status_color[i] = StringVar()
 		self.symbol_price[i] = DoubleVar()

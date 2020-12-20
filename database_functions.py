@@ -94,7 +94,7 @@ class database():
                 data.symbol_data_openlow_std[i].set(round(np.std(b),3))
                 data.symbol_data_range_std[i].set(round(np.std(c),3))
 
-                data.data_ready[i] = True
+                data.data_ready[i].set(True)
 
                 self.reg_list.append(i)
 
