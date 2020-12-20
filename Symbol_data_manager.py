@@ -263,7 +263,7 @@ def getinfo(symbol):
 		r= requests.get(p)
 		if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
 			print("No symbol found")
-			return "Unfound","",""
+			return "Unfound","","","","","",""
 		time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
 		Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
 		Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
