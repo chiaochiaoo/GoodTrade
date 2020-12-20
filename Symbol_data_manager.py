@@ -24,6 +24,7 @@ class Symbol_data_manager:
 		print("data initilize:",self.symbols)
 
 
+		self.reg_symbols = self.symbols[:]
 		#These filed need to be initilized. 
 
 		#basics
@@ -136,8 +137,11 @@ class price_updater:
 		#fetch this 
 		self.price_list = []
 		self.volume_list = []
+		self.black_list = []
 
 		self.symbols = s.get_list()
+
+
 
 		self.data = s
 		self.lock = {}
@@ -194,6 +198,8 @@ class price_updater:
 			#print("symbols:",self.symbols)
 			self.count+=1
 			for i in self.symbols:
+
+				if i not in self.black_list:
 					status = self.data.symbol_status[i]
 					timestamp = self.data.symbol_update_time[i]
 					price = self.data.symbol_price[i]
@@ -224,6 +230,9 @@ class price_updater:
 
 			#I need to make sure that label still exist. 
 			#status["text"],timestamp["text"],price["text"]= self.count,self.count,self.count
+
+			if stat != "Connected":
+				self.black_list.append(symbol)
 
 			if symbol in self.symbols:
 				status.set(stat)
