@@ -19,7 +19,7 @@ class viewer:
 		self.data = Symbol_data_manager()
 
 		self.listening = ttk.LabelFrame(root,text="Listener") 
-		self.listening.place(relx=0.41,rely=0.05,relheight=1,width=650)
+		self.listening.place(relx=0.35,rely=0.05,relheight=1,width=650)
 
 		self.tabControl = ttk.Notebook(self.listening) 
 		self.tab1 = tk.Canvas(self.tabControl) 
@@ -29,8 +29,12 @@ class viewer:
 		self.tab5 = tk.Canvas(self.tabControl)
 		self.tab6 = tk.Canvas(self.tabControl)
 		self.tab7 = tk.Canvas(self.tabControl)
+		self.tab8 = tk.Canvas(self.tabControl)
+		self.tab9 = tk.Canvas(self.tabControl)
 
 		self.tabControl.add(self.tab1, text ='Tickers Management') 
+		self.tabControl.add(self.tab8, text ='All alerts') 
+		self.tabControl.add(self.tab9, text ='Breakout') 
 		self.tabControl.add(self.tab2, text ='Extreme Range') 
 		self.tabControl.add(self.tab3, text ='Extreme Volume') 
 		self.tabControl.add(self.tab4, text ='First five minutes')
@@ -173,6 +177,8 @@ class ticker_manager(pannel):
 
 	def add_symbol_label(self,symbol):
 
+		data = threading.Thread(target=self.data.data_request(symbol), daemon=True)
+		data.start()
 
 		self.ticker_index[symbol] = self.ticker_count 
 		i = self.ticker_count

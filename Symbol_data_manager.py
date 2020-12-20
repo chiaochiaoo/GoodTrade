@@ -109,15 +109,16 @@ class Symbol_data_manager:
 		self.symbol_data_openlow_std[i] = DoubleVar()
 		self.symbol_data_range_std[i] = DoubleVar()
 
-		data = threading.Thread(target=db.fetch_high_low(i,self), daemon=True)
-		data.start()
+
 
 		#alert
 		self.symbol_last_alert[i] = StringVar()
 		self.symbol_last_alert_time[i] = StringVar()
 
 
-
+	def data_request(self,symbol):
+		data = threading.Thread(target=db.fetch_high_low(symbol,self), daemon=True)
+		data.start()
 
 	def change_status(self,symbol,status):
 		self.symbol_status[symbol].set(status)
