@@ -27,7 +27,7 @@ class all_alerts(pannel):
 
 		if set(vals) not in self.alert_base:
 			for i in range(len(vals)):
-				self.tickers_labels[i].append(tk.Label(self.frame ,text=vals[i],width=width[j]))
+				self.tickers_labels[i].append(tk.Label(self.frame ,text=vals[i],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][i])
 				self.tickers_labels[i][j].grid(row= l+2, column=0,padx=0)
 
@@ -45,7 +45,7 @@ class alert(pannel):
 		#init the labels. 
 
 	#any alert will need a threshold. deviation. std. 
-	def add_symbol(self,symbol,format,width,val_position,alert_position,alert_vals,data_ready):
+	def add_symbol(self,symbol,format,val_position,alert_position,alert_vals,data_ready):
 
 		l = self.label_count
 
@@ -55,24 +55,24 @@ class alert(pannel):
 		for j in range(len(format)):
 
 			if j==0:
-				self.tickers_labels[i].append(tk.Label(self.frame ,text=format[j],width=width[j]))
+				self.tickers_labels[i].append(tk.Label(self.frame ,text=format[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 			elif j==1:
-				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=width[j]))
+				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 				format[j].trace('w', lambda *_, text=format[j],label=self.tickers_labels[i][j]: self.status_change_color(text,label))
 
 			#when it is alert label creation, create a trace set for value position 
 			elif j == alert_position:
-				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=width[j]))
+				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 				format[val_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
 
 			elif j>1:
-				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=width[j]))
+				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 
@@ -174,6 +174,6 @@ class highlow(alert):
 		#any alert will need a threshold. deviation. std. 
 
 		#self,symbol,format,width,val_position,alert_position,alert_vals
-		super().add_symbol(symbol, labels, self.width,value_position,alert_position,alertvals,data_ready)
+		super().add_symbol(symbol, labels,value_position,alert_position,alertvals,data_ready)
 
 	#find a way to bound the special checking value to. hmm. every update.
