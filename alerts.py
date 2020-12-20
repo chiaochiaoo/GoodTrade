@@ -34,7 +34,7 @@ class alert(pannel):
 		#init the labels. 
 
 	#any alert will need a threshold. deviation. std. 
-	def add_symbol(self,symbol,format,width,val_position,alert_position,alert_vals):
+	def add_symbol(self,symbol,format,width,val_position,alert_position,alert_vals,data_ready):
 
 		l = self.label_count
 
@@ -58,7 +58,7 @@ class alert(pannel):
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
-				format[val_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals: self.alert(eval_string,label,alertsvals))
+				format[val_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready: self.alert(eval_string,label,alertsvals,ready))
 
 			elif j>1:
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=width[j]))
@@ -81,13 +81,15 @@ class alert(pannel):
 
 
 	#alert vals: cur, mean, std.
-	def alert(self,eval_string,eval_label,alerts_vals):
+	def alert(self,eval_string,eval_label,alerts_vals,ready):
 
 		#check how many std it is. 
 
-		cur = round((alerts_vals[0].get()-alerts_vals[1].get())/alerts_vals[2].get(),3)
+		#attention, only do the calculation when the database is set. 
 
-		eval_string.set(str(cur)+" from mean")
+		if ready == True:
+			cur = round((alerts_vals[0].get()-alerts_vals[1].get())/alerts_vals[2].get(),3)
+			eval_string.set(str(cur)+" from mean")
 
 
 class highlow(alert):
@@ -111,8 +113,10 @@ class highlow(alert):
 		hist_range= self.data.symbol_data_range_range[symbol]
 		eva= self.data.symbol_data_openhigh_eval[symbol]
 
+		data_ready = self.data.data_ready[symbol]
+
 		value_position = 2
-		alert_position = 7
+		alert_position = 8
 		#cur, mean, std. 
 		alertvals= [cur_range,hist_avg,hist_std]
 		labels = [symbol,status,cur_range,cur_high,cur_low,hist_avg,hist_std,hist_range,eva]
@@ -120,6 +124,6 @@ class highlow(alert):
 		#any alert will need a threshold. deviation. std. 
 
 		#self,symbol,format,width,val_position,alert_position,alert_vals
-		super().add_symbol(symbol, labels, self.width,value_position,alert_position,alertvals)
+		super().add_symbol(symbol, labels, self.width,value_position,alert_position,alertvals,data_ready)
 
 	#find a way to bound the special checking value to. hmm. every update.
