@@ -44,14 +44,11 @@ class all_alerts(pannel):
 			
 			self.tickers_labels[key].append(tk.Button(self.frame ,width=self.width[i],command = lambda k=key: self.dismiss_alerts(k)))
 			self.label_default_configure(self.tickers_labels[key][i])
-			self.tickers_labels[key][i].grid(row= l+2, column=i,padx=0)
-
+			self.tickers_labels[key][i].grid(row= l+2, column=i+1,padx=0)
 
 
 			self.label_count +=1
-
 			self.alert_base.append(set(vals))
-
 			self.rebind(self.canvas,self.frame)
 
 class alert(pannel):
