@@ -85,7 +85,7 @@ class alert(pannel):
 
 		#check how many std it is. 
 
-		cur = round((alerts_vals[0]-alerts_vals[1])/alerts_vals[2],3)
+		cur = round((alerts_vals[0].get()-alerts_vals[1].get())/alerts_vals[2].get(),3)
 
 		eval_string.set(str(cur)+" from mean")
 
@@ -115,9 +115,11 @@ class highlow(alert):
 		alert_position = 7
 		#cur, mean, std. 
 		alertvals= [cur_range,hist_avg,hist_std]
-		labels = [symbol,status,cur_range,cur_high,cur_low,hist_avg,hist_std,hist_range,eva,value_position,alert_position,alertvals]
+		labels = [symbol,status,cur_range,cur_high,cur_low,hist_avg,hist_std,hist_range,eva]
 
 		#any alert will need a threshold. deviation. std. 
-		super().add_symbol(symbol, labels, self.width)
+
+		#self,symbol,format,width,val_position,alert_position,alert_vals
+		super().add_symbol(symbol, labels, self.width,value_position,alert_position,alertvals)
 
 	#find a way to bound the special checking value to. hmm. every update.
