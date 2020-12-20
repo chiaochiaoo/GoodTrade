@@ -20,6 +20,7 @@ class all_alerts(pannel):
 	#vals = symbol,time ,alert type
 	def add_alerts(self,vals):
 
+		print(vals)
 		l = self.label_count 
 
 		symbol = vals[0]
@@ -32,6 +33,8 @@ class all_alerts(pannel):
 				self.tickers_labels[symbol][i].grid(row= l+2, column=0,padx=0)
 
 			self.label_count +=1
+
+			self.alert_base.append(set(vals))
 
 class alert(pannel):
 
@@ -111,8 +114,6 @@ class alert(pannel):
 			cur = round((cur_price-mean)/std,3)
 
 			eval_string.set(str(cur)+" from mean")
-
-			print(time)
 
 			#color. 
 
