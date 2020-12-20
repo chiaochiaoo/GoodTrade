@@ -109,6 +109,12 @@ class alert(pannel):
 		self.rebind(self.canvas,self.frame)
 
 
+
+	def set_latest_alert(self,symbol,alert,time):
+
+		self.data.symbol_last_alert[symbol].set(alert)
+		self.data.symbol_last_alert_time[symbol].set(time)
+
 	#alert vals: cur, mean, std.
 	def alert(self,eval_string,eval_label,alerts_vals,ready,status):
 
@@ -139,18 +145,20 @@ class alert(pannel):
 				alert_type = "Moderate "+alert_type
 				eval_label["background"]="#97FEA8"
 				self.alert_pannel.add_alerts([symbol,time,alert_type])
+				self.set_latest_alert(symbol, alert_type, time)
 
 			elif cur>1 and cur<2:
 				alert_type = "High "+alert_type
 				eval_label["background"]="yellow"
-
 				self.alert_pannel.add_alerts([symbol,time,alert_type])
+				self.set_latest_alert(symbol, alert_type, time)
 			else:
 				### Send the alert to alert pannel.
 				alert_type = "Very high "+alert_type
 				eval_label["background"]="red"
 
 				self.alert_pannel.add_alerts([symbol,time,alert_type])
+				self.set_latest_alert(symbol, alert_type, time)
 
 
 
