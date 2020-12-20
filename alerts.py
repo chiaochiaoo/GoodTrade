@@ -21,7 +21,7 @@ class all_alerts(pannel):
 	def add_alerts(self,vals):
 
 		l = self.label_count 
-		i = symbol
+		i = vals[0]
 
 		self.tickers_labels[i] = []
 
@@ -123,7 +123,7 @@ class alert(pannel):
 				alert_type = "Moderate "+alert_type
 				eval_label["background"]="#97FEA8"
 				self.alert_pannel.add_alerts([symbol,time,alert_type])
-				
+
 			elif cur>1 and cur<2:
 				alert_type = "High "+alert_type
 				eval_label["background"]="yellow"
