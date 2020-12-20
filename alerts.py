@@ -93,7 +93,7 @@ class highlow(alert):
 		super().__init__(frame,data)
 
 		self.labels = ["Ticker","Status","Cur Range","Cur High","Cur low","H. Avg","H. Std","H. Range","Evaluation"]
-		self.width = [8,10,9,9,9,7,7,9,12]
+		self.width = [8,10,7,7,7,7,7,9,12]
 		self.labels_creator(self.frame)
 
 
