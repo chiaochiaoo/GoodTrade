@@ -10,6 +10,7 @@ from alerts import *
 from scanner import *
 from pannel import *
 from Symbol_data_manager import *
+from database_functions import *
 
 class viewer:
 
@@ -19,7 +20,7 @@ class viewer:
 		self.data = Symbol_data_manager()
 
 		self.listening = ttk.LabelFrame(root,text="Listener") 
-		self.listening.place(relx=0.35,rely=0.05,relheight=1,width=650)
+		self.listening.place(x=500,rely=0.05,relheight=1,width=850)
 
 		self.tabControl = ttk.Notebook(self.listening) 
 		self.tab1 = tk.Canvas(self.tabControl) 
@@ -56,6 +57,9 @@ class viewer:
 
 		sm = price_updater(self.data)
 		sm.start()
+
+		db = database(self.data)
+		db.start()
 
 
 class ticker_manager(pannel):
@@ -177,8 +181,8 @@ class ticker_manager(pannel):
 
 	def add_symbol_label(self,symbol):
 
-		data = threading.Thread(target=self.data.data_request(symbol), daemon=True)
-		data.start()
+		# data = threading.Thread(target=self.data.data_request(symbol), daemon=True)
+		# data.start()
 
 		self.ticker_index[symbol] = self.ticker_count 
 		i = self.ticker_count

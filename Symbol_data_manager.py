@@ -5,8 +5,6 @@ from os import path
 import threading
 import time
 import requests
-import database_functions as db
-
 
 class Symbol_data_manager:	
 
@@ -63,11 +61,7 @@ class Symbol_data_manager:
 		self.symbol_last_alert = {}
 		self.symbol_last_alert_time ={}
 
-
-
-
 		#mark this when a symbol datastructure is completely loaded. 
-
 		self.symbol_loaded = []
 
 		self.init_data()
@@ -109,16 +103,13 @@ class Symbol_data_manager:
 		self.symbol_data_openlow_std[i] = DoubleVar()
 		self.symbol_data_range_std[i] = DoubleVar()
 
-
-
 		#alert
 		self.symbol_last_alert[i] = StringVar()
 		self.symbol_last_alert_time[i] = StringVar()
 
 
-	def data_request(self,symbol):
-		data = threading.Thread(target=db.fetch_high_low(symbol,self), daemon=True)
-		data.start()
+	# def data_request(self,symbol):
+
 
 	def change_status(self,symbol,status):
 		self.symbol_status[symbol].set(status)
@@ -169,8 +160,6 @@ class price_updater:
 
 		self.symbols = s.get_list()
 
-
-
 		self.data = s
 		self.lock = {}
 		self.count = 0
@@ -199,8 +188,6 @@ class price_updater:
 		# self.open_high = 0
 		# self.high_low = 0
 		# self.open_low = 0
-
-		
 
 		self.init_info()
 
