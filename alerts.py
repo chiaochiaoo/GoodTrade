@@ -30,7 +30,7 @@ class all_alerts(pannel):
 			for i in range(len(vals)):
 				self.tickers_labels[symbol].append(tk.Label(self.frame ,text=vals[i],width=self.width[i]))
 				self.label_default_configure(self.tickers_labels[symbol][i])
-				self.tickers_labels[symbol][i].grid(row= l+2, column=0,padx=0)
+				self.tickers_labels[symbol][i].grid(row= l+2, column=i,padx=0)
 
 			self.label_count +=1
 
