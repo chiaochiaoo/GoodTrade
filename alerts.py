@@ -87,6 +87,8 @@ class alert(pannel):
 
 		#attention, only do the calculation when the database is set. 
 
+		print("evaluation begins")
+
 		if ready == True:
 			cur = round((alerts_vals[0].get()-alerts_vals[1].get())/alerts_vals[2].get(),3)
 			eval_string.set(str(cur)+" from mean")
