@@ -58,7 +58,7 @@ class alert(pannel):
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
-				format[val_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready: self.alert(eval_string,label,alertsvals,ready))
+				format[val_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
 
 			elif j>1:
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=width[j]))
@@ -81,15 +81,13 @@ class alert(pannel):
 
 
 	#alert vals: cur, mean, std.
-	def alert(self,eval_string,eval_label,alerts_vals,ready):
+	def alert(self,eval_string,eval_label,alerts_vals,ready,status):
 
 		#check how many std it is. 
 
 		#attention, only do the calculation when the database is set. 
 
-
-		if ready.get() == True:
-			print("evaluation begins")
+		if ready.get() == True and status.get() =="Connected":
 			cur = round((alerts_vals[0].get()-alerts_vals[1].get())/alerts_vals[2].get(),3)
 			eval_string.set(str(cur)+" from mean")
 
@@ -101,7 +99,7 @@ class highlow(alert):
 		super().__init__(frame,data)
 
 		self.labels = ["Ticker","Status","Cur Range","Cur High","Cur low","H. Avg","H. Std","H. Range","Evaluation"]
-		self.width = [8,10,7,7,7,7,7,9,12]
+		self.width = [8,10,7,7,7,7,7,9,15]
 		self.labels_creator(self.frame)
 
 	def add_symbol(self,symbol):
