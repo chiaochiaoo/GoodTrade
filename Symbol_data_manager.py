@@ -366,9 +366,6 @@ class price_updater:
 
 			if symbol in self.symbols:
 
-				rg,rgoh,rgol,hp,lp
-
-
 
 				status.set(stat)
 				timestamp.set(time)
