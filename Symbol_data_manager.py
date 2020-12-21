@@ -416,16 +416,10 @@ class price_updater:
 					last_5_range.set(l5_r)
 					last_5_vol.set(l5_v)
 
-
 					#check if time stamp is 9:35
-					if timestamp == 530:
-						print("time CHECK")
-					if timestamp ==575:
-
-						if symbol not in self.data.first_5_list:
-							self.data.first_5_list.append(symbol) 
-							self.data.first_5_min_range[symbol].set(l5_r)
-							self.data.first_5_min_volume[symbol].set(l5_v)
+					if timestamp <575:
+						self.data.first_5_min_range[symbol].set(l5_r)
+						self.data.first_5_min_volume[symbol].set(l5_v)
 
 					
 
