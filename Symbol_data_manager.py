@@ -380,7 +380,6 @@ class price_updater:
 				rgoh = round(high.get() - op,3)
 				rgol = round(op - low.get(),3)
 
-				low.set(lp)
 				range_.set(rg)
 				oh.set(rgoh)
 				ol.set(rgol)
