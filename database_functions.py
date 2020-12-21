@@ -96,7 +96,7 @@ class database():
 
 				###ADD the first 5 here. seperate them later. 
 
-				postbody = "http://api.kibot.com/?action=history&symbol="+symbol+"&interval=5&period=14&regularsession=1&user=sajali26@hotmail.com&password=guupu4upu"
+				postbody = "http://api.kibot.com/?action=history&symbol="+req+"&interval=5&period=14&regularsession=1&user=sajali26@hotmail.com&password=guupu4upu"
 				r= self.request(postbody, symbol)
 
 				if r!="":
