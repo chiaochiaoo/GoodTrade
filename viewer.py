@@ -35,13 +35,13 @@ class viewer:
 
 		self.tabControl.add(self.tab1, text ='Tickers Management') 
 		self.tabControl.add(self.tab8, text ='All alerts') 
-		self.tabControl.add(self.tab9, text ='Breakout') 
-		self.tabControl.add(self.tab2, text ='Extreme Range') 
-		self.tabControl.add(self.tab3, text ='Extreme Volume') 
-		self.tabControl.add(self.tab4, text ='First five minutes')
 		self.tabControl.add(self.tab5, text ='High-Low')
 		self.tabControl.add(self.tab6, text ='Open-High')
 		self.tabControl.add(self.tab7, text ='Open-Low')
+		self.tabControl.add(self.tab2, text ='Extreme Range') 
+		self.tabControl.add(self.tab3, text ='Extreme Volume') 
+		self.tabControl.add(self.tab4, text ='First five minutes')
+		self.tabControl.add(self.tab9, text ='Breakout')
 		self.tabControl.pack(expand = 1, fill ="both") 
 
 		#self.ticker_management_init(self.tab1)
@@ -50,7 +50,9 @@ class viewer:
 		self.open_high_pannel = openhigh(self.tab6,self.data,self.all_alerts)
 		self.open_low_pannel = openlow(self.tab7,self.data,self.all_alerts)
 
-		alerts = [self.high_low_pannel,self.open_high_pannel,self.open_low_pannel]
+		self.first_5 = firstfive(self.tab4,self.data,self.all_alerts)
+
+		alerts = [self.high_low_pannel,self.open_high_pannel,self.open_low_pannel,self.first_5]
 
 		self.tm = ticker_manager(self.tab1,self.data,alerts)
 		

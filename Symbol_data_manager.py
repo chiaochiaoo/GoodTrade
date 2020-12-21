@@ -65,9 +65,42 @@ class Symbol_data_manager:
 		self.symbol_data_openlow_std = {}
 		self.symbol_data_range_std = {}
 
+		self.symbol_data_first5_range = {}
+		self.symbol_data_first5_vol_range = {}
+
+		self.symbol_data_first5_val = {}
+		self.symbol_data_first5_vol_val = {}
+
+		self.symbol_data_first5_std = {}
+		self.symbol_data_first5_vol_std = {}
+
+		self.symbol_data_first5_dis = {}
+		self.symbol_data_first5_vol_dis = {}
+
+
+		self.symbol_data_normal5_range = {}
+		self.symbol_data_normal5_vol_range = {}
+
+		self.symbol_data_normal5_val = {}
+		self.symbol_data_normal5_vol_val = {}
+
+		self.symbol_data_normal5_std = {}
+		self.symbol_data_normal5_vol_std = {}
+
+		self.symbol_data_normal5_dis = {}
+		self.symbol_data_normal5_vol_dis = {}
+
+		self.symbol_data_first5_range_eval = {}
+		self.symbol_data_first5_vol_eval = {}
+
+		self.symbol_data_normal5_range_eval = {}
+		self.symbol_data_normal5_vol_eval = {}
+
 		self.symbol_data_openhigh_eval = {}
 		self.symbol_data_openlow_eval= {}
 		self.symbol_data_range_eval = {}
+
+
 		#alerts
 		self.symbol_last_alert = {}
 		self.symbol_last_alert_time ={}
@@ -103,8 +136,8 @@ class Symbol_data_manager:
 		self.minute_data[i] = {"high":[],"low":[],"vol":[]}
 		self.minute_timestamp[i] = []
 
-		self.last_5_min_range[i] = 0
-		self.last_5_min_volume[i] = 0
+		self.last_5_min_range[i] = DoubleVar()
+		self.last_5_min_volume[i] = DoubleVar()
 
 		self.symbol_update_time[i] = StringVar()
 
@@ -112,6 +145,11 @@ class Symbol_data_manager:
 		self.symbol_data_openhigh_dis[i] = []
 		self.symbol_data_openlow_dis[i] = []
 		self.symbol_data_range_dis[i] = []
+
+		self.symbol_data_normal5_dis[i]  = []
+		self.symbol_data_normal5_vol_dis[i]  = []
+		self.symbol_data_first5_dis[i] = []
+		self.symbol_data_first5_vol_dis[i] = []
 
 		self.symbol_data_openhigh_range[i] = StringVar()
 		self.symbol_data_openlow_range[i] = StringVar()
@@ -125,7 +163,32 @@ class Symbol_data_manager:
 		self.symbol_data_openlow_std[i] = DoubleVar()
 		self.symbol_data_range_std[i] = DoubleVar()
 
+		self.symbol_data_first5_range[i] = StringVar()
+		self.symbol_data_first5_vol_range[i] = StringVar()
+
+		self.symbol_data_first5_val[i] = DoubleVar()
+		self.symbol_data_first5_vol_val[i] = DoubleVar()
+
+		self.symbol_data_first5_std[i] = DoubleVar()
+		self.symbol_data_first5_vol_std[i] = DoubleVar()
+
+		self.symbol_data_normal5_range[i] = StringVar()
+		self.symbol_data_normal5_vol_range[i] = StringVar()
+
+		self.symbol_data_normal5_val[i] = DoubleVar()
+		self.symbol_data_normal5_vol_val[i] = DoubleVar()
+
+		self.symbol_data_normal5_std[i] = DoubleVar()
+		self.symbol_data_normal5_vol_std[i] = DoubleVar()
+
 		#eval
+
+		self.symbol_data_first5_range_eval[i] =  StringVar()
+		self.symbol_data_first5_vol_eval[i] = StringVar()
+
+		self.symbol_data_normal5_range_eval[i] =  StringVar()
+		self.symbol_data_normal5_vol_eval[i] = StringVar()
+
 		self.symbol_data_openhigh_eval[i] = StringVar()
 		self.symbol_data_openlow_eval[i] = StringVar()
 		self.symbol_data_range_eval[i] = StringVar()
@@ -328,7 +391,7 @@ class price_updater:
 							self.data.minute_data[symbol]["high"][idx] = high
 						if low < self.data.minute_data[symbol]["low"][idx]:
 							self.data.minute_data[symbol]["low"][idx] = low
-						self.data.minute_data[symbol]["vol"][idx] = vol
+						self.data.minute_data[symbol]["vol"][idx] = vol/1000
 
 					#perform an update. 
 
@@ -340,7 +403,7 @@ class price_updater:
 					l5_r = round(l5_h - l5_l,3)
 
 					index = min(self.data.minute_count[symbol], 5)
-					l5_v = self.data.minute_data[symbol]["vol"][-index:] - self.data.minute_data[symbol]["vol"][0]
+					l5_v = self.data.minute_data[symbol]["vol"][-index] - self.data.minute_data[symbol]["vol"][0]
 
 					last_5_range.set(l5_r)
 					last_5_vol.set(l5_v)
