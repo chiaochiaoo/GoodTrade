@@ -41,6 +41,11 @@ class Symbol_data_manager:
 
 		self.last_5_min_range = {}
 		self.last_5_min_volume = {}
+
+
+		self.first_5_list = []
+		self.first_5_min_range = {}
+		self.first_5_min_volume = {}
 		#self.symbol_volume = {}
 
 		self.symbol_status = {}
@@ -138,6 +143,9 @@ class Symbol_data_manager:
 
 		self.last_5_min_range[i] = DoubleVar()
 		self.last_5_min_volume[i] = DoubleVar()
+
+		self.first_5_min_range[i] = DoubleVar()
+		self.first_5_min_volume[i] = DoubleVar()
 
 		self.symbol_update_time[i] = StringVar()
 
@@ -407,6 +415,18 @@ class price_updater:
 
 					last_5_range.set(l5_r)
 					last_5_vol.set(l5_v)
+
+
+					#check if time stamp is 9:35
+					if timestmap == 530:
+						print("time CHECK")
+					if timestamp ==575:
+
+						if symbol not in self.data.first_5_list:
+							self.data.first_5_list.append(symbol) 
+							self.data.first_5_min_range[symbol].set(l5_r)
+							self.data.first_5_min_volume[symbol].set(l5_v)
+
 					
 
 

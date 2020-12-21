@@ -303,8 +303,8 @@ class firstfive(alert):
 
 		status = self.data.symbol_status[symbol]
 		#?
-		cur_range =self.data.last_5_min_range[symbol]
-		cur_vol = self.data.last_5_min_volume[symbol]
+		cur_range =self.data.first_5_min_range[symbol]
+		cur_vol = self.data.first_5_min_volume[symbol]
 
 		hist_avg= self.data.symbol_data_first5_val[symbol]
 		hist_std = self.data.symbol_data_first5_std[symbol]
