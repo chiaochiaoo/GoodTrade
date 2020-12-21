@@ -40,6 +40,7 @@ class Symbol_data_manager:
 		self.minute_count = {}
 		self.minute_data = {}
 		self.minute_timestamp = {}
+		self.minute_timestamp_val = {}
 
 		self.last_5_min_range = {}
 		self.last_5_min_volume = {}
@@ -142,6 +143,7 @@ class Symbol_data_manager:
 		self.minute_count[i] = 0 
 		self.minute_data[i] = {"high":[],"low":[],"vol":[]}
 		self.minute_timestamp[i] = []
+		self.minute_timestamp_val[i] =DoubleVar()
 
 		self.last_5_min_range[i] = DoubleVar()
 		self.last_5_min_volume[i] = DoubleVar()
@@ -392,6 +394,8 @@ class price_updater:
 				if stat == "Connected":
 
 					timestamp = self.timestamp(time[:5])
+
+					self.data.minute_timestamp_val[symbol].set(timestamp)
 
 					if timestamp == 570:
 						open_.set(op)

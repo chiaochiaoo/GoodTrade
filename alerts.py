@@ -134,6 +134,9 @@ class alert(pannel):
 			std=  round(alerts_vals[4].get(),3)
 			alert_type = alerts_vals[5]
 
+			ts = timestamp(time)
+
+
 			cur = round((cur_price-mean)/std,3)
 
 			eval_string.set(str(cur)+" from mean")
@@ -152,15 +155,16 @@ class alert(pannel):
 			elif cur>1 and cur<2:
 				alert_type = "High "+alert_type
 				eval_label["background"]="yellow"
-				self.alert_pannel.add_alerts([symbol,time,alert_type])
-				self.set_latest_alert(symbol, alert_type, time)
+				if ts>570:
+					self.alert_pannel.add_alerts([symbol,time,alert_type])
+					self.set_latest_alert(symbol, alert_type, time)
 			else:
 				### Send the alert to alert pannel.
 				alert_type = "Very high "+alert_type
 				eval_label["background"]="red"
-
-				self.alert_pannel.add_alerts([symbol,time,alert_type])
-				self.set_latest_alert(symbol, alert_type, time)
+				if ts>570:
+					self.alert_pannel.add_alerts([symbol,time,alert_type])
+					self.set_latest_alert(symbol, alert_type, time)
 
 
 
@@ -367,9 +371,9 @@ class extremrange(alert):
 		value_position = 2
 		alert_position = 6
 		alert_type = "Intraday Range"
-
+		alert_time = 0
 		#cur, mean, std. symbol, time. 
-		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type]
+		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type,alert_time]
 		labels = [symbol,status,cur_range,hist_avg,hist_std,hist_range,eva]
 
 
@@ -413,8 +417,10 @@ class extremevolume(alert):
 		alert_position = 6
 		alert_type = "Intraday Open-Low"
 
+		alert_time = 0
+
 		#cur, mean, std. symbol, time. 
-		alertvals= [symbol,time,cur_vol,hist_avg,hist_std,alert_type]
+		alertvals= [symbol,time,cur_vol,hist_avg,hist_std,alert_type,alert_time]
 		labels = [symbol,status,cur_vol,hist_avg,hist_std,hist_range,eva]
 		#any alert will need a threshold. deviation. std. 
 

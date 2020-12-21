@@ -65,3 +65,14 @@ class pannel:
 			self.b.configure(highlightbackground="#d9d9d9")
 			self.b.configure(highlightcolor="black")
 			self.b.grid(row=1, column=i)
+
+
+def timestamp(self,s):
+
+	p = s.split(":")
+	try:
+		x = int(p[0])*60+int(p[1])
+		return x
+	except Exception as e:
+		print(e)
+		return 0
