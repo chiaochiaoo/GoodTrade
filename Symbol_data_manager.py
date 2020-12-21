@@ -257,7 +257,7 @@ class price_updater:
 		if self.lock[symbol]==False:
 			self.lock[symbol] = True
 
-			stat,time,midprice,op,hp,lp,rg = getinfo(symbol)
+			stat,time,midprice,op,hp,lp,rg,rgoh,rgol = getinfo(symbol)
 
 			#I need to make sure that label still exist. 
 			#status["text"],timestamp["text"],price["text"]= self.count,self.count,self.count
@@ -274,10 +274,8 @@ class price_updater:
 				low.set(lp)
 				range_.set(rg)
 
-				oh_ = round(hp-op,3)
-				ol_ = round(op-lp,3)
-				oh.set(oh_)
-				ol.set(ol_)
+				oh.set(rgoh)
+				ol.set(rgol)
 
 
 			self.lock[symbol] = False
@@ -308,7 +306,7 @@ def getinfo(symbol):
 		r= requests.get(p)
 		if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
 			print("No symbol found")
-			return "Unfound","","","","","",""
+			return "Unfound","","","","","","","",""
 		time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
 		Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
 		Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
@@ -316,6 +314,8 @@ def getinfo(symbol):
 		high_ = float(find_between(r.text, "HighPrice=\"", "\""))
 		low_ =float(find_between(r.text, "LowPrice=\"", "\""))
 		range_ = round(high_-low_,4)
+		rgoh = round(high_-open_,4)
+		rgol = round(open_-low_,4)
 		#print(time,price)
 		return "Connected",\
 				time,\
@@ -323,14 +323,16 @@ def getinfo(symbol):
 				open_,\
 				high_,\
 				low_,\
-				range_
+				range_,\
+				rgoh,\
+				rgol
 
 
     # p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
     # r= requests.get(p,allow_redirects=False,stream=True)
 	except Exception as e:
 		print(e)
-		return "Disconnected","","","","","",""
+		return "Disconnected","","","","","","","",""
 
 def find_between(data, first, last):
     try:
