@@ -360,7 +360,7 @@ class price_updater:
 			last_5_range = self.data.last_5_min_range[symbol]
 			last_5_vol = self.data.last_5_min_volume[symbol]
 
-			stat,time,midprice,op,vol = getinfo(symbol)
+			stat,time,midprice,op,high,low,vol = getinfo(symbol)
 
 			#I need to make sure that label still exist. 
 			#status["text"],timestamp["text"],price["text"]= self.count,self.count,self.count
@@ -477,11 +477,13 @@ def getinfo(symbol):
 		r= requests.get(p)
 		if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
 			print("No symbol found")
-			return "Unfound","","","","","","","","",""
+			return "Unfound","","","","","",""
 		time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
 		Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
 		Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
 		open_ = float(find_between(r.text, "OpenPrice=\"", "\""))
+		high = float(find_between(r.text, "HighPrice=\"", "\""))
+		low = float(find_between(r.text, "LowPrice=\"", "\""))
 		vol = int(find_between(r.text, "Volume=\"", "\""))
 
 		#print(time,price)
@@ -489,6 +491,8 @@ def getinfo(symbol):
 				time,\
 				round((Bidprice+Askprice)/2,4),\
 				open_,\
+				high,\
+				low,\
 				vol
 
 
@@ -496,7 +500,7 @@ def getinfo(symbol):
     # r= requests.get(p,allow_redirects=False,stream=True)
 	except Exception as e:
 		print(e)
-		return "Disconnected","","","","","","","","",""
+		return "Disconnected","","","","","",""
 
 def find_between(data, first, last):
     try:
