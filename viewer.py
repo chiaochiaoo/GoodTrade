@@ -33,7 +33,7 @@ class viewer:
 		self.tab8 = tk.Canvas(self.tabControl)
 		self.tab9 = tk.Canvas(self.tabControl)
 
-		self.tabControl.add(self.tab1, text ='Tickers Management') 
+		self.tabControl.add(self.tab1, text ='Tickers Manager') 
 		self.tabControl.add(self.tab8, text ='All alerts') 
 		self.tabControl.add(self.tab5, text ='High-Low')
 		self.tabControl.add(self.tab6, text ='Open-High')
