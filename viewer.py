@@ -48,6 +48,7 @@ class viewer:
 		self.all_alerts = all_alerts(self.tab8)
 		self.high_low_pannel = highlow(self.tab5,self.data,self.all_alerts)
 		self.open_high_pannel = openhigh(self.tab6,self.data,self.all_alerts)
+		self.open_low_pannel = openlow(self.tab7,self.data,self.all_alerts)
 
 		self.tm = ticker_manager(self.tab1,self.data,[self.high_low_pannel,self.open_high_pannel])
 		
@@ -101,7 +102,7 @@ class ticker_manager(pannel):
 		self.data = data
 
 
-		self.width = [8,10,12,10,10,10,24,10]
+		self.width = [8,10,12,10,24,10,10]
 		self.labels = ["Ticker","Status","Last update","Price","Last Alert","Last Alert time","Remove"]
 
 		#init the labels. 
