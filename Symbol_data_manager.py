@@ -402,8 +402,8 @@ class price_updater:
 
 					l5_r = round(l5_h - l5_l,3)
 
-					index = min(self.data.minute_count[symbol], 5)
-					l5_v = self.data.minute_data[symbol]["vol"][-index] - self.data.minute_data[symbol]["vol"][0]
+					index = min(self.data.minute_count[symbol]-1, 5)
+					l5_v = round(self.data.minute_data[symbol]["vol"][-index] - self.data.minute_data[symbol]["vol"][0],3)
 
 					last_5_range.set(l5_r)
 					last_5_vol.set(l5_v)
