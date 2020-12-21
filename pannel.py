@@ -67,7 +67,7 @@ class pannel:
 			self.b.grid(row=1, column=i)
 
 
-def timestamp(self,s):
+def timestamp(s):
 
 	p = s.split(":")
 	try:
