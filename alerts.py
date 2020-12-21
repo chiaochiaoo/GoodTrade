@@ -221,8 +221,8 @@ class openhigh(alert):
 		cur_open = self.data.symbol_price_open[symbol]
 		cur_high = self.data.symbol_price_high[symbol]
 		hist_avg= self.data.symbol_data_openhigh_val[symbol]
-		hist_std = self.data.symbol_data_openhigh_range[symbol]
-		hist_range= self.data.symbol_data_openhigh_std[symbol]
+		hist_std = self.data.symbol_data_openhigh_std[symbol]
+		hist_range= self.data.symbol_data_openhigh_range[symbol]
 
 		eva= self.data.symbol_data_openhigh_eval[symbol]
 		time = self.data.symbol_update_time[symbol]

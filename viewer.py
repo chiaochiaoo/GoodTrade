@@ -101,7 +101,7 @@ class ticker_manager(pannel):
 		self.data = data
 
 
-		self.width = [8,10,12,10,10,24,10,10]
+		self.width = [8,10,12,10,10,10,24,10]
 		self.labels = ["Ticker","Status","Last update","Price","Last Alert","Last Alert time","Remove"]
 
 		#init the labels. 
@@ -112,7 +112,6 @@ class ticker_manager(pannel):
 	def init_reg_list(self):
 
 		ticks = self.data.get_list()
-		width = [8,10,12,10,12,10,10]
 
 		for i in range(len(ticks)):
 			self.add_symbol_label(ticks[i])
@@ -152,7 +151,6 @@ class ticker_manager(pannel):
 		i = symbol
 		l = self.label_count
 
-		width = [8,10,12,10,10,12,10,10]
 		info = [symbol,\
 				self.data.symbol_status[symbol],\
 				self.data.symbol_update_time[symbol],\
@@ -166,23 +164,23 @@ class ticker_manager(pannel):
 		#add in tickers.
 		for j in range(len(info)):
 			if j == 0:
-				self.tickers_labels[i].append(tk.Label(self.frame ,text=info[j],width=width[j]))
+				self.tickers_labels[i].append(tk.Label(self.frame ,text=info[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 
 			elif j == 1:
-				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=info[j],width=width[j]))
+				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=info[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 				info[j].trace('w', lambda *_, text=info[j],label=self.tickers_labels[i][j]: self.status_change_color(text,label))
 			elif j != (len(info)-1):
-				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=info[j],width=width[j]))
+				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=info[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 
 				
 			else:
-				self.tickers_labels[i].append(tk.Button(self.frame ,text=info[j],width=width[j],command = lambda s=symbol: self.delete_symbol_reg_list(s)))
+				self.tickers_labels[i].append(tk.Button(self.frame ,text=info[j],width=self.width[j],command = lambda s=symbol: self.delete_symbol_reg_list(s)))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 
