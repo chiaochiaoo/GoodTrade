@@ -25,6 +25,8 @@ class Symbol_data_manager:
 		self.reg_symbols = self.symbols[:]
 		#These filed need to be initilized. 
 
+		self.symbol_init =[]
+
 		#basics
 		self.symbol_price = {}
 		self.symbol_price_high = {}
@@ -366,6 +368,11 @@ class price_updater:
 
 			if symbol in self.symbols:
 
+				if symbol not in self.data.symbol_init:
+					low.set(midprice)
+					self.data.symbol_init.append(symbol)
+
+
 
 				status.set(stat)
 				timestamp.set(time)
@@ -373,8 +380,10 @@ class price_updater:
 
 				if midprice<low.get():
 					low.set(midprice)
+
 				if midprice>high.get():
 					high.set(midprice)
+
 				rg = round(high.get() - low.get(),3)
 				range_.set(rg)
 
@@ -407,9 +416,9 @@ class price_updater:
 					else:
 						#update these. 
 						idx = self.data.minute_count[symbol]-1
-						if midprice > self.data.minute_data[symbol]["high"][idx]:
+						if midprice >= self.data.minute_data[symbol]["high"][idx]:
 							self.data.minute_data[symbol]["high"][idx] = midprice
-						if midprice < self.data.minute_data[symbol]["low"][idx]:
+						if midprice <= self.data.minute_data[symbol]["low"][idx]:
 							self.data.minute_data[symbol]["low"][idx] = midprice
 						self.data.minute_data[symbol]["vol"][idx] = vol/1000
 
