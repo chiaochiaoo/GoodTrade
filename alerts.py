@@ -51,6 +51,8 @@ class all_alerts(pannel):
 			self.alert_base.append(set(vals))
 			self.rebind(self.canvas,self.frame)
 
+		self.rebind(self.canvas,self.frame)
+
 class alert(pannel):
 
 	def __init__(self,frame,data:Symbol_data_manager,alert_pannel:all_alerts):
@@ -293,8 +295,8 @@ class firstfive(alert):
 
 		super().__init__(frame,data,alert_panel)
 
-		self.labels = ["Ticker","Status","Cur Range","H. Avg","H. Std","H. Range","Cur Vol","H.Vol Avg","H.Vol Std","H.Vol Range","Evaluation:Range"]
-		self.width = [8,10,7,7,7,7,7,7,7,12,14,15]
+		self.labels = ["Ticker","Status","Cur Range","H. Avg","H. Std","H. Range","Cur Vol","H.Vol Avg","H.Vol Std","H.Vol Range","Evaluation:Range","Evaluation:Volume"]
+		self.width = [8,10,7,7,7,7,7,7,7,12,14,15,15]
 		self.labels_creator(self.frame)
 
 	def add_symbol(self,symbol):
