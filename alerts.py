@@ -276,7 +276,7 @@ class openlow(alert):
 
 		#cur, mean, std. symbol, time. 
 		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type]
-		labels = [symbol,status,cur_range,cur_open,cur_high,hist_avg,hist_std,hist_range,eva]
+		labels = [symbol,status,cur_range,cur_open,cur_low,hist_avg,hist_std,hist_range,eva]
 
 
 		#any alert will need a threshold. deviation. std. 
