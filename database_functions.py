@@ -104,29 +104,43 @@ class database():
 					a=data.symbol_data_first5_dis[i]
 					b=data.symbol_data_first5_vol_dis[i]
 
+					c=data.symbol_data_normal5_dis[i]
+					d=data.symbol_data_normal5_vol_dis[i]
+
 					for line in r.splitlines():
 						lst=line.split(",")
+
+						r = round(float(lst[3])-float(lst[4]),3)
+						v = int(lst[6])
 						if lst[1]=='09:30':
-							a.append(round(float(lst[3])-float(lst[4]),3))
-							b.append(int(lst[6]))
+							a.append(r)
+							b.append(v)
+						c.append(r)
+						d.append(v)
 
 
-					print(symbol,"Fetch first 5  data complete:",len(a),"days")
+					print(symbol,"Fetch 5-min  data complete:",len(a),"days")
 
 
 					#set the var.
 					data.symbol_data_first5_range[i].set(str(round(min(a),3))+"-"+str(round(max(a),3)))
-
 					data.symbol_data_first5_vol_range[i].set(str(int(min(b)//1000))+"k-"+str(int(max(b)/1000))+"k")
-
 
 					data.symbol_data_first5_val[i].set(round(np.mean(a),3))
 					data.symbol_data_first5_vol_val[i].set(int(np.mean(b)/1000))
 
-
 					data.symbol_data_first5_std[i].set(round(np.std(a),3))
 					data.symbol_data_first5_vol_std[i].set(int(np.std(b)/1000))
 
+					#######
+					data.symbol_data_normal5_range[i].set(str(round(min(c),3))+"-"+str(round(max(c),3)))
+					data.symbol_data_normal5_vol_range[i].set(str(int(min(d)//1000))+"k-"+str(int(max(d)/1000))+"k")
+
+					data.symbol_data_normal5_val[i].set(round(np.mean(c),3))
+					data.symbol_data_normal5_vol_val[i].set(int(np.mean(d)/1000))
+
+					data.symbol_data_normal5_std[i].set(round(np.std(c),3))
+					data.symbol_data_normal5_vol_std[i].set(int(np.std(d)/1000))
 
 					######################
 

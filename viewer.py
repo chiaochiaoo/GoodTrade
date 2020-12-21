@@ -52,7 +52,10 @@ class viewer:
 
 		self.first_5 = firstfive(self.tab4,self.data,self.all_alerts)
 
-		alerts = [self.high_low_pannel,self.open_high_pannel,self.open_low_pannel,self.first_5]
+		self.er = extremrange(self.tab2,self.data,self.all_alerts)
+		self.ev = extremevolume(self.tab3,self.data,self.all_alerts)
+
+		alerts = [self.high_low_pannel,self.open_high_pannel,self.open_low_pannel,self.first_5,self.er,self.ev]
 
 		self.tm = ticker_manager(self.tab1,self.data,alerts)
 		
@@ -217,8 +220,8 @@ class ticker_manager(pannel):
 
 root = tk.Tk() 
 root.title("GoodTrade") 
-root.geometry("1200x700")
-root.minsize(1000, 600)
+root.geometry("1400x700")
+root.minsize(1200, 600)
 root.maxsize(3000, 1500)
 view = viewer(root)
 
