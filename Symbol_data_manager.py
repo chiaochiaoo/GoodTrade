@@ -387,10 +387,10 @@ class price_updater:
 					else:
 						#update these. 
 						idx = self.data.minute_count[symbol]-1
-						if high > self.data.minute_data[symbol]["high"][idx]:
-							self.data.minute_data[symbol]["high"][idx] = high
-						if low < self.data.minute_data[symbol]["low"][idx]:
-							self.data.minute_data[symbol]["low"][idx] = low
+						if hp > self.data.minute_data[symbol]["high"][idx]:
+							self.data.minute_data[symbol]["high"][idx] = hp
+						if lp < self.data.minute_data[symbol]["low"][idx]:
+							self.data.minute_data[symbol]["low"][idx] = lp
 						self.data.minute_data[symbol]["vol"][idx] = vol/1000
 
 					#perform an update. 
