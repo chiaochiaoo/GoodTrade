@@ -356,7 +356,7 @@ class price_updater:
 			last_5_range = self.data.last_5_min_range[symbol]
 			last_5_vol = self.data.last_5_min_volume[symbol]
 
-			stat,time,midprice,op,hp,lp,rg,rgoh,rgol,vol = getinfo(symbol)
+			stat,time,midprice,op,vol = getinfo(symbol)
 
 			#I need to make sure that label still exist. 
 			#status["text"],timestamp["text"],price["text"]= self.count,self.count,self.count
@@ -365,11 +365,24 @@ class price_updater:
 				self.black_list.append(symbol)
 
 			if symbol in self.symbols:
+
+				rg,rgoh,rgol,hp,lp
+
+
+
 				status.set(stat)
 				timestamp.set(time)
 				price.set(midprice)
 				open_.set(op)
-				high.set(hp)
+
+				if midprice<low.get():
+					low.set(midprice)
+				if midprice>high.get():
+					high.set(midprice)
+				rg = round(high.get() - low.get(),3)
+				rgoh = round(high.get() - op,3)
+				rgol = round(op - low.get(),3)
+
 				low.set(lp)
 				range_.set(rg)
 				oh.set(rgoh)
@@ -457,22 +470,13 @@ def getinfo(symbol):
 		Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
 		Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
 		open_ = float(find_between(r.text, "OpenPrice=\"", "\""))
-		high_ = float(find_between(r.text, "HighPrice=\"", "\""))
-		low_ =float(find_between(r.text, "LowPrice=\"", "\""))
 		vol = int(find_between(r.text, "Volume=\"", "\""))
-		range_ = round(high_-low_,4)
-		rgoh = round(high_-open_,4)
-		rgol = round(open_-low_,4)
+
 		#print(time,price)
 		return "Connected",\
 				time,\
 				round((Bidprice+Askprice)/2,4),\
 				open_,\
-				high_,\
-				low_,\
-				range_,\
-				rgoh,\
-				rgol,\
 				vol
 
 
