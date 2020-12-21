@@ -31,10 +31,16 @@ class Symbol_data_manager:
 		self.symbol_price_low = {}
 		self.symbol_price_open = {}
 		self.symbol_price_range = {}
-
 		self.symbol_price_openhigh = {}
 		self.symbol_price_openlow = {}
 
+		### Update these upon new ticks 
+		self.minute_count = {}
+		self.minute_data = {}
+		self.minute_timestamp = {}
+
+		self.last_5_min_range = {}
+		self.last_5_min_volume = {}
 		#self.symbol_volume = {}
 
 		self.symbol_status = {}
@@ -86,13 +92,19 @@ class Symbol_data_manager:
 		self.symbol_status_color[i] = StringVar()
 		self.symbol_price[i] = DoubleVar()
 
-
 		self.symbol_price_open[i] = DoubleVar()
 		self.symbol_price_range[i] = DoubleVar()
 		self.symbol_price_high[i] = DoubleVar()
 		self.symbol_price_low[i] = DoubleVar()
 		self.symbol_price_openhigh[i] = DoubleVar()
 		self.symbol_price_openlow[i] = DoubleVar()
+
+		self.minute_count[i] = 0 
+		self.minute_data[i] = {"high":[],"low":[],"vol":[]}
+		self.minute_timestamp[i] = []
+
+		self.last_5_min_range[i] = 0
+		self.last_5_min_volume[i] = 0
 
 		self.symbol_update_time[i] = StringVar()
 
@@ -230,25 +242,14 @@ class price_updater:
 			for i in self.symbols:
 
 				if i not in self.black_list:
-					status = self.data.symbol_status[i]
-					timestamp = self.data.symbol_update_time[i]
-					price = self.data.symbol_price[i]
-
-					open_ = self.data.symbol_price_open[i]
-					high = self.data.symbol_price_high[i]
-					low = self.data.symbol_price_low[i]
-					range_ = self.data.symbol_price_range[i]
-
-					oh = self.data.symbol_price_openhigh[i]
-					ol = self.data.symbol_price_openlow[i]
-
-					fetch = threading.Thread(target=self.update_symbol, args=(i,status,timestamp,price,open_,high,low,range_,oh,ol), daemon=True)
+	
+					fetch = threading.Thread(target=self.update_symbol, args=(i,), daemon=True)
 					#only start when the last one has returned. 
 					fetch.start()
 			time.sleep(1)
 
 	#a single thread 
-	def update_symbol(self,symbol,status,timestamp,price,open_,high,low,range_,oh,ol):
+	def update_symbol(self,symbol):
 
 		#get the info. and, update!!!
 		if symbol not in self.lock:
@@ -256,6 +257,19 @@ class price_updater:
 
 		if self.lock[symbol]==False:
 			self.lock[symbol] = True
+
+
+			status = self.data.symbol_status[symbol]
+			timestamp = self.data.symbol_update_time[symbol]
+			price = self.data.symbol_price[symbol]
+
+			open_ = self.data.symbol_price_open[symbol]
+			high = self.data.symbol_price_high[symbol]
+			low = self.data.symbol_price_low[symbol]
+			range_ = self.data.symbol_price_range[symbol]
+
+			oh = self.data.symbol_price_openhigh[symbol]
+			ol = self.data.symbol_price_openlow[symbol]
 
 			stat,time,midprice,op,hp,lp,rg,rgoh,rgol = getinfo(symbol)
 
