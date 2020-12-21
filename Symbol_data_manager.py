@@ -397,8 +397,8 @@ class price_updater:
 					if timestamp not in self.data.minute_timestamp[symbol]:
 						self.data.minute_timestamp[symbol].append(timestamp)
 
-						self.data.minute_data[symbol]["high"].append(hp)
-						self.data.minute_data[symbol]["low"].append(lp)
+						self.data.minute_data[symbol]["high"].append(midprice)
+						self.data.minute_data[symbol]["low"].append(midprice)
 						self.data.minute_data[symbol]["vol"].append(vol)
 
 						self.data.minute_count[symbol] +=1
@@ -407,10 +407,10 @@ class price_updater:
 					else:
 						#update these. 
 						idx = self.data.minute_count[symbol]-1
-						if hp > self.data.minute_data[symbol]["high"][idx]:
-							self.data.minute_data[symbol]["high"][idx] = hp
-						if lp < self.data.minute_data[symbol]["low"][idx]:
-							self.data.minute_data[symbol]["low"][idx] = lp
+						if midprice > self.data.minute_data[symbol]["high"][idx]:
+							self.data.minute_data[symbol]["high"][idx] = midprice
+						if midprice < self.data.minute_data[symbol]["low"][idx]:
+							self.data.minute_data[symbol]["low"][idx] = midprice
 						self.data.minute_data[symbol]["vol"][idx] = vol/1000
 
 					#perform an update. 
