@@ -144,10 +144,10 @@ class alert(pannel):
 				eval_label["background"]="white"
 
 			elif cur>0.5 and cur<1:
-				alert_type = "Moderate "+alert_type
+				#alert_type = "Moderate "+alert_type
 				eval_label["background"]="#97FEA8"
-				self.alert_pannel.add_alerts([symbol,time,alert_type])
-				self.set_latest_alert(symbol, alert_type, time)
+				# self.alert_pannel.add_alerts([symbol,time,alert_type])
+				# self.set_latest_alert(symbol, alert_type, time)
 
 			elif cur>1 and cur<2:
 				alert_type = "High "+alert_type
