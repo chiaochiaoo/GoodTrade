@@ -168,7 +168,7 @@ class highlow(alert):
 
 		super().__init__(frame,data,alert_panel)
 
-		self.labels = ["Ticker","Status","Cur Range","Cur High","Cur low","H. Avg","H. Std","H. Range","Evaluation"]
+		self.labels = ["Ticker","Status","Cur Range","Cur High","Cur Low","H. Avg","H. Std","H. Range","Evaluation"]
 		self.width = [8,10,7,7,7,7,7,9,15]
 		self.labels_creator(self.frame)
 
@@ -181,7 +181,7 @@ class highlow(alert):
 		hist_avg= self.data.symbol_data_range_val[symbol]
 		hist_std = self.data.symbol_data_range_std[symbol]
 		hist_range= self.data.symbol_data_range_range[symbol]
-		eva= self.data.symbol_data_openhigh_eval[symbol]
+		eva= self.data.symbol_data_range_eval[symbol]
 		time = self.data.symbol_update_time[symbol]
 
 		data_ready = self.data.data_ready[symbol]
@@ -193,6 +193,49 @@ class highlow(alert):
 		#cur, mean, std. symbol, time. 
 		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type]
 		labels = [symbol,status,cur_range,cur_high,cur_low,hist_avg,hist_std,hist_range,eva]
+
+
+		#any alert will need a threshold. deviation. std. 
+
+		#self,symbol,format,width,val_position,alert_position,alert_vals
+		super().add_symbol(symbol, labels,value_position,alert_position,alertvals,data_ready)
+
+	#find a way to bound the special checking value to. hmm. every update.
+
+
+
+class openhigh(alert):
+
+	def __init__(self,frame,data:Symbol_data_manager,alert_panel:all_alerts):
+
+		super().__init__(frame,data,alert_panel)
+
+		self.labels = ["Ticker","Status","Cur Range","Cur Open","Cur High","H. Avg","H. Std","H. Range","Evaluation"]
+		self.width = [8,10,7,7,7,7,7,9,15]
+		self.labels_creator(self.frame)
+
+	def add_symbol(self,symbol):
+
+		status = self.data.symbol_status[symbol]
+		cur_range =self.data.symbol_price_openhigh[symbol]
+		cur_open = self.data.symbol_price_open[symbol]
+		cur_high = self.data.symbol_price_high[symbol]
+		hist_avg= self.data.symbol_data_openhigh_val[symbol]
+		hist_std = self.data.symbol_data_openhigh_range[symbol]
+		hist_range= self.data.symbol_data_openhigh_std[symbol]
+
+		eva= self.data.symbol_data_openhigh_eval[symbol]
+		time = self.data.symbol_update_time[symbol]
+
+		data_ready = self.data.data_ready[symbol]
+
+		value_position = 2
+		alert_position = 8
+		alert_type = "Intraday Open-High"
+
+		#cur, mean, std. symbol, time. 
+		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type]
+		labels = [symbol,status,cur_range,cur_open,cur_high,hist_avg,hist_std,hist_range,eva]
 
 
 		#any alert will need a threshold. deviation. std. 

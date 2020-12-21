@@ -32,12 +32,14 @@ class Symbol_data_manager:
 		self.symbol_price_open = {}
 		self.symbol_price_range = {}
 
+		self.symbol_price_openhigh = {}
+		self.symbol_price_openlow = {}
+
 		#self.symbol_volume = {}
 
 		self.symbol_status = {}
 		self.symbol_status_color = {}
 		self.symbol_update_time = {}
-
 
 		#data
 
@@ -89,6 +91,8 @@ class Symbol_data_manager:
 		self.symbol_price_range[i] = DoubleVar()
 		self.symbol_price_high[i] = DoubleVar()
 		self.symbol_price_low[i] = DoubleVar()
+		self.symbol_price_openhigh[i] = DoubleVar()
+		self.symbol_price_openlow[i] = DoubleVar()
 
 		self.symbol_update_time[i] = StringVar()
 
@@ -235,15 +239,16 @@ class price_updater:
 					low = self.data.symbol_price_low[i]
 					range_ = self.data.symbol_price_range[i]
 
+					oh = self.data.symbol_price_openhigh[i]
+					ol = self.data.symbol_price_openlow[i]
 
-
-					fetch = threading.Thread(target=self.update_symbol, args=(i,status,timestamp,price,open_,high,low,range_), daemon=True)
+					fetch = threading.Thread(target=self.update_symbol, args=(i,status,timestamp,price,open_,high,low,range_,oh,ol), daemon=True)
 					#only start when the last one has returned. 
 					fetch.start()
 			time.sleep(1)
 
 	#a single thread 
-	def update_symbol(self,symbol,status,timestamp,price,open_,high,low,range_):
+	def update_symbol(self,symbol,status,timestamp,price,open_,high,low,range_,oh,ol):
 
 		#get the info. and, update!!!
 		if symbol not in self.lock:
@@ -268,6 +273,11 @@ class price_updater:
 				high.set(hp)
 				low.set(lp)
 				range_.set(rg)
+
+				oh_ = round(hp-op,3)
+				ol_ = round(op-lp,3)
+				oh.set(oh_)
+				ol.set(ol_)
 
 
 			self.lock[symbol] = False
