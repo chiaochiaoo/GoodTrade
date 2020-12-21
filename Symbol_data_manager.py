@@ -418,7 +418,7 @@ class price_updater:
 
 
 					#check if time stamp is 9:35
-					if timestmap == 530:
+					if timestamp == 531:
 						print("time CHECK")
 					if timestamp ==575:
 
