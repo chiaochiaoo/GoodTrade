@@ -20,7 +20,7 @@ class viewer:
 		self.data = Symbol_data_manager()
 
 		self.listening = ttk.LabelFrame(root,text="Listener") 
-		self.listening.place(x=500,rely=0.05,relheight=1,width=1200)
+		self.listening.place(x=500,rely=0.05,relheight=1,width=1000)
 
 		self.tabControl = ttk.Notebook(self.listening) 
 		self.tab1 = tk.Canvas(self.tabControl) 
