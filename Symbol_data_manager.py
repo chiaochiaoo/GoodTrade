@@ -249,6 +249,17 @@ class price_updater:
 			time.sleep(1)
 
 	#a single thread 
+
+	def timestamp(self,s):
+    
+		p = s.split(":")
+		try:
+			x = int(p[0])*60+int(p[1])
+			return x
+		except Exception as e:
+			print(e)
+			return 0
+
 	def update_symbol(self,symbol):
 
 		#get the info. and, update!!!
@@ -257,7 +268,6 @@ class price_updater:
 
 		if self.lock[symbol]==False:
 			self.lock[symbol] = True
-
 
 			status = self.data.symbol_status[symbol]
 			timestamp = self.data.symbol_update_time[symbol]
@@ -271,7 +281,11 @@ class price_updater:
 			oh = self.data.symbol_price_openhigh[symbol]
 			ol = self.data.symbol_price_openlow[symbol]
 
-			stat,time,midprice,op,hp,lp,rg,rgoh,rgol = getinfo(symbol)
+
+			last_5_range = self.data.last_5_min_range[symbol]
+			last_5_vol = self.data.last_5_min_volume[symbol]
+
+			stat,time,midprice,op,hp,lp,rg,rgoh,rgol,vol = getinfo(symbol)
 
 			#I need to make sure that label still exist. 
 			#status["text"],timestamp["text"],price["text"]= self.count,self.count,self.count
@@ -287,9 +301,50 @@ class price_updater:
 				high.set(hp)
 				low.set(lp)
 				range_.set(rg)
-
 				oh.set(rgoh)
 				ol.set(rgol)
+
+				#now it's time tp update the 5 min range/volume.
+
+				if stat == "Connected":
+
+					timestamp = self.timestamp(time[:5])
+
+					#if timestamp not registered yet.
+					if timestamp not in self.data.minute_timestamp[symbol]:
+						self.data.minute_timestamp[symbol].append(timestamp)
+
+						self.data.minute_data[symbol]["high"].append(hp)
+						self.data.minute_data[symbol]["low"].append(lp)
+						self.data.minute_data[symbol]["vol"].append(vol)
+
+						self.data.minute_count[symbol] +=1
+
+					#if timestamp already registered. 
+					else:
+						#update these. 
+						idx = self.data.minute_count[symbol]
+						if high > self.data.minute_data[symbol]["high"][idx]:
+							self.data.minute_data[symbol]["high"][idx] = high
+						if low < self.data.minute_data[symbol]["low"][idx]:
+							self.data.minute_data[symbol]["low"][idx] = low
+						self.data.minute_data[symbol]["vol"][idx] = vol
+
+					#perform an update. 
+
+					#
+					l5_h = max(self.data.minute_data[symbol]["high"][-5:])
+					l5_l = min(self.data.minute_data[symbol]["low"][-5:])
+
+
+					l5_r = round(l5_h - l5_l,3)
+
+					index = min(self.data.minute_count[symbol], 5)
+					l5_v = self.data.minute_data[symbol]["vol"][-index:] - self.data.minute_data[symbol]["vol"][0]
+
+					last_5_range.set(l5_r)
+					last_5_vol.set(l5_v)
+					
 
 
 			self.lock[symbol] = False
@@ -320,13 +375,14 @@ def getinfo(symbol):
 		r= requests.get(p)
 		if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
 			print("No symbol found")
-			return "Unfound","","","","","","","",""
+			return "Unfound","","","","","","","","",""
 		time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
 		Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
 		Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
 		open_ = float(find_between(r.text, "OpenPrice=\"", "\""))
 		high_ = float(find_between(r.text, "HighPrice=\"", "\""))
 		low_ =float(find_between(r.text, "LowPrice=\"", "\""))
+		vol = int(find_between(r.text, "Volume=\"", "\""))
 		range_ = round(high_-low_,4)
 		rgoh = round(high_-open_,4)
 		rgol = round(open_-low_,4)
@@ -339,14 +395,15 @@ def getinfo(symbol):
 				low_,\
 				range_,\
 				rgoh,\
-				rgol
+				rgol,\
+				vol
 
 
     # p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
     # r= requests.get(p,allow_redirects=False,stream=True)
 	except Exception as e:
 		print(e)
-		return "Disconnected","","","","","","","",""
+		return "Disconnected","","","","","","","","",""
 
 def find_between(data, first, last):
     try:
