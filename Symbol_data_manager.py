@@ -386,7 +386,7 @@ class price_updater:
 					#if timestamp already registered. 
 					else:
 						#update these. 
-						idx = self.data.minute_count[symbol]
+						idx = self.data.minute_count[symbol]-1
 						if high > self.data.minute_data[symbol]["high"][idx]:
 							self.data.minute_data[symbol]["high"][idx] = high
 						if low < self.data.minute_data[symbol]["low"][idx]:
