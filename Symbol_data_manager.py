@@ -314,6 +314,8 @@ class price_updater:
 		while True:
 			#print("symbols:",self.symbols)
 			self.count+=1
+
+			print("Current thread count:",threading.active_count())
 			for i in self.symbols:
 
 				if i not in self.black_list:
@@ -321,7 +323,7 @@ class price_updater:
 					fetch = threading.Thread(target=self.update_symbol, args=(i,), daemon=True)
 					#only start when the last one has returned. 
 					fetch.start()
-			time.sleep(20)
+			time.sleep(5)
 
 	#a single thread 
 
