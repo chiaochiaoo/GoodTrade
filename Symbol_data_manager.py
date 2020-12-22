@@ -370,23 +370,18 @@ class price_updater:
 
 			if symbol in self.symbols:
 
-				if symbol not in self.data.symbol_init:
-					low.set(midprice)
-					self.data.symbol_init.append(symbol)
+
 
 
 				status.set(stat)
-				timestamp.set(time)
-				price.set(midprice)
+				# if midprice<low.get():
+				# 	low.set(midprice)
 
-				if midprice<low.get():
-					low.set(midprice)
+				# if midprice>high.get():
+				# 	high.set(midprice)
 
-				if midprice>high.get():
-					high.set(midprice)
-
-				rg = round(high.get() - low.get(),3)
-				range_.set(rg)
+				# rg = round(high.get() - low.get(),3)
+				# range_.set(rg)
 
 				#now it's time tp update the 5 min range/volume.
 
@@ -396,10 +391,26 @@ class price_updater:
 
 					self.data.minute_timestamp_val[symbol].set(timestamp)
 
+					if timestamp <570:
+						if symbol not in self.data.symbol_init:
+							self.data.symbol_init.append(symbol)
+							low.set(midprice)
+							high.set(midprice)
+						timestamp.set(time)
+						price.set(midprice)
+						if midprice<low.get():
+							low.set(midprice)
+
+						if midprice>high.get():
+							high.set(midprice)
+
+
 					if timestamp == 570:
 						open_.set(op)
 
 					if timestamp >=570:
+						high.set(high_)
+						low.set(low_)
 						rgoh = round(high_ - op,3)
 						rgol = round(op - low_,3)
 						oh.set(rgoh)
