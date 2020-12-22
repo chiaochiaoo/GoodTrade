@@ -1,13 +1,15 @@
 import tkinter as tk                     
 from tkinter import ttk 
+import threading
 from pannel import *
+
 try:
     from finviz.screener import Screener
 except ImportError:
     pip.main(['install', 'finviz'])
     from finviz.screener import Screener
 
-import threading
+
 
 def status_change(var,label):
 	label["text"] = "Current Status: "+var.get()
