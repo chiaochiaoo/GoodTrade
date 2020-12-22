@@ -329,6 +329,7 @@ class price_updater:
     
 		p = s.split(":")
 		try:
+			print("check:",p[0],p[1])
 			x = int(p[0])*60+int(p[1])
 			return x
 		except Exception as e:
