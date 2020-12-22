@@ -1,7 +1,9 @@
 import tkinter as tk                     
 from tkinter import ttk 
-import threading
+#import threading
 from pannel import *
+
+#import subprocess
 
 try:
     from finviz.screener import Screener
@@ -158,8 +160,10 @@ class scanner(pannel):
 
 		#self.downloader.start(cond,market_,type_,cap)
 	
-		download = threading.Thread(name="scanner thread",target=self.refreshstocks,args=(cond,market_,type_,cap,), daemon=True)
-		download.start()
+		# download = threading.Thread(name="scanner thread",target=self.refreshstocks,args=(cond,market_,type_,cap,), daemon=True)
+		# download.start()
+
+		self.refreshstocks(cond,market_,type_,cap,)
 
 	def add_labels(self,d):
 		#This is where it adds the labels. 
