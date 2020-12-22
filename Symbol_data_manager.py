@@ -370,9 +370,6 @@ class price_updater:
 
 			if symbol in self.symbols:
 
-
-
-
 				status.set(stat)
 				# if midprice<low.get():
 				# 	low.set(midprice)
@@ -495,7 +492,10 @@ def getinfo(symbol):
 		open_ = float(find_between(r.text, "OpenPrice=\"", "\""))
 		high = float(find_between(r.text, "HighPrice=\"", "\""))
 		low = float(find_between(r.text, "LowPrice=\"", "\""))
-		vol = int(find_between(r.text, "Volume=\"", "\""))
+		try:
+			vol = int(find_between(r.text, "Volume=\"", "\""))
+		except:
+			vol = 0
 
 		#print(time,price)
 		return "Connected",\
