@@ -387,7 +387,7 @@ class price_updater:
 
 				if stat == "Connected":
 
-					timestamp = self.timestamp(time[:5])
+					time = self.timestamp(time[:5])
 
 					self.data.minute_timestamp_val[symbol].set(timestamp)
 
