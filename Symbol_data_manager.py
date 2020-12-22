@@ -225,6 +225,7 @@ class Symbol_data_manager:
 		self.symbols.append(symbol)
 		self.save()
 
+		print("registering:",symbol)
 		reg = threading.Thread(target=register,args=(symbol,), daemon=True)
 		reg.start()
 
@@ -329,8 +330,6 @@ class price_updater:
     
 		p = s.split(":")
 		try:
-			print("sm check:",p)
-			print("sm chcke2:",p[0],p[1])
 			x = int(p[0])*60+int(p[1])
 			return x
 		except Exception as e:
