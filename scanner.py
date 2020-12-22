@@ -155,7 +155,7 @@ class scanner(pannel):
 		self.delete_old_lables()
 
 		#self.downloader.start(cond,market_,type_,cap)
-
+	
 		download = threading.Thread(name="scanner thread",target=self.refreshstocks,args=(cond,market_,type_,cap,), daemon=True)
 		download.start()
 
@@ -196,66 +196,73 @@ class scanner(pannel):
 
 	def refreshstocks(self,cond,market_,type_,cap):
 
-		if(self.downloading == True):
-			self.status.set("Already downloading")
+		try:
+			if(self.downloading == True):
+				self.status.set("Already downloading")
 
-		else:
-			self.status.set("Downloading")
-			self.downloading = True
+			else:
+				self.status.set("Downloading")
+				self.downloading = True
 
-			market = ''
-			cond2 = ''
-			signal = ''
-
-			if market_ == 'Nasdaq':
-				market = 'exch_nasd'
-
-			elif market_ =='NYSE':
-				market = 'exch_nyse'
-
-			elif market_ =='AMEX':
-				market = 'exch_amex'
-
-			if type_ == 'Most Active':
-				signal = 'ta_mostactive'
-
-			elif type_ =='Top Gainner':
-				signal = 'ta_topgainers'
-
-			elif type_ =='New Highs':
-				signal = 'ta_newhigh'
-
-			elif type_ =='Unusual Volume':
-				signal = 'ta_unusualvolume'
-
-
-			if cap =='Any':
+				market = ''
 				cond2 = ''
-			elif cap == 'Mega':
-				cond2 = 'cap_mega'
-			elif cap =='Large':
-				cond2 = 'cap_large'
-			elif cap == 'Mid':
-				cond2 = 'cap_mid'
-			elif cap =='Small':
-				cond2 = 'cap_small'
-			elif cap =='Large+':
-				cond2 = 'cap_largeover'
-			elif cap =='Mid+':
-				cond2 = 'cap_midover'
-			elif cap =='Small+':
-				cond2 = 'cap_smallover'
+				signal = ''
 
-			#self.markcap.set('Any') 
+				if market_ == 'Nasdaq':
+					market = 'exch_nasd'
 
-			filters = [market,cond,cond2]  # Shows companies in NASDAQ which are in the S&P500
+				elif market_ =='NYSE':
+					market = 'exch_nyse'
 
-			stock_list = Screener(filters=filters, table='Performance', signal=signal)  # Get the performance table and sort it by price ascending
+				elif market_ =='AMEX':
+					market = 'exch_amex'
 
-			print(len(stock_list))
+				if type_ == 'Most Active':
+					signal = 'ta_mostactive'
 
-			self.add_labels(stock_list)
+				elif type_ =='Top Gainner':
+					signal = 'ta_topgainers'
 
-			self.status.set("Download compelted")
-			self.downloading = False
-			print("Scanner download complete")
+				elif type_ =='New Highs':
+					signal = 'ta_newhigh'
+
+				elif type_ =='Unusual Volume':
+					signal = 'ta_unusualvolume'
+
+
+				if cap =='Any':
+					cond2 = ''
+				elif cap == 'Mega':
+					cond2 = 'cap_mega'
+				elif cap =='Large':
+					cond2 = 'cap_large'
+				elif cap == 'Mid':
+					cond2 = 'cap_mid'
+				elif cap =='Small':
+					cond2 = 'cap_small'
+				elif cap =='Large+':
+					cond2 = 'cap_largeover'
+				elif cap =='Mid+':
+					cond2 = 'cap_midover'
+				elif cap =='Small+':
+					cond2 = 'cap_smallover'
+
+				#self.markcap.set('Any') 
+
+				filters = [market,cond,cond2]  # Shows companies in NASDAQ which are in the S&P500
+
+				stock_list = Screener(filters=filters, table='Performance', signal=signal)  # Get the performance table and sort it by price ascending
+
+				print(len(stock_list))
+
+				self.add_labels(stock_list)
+
+				self.status.set("Download compelted")
+				self.downloading = False
+				print("Scanner download complete")
+
+		except Exception as e:
+			print(e)
+			self.downloading == False
+			self.status.set("Error")
+			return 0
