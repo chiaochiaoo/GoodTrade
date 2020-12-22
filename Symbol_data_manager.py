@@ -451,7 +451,7 @@ class price_updater:
 					last_5_range.set(l5_r)
 					last_5_vol.set(l5_v)
 
-					print(symbol,":",time,"vol:",int(vol/1000))
+					print(symbol,":",time,"vol:",int(vol))
 
 					#check if time stamp is 9:35
 					if timestamp <575:
