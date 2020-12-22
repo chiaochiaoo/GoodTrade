@@ -28,7 +28,7 @@ class database():
 				if i not in self.black_list and i not in self.reg_list:
 					fetch = threading.Thread(target=self.fetch_high_low, args=(i,), daemon=True)
 					fetch.start()
-					time.sleep(1)
+					time.sleep(2)
 
 	def request(self,req,symbol):
 
