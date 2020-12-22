@@ -321,7 +321,7 @@ class price_updater:
 					fetch = threading.Thread(target=self.update_symbol, args=(i,), daemon=True)
 					#only start when the last one has returned. 
 					fetch.start()
-			time.sleep(5)
+			time.sleep(20)
 
 	#a single thread 
 
