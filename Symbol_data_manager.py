@@ -360,7 +360,7 @@ class price_updater:
 			last_5_range = self.data.last_5_min_range[symbol]
 			last_5_vol = self.data.last_5_min_volume[symbol]
 
-			stat,time,midprice,op,high,low,vol = getinfo(symbol)
+			stat,time,midprice,op,high_,low_,vol = getinfo(symbol)
 
 			#I need to make sure that label still exist. 
 			#status["text"],timestamp["text"],price["text"]= self.count,self.count,self.count
@@ -373,7 +373,6 @@ class price_updater:
 				if symbol not in self.data.symbol_init:
 					low.set(midprice)
 					self.data.symbol_init.append(symbol)
-
 
 
 				status.set(stat)
@@ -401,8 +400,8 @@ class price_updater:
 						open_.set(op)
 
 					if timestamp >=570:
-						rgoh = round(high.get() - op,3)
-						rgol = round(op - low.get(),3)
+						rgoh = round(high_ - op,3)
+						rgol = round(op - low_,3)
 						oh.set(rgoh)
 						ol.set(rgol)
 
