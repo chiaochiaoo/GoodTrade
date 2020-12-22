@@ -419,11 +419,9 @@ class price_updater:
 					#if timestamp not registered yet.
 					if timestamp not in self.data.minute_timestamp[symbol]:
 						self.data.minute_timestamp[symbol].append(timestamp)
-
 						self.data.minute_data[symbol]["high"].append(midprice)
 						self.data.minute_data[symbol]["low"].append(midprice)
 						self.data.minute_data[symbol]["vol"].append(vol)
-
 						self.data.minute_count[symbol] +=1
 
 					#if timestamp already registered. 
@@ -435,6 +433,9 @@ class price_updater:
 						if midprice <= self.data.minute_data[symbol]["low"][idx]:
 							self.data.minute_data[symbol]["low"][idx] = midprice
 						self.data.minute_data[symbol]["vol"][idx] = vol
+
+						print(self.data.minute_data[symbol]["high"][idx] == self.data.minute_data[symbol]["high"][-1])
+						print(self.data.minute_data[symbol]["vol"][idx] == self.data.minute_data[symbol]["vol"][-1])
 
 					#perform an update. 
 
@@ -451,7 +452,7 @@ class price_updater:
 					last_5_range.set(l5_r)
 					last_5_vol.set(l5_v)
 
-					print(symbol,":",time,"vol:",int(vol))
+					#print(symbol,":",time,"vol:",int(vol))
 
 					#check if time stamp is 9:35
 					if timestamp <575:
