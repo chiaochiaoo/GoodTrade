@@ -345,7 +345,7 @@ class price_updater:
 			self.lock[symbol] = True
 
 			status = self.data.symbol_status[symbol]
-			timestamp = self.data.symbol_update_time[symbol]
+			timestatus = self.data.symbol_update_time[symbol]
 			price = self.data.symbol_price[symbol]
 
 			open_ = self.data.symbol_price_open[symbol]
@@ -387,16 +387,16 @@ class price_updater:
 
 				if stat == "Connected":
 
-					time = self.timestamp(time[:5])
+					timestamp = self.timestamp(time[:5])
 
 					self.data.minute_timestamp_val[symbol].set(timestamp)
 
-					if time <570:
+					if timestamp <570:
 						if symbol not in self.data.symbol_init:
 							self.data.symbol_init.append(symbol)
 							low.set(midprice)
 							high.set(midprice)
-						timestamp.set(time)
+						timestatus.set(time)
 						price.set(midprice)
 						if midprice<low.get():
 							low.set(midprice)
@@ -405,10 +405,10 @@ class price_updater:
 							high.set(midprice)
 
 
-					if time == 570:
+					if timestamp == 570:
 						open_.set(op)
 
-					if time >=570:
+					if timestamp >=570:
 						high.set(high_)
 						low.set(low_)
 						rgoh = round(high_ - op,3)
