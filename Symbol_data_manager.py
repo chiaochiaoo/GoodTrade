@@ -493,7 +493,7 @@ def getinfo(symbol):
 		high = float(find_between(r.text, "HighPrice=\"", "\""))
 		low = float(find_between(r.text, "LowPrice=\"", "\""))
 		try:
-			vol = int(find_between(r.text, "Volume=\"", "\""))
+			vol = int(float(find_between(r.text, "Volume=\"", "\"")))
 		except:
 			vol = 0
 
