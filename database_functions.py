@@ -3,6 +3,10 @@ import numpy as np
 import threading
 from Symbol_data_manager import *
 
+
+
+#change: Use as it calls. Not a constant thread. Consue too much resources.
+
 class database():
 
 	def __init__(self,s: Symbol_data_manager):
@@ -13,7 +17,7 @@ class database():
 		self.lock = {}
 
 	def start(self):
-		fetch = threading.Thread(target=self.update_info, daemon=True)
+		fetch = threading.Thread(name="Data_base",target=self.update_info, daemon=True)
 		fetch.start()
 
 	def update_info(self):

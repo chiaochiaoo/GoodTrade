@@ -14,8 +14,6 @@ def status_change(var,label):
 
 class scanner(pannel):
 
-
-
 	def __init__(self,root,tickers_manager):
 
 		super()

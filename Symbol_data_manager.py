@@ -209,8 +209,8 @@ class Symbol_data_manager:
 		self.symbol_last_alert[i] = StringVar()
 		self.symbol_last_alert_time[i] = StringVar()
 
-		reg = threading.Thread(target=register,args=(i,), daemon=True)
-		reg.start()
+		# reg = threading.Thread(target=register,args=(i,), daemon=True)
+		# reg.start()
 
 	def change_status(self,symbol,status):
 		self.symbol_status[symbol].set(status)
@@ -225,8 +225,7 @@ class Symbol_data_manager:
 		self.save()
 
 		print("registering:",symbol)
-		reg = threading.Thread(target=register,args=(symbol,), daemon=True)
-		reg.start()
+
 
 
 	def delete(self,symbol):
@@ -234,8 +233,8 @@ class Symbol_data_manager:
 			self.symbols.remove(symbol)
 		self.save()
 
-		dereg = threading.Thread(target=deregister,args=(symbol,), daemon=True)
-		dereg.start()
+		# dereg = threading.Thread(target=deregister,args=(symbol,), daemon=True)
+		# dereg.start()
 
 	def save(self):
 		np.savetxt('list.txt',self.symbols, delimiter=",", fmt="%s")   
@@ -304,7 +303,7 @@ class price_updater:
 	#these three functions together update the prices per second. 
 	def start(self):
 		print("Console (PT): Thread created, ready to start")
-		t1 = threading.Thread(target=self.update_info, daemon=True)
+		t1 = threading.Thread(name='Symbol Data Manager updates',target=self.update_info, daemon=True)
 		t1.start()
 		print("Console (PT): Thread running. Continue:")
 
@@ -317,11 +316,14 @@ class price_updater:
 
 			print("Current thread count:",threading.active_count())
 
+			for thread in threading.enumerate(): 
+				print(thread.name)
+
 			# for i in self.symbols:
 
 			# 	if i not in self.black_list:
 	
-			# 		fetch = threading.Thread(target=self.update_symbol, args=(i,), daemon=True)
+			# 		fetch = threading.Thread(name='updating'+i,target=self.update_symbol, args=(i,), daemon=True)
 			# 		fetch.start()
 			time.sleep(5)
 
