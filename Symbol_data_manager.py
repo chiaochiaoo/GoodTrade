@@ -209,9 +209,8 @@ class Symbol_data_manager:
 		self.symbol_last_alert[i] = StringVar()
 		self.symbol_last_alert_time[i] = StringVar()
 
-
-	# def data_request(self,symbol):
-
+		reg = threading.Thread(target=register,args=(symbol,), daemon=True)
+		reg.start()
 
 	def change_status(self,symbol,status):
 		self.symbol_status[symbol].set(status)

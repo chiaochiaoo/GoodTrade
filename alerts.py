@@ -137,9 +137,12 @@ class alert(pannel):
 			ts = timestamp(time)
 
 
-			cur = round((cur_price-mean)/std,3)
-
-			eval_string.set(str(cur)+" from mean")
+			if std != 0:
+				cur = round((cur_price-mean)/std,3)
+				eval_string.set(str(cur)+" from mean")
+			else:
+				cur = 0
+				eval_string.set("Unable to process std 0")
 
 			#color. 
 
