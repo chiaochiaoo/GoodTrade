@@ -209,8 +209,8 @@ class Symbol_data_manager:
 		self.symbol_last_alert[i] = StringVar()
 		self.symbol_last_alert_time[i] = StringVar()
 
-		# reg = threading.Thread(target=register,args=(i,), daemon=True)
-		# reg.start()
+		reg = threading.Thread(target=register,args=(i,), daemon=True)
+		reg.start()
 
 	def change_status(self,symbol,status):
 		self.symbol_status[symbol].set(status)
@@ -233,8 +233,8 @@ class Symbol_data_manager:
 			self.symbols.remove(symbol)
 		self.save()
 
-		# dereg = threading.Thread(target=deregister,args=(symbol,), daemon=True)
-		# dereg.start()
+		dereg = threading.Thread(target=deregister,args=(symbol,), daemon=True)
+		dereg.start()
 
 	def save(self):
 		np.savetxt('list.txt',self.symbols, delimiter=",", fmt="%s")   
@@ -319,12 +319,12 @@ class price_updater:
 			for thread in threading.enumerate(): 
 				print(thread.name)
 
-			# for i in self.symbols:
+			for i in self.symbols:
 
-			# 	if i not in self.black_list:
+				if i not in self.black_list:
 	
-			# 		fetch = threading.Thread(name='updating'+i,target=self.update_symbol, args=(i,), daemon=True)
-			# 		fetch.start()
+					fetch = threading.Thread(name='updating'+i,target=self.update_symbol, args=(i,), daemon=True)
+					fetch.start()
 			time.sleep(5)
 
 	#a single thread 
