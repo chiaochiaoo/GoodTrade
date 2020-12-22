@@ -71,8 +71,6 @@ def timestamp(s):
 
 	p = s.split(":")
 	try:
-		print("pn check:",p)
-		print("pn chcke2:",p[0],p[1])
 		x = int(p[0])*60+int(p[1])
 		return x
 	except Exception as e:

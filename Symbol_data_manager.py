@@ -377,6 +377,7 @@ class price_updater:
 
 					timestatus.set(time)
 					timestamp = self.timestamp(time[:5])
+					price.set(midprice)
 
 					self.data.minute_timestamp_val[symbol].set(timestamp)
 
@@ -385,7 +386,6 @@ class price_updater:
 							self.data.symbol_init.append(symbol)
 							low.set(midprice)
 							high.set(midprice)
-						price.set(midprice)
 
 						if midprice<low.get():
 							low.set(midprice)
@@ -482,10 +482,7 @@ def getinfo(symbol):
 		open_ = float(find_between(r.text, "OpenPrice=\"", "\""))
 		high = float(find_between(r.text, "HighPrice=\"", "\""))
 		low = float(find_between(r.text, "LowPrice=\"", "\""))
-		try:
-			vol = int(float(find_between(r.text, "Volume=\"", "\"")))
-		except:
-			vol = 0
+		vol = int(find_between(r.text, "Volume=\"", "\""))
 
 		#print(time,price)
 		return "Connected",\
