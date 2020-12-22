@@ -422,7 +422,7 @@ class price_updater:
 
 						self.data.minute_data[symbol]["high"].append(midprice)
 						self.data.minute_data[symbol]["low"].append(midprice)
-						self.data.minute_data[symbol]["vol"].append(vol)
+						self.data.minute_data[symbol]["vol"].append(int(vol/1000))
 
 						self.data.minute_count[symbol] +=1
 
@@ -434,7 +434,7 @@ class price_updater:
 							self.data.minute_data[symbol]["high"][idx] = midprice
 						if midprice <= self.data.minute_data[symbol]["low"][idx]:
 							self.data.minute_data[symbol]["low"][idx] = midprice
-						self.data.minute_data[symbol]["vol"][idx] = vol/1000
+						self.data.minute_data[symbol]["vol"][idx] = int(vol/1000)
 
 					#perform an update. 
 
@@ -446,10 +446,12 @@ class price_updater:
 					l5_r = round(l5_h - l5_l,3)
 
 					index = min(self.data.minute_count[symbol]-1, 5)
-					l5_v = round(self.data.minute_data[symbol]["vol"][-index] - self.data.minute_data[symbol]["vol"][0],3)
+					l5_v = self.data.minute_data[symbol]["vol"][0] - self.data.minute_data[symbol]["vol"][-index]
 
 					last_5_range.set(l5_r)
 					last_5_vol.set(l5_v)
+
+					print(symbol,":",time,"vol:",int(vol/1000))
 
 					#check if time stamp is 9:35
 					if timestamp <575:
