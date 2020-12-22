@@ -380,9 +380,6 @@ class price_updater:
 				# if midprice>high.get():
 				# 	high.set(midprice)
 
-				# rg = round(high.get() - low.get(),3)
-				# range_.set(rg)
-
 				#now it's time tp update the 5 min range/volume.
 
 				if stat == "Connected":
@@ -398,12 +395,12 @@ class price_updater:
 							high.set(midprice)
 						timestatus.set(time)
 						price.set(midprice)
+
 						if midprice<low.get():
 							low.set(midprice)
 
 						if midprice>high.get():
 							high.set(midprice)
-
 
 					if timestamp == 570:
 						open_.set(op)
@@ -415,6 +412,9 @@ class price_updater:
 						rgol = round(op - low_,3)
 						oh.set(rgoh)
 						ol.set(rgol)
+
+					rg = round(high.get() - low.get(),3)
+					range_.set(rg)
 
 					#if timestamp not registered yet.
 					if timestamp not in self.data.minute_timestamp[symbol]:
