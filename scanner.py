@@ -156,7 +156,7 @@ class scanner(pannel):
 
 		#self.downloader.start(cond,market_,type_,cap)
 
-		download = threading.Thread(target=refreshstocks,args=(self,cond,market_,type_,cap,), daemon=True)
+		download = threading.Thread(name="scanner thread",target=refreshstocks,args=(self,cond,market_,type_,cap,), daemon=True)
 		download.start()
 
 	def add_labels(self,d):
