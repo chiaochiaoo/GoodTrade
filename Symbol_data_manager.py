@@ -391,7 +391,7 @@ class price_updater:
 
 					self.data.minute_timestamp_val[symbol].set(timestamp)
 
-					if timestamp <570:
+					if time <570:
 						if symbol not in self.data.symbol_init:
 							self.data.symbol_init.append(symbol)
 							low.set(midprice)
@@ -405,10 +405,10 @@ class price_updater:
 							high.set(midprice)
 
 
-					if timestamp == 570:
+					if time == 570:
 						open_.set(op)
 
-					if timestamp >=570:
+					if time >=570:
 						high.set(high_)
 						low.set(low_)
 						rgoh = round(high_ - op,3)
