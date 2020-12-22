@@ -7,11 +7,19 @@ except ImportError:
     pip.main(['install', 'finviz'])
     from finviz.screener import Screener
 
+import threading
+
+def status_change(var,label):
+	label["text"] = "Current Status: "+var.get()
+
 class scanner(pannel):
+
+
 
 	def __init__(self,root,tickers_manager):
 
 		super()
+
 		self.tickers_manager = tickers_manager
 
 		self.setting = ttk.LabelFrame(root,text="Settings") 
@@ -19,7 +27,6 @@ class scanner(pannel):
 
 		self.refresh = ttk.Button(self.setting,  
 			text ="Fetch Data",command=self.refresh).place(relx=0.8, rely=0.01, height=50, width=70)   
-
 
 		self.market = tk.StringVar(self.setting)
 		self.choices2 = {'Nasdaq','NYSE','AMEX'}
@@ -53,9 +60,18 @@ class scanner(pannel):
 		self.menu4 = ttk.Label(self.setting, text="Market Cap").grid(row = 1, column = 4)
 		self.popupMenu4.grid(row = 2, column =4)
 
-		self.tab = ttk.LabelFrame(self.setting,text="Scanner") 
 
-		self.tab.place(x=0, y=60, relheight=0.85, relwidth=1)
+		self.downloading = False
+
+		self.status_info = ttk.Label(self.setting, text="Current Status: ")
+		self.status = tk.StringVar()
+		self.status.trace('w', lambda *_, var=self.status,label=self.status_info:status_change(var,label))
+		self.status_info.place(x = 0, y =60)
+
+		self.status.set("Ready")
+
+		self.tab = ttk.LabelFrame(self.setting,text="Scanner") 
+		self.tab.place(x=0, y=80, relheight=0.85, relwidth=1)
 
 		self.scanner_canvas = tk.Canvas(self.tab)
 		self.scanner_canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
@@ -111,15 +127,15 @@ class scanner(pannel):
 			market = '.AM'
 		return market
 
-	def refresh(self):
+	#This is the button function. 
+	#Take all the information needed and send it to the new process. 
 
-		d = self.refreshstocks()
 
-		#d= readstocks()
-		#read the corresponding list. 
-		width = [8,12,10,6,10,10]
-		labels = ["Ticker","Cur.V","Avg.V","Rel.V","%"+"since close","Add to list"]
-		#append it to the view.
+	#Steps1. Asychonous Version.
+	#Steps2. Synchonous Version. - Just need to let it load, and then call it and sne,.d 
+
+	def delete_old_lables(self):
+
 		if len(self.info)>0:
 			for i in self.info:
 				for j in i:
@@ -127,6 +143,29 @@ class scanner(pannel):
 
 		self.info = []
 
+	def refresh(self):
+
+		#this is where it downloads the stock info. Turn this into multi processing. just allocate the info and send it.
+
+		cond = "sh_relvol_o"+self.relv.get()
+		market_ = self.market.get()
+		type_ = self.signal.get()
+		cap = self.markcap.get() 
+
+		#d = refreshstocks(self,cond,market_,type_,cap)
+
+		self.delete_old_lables()
+
+		#self.downloader.start(cond,market_,type_,cap)
+
+		download = threading.Thread(target=refreshstocks,args=(self,cond,market_,type_,cap,), daemon=True)
+		download.start()
+
+	def add_labels(self,d):
+		#This is where it adds the labels. 
+
+		width = [8,12,10,6,10,10]
+		labels = ["Ticker","Cur.V","Avg.V","Rel.V","%"+"since close","Add to list"]
 		suffix = self.market_suffix()
 
 		for i in range(len(d)):
@@ -143,9 +182,9 @@ class scanner(pannel):
 					self.info[i].append(tk.Button(self.scanner_frame ,text=info[j],width=width[j],command= lambda k=i: self.tickers_manager.add_symbol_reg_list(d[k]["Ticker"]+suffix)))
 					self.label_default_configure(self.info[i][j])
 					self.info[i][j].grid(row=i+2, column=j,padx=0)
-
 		
 		super().rebind(self.scanner_canvas,self.scanner_frame)
+
 
 	def rank(self):
 		for i in range(len(self.info_nas)):
@@ -154,29 +193,30 @@ class scanner(pannel):
 
 	#add it to it .
 
-	def refreshstocks(self):
+
+	#here, don't return the obj, but call the thing with it as parameters. 
+
+def refreshstocks(pannel,cond,market_,type_,cap):
+
+	if(pannel.downloading == True):
+		pannel.status.set("Already downloading")
+
+	else:
+		pannel.status.set("Downloading")
+		pannel.downloading = True
 
 		market = ''
-		cond = "sh_relvol_o"+self.relv.get()
 		cond2 = ''
 		signal = ''
 
-		market_ = self.market.get()
-		type_ = self.signal.get()
-
-		cap = self.markcap.get() 
-
 		if market_ == 'Nasdaq':
 			market = 'exch_nasd'
-			#cond = 'sh_relvol_o2'
 
 		elif market_ =='NYSE':
 			market = 'exch_nyse'
-			#cond = 'sh_relvol_o1'
 
 		elif market_ =='AMEX':
 			market = 'exch_amex'
-			#cond = 'sh_relvol_o1'
 
 		if type_ == 'Most Active':
 			signal = 'ta_mostactive'
@@ -190,7 +230,6 @@ class scanner(pannel):
 		elif type_ =='Unusual Volume':
 			signal = 'ta_unusualvolume'
 
-		#'Any','Mega','Large','Mid','Small','Mega+','Large+','Mid+','Small+'}
 
 		if cap =='Any':
 			cond2 = ''
@@ -211,16 +250,14 @@ class scanner(pannel):
 
 		#self.markcap.set('Any') 
 
-
-
 		filters = [market,cond,cond2]  # Shows companies in NASDAQ which are in the S&P500
 
 		stock_list = Screener(filters=filters, table='Performance', signal=signal)  # Get the performance table and sort it by price ascending
 
 		print(len(stock_list))
-		return stock_list
-	  	# Export the screener results to .csv
-		#stock_list.to_csv("temp.csv")
 
-	  	# stock_list2 = Screener(filters=filters, table='Ownership', signal=signal) #,order='-relativevolume'
-	  	# stock_list2.to_csv("NASDAQ_stock_own.csv")
+		pannel.add_labels(stock_list)
+
+		pannel.status.set("Download compelted")
+		pannel.downloading = False
+		print("Scanner download complete")

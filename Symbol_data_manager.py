@@ -402,6 +402,9 @@ class price_updater:
 						oh.set(rgoh)
 						ol.set(rgol)
 
+
+					###GENERAL CASE ####
+
 					rg = round(high.get() - low.get(),3)
 					range_.set(rg)
 
