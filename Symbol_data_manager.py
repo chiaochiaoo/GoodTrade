@@ -209,7 +209,7 @@ class Symbol_data_manager:
 		self.symbol_last_alert[i] = StringVar()
 		self.symbol_last_alert_time[i] = StringVar()
 
-		reg = threading.Thread(target=register,args=(symbol,), daemon=True)
+		reg = threading.Thread(target=register,args=(i,), daemon=True)
 		reg.start()
 
 	def change_status(self,symbol,status):
