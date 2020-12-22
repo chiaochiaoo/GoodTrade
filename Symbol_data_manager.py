@@ -329,7 +329,8 @@ class price_updater:
     
 		p = s.split(":")
 		try:
-			print("check:",p[0],p[1])
+			print("sm check:",p)
+			print("sm chcke2:",p[0],p[1])
 			x = int(p[0])*60+int(p[1])
 			return x
 		except Exception as e:
@@ -370,15 +371,7 @@ class price_updater:
 				self.black_list.append(symbol)
 
 			if symbol in self.symbols:
-
 				status.set(stat)
-				# if midprice<low.get():
-				# 	low.set(midprice)
-
-				# if midprice>high.get():
-				# 	high.set(midprice)
-
-				#now it's time tp update the 5 min range/volume.
 
 				if stat == "Connected":
 
@@ -438,10 +431,7 @@ class price_updater:
 					#
 					l5_h = max(self.data.minute_data[symbol]["high"][-5:])
 					l5_l = min(self.data.minute_data[symbol]["low"][-5:])
-
-
 					l5_r = round(l5_h - l5_l,3)
-
 					index = min(self.data.minute_count[symbol]-1, 5)
 					l5_v = round((self.data.minute_data[symbol]["vol"][-1] - self.data.minute_data[symbol]["vol"][-index])/1000,2)
 
@@ -455,7 +445,6 @@ class price_updater:
 						self.data.first_5_min_range[symbol].set(l5_r)
 						self.data.first_5_min_volume[symbol].set(l5_v)
 
-					
 
 
 			self.lock[symbol] = False
