@@ -375,6 +375,7 @@ class price_updater:
 
 				if stat == "Connected":
 
+					timestatus.set(time)
 					timestamp = self.timestamp(time[:5])
 
 					self.data.minute_timestamp_val[symbol].set(timestamp)
@@ -384,7 +385,6 @@ class price_updater:
 							self.data.symbol_init.append(symbol)
 							low.set(midprice)
 							high.set(midprice)
-						timestatus.set(time)
 						price.set(midprice)
 
 						if midprice<low.get():
