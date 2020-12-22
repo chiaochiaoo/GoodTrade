@@ -434,8 +434,6 @@ class price_updater:
 							self.data.minute_data[symbol]["low"][idx] = midprice
 						self.data.minute_data[symbol]["vol"][idx] = vol
 
-						print(self.data.minute_data[symbol]["high"][idx] == self.data.minute_data[symbol]["high"][-1])
-						print(self.data.minute_data[symbol]["vol"][idx] == self.data.minute_data[symbol]["vol"][-1])
 
 					#perform an update. 
 
