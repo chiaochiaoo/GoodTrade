@@ -320,9 +320,7 @@ class price_updater:
 				print(thread.name)
 
 			for i in self.symbols:
-
 				if i not in self.black_list:
-	
 					fetch = threading.Thread(name='updating'+i,target=self.update_symbol, args=(i,), daemon=True)
 					fetch.start()
 			time.sleep(5)

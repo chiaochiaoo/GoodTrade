@@ -1,9 +1,12 @@
 import tkinter as tk                     
 from tkinter import ttk 
-import threading
-from pannel import *
 
-from scanner_process_manager import *
+from pannel import *
+try:
+    from finviz.screener import Screener
+except ImportError:
+    pip.main(['install', 'finviz'])
+    from finviz.screener import Screener
 
 
 def status_change(var,label):
@@ -11,13 +14,13 @@ def status_change(var,label):
 
 class scanner(pannel):
 
-	def __init__(self,root,tickers_manager,scanner_process:scanner_process_manager):
+
+
+	def __init__(self,root,tickers_manager):
 
 		super()
 
 		self.tickers_manager = tickers_manager
-
-		self.scanner_process_manager = scanner_process
 
 		self.setting = ttk.LabelFrame(root,text="Settings") 
 		self.setting.place(relx=0.01, rely=0.05, relheight=1, width=480)
@@ -154,15 +157,9 @@ class scanner(pannel):
 		self.delete_old_lables()
 
 		#self.downloader.start(cond,market_,type_,cap)
-	
-		# download = threading.Thread(name="scanner thread",target=self.refreshstocks,args=(cond,market_,type_,cap,), daemon=True)
-		# download.start()
 
-		#send the info to the 
-
-		self.scanner_process_manager.send_request()
-
-		#self.refreshstocks(cond,market_,type_,cap,)
+		download = threading.Thread(target=refreshstocks,args=(self,cond,market_,type_,cap,), daemon=True)
+		download.start()
 
 	def add_labels(self,d):
 		#This is where it adds the labels. 
@@ -188,3 +185,79 @@ class scanner(pannel):
 		
 		super().rebind(self.scanner_canvas,self.scanner_frame)
 
+
+	def rank(self):
+		for i in range(len(self.info_nas)):
+			for j in range(len(self.info_nas[i])):
+				self.info_nas[i][j].grid(row=len(self.info_nas)-i+1, column=j,padx=0)
+
+	#add it to it .
+
+
+	#here, don't return the obj, but call the thing with it as parameters. 
+
+def refreshstocks(pannel,cond,market_,type_,cap):
+
+	if(pannel.downloading == True):
+		pannel.status.set("Already downloading")
+
+	else:
+		pannel.status.set("Downloading")
+		pannel.downloading = True
+
+		market = ''
+		cond2 = ''
+		signal = ''
+
+		if market_ == 'Nasdaq':
+			market = 'exch_nasd'
+
+		elif market_ =='NYSE':
+			market = 'exch_nyse'
+
+		elif market_ =='AMEX':
+			market = 'exch_amex'
+
+		if type_ == 'Most Active':
+			signal = 'ta_mostactive'
+
+		elif type_ =='Top Gainner':
+			signal = 'ta_topgainers'
+
+		elif type_ =='New Highs':
+			signal = 'ta_newhigh'
+
+		elif type_ =='Unusual Volume':
+			signal = 'ta_unusualvolume'
+
+
+		if cap =='Any':
+			cond2 = ''
+		elif cap == 'Mega':
+			cond2 = 'cap_mega'
+		elif cap =='Large':
+			cond2 = 'cap_large'
+		elif cap == 'Mid':
+			cond2 = 'cap_mid'
+		elif cap =='Small':
+			cond2 = 'cap_small'
+		elif cap =='Large+':
+			cond2 = 'cap_largeover'
+		elif cap =='Mid+':
+			cond2 = 'cap_midover'
+		elif cap =='Small+':
+			cond2 = 'cap_smallover'
+
+		#self.markcap.set('Any') 
+
+		filters = [market,cond,cond2]  # Shows companies in NASDAQ which are in the S&P500
+
+		stock_list = Screener(filters=filters, table='Performance', signal=signal)  # Get the performance table and sort it by price ascending
+
+		print(len(stock_list))
+
+		pannel.add_labels(stock_list)
+
+		pannel.status.set("Download compelted")
+		pannel.downloading = False
+		print("Scanner download complete")

@@ -7,16 +7,19 @@ import time
 import threading
 
 from alerts import *
-from scanner import *
+
 from pannel import *
 from Symbol_data_manager import *
 from database_functions import *
 
+from scanner import *
+from scanner_process_manager import *
+
+
 class viewer:
 
-
-	def __init__(self, root=None):
-
+	def __init__(self, root,scanner_process):
+		
 		self.data = Symbol_data_manager()
 
 		self.listening = ttk.LabelFrame(root,text="Listener") 
@@ -51,7 +54,6 @@ class viewer:
 		self.open_low_pannel = openlow(self.tab7,self.data,self.all_alerts)
 
 		self.first_5 = firstfive(self.tab4,self.data,self.all_alerts)
-
 		self.er = extremrange(self.tab2,self.data,self.all_alerts)
 		self.ev = extremevolume(self.tab3,self.data,self.all_alerts)
 
@@ -59,7 +61,9 @@ class viewer:
 
 		self.tm = ticker_manager(self.tab1,self.data,alerts)
 		
-		self.scanner_pannel = scanner(root,self.tm)
+
+		self.scanner_pannel = scanner(root,self.tm,scanner_process)
+		scanner_process.set_pannel(self.scanner_pannel)
 
 
 		# self.Open_High_init(self.tab6)
@@ -70,8 +74,6 @@ class viewer:
 
 		db = database(self.data)
 		db.start()
-
-
 
 
 class ticker_manager(pannel):
@@ -216,13 +218,34 @@ class ticker_manager(pannel):
 
 
 
+if __name__ == '__main__':
+
+	multiprocessing.freeze_support()
 
 
-root = tk.Tk() 
-root.title("GoodTrade") 
-root.geometry("1400x700")
-root.minsize(1200, 600)
-root.maxsize(3000, 1500)
-view = viewer(root)
+	#### SCANNER SUB PROCESS####
+	request_scanner, receive_pipe = multiprocessing.Pipe()
+	p = multiprocessing.Process(target=multi_processing_scanner, args=(receive_pipe,),daemon=True)
+	p.daemon=True
+	p.start()
 
-root.mainloop()
+
+	#### DATABASE SUB PROCESS####
+
+
+
+	### INFO FETCH SUB PROCESS####
+
+	
+	root = tk.Tk() 
+	root.title("GoodTrade") 
+	root.geometry("1400x700")
+	root.minsize(1200, 600)
+	root.maxsize(3000, 1500)
+
+	### scanner pannel needs the manager. 
+	t = scanner_process_manager(request_scanner)
+
+
+	view = viewer(root,t)
+	root.mainloop()
