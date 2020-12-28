@@ -540,7 +540,8 @@ reg_count = 0
 def register(symbol):
 	global reg_count
 	try:
-		p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=TOS&feedtype=L1"
+		#p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=TOS&feedtype=L1"
+		P ="http://localhost:8080/GetSnapshot?symbol="+symbol+"&feedtype=L1"
 		r= requests.get(p)
 
 
@@ -554,7 +555,7 @@ def register(symbol):
 def deregister(symbol):
 	global reg_count
 	try:
-		p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=TOS&feedtype=L1"
+		p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
 		r= requests.get(p)
 		reg_count-=1
 		print(symbol,"deregister","total:",reg_count)
