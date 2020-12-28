@@ -455,10 +455,10 @@ class price_updater:
 					l5_v = round((self.data.minute_data[symbol]["vol"][-1] - self.data.minute_data[symbol]["vol"][-index])/1000,2)
 
 
-					print(symbol,timestamp,vol,-index)
-					print(self.data.minute_timestamp[symbol])
-					print(self.data.minute_data[symbol]["vol"])
-					print(l5_v)
+					# print(symbol,timestamp,vol,-index)
+					# print(self.data.minute_timestamp[symbol])
+					# print(self.data.minute_data[symbol]["vol"])
+					# print(l5_v)
 					# if timestamp not in self.data.minute_timestamp[symbol]:
 					# 	print(symbol,"volume",l5_v[-5:])
 
@@ -540,8 +540,10 @@ reg_count = 0
 def register(symbol):
 	global reg_count
 	try:
-		p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
+		p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1&feedtype=TOS"
 		r= requests.get(p)
+
+
 		reg_count+=1
 		print(symbol,"registerd ","total:",reg_count)
 		return True
@@ -552,7 +554,7 @@ def register(symbol):
 def deregister(symbol):
 	global reg_count
 	try:
-		p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
+		p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1&feedtype=TOS"
 		r= requests.get(p)
 		reg_count-=1
 		print(symbol,"deregister","total:",reg_count)
