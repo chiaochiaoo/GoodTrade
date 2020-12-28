@@ -6,6 +6,7 @@ import threading
 import time
 import requests
 
+
 class Symbol_data_manager:	
 
 	#if file does not exist, create an empty file. 
@@ -20,7 +21,6 @@ class Symbol_data_manager:
 				self.symbols = [self.symbols]
 
 		print("data initilize:",self.symbols)
-
 
 		self.reg_symbols = self.symbols[:]
 		#These filed need to be initilized. 
@@ -114,7 +114,18 @@ class Symbol_data_manager:
 		self.symbol_last_alert_time ={}
 
 
+
 		#mark this when a symbol datastructure is completely loaded. 
+
+		self.data_list = [self.symbol_data_openhigh_range,self.symbol_data_openlow_range,self.symbol_data_range_range,
+		self.symbol_data_first5_range,self.symbol_data_first5_vol_range,self.symbol_data_normal5_range,
+		self.symbol_data_normal5_vol_range,
+		self.symbol_data_openhigh_val,self.symbol_data_openlow_val,self.symbol_data_range_val,
+		self.symbol_data_first5_val,self.symbol_data_first5_vol_val,self.symbol_data_normal5_val,
+		self.symbol_data_normal5_vol_val,
+		self.symbol_data_openhigh_std,self.symbol_data_openlow_std,self.symbol_data_range_std,
+		self.symbol_data_first5_std,self.symbol_data_first5_vol_std,self.symbol_data_normal5_std,
+		self.symbol_data_normal5_vol_std]
 		self.data_ready = {}
 
 		self.init_data()
@@ -314,10 +325,10 @@ class price_updater:
 			#print("symbols:",self.symbols)
 			self.count+=1
 
-			print("Current thread count:",threading.active_count())
+			# print("Current thread count:",threading.active_count())
 
-			for thread in threading.enumerate(): 
-				print(thread.name)
+			# for thread in threading.enumerate(): 
+			# 	print(thread.name)
 
 			for i in self.symbols:
 				if i not in self.black_list:
