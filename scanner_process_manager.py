@@ -11,35 +11,28 @@ except ImportError:
 # Sleep normally.
 
 
-
 class scanner_process_manager:
 	def __init__(self,request_pipe):
 		#if a downloading request is already sent. 
 		self.downloading = False
-		# this is where the label is
-		#self.status = status
-		#create the writting pipe. 
 		self.request = request_pipe
-		#start the process. 
 		self.pannel = None
 
 	def set_pannel(self,scanner_pannel):
 		self.pannel = scanner_pannel
 
-	def send_request(self):
+
+	def adding_comlete(self):
+		self.downloading = False
+
+	def send_request(self,cond,market_,type_,cap):
 		if(self.downloading == True):
-			#self.status.set("Already downloading")
-			print("Already downloading")
-
+			self.pannel.status_change("Downloading in progress")
+			#print("Already downloading")
 		else:
-			#self.status.set("Downloading")
-			print("Downloading")
 			self.downloading = True
-
-			#cond,market_,type_,cap
-			# "sh_relvol_o2"
-			self.request.send(["sh_relvol_o2",'Nasdaq','Most Active',""])
-
+			self.pannel.status_change("Downloading in progress")
+			self.request.send([cond,market_,type_,cap])
 			#when success, put it False. ... Put on a thread to receive it. 
 			#HERE,.... seperate a thread to run it. 
 			receive = threading.Thread(name="Reiceive info",target=self.receive_request, daemon=True)
@@ -48,13 +41,8 @@ class scanner_process_manager:
 
 	def receive_request(self):
 		d = self.request.recv()
-		print(d)
-		#self.status.set("Downloading complete")
-		print("Downloading complete")
 
-		#where do i give it? OH.. pannel.
 		self.pannel.add_labels(d)
-		self.downloading = False
 
 def multi_processing_scanner(pipe_receive):
 
@@ -64,6 +52,7 @@ def multi_processing_scanner(pipe_receive):
 		#unpack. 
 		cond, market_, type_, cap = receive_things[0],receive_things[1],receive_things[2],receive_things[3]
 
+		print(cond, market_, type_, cap)
 		d = refreshstocks(cond, market_, type_, cap)
 		#send back.
 		pipe_receive.send(d)
@@ -117,7 +106,12 @@ def refreshstocks(cond,market_,type_,cap):
 
 	filters = [market,cond,cond2]  # Shows companies in NASDAQ which are in the S&P500
 
-	stock_list = Screener(filters=filters, table='Performance', signal=signal)  # Get the performance table and sort it by price ascending
+	print(filters)
+
+	try:
+		stock_list = Screener(filters=filters, table='Performance', signal=signal)  # Get the performance table and sort it by price ascending
+	except:
+		return []
 
 	print(len(stock_list))
 

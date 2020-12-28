@@ -109,6 +109,9 @@ class scanner(pannel):
 		self.rebind(self.scanner_canvas,self.scanner_frame)
 
 
+	def status_change(self,var):
+		self.status.set(var)
+
 	def market_suffix(self):
 		market_ = self.market.get()
 		market = ""
@@ -138,7 +141,7 @@ class scanner(pannel):
 				for j in i:
 					j.destroy()
 
-		self.info = []
+		
 
 	def refresh(self):
 
@@ -149,42 +152,52 @@ class scanner(pannel):
 		type_ = self.signal.get()
 		cap = self.markcap.get() 
 
-		#d = refreshstocks(self,cond,market_,type_,cap)
-
 		self.delete_old_lables()
 
-		#self.downloader.start(cond,market_,type_,cap)
-	
-		# download = threading.Thread(name="scanner thread",target=self.refreshstocks,args=(cond,market_,type_,cap,), daemon=True)
-		# download.start()
-
-		#send the info to the 
-
-		self.scanner_process_manager.send_request()
-
-		#self.refreshstocks(cond,market_,type_,cap,)
+		self.scanner_process_manager.send_request(cond,market_,type_,cap)
+		
 
 	def add_labels(self,d):
 		#This is where it adds the labels. 
 
-		width = [8,12,10,6,10,10]
-		labels = ["Ticker","Cur.V","Avg.V","Rel.V","%"+"since close","Add to list"]
-		suffix = self.market_suffix()
+		if (len(d)==0):
+			#got nothing!
+			self.status_change("Unmatch results")
+			self.scanner_process_manager.adding_comlete()
+		else:
+			width = [8,12,10,6,10,10]
+			labels = ["Ticker","Cur.V","Avg.V","Rel.V","%"+"since close","Add to list"]
+			suffix = self.market_suffix()
 
-		for i in range(len(d)):
-			#info = [d.iloc[i]["Ticker"],d.iloc[i]["Volume"],d.iloc[i]["Avg Volume"],d.iloc[i]["Rel Volume"],\d.iloc[i]["Change"],"","","",""]
-			info = [d[i]["Ticker"],d[i]["Volume"],d[i]["Avg Volume"],d[i]["Rel Volume"],\
-			d[i]["Change"],"","","",""]
-			self.info.append([])
-			for j in range(len(labels)):
-				if j!= len(labels)-1:
-					self.info[i].append(tk.Label(self.scanner_frame ,text=info[j],width=width[j]))
-					self.label_default_configure(self.info[i][j])
-					self.info[i][j].grid(row=i+2, column=j,padx=0)
-				else:
-					self.info[i].append(tk.Button(self.scanner_frame ,text=info[j],width=width[j],command= lambda k=i: self.tickers_manager.add_symbol_reg_list(d[k]["Ticker"]+suffix)))
-					self.label_default_configure(self.info[i][j])
-					self.info[i][j].grid(row=i+2, column=j,padx=0)
-		
-		super().rebind(self.scanner_canvas,self.scanner_frame)
+			self.info = []
+			good = True
+			try:
+				for i in range(len(d)):
+					#info = [d.iloc[i]["Ticker"],d.iloc[i]["Volume"],d.iloc[i]["Avg Volume"],d.iloc[i]["Rel Volume"],\d.iloc[i]["Change"],"","","",""]
+					info = [d[i]["Ticker"],d[i]["Volume"],d[i]["Avg Volume"],d[i]["Rel Volume"],\
+					d[i]["Change"],"","","",""]
+					self.info.append([])
+					for j in range(len(labels)):
+						if j!= len(labels)-1:
+							self.info[i].append(tk.Label(self.scanner_frame ,text=info[j],width=width[j]))
+							#self.label_default_configure(self.info[i][j])
+							self.info[i][j].grid(row=i+2, column=j,padx=0)
+						else:
+							self.info[i].append(tk.Button(self.scanner_frame ,text=info[j],width=width[j],command= lambda k=i: self.tickers_manager.add_symbol_reg_list(d[k]["Ticker"]+suffix)))
+							#self.label_default_configure(self.info[i][j])
+							self.info[i][j].grid(row=i+2, column=j,padx=0)
+			except:
+				good = False
+			
+			super().rebind(self.scanner_canvas,self.scanner_frame)
+
+			self.scanner_process_manager.adding_comlete()
+
+			if good:
+				self.scanner_process_manager.adding_comlete()
+				self.status_change("Ready")
+			else:
+				self.status_change("Please retry")
+				self.scanner_process_manager.adding_comlete()
+			 
 
