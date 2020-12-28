@@ -424,7 +424,11 @@ class price_updater:
 
 					#if timestamp not registered yet.
 					if timestamp not in self.data.minute_timestamp[symbol]:
-						self.data.minute_timestamp[symbol].append(timestamp-1)
+						if len(self.data.minute_timestamp[symbol])==0:
+
+							self.data.minute_timestamp[symbol].append(timestamp-1)
+						else:
+							self.data.minute_timestamp[symbol].append(timestamp)
 						self.data.minute_data[symbol]["high"].append(midprice)
 						self.data.minute_data[symbol]["low"].append(midprice)
 						self.data.minute_data[symbol]["vol"].append(vol)
