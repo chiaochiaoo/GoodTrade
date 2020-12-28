@@ -7,20 +7,28 @@ import time
 import threading
 
 from alerts import *
-
 from pannel import *
 from Symbol_data_manager import *
-from database_functions import *
 
 from scanner import *
 from scanner_process_manager import *
 
+from database_process_manager import *
+#from database_functions import *
+
+
+
 
 class viewer:
 
-	def __init__(self, root,scanner_process):
+	def __init__(self,root,scanner_process,database_process):
 		
 		self.data = Symbol_data_manager()
+
+		self.db = database_process
+		self.db.set_symbols_manager(self.data)
+
+		self.data.set_database_manager(self.db)
 
 		self.listening = ttk.LabelFrame(root,text="Listener") 
 		self.listening.place(x=500,rely=0.05,relheight=1,width=900)
@@ -63,17 +71,15 @@ class viewer:
 		
 
 		self.scanner_pannel = scanner(root,self.tm,scanner_process)
+
 		scanner_process.set_pannel(self.scanner_pannel)
 
 
-		# self.Open_High_init(self.tab6)
-		# self.Open_Low_init(self.tab7)
+		# sm = price_updater(self.data)
+		# sm.start()
 
-		sm = price_updater(self.data)
-		sm.start()
-
-		db = database(self.data)
-		db.start()
+		# db = database(self.data)
+		# db.start()
 
 
 class ticker_manager(pannel):
@@ -229,13 +235,21 @@ if __name__ == '__main__':
 	p.daemon=True
 	p.start()
 
+	s = scanner_process_manager(request_scanner)
 
 	#### DATABASE SUB PROCESS####
 
+	request_database, receive_database = multiprocessing.Pipe()
+	d = multiprocessing.Process(target=multi_processing_database, args=(receive_database,),daemon=True)
+	d.daemon=True
+	d.start()
 
+	d = database_process_manager(request_database)
 
 	### INFO FETCH SUB PROCESS####
 
+
+	### scanner pannel needs the manager. 
 	
 	root = tk.Tk() 
 	root.title("GoodTrade") 
@@ -243,9 +257,5 @@ if __name__ == '__main__':
 	root.minsize(1200, 600)
 	root.maxsize(3000, 1500)
 
-	### scanner pannel needs the manager. 
-	t = scanner_process_manager(request_scanner)
-
-
-	view = viewer(root,t)
+	view = viewer(root,s,d)
 	root.mainloop()

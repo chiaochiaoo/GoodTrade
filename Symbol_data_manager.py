@@ -136,6 +136,10 @@ class Symbol_data_manager:
 		for i in self.symbols:
 			self.init_symbol(i)
 
+
+	def set_database_manager(self,database):
+		self.database = database
+
 	def init_symbol(self,i):
 		#basic
 
@@ -234,6 +238,8 @@ class Symbol_data_manager:
 		self.init_symbol(symbol)
 		self.symbols.append(symbol)
 		self.save()
+		
+		self.database.send_request(symbol)
 
 		print("registering:",symbol)
 
