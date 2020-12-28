@@ -451,7 +451,7 @@ class price_updater:
 					l5_v = round((self.data.minute_data[symbol]["vol"][-1] - self.data.minute_data[symbol]["vol"][-index])/1000,2)
 
 
-					print(symbol,timestamp,vol)
+					print(symbol,timestamp,vol,self.data.minute_count[symbol]-1,-index)
 					print(self.data.minute_timestamp[symbol])
 					print(self.data.minute_data[symbol]["vol"])
 					print(l5_v)
