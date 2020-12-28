@@ -449,6 +449,7 @@ class price_updater:
 					index = min(self.data.minute_count[symbol]-1, 5)
 					l5_v = round((self.data.minute_data[symbol]["vol"][-1] - self.data.minute_data[symbol]["vol"][-index])/1000,2)
 
+					print(symbol,"volume",l5_v[-5:])
 					last_5_range.set(l5_r)
 					last_5_vol.set(l5_v)
 
