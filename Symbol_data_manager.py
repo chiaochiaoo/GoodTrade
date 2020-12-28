@@ -421,6 +421,8 @@ class price_updater:
 					rg = round(high.get() - low.get(),3)
 					range_.set(rg)
 
+					print(symbol,timestamp,vol)
+					print(self.data.minute_timestamp[symbol])
 					#if timestamp not registered yet.
 					if timestamp not in self.data.minute_timestamp[symbol]:
 						self.data.minute_timestamp[symbol].append(timestamp)
@@ -428,8 +430,6 @@ class price_updater:
 						self.data.minute_data[symbol]["low"].append(midprice)
 						self.data.minute_data[symbol]["vol"].append(vol)
 						self.data.minute_count[symbol] +=1
-
-						
 
 					#if timestamp already registered. 
 					else:
