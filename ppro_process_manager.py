@@ -161,8 +161,8 @@ def process_and_send(lst,pipe):
 	d["high"] = high
 	d["low"] = low
 
-	d["oh"] = high - open_
-	d["ol"] = open_ - low
+	d["oh"] = round(high - open_,3)
+	d["ol"] = round(open_ - low,3)
 
 
 	if timestamp <570:
@@ -174,7 +174,7 @@ def process_and_send(lst,pipe):
 		d["oh"] = 0
 		d["ol"] = 0
 
-	d["range"] = d["high"] - d["low"]
+	d["range"] = round(d["high"] - d["low"],3)
 	
 	# now update the datalists. 
 	if timestamp not in d["timetamps"]:
