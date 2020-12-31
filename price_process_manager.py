@@ -36,11 +36,9 @@ def register(symbol):
 
 		reg_list.append(symbol)
 		#append it to the list. 
-		return True
 	except Exception as e:
 		print(e)
 		black_list.append(symbol)
-		return False
 
 def deregister(symbol):
 	global reg_count
@@ -50,10 +48,9 @@ def deregister(symbol):
 		reg_count-=1
 		print(symbol,"deregister","total:",reg_count)
 		reg_list.pop(p)
-		return True
+
 	except Exception as e:
 		print(e)
-		return False
 
 
 def multi_processing_price(pipe_receive):
@@ -85,7 +82,7 @@ def multi_processing_price(pipe_receive):
 			info = threading.Thread(target=getinfo,args=(i,pipe_receive,), daemon=True)
 			info.start()
 
-		time.sleep(5)
+		time.sleep(2.5)
 		#send each dictionary. 
 		#pipe_receive.send(data)
 
@@ -97,6 +94,8 @@ def find_between(data, first, last):
 	except ValueError:
 		return data
 
+
+#IF STILL THE SAME TIME, TRY TO reregister?
 def getinfo(symbol,pipe):
 	global lock
 	if symbol not in lock:
@@ -106,9 +105,11 @@ def getinfo(symbol,pipe):
 			lock[symbol] = True
 			p="http://localhost:8080/GetLv1?symbol="+symbol
 			r= requests.get(p)
+
+
 			if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
 				print("No symbol found")
-				return "Unfound","","","","","",""
+
 			time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
 			Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
 			Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
@@ -347,7 +348,7 @@ if __name__ == '__main__':
 	# t = database_process_manager(request_pipe,None)
 	# t.send_request("AAPl")
 
-	request_pipe.send("AAPL.NQ")
+	#request_pipe.send("AAPL.NQ")
 	request_pipe.send("AMD.NQ")
 
 	while True:
