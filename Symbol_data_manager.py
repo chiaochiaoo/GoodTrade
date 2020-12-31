@@ -128,6 +128,19 @@ class Symbol_data_manager:
 		self.symbol_data_normal5_vol_std]
 		self.data_ready = {}
 
+		self.update_list = [self.symbol_status,self.symbol_price,self.minute_timestamp,
+		self.minute_timestamp_val,
+		self.symbol_price_high,
+		self.symbol_price_low ,
+		self.symbol_price_range,
+		self.last_5_min_range,
+		self.last_5_min_volume,
+		self.symbol_price_open,
+		self.symbol_price_openhigh,
+		self.symbol_price_openlow,
+		self.first_5_min_range,
+		self.first_5_min_volume]
+
 		self.init_data()
 
 
@@ -136,6 +149,9 @@ class Symbol_data_manager:
 		for i in self.symbols:
 			self.init_symbol(i)
 
+
+	def set_ppro_manager(self,ppro):
+		self.ppro = ppro
 
 	def set_database_manager(self,database):
 		self.database = database
@@ -224,8 +240,9 @@ class Symbol_data_manager:
 		self.symbol_last_alert[i] = StringVar()
 		self.symbol_last_alert_time[i] = StringVar()
 
-		reg = threading.Thread(target=register,args=(i,), daemon=True)
-		reg.start()
+		#self.ppro.register(i)
+		# reg = threading.Thread(target=register,args=(i,), daemon=True)
+		# reg.start()
 
 	def change_status(self,symbol,status):
 		self.symbol_status[symbol].set(status)
@@ -240,6 +257,7 @@ class Symbol_data_manager:
 		self.save()
 
 		self.database.send_request(symbol)
+		self.ppro.register(symbol)
 
 		print("registering:",symbol)
 
@@ -250,8 +268,9 @@ class Symbol_data_manager:
 			self.symbols.remove(symbol)
 		self.save()
 
-		dereg = threading.Thread(target=deregister,args=(symbol,), daemon=True)
-		dereg.start()
+		self.ppro.deregister(symbol)
+		# dereg = threading.Thread(target=deregister,args=(symbol,), daemon=True)
+		# dereg.start()
 
 	def save(self):
 		np.savetxt('list.txt',self.symbols, delimiter=",", fmt="%s")   
@@ -282,30 +301,6 @@ class price_updater:
 		self.lock = {}
 		self.count = 0
 
-		#Won't need these no more.
-		# self.symbols_labels = v.tickers_labels
-		# self.symbols_index = v.ticker_index
-
-		#time
-		# self.last_update = {}
-		# self.last_price = {}
-
-		# self.lowhigh_cur = {}
-		# self.openhigh_cur = {}
-		# self.openlow_cur = {}
-
-		# self.lowhigh ={}
-		# self.openlow ={}
-		# self.openhigh = {}
-
-		
-		# self.open = {}
-		# self.high = {}
-		# self.low = {}
-
-		# self.open_high = 0
-		# self.high_low = 0
-		# self.open_low = 0
 
 		self.init_info()
 
