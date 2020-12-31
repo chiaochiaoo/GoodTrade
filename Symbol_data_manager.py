@@ -547,10 +547,11 @@ reg_count = 0
 def register(symbol):
 	global reg_count
 	try:
-		#p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=TOS&feedtype=L1"
-		p ="http://localhost:8080/GetSnapshot?symbol="+symbol+"&feedtype=L1"
+		p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
+		#p ="http://localhost:8080/GetSnapshot?symbol="+symbol+"&feedtype=L1"
 		r= requests.get(p)
-		p ="http://localhost:8080/GetSnapshot?symbol="+symbol+"&feedtype=TOS"
+		p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=TOS"
+		#p ="http://localhost:8080/GetSnapshot?symbol="+symbol+"&feedtype=TOS"
 		r= requests.get(p)
 
 
