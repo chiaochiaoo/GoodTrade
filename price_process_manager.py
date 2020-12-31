@@ -27,8 +27,8 @@ def register(symbol):
 	global reg_list
 	global black_list
 	try:
-		#p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=TOS&feedtype=L1"
-		p ="http://localhost:8080/GetSnapshot?symbol="+symbol+"&feedtype=L1"
+		p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
+		#p ="http://localhost:8080/GetSnapshot?symbol="+symbol+"&feedtype=L1"
 		r= requests.get(p)
 
 		reg_count+=1
