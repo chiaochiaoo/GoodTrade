@@ -75,11 +75,9 @@ class viewer:
 		scanner_process.set_pannel(self.scanner_pannel)
 
 
-		# sm = price_updater(self.data)
-		# sm.start()
+		sm = price_updater(self.data)
+		sm.start()
 
-		# db = database(self.data)
-		# db.start()
 
 
 class ticker_manager(pannel):
