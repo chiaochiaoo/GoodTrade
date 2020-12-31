@@ -313,13 +313,14 @@ class price_updater:
 
 
 	def init_info(self):
+		print("Symbol data manager:init")
 		for i in self.symbols:
 			self.data.change_status(i, "Connecting")
 
 	
 	#these three functions together update the prices per second. 
 	def start(self):
-		print("Console (PT): Thread created, ready to start")
+		print("Console (Symol Manager): Thread created, ready to start")
 		t1 = threading.Thread(name='Thread: Symbol data receiver',target=self.update_info, daemon=True)
 		t1.start()
 		print("Console (PT): Thread running. Continue:")
