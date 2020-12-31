@@ -238,7 +238,7 @@ class Symbol_data_manager:
 		self.init_symbol(symbol)
 		self.symbols.append(symbol)
 		self.save()
-		
+
 		self.database.send_request(symbol)
 
 		print("registering:",symbol)
@@ -320,7 +320,7 @@ class price_updater:
 	#these three functions together update the prices per second. 
 	def start(self):
 		print("Console (PT): Thread created, ready to start")
-		t1 = threading.Thread(name='Symbol Data Manager updates',target=self.update_info, daemon=True)
+		t1 = threading.Thread(name='Thread: Symbol data receiver',target=self.update_info, daemon=True)
 		t1.start()
 		print("Console (PT): Thread running. Continue:")
 
@@ -331,10 +331,10 @@ class price_updater:
 			#print("symbols:",self.symbols)
 			self.count+=1
 
-			# print("Current thread count:",threading.active_count())
+			print("Current thread count:",threading.active_count())
 
-			# for thread in threading.enumerate(): 
-			# 	print(thread.name)
+			for thread in threading.enumerate(): 
+				print(thread.name)
 
 			for i in self.symbols:
 				if i not in self.black_list:
@@ -547,7 +547,7 @@ def register(symbol):
 	global reg_count
 	try:
 		#p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=TOS&feedtype=L1"
-		P ="http://localhost:8080/GetSnapshot?symbol="+symbol+"&feedtype=L1"
+		p ="http://localhost:8080/GetSnapshot?symbol="+symbol+"&feedtype=L1"
 		r= requests.get(p)
 
 
