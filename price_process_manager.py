@@ -123,7 +123,7 @@ def getinfo(symbol,pipe):
 
 			lock[symbol] = False
 
-			pipe_receive.send(output)
+			pipe.send(output)
 
 		except Exception as e:
 			print(e)
