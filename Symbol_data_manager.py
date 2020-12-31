@@ -567,6 +567,8 @@ def deregister(symbol):
 	try:
 		p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
 		r= requests.get(p)
+		p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=TOS"
+		r= requests.get(p)
 		reg_count-=1
 		print(symbol,"deregister","total:",reg_count)
 		return True
