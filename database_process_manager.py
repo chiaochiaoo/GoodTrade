@@ -37,7 +37,7 @@ class database_process_manager:
 		self.receive_start()
 
 	def receive_start(self):
-		receive = threading.Thread(name="Receive info",target=self.receive_request, daemon=True)
+		receive = threading.Thread(name="Thread: Database info receiver",target=self.receive_request, daemon=True)
 		receive.start()
 
 	def send_request(self,symbol):
