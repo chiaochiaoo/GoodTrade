@@ -128,7 +128,7 @@ class Symbol_data_manager:
 		self.symbol_data_normal5_vol_std]
 		self.data_ready = {}
 
-		self.update_list = [self.symbol_status,self.symbol_price,self.minute_timestamp,
+		self.update_list = [self.symbol_status,self.symbol_price,self.symbol_update_time,
 		self.minute_timestamp_val,
 		self.symbol_price_high,
 		self.symbol_price_low ,
