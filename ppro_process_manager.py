@@ -192,6 +192,7 @@ def process_and_send(lst,pipe):
 			d["lows"][-1] = price
 		d["vols"][-1] = vol
 
+	print(d["timetamps"],d["highs"],d["lows"],d["vols"])
 	#last 5 range
 	d["last_5_range"] = round(max(d["highs"][-5:]) - min(d["lows"][-5:]),3)
 	# last 5 volume
