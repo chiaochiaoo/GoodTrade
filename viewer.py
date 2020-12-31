@@ -16,12 +16,14 @@ from scanner_process_manager import *
 from database_process_manager import *
 #from database_functions import *
 
+from ppro_process_manager import *
+
 
 
 
 class viewer:
 
-	def __init__(self,root,scanner_process,database_process):
+	def __init__(self,root,scanner_process,database_process,ppro_process):
 		
 		self.data = Symbol_data_manager()
 
@@ -29,6 +31,12 @@ class viewer:
 		self.db.set_symbols_manager(self.data)
 
 		self.data.set_database_manager(self.db)
+
+		self.ppro = ppro_process
+		self.ppro.set_symbols_manager(self.data)
+
+		self.data.set_database_manager(self.db)
+
 
 		self.listening = ttk.LabelFrame(root,text="Listener") 
 		self.listening.place(x=500,rely=0.05,relheight=1,width=900)
@@ -75,8 +83,8 @@ class viewer:
 		scanner_process.set_pannel(self.scanner_pannel)
 
 
-		sm = price_updater(self.data)
-		sm.start()
+		# sm = price_updater(self.data)
+		# sm.start()
 
 
 
@@ -246,6 +254,12 @@ if __name__ == '__main__':
 
 	### INFO FETCH SUB PROCESS####
 
+	request_pipe, receive_pipe = multiprocessing.Pipe()
+	p2 = multiprocessing.Process(target=multi_processing_price, args=(receive_pipe,),daemon=True)
+	p2.daemon=True
+	p2.start()
+
+	ppro = ppro_process_manager(request_pipe)
 
 	### scanner pannel needs the manager. 
 	
@@ -255,5 +269,5 @@ if __name__ == '__main__':
 	root.minsize(1200, 600)
 	root.maxsize(3000, 1500)
 
-	view = viewer(root,s,d)
+	view = viewer(root,s,d,ppro)
 	root.mainloop()
