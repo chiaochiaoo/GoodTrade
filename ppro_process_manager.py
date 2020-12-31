@@ -182,9 +182,9 @@ def process_and_send(lst,pipe):
 			d["timetamps"].append(timestamp-1)
 		else:
 			d["timetamps"].append(timestamp)
-			d["highs"].append(price)
-			d["lows"].append(price)
-			d["vols"].append(vol)
+		d["highs"].append(price)
+		d["lows"].append(price)
+		d["vols"].append(vol)
 	else:
 		if price >= d["highs"][-1]:
 			d["highs"][-1] = price
