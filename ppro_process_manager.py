@@ -112,7 +112,7 @@ def timestamp(s):
 
 #IF STILL THE SAME TIME, TRY TO reregister?
 data = {}
-def init(symbol,price):
+def init(symbol):
 	global data
 	data[symbol] = {}
 	d = data[symbol]
