@@ -355,7 +355,7 @@ if __name__ == '__main__':
 	# t = database_process_manager(request_pipe,None)
 	# t.send_request("AAPl")
 
-	#request_pipe.send("AAPL.NQ")
+	request_pipe.send("AAPL.NQ")
 	request_pipe.send("AMD.NQ")
 
 	while True:
