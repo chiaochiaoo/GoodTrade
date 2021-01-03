@@ -52,8 +52,6 @@ class database_process_manager:
 			d = self.request.recv()
 			symbol = d[0]
 
-			
-
 			#nothing is returned. 
 			if (len(d)==1):
 				self.black_list.append(symbol)
