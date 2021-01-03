@@ -68,15 +68,15 @@ class viewer:
 		
 		self.open_high_pannel = openhigh(self.tab6,self.data,self.all_alerts)
 
-		# self.high_low_pannel = highlow(self.tab5,self.data,self.all_alerts)
-		# self.open_low_pannel = openlow(self.tab7,self.data,self.all_alerts)
+		self.high_low_pannel = highlow(self.tab5,self.data,self.all_alerts)
+		self.open_low_pannel = openlow(self.tab7,self.data,self.all_alerts)
 
-		# self.first_5 = firstfive(self.tab4,self.data,self.all_alerts)
-		# self.er = extremrange(self.tab2,self.data,self.all_alerts)
-		# self.ev = extremevolume(self.tab3,self.data,self.all_alerts)
+		self.first_5 = firstfive(self.tab4,self.data,self.all_alerts)
+		self.er = extremrange(self.tab2,self.data,self.all_alerts)
+		self.ev = extremevolume(self.tab3,self.data,self.all_alerts)
 
-		alerts  =[self.open_high_pannel]
-		# alerts = [self.high_low_pannel,self.open_high_pannel,self.open_low_pannel,self.first_5,self.er,self.ev]
+		#alerts  =[self.open_high_pannel]
+		alerts = [self.high_low_pannel,self.open_high_pannel,self.open_low_pannel,self.first_5,self.er,self.ev]
 
 		self.tm = ticker_manager(self.tab1,self.data,alerts)
 		
