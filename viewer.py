@@ -30,12 +30,12 @@ class viewer:
 		self.db = database_process
 		self.db.set_symbols_manager(self.data)
 
-		self.data.set_database_manager(self.db)
-
 		self.ppro = ppro_process
 		self.ppro.set_symbols_manager(self.data)
 
+
 		self.data.set_database_manager(self.db)
+		self.data.set_ppro_manager(self.ppro)
 
 
 		self.listening = ttk.LabelFrame(root,text="Listener") 
