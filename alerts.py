@@ -341,26 +341,35 @@ class firstfive(alert):
 		hist_v_range= self.data.symbol_data_first5_vol_range[symbol]
 
 		eva= self.data.symbol_data_first5_range_eval[symbol]
+
+		eva2 = self.data.symbol_data_first5_vol_eval[symbol]
+
 		time = self.data.symbol_update_time[symbol]
 
 		data_ready = self.data.data_ready[symbol]
 
+
+		labels = [symbol,status,cur_range,hist_avg,hist_std,hist_range,cur_vol,hist_v_avg,hist_v_std,hist_v_range,eva,eva2]
+
 		value_position = 2
 		alert_position = 10
-		alert_type = "Opening"
-
-		#cur, mean, std. symbol, time. 
+		alert_type = "Opening Rg"
 		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type]
-		labels = [symbol,status,cur_range,hist_avg,hist_std,hist_range,cur_vol,hist_v_avg,hist_v_std,hist_v_range,eva]
+		#cur, mean, std. symbol, time. 
+		
+
+		value_position2 = 6
+		alert_position2 = 11
+
+		alert_type2 = "Opening Vol"
+		alertvals2= [symbol,time,cur_vol,hist_v_avg,hist_v_std,alert_type2]
 
 
-
-
-
-		alert_positions = [alert_position]
+		alert_positions = [alert_position,alert_position2]
 
 		alerts = {}
 		alerts[alert_position] = [value_position,alert_position,alertvals]
+		alerts[alert_position2] = [value_position2,alert_position2,alertvals2]
 		#any alert will need a threshold. deviation. std. 
 
 		#self,symbol,format,width,val_position,alert_position,alert_vals
