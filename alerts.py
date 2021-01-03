@@ -13,8 +13,6 @@ class all_alerts(pannel):
 
 		self.alert_base = []
 
-	
-
 	#if the type and the time match, then don't add. 
 
 	def dismiss_alerts(self,key):
@@ -53,7 +51,6 @@ class all_alerts(pannel):
 
 		self.rebind(self.canvas,self.frame)
 
-
 class alert(pannel):
 
 	def __init__(self,frame,data:Symbol_data_manager,alert_pannel:all_alerts):
@@ -63,10 +60,21 @@ class alert(pannel):
 		self.alert_pannel=alert_pannel
 		self.data = data
 
+		self.alerts = {}
+
 		#init the labels. 
 
 	#any alert will need a threshold. deviation. std. 
 	def add_symbol(self,symbol,format,alert_positions,alerts,data_ready):
+
+		#init the alert value
+		if symbol not in self.alerts:
+				self.alerts[symbol] = {}
+
+		for i in alert_positions:
+			self.alerts[symbol][alerts[i][2][5]] = 0
+			
+			
 
 		l = self.label_count
 
@@ -116,7 +124,6 @@ class alert(pannel):
 		self.rebind(self.canvas,self.frame)
 
 
-
 	def set_latest_alert(self,symbol,alert,time):
 
 		self.data.symbol_last_alert[symbol].set(alert)
@@ -141,6 +148,8 @@ class alert(pannel):
 
 			ts = timestamp(time)
 
+			#on certain alert_type, the math can be different. 
+
 
 			if std != 0:
 				cur = round((cur_price-mean)/std,3)
@@ -155,26 +164,32 @@ class alert(pannel):
 				eval_label["background"]="white"
 
 			elif cur>0.5 and cur<1:
-				#alert_type = "Moderate "+alert_type
+				
+				alert_str = "Moderate "+alert_type
 				eval_label["background"]="#97FEA8"
-				# self.alert_pannel.add_alerts([symbol,time,alert_type])
-				# self.set_latest_alert(symbol, alert_type, time)
 
-			elif cur>1 and cur<2:
-				alert_type = "High "+alert_type
+				if ts>570 and self.alerts[symbol][alert_type] < 0.5:
+					self.alerts[symbol][alert_type] = 0.5
+					self.alert_pannel.add_alerts([symbol,time,alert_str])
+					self.set_latest_alert(symbol, alert_str, time)
+
+			elif cur>1 and cur<2 and self.alerts[symbol][alert_type] < 1:
+				self.alerts[symbol][alert_type] = 1
+				alert_str = "High "+alert_type
 				eval_label["background"]="yellow"
 				if ts>570:
-					self.alert_pannel.add_alerts([symbol,time,alert_type])
-					self.set_latest_alert(symbol, alert_type, time)
-			else:
+					#only set when there is higher severity. 
+					self.alert_pannel.add_alerts([symbol,time,alert_str])
+					self.set_latest_alert(symbol, alert_str, time)
+			elif cur>2 and self.alerts[symbol][alert_type] < 2:
+
+				self.alerts[symbol][alert_type] = 2
 				### Send the alert to alert pannel.
-				alert_type = "Very high "+alert_type
+				alert_str = "Very high "+alert_type
 				eval_label["background"]="red"
 				if ts>570:
-					self.alert_pannel.add_alerts([symbol,time,alert_type])
-					self.set_latest_alert(symbol, alert_type, time)
-
-
+					self.alert_pannel.add_alerts([symbol,time,alert_str])
+					self.set_latest_alert(symbol, alert_str, time)
 
 class highlow(alert):
 
@@ -219,8 +234,6 @@ class highlow(alert):
 		super().add_symbol(symbol,labels,alert_positions,alerts,data_ready)
 
 	#find a way to bound the special checking value to. hmm. every update.
-
-
 
 class openhigh(alert):
 
@@ -376,7 +389,6 @@ class firstfive(alert):
 		super().add_symbol(symbol,labels,alert_positions,alerts,data_ready)
 
 	#find a way to bound the special checking value to. hmm. every update.
-
 
 
 class extremrange(alert):
