@@ -218,23 +218,22 @@ def getinfo(symbol,pipe):
 			p="http://localhost:8080/GetLv1?symbol="+symbol
 			r= requests.get(p)
 
-
 			if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
 				print("No symbol found")
 				pipe.send(["Unfound",symbol])
+			else:
+				time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
+				Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
+				Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
+				open_ = float(find_between(r.text, "OpenPrice=\"", "\""))
+				high = float(find_between(r.text, "HighPrice=\"", "\""))
+				low = float(find_between(r.text, "LowPrice=\"", "\""))
+				vol = int(find_between(r.text, "Volume=\"", "\""))
+				price = round((Bidprice+Askprice)/2,4)
 
-			time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
-			Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
-			Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
-			open_ = float(find_between(r.text, "OpenPrice=\"", "\""))
-			high = float(find_between(r.text, "HighPrice=\"", "\""))
-			low = float(find_between(r.text, "LowPrice=\"", "\""))
-			vol = int(find_between(r.text, "Volume=\"", "\""))
-			price = round((Bidprice+Askprice)/2,4)
-
-			ts = timestamp(time[:5])
-			#print(time,price)
-			process_and_send(["Connected",symbol,time,ts,price,open_,high,low,vol],pipe)
+				ts = timestamp(time[:5])
+				#print(time,price)
+				process_and_send(["Connected",symbol,time,ts,price,open_,high,low,vol],pipe)
 
 			#pipe.send(output)
 
