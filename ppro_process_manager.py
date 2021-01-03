@@ -221,7 +221,7 @@ def getinfo(symbol,pipe):
 
 			if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
 				print("No symbol found")
-				pipe.send(["Unfound"])
+				pipe.send(["Unfound",symbol])
 
 			time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
 			Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
@@ -240,7 +240,7 @@ def getinfo(symbol,pipe):
 
 		except Exception as e:
 			print(e)
-			pipe.send(["Ppro Error"])
+			pipe.send(["Ppro Error",symbol])
 			lock[symbol] = True
 
 # i may need to come up with a new strucutre.
