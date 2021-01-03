@@ -53,123 +53,123 @@ class all_alerts(pannel):
 
 		self.rebind(self.canvas,self.frame)
 
-class alert(pannel):
+# class alert(pannel):
 
-	def __init__(self,frame,data:Symbol_data_manager,alert_pannel:all_alerts):
+# 	def __init__(self,frame,data:Symbol_data_manager,alert_pannel:all_alerts):
 
-		super().__init__(frame)
+# 		super().__init__(frame)
 
-		self.alert_pannel=alert_pannel
-		self.data = data
+# 		self.alert_pannel=alert_pannel
+# 		self.data = data
 
-		#init the labels. 
+# 		#init the labels. 
 
-	#any alert will need a threshold. deviation. std. 
-	def add_symbol(self,symbol,format,val_position,alert_position,alert_vals,data_ready):
+# 	#any alert will need a threshold. deviation. std. 
+# 	def add_symbol(self,symbol,format,val_position,alert_position,alert_vals,data_ready):
 
-		l = self.label_count
+# 		l = self.label_count
 
-		self.tickers_labels[symbol] = []
-		i = symbol
+# 		self.tickers_labels[symbol] = []
+# 		i = symbol
 
-		for j in range(len(format)):
+# 		for j in range(len(format)):
 
-			if j==0:
-				self.tickers_labels[i].append(tk.Label(self.frame ,text=format[j],width=self.width[j]))
-				self.label_default_configure(self.tickers_labels[i][j])
-				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
-			elif j==1:
-				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
-				self.label_default_configure(self.tickers_labels[i][j])
-				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
-				format[j].trace('w', lambda *_, text=format[j],label=self.tickers_labels[i][j]: self.status_change_color(text,label))
+# 			if j==0:
+# 				self.tickers_labels[i].append(tk.Label(self.frame ,text=format[j],width=self.width[j]))
+# 				self.label_default_configure(self.tickers_labels[i][j])
+# 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
+# 			elif j==1:
+# 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
+# 				self.label_default_configure(self.tickers_labels[i][j])
+# 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
+# 				format[j].trace('w', lambda *_, text=format[j],label=self.tickers_labels[i][j]: self.status_change_color(text,label))
 
-			#when it is alert label creation, create a trace set for value position 
-			elif j == alert_position:
-				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
-				self.label_default_configure(self.tickers_labels[i][j])
-				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
-				format[val_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
+# 			#when it is alert label creation, create a trace set for value position 
+# 			elif j == alert_position:
+# 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
+# 				self.label_default_configure(self.tickers_labels[i][j])
+# 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
+# 				format[val_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
 
-			elif j>1:
-				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
-				self.label_default_configure(self.tickers_labels[i][j])
-				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
+# 			elif j>1:
+# 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
+# 				self.label_default_configure(self.tickers_labels[i][j])
+# 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 
-		#self.ticker_count +=1
-		self.label_count +=1
+# 		#self.ticker_count +=1
+# 		self.label_count +=1
 
-		self.rebind(self.canvas,self.frame)
+# 		self.rebind(self.canvas,self.frame)
 
-	def delete_symbol(self,symbol):
+# 	def delete_symbol(self,symbol):
 
-		for i in self.tickers_labels[symbol]:
-			i.destroy()
+# 		for i in self.tickers_labels[symbol]:
+# 			i.destroy()
 
-		self.tickers_labels.pop(symbol,None)
+# 		self.tickers_labels.pop(symbol,None)
 
-		self.rebind(self.canvas,self.frame)
+# 		self.rebind(self.canvas,self.frame)
 
 
 
-	def set_latest_alert(self,symbol,alert,time):
+# 	def set_latest_alert(self,symbol,alert,time):
 
-		self.data.symbol_last_alert[symbol].set(alert)
-		self.data.symbol_last_alert_time[symbol].set(time)
+# 		self.data.symbol_last_alert[symbol].set(alert)
+# 		self.data.symbol_last_alert_time[symbol].set(time)
 
-	#alert vals: cur, mean, std.
-	def alert(self,eval_string,eval_label,alerts_vals,ready,status):
+# 	#alert vals: cur, mean, std.
+# 	def alert(self,eval_string,eval_label,alerts_vals,ready,status):
 
-		#check how many std it is. `
+# 		#check how many std it is. `
 
-		#attention, only do the calculation when the database is set. 
+# 		#attention, only do the calculation when the database is set. 
 
-		if ready.get() == True and status.get() =="Connected":
+# 		if ready.get() == True and status.get() =="Connected":
 
-			symbol= alerts_vals[0]
-			time= alerts_vals[1].get()[:5]
+# 			symbol= alerts_vals[0]
+# 			time= alerts_vals[1].get()[:5]
 			
-			cur_price= round(alerts_vals[2].get(),3)
-			mean= round(alerts_vals[3].get(),3)
-			std=  round(alerts_vals[4].get(),3)
-			alert_type = alerts_vals[5]
+# 			cur_price= round(alerts_vals[2].get(),3)
+# 			mean= round(alerts_vals[3].get(),3)
+# 			std=  round(alerts_vals[4].get(),3)
+# 			alert_type = alerts_vals[5]
 
-			ts = timestamp(time)
+# 			ts = timestamp(time)
 
 
-			if std != 0:
-				cur = round((cur_price-mean)/std,3)
-				eval_string.set(str(cur)+" from mean")
-			else:
-				cur = 0
-				eval_string.set("Unable to process std 0")
+# 			if std != 0:
+# 				cur = round((cur_price-mean)/std,3)
+# 				eval_string.set(str(cur)+" from mean")
+# 			else:
+# 				cur = 0
+# 				eval_string.set("Unable to process std 0")
 
-			#color. 
+# 			#color. 
 
-			if cur <0.5:
-				eval_label["background"]="white"
+# 			if cur <0.5:
+# 				eval_label["background"]="white"
 
-			elif cur>0.5 and cur<1:
-				#alert_type = "Moderate "+alert_type
-				eval_label["background"]="#97FEA8"
-				# self.alert_pannel.add_alerts([symbol,time,alert_type])
-				# self.set_latest_alert(symbol, alert_type, time)
+# 			elif cur>0.5 and cur<1:
+# 				#alert_type = "Moderate "+alert_type
+# 				eval_label["background"]="#97FEA8"
+# 				# self.alert_pannel.add_alerts([symbol,time,alert_type])
+# 				# self.set_latest_alert(symbol, alert_type, time)
 
-			elif cur>1 and cur<2:
-				alert_type = "High "+alert_type
-				eval_label["background"]="yellow"
-				if ts>570:
-					self.alert_pannel.add_alerts([symbol,time,alert_type])
-					self.set_latest_alert(symbol, alert_type, time)
-			else:
-				### Send the alert to alert pannel.
-				alert_type = "Very high "+alert_type
-				eval_label["background"]="red"
-				if ts>570:
-					self.alert_pannel.add_alerts([symbol,time,alert_type])
-					self.set_latest_alert(symbol, alert_type, time)
+# 			elif cur>1 and cur<2:
+# 				alert_type = "High "+alert_type
+# 				eval_label["background"]="yellow"
+# 				if ts>570:
+# 					self.alert_pannel.add_alerts([symbol,time,alert_type])
+# 					self.set_latest_alert(symbol, alert_type, time)
+# 			else:
+# 				### Send the alert to alert pannel.
+# 				alert_type = "Very high "+alert_type
+# 				eval_label["background"]="red"
+# 				if ts>570:
+# 					self.alert_pannel.add_alerts([symbol,time,alert_type])
+# 					self.set_latest_alert(symbol, alert_type, time)
 
-class double_alert(pannel):
+class alert(pannel):
 
 	def __init__(self,frame,data:Symbol_data_manager,alert_pannel:all_alerts):
 
@@ -208,7 +208,7 @@ class double_alert(pannel):
 				#unpack value_position,alert_position,alertvals
 				value_position = alerts[j][0]
 				alert_position = alerts[j][1]
-				alertvals = alerts[j][2]
+				alert_vals = alerts[j][2]
 				format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
 
 			elif j>1:
@@ -374,7 +374,7 @@ class openhigh(alert):
 		#any alert will need a threshold. deviation. std. 
 
 		#self,symbol,format,width,val_position,alert_position,alert_vals
-		super().add_symbol(symbol, labels,alert_positions,alerts,data_ready)
+		super().add_symbol(symbol,labels,alert_positions,alerts,data_ready)
 
 	#find a way to bound the special checking value to. hmm. every update.
 
