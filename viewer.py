@@ -154,7 +154,7 @@ class ticker_manager(pannel):
 			self.data.delete(symbol)
 			
 			for i in self.tickers_tracers[symbol]:
-				i[0].trace_remove("w",i[1])
+				i[0].trace_remove("write",i[1])
 
 
 			for i in self.tickers_labels[symbol]:
