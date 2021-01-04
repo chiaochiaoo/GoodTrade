@@ -167,7 +167,7 @@ class alert(pannel):
 				alert_position = alerts[j][1]
 				alert_vals = alerts[j][2]
 				m=format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
-				self.tickers_tracers[i].append((format[j],m))
+				#self.tickers_tracers[i].append((format[j],m))
 			elif j>1:
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
@@ -253,7 +253,7 @@ class alert(pannel):
 
 						elif cur_price<resistance and cur_price>support and self.alerts[symbol][alert_type]!=0 :
 
-							self.alerts[symbol][alert_type] = 1
+							self.alerts[symbol][alert_type] = 0
 
 							eval_label["background"]="#d9d9d9"
 							eval_string.set("")
