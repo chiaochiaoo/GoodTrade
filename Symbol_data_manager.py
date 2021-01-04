@@ -222,6 +222,8 @@ class Symbol_data_manager:
 		self.symbol_data_normal5_range[i] = StringVar()
 		self.symbol_data_normal5_vol_range[i] = StringVar()
 
+
+
 		self.symbol_data_normal5_val[i] = DoubleVar()
 		self.symbol_data_normal5_vol_val[i] = DoubleVar()
 

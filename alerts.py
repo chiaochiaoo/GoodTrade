@@ -89,6 +89,7 @@ class alert(pannel):
 		l = self.label_count
 
 		self.tickers_labels[symbol] = []
+		self.tickers_tracers[symbol] = []
 		i = symbol
 
 		for j in range(len(format)):
@@ -101,7 +102,8 @@ class alert(pannel):
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
-				format[j].trace('w', lambda *_, text=format[j],label=self.tickers_labels[i][j]: self.status_change_color(text,label))
+				m=format[j].trace('w', lambda *_, text=format[j],label=self.tickers_labels[i][j]: self.status_change_color(text,label))
+				self.tickers_tracers[i].append((format[j],m))
 
 			#when it is alert label creation, create a trace set for value position 
 			elif j in alert_positions:
@@ -113,7 +115,7 @@ class alert(pannel):
 				alert_position = alerts[j][1]
 				alert_vals = alerts[j][2]
 				format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
-
+				self.tickers_tracers[i].append((format[j],m))
 			elif j>1:
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
@@ -136,6 +138,7 @@ class alert(pannel):
 		l = self.label_count
 
 		self.tickers_labels[symbol] = []
+		self.tickers_tracers[symbol] = []
 		i = symbol
 
 		for j in range(len(format)):
@@ -148,8 +151,8 @@ class alert(pannel):
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
-				format[j].trace('w', lambda *_, text=format[j],label=self.tickers_labels[i][j]: self.status_change_color(text,label))
-
+				m=format[j].trace('w', lambda *_, text=format[j],label=self.tickers_labels[i][j]: self.status_change_color(text,label))
+				self.tickers_tracers[i].append((format[j],m))
 			#text filed for hmm,,,entry, 
 			elif j ==2 or j ==3:
 				self.tickers_labels[i].append(tk.Entry(self.frame ,textvariable=format[j],width=self.width[j]))
@@ -163,8 +166,8 @@ class alert(pannel):
 				value_position = alerts[j][0]
 				alert_position = alerts[j][1]
 				alert_vals = alerts[j][2]
-				format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
-
+				m=format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
+				self.tickers_tracers[i].append((format[j],m))
 			elif j>1:
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
@@ -176,6 +179,9 @@ class alert(pannel):
 		self.rebind(self.canvas,self.frame)
 
 	def delete_symbol(self,symbol):
+
+		for i in self.self.tickers_tracers[symbol]:
+			i[0].trace_remove("w",i[1])
 
 		for i in self.tickers_labels[symbol]:
 			i.destroy()

@@ -8,6 +8,7 @@ class pannel:
 		self.label_count = 0
 		self.ticker_count = 0
 		self.tickers_labels = {}
+		self.tickers_tracers = {}
 
 		self.tm = ttk.LabelFrame(frame) 
 		self.tm.place(x=0, y=40, relheight=0.85, relwidth=1)
