@@ -19,7 +19,7 @@ class scanner(pannel):
 
 		self.scanner_process_manager = scanner_process
 
-		self.setting = ttk.LabelFrame(root,text="Settings") 
+		self.setting = ttk.LabelFrame(root,text="Scanner Settings") 
 		self.setting.place(relx=0.01, rely=0.05, relheight=1, width=480)
 
 		self.refresh = ttk.Button(self.setting,  
