@@ -221,7 +221,7 @@ class alert(pannel):
 					support= to_number(alerts_vals[3].get())
 					resistance =  to_number(alerts_vals[4].get())
 
-					
+					print("breakout check:",cur_price,support,resistance)
 
 					if support != 0.00 and resistance != 0.00:
 						print(support,resistance,cur_price)
