@@ -164,6 +164,9 @@ class ticker_manager(pannel):
 			self.ticker_stats["text"] = "Current Registered Tickers: "+str(self.ticker_count)
 
 			self.rebind(self.canvas,self.frame)
+			
+		for i in self.self.tickers_tracers[symbol]:
+			i[0].trace_remove("w",i[1])
 
 		for i in self.alerts:
 			i.delete_symbol(symbol)
@@ -188,6 +191,7 @@ class ticker_manager(pannel):
 
 		self.tickers_labels[i]=[]
 
+		self.tickers_tracers[i] = []
 		#add in tickers.
 		for j in range(len(info)):
 			if j == 0:
@@ -199,7 +203,8 @@ class ticker_manager(pannel):
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=info[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
-				info[j].trace('w', lambda *_, text=info[j],label=self.tickers_labels[i][j]: self.status_change_color(text,label))
+				m=info[j].trace('w', lambda *_, text=info[j],label=self.tickers_labels[i][j]: self.status_change_color(text,label))
+				self.tickers_tracers[i].append((info[j],m))
 			elif j != (len(info)-1):
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=info[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
