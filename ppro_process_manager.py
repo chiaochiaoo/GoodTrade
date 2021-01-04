@@ -55,7 +55,7 @@ def deregister(symbol):
 		reg_list.pop(p)
 
 	except Exception as e:
-		print("Dereg",e)
+		print("Dereg",symbol,e)
 
 def multi_processing_price(pipe_receive):
 
