@@ -197,97 +197,102 @@ class alert(pannel):
 
 		#attention, only do the calculation when the database is set. 
 
-		if ready.get() == True and status.get() =="Connected":
+		try:
 
-			symbol= alerts_vals[0]
-			time= alerts_vals[1].get()[:5]
-			alert_type = alerts_vals[5]
-			ts = timestamp(time)
+			if ready.get() == True and status.get() =="Connected":
 
-			if alert_type=="breakout":
+				symbol= alerts_vals[0]
+				time= alerts_vals[1].get()[:5]
+				alert_type = alerts_vals[5]
+				ts = timestamp(time)
 
-				### ASSUME NUMBER ONLY.
-				cur_price= round(alerts_vals[2].get(),3)
-				support= to_number(alerts_vals[3].get())
-				resistance =  to_number(alerts_vals[4].get())
+				if alert_type=="breakout":
 
-				
+					### ASSUME NUMBER ONLY.
+					cur_price= round(alerts_vals[2].get(),3)
+					support= to_number(alerts_vals[3].get())
+					resistance =  to_number(alerts_vals[4].get())
 
-				if support != 0.00 and resistance != 0.00:
-					print(support,resistance,cur_price)
+					
 
-					if cur_price<support and self.alerts[symbol][alert_type]!=2:
+					if support != 0.00 and resistance != 0.00:
+						print(support,resistance,cur_price)
+
+						if cur_price<support and self.alerts[symbol][alert_type]!=2:
+
+							self.alerts[symbol][alert_type] = 2
+
+							alert_str = "Support "+alert_type
+							eval_label["background"]="yellow"
+
+							eval_string.set(alert_str)
+
+							self.alert_pannel.add_alerts([symbol,time,alert_str])
+							self.set_latest_alert(symbol, alert_str, time)
+
+						elif cur_price>resistance and self.alerts[symbol][alert_type]!=1 :
+						
+							self.alerts[symbol][alert_type] = 1
+
+							alert_str = "Resistance "+alert_type
+							eval_label["background"]="yellow"
+
+							eval_string.set(alert_str)
+
+							self.alert_pannel.add_alerts([symbol,time,alert_str])
+							self.set_latest_alert(symbol, alert_str, time)
+
+				else:
+					
+					cur_price= round(alerts_vals[2].get(),3)
+					mean= round(alerts_vals[3].get(),3)
+					std=  round(alerts_vals[4].get(),3)
+
+					#on certain alert_type, the math can be different. 
+
+
+					if std != 0:
+						cur = round((cur_price-mean)/std,3)
+						eval_string.set(str(cur)+" from mean")
+					else:
+						cur = 0
+						eval_string.set("Unable to process std 0")
+
+					#color. 
+
+					if cur <0.5:
+						eval_label["background"]="white"
+
+					elif cur>0.5 and cur<1:
+						
+						alert_str = "Moderate "+alert_type
+						eval_label["background"]="#97FEA8"
+
+						if ts>570 and self.alerts[symbol][alert_type] < 0.5:
+							self.alerts[symbol][alert_type] = 0.5
+							self.alert_pannel.add_alerts([symbol,time,alert_str])
+							self.set_latest_alert(symbol, alert_str, time)
+
+					elif cur>1 and cur<2 and self.alerts[symbol][alert_type] < 1:
+						self.alerts[symbol][alert_type] = 1
+						alert_str = "High "+alert_type
+						eval_label["background"]="yellow"
+						if ts>570:
+							#only set when there is higher severity. 
+							self.alert_pannel.add_alerts([symbol,time,alert_str])
+							self.set_latest_alert(symbol, alert_str, time)
+					elif cur>2 and self.alerts[symbol][alert_type] < 2:
 
 						self.alerts[symbol][alert_type] = 2
+						### Send the alert to alert pannel.
+						alert_str = "Very high "+alert_type
+						eval_label["background"]="red"
+						if ts>570:
+							self.alert_pannel.add_alerts([symbol,time,alert_str])
+							self.set_latest_alert(symbol, alert_str, time)
 
-						alert_str = "Support "+alert_type
-						eval_label["background"]="yellow"
-
-						eval_string.set(alert_str)
-
-						self.alert_pannel.add_alerts([symbol,time,alert_str])
-						self.set_latest_alert(symbol, alert_str, time)
-
-					elif cur_price>resistance and self.alerts[symbol][alert_type]!=1 :
-					
-						self.alerts[symbol][alert_type] = 1
-
-						alert_str = "Resistance "+alert_type
-						eval_label["background"]="yellow"
-
-						eval_string.set(alert_str)
-
-						self.alert_pannel.add_alerts([symbol,time,alert_str])
-						self.set_latest_alert(symbol, alert_str, time)
-
-			else:
-				
-				cur_price= round(alerts_vals[2].get(),3)
-				mean= round(alerts_vals[3].get(),3)
-				std=  round(alerts_vals[4].get(),3)
-
-				#on certain alert_type, the math can be different. 
-
-
-				if std != 0:
-					cur = round((cur_price-mean)/std,3)
-					eval_string.set(str(cur)+" from mean")
-				else:
-					cur = 0
-					eval_string.set("Unable to process std 0")
-
-				#color. 
-
-				if cur <0.5:
-					eval_label["background"]="white"
-
-				elif cur>0.5 and cur<1:
-					
-					alert_str = "Moderate "+alert_type
-					eval_label["background"]="#97FEA8"
-
-					if ts>570 and self.alerts[symbol][alert_type] < 0.5:
-						self.alerts[symbol][alert_type] = 0.5
-						self.alert_pannel.add_alerts([symbol,time,alert_str])
-						self.set_latest_alert(symbol, alert_str, time)
-
-				elif cur>1 and cur<2 and self.alerts[symbol][alert_type] < 1:
-					self.alerts[symbol][alert_type] = 1
-					alert_str = "High "+alert_type
-					eval_label["background"]="yellow"
-					if ts>570:
-						#only set when there is higher severity. 
-						self.alert_pannel.add_alerts([symbol,time,alert_str])
-						self.set_latest_alert(symbol, alert_str, time)
-				elif cur>2 and self.alerts[symbol][alert_type] < 2:
-
-					self.alerts[symbol][alert_type] = 2
-					### Send the alert to alert pannel.
-					alert_str = "Very high "+alert_type
-					eval_label["background"]="red"
-					if ts>570:
-						self.alert_pannel.add_alerts([symbol,time,alert_str])
-						self.set_latest_alert(symbol, alert_str, time)
+		except Exception as e:
+			print("Symbol deleted. Remaining alert.")
 
 
 
