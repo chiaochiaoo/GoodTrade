@@ -114,8 +114,8 @@ class alert(pannel):
 				value_position = alerts[j][0]
 				alert_position = alerts[j][1]
 				alert_vals = alerts[j][2]
-				format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
-				self.tickers_tracers[i].append((format[j],m))
+				m=format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
+				self.tickers_tracers[i].append((format[value_position],m))
 			elif j>1:
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
@@ -166,8 +166,8 @@ class alert(pannel):
 				value_position = alerts[j][0]
 				alert_position = alerts[j][1]
 				alert_vals = alerts[j][2]
-				m=format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
-				self.tickers_tracers[i].append((format[j],m))
+				#m=format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
+				#self.tickers_tracers[i].append((format[j],m))
 			elif j>1:
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
@@ -180,7 +180,9 @@ class alert(pannel):
 
 	def delete_symbol(self,symbol):
 
+		#print(self.tickers_tracers[symbol])
 		for i in self.tickers_tracers[symbol]:
+			#print("removing",i[0].get(),i[1])
 			i[0].trace_vdelete("w",i[1])
 
 		for i in self.tickers_labels[symbol]:

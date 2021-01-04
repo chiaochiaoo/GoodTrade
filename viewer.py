@@ -154,6 +154,7 @@ class ticker_manager(pannel):
 			self.data.delete(symbol)
 			
 			for i in self.tickers_tracers[symbol]:
+				#print("viewer removing",i[0].get(),i[1])
 				i[0].trace_vdelete("w",i[1])
 
 
@@ -161,7 +162,6 @@ class ticker_manager(pannel):
 				i.destroy()
 
 			self.tickers_labels.pop(symbol,None)
-
 
 			self.ticker_count -= 1
 			self.ticker_stats["text"] = "Current Registered Tickers: "+str(self.ticker_count)
