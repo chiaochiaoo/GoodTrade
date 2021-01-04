@@ -45,14 +45,22 @@ class pannel:
 
 	def status_change_color(self,text,label):
 
-		if text.get() == "Connecting":
-			label["background"] = "#ECF57C"
-		elif text.get() == "Unfound":
-			label["background"] = "red"
-		elif text.get() == "Disconnected":
-			label["background"] = "red"
-		elif text.get() == "Connected":
-			label["background"] = "#97FEA8"
+		try:
+
+			if text.get() == "Connecting":
+				label["background"] = "#ECF57C"
+			elif text.get() == "Unfound":
+				label["background"] = "red"
+			elif text.get() == "Disconnected":
+				label["background"] = "red"
+			elif text.get() == "Connected":
+				label["background"] = "#97FEA8"
+
+		except Exception as e:
+
+			print("destroyed labels")
+
+
 
 	def labels_creator(self,frame):
 		for i in range(len(self.labels)): #Rows

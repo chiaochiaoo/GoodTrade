@@ -152,6 +152,9 @@ class ticker_manager(pannel):
 			
 			#1. remove it from the list.
 			self.data.delete(symbol)
+			
+			for i in self.self.tickers_tracers[symbol]:
+				i[0].trace_remove("w",i[1])
 
 
 			for i in self.tickers_labels[symbol]:
@@ -165,8 +168,7 @@ class ticker_manager(pannel):
 
 			self.rebind(self.canvas,self.frame)
 			
-		for i in self.self.tickers_tracers[symbol]:
-			i[0].trace_remove("w",i[1])
+
 
 		for i in self.alerts:
 			i.delete_symbol(symbol)
