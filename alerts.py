@@ -3,6 +3,18 @@ from tkinter import ttk
 from pannel import *
 from Symbol_data_manager import *
 
+
+def to_number(str):
+
+	try:
+		x = round(float(str),2)
+		return x 
+
+	except Exception as e:
+		print("to_num",e)
+		return 0.00
+
+
 class all_alerts(pannel):
 	def __init__(self,frame):
 		super().__init__(frame)
@@ -196,12 +208,12 @@ class alert(pannel):
 
 				### ASSUME NUMBER ONLY.
 				cur_price= round(alerts_vals[2].get(),3)
-				support= self.to_number(alerts_vals[3].get())
-				resistance =  self.to_number(alerts_vals[4].get())
+				support= to_number(alerts_vals[3].get())
+				resistance =  to_number(alerts_vals[4].get())
 
 				
 
-				if round(support,1) != 0.0 and round(resistance,1) != 0.0:
+				if support != 0.00 and resistance != 0.00:
 					print(support,resistance)
 
 					if cur_price<support and self.alerts[symbol][alert_type]!=0:
@@ -278,15 +290,7 @@ class alert(pannel):
 						self.set_latest_alert(symbol, alert_str, time)
 
 
-	def to_number(self,str):
 
-		try:
-			x = float(x)
-			return x 
-
-		except Exception as e:
-			print("to_num",e)
-			return 0.0
 
 
 class highlow(alert):
