@@ -40,7 +40,7 @@ def register(symbol):
 		reg_list.append(symbol)
 		#append it to the list. 
 	except Exception as e:
-		print(e)
+		print("Register,",e)
 		black_list.append(symbol)
 
 def deregister(symbol):
@@ -55,7 +55,7 @@ def deregister(symbol):
 		reg_list.pop(p)
 
 	except Exception as e:
-		print(e)
+		print("Dereg",e)
 
 def multi_processing_price(pipe_receive):
 
@@ -105,7 +105,7 @@ def timestamp(s):
 		x = int(p[0])*60+int(p[1])
 		return x
 	except Exception as e:
-		print(e)
+		print("timestamp",e)
 		return 0
 
 #IF STILL THE SAME TIME, TRY TO reregister?
@@ -238,7 +238,7 @@ def getinfo(symbol,pipe):
 			#pipe.send(output)
 
 		except Exception as e:
-			print(e)
+			print("Get info",e)
 			pipe.send(["Ppro Error",symbol])
 			lock[symbol] = True
 
