@@ -590,7 +590,7 @@ class breakout(alert):
 		status = self.data.symbol_status[symbol]
 		#?
 
-		cur_price = self.data.last_5_min_volume[symbol]
+		cur_price = self.data.symbol_price[symbol]
 
 		support = self.data.symbol_data_support[symbol]
 		resistance  = self.data.symbol_data_resistance[symbol]
