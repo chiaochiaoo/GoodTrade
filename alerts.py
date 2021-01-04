@@ -214,6 +214,7 @@ class alert(pannel):
 				alert_type = alerts_vals[5]
 				ts = timestamp(time)
 
+				print(alert_type)
 				if alert_type=="breakout":
 
 					### ASSUME NUMBER ONLY.
