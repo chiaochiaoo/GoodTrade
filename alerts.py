@@ -195,8 +195,8 @@ class alert(pannel):
 
 				### ASSUME NUMBER ONLY.
 				cur_price= round(alerts_vals[2].get(),3)
-				support= to_number(alerts_vals[3].get())
-				resistance =  to_number(alerts_vals[4].get())
+				support= self.to_number(alerts_vals[3].get())
+				resistance =  self.to_number(alerts_vals[4].get())
 
 				if support != 0 and resistance !=0:
 
