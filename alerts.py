@@ -214,11 +214,11 @@ class alert(pannel):
 				
 
 				if support != 0.00 and resistance != 0.00:
-					print(support,resistance)
+					print(support,resistance,cur_price)
 
-					if cur_price<support and self.alerts[symbol][alert_type]!=0:
+					if cur_price<support and self.alerts[symbol][alert_type]!=2:
 
-						self.alerts[symbol][alert_type] = 0
+						self.alerts[symbol][alert_type] = 2
 
 						alert_str = "Support "+alert_type
 						eval_label["background"]="yellow"
