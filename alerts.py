@@ -198,7 +198,7 @@ class alert(pannel):
 				support= self.to_number(alerts_vals[3].get())
 				resistance =  self.to_number(alerts_vals[4].get())
 
-				if support != 0 and resistance !=0:
+				if support != None and resistance !=None:
 
 					if cur_price<support:
 
@@ -274,7 +274,7 @@ class alert(pannel):
 			return x 
 
 		except Exception as e:
-			return 0
+			return None
 
 
 class highlow(alert):
@@ -581,7 +581,7 @@ class breakout(alert):
 
 		super().__init__(frame,data,alert_panel)
 
-		self.labels = ["Ticker","Status","Support","resistance ","Cur Val","Evaluation"]
+		self.labels = ["Ticker","Status","Support","Resistance ","Cur Price","Evaluation"]
 		self.width = [8,10,10,10,10,15]
 		self.labels_creator(self.frame)
 
