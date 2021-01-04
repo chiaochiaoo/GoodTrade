@@ -191,6 +191,7 @@ class alert(pannel):
 			time= alerts_vals[1].get()[:5]
 			alert_type = alerts_vals[5]
 			ts = timestamp(time)
+
 			if alert_type=="breakout":
 
 				### ASSUME NUMBER ONLY.
@@ -198,11 +199,14 @@ class alert(pannel):
 				support= self.to_number(alerts_vals[3].get())
 				resistance =  self.to_number(alerts_vals[4].get())
 
-				print(support,resistance)
+				
 
-				if support != None and resistance !=None:
+				if round(support,1) != 0.0 and round(resistance,1) != 0.0:
+					print(support,resistance)
 
-					if cur_price<support:
+					if cur_price<support and and self.alerts[symbol][alert_type]!=0:
+
+						self.alerts[symbol][alert_type] = 0
 
 						alert_str = "Support "+alert_type
 						eval_label["background"]="yellow"
@@ -212,8 +216,10 @@ class alert(pannel):
 						self.alert_pannel.add_alerts([symbol,time,alert_str])
 						self.set_latest_alert(symbol, alert_str, time)
 
-					elif cur_price>resistance :
+					elif cur_price>resistance and self.alerts[symbol][alert_type]!=1 :
 					
+						self.alerts[symbol][alert_type] = 1
+
 						alert_str = "Resistance "+alert_type
 						eval_label["background"]="yellow"
 
@@ -275,12 +281,12 @@ class alert(pannel):
 	def to_number(self,str):
 
 		try:
-			x = round(str,3)
+			x = float(x)
 			return x 
 
 		except Exception as e:
 			print("to_num",e)
-			return None
+			return 0.0
 
 
 class highlow(alert):
