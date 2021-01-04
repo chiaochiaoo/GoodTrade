@@ -75,8 +75,10 @@ class viewer:
 		self.er = extremrange(self.tab2,self.data,self.all_alerts)
 		self.ev = extremevolume(self.tab3,self.data,self.all_alerts)
 
+		self.br = breakout(self.tab9,self.data,self.all_alerts)
+
 		#alerts  =[self.open_high_pannel]
-		alerts = [self.high_low_pannel,self.open_high_pannel,self.open_low_pannel,self.first_5,self.er,self.ev]
+		alerts = [self.high_low_pannel,self.open_high_pannel,self.open_low_pannel,self.first_5,self.er,self.ev,self.br]
 
 		self.tm = ticker_manager(self.tab1,self.data,alerts)
 		

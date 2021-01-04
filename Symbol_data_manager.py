@@ -108,6 +108,10 @@ class Symbol_data_manager:
 		self.symbol_data_openlow_eval= {}
 		self.symbol_data_range_eval = {}
 
+		self.symbol_data_resistance = {}
+		self.symbol_data_support = {}
+		self.symbol_data_breakout_eval = {}
+
 
 		#alerts
 		self.symbol_last_alert = {}
@@ -235,6 +239,12 @@ class Symbol_data_manager:
 		self.symbol_data_openhigh_eval[i] = StringVar()
 		self.symbol_data_openlow_eval[i] = StringVar()
 		self.symbol_data_range_eval[i] = StringVar()
+
+
+		###
+		self.symbol_data_resistance[i] = DoubleVar()
+		self.symbol_data_support[i] = DoubleVar()
+		self.symbol_data_breakout_eval[i] = StringVar()
 
 		#alert
 		self.symbol_last_alert[i] = StringVar()
