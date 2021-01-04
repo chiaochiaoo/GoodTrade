@@ -270,7 +270,7 @@ class alert(pannel):
 	def to_number(self,str):
 
 		try:
-			x = round(str,3)
+			x = 1#round(str,3)
 			return x 
 
 		except Exception as e:
