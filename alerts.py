@@ -222,7 +222,7 @@ class alert(pannel):
 					support= to_number(alerts_vals[3].get())
 					resistance =  to_number(alerts_vals[4].get())
 
-					print("breakout check:",cur_price,support,resistance)
+					#print("breakout check:",cur_price,support,resistance)
 
 					if support != 0.00 and resistance != 0.00:
 						print(support,resistance,cur_price)
@@ -255,8 +255,8 @@ class alert(pannel):
 
 							self.alerts[symbol][alert_type] = 1
 
-							eval_label["background"]="white"
-							eval_string.set(alert_str)
+							eval_label["background"]="#d9d9d9"
+							eval_string.set("")
 
 				else:
 					
