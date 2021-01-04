@@ -216,6 +216,7 @@ class alert(pannel):
 					
 						alert_str = "Resistance "+alert_type
 						eval_label["background"]="yellow"
+
 						eval_string.set(alert_str)
 
 						self.alert_pannel.add_alerts([symbol,time,alert_str])
@@ -278,6 +279,7 @@ class alert(pannel):
 			return x 
 
 		except Exception as e:
+			print("to_num",e)
 			return None
 
 
