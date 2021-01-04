@@ -204,7 +204,7 @@ class alert(pannel):
 				if round(support,1) != 0.0 and round(resistance,1) != 0.0:
 					print(support,resistance)
 
-					if cur_price<support and and self.alerts[symbol][alert_type]!=0:
+					if cur_price<support and self.alerts[symbol][alert_type]!=0:
 
 						self.alerts[symbol][alert_type] = 0
 
