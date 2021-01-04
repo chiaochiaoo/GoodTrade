@@ -267,7 +267,7 @@ class alert(pannel):
 						self.set_latest_alert(symbol, alert_str, time)
 
 
-	def to_number(str):
+	def to_number(self,str):
 
 		try:
 			x = round(str,3)
