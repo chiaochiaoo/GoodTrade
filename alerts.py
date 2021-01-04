@@ -180,7 +180,7 @@ class alert(pannel):
 
 	def delete_symbol(self,symbol):
 
-		for i in self.self.tickers_tracers[symbol]:
+		for i in self.tickers_tracers[symbol]:
 			i[0].trace_remove("w",i[1])
 
 		for i in self.tickers_labels[symbol]:
