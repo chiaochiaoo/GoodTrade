@@ -227,7 +227,7 @@ class alert(pannel):
 					if support != 0.00 and resistance != 0.00:
 						print(support,resistance,cur_price)
 
-						if cur_price<support and self.alerts[symbol][alert_type]!=2:
+						if cur_price<support and cur_price>resistance and self.alerts[symbol][alert_type]!=2:
 
 							self.alerts[symbol][alert_type] = 2
 
@@ -239,7 +239,7 @@ class alert(pannel):
 							self.alert_pannel.add_alerts([symbol,time,alert_str])
 							self.set_latest_alert(symbol, alert_str, time)
 
-						elif cur_price>resistance and self.alerts[symbol][alert_type]!=1 :
+						elif cur_price>resistance and cur_price>support and self.alerts[symbol][alert_type]!=1 :
 						
 							self.alerts[symbol][alert_type] = 1
 
@@ -250,6 +250,13 @@ class alert(pannel):
 
 							self.alert_pannel.add_alerts([symbol,time,alert_str])
 							self.set_latest_alert(symbol, alert_str, time)
+
+						elif cur_price<resistance and cur_price>support and self.alerts[symbol][alert_type]!=0 :
+
+							self.alerts[symbol][alert_type] = 1
+
+							eval_label["background"]="white"
+							eval_string.set(alert_str)
 
 				else:
 					
