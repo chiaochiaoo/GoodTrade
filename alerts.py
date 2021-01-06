@@ -292,7 +292,7 @@ class alert(pannel):
 
 						#only update the time
 						else:
-							print("ts:",seconds,self.breakout_time[symbol])
+							#print("ts:",seconds,self.breakout_time[symbol])
 							been = str(seconds - self.breakout_time[symbol])
 							if self.alerts[symbol][alert_type]==2:
 								alert_str = "Support "+alert_type +" :"+been+" sec ago"
