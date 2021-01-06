@@ -58,22 +58,22 @@ class database_process_manager:
 			print("receive")
 			print(d)
 
-			# symbol = d[0]
+			symbol = d[0]
 
-			# #nothing is returned. 
-			# if (len(d)==1):
-			# 	self.black_list.append(symbol)
-			# else:
-			# 	if len(d)-1 == len(self.data):
-			# 		for i in range(len(self.data)):
-			# 			self.data[i][symbol].set(d[i+1])
+			#nothing is returned. 
+			if (len(d)==1):
+				self.black_list.append(symbol)
+			else:
+				if len(d)-1 == len(self.data):
+					for i in range(len(self.data)):
+						self.data[i][symbol].set(d[i+1])
 
-			# 		self.reg_list.append(symbol)
-			# 		self.data_status[symbol].set(True)
-			# 		print(symbol," setting complete")
+					self.reg_list.append(symbol)
+					self.data_status[symbol].set(True)
+					print(symbol," setting complete")
 
-			# 	else:
-			# 		print("Data length mismatch:",len(d)-1,len(self.data))
+				else:
+					print("Data length mismatch:",len(d)-1,len(self.data))
 
 
 		### Upon receive, set the properties for each. 
@@ -238,18 +238,31 @@ def fetch_data(symbol):
 			return data_list
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
 
-	multiprocessing.freeze_support()
-	request_pipe, receive_pipe = multiprocessing.Pipe()
-	p = multiprocessing.Process(target=multi_processing_database, args=(receive_pipe,),daemon=True)
-	p.daemon=True
-	p.start()
+	# multiprocessing.freeze_support()
+	# request_pipe, receive_pipe = multiprocessing.Pipe()
+	# p = multiprocessing.Process(target=multi_processing_database, args=(receive_pipe,),daemon=True)
+	# p.daemon=True
+	# p.start()
 
-	t = database_process_manager(request_pipe)
-	t.send_request("AAPl")
-	t.receive_request()
+	# t = database_process_manager(request_pipe)
+	# t.send_request("AAPl")
+	# t.receive_request()
 
-	while True:
-		a = 1
+	# while True:
+	# 	a = 1
+
+	# file = "data/BNGO.NQ_0106.txt"
+
+	# if os.path.isfile(file):
+	# 	with open(file) as json_file:
+	# 		data1 = json.load(json_file)
+	
+	# data2 = fetch_data("BNGO.NQ")
+
+	# print(data1)
+	# print(data2)
+	# print(data1==data2)
+
 
