@@ -227,7 +227,6 @@ class alert(pannel):
 				ts = timestamp(time)
 				seconds = timestamp_seconds(second)
 
-				print(minute,second)
 
 				#print(alert_type)
 				if alert_type=="breakout":
@@ -242,7 +241,7 @@ class alert(pannel):
 					if support != 0.00 and resistance != 0.00:
 						print(support,resistance,cur_price)
 
-						if cur_price<support and cur_price>resistance and self.alerts[symbol][alert_type]!=2:
+						if cur_price<support and cur_price<resistance and self.alerts[symbol][alert_type]!=2:
 
 							self.alerts[symbol][alert_type] = 2
 
@@ -254,7 +253,6 @@ class alert(pannel):
 
 							alert_str = "Support "+alert_type +" :"+been+" sec ago"
 
-							alert_str = "Support "+alert_type
 
 							eval_label["background"]="yellow"
 							eval_string.set(alert_str)
@@ -270,11 +268,9 @@ class alert(pannel):
 								self.breakout_time[symbol] = seconds
 							
 							been = str(seconds - self.breakout_time[symbol])
-							
+
 							alert_str = "Resistance "+alert_type +" :"+been+" sec ago"
 
-
-							alert_str = "Support "+alert_type
 							eval_label["background"]="yellow"
 
 							eval_string.set(alert_str)
