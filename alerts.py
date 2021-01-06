@@ -239,7 +239,7 @@ class alert(pannel):
 					#print("breakout check:",cur_price,support,resistance)
 
 					if support != 0.00 and resistance != 0.00:
-						print(support,resistance,cur_price)
+						#print(support,resistance,cur_price)
 
 						if cur_price<support and cur_price<resistance and self.alerts[symbol][alert_type]!=2:
 
@@ -249,6 +249,8 @@ class alert(pannel):
 								self.breakout_time[symbol] = seconds
 							
 							been = str(seconds - self.breakout_time[symbol])
+
+							print(seconds,self.breakout_time[symbol],been)
 						
 
 							alert_str = "Support "+alert_type +" :"+been+" sec ago"
