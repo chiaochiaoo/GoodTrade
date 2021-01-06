@@ -340,7 +340,8 @@ class alert(pannel):
 							self.set_latest_alert(symbol, alert_str, time)
 
 		except Exception as e:
-			print("Symbol deleted. Remaining alert.")
+			print(e)
+			print("Alert Error:")
 
 
 
