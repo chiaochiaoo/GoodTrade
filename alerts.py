@@ -225,8 +225,9 @@ class alert(pannel):
 				minute= time[:5]
 				second = time[:8]
 				ts = timestamp(time)
-
 				seconds = timestamp_seconds(second)
+
+				print(minute,second)
 
 				#print(alert_type)
 				if alert_type=="breakout":
@@ -248,7 +249,7 @@ class alert(pannel):
 							if self.breakout_time[symbol] == 0:
 								self.breakout_time[symbol] = seconds
 							
-							been = seconds - self.breakout_time[symbol]
+							been = str(seconds - self.breakout_time[symbol])
 						
 
 							alert_str = "Support "+alert_type +" :"+been+" sec ago"
@@ -268,7 +269,8 @@ class alert(pannel):
 							if self.breakout_time[symbol] == 0:
 								self.breakout_time[symbol] = seconds
 							
-							been = seconds - self.breakout_time[symbol]
+							been = str(seconds - self.breakout_time[symbol])
+							
 							alert_str = "Resistance "+alert_type +" :"+been+" sec ago"
 
 
