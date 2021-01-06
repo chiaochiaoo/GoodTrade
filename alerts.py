@@ -235,14 +235,18 @@ class alert(pannel):
 
 						if cur_price<support and cur_price>resistance and self.alerts[symbol][alert_type]!=2:
 
+							self.alerts[symbol][alert_type] = 2
+
+							print("test:",self.breakout_time[symbol])
+
 							if self.breakout_time[symbol] == 0:
 								self.breakout_time[symbol] = seconds
 							
 							been = seconds - self.breakout_time[symbol]
 						
-							self.alerts[symbol][alert_type] = 2
 
 							alert_str = "Support "+alert_type +" :"+been+" sec ago"
+
 							eval_label["background"]="yellow"
 							eval_string.set(alert_str)
 
