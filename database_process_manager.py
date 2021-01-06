@@ -2,6 +2,9 @@ import requests
 import numpy as np
 import threading
 import multiprocessing
+import os.path
+from datetime import date
+import json
 
 from Symbol_data_manager import *
 
@@ -48,24 +51,29 @@ class database_process_manager:
 		#need to add a while loop to count how many has received.
 		#deactivate it when it gets nothing to receive. 
 
+		print("Receiving Starts")
 		while True: 
 			d = self.request.recv()
-			symbol = d[0]
 
-			#nothing is returned. 
-			if (len(d)==1):
-				self.black_list.append(symbol)
-			else:
-				if len(d)-1 == len(self.data):
-					for i in range(len(self.data)):
-						self.data[i][symbol].set(d[i+1])
+			print("receive")
+			print(d)
 
-					self.reg_list.append(symbol)
-					self.data_status[symbol].set(True)
-					print(symbol," setting complete")
+			# symbol = d[0]
 
-				else:
-					print("Data length mismatch:",len(d)-1,len(self.data))
+			# #nothing is returned. 
+			# if (len(d)==1):
+			# 	self.black_list.append(symbol)
+			# else:
+			# 	if len(d)-1 == len(self.data):
+			# 		for i in range(len(self.data)):
+			# 			self.data[i][symbol].set(d[i+1])
+
+			# 		self.reg_list.append(symbol)
+			# 		self.data_status[symbol].set(True)
+			# 		print(symbol," setting complete")
+
+			# 	else:
+			# 		print("Data length mismatch:",len(d)-1,len(self.data))
 
 
 		### Upon receive, set the properties for each. 
@@ -77,12 +85,23 @@ class database_process_manager:
 def multi_processing_database(pipe_receive):
 
 	print("Database for Database online")
+	today = date.today().strftime("%m%d")
 
 	while True:
 		symbol = pipe_receive.recv()
 		#unpack. 
 		print("Database processing:",symbol)
-		data = fetch_data(symbol)
+
+		file = "data/"+symbol+"_"+today+".txt"
+
+		if os.path.isfile(file):
+			with open(file) as json_file:
+				data = json.load(json_file)
+		else:
+			data = fetch_data(symbol)
+			with open(file, 'w') as outfile:
+				json.dump(data, outfile)
+
 
 		pipe_receive.send(data)
 
@@ -219,16 +238,18 @@ def fetch_data(symbol):
 			return data_list
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
 
-# 	multiprocessing.freeze_support()
-# 	request_pipe, receive_pipe = multiprocessing.Pipe()
-# 	p = multiprocessing.Process(target=multi_processing_database, args=(receive_pipe,),daemon=True)
-# 	p.daemon=True
-# 	p.start()
+	multiprocessing.freeze_support()
+	request_pipe, receive_pipe = multiprocessing.Pipe()
+	p = multiprocessing.Process(target=multi_processing_database, args=(receive_pipe,),daemon=True)
+	p.daemon=True
+	p.start()
 
-# 	t = database_process_manager(request_pipe,None)
-# 	t.send_request("AAPl")
+	t = database_process_manager(request_pipe)
+	t.send_request("AAPl")
+	t.receive_request()
 
-# 	while True:
-# 		a = 1
+	while True:
+		a = 1
+
