@@ -85,3 +85,16 @@ def timestamp(s):
 	except Exception as e:
 		print(e)
 		return 0
+
+
+def timestamp_seconds(s):
+
+	p = s.split(":")
+	try:
+		x = int(p[0])*3600+int(p[1])*60+int(p[2])
+		return x
+	except Exception as e:
+		print(e)
+		return 0
+
+#print(timestamp_seconds("13:23:46"))

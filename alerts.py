@@ -74,6 +74,9 @@ class alert(pannel):
 
 		self.alerts = {}
 
+
+		self.breakout_time = {}
+
 		#init the labels. 
 
 	#any alert will need a threshold. deviation. std. 
@@ -131,6 +134,7 @@ class alert(pannel):
 		#init the alert value
 		if symbol not in self.alerts:
 				self.alerts[symbol] = {}
+				self.breakout_time[symbol] = 0
 
 		for i in alert_positions:
 			self.alerts[symbol][alerts[i][2][5]] = 0
@@ -214,6 +218,8 @@ class alert(pannel):
 				alert_type = alerts_vals[5]
 				ts = timestamp(time)
 
+				seconds = timestamp_seconds(time)
+
 				#print(alert_type)
 				if alert_type=="breakout":
 
@@ -229,21 +235,31 @@ class alert(pannel):
 
 						if cur_price<support and cur_price>resistance and self.alerts[symbol][alert_type]!=2:
 
+							if self.breakout_time[symbol] == 0:
+								self.breakout_time[symbol] = seconds
+							
+							been = seconds - self.breakout_time[symbol]
+						
 							self.alerts[symbol][alert_type] = 2
 
-							alert_str = "Support "+alert_type
+							alert_str = "Support "+alert_type +" :"+been+" sec ago"
 							eval_label["background"]="yellow"
-
 							eval_string.set(alert_str)
 
 							self.alert_pannel.add_alerts([symbol,time,alert_str])
 							self.set_latest_alert(symbol, alert_str, time)
 
 						elif cur_price>resistance and cur_price>support and self.alerts[symbol][alert_type]!=1 :
+
+							#check time. 
+							if self.breakout_time[symbol] == 0:
+								self.breakout_time[symbol] = seconds
+							
+							been = seconds - self.breakout_time[symbol]
 						
 							self.alerts[symbol][alert_type] = 1
 
-							alert_str = "Resistance "+alert_type
+							alert_str = "Resistance "+alert_type +" :"+been+" sec ago"
 							eval_label["background"]="yellow"
 
 							eval_string.set(alert_str)
@@ -252,6 +268,9 @@ class alert(pannel):
 							self.set_latest_alert(symbol, alert_str, time)
 
 						elif cur_price<resistance and cur_price>support and self.alerts[symbol][alert_type]!=0 :
+
+							#refresh it back. 
+							self.breakout_time[symbol] = 0
 
 							self.alerts[symbol][alert_type] = 0
 
@@ -619,7 +638,7 @@ class breakout(alert):
 		super().__init__(frame,data,alert_panel)
 
 		self.labels = ["Ticker","Status","Support","Resistance ","Cur Price","Evaluation"]
-		self.width = [8,10,10,10,10,15]
+		self.width = [8,10,10,10,10,35]
 		self.labels_creator(self.frame)
 
 	def add_symbol(self,symbol):
