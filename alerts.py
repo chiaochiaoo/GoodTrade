@@ -75,7 +75,7 @@ class alert(pannel):
 		self.alerts = {}
 
 
-		#self.breakout_time = {}
+		self.breakout_time = {}
 
 		#init the labels. 
 
@@ -135,7 +135,7 @@ class alert(pannel):
 			#init the alert value
 			if symbol not in self.alerts:
 					self.alerts[symbol] = {}
-					#self.breakout_time[symbol] = 0
+					self.breakout_time[symbol] = 0
 
 
 		except Exception as e:
