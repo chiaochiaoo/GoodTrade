@@ -304,8 +304,9 @@ class ppro_process_manager:
 			if status == "Connected":
 				if len(d)-1 == len(self.data_list):
 					for i in range(1,len(self.data_list)):
-						if self.data_list[i][symbol].get()!=d[i+1]:
-							self.data_list[i][symbol].set(d[i+1])
+						self.data_list[i][symbol].set(d[i+1])
+						# if self.data_list[i][symbol].get()!=d[i+1]:
+						# 	self.data_list[i][symbol].set(d[i+1])
 
 		#grab all info. 
 
@@ -322,143 +323,23 @@ class ppro_process_manager:
 	def deregister(self,symbol):
 		self.request.send(symbol)
 	
-	# def update_symbol(self,symbol):
 
-	# 	#get the info. and, update!!!
-	# 	if symbol not in self.lock:
-	# 		 self.lock[symbol] = False
+# if __name__ == '__main__':
 
-	# 	if self.lock[symbol]==False:
-	# 		self.lock[symbol] = True
+# 	multiprocessing.freeze_support()
+# 	request_pipe, receive_pipe = multiprocessing.Pipe()
+# 	p = multiprocessing.Process(target=multi_processing_price, args=(receive_pipe,),daemon=True)
+# 	p.daemon=True
+# 	p.start()
 
-	# 		status = self.data.symbol_status[symbol]
-	# 		timestatus = self.data.symbol_update_time[symbol]
-	# 		price = self.data.symbol_price[symbol]
+# 	t = ppro_process_manager(request_pipe)
+# 	t.register("AAPL.NQ")
 
-	# 		open_ = self.data.symbol_price_open[symbol]
-	# 		high = self.data.symbol_price_high[symbol]
-	# 		low = self.data.symbol_price_low[symbol]
-	# 		range_ = self.data.symbol_price_range[symbol]
+# 	# request_pipe.send("AAPL.NQ")
+# 	# request_pipe.send("AMD.NQ")
 
-	# 		oh = self.data.symbol_price_openhigh[symbol]
-	# 		ol = self.data.symbol_price_openlow[symbol]
-
-	# 		last_5_range = self.data.last_5_min_range[symbol]
-	# 		last_5_vol = self.data.last_5_min_volume[symbol]
-
-	# 		#stat,time,midprice,op,high_,low_,vol = getinfo(symbol)
-
-	# 		#I need to make sure that label still exist. 
-	# 		#status["text"],timestamp["text"],price["text"]= self.count,self.count,self.count
-
-	# 		if stat != "Connected":
-	# 			self.black_list.append(symbol)
-
-	# 		if symbol in self.symbols:
-	# 			status.set(stat)
-
-	# 			if stat == "Connected":
-
-	# 				timestatus.set(time)
-	# 				timestamp = self.timestamp(time[:5])
-	# 				price.set(midprice)
-
-	# 				self.data.minute_timestamp_val[symbol].set(timestamp)
-
-	# 				if timestamp <570:
-	# 					if symbol not in self.data.symbol_init:
-	# 						self.data.symbol_init.append(symbol)
-	# 						low.set(midprice)
-	# 						high.set(midprice)
-
-	# 					if midprice<low.get():
-	# 						low.set(midprice)
-
-	# 					if midprice>high.get():
-	# 						high.set(midprice)
-
-	# 				if timestamp == 570:
-	# 					open_.set(op)
-
-	# 				if timestamp >=570:
-	# 					high.set(high_)
-	# 					low.set(low_)
-	# 					rgoh = round(high_ - op,3)
-	# 					rgol = round(op - low_,3)
-	# 					oh.set(rgoh)
-	# 					ol.set(rgol)
-
-	# 				###GENERAL CASE ####
-
-	# 				rg = round(high.get() - low.get(),3)
-	# 				range_.set(rg)
-
-
-	# 				#if timestamp not registered yet.
-	# 				if timestamp not in self.data.minute_timestamp[symbol]:
-	# 					if len(self.data.minute_timestamp[symbol])==0:
-
-	# 						self.data.minute_timestamp[symbol].append(timestamp-1)
-	# 					else:
-	# 						self.data.minute_timestamp[symbol].append(timestamp)
-	# 					self.data.minute_data[symbol]["high"].append(midprice)
-	# 					self.data.minute_data[symbol]["low"].append(midprice)
-	# 					self.data.minute_data[symbol]["vol"].append(vol)
-	# 					self.data.minute_count[symbol] +=1
-	# 				#if timestamp already registered. 
-	# 				else:
-	# 					#update these. 
-	# 					idx = self.data.minute_count[symbol]-1
-	# 					if midprice >= self.data.minute_data[symbol]["high"][idx]:
-	# 						self.data.minute_data[symbol]["high"][idx] = midprice
-	# 					if midprice <= self.data.minute_data[symbol]["low"][idx]:
-	# 						self.data.minute_data[symbol]["low"][idx] = midprice
-	# 					self.data.minute_data[symbol]["vol"][idx] = vol
-
-	# 				l5_h = max(self.data.minute_data[symbol]["high"][-5:])
-	# 				l5_l = min(self.data.minute_data[symbol]["low"][-5:])
-	# 				l5_r = round(l5_h - l5_l,3)
-	# 				index = min(len(self.data.minute_data[symbol]["vol"]), 5)
-	# 				l5_v = round((self.data.minute_data[symbol]["vol"][-1] - self.data.minute_data[symbol]["vol"][-index])/1000,2)
-
-
-	# 				# print(symbol,timestamp,vol,-index)
-	# 				# print(self.data.minute_timestamp[symbol])
-	# 				# print(self.data.minute_data[symbol]["vol"])
-	# 				# print(l5_v)
-	# 				# if timestamp not in self.data.minute_timestamp[symbol]:
-	# 				# 	print(symbol,"volume",l5_v[-5:])
-
-	# 				last_5_range.set(l5_r)
-	# 				last_5_vol.set(l5_v)
-
-	# 				#print(symbol,":",time,"vol:",int(vol))
-
-	# 				#check if time stamp is 9:35
-	# 				if timestamp <575:
-	# 					self.data.first_5_min_range[symbol].set(l5_r)
-	# 					self.data.first_5_min_volume[symbol].set(l5_v)
-
-	# 		self.lock[symbol] = False
-
-
-
-if __name__ == '__main__':
-
-	multiprocessing.freeze_support()
-	request_pipe, receive_pipe = multiprocessing.Pipe()
-	p = multiprocessing.Process(target=multi_processing_price, args=(receive_pipe,),daemon=True)
-	p.daemon=True
-	p.start()
-
-	t = ppro_process_manager(request_pipe)
-	t.register("AAPL.NQ")
-
-	# request_pipe.send("AAPL.NQ")
-	# request_pipe.send("AMD.NQ")
-
-	while True:
-		print(request_pipe.recv())
+# 	while True:
+# 		print(request_pipe.recv())
 
 
 
