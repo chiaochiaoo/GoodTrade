@@ -75,7 +75,7 @@ class alert(pannel):
 		self.alerts = {}
 
 
-		self.breakout_time = {}
+		#self.breakout_time = {}
 
 		#init the labels. 
 
@@ -135,7 +135,7 @@ class alert(pannel):
 			#init the alert value
 			if symbol not in self.alerts:
 					self.alerts[symbol] = {}
-					self.breakout_time[symbol] = 0
+					#self.breakout_time[symbol] = 0
 
 
 		except Exception as e:
@@ -242,15 +242,15 @@ class alert(pannel):
 
 							self.alerts[symbol][alert_type] = 2
 
-
-
-							if self.breakout_time[symbol] == 0:
-								self.breakout_time[symbol] = seconds
+							# if self.breakout_time[symbol] == 0:
+							# 	self.breakout_time[symbol] = seconds
 							
-							been = seconds - self.breakout_time[symbol]
+							# been = seconds - self.breakout_time[symbol]
 						
 
-							alert_str = "Support "+alert_type +" :"+been+" sec ago"
+							# alert_str = "Support "+alert_type +" :"+been+" sec ago"
+
+							alert_str = "Support "+alert_type
 
 							eval_label["background"]="yellow"
 							eval_string.set(alert_str)
@@ -260,15 +260,16 @@ class alert(pannel):
 
 						elif cur_price>resistance and cur_price>support and self.alerts[symbol][alert_type]!=1 :
 
-							#check time. 
-							if self.breakout_time[symbol] == 0:
-								self.breakout_time[symbol] = seconds
-							
-							been = seconds - self.breakout_time[symbol]
-						
 							self.alerts[symbol][alert_type] = 1
+							#check time. 
+							# if self.breakout_time[symbol] == 0:
+							# 	self.breakout_time[symbol] = seconds
+							
+							# been = seconds - self.breakout_time[symbol]
+							# alert_str = "Resistance "+alert_type +" :"+been+" sec ago"
 
-							alert_str = "Resistance "+alert_type +" :"+been+" sec ago"
+
+							alert_str = "Support "+alert_type
 							eval_label["background"]="yellow"
 
 							eval_string.set(alert_str)
