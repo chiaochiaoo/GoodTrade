@@ -290,6 +290,16 @@ class alert(pannel):
 							eval_label["background"]="#d9d9d9"
 							eval_string.set("")
 
+						#only update the time
+						else:
+							been = str(seconds - self.breakout_time[symbol])
+							if self.alerts[symbol][alert_type]==2:
+								alert_str = "Support "+alert_type +" :"+been+" sec ago"
+								eval_string.set(alert_str)
+							if self.alerts[symbol][alert_type]==1:
+								alert_str = "Resistance "+alert_type +" :"+been+" sec ago"
+								eval_string.set(alert_str)
+
 				else:
 					
 					cur_price= round(alerts_vals[2].get(),3)
