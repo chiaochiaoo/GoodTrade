@@ -219,11 +219,14 @@ class alert(pannel):
 			if ready.get() == True and status.get() =="Connected":
 
 				symbol= alerts_vals[0]
-				time= alerts_vals[1].get()[:5]
+				time= alerts_vals[1].get()
 				alert_type = alerts_vals[5]
+
+				minute= time[:5]
+				second = time[:8]
 				ts = timestamp(time)
 
-				seconds = timestamp_seconds(time)
+				seconds = timestamp_seconds(second)
 
 				#print(alert_type)
 				if alert_type=="breakout":
@@ -242,13 +245,13 @@ class alert(pannel):
 
 							self.alerts[symbol][alert_type] = 2
 
-							# if self.breakout_time[symbol] == 0:
-							# 	self.breakout_time[symbol] = seconds
+							if self.breakout_time[symbol] == 0:
+								self.breakout_time[symbol] = seconds
 							
-							# been = seconds - self.breakout_time[symbol]
+							been = seconds - self.breakout_time[symbol]
 						
 
-							# alert_str = "Support "+alert_type +" :"+been+" sec ago"
+							alert_str = "Support "+alert_type +" :"+been+" sec ago"
 
 							alert_str = "Support "+alert_type
 
@@ -262,11 +265,11 @@ class alert(pannel):
 
 							self.alerts[symbol][alert_type] = 1
 							#check time. 
-							# if self.breakout_time[symbol] == 0:
-							# 	self.breakout_time[symbol] = seconds
+							if self.breakout_time[symbol] == 0:
+								self.breakout_time[symbol] = seconds
 							
-							# been = seconds - self.breakout_time[symbol]
-							# alert_str = "Resistance "+alert_type +" :"+been+" sec ago"
+							been = seconds - self.breakout_time[symbol]
+							alert_str = "Resistance "+alert_type +" :"+been+" sec ago"
 
 
 							alert_str = "Support "+alert_type
@@ -338,8 +341,6 @@ class alert(pannel):
 
 		except Exception as e:
 			print("Symbol deleted. Remaining alert.")
-
-
 
 
 
