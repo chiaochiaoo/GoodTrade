@@ -131,10 +131,15 @@ class alert(pannel):
 
 	def add_symbol_breakout(self,symbol,format,alert_positions,alerts,data_ready):
 
-		#init the alert value
-		if symbol not in self.alerts:
-				self.alerts[symbol] = {}
-				self.breakout_time[symbol] = 0
+		try:
+			#init the alert value
+			if symbol not in self.alerts:
+					self.alerts[symbol] = {}
+					self.breakout_time[symbol] = 0
+
+
+		except Exception as e:
+			print("add problem")
 
 		for i in alert_positions:
 			self.alerts[symbol][alerts[i][2][5]] = 0
@@ -237,7 +242,7 @@ class alert(pannel):
 
 							self.alerts[symbol][alert_type] = 2
 
-							print("test:",self.breakout_time[symbol])
+
 
 							if self.breakout_time[symbol] == 0:
 								self.breakout_time[symbol] = seconds
