@@ -98,7 +98,7 @@ def multi_processing_price(pipe_receive):
 	while True:
 
 		k+=1
-		if k%5 = 0:
+		if k%5 == 0:
 			current_time = datetime.now().strftime("%M:%S")
 			msg = "Server functional."+current_time
 			pipe_receive.send(["message",msg])
