@@ -3,7 +3,6 @@ import multiprocessing
 import threading
 import time
 from Symbol_data_manager import *
-
 global reg_count
 reg_count = 0
 
@@ -11,20 +10,11 @@ global lock
 lock = {}
 
 global black_list
-black_list = []
-
 global reg_list
-reg_list = []
-
 global data
+black_list = []
+reg_list = []
 data = {}
-
-global retry_list
-retry_list = []
-
-
-
-
 ############################################################
 #### pipe in, symbol. if symbol not reg, reg. if reg, dereg.
 #### main loop. for each reg, thread out and return.
@@ -322,7 +312,6 @@ class ppro_process_manager:
 
 		#put the receive in corresponding box.
 		while True:
-			print(d)
 			d = self.request.recv()
 			status = d[0]
 			symbol = d[1]
@@ -331,9 +320,9 @@ class ppro_process_manager:
 			if status == "Connected":
 				if len(d)-1 == len(self.data_list):
 					for i in range(1,len(self.data_list)):
-						#self.data_list[i][symbol].set(d[i+1])
-						if self.data_list[i][symbol].get()!=d[i+1]:
-							self.data_list[i][symbol].set(d[i+1])
+						self.data_list[i][symbol].set(d[i+1])
+						# if self.data_list[i][symbol].get()!=d[i+1]:
+						# 	self.data_list[i][symbol].set(d[i+1])
 
 		#grab all info. 
 

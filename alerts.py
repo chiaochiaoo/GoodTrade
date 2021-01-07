@@ -254,12 +254,12 @@ class alert(pannel):
 						
 
 							alert_str = "Support "+alert_type +" :"+been+" sec ago"
-							notf_str = "Support "+alert_type
+
 
 							eval_label["background"]="yellow"
 							eval_string.set(alert_str)
 
-							self.alert_pannel.add_alerts([symbol,time,notf_str])
+							self.alert_pannel.add_alerts([symbol,time,alert_str])
 							self.set_latest_alert(symbol, alert_str, time)
 
 						elif cur_price>resistance and cur_price>support and self.alerts[symbol][alert_type]!=1 :
@@ -272,12 +272,12 @@ class alert(pannel):
 							been = str(seconds - self.breakout_time[symbol])
 
 							alert_str = "Resistance "+alert_type +" :"+been+" sec ago"
-							notf_str = "Support "+alert_type
 
 							eval_label["background"]="yellow"
+
 							eval_string.set(alert_str)
 
-							self.alert_pannel.add_alerts([symbol,time,notf_str])
+							self.alert_pannel.add_alerts([symbol,time,alert_str])
 							self.set_latest_alert(symbol, alert_str, time)
 
 						elif cur_price<resistance and cur_price>support and self.alerts[symbol][alert_type]!=0 :
