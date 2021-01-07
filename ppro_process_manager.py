@@ -28,9 +28,13 @@ def test_register():
 	try:
 		p="http://localhost:8080/Register?symbol=AAPL.NQ&feedtype=L1"
 		r= requests.get(p)
-		return True
+		if "PProApi" in r.text:
+			return False
+		else:
+			return True
+
 	except Exception as e:
-		return False
+		return True
 
 def register(symbol):
 	global reg_count
@@ -85,11 +89,14 @@ def multi_processing_price(pipe_receive):
 	while True:
 
 		while connection_error:
-			if test_register():
-				connection_error = False
-			time.sleep(3)
-
-		
+			connection_error = test_register():
+			
+			if connection_error:
+				pipe_receive.send(["message","Conection failed. try again in 3 sec."])
+				time.sleep(3)
+			else:
+				pipe_receive.send(["message","Connection established."])
+			
 		#check new symbols. 
 		rec = []
 		while pipe_receive.poll():
@@ -331,16 +338,21 @@ class ppro_process_manager:
 		#put the receive in corresponding box.
 		while True:
 			d = self.request.recv()
-			status = d[0]
-			symbol = d[1]
 
-			self.data_list[0][symbol].set(status)
-			if status == "Connected":
-				if len(d)-1 == len(self.data_list):
-					for i in range(1,len(self.data_list)):
-						self.data_list[i][symbol].set(d[i+1])
-						# if self.data_list[i][symbol].get()!=d[i+1]:
-						# 	self.data_list[i][symbol].set(d[i+1])
+			status = d[0]
+
+			if status == "message":
+				print(d[1])
+			else:
+				symbol = d[1]
+
+				self.data_list[0][symbol].set(status)
+				if status == "Connected":
+					if len(d)-1 == len(self.data_list):
+						for i in range(1,len(self.data_list)):
+							self.data_list[i][symbol].set(d[i+1])
+							# if self.data_list[i][symbol].get()!=d[i+1]:
+							# 	self.data_list[i][symbol].set(d[i+1])
 
 		#grab all info. 
 
@@ -357,7 +369,6 @@ class ppro_process_manager:
 	def deregister(self,symbol):
 		self.request.send(symbol)
 	
-
 # if __name__ == '__main__':
 
 # 	multiprocessing.freeze_support()
