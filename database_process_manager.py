@@ -51,12 +51,12 @@ class database_process_manager:
 		#need to add a while loop to count how many has received.
 		#deactivate it when it gets nothing to receive. 
 
-		print("Receiving Starts")
+		print("Database Online: Receiving Starts")
 		while True: 
 			d = self.request.recv()
 
-			print("receive")
-			print(d)
+			# print("receive")
+			# print(d)
 
 			symbol = d[0]
 
