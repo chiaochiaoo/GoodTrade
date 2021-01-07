@@ -17,7 +17,6 @@ reg_list = []
 data = {}
 
 global connection_error
-connection_error = False
 ############################################################
 #### pipe in, symbol. if symbol not reg, reg. if reg, dereg.
 #### main loop. for each reg, thread out and return.
@@ -81,9 +80,11 @@ def multi_processing_price(pipe_receive):
 
 	print("Database for Database online")
 
+	connection_error = True
+
 	while True:
 
-		if connection_error:
+		while connection_error:
 			if test_register():
 				connection_error = False
 			time.sleep(3)
