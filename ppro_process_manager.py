@@ -29,7 +29,7 @@ def test_register():
 		p="http://localhost:8080/Register?symbol=AAPL.NQ&feedtype=L1"
 		r= requests.get(p)
 		return True
-	else:
+	except Exception as e:
 		return False
 
 def register(symbol):
