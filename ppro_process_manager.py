@@ -43,6 +43,8 @@ def register(symbol):
 	global reg_count
 	global reg_list
 
+	global lock
+
 	try:
 		p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
 		#p ="http://localhost:8080/GetSnapshot?symbol="+symbol+"&feedtype=L1"
@@ -55,6 +57,9 @@ def register(symbol):
 		print(symbol,"registerd ","total:",reg_count)
 
 		reg_list.append(symbol)
+
+		if symbol not in lock:
+			lock[symbol] = False
 
 		#append it to the list. 
 	except Exception as e:
@@ -258,44 +263,44 @@ def process_and_send(lst,pipe):
 	lock[symbol] = False
 
 def getinfo(symbol,pipe):
-	global lock
+	
 	global black_list
 
 	global connection_error
 
-	if symbol not in lock:
-		lock[symbol] = False
-	if not lock[symbol]:
-		try:
-			lock[symbol] = True
-			p="http://localhost:8080/GetLv1?symbol="+symbol
-			r= requests.get(p)
+	if not connection_error:
 
-			if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
-				print("No symbol found")
-				black_list.append(symbol)
-				pipe.send(["Unfound",symbol])
-			else:
-				time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
-				Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
-				Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
-				open_ = float(find_between(r.text, "OpenPrice=\"", "\""))
-				high = float(find_between(r.text, "HighPrice=\"", "\""))
-				low = float(find_between(r.text, "LowPrice=\"", "\""))
-				vol = int(find_between(r.text, "Volume=\"", "\""))
-				price = round((Bidprice+Askprice)/2,4)
+		if not lock[symbol]:
+			try:
+				lock[symbol] = True
+				p="http://localhost:8080/GetLv1?symbol="+symbol
+				r= requests.get(p)
 
-				ts = timestamp(time[:5])
-				#print(time,price)
-				process_and_send(["Connected",symbol,time,ts,price,open_,high,low,vol],pipe)
+				if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
+					print("No symbol found")
+					black_list.append(symbol)
+					pipe.send(["Unfound",symbol])
+				else:
+					time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
+					Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
+					Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
+					open_ = float(find_between(r.text, "OpenPrice=\"", "\""))
+					high = float(find_between(r.text, "HighPrice=\"", "\""))
+					low = float(find_between(r.text, "LowPrice=\"", "\""))
+					vol = int(find_between(r.text, "Volume=\"", "\""))
+					price = round((Bidprice+Askprice)/2,4)
 
-			#pipe.send(output)
+					ts = timestamp(time[:5])
+					#print(time,price)
+					process_and_send(["Connected",symbol,time,ts,price,open_,high,low,vol],pipe)
 
-		except Exception as e:
-			print("Get info",e)
-			connection_error = True
-			pipe.send(["Ppro Error",symbol])
-			lock[symbol] = True
+				#pipe.send(output)
+
+			except Exception as e:
+				print("Get info",e)
+				connection_error = True
+				pipe.send(["Ppro Error",symbol])
+				lock[symbol] = False
 
 # i may need to come up with a new strucutre.
 # now its like. iterate through each symbols. and wait for some seconds. do it again.
