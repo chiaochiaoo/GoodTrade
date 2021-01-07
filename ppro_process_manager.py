@@ -16,14 +16,22 @@ black_list = []
 reg_list = []
 data = {}
 
-global retry_list
-retry_list = []
+global connection_error
+connection_error = False
 ############################################################
 #### pipe in, symbol. if symbol not reg, reg. if reg, dereg.
 #### main loop. for each reg, thread out and return.
 #### send the updates back to the client.
 ############################################################
 
+
+def test_register():
+	try:
+		p="http://localhost:8080/Register?symbol=AAPL.NQ&feedtype=L1"
+		r= requests.get(p)
+		return True
+	else:
+		return False
 
 def register(symbol):
 	global reg_count
@@ -44,6 +52,8 @@ def register(symbol):
 
 		#append it to the list. 
 	except Exception as e:
+
+		#means cannot connect. 
 		print("Register,",e)
 		
 		#it could be database not linked 
@@ -67,10 +77,17 @@ def multi_processing_price(pipe_receive):
 
 	global black_list
 	global reg_list
-	global retry_list
+	global connection_error
+
 	print("Database for Database online")
 
 	while True:
+
+		if connection_error:
+			if test_register():
+				connection_error = False
+			time.sleep(3)
+
 		
 		#check new symbols. 
 		rec = []
@@ -89,9 +106,7 @@ def multi_processing_price(pipe_receive):
 
 		#try to register again the ones that have ppro errors. 
 
-		for i in retry_list:
-			reg = threading.Thread(target=register,args=(i,), daemon=True)
-			reg.start()
+
 
 		#bulk cmds. get updates on these symbols. on finish, send it back to client. 
 		for i in reg_list:
@@ -222,8 +237,9 @@ def process_and_send(lst,pipe):
 
 def getinfo(symbol,pipe):
 	global lock
-	global retry_list
 	global black_list
+
+	global connection_error
 
 	if symbol not in lock:
 		lock[symbol] = False
@@ -251,13 +267,11 @@ def getinfo(symbol,pipe):
 				#print(time,price)
 				process_and_send(["Connected",symbol,time,ts,price,open_,high,low,vol],pipe)
 
-				if symbol in retry_list:
-					retry_list.pop(symbol)
 			#pipe.send(output)
 
 		except Exception as e:
 			print("Get info",e)
-			retry_list.append(symbol)
+			connection_error = True
 			pipe.send(["Ppro Error",symbol])
 			lock[symbol] = True
 
