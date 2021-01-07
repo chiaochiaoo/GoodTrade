@@ -89,7 +89,7 @@ def multi_processing_price(pipe_receive):
 	while True:
 
 		while connection_error:
-			connection_error = test_register():
+			connection_error = test_register()
 			
 			if connection_error:
 				pipe_receive.send(["message","Conection failed. try again in 3 sec."])
