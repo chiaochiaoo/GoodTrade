@@ -108,13 +108,15 @@ def multi_processing_price(pipe_receive):
 			
 			if connection_error:
 				pipe_receive.send(["message","Conection failed. try again in 3 sec."])
-				time.sleep(3)
+				
 			else:
 				pipe_receive.send(["message","Connection established."])
 
 				for i in reg_list:
 					reg = threading.Thread(target=register,args=(i,), daemon=True)
 					reg.start()
+
+			time.sleep(3)
 			
 		#check new symbols. 
 		rec = []
