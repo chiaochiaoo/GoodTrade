@@ -3,6 +3,9 @@ import multiprocessing
 import threading
 import time
 from Symbol_data_manager import *
+from datetime import datetime
+
+
 global reg_count
 reg_count = 0
 
@@ -82,11 +85,18 @@ def multi_processing_price(pipe_receive):
 	global reg_list
 	global connection_error
 
+	k = 0
 	print("Database for Database online")
 
 	connection_error = True
 
 	while True:
+
+		k+=1
+		if k%5 = 0:
+			current_time = datetime.now().strftime("%M:%S")
+			msg = "Server functional."+current_time
+			pipe_receive.send(["message",msg])
 
 		while connection_error:
 			connection_error = test_register()
@@ -96,7 +106,7 @@ def multi_processing_price(pipe_receive):
 				time.sleep(3)
 			else:
 				pipe_receive.send(["message","Connection established."])
-				
+
 				for i in reg_list:
 					reg = threading.Thread(target=register,args=(i,), daemon=True)
 					reg.start()
@@ -351,6 +361,7 @@ class ppro_process_manager:
 				symbol = d[1]
 
 				self.data_list[0][symbol].set(status)
+
 				if status == "Connected":
 					if len(d)-1 == len(self.data_list):
 						for i in range(1,len(self.data_list)):

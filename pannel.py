@@ -51,10 +51,10 @@ class pannel:
 				label["background"] = "#ECF57C"
 			elif text.get() == "Unfound":
 				label["background"] = "red"
-			elif text.get() == "Disconnected":
-				label["background"] = "red"
 			elif text.get() == "Connected":
 				label["background"] = "#97FEA8"
+			else:
+				label["background"] = "red"
 
 		except Exception as e:
 
