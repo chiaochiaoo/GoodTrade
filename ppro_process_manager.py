@@ -15,6 +15,9 @@ global data
 black_list = []
 reg_list = []
 data = {}
+
+global retry_list
+retry_list = []
 ############################################################
 #### pipe in, symbol. if symbol not reg, reg. if reg, dereg.
 #### main loop. for each reg, thread out and return.
