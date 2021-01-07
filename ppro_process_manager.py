@@ -35,7 +35,7 @@ retry_list = []
 def register(symbol):
 	global reg_count
 	global reg_list
-	global black_list
+
 	try:
 		p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
 		#p ="http://localhost:8080/GetSnapshot?symbol="+symbol+"&feedtype=L1"
@@ -48,10 +48,13 @@ def register(symbol):
 		print(symbol,"registerd ","total:",reg_count)
 
 		reg_list.append(symbol)
+
 		#append it to the list. 
 	except Exception as e:
 		print("Register,",e)
-		black_list.append(symbol)
+		
+		#it could be database not linked 
+		
 
 def deregister(symbol):
 	global reg_count
@@ -71,6 +74,7 @@ def multi_processing_price(pipe_receive):
 
 	global black_list
 	global reg_list
+	global retry_list
 	print("Database for Database online")
 
 	while True:
@@ -90,6 +94,11 @@ def multi_processing_price(pipe_receive):
 					dereg = threading.Thread(target=deregister,args=(i,), daemon=True)
 					dereg.start()
 
+		#try to register again the ones that have ppro errors. 
+
+		for i in retry_list:
+			reg = threading.Thread(target=register,args=(i,), daemon=True)
+			reg.start()
 
 		#bulk cmds. get updates on these symbols. on finish, send it back to client. 
 		for i in reg_list:
@@ -220,6 +229,9 @@ def process_and_send(lst,pipe):
 
 def getinfo(symbol,pipe):
 	global lock
+	global retry_list
+	global black_list
+
 	if symbol not in lock:
 		lock[symbol] = False
 	if not lock[symbol]:
@@ -230,6 +242,7 @@ def getinfo(symbol,pipe):
 
 			if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
 				print("No symbol found")
+				black_list.append(symbol)
 				pipe.send(["Unfound",symbol])
 			else:
 				time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
@@ -245,10 +258,13 @@ def getinfo(symbol,pipe):
 				#print(time,price)
 				process_and_send(["Connected",symbol,time,ts,price,open_,high,low,vol],pipe)
 
+				if symbol in retry_list:
+					retry_list.pop(symbol)
 			#pipe.send(output)
 
 		except Exception as e:
 			print("Get info",e)
+			retry_list.append(symbol)
 			pipe.send(["Ppro Error",symbol])
 			lock[symbol] = True
 
