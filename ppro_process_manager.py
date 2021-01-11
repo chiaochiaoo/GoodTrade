@@ -258,7 +258,7 @@ def process_and_send(lst,pipe):
 		d["f5r"] = d["last_5_range"]
 		d["f5v"] = d["vol"]
 
-	#pre-market
+
 	pipe.send([status,symbol,price,time,timestamp,d["high"],d["low"],\
 	d["range"],d["last_5_range"],d["vol"],d["open"],d["oh"],d["ol"],
 	d["f5r"],d["f5v"]])

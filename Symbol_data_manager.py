@@ -27,6 +27,11 @@ class Symbol_data_manager:
 
 		self.symbol_init =[]
 
+
+		#system
+
+		self.auto_support_resistance = IntVar()
+
 		#basics
 		self.symbol_price = {}
 		self.symbol_price_high = {}

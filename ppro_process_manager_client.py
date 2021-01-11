@@ -29,6 +29,11 @@ class ppro_process_manager:
 		self.data_list = s.update_list
 		self.symbols = s.get_list()
 
+		#########
+		self.supoort = s.symbol_data_support
+		self.resistance = s.symbol_data_resistance
+		self.auto_support_resistance = s.auto_support_resistance
+
 		for i in self.symbols:
 			self.register(i)
 
@@ -66,12 +71,13 @@ class ppro_process_manager:
 							if self.data_list[i][symbol].get()!=d[i+1]:
 								self.data_list[i][symbol].set(d[i+1])
 
-						timestamp = d[4]
-						high = d[5]
-						low = d[6]
-						if timestamp < 570:
-							self.data.symbol_data_resistance[symbol].set(high)
-							self.data.symbol_data_support[symbol].set(low)
+						if self.auto_support_resistance.get() == 1:
+							timestamp = d[4]
+							high = d[5]
+							low = d[6]
+							if timestamp < 570:
+								self.resistance[symbol].set(high)
+								self.supoort[symbol].set(low)
 		#grab all info. 
 
 		# take input

@@ -713,16 +713,16 @@ class breakout(alert):
 		self.labels_creator(self.frame)
 
 
-		self.Entry1 = tk.Checkbutton(frame)
-		self.Entry1.place(x=5, y=5, height=30, width=150, bordermode='ignore')
-		self.Entry1.configure(text='Auto range detection')
+		self.checker = tk.Checkbutton(frame,variable=self.data.auto_support_resistance)
+		self.checker.place(x=5, y=5, height=30, width=150, bordermode='ignore')
+		self.checker.configure(text='Auto range detection')
 
 
 	def range_tracker(self,support,resistance,rg):
 		try:
 			num = float(resistance.get())-float(support.get())
 			if num>0:
-				rg.set(num)
+				rg.set(round(num,2))
 			else:
 				rg.set(0)
 			#print("setting rg suc")
