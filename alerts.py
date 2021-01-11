@@ -229,7 +229,8 @@ class alert(pannel):
 
 
 				#print(alert_type)
-				if alert_type=="breakout":
+				if alert_type=="breakout" and ts>565:
+
 
 					### ASSUME NUMBER ONLY.
 					cur_price= round(alerts_vals[2].get(),3)
