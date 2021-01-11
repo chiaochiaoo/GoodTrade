@@ -167,17 +167,17 @@ def timestamp(s):
 
 #IF STILL THE SAME TIME, TRY TO reregister?
 
-def init(symbol):
+def init(symbol,price):
 	global data
 	data[symbol] = {}
 	d = data[symbol]
 
-	d["price"]=0
+	d["price"]=price
 	d["timestamp"] =0
 	d["time"] = ""
 
-	d["high"] = 0
-	d["low"] = 0
+	d["high"] = price
+	d["low"] = price
 
 	d["range"] = 0
 	d["last_5_range"] = 0
@@ -203,7 +203,7 @@ def process_and_send(lst,pipe):
 
 	global data
 	if symbol not in data:
-		init(symbol)
+		init(symbol,price)
 	
 	d = data[symbol]
 
@@ -213,8 +213,8 @@ def process_and_send(lst,pipe):
 	d["time"] = time
 	d["price"] = price
 	d["open"] = open_
-	d["high"] = high
-	d["low"] = low
+
+
 
 	d["oh"] = round(high - open_,3)
 	d["ol"] = round(open_ - low,3)
@@ -228,6 +228,10 @@ def process_and_send(lst,pipe):
 		d["open"] = 0
 		d["oh"] = 0
 		d["ol"] = 0
+
+	else:
+		d["high"] = high
+		d["low"] = low
 
 	d["range"] = round(d["high"] - d["low"],3)
 	
