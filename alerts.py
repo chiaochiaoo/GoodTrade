@@ -229,7 +229,7 @@ class alert(pannel):
 
 
 				#print(alert_type)
-				if alert_type=="breakout" and ts>565:
+				if alert_type=="breakout":
 
 
 					### ASSUME NUMBER ONLY.
@@ -239,7 +239,7 @@ class alert(pannel):
 
 					#print("breakout check:",cur_price,support,resistance)
 
-					if support != 0.00 and resistance != 0.00:
+					if support != 0.00 and resistance != 0.00 and ts>565:
 						#print(support,resistance,cur_price)
 
 						if cur_price<support and cur_price<resistance and self.alerts[symbol][alert_type]!=2:
@@ -714,6 +714,7 @@ class breakout(alert):
 		self.labels_creator(self.frame)
 
 
+		self.data.auto_support_resistance.set(1)
 		self.checker = tk.Checkbutton(frame,variable=self.data.auto_support_resistance)
 		self.checker.place(x=5, y=5, height=30, width=150, bordermode='ignore')
 		self.checker.configure(text='Auto range detection')
