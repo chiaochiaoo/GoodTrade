@@ -36,6 +36,8 @@ class Symbol_data_manager:
 		self.symbol_price_openhigh = {}
 		self.symbol_price_openlow = {}
 
+		self.symbol_price_opennow = {}
+
 		### Update these upon new ticks 
 		self.minute_count = {}
 		self.minute_data = {}
@@ -110,6 +112,7 @@ class Symbol_data_manager:
 
 		self.symbol_data_resistance = {}
 		self.symbol_data_support = {}
+		self.symbol_data_support_resistance_range = {}
 		self.symbol_data_breakout_eval = {}
 
 
@@ -174,6 +177,7 @@ class Symbol_data_manager:
 		self.symbol_price_low[i] = DoubleVar()
 		self.symbol_price_openhigh[i] = DoubleVar()
 		self.symbol_price_openlow[i] = DoubleVar()
+		self.symbol_price_opennow[i] = DoubleVar()
 
 		self.minute_count[i] = 0 
 		self.minute_data[i] = {"high":[],"low":[],"vol":[]}
@@ -246,6 +250,7 @@ class Symbol_data_manager:
 		###
 		self.symbol_data_resistance[i] = DoubleVar()
 		self.symbol_data_support[i] = DoubleVar()
+		self.symbol_data_support_resistance_range[i] = DoubleVar()
 		self.symbol_data_breakout_eval[i] = StringVar()
 
 		#alert
