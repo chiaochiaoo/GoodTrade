@@ -207,6 +207,8 @@ def process_and_send(lst,pipe):
 		init(symbol,price)
 
 	#here;s the false print check. 0.005
+	d = data[symbol]
+	
 	if abs(price-d["price"])/d["price"] < 0.005:
 		
 		d = data[symbol]
