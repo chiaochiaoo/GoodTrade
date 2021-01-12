@@ -30,7 +30,8 @@ class Symbol_data_manager:
 
 		#system
 
-		self.auto_support_resistance = IntVar()
+		self.auto_support_resistance = {} 
+		self.all_auto = IntVar()
 
 		#basics
 		self.symbol_price = {}
@@ -156,6 +157,10 @@ class Symbol_data_manager:
 		self.init_data()
 
 
+	def toggle_all(self,val):
+		for i in self.symbols:
+			self.auto_support_resistance[i].set(val)
+
 	def init_data(self):
 
 		for i in self.symbols:
@@ -169,6 +174,9 @@ class Symbol_data_manager:
 		self.database = database
 
 	def init_symbol(self,i):
+
+		#system
+		self.auto_support_resistance[i] = IntVar()
 		#basic
 
 		self.data_ready[i] = BooleanVar(value=False)

@@ -71,7 +71,7 @@ class ppro_process_manager:
 							if self.data_list[i][symbol].get()!=d[i+1]:
 								self.data_list[i][symbol].set(d[i+1])
 
-						if self.auto_support_resistance.get() == 1:
+						if self.auto_support_resistance[symbol].get() == 1:
 							timestamp = d[4]
 							high = d[5]
 							low = d[6]

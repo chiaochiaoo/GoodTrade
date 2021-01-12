@@ -162,8 +162,13 @@ class alert(pannel):
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 				m=format[j].trace('w', lambda *_, text=format[j],label=self.tickers_labels[i][j]: self.status_change_color(text,label))
 				self.tickers_tracers[i].append((format[j],m))
+
+			elif j ==2:
+				self.tickers_labels[i].append(tk.Checkbutton(self.frame,variable=format[j]))
+				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
+				#self.tickers_labels[i][j].configure(text='Auto range detection')
 			#text filed for hmm,,,entry, 
-			elif j ==2 or j ==3:
+			elif j ==3 or j ==4:
 				self.tickers_labels[i].append(tk.Entry(self.frame ,textvariable=format[j],width=self.width[j]))
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 			#when it is alert label creation, create a trace set for value position 
@@ -709,14 +714,25 @@ class breakout(alert):
 
 		super().__init__(frame,data,alert_panel)
 
-		self.labels = ["Ticker","Status","Support","Resistance ","Range","Cur Price","Evaluation"]
-		self.width = [8,10,10,10,10,10,35]
+		self.labels = ["Ticker","Status","Auto","Support","Resistance ","Range","Cur Price","Evaluation"]
+		self.width = [8,10,4,10,10,10,10,35]
 		self.labels_creator(self.frame)
 
 
-		self.checker = tk.Checkbutton(frame,variable=self.data.auto_support_resistance)
+		self.checker = tk.Checkbutton(frame,variable=self.data.all_auto)
 		self.checker.place(x=5, y=5, height=30, width=150, bordermode='ignore')
 		self.checker.configure(text='Auto range detection')
+
+
+		self.data.all_auto.trace('w', lambda *_,val=self.data.all_auto: self.set_auto(val))
+
+
+	def set_auto(self,val):
+
+
+		v = val.get()
+		print("hello ",v)
+		self.data.toggle_all(v)
 
 
 	def range_tracker(self,support,resistance,rg):
@@ -738,6 +754,8 @@ class breakout(alert):
 
 		cur_price = self.data.symbol_price[symbol]
 
+		checker = self.data.auto_support_resistance[symbol]
+
 		support = self.data.symbol_data_support[symbol]
 		resistance  = self.data.symbol_data_resistance[symbol]
 
@@ -757,8 +775,8 @@ class breakout(alert):
 
 		data_ready = self.data.data_ready[symbol]
 
-		value_position = 5
-		alert_position = 6
+		value_position = 6
+		alert_position = 7
 		alert_type = "breakout"
 
 		alert_time = 0
@@ -766,7 +784,7 @@ class breakout(alert):
 
 		#cur, mean, std. symbol, time. 
 		alertvals= [symbol,time,cur_price,support,resistance ,alert_type]
-		labels = [symbol,status,support,resistance ,range_,cur_price,eva]
+		labels = [symbol,status,checker,support,resistance ,range_,cur_price,eva]
 
 		#any alert will need a threshold. deviation. std. or type.
 
