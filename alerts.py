@@ -729,9 +729,7 @@ class breakout(alert):
 
 	def set_auto(self,val):
 
-
 		v = val.get()
-		print("hello ",v)
 		self.data.toggle_all(v)
 
 

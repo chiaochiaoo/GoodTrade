@@ -47,6 +47,9 @@ class ppro_process_manager:
 	def receive_request(self):
 
 		#put the receive in corresponding box.
+
+		temp = {}
+
 		while True:
 			d = self.request.recv()
 
@@ -55,6 +58,7 @@ class ppro_process_manager:
 			if status == "message":
 				print(d[1])
 			else:
+
 				symbol = d[1]
 
 				self.data_list[0][symbol].set(status)
@@ -75,9 +79,22 @@ class ppro_process_manager:
 							timestamp = d[4]
 							high = d[5]
 							low = d[6]
+
+							#need to check if its the same as previous set. if not, that means it's manually changed. 
 							if timestamp < 570:
-								self.resistance[symbol].set(high)
-								self.supoort[symbol].set(low)
+
+								if symbol in temp:
+									cur = (self.resistance[symbol].get(),self.supoort[symbol].get())
+									if cur != temp[symbol]:
+										self.auto_support_resistance[symbol].set(0)
+									else:
+										temp[symbol] = (high,low)
+										self.resistance[symbol].set(high)
+										self.supoort[symbol].set(low)
+								else:
+									temp[symbol] = (high,low)
+									self.resistance[symbol].set(high)
+									self.supoort[symbol].set(low)
 		#grab all info. 
 
 		# take input
