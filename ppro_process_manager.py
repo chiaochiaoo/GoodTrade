@@ -120,19 +120,41 @@ def multi_processing_price(pipe_receive):
 			time.sleep(3)
 			
 		#check new symbols. 
-		rec = []
+		reg = []
+		dereg = []
+		long_ = []
+		short_ = []
+
 		while pipe_receive.poll():
-			rec.append(pipe_receive.recv())
+			rec = pipe_receive.recv()
+			rec = rec.split("_")
+			order,symbol = rec[0],rec[1]
+			if order == "reg":
+				reg.append(symbol)
+			elif order == "dereg":
+				dereg.append(symbol)
+			elif order == "long":
+				long_.append(symbol)
+			elif order == "short":
+				short_.append(symbol)
 
 		#bulk cmds. reg these symbols. 
-		for i in rec:
+		for i in reg:
 			if i not in black_list:
-				if i not in reg_list:
-					reg = threading.Thread(target=register,args=(i,), daemon=True)
-					reg.start()
-				else:
-					dereg = threading.Thread(target=deregister,args=(i,), daemon=True)
-					dereg.start()
+				reg = threading.Thread(target=register,args=(i,), daemon=True)
+				reg.start()
+
+		for i in dereg:
+			dereg = threading.Thread(target=deregister,args=(i,), daemon=True)
+			dereg.start()
+
+		for i in long_:
+			l = threading.Thread(target=buy_market_order,args=(i,10), daemon=True)
+			l.start()
+
+		for i in short_:
+			s = threading.Thread(target=sell_market_order,args=(i,10), daemon=True)
+			s.start()
 
 		#try to register again the ones that have ppro errors. 
 
@@ -309,6 +331,26 @@ def getinfo(symbol,pipe):
 				connection_error = True
 				pipe.send(["Ppro Error",symbol])
 				lock[symbol] = False
+
+
+
+def buy_market_order(symbol,share):
+    r = requests.post('http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Buy ARCX Market DAY&shares='+str(share))
+    if r.status_code == 200:
+        print('buy market order Success!')
+        return True
+    else:
+        print("Error sending buy order")
+
+
+def sell_market_order(symbol,share):
+    r = requests.post('http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(share))
+    if r.status_code == 200:
+        print('sell market order Success!')
+        print(r.text)
+        return True
+    else:
+        print("Error sending sell order")
 
 # i may need to come up with a new strucutre.
 # now its like. iterate through each symbols. and wait for some seconds. do it again.

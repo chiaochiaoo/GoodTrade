@@ -105,8 +105,15 @@ class ppro_process_manager:
 			self.register(i)
 
 	def register(self,symbol):
-		self.request.send(symbol)
+		self.request.send("reg"+"_"+symbol)
 
 	def deregister(self,symbol):
-		self.request.send(symbol)
+		self.request.send("dereg"+"_"+symbol)
+
+
+	def long(self,symbol):
+		self.request.send("long"+"_"+symbol)
+
+	def short(self,symbol):
+		self.request.send("short"+"_"+symbol)
 	
