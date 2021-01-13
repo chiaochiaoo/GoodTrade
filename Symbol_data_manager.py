@@ -30,6 +30,8 @@ class Symbol_data_manager:
 
 		#system
 
+		self.ppro = None
+
 		self.auto_support_resistance = {} 
 		self.auto_trade = {}
 

@@ -232,6 +232,8 @@ class alert(pannel):
 				ts = timestamp(time)
 				seconds = timestamp_seconds(second)
 
+				auto_trade = self.data.auto_trade
+
 
 				#print(alert_type)
 				if alert_type=="breakout":
@@ -244,7 +246,7 @@ class alert(pannel):
 
 					#print("breakout check:",cur_price,support,resistance)
 
-					if support != 0.00 and resistance != 0.00 and ts>565:
+					if support != 0.00 and resistance != 0.00 :#and ts>565:
 						#print(support,resistance,cur_price)
 
 						if cur_price<support and cur_price<resistance and self.alerts[symbol][alert_type]!=2:
@@ -254,12 +256,14 @@ class alert(pannel):
 							if self.breakout_time[symbol] == 0:
 								self.breakout_time[symbol] = seconds
 							
-							been = str(seconds - self.breakout_time[symbol])
+							been = seconds - self.breakout_time[symbol]
 
 							print(seconds,self.breakout_time[symbol],been)
-						
 
-							alert_str = "Support "+alert_type +" :"+been+" sec ago"
+							if been<60:
+								alert_str = "Support "+alert_type +" :"+str(been)+" sec ago"
+							else:
+								alert_str = "Support "+alert_type +" :"+str(been//60)+" min ago"
 
 
 							eval_label["background"]="yellow"
@@ -267,6 +271,9 @@ class alert(pannel):
 
 							self.alert_pannel.add_alerts([symbol,time,alert_str])
 							self.set_latest_alert(symbol, alert_str, time)
+
+							if auto_trade[symbol].get()==1:
+								self.data.ppro.short(symbol)
 
 						elif cur_price>resistance and cur_price>support and self.alerts[symbol][alert_type]!=1 :
 
@@ -275,9 +282,13 @@ class alert(pannel):
 							if self.breakout_time[symbol] == 0:
 								self.breakout_time[symbol] = seconds
 							
-							been = str(seconds - self.breakout_time[symbol])
+							been = seconds - self.breakout_time[symbol]
 
-							alert_str = "Resistance "+alert_type +" :"+been+" sec ago"
+							if been<60:
+								alert_str = "Resistance "+alert_type +" :"+str(been)+" sec ago"
+							else:
+								alert_str = "Resistance "+alert_type +" :"+str(been//60)+" min ago"
+
 
 							eval_label["background"]="yellow"
 
@@ -285,6 +296,9 @@ class alert(pannel):
 
 							self.alert_pannel.add_alerts([symbol,time,alert_str])
 							self.set_latest_alert(symbol, alert_str, time)
+
+							if auto_trade[symbol].get()==1:
+								self.data.ppro.long(symbol)
 
 						elif cur_price<resistance and cur_price>support and self.alerts[symbol][alert_type]!=0 :
 

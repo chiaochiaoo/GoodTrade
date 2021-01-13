@@ -87,87 +87,90 @@ def deregister(symbol):
 
 def multi_processing_price(pipe_receive):
 
+
+
 	global black_list
 	global reg_list
 	global connection_error
 
-	k = 0
-	print("Database for Database online")
+	try:
 
-	connection_error = True
+		k = 0
+		print("Database for Database online")
 
-	while True:
+		connection_error = True
 
-		k+=1
-		if k%5 == 0:
-			current_time = datetime.now().strftime("%M:%S")
-			msg = "Server functional."+current_time
-			pipe_receive.send(["message",msg])
+		while True:
 
-		while connection_error:
-			connection_error = test_register()
-			
-			if connection_error:
-				pipe_receive.send(["message","Conection failed. try again in 3 sec."])
+			# k+=1
+			# if k%5 == 0:
+			# 	current_time = datetime.now().strftime("%M:%S")
+			# 	msg = "Server functional."+current_time
+			# 	pipe_receive.send(["message",msg])
+
+			while connection_error:
+				connection_error = test_register()
 				
-			else:
-				pipe_receive.send(["message","Connection established."])
+				if connection_error:
+					pipe_receive.send(["message","Conection failed. try again in 3 sec."])
+					
+				else:
+					pipe_receive.send(["message","Connection established."])
 
-				for i in reg_list:
+					for i in reg_list:
+						reg = threading.Thread(target=register,args=(i,), daemon=True)
+						reg.start()
+
+				time.sleep(3)
+				
+			#check new symbols. 
+			reg = []
+			dereg = []
+			long_ = []
+			short_ = []
+
+			while pipe_receive.poll():
+				rec = pipe_receive.recv()
+				rec = rec.split("_")
+				order,symbol = rec[0],rec[1]
+				if order == "reg":
+					reg.append(symbol)
+				elif order == "dereg":
+					dereg.append(symbol)
+				elif order == "long":
+					long_.append(symbol)
+				elif order == "short":
+					short_.append(symbol)
+
+			#bulk cmds. reg these symbols. 
+			for i in reg:
+				if i not in black_list:
 					reg = threading.Thread(target=register,args=(i,), daemon=True)
 					reg.start()
 
-			time.sleep(3)
-			
-		#check new symbols. 
-		reg = []
-		dereg = []
-		long_ = []
-		short_ = []
+			for i in dereg:
+				dereg = threading.Thread(target=deregister,args=(i,), daemon=True)
+				dereg.start()
 
-		while pipe_receive.poll():
-			rec = pipe_receive.recv()
-			rec = rec.split("_")
-			order,symbol = rec[0],rec[1]
-			if order == "reg":
-				reg.append(symbol)
-			elif order == "dereg":
-				dereg.append(symbol)
-			elif order == "long":
-				long_.append(symbol)
-			elif order == "short":
-				short_.append(symbol)
+			for i in long_:
+				l = threading.Thread(target=buy_market_order,args=(i,10), daemon=True)
+				l.start()
 
-		#bulk cmds. reg these symbols. 
-		for i in reg:
-			if i not in black_list:
-				reg = threading.Thread(target=register,args=(i,), daemon=True)
-				reg.start()
+			for i in short_:
+				s = threading.Thread(target=sell_market_order,args=(i,10), daemon=True)
+				s.start()
 
-		for i in dereg:
-			dereg = threading.Thread(target=deregister,args=(i,), daemon=True)
-			dereg.start()
+			#try to register again the ones that have ppro errors. 
+			#bulk cmds. get updates on these symbols. on finish, send it back to client. 
+			for i in reg_list:
+				info = threading.Thread(target=getinfo,args=(i,pipe_receive,), daemon=True)
+				info.start()
 
-		for i in long_:
-			l = threading.Thread(target=buy_market_order,args=(i,10), daemon=True)
-			l.start()
-
-		for i in short_:
-			s = threading.Thread(target=sell_market_order,args=(i,10), daemon=True)
-			s.start()
-
-		#try to register again the ones that have ppro errors. 
-
-
-
-		#bulk cmds. get updates on these symbols. on finish, send it back to client. 
-		for i in reg_list:
-			info = threading.Thread(target=getinfo,args=(i,pipe_receive,), daemon=True)
-			info.start()
-
-		time.sleep(2.5)
-		#send each dictionary. 
-		#pipe_receive.send(data)
+			time.sleep(2.5)
+			#send each dictionary. 
+			#pipe_receive.send(data)
+	except Exception as e:
+		pipe_receive.send(["message",e])
 
 def find_between(data, first, last):
 	try:
