@@ -320,12 +320,13 @@ class alert(pannel):
 
 								eval_string.set(alert_str)
 
-							if been>60 and been <300:
-								eval_label["background"]="green"
-							if been>300:
+
+							elif been>600:
+								eval_label["background"]="#FF5B5B"
+							elif been>300:
 								eval_label["background"]="yellow"
-							if been>600:
-								eval_label["background"]="#F57613"
+							if been>60:
+								eval_label["background"]="#67FF37"
 
 				else:
 					
