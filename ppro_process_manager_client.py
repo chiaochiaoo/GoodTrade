@@ -101,7 +101,7 @@ class ppro_process_manager:
 	def init_info(self):
 		for i in self.symbols:
 			self.data.change_status(i, "Connecting")
-			self.register(i)
+			#self.register(i)
 
 	def register(self,symbol):
 		print("register send:",symbol)

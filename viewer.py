@@ -218,6 +218,7 @@ class ticker_manager(pannel):
 		self.label_count +=1
 
 		self.ticker_stats["text"] = "Current Registered Tickers: "+str(self.ticker_count)
+
 		self.data.change_status(symbol, "Connecting")
 		self.rebind(self.canvas,self.frame)
 
