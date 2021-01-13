@@ -260,13 +260,8 @@ class alert(pannel):
 
 							print(seconds,self.breakout_time[symbol],been)
 
-							if been<60:
-								alert_str = "Support "+alert_type +" :"+str(been)+" sec ago"
-							else:
-								alert_str = "Support "+alert_type +" :"+str(been//60)+" min ago"
+							alert_str = "Support "+alert_type +" :"+str(been)+" sec ago"
 
-
-							eval_label["background"]="yellow"
 							eval_string.set(alert_str)
 
 							self.alert_pannel.add_alerts([symbol,time,alert_str])
@@ -289,9 +284,6 @@ class alert(pannel):
 							else:
 								alert_str = "Resistance "+alert_type +" :"+str(been//60)+" min ago"
 
-
-							#eval_label["background"]="#d9d9d9"
-							eval_label["background"]="yellow"
 
 							eval_string.set(alert_str)
 
@@ -316,11 +308,26 @@ class alert(pannel):
 							#print("ts:",seconds,self.breakout_time[symbol])
 							been = str(seconds - self.breakout_time[symbol])
 							if self.alerts[symbol][alert_type]==2:
-								alert_str = "Support "+alert_type +" :"+been+" sec ago"
+								if been<60:
+									alert_str = "Support "+alert_type +" :"+str(been)+" sec ago"
+								else:
+									alert_str = "Support "+alert_type +" :"+str(been//60)+" min ago"							
 								eval_string.set(alert_str)
 							if self.alerts[symbol][alert_type]==1:
-								alert_str = "Resistance "+alert_type +" :"+been+" sec ago"
+
+								if been<60:
+									alert_str = "Resistance "+alert_type +" :"+str(been)+" sec ago"
+								else:
+									alert_str = "Resistance "+alert_type +" :"+str(been//60)+" min ago"	
+
 								eval_string.set(alert_str)
+
+							if been>60 and been <300:
+								eval_label["background"]="green"
+							if been>300:
+								eval_label["background"]="yellow"
+							if been>600:
+								eval_label["background"]="#F57613"
 
 				else:
 					
