@@ -33,6 +33,7 @@ def test_register():
 		p="http://localhost:8080/Register?symbol=AAPL.NQ&feedtype=L1"
 		r= requests.get(p)
 		if "PProApi" in r.text:
+			deregister("AAPL.NQ")
 			return False
 		else:
 			return True
@@ -64,7 +65,6 @@ def register(symbol):
 
 		#append it to the list. 
 	except Exception as e:
-
 		#means cannot connect. 
 		print("Register,",e)
 		
@@ -96,7 +96,6 @@ def multi_processing_price(pipe_receive):
 	try:
 
 		k = 0
-		print("Database for Database online")
 
 		connection_error = True
 
@@ -234,7 +233,7 @@ def process_and_send(lst,pipe):
 	#here;s the false print check. 0.005
 	d = data[symbol]
 
-	if timestamp - d["timestamp"] >30:
+	if d["timestamp"]!=0 and timestamp - d["timestamp"] >30:
 		pipe.send(["Lagged",symbol])
 		register(symbol)
 

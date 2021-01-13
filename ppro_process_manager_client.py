@@ -104,6 +104,7 @@ class ppro_process_manager:
 			self.register(i)
 
 	def register(self,symbol):
+		print("register send:",symbol)
 		self.request.send("reg"+"_"+symbol)
 
 	def deregister(self,symbol):
