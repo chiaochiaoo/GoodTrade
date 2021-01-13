@@ -209,8 +209,6 @@ class ticker_manager(pannel):
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=info[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
-
-				
 			else:
 				self.tickers_labels[i].append(tk.Button(self.frame ,text=info[j],width=self.width[j],command = lambda s=symbol: self.delete_symbol_reg_list(s)))
 				self.label_default_configure(self.tickers_labels[i][j])
@@ -220,6 +218,7 @@ class ticker_manager(pannel):
 		self.label_count +=1
 
 		self.ticker_stats["text"] = "Current Registered Tickers: "+str(self.ticker_count)
+
 		self.data.change_status(symbol, "Connecting")
 		self.rebind(self.canvas,self.frame)
 

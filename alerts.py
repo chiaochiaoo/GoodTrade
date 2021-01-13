@@ -162,8 +162,13 @@ class alert(pannel):
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 				m=format[j].trace('w', lambda *_, text=format[j],label=self.tickers_labels[i][j]: self.status_change_color(text,label))
 				self.tickers_tracers[i].append((format[j],m))
-			#text filed for hmm,,,entry, 
+
 			elif j ==2 or j ==3:
+				self.tickers_labels[i].append(tk.Checkbutton(self.frame,variable=format[j]))
+				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
+				#self.tickers_labels[i][j].configure(text='Auto range detection')
+			#text filed for hmm,,,entry, 
+			elif j ==4 or j ==5:
 				self.tickers_labels[i].append(tk.Entry(self.frame ,textvariable=format[j],width=self.width[j]))
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 			#when it is alert label creation, create a trace set for value position 
@@ -176,7 +181,7 @@ class alert(pannel):
 				alert_position = alerts[j][1]
 				alert_vals = alerts[j][2]
 				m=format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
-				self.tickers_tracers[i].append((format[j],m))
+				self.tickers_tracers[i].append((format[value_position],m))
 			elif j>1:
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
@@ -188,11 +193,9 @@ class alert(pannel):
 		self.rebind(self.canvas,self.frame)
 
 	def delete_symbol(self,symbol):
-
-		#print(self.tickers_tracers[symbol])
 		for i in self.tickers_tracers[symbol]:
-			#print("removing",i[0].get(),i[1])
 			i[0].trace_vdelete("w",i[1])
+
 
 		for i in self.tickers_labels[symbol]:
 			i.destroy()
@@ -227,9 +230,12 @@ class alert(pannel):
 				ts = timestamp(time)
 				seconds = timestamp_seconds(second)
 
+				auto_trade = self.data.auto_trade
+
 
 				#print(alert_type)
 				if alert_type=="breakout":
+
 
 					### ASSUME NUMBER ONLY.
 					cur_price= round(alerts_vals[2].get(),3)
@@ -238,7 +244,7 @@ class alert(pannel):
 
 					#print("breakout check:",cur_price,support,resistance)
 
-					if support != 0.00 and resistance != 0.00:
+					if support != 0.00 and resistance != 0.00 and ts>565:
 						#print(support,resistance,cur_price)
 
 						if cur_price<support and cur_price<resistance and self.alerts[symbol][alert_type]!=2:
@@ -248,19 +254,19 @@ class alert(pannel):
 							if self.breakout_time[symbol] == 0:
 								self.breakout_time[symbol] = seconds
 							
-							been = str(seconds - self.breakout_time[symbol])
+							been = seconds - self.breakout_time[symbol]
 
 							print(seconds,self.breakout_time[symbol],been)
-						
 
-							alert_str = "Support "+alert_type +" :"+been+" sec ago"
+							alert_str = "Support "+alert_type +" :"+str(been)+" sec ago"
 
-
-							eval_label["background"]="yellow"
 							eval_string.set(alert_str)
 
 							self.alert_pannel.add_alerts([symbol,time,alert_str])
 							self.set_latest_alert(symbol, alert_str, time)
+
+							if auto_trade[symbol].get()==1:
+								self.data.ppro.short(symbol)
 
 						elif cur_price>resistance and cur_price>support and self.alerts[symbol][alert_type]!=1 :
 
@@ -269,16 +275,21 @@ class alert(pannel):
 							if self.breakout_time[symbol] == 0:
 								self.breakout_time[symbol] = seconds
 							
-							been = str(seconds - self.breakout_time[symbol])
+							been = seconds - self.breakout_time[symbol]
 
-							alert_str = "Resistance "+alert_type +" :"+been+" sec ago"
+							if been<60:
+								alert_str = "Resistance "+alert_type +" :"+str(been)+" sec ago"
+							else:
+								alert_str = "Resistance "+alert_type +" :"+str(been//60)+" min ago"
 
-							eval_label["background"]="yellow"
 
 							eval_string.set(alert_str)
 
 							self.alert_pannel.add_alerts([symbol,time,alert_str])
 							self.set_latest_alert(symbol, alert_str, time)
+
+							if auto_trade[symbol].get()==1:
+								self.data.ppro.long(symbol)
 
 						elif cur_price<resistance and cur_price>support and self.alerts[symbol][alert_type]!=0 :
 
@@ -293,13 +304,28 @@ class alert(pannel):
 						#only update the time
 						else:
 							#print("ts:",seconds,self.breakout_time[symbol])
-							been = str(seconds - self.breakout_time[symbol])
+							been = seconds - self.breakout_time[symbol]
 							if self.alerts[symbol][alert_type]==2:
-								alert_str = "Support "+alert_type +" :"+been+" sec ago"
+								if been<60:
+									alert_str = "Support "+alert_type +" :"+str(been)+" sec ago"
+								else:
+									alert_str = "Support "+alert_type +" :"+str(been//60)+" min ago"							
 								eval_string.set(alert_str)
 							if self.alerts[symbol][alert_type]==1:
-								alert_str = "Resistance "+alert_type +" :"+been+" sec ago"
+
+								if been<60:
+									alert_str = "Resistance "+alert_type +" :"+str(been)+" sec ago"
+								else:
+									alert_str = "Resistance "+alert_type +" :"+str(been//60)+" min ago"	
+
 								eval_string.set(alert_str)
+
+							if been>60 and been <300:
+								eval_label["background"]="green"
+							if been>300:
+								eval_label["background"]="yellow"
+							if been>600:
+								eval_label["background"]="#F57613"
 
 				else:
 					
@@ -708,21 +734,36 @@ class breakout(alert):
 
 		super().__init__(frame,data,alert_panel)
 
-		self.labels = ["Ticker","Status","Support","Resistance ","Range","Cur Price","Evaluation"]
-		self.width = [8,10,10,10,10,10,35]
+		self.labels = ["Ticker","Status","AR","AT","Support","Resistance ","Range","Cur Price","Evaluation"]
+		self.width = [8,10,4,4,10,10,10,10,35]
 		self.labels_creator(self.frame)
 
 
-		self.Entry1 = tk.Checkbutton(frame)
-		self.Entry1.place(x=5, y=5, height=30, width=150, bordermode='ignore')
-		self.Entry1.configure(text='Auto range detection')
+		self.checker = tk.Checkbutton(frame,variable=self.data.all_auto)
+		self.checker.place(x=5, y=5, height=30, width=150, bordermode='ignore')
+		self.checker.configure(text='Auto range detection')
+
+
+		self.checker2 = tk.Checkbutton(frame,variable=self.data.all_auto_trade)
+		self.checker2.place(x=175, y=5, height=30, width=150, bordermode='ignore')
+		self.checker2.configure(text='Auto Trade Breakout')
+
+
+		self.data.all_auto.trace('w', lambda *_,vals=self.data.auto_support_resistance,val=self.data.all_auto: self.set_auto(vals,val))
+		self.data.all_auto_trade.trace('w', lambda *_,vals=self.data.auto_trade,val=self.data.all_auto_trade: self.set_auto(vals,val))
+
+
+	def set_auto(self,vals,val):
+
+		v = val.get()
+		self.data.toggle_all(vals,v)
 
 
 	def range_tracker(self,support,resistance,rg):
 		try:
 			num = float(resistance.get())-float(support.get())
 			if num>0:
-				rg.set(num)
+				rg.set(round(num,2))
 			else:
 				rg.set(0)
 			#print("setting rg suc")
@@ -737,6 +778,10 @@ class breakout(alert):
 
 		cur_price = self.data.symbol_price[symbol]
 
+		checker = self.data.auto_support_resistance[symbol]
+
+		checker_trade = self.data.auto_trade[symbol]
+
 		support = self.data.symbol_data_support[symbol]
 		resistance  = self.data.symbol_data_resistance[symbol]
 
@@ -746,8 +791,8 @@ class breakout(alert):
 
 		m=support.trace('w', lambda *_, support=support,resist=resistance,rg=range_: self.range_tracker(support,resist,rg))
 		self.tickers_tracers[symbol].append((support,m))
-		m=resistance.trace('w', lambda *_, support=support,resist=resistance,rg=range_: self.range_tracker(support,resist,rg))
-		self.tickers_tracers[symbol].append((resistance,m))
+		n=resistance.trace('w', lambda *_, support=support,resist=resistance,rg=range_: self.range_tracker(support,resist,rg))
+		self.tickers_tracers[symbol].append((resistance,n))
 
 
 		eva= self.data.symbol_data_breakout_eval[symbol]
@@ -756,8 +801,8 @@ class breakout(alert):
 
 		data_ready = self.data.data_ready[symbol]
 
-		value_position = 5
-		alert_position = 6
+		value_position = 7
+		alert_position = 8
 		alert_type = "breakout"
 
 		alert_time = 0
@@ -765,7 +810,7 @@ class breakout(alert):
 
 		#cur, mean, std. symbol, time. 
 		alertvals= [symbol,time,cur_price,support,resistance ,alert_type]
-		labels = [symbol,status,support,resistance ,range_,cur_price,eva]
+		labels = [symbol,status,checker,checker_trade,support,resistance ,range_,cur_price,eva]
 
 		#any alert will need a threshold. deviation. std. or type.
 

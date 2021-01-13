@@ -4,6 +4,7 @@ import threading
 import time
 from Symbol_data_manager import *
 from datetime import datetime
+from ppro_process_manager_client import *
 
 
 global reg_count
@@ -29,9 +30,9 @@ global connection_error
 
 def test_register():
 	try:
-		p="http://localhost:8080/Register?symbol=AAPL.NQ&feedtype=L1"
+		p="http://localhost:8080/Deregister?symbol=AAPL.NQ&feedtype=L1"
 		r= requests.get(p)
-		if "PProApi" in r.text:
+		if "Response" in r.text:
 			return False
 		else:
 			return True
@@ -63,7 +64,6 @@ def register(symbol):
 
 		#append it to the list. 
 	except Exception as e:
-
 		#means cannot connect. 
 		print("Register,",e)
 		
@@ -86,65 +86,89 @@ def deregister(symbol):
 
 def multi_processing_price(pipe_receive):
 
+
+
 	global black_list
 	global reg_list
 	global connection_error
 
-	k = 0
-	print("Database for Database online")
+	try:
 
-	connection_error = True
+		k = 0
 
-	while True:
+		connection_error = True
 
-		k+=1
-		if k%5 == 0:
-			current_time = datetime.now().strftime("%M:%S")
-			msg = "Server functional."+current_time
-			pipe_receive.send(["message",msg])
+		while True:
 
-		while connection_error:
-			connection_error = test_register()
-			
-			if connection_error:
-				pipe_receive.send(["message","Conection failed. try again in 3 sec."])
+			# k+=1
+			# if k%5 == 0:
+			# 	current_time = datetime.now().strftime("%M:%S")
+			# 	msg = "Server functional."+current_time
+			# 	pipe_receive.send(["message",msg])
+
+			while connection_error:
+				connection_error = test_register()
 				
-			else:
-				pipe_receive.send(["message","Connection established."])
-
-				for i in reg_list:
-					reg = threading.Thread(target=register,args=(i,), daemon=True)
-					reg.start()
-
-			time.sleep(3)
-			
-		#check new symbols. 
-		rec = []
-		while pipe_receive.poll():
-			rec.append(pipe_receive.recv())
-
-		#bulk cmds. reg these symbols. 
-		for i in rec:
-			if i not in black_list:
-				if i not in reg_list:
-					reg = threading.Thread(target=register,args=(i,), daemon=True)
-					reg.start()
+				if connection_error:
+					pipe_receive.send(["message","Conection failed. try again in 3 sec."])
+					
 				else:
-					dereg = threading.Thread(target=deregister,args=(i,), daemon=True)
-					dereg.start()
+					pipe_receive.send(["message","Connection established."])
 
-		#try to register again the ones that have ppro errors. 
+					for i in reg_list:
+						reg = threading.Thread(target=register,args=(i,), daemon=True)
+						reg.start()
 
+				time.sleep(3)
+				
+			#check new symbols. 
+			reg = []
+			dereg = []
+			long_ = []
+			short_ = []
 
+			while pipe_receive.poll():
+				rec = pipe_receive.recv()
+				rec = rec.split("_")
+				order,symbol = rec[0],rec[1]
+				if order == "reg":
+					reg.append(symbol)
+				elif order == "dereg":
+					dereg.append(symbol)
+				elif order == "long":
+					long_.append(symbol)
+				elif order == "short":
+					short_.append(symbol)
 
-		#bulk cmds. get updates on these symbols. on finish, send it back to client. 
-		for i in reg_list:
-			info = threading.Thread(target=getinfo,args=(i,pipe_receive,), daemon=True)
-			info.start()
+			#bulk cmds. reg these symbols. 
+			for i in reg:
+				if i not in black_list:
+					reg = threading.Thread(target=register,args=(i,), daemon=True)
+					reg.start()
 
-		time.sleep(2.5)
-		#send each dictionary. 
-		#pipe_receive.send(data)
+			for i in dereg:
+				dereg = threading.Thread(target=deregister,args=(i,), daemon=True)
+				dereg.start()
+
+			for i in long_:
+				l = threading.Thread(target=buy_market_order,args=(i,10), daemon=True)
+				l.start()
+
+			for i in short_:
+				s = threading.Thread(target=sell_market_order,args=(i,10), daemon=True)
+				s.start()
+
+			#try to register again the ones that have ppro errors. 
+			#bulk cmds. get updates on these symbols. on finish, send it back to client. 
+			for i in reg_list:
+				info = threading.Thread(target=getinfo,args=(i,pipe_receive,), daemon=True)
+				info.start()
+
+			time.sleep(2.5)
+			#send each dictionary. 
+			#pipe_receive.send(data)
+	except Exception as e:
+		pipe_receive.send(["message",e])
 
 def find_between(data, first, last):
 	try:
@@ -166,17 +190,17 @@ def timestamp(s):
 
 #IF STILL THE SAME TIME, TRY TO reregister?
 
-def init(symbol):
+def init(symbol,price):
 	global data
 	data[symbol] = {}
 	d = data[symbol]
 
-	d["price"]=0
+	d["price"]=price
 	d["timestamp"] =0
 	d["time"] = ""
 
-	d["high"] = 0
-	d["low"] = 0
+	d["high"] = price
+	d["low"] = price
 
 	d["range"] = 0
 	d["last_5_range"] = 0
@@ -201,66 +225,76 @@ def process_and_send(lst,pipe):
 	status,symbol,time,timestamp,price,open_,high,low,vol  = lst[0],lst[1],lst[2],lst[3],lst[4],lst[5],lst[6],lst[7],lst[8]
 
 	global data
+
 	if symbol not in data:
-		init(symbol)
-	
+		init(symbol,price)
+
+	#here;s the false print check. 0.005
 	d = data[symbol]
 
-	#pre-market
+	if d["timestamp"]!=0 and timestamp - d["timestamp"] >30:
+		pipe.send(["Lagged",symbol])
+		register(symbol)
+
 	
-	d["timestamp"] =timestamp
-	d["time"] = time
-	d["price"] = price
-	d["open"] = open_
-	d["high"] = high
-	d["low"] = low
+	if abs(price-d["price"])/d["price"] < 0.005:
+		
+		d = data[symbol]
+		
+		d["timestamp"] = timestamp
+		d["time"] = time
+		d["price"] = price
+		d["open"] = open_
 
-	d["oh"] = round(high - open_,3)
-	d["ol"] = round(open_ - low,3)
+		d["oh"] = round(high - open_,3)
+		d["ol"] = round(open_ - low,3)
 
+		if timestamp <570:
+			if price<d["low"]:
+				d["low"] = price
+			if price>d["high"]:
+				d["high"] = price
+			d["open"] = 0
+			d["oh"] = 0
+			d["ol"] = 0
 
-	if timestamp <570:
-		if price<d["low"]:
-			d["low"] = price
-		if price>d["high"]:
-			d["high"] = price
-		d["open"] = 0
-		d["oh"] = 0
-		d["ol"] = 0
-
-	d["range"] = round(d["high"] - d["low"],3)
-	
-	# now update the datalists. 
-	if timestamp not in d["timetamps"]:
-		if len(d["timetamps"])==0:
-			d["timetamps"].append(timestamp-1)
 		else:
-			d["timetamps"].append(timestamp)
-		d["highs"].append(price)
-		d["lows"].append(price)
-		d["vols"].append(vol)
-	else:
-		if price >= d["highs"][-1]:
-			d["highs"][-1] = price
-		if price <= d["lows"][-1]:
-			d["lows"][-1] = price
-		d["vols"][-1] = vol
+			d["high"] = high
+			d["low"] = low
 
-	#print(d["timetamps"],d["highs"],d["lows"],d["vols"])
-	#last 5 range
-	d["last_5_range"] = round(max(d["highs"][-5:]) - min(d["lows"][-5:]),3)
-	# last 5 volume
-	index = min(len(d["vols"]), 5)
-	d["vol"] = round((d["vols"][-1] - d["vols"][-index])/1000,2)
-	
-	if timestamp <575:
-		d["f5r"] = d["last_5_range"]
-		d["f5v"] = d["vol"]
+		d["range"] = round(d["high"] - d["low"],3)
+		
+		# now update the datalists. 
+		if timestamp not in d["timetamps"]:
+			if len(d["timetamps"])==0:
+				d["timetamps"].append(timestamp-1)
+			else:
+				d["timetamps"].append(timestamp)
+			d["highs"].append(price)
+			d["lows"].append(price)
+			d["vols"].append(vol)
+		else:
+			if price >= d["highs"][-1]:
+				d["highs"][-1] = price
+			if price <= d["lows"][-1]:
+				d["lows"][-1] = price
+			d["vols"][-1] = vol
 
-	#pre-market
-	pipe.send([status,symbol,price,time,timestamp,d["high"],d["low"],\
-	d["range"],d["last_5_range"],d["vol"],d["open"],d["oh"],d["ol"],
-	d["f5r"],d["f5v"]])
+		#print(d["timetamps"],d["highs"],d["lows"],d["vols"])
+		#last 5 range
+		d["last_5_range"] = round(max(d["highs"][-5:]) - min(d["lows"][-5:]),3)
+		# last 5 volume
+		index = min(len(d["vols"]), 5)
+		d["vol"] = round((d["vols"][-1] - d["vols"][-index])/1000,2)
+		
+		if timestamp <575:
+			d["f5r"] = d["last_5_range"]
+			d["f5v"] = d["vol"]
+
+
+		pipe.send([status,symbol,price,time,timestamp,d["high"],d["low"],\
+		d["range"],d["last_5_range"],d["vol"],d["open"],d["oh"],d["ol"],
+		d["f5r"],d["f5v"]])
 
 	lock[symbol] = False
 
@@ -304,6 +338,26 @@ def getinfo(symbol,pipe):
 				pipe.send(["Ppro Error",symbol])
 				lock[symbol] = False
 
+
+
+def buy_market_order(symbol,share):
+    r = requests.post('http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Buy ARCX Market DAY&shares='+str(share))
+    if r.status_code == 200:
+        print('buy market order Success!')
+        return True
+    else:
+        print("Error sending buy order")
+
+
+def sell_market_order(symbol,share):
+    r = requests.post('http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(share))
+    if r.status_code == 200:
+        print('sell market order Success!')
+        #print(r.text)
+        return True
+    else:
+        print("Error sending sell order")
+
 # i may need to come up with a new strucutre.
 # now its like. iterate through each symbols. and wait for some seconds. do it again.
 
@@ -317,80 +371,7 @@ def getinfo(symbol,pipe):
 
 # Want: all the information are processed locally. only update is sent. 
 
-class ppro_process_manager:
 
-	#A big manager. Who has access to all the corresponding grids in the labels. 
-	#update each symbols per, 39 seconds? 
-	#run every ten seconds. 
-	def __init__(self,request_pipe):
-		#need to track. 1 min range/ volume. 5 min range/volume.
-		#self.depositLabel['text'] = 'change the value'
-		#fetch this 
-		self.request = request_pipe
-
-		self.reg_list = []
-		self.black_list = []
-		self.lock = {}
-
-		self.init = False
-
-		#repeat this every 5 seconds.
-
-	def set_symbols_manager(self,s):
-
-		##? 
-		self.data = s
-
-		self.data_list = s.update_list
-		self.symbols = s.get_list()
-
-		for i in self.symbols:
-			self.register(i)
-
-		self.init_info()
-		self.receive_start()
-
-	def receive_start(self):
-		receive = threading.Thread(name="Thread: Database info receiver",target=self.receive_request, daemon=True)
-		receive.start()
-
-	def receive_request(self):
-
-		#put the receive in corresponding box.
-		while True:
-			d = self.request.recv()
-
-			status = d[0]
-
-			if status == "message":
-				print(d[1])
-			else:
-				symbol = d[1]
-
-				self.data_list[0][symbol].set(status)
-
-				if status == "Connected":
-					if len(d)-1 == len(self.data_list):
-						for i in range(1,len(self.data_list)):
-							self.data_list[i][symbol].set(d[i+1])
-							# if self.data_list[i][symbol].get()!=d[i+1]:
-							# 	self.data_list[i][symbol].set(d[i+1])
-
-		#grab all info. 
-
-		# take input
-
-	def init_info(self):
-		for i in self.symbols:
-			self.data.change_status(i, "Connecting")
-			self.register(i)
-
-	def register(self,symbol):
-		self.request.send(symbol)
-
-	def deregister(self,symbol):
-		self.request.send(symbol)
-	
 # if __name__ == '__main__':
 
 # 	multiprocessing.freeze_support()
