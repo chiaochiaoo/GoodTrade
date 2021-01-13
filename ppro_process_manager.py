@@ -30,10 +30,9 @@ global connection_error
 
 def test_register():
 	try:
-		p="http://localhost:8080/Register?symbol=AAPL.NQ&feedtype=L1"
+		p="http://localhost:8080/Deregister?symbol=AAPL.NQ&feedtype=L1"
 		r= requests.get(p)
-		if "PProApi" in r.text:
-			deregister("AAPL.NQ")
+		if "Response" in r.text:
 			return False
 		else:
 			return True
