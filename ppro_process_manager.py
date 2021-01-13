@@ -233,12 +233,17 @@ def process_and_send(lst,pipe):
 
 	#here;s the false print check. 0.005
 	d = data[symbol]
+
+	if timestamp - d["timestamp"] >30:
+		pipe.send(["Lagged",symbol])
+		register(symbol)
+
 	
 	if abs(price-d["price"])/d["price"] < 0.005:
 		
 		d = data[symbol]
 		
-		d["timestamp"] =timestamp
+		d["timestamp"] = timestamp
 		d["time"] = time
 		d["price"] = price
 		d["open"] = open_
@@ -350,7 +355,7 @@ def sell_market_order(symbol,share):
     r = requests.post('http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(share))
     if r.status_code == 200:
         print('sell market order Success!')
-        print(r.text)
+        #print(r.text)
         return True
     else:
         print("Error sending sell order")

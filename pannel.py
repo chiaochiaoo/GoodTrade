@@ -53,6 +53,8 @@ class pannel:
 				label["background"] = "red"
 			elif text.get() == "Connected":
 				label["background"] = "#97FEA8"
+			elif text.get() == "Lagged":
+				label["background"] = "#97FEA8"
 			else:
 				label["background"] = "red"
 

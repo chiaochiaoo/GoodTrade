@@ -67,7 +67,6 @@ class ppro_process_manager:
 				#   d["high"],d["low"],\d["range"],d["last_5_range"],
 				#   d["vol"],d["open"],d["oh"],d["ol"],d["f5r"],d["f5v"]])
 
-
 				if status == "Connected":
 					if len(d)-1 == len(self.data_list):
 						for i in range(1,len(self.data_list)):

@@ -290,6 +290,7 @@ class alert(pannel):
 								alert_str = "Resistance "+alert_type +" :"+str(been//60)+" min ago"
 
 
+							#eval_label["background"]="#d9d9d9"
 							eval_label["background"]="yellow"
 
 							eval_string.set(alert_str)
