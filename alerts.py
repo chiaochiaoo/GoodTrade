@@ -181,7 +181,7 @@ class alert(pannel):
 				alert_position = alerts[j][1]
 				alert_vals = alerts[j][2]
 				m=format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
-				self.tickers_tracers[i].append((format[j],m))
+				self.tickers_tracers[i].append((format[value_position],m))
 			elif j>1:
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
@@ -193,11 +193,9 @@ class alert(pannel):
 		self.rebind(self.canvas,self.frame)
 
 	def delete_symbol(self,symbol):
-
-		#print(self.tickers_tracers[symbol])
 		for i in self.tickers_tracers[symbol]:
-			#print("removing",i[0].get(),i[1])
 			i[0].trace_vdelete("w",i[1])
+
 
 		for i in self.tickers_labels[symbol]:
 			i.destroy()
@@ -793,8 +791,8 @@ class breakout(alert):
 
 		m=support.trace('w', lambda *_, support=support,resist=resistance,rg=range_: self.range_tracker(support,resist,rg))
 		self.tickers_tracers[symbol].append((support,m))
-		m=resistance.trace('w', lambda *_, support=support,resist=resistance,rg=range_: self.range_tracker(support,resist,rg))
-		self.tickers_tracers[symbol].append((resistance,m))
+		n=resistance.trace('w', lambda *_, support=support,resist=resistance,rg=range_: self.range_tracker(support,resist,rg))
+		self.tickers_tracers[symbol].append((resistance,n))
 
 
 		eva= self.data.symbol_data_breakout_eval[symbol]
