@@ -1,7 +1,7 @@
 
 import socket
 
-HOST = '99.231.5.37'  # The server's hostname or IP address
+HOST = '127.0.0.1'  # The server's hostname or IP address
 PORT = 65432        # The port used by the server
 
 print(socket.gethostname())
