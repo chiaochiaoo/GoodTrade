@@ -70,7 +70,7 @@ class ppro_process_manager:
 				if status == "Connected":
 					if len(d)-1 == len(self.data_list):
 						for i in range(1,len(self.data_list)):
-							#self.data_list[i][symbol].set(d[i+1])
+							self.data_list[i][symbol].set(d[i+1])
 							if self.data_list[i][symbol].get()!=d[i+1]:
 								self.data_list[i][symbol].set(d[i+1])
 
