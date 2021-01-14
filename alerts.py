@@ -253,7 +253,7 @@ class alert(pannel):
 
 							if self.breakout_time[symbol] == 0:
 								self.breakout_time[symbol] = seconds
-							
+
 							been = seconds - self.breakout_time[symbol]
 
 							print(seconds,self.breakout_time[symbol],been)
@@ -274,7 +274,7 @@ class alert(pannel):
 							#check time. 
 							if self.breakout_time[symbol] == 0:
 								self.breakout_time[symbol] = seconds
-							
+
 							been = seconds - self.breakout_time[symbol]
 
 							if been<60:
@@ -293,11 +293,12 @@ class alert(pannel):
 
 						elif cur_price<resistance and cur_price>support and self.alerts[symbol][alert_type]!=0 :
 
-							#refresh it back. 
+							#refresh it back.
 							self.breakout_time[symbol] = 0
 
 							self.alerts[symbol][alert_type] = 0
 
+							#normal white color
 							eval_label["background"]="#d9d9d9"
 							eval_string.set("")
 
@@ -305,11 +306,12 @@ class alert(pannel):
 						else:
 							#print("ts:",seconds,self.breakout_time[symbol])
 							been = seconds - self.breakout_time[symbol]
+
 							if self.alerts[symbol][alert_type]==2:
 								if been<60:
 									alert_str = "Support "+alert_type +" :"+str(been)+" sec ago"
 								else:
-									alert_str = "Support "+alert_type +" :"+str(been//60)+" min ago"							
+									alert_str = "Support "+alert_type +" :"+str(been//60)+" min ago"
 								eval_string.set(alert_str)
 							if self.alerts[symbol][alert_type]==1:
 
@@ -320,16 +322,20 @@ class alert(pannel):
 
 								eval_string.set(alert_str)
 
+							if self.alerts[symbol][alert_type]!=0:
+								if been>6 and been>30:
+									#green
+									eval_label["background"]="#67FF37"
+								if been>30 and been <60:
+									eval_label["background"]="yellow"
+								if been>60:
 
-							elif been>600:
-								eval_label["background"]="#FF5B5B"
-							elif been>300:
-								eval_label["background"]="yellow"
-							if been>60:
-								eval_label["background"]="#67FF37"
+									eval_label["background"]="#FF5B5B"
+
+
 
 				else:
-					
+
 					cur_price= round(alerts_vals[2].get(),3)
 					mean= round(alerts_vals[3].get(),3)
 					std=  round(alerts_vals[4].get(),3)
