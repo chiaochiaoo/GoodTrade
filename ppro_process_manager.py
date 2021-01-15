@@ -235,9 +235,8 @@ def process_and_send(lst,pipe):
 	d = data[symbol]
 
 	now = datetime.now()
-	cur = timestamp(str(now.hour)+":"+str(now.minute))
-
-	if cur - d["timestamp"] >2:
+	cur =timestamp(str(now.minute)+":"+str(now.second))
+	if d["timestamp"]!=0 and timestamp - d["timestamp"] >30:
 		pipe.send(["Lagged",symbol])
 		register(symbol)
 
@@ -322,6 +321,7 @@ def getinfo(symbol,pipe):
 					black_list.append(symbol)
 					pipe.send(["Unfound",symbol])
 				else:
+
 					time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
 					Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
 					Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
@@ -331,6 +331,7 @@ def getinfo(symbol,pipe):
 					vol = int(find_between(r.text, "Volume=\"", "\""))
 					price = round((Bidprice+Askprice)/2,4)
 
+					print(time,Bidprice,Askprice,open_,high,low,vol,price)
 					ts = timestamp(time[:5])
 					#print(time,price)
 					process_and_send(["Connected",symbol,time,ts,price,open_,high,low,vol],pipe)
@@ -338,7 +339,7 @@ def getinfo(symbol,pipe):
 				#pipe.send(output)
 
 			except Exception as e:
-				print("Get info",e)
+				print("Get info error:",e)
 				connection_error = True
 				pipe.send(["Ppro Error",symbol])
 				lock[symbol] = False
