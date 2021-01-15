@@ -235,6 +235,7 @@ def process_and_send(lst,pipe):
 
 	now = datetime.now()
 	print(now)
+	print(now.hour,now.minute)
 	cur =timestamp(str(now.hour)+":"+str(now.minute))
 	print(cur)
 	print(cur,timestamp)
@@ -412,6 +413,3 @@ def sell_market_order(symbol,share):
 	 #if not, register/deregister these symbols. 
 # 2. For each of these register symbols,fetch the updates for it! 
 
-now = datetime.now()
-cur =timestamp(str(now.hour)+":"+str(now.minute))
-print(cur)
