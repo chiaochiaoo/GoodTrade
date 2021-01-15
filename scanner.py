@@ -314,7 +314,7 @@ class scanner(pannel):
 			self.NT_update_time.set(d[3])
 
 		except Exception as e:
-			print(e)
+			print("Adding Nasdaq labels error",e)
 
 		self.scanner_process_manager.updating_comlete()
 

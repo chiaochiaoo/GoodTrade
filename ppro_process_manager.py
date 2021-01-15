@@ -247,6 +247,7 @@ def process_and_send(lst,pipe):
 	ts = now.hour*3600 + now.minute*60 + now.second
 	rec = timestamp_seconds(time)
 
+	print(symbol,now,time)
 	if ts- rec >30:
 		pipe.send(["Lagged",symbol])
 		register(symbol)
@@ -314,7 +315,7 @@ def process_and_send(lst,pipe):
 	lock[symbol] = False
 
 def getinfo(symbol,pipe):
-	
+
 	global black_list
 
 	global connection_error
@@ -323,6 +324,7 @@ def getinfo(symbol,pipe):
 
 		if not lock[symbol]:
 			try:
+				#######################################################################
 				lock[symbol] = True
 				p="http://localhost:8080/GetLv1?symbol="+symbol
 				r= requests.get(p)

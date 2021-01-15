@@ -392,8 +392,7 @@ class alert(pannel):
 							self.set_latest_alert(symbol, alert_str, time)
 
 		except Exception as e:
-			print(e)
-			print("Alert Error:")
+			print("Alert Error:",e)
 
 
 
