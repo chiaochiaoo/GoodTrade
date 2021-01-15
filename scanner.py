@@ -286,11 +286,12 @@ class scanner(pannel):
 						self.nasdaq[i+l].append(tk.Label(self.NT_scanner_frame2,text=d[2][i][j],width=width[j]))
 						self.nasdaq[i+l][j].grid(row=i+2, column=j,padx=0)
 					else:
-						if d[2][i][2] = "NY":
+						sy = ""
+						if d[2][i][2] == "NY":
 							sy = d[2][i][1] +".NY"
-						elif d[2][i][2] = "AM" or d[2][i][2] = "P" or d[2][i][2] = "Z":
+						elif d[2][i][2] == "AM" or d[2][i][2] == "P" or d[2][i][2] == "Z":
 							sy = d[2][i][1] +".AM"
-						elif d[2][i][2] = "Q" or d[2][i][2] = "S" or d[2][i][2] = "G":
+						elif d[2][i][2] == "Q" or d[2][i][2] == "S" or d[2][i][2] == "G":
 							sy = d[2][i][1] +".NQ"
 
 
