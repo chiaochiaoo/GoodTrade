@@ -323,14 +323,15 @@ class alert(pannel):
 								eval_string.set(alert_str)
 
 							if self.alerts[symbol][alert_type]!=0:
-								if been>6 and been>30:
+								if been>60 and been<180:
 									#green
 									eval_label["background"]="#67FF37"
-								if been>30 and been <60:
+								if been>180 and been <300:
 									eval_label["background"]="yellow"
-								if been>60:
-
+								if been>300 and been <600:
 									eval_label["background"]="#FF5B5B"
+								if been>600:
+									eval_label["background"]="red"
 
 
 

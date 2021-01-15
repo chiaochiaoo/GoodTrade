@@ -131,24 +131,32 @@ def multi_processing_scanner(pipe_receive):
 					data = []
 					table = soup.find('div', attrs={'id':'asGrid'})
 
-					table = table.find('div')
-					table_body = table.findAll('tbody')[1]
+					try:
 
-					for i in table_body.findAll('tr'):
-					    col =i.find_all('td')
-					    cols = [ele.text.strip() for ele in col]
-					    data.append(cols)
+						table = table.find('div')
+						table_body = table.findAll('tbody')[1]
+
+						for i in table_body.findAll('tr'):
+						    col =i.find_all('td')
+						    cols = [ele.text.strip() for ele in col]
+						    data.append(cols)
+					except:
+						data = []
 
 					data2 = []
-					table = soup.find('div', attrs={'id':'ahGrid'})
 
-					table = table.find('div')
-					table_body = table.findAll('tbody')[1]
+					try:
+						table = soup.find('div', attrs={'id':'ahGrid'})
 
-					for i in table_body.findAll('tr'):
-					    col =i.find_all('td')
-					    cols = [ele.text.strip() for ele in col]
-					    data2.append(cols)
+						table = table.find('div')
+						table_body = table.findAll('tbody')[1]
+
+						for i in table_body.findAll('tr'):
+						    col =i.find_all('td')
+						    cols = [ele.text.strip() for ele in col]
+						    data2.append(cols)
+					except:
+						data2 = []
 
 					pipe_receive.send(["Nasdaq",data,data2,str(t)])
 					#self.pannel.status_nasdaqchange("Fetching complete")
