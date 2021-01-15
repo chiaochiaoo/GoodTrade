@@ -186,7 +186,7 @@ def timestamp(s):
 		x = int(p[0])*60+int(p[1])
 		return x
 	except Exception as e:
-		print("timestamp",e)
+		print("Timestamp conversion error:",e)
 		return 0
 
 def timestamp_seconds(s):
@@ -196,7 +196,7 @@ def timestamp_seconds(s):
 		x = int(p[0])*3600+int(p[1])*60+int(p[2])
 		return x
 	except Exception as e:
-		print(e)
+		print("Timestamp conversion error:",e)
 		return 0
 #IF STILL THE SAME TIME, TRY TO reregister?
 
@@ -245,11 +245,9 @@ def process_and_send(lst,pipe):
 	now = datetime.now()
 
 	ts = now.hour*3600 + now.minute*60 + now.second
-	print(ts,timestamp_seconds(time))
-	#cur =timestamp(s)
-	#print(cur)
-	#print(cur,timestamp)
-	if d["timestamp"]!=0 and timestamp - d["timestamp"] >30:
+	rec = timestamp_seconds(time)
+
+	if ts- rec >30:
 		pipe.send(["Lagged",symbol])
 		register(symbol)
 
