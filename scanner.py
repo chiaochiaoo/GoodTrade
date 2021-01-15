@@ -77,7 +77,7 @@ class scanner(pannel):
 
 		self.NT_scanner_canvas2 = tk.Canvas(self.after)
 		self.NT_scanner_canvas2.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
-		self.scroll = tk.Scrollbar(self.all)
+		self.scroll = tk.Scrollbar(self.after)
 		self.scroll.config(orient=tk.VERTICAL, command=self.NT_scanner_canvas2.yview)
 		self.scroll.pack(side=tk.RIGHT,fill="y")
 		self.NT_scanner_canvas2.configure(yscrollcommand=self.scroll.set)
