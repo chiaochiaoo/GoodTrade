@@ -235,8 +235,9 @@ def process_and_send(lst,pipe):
 	d = data[symbol]
 
 	now = datetime.now()
+	print(now)
 	cur =timestamp(str(now.hour)+":"+str(now.minute))
-
+	print(cur)
 	print(cur,timestamp)
 	if d["timestamp"]!=0 and timestamp - d["timestamp"] >30:
 		pipe.send(["Lagged",symbol])
@@ -412,3 +413,6 @@ def sell_market_order(symbol,share):
 	 #if not, register/deregister these symbols. 
 # 2. For each of these register symbols,fetch the updates for it! 
 
+now = datetime.now()
+cur =timestamp(str(now.hour)+":"+str(now.minute))
+print(cur)
