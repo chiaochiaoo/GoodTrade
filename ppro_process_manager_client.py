@@ -68,6 +68,8 @@ class ppro_process_manager:
 				#   d["vol"],d["open"],d["oh"],d["ol"],d["f5r"],d["f5v"]])
 
 				if status == "Connected":
+
+					print(d)
 					if len(d)-1 == len(self.data_list):
 						for i in range(1,len(self.data_list)):
 							self.data_list[i][symbol].set(d[i+1])
