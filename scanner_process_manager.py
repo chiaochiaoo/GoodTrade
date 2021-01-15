@@ -1,5 +1,7 @@
 import threading
 import multiprocessing
+import time
+import re
 
 try:
     from finviz.screener import Screener
@@ -7,6 +9,17 @@ except ImportError:
     pip.main(['install', 'finviz'])
     from finviz.screener import Screener
 
+try:
+    from bs4 import BeautifulSoup
+except ImportError:
+    pip.main(['install', 'BeautifulSoup'])
+    from bs4 import BeautifulSoup
+
+try:
+    from selenium import webdriver
+except ImportError:
+    pip.main(['install', 'selenium'])
+    from selenium import webdriver
 # A mini thread of the main thread. 
 # Sleep normally.
 
@@ -15,6 +28,7 @@ class scanner_process_manager:
 	def __init__(self,request_pipe):
 		#if a downloading request is already sent. 
 		self.downloading = False
+		self.downloading2 = False
 		self.request = request_pipe
 		self.pannel = None
 
@@ -25,6 +39,9 @@ class scanner_process_manager:
 	def adding_comlete(self):
 		self.downloading = False
 
+	def updating_comlete(self):
+		self.downloading2 = False
+
 	def send_request(self,cond,market_,type_,cap):
 		if(self.downloading == True):
 			self.pannel.status_change("Downloading in progress")
@@ -32,9 +49,21 @@ class scanner_process_manager:
 		else:
 			self.downloading = True
 			self.pannel.status_change("Downloading in progress")
-			self.request.send([cond,market_,type_,cap])
-			#when success, put it False. ... Put on a thread to receive it. 
-			#HERE,.... seperate a thread to run it. 
+			self.request.send(["f",cond,market_,type_,cap])
+			#when success, put it False. ... Put on a thread to receive it.
+			#HERE,.... seperate a thread to run it.
+			receive = threading.Thread(name="Reiceive info",target=self.receive_request, daemon=True)
+			receive.start()
+
+	def refresh_nasdaq_trader(self):
+
+		if(self.downloading2 == True):
+			self.pannel.status_nasdaqchange("Updating in progress")
+
+		else:
+			self.downloading2 = True
+			self.request.send(["n"])
+
 			receive = threading.Thread(name="Reiceive info",target=self.receive_request, daemon=True)
 			receive.start()
 
@@ -42,20 +71,92 @@ class scanner_process_manager:
 	def receive_request(self):
 		d = self.request.recv()
 
-		self.pannel.add_labels(d)
+		#print(d)
+		#check if it is normal type?
+		if d[0]=="Nasdaq":
+			self.pannel.add_nasdaq_labels(d)
+		else:
+			self.pannel.add_labels(d)
 
 def multi_processing_scanner(pipe_receive):
 
-	print("Database online")
+	sucess = False
+
+	while not sucess:
+
+		try:
+			PATH = "./network/chromedriver.exe"
+			driver = webdriver.Chrome(PATH)
+			driver.get('http://www.nasdaqtrader.com/')
+			# driver.find_element_by_id('tab4').click()
+			# time.sleep(1)
+			# driver.find_element_by_id('ahButton').click()
+			time.sleep(1)
+			sucess= True
+			print("Database online")
+		except:
+			#self.pannel.status_nasdaqchange("Problem accessing server")
+			sucess= False
+
+	#self.pannel.status_nasdaqchange("Ready")
+
 	while True:
 		receive_things = pipe_receive.recv()
-		#unpack. 
-		cond, market_, type_, cap = receive_things[0],receive_things[1],receive_things[2],receive_things[3]
 
-		print(cond, market_, type_, cap)
-		d = refreshstocks(cond, market_, type_, cap)
-		#send back.
-		pipe_receive.send(d)
+		order_type = receive_things[0]
+
+		if order_type == "f":
+			#unpack.
+			cond, market_, type_, cap = receive_things[1],receive_things[2],receive_things[3],receive_things[4]
+
+			print(cond, market_, type_, cap)
+			d = refreshstocks(cond, market_, type_, cap)
+			#send back.
+			pipe_receive.send(d)
+
+		elif order_type =="n":
+			driver.find_element_by_id('tab4').click()
+			time.sleep(1)
+			driver.find_element_by_id('ahButton').click()
+			time.sleep(1)
+			sucess = False
+
+			while not sucess:
+				try:
+					soup = BeautifulSoup(driver.page_source, 'html.parser')
+
+					t = soup.find(text=re.compile('Last updated*'))
+
+					data = []
+					table = soup.find('div', attrs={'id':'asGrid'})
+
+					table = table.find('div')
+					table_body = table.findAll('tbody')[1]
+
+					for i in table_body.findAll('tr'):
+					    col =i.find_all('td')
+					    cols = [ele.text.strip() for ele in col]
+					    data.append(cols)
+
+					data2 = []
+					table = soup.find('div', attrs={'id':'ahGrid'})
+
+					table = table.find('div')
+					table_body = table.findAll('tbody')[1]
+
+					for i in table_body.findAll('tr'):
+					    col =i.find_all('td')
+					    cols = [ele.text.strip() for ele in col]
+					    data2.append(cols)
+
+					pipe_receive.send(["Nasdaq",data,data2,str(t)])
+					#self.pannel.status_nasdaqchange("Fetching complete")
+					sucess= True
+				except:
+					#self.pannel.status_nasdaqchange("Problem fetching data")
+					sucess = False
+
+
 
 def refreshstocks(cond,market_,type_,cap):
 

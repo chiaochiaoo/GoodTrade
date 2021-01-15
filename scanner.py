@@ -15,15 +15,105 @@ class scanner(pannel):
 
 		super()
 
+		self.tabControl = ttk.Notebook(root)
+		self.tabControl.place(x=0,rely=0.01,relheight=1,width=500)
+
+		self.tab1 = tk.Canvas(self.tabControl)
+		self.tab2 = tk.Canvas(self.tabControl)
+
+		self.tabControl.add(self.tab1, text ='Finviz') 
+		self.tabControl.add(self.tab2, text ='Nasdaq Trader') 
+
+
+
+		############################### Nasdaq Trader ############################################
+
+
+		self.nasdaq = []
+
+		self.NT_refresh = ttk.Button(self.tab2,
+			text ="Refresh",command=self.refresh_nasdaq).place(relx=0.01, rely=0.01, height=25, width=70)
+
+		self.NT_update_time = tk.StringVar(root)
+		self.NT_update_time.set('Last updated') 
+
+		self.NT_stat = ttk.Label(self.tab2, textvariable=self.NT_update_time).place(x=95, rely=0.01, height=25, width=200)
+
+		width = [3,5,10,10,10,10,5]
+		labels = ["Rank","Symbol","MKT Center","Matched Shares","Last Matched","Open Orders","Add"]
+
+		self.NT = ttk.Notebook(self.tab2)
+		self.NT.place(x=0,rely=0.05,relheight=1,width=500)
+
+		self.all = tk.Canvas(self.NT)
+		self.after = tk.Canvas(self.NT)
+
+		self.NT.add(self.all, text ='All Sessions')
+		self.NT.add(self.after, text ='After Hours')
+
+
+		self.NT_scanner_canvas = tk.Canvas(self.all)
+		self.NT_scanner_canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
+		self.scroll = tk.Scrollbar(self.all)
+		self.scroll.config(orient=tk.VERTICAL, command=self.NT_scanner_canvas.yview)
+		self.scroll.pack(side=tk.RIGHT,fill="y")
+		self.NT_scanner_canvas.configure(yscrollcommand=self.scroll.set)
+		self.NT_scanner_frame = tk.Frame(self.NT_scanner_canvas)
+		self.NT_scanner_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
+		self.NT_scanner_canvas.create_window(0, 0, window=self.NT_scanner_frame, anchor=tk.NW)
+
+		for i in range(len(labels)): #Rows
+			self.b = tk.Button(self.NT_scanner_frame, text=labels[i],width=width[i])#,command=self.rank
+			self.b.configure(activebackground="#f9f9f9")
+			self.b.configure(activeforeground="black")
+			self.b.configure(background="#d9d9d9")
+			self.b.configure(disabledforeground="#a3a3a3")
+			self.b.configure(relief="ridge")
+			self.b.configure(foreground="#000000")
+			self.b.configure(highlightbackground="#d9d9d9")
+			self.b.configure(highlightcolor="black")
+			self.b.grid(row=1, column=i)
+
+
+		self.NT_scanner_canvas2 = tk.Canvas(self.after)
+		self.NT_scanner_canvas2.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
+		self.scroll = tk.Scrollbar(self.all)
+		self.scroll.config(orient=tk.VERTICAL, command=self.NT_scanner_canvas2.yview)
+		self.scroll.pack(side=tk.RIGHT,fill="y")
+		self.NT_scanner_canvas2.configure(yscrollcommand=self.scroll.set)
+		self.NT_scanner_frame2 = tk.Frame(self.NT_scanner_canvas2)
+		self.NT_scanner_frame2.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
+		self.NT_scanner_canvas2.create_window(0, 0, window=self.NT_scanner_frame2, anchor=tk.NW)
+
+		for i in range(len(labels)): #Rows
+			self.b = tk.Button(self.NT_scanner_frame2, text=labels[i],width=width[i])#,command=self.rank
+			self.b.configure(activebackground="#f9f9f9")
+			self.b.configure(activeforeground="black")
+			self.b.configure(background="#d9d9d9")
+			self.b.configure(disabledforeground="#a3a3a3")
+			self.b.configure(relief="ridge")
+			self.b.configure(foreground="#000000")
+			self.b.configure(highlightbackground="#d9d9d9")
+			self.b.configure(highlightcolor="black")
+			self.b.grid(row=1, column=i)
+
+
+
+
+
+
+		############################### Finviz ############################################
+
 		self.tickers_manager = tickers_manager
 
 		self.scanner_process_manager = scanner_process
 
-		self.setting = ttk.LabelFrame(root,text="Scanner Settings") 
-		self.setting.place(relx=0.01, rely=0.05, relheight=1, width=480)
+		self.setting = ttk.LabelFrame(self.tab1,text="Scanner Settings") 
+		self.setting.place(relx=0.01, rely=0.01, relheight=1, width=480)
 
 		self.refresh = ttk.Button(self.setting,  
-			text ="Fetch Data",command=self.refresh).place(relx=0.8, rely=0.01, height=50, width=70)   
+			text ="Fetch Data",command=self.refresh).place(relx=0.8, rely=0.01, height=50, width=70)
+
 
 		self.market = tk.StringVar(self.setting)
 		self.choices2 = {'Nasdaq','NYSE','AMEX'}
@@ -57,7 +147,6 @@ class scanner(pannel):
 		self.menu4 = ttk.Label(self.setting, text="Market Cap").grid(row = 1, column = 4)
 		self.popupMenu4.grid(row = 2, column =4)
 
-
 		self.downloading = False
 
 		self.status_info = ttk.Label(self.setting, text="Current Status: ")
@@ -82,12 +171,11 @@ class scanner(pannel):
 
 		self.scanner_frame = tk.Frame(self.scanner_canvas)
 		self.scanner_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
-
 		self.scanner_canvas.create_window(0, 0, window=self.scanner_frame, anchor=tk.NW)
 
-		labels = ["Symbol","Rel.V","Price","Change","Perf Week","MCap","Inst own",\
-		"Inst tran","Insi own","Insi tran","Short float","Short Ratio","Prem Low","Prem high","Prem Avg","Status"]
-		width = [8,6,6,6,8,8,8,8,8,8,10,10,10,10,10,10]
+		# labels = ["Symbol","Rel.V","Price","Change","Perf Week","MCap","Inst own",\
+		# "Inst tran","Insi own","Insi tran","Short float","Short Ratio","Prem Low","Prem high","Prem Avg","Status"]
+		# width = [8,6,6,6,8,8,8,8,8,8,10,10,10,10,10,10]
 
 		width = [8,12,10,6,10,10]
 		labels = ["Ticker","Cur.V","Avg.V","Rel.V","%"+"since close","Add to list"]
@@ -109,8 +197,12 @@ class scanner(pannel):
 		self.rebind(self.scanner_canvas,self.scanner_frame)
 
 
+
 	def status_change(self,var):
 		self.status.set(var)
+
+	def status_nasdaqchange(self,var):
+		self.NT_update_time.set(var)
 
 	def market_suffix(self):
 		market_ = self.market.get()
@@ -127,12 +219,12 @@ class scanner(pannel):
 			market = '.AM'
 		return market
 
-	#This is the button function. 
-	#Take all the information needed and send it to the new process. 
+	#This is the button function.
+	#Take all the information needed and send it to the new process.
 
 
 	#Steps1. Asychonous Version.
-	#Steps2. Synchonous Version. - Just need to let it load, and then call it and sne,.d 
+	#Steps2. Synchonous Version. - Just need to let it load, and then call it and sne,.d
 
 	def delete_old_lables(self):
 
@@ -141,7 +233,12 @@ class scanner(pannel):
 				for j in i:
 					j.destroy()
 
-		
+	def delete_old_labels_nasdaq(self):
+
+		if len(self.nasdaq)>0:
+			for i in self.nasdaq:
+				for j in i:
+					j.destroy()
 
 	def refresh(self):
 
@@ -150,15 +247,61 @@ class scanner(pannel):
 		cond = "sh_relvol_o"+self.relv.get()
 		market_ = self.market.get()
 		type_ = self.signal.get()
-		cap = self.markcap.get() 
+		cap = self.markcap.get()
 
 		self.delete_old_lables()
-
 		self.scanner_process_manager.send_request(cond,market_,type_,cap)
-		
+
+
+	def refresh_nasdaq(self):
+		self.delete_old_labels_nasdaq()
+		self.scanner_process_manager.refresh_nasdaq_trader()
+
+	def add_nasdaq_labels(self,d):
+
+		#print(d[3])
+		self.nasdaq = []
+
+		width = [3,5,10,10,10,10,5]
+
+		try:
+			for i in range(len(d[1])):
+				self.nasdaq.append([])
+				for j in range(len(width)):
+					if j!= len(width)-1:
+						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=d[1][i][j],width=width[j]))
+						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+					else:
+						self.nasdaq[i].append(tk.Button(self.NT_scanner_frame ,text="Add",width=width[j],command= lambda k=d[1][i][1]: self.tickers_manager.add_symbol_reg_list(k+".NQ")))
+						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+
+			self.rebind(self.NT_scanner_canvas,self.NT_scanner_frame)
+
+
+			l = len(self.nasdaq)
+			for i in range(len(d[2])):
+				self.nasdaq.append([])
+				for j in range(len(width)):
+					if j!= len(width)-1:
+						self.nasdaq[i+l].append(tk.Label(self.NT_scanner_frame2,text=d[2][i][j],width=width[j]))
+						self.nasdaq[i+l][j].grid(row=i+2, column=j,padx=0)
+					else:
+						self.nasdaq[i+l].append(tk.Button(self.NT_scanner_frame2,text="Add",width=width[j],command= lambda k=d[2][i][1]: self.tickers_manager.add_symbol_reg_list(k+".NQ")))
+						self.nasdaq[i+l][j].grid(row=i+2, column=j,padx=0)
+
+			self.rebind(self.NT_scanner_canvas2,self.NT_scanner_frame2)
+
+
+
+			self.NT_update_time.set(d[3])
+
+		except Exception as e:
+			print(e)
+
+		self.scanner_process_manager.updating_comlete()
 
 	def add_labels(self,d):
-		#This is where it adds the labels. 
+		#This is where it adds the labels.
 
 		if (len(d)==0):
 			#got nothing!
@@ -188,7 +331,7 @@ class scanner(pannel):
 							self.info[i][j].grid(row=i+2, column=j,padx=0)
 			except:
 				good = False
-			
+
 			super().rebind(self.scanner_canvas,self.scanner_frame)
 
 			self.scanner_process_manager.adding_comlete()
@@ -199,5 +342,4 @@ class scanner(pannel):
 			else:
 				self.status_change("Please retry")
 				self.scanner_process_manager.adding_comlete()
-			 
 

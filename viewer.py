@@ -1,8 +1,8 @@
-import tkinter as tk                     
-from tkinter import ttk 
+import tkinter as tk
+from tkinter import ttk
 import pandas as pd
 import numpy as np
-import os 
+import os
 import time
 import threading
 
@@ -24,7 +24,7 @@ from ppro_process_manager import *
 class viewer:
 
 	def __init__(self,root,scanner_process,database_process,ppro_process):
-		
+
 		self.data = Symbol_data_manager()
 
 		self.db = database_process
@@ -37,15 +37,14 @@ class viewer:
 		self.data.set_database_manager(self.db)
 		self.data.set_ppro_manager(self.ppro)
 
-
 		self.listening = ttk.LabelFrame(root,text="Listener") 
 		self.listening.place(x=500,rely=0.05,relheight=1,width=900)
 
-		self.tabControl = ttk.Notebook(self.listening) 
-		self.tab1 = tk.Canvas(self.tabControl) 
-		self.tab2 = tk.Canvas(self.tabControl) 
+		self.tabControl = ttk.Notebook(self.listening)
+		self.tab1 = tk.Canvas(self.tabControl)
+		self.tab2 = tk.Canvas(self.tabControl)
 		self.tab3 = tk.Canvas(self.tabControl)
-		self.tab4 = tk.Canvas(self.tabControl) 
+		self.tab4 = tk.Canvas(self.tabControl)
 		self.tab5 = tk.Canvas(self.tabControl)
 		self.tab6 = tk.Canvas(self.tabControl)
 		self.tab7 = tk.Canvas(self.tabControl)
