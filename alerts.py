@@ -327,7 +327,7 @@ class alert(pannel):
 								if been>180 and been <300:
 									eval_label["background"]="yellow"
 
-								if been ==300:
+								if been >180 and been <190:
 									if auto_trade[symbol].get()==1 and self.alerts[symbol][alert_type]==1:
 										self.data.ppro.long(symbol)
 									if auto_trade[symbol].get()==1 and self.alerts[symbol][alert_type]==2:
