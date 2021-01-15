@@ -69,7 +69,7 @@ def register(symbol):
 		print("Register,",e)
 		
 		#it could be database not linked 
-		
+
 
 def deregister(symbol):
 	global reg_count
@@ -189,6 +189,15 @@ def timestamp(s):
 		print("timestamp",e)
 		return 0
 
+def timestamp_seconds(s):
+
+	p = s.split(":")
+	try:
+		x = int(p[0])*3600+int(p[1])*60+int(p[2])
+		return x
+	except Exception as e:
+		print(e)
+		return 0
 #IF STILL THE SAME TIME, TRY TO reregister?
 
 def init(symbol,price):
@@ -235,8 +244,8 @@ def process_and_send(lst,pipe):
 
 	now = datetime.now()
 
-	ts = now.hour*60 + now.minute
-	print(ts,timestamp)
+	ts = now.hour*3600 + now.minute*60 + now.seconds
+	print(ts,timestamp_seconds(time))
 	#cur =timestamp(s)
 	#print(cur)
 	#print(cur,timestamp)
