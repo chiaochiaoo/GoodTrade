@@ -237,8 +237,8 @@ def process_and_send(lst,pipe):
 	print(now)
 	print(now.hour,now.minute)
 	s = str(now.hour)+":"+str(now.minute)
-	prnt(s)
-	cur =timestamp(str(now.hour)+":"+str(now.minute))
+	print(s)
+	cur =timestamp(s)
 	print(cur)
 	print(cur,timestamp)
 	if d["timestamp"]!=0 and timestamp - d["timestamp"] >30:
