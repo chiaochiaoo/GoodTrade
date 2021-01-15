@@ -13,7 +13,7 @@ except ImportError:
 try:
     from bs4 import BeautifulSoup
 except ImportError:
-    pip.main(['install', 'BeautifulSoup'])
+    pip.main(['install', 'BeautifulSoup4'])
     from bs4 import BeautifulSoup
 
 try:
