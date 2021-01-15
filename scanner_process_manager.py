@@ -2,6 +2,7 @@ import threading
 import multiprocessing
 import time
 import re
+import pip
 
 try:
     from finviz.screener import Screener
