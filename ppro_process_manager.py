@@ -236,6 +236,8 @@ def process_and_send(lst,pipe):
 	now = datetime.now()
 	print(now)
 	print(now.hour,now.minute)
+	s = str(now.hour)+":"+str(now.minute)
+	prnt(s)
 	cur =timestamp(str(now.hour)+":"+str(now.minute))
 	print(cur)
 	print(cur,timestamp)
