@@ -247,7 +247,7 @@ def process_and_send(lst,pipe):
 	ts = now.hour*3600 + now.minute*60 + now.second
 	rec = timestamp_seconds(time)
 
-	print(symbol,now,time)
+	print(symbol,ts-rec)
 	if ts- rec >30:
 		pipe.send(["Lagged",symbol])
 		register(symbol)
