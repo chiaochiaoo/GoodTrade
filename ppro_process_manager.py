@@ -244,7 +244,7 @@ def process_and_send(lst,pipe):
 
 	now = datetime.now()
 
-	ts = now.hour*3600 + now.minute*60 + now.seconds
+	ts = now.hour*3600 + now.minute*60 + now.second
 	print(ts,timestamp_seconds(time))
 	#cur =timestamp(s)
 	#print(cur)
