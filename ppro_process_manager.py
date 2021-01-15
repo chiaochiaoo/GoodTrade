@@ -346,7 +346,13 @@ def getinfo(symbol,pipe):
 					high = float(find_between(r.text, "HighPrice=\"", "\""))
 					low = float(find_between(r.text, "LowPrice=\"", "\""))
 					vol = int(find_between(r.text, "Volume=\"", "\""))
+
 					price = float(find_between(r.text, "LastPrice=\"", "\""))
+
+					if price<1:
+						price = round(price,3)
+					else:
+						price = round(price,2)
 
 					#print(time,Bidprice,Askprice,open_,high,low,vol,price)
 					ts = timestamp(time[:5])
