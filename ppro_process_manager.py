@@ -110,10 +110,10 @@ def multi_processing_price(pipe_receive):
 
 			while connection_error:
 				connection_error = test_register()
-				
+
 				if connection_error:
 					pipe_receive.send(["message","Conection failed. try again in 3 sec."])
-					
+
 				else:
 					pipe_receive.send(["message","Connection established."])
 
@@ -122,7 +122,7 @@ def multi_processing_price(pipe_receive):
 						reg.start()
 
 				time.sleep(3)
-				
+
 			#check new symbols. 
 			reg = []
 			dereg = []
@@ -234,8 +234,10 @@ def process_and_send(lst,pipe):
 	#here;s the false print check. 0.005
 	d = data[symbol]
 
-	# now = datetime.now()
-	# cur =timestamp(str(now.minute)+":"+str(now.second))
+	now = datetime.now()
+	cur =timestamp(str(now.hour)+":"+str(now.minute))
+
+	print(cur,timestamp)
 	if d["timestamp"]!=0 and timestamp - d["timestamp"] >30:
 		pipe.send(["Lagged",symbol])
 		register(symbol)
