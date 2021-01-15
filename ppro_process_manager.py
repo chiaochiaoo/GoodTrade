@@ -331,9 +331,9 @@ def getinfo(symbol,pipe):
 					vol = int(find_between(r.text, "Volume=\"", "\""))
 					price = round((Bidprice+Askprice)/2,4)
 
-					print(time,Bidprice,Askprice,open_,high,low,vol,price)
+					#print(time,Bidprice,Askprice,open_,high,low,vol,price)
 					ts = timestamp(time[:5])
-					#print(time,price)
+
 					process_and_send(["Connected",symbol,time,ts,price,open_,high,low,vol],pipe)
 
 				#pipe.send(output)

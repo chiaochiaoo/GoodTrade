@@ -232,6 +232,8 @@ class alert(pannel):
 
 				auto_trade = self.data.auto_trade
 
+				print(time,ts)
+
 
 				#print(alert_type)
 				if alert_type=="breakout":
