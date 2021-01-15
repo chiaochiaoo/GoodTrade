@@ -40,13 +40,13 @@ class all_alerts(pannel):
 		l = self.label_count 
 
 		symbol = vals[0]
-		
+
 		if set(vals) not in self.alert_base:
 
 			key = str(vals)
 			self.tickers_labels[key] = []
 			for i in range(len(vals)):
-				
+
 				self.tickers_labels[key].append(tk.Label(self.frame ,text=vals[i],width=self.width[i]))
 				self.label_default_configure(self.tickers_labels[key][i])
 				self.tickers_labels[key][i].grid(row= l+2, column=i,padx=0)

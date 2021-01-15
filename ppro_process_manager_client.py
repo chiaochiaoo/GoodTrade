@@ -23,7 +23,7 @@ class ppro_process_manager:
 
 	def set_symbols_manager(self,s):
 
-		##? 
+		##?
 		self.data = s
 
 		self.data_list = s.update_list
