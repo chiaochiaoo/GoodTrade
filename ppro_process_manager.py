@@ -2,6 +2,8 @@ import requests
 import multiprocessing
 import threading
 import time
+from datetime import datetime
+
 from Symbol_data_manager import *
 from datetime import datetime
 from ppro_process_manager_client import *
@@ -232,15 +234,18 @@ def process_and_send(lst,pipe):
 	#here;s the false print check. 0.005
 	d = data[symbol]
 
-	if d["timestamp"]!=0 and timestamp - d["timestamp"] >30:
+	now = datetime.now()
+	cur = timestamp(str(now.hour)+":"+str(now.minute))
+
+	if cur - d["timestamp"] >2:
 		pipe.send(["Lagged",symbol])
 		register(symbol)
 
-	
+
 	if abs(price-d["price"])/d["price"] < 0.005:
-		
+
 		d = data[symbol]
-		
+
 		d["timestamp"] = timestamp
 		d["time"] = time
 		d["price"] = price
