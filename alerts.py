@@ -265,8 +265,7 @@ class alert(pannel):
 							self.alert_pannel.add_alerts([symbol,time,alert_str])
 							self.set_latest_alert(symbol, alert_str, time)
 
-							if auto_trade[symbol].get()==1:
-								self.data.ppro.short(symbol)
+
 
 						elif cur_price>resistance and cur_price>support and self.alerts[symbol][alert_type]!=1 :
 
@@ -288,8 +287,7 @@ class alert(pannel):
 							self.alert_pannel.add_alerts([symbol,time,alert_str])
 							self.set_latest_alert(symbol, alert_str, time)
 
-							if auto_trade[symbol].get()==1:
-								self.data.ppro.long(symbol)
+
 
 						elif cur_price<resistance and cur_price>support and self.alerts[symbol][alert_type]!=0 :
 
@@ -328,6 +326,13 @@ class alert(pannel):
 									eval_label["background"]="#67FF37"
 								if been>180 and been <300:
 									eval_label["background"]="yellow"
+
+								if been ==300:
+									if auto_trade[symbol].get()==1 and self.alerts[symbol][alert_type]==1:
+										self.data.ppro.long(symbol)
+									if auto_trade[symbol].get()==1 and self.alerts[symbol][alert_type]==2:
+										self.data.ppro.short(symbol)
+
 								if been>300 and been <600:
 									eval_label["background"]="#FF5B5B"
 								if been>600:
