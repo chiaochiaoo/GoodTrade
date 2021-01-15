@@ -5,7 +5,6 @@ import time
 from datetime import datetime
 
 from Symbol_data_manager import *
-from datetime import datetime
 from ppro_process_manager_client import *
 
 
