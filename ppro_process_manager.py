@@ -234,10 +234,9 @@ def process_and_send(lst,pipe):
 	d = data[symbol]
 
 	now = datetime.now()
-	print(now)
-	#print(now.hour,now.minute)
-	s = str(now.hour)+":"+str(now.minute)
-	print(s)
+
+	ts = now.hour*60 + now.minute
+	print(ts,timestamp)
 	#cur =timestamp(s)
 	#print(cur)
 	#print(cur,timestamp)
