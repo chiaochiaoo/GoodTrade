@@ -56,12 +56,12 @@ class database_process_manager:
 		while True:
 			d = self.request.recv()
 
-			# print("receive")
-			# print(d)
+			print("receive")
+			print(d)
 
 			symbol = d[0]
 
-			#nothing is returned. 
+			#nothing is returned.
 			if (len(d)==1):
 				self.black_list.append(symbol)
 			else:
@@ -77,7 +77,7 @@ class database_process_manager:
 					print("Data length mismatch:",len(d)-1,len(self.data))
 
 
-		### Upon receive, set the properties for each. 
+		### Upon receive, set the properties for each.
 		### What if i have many symbols at the same time?
 
 
