@@ -56,8 +56,8 @@ class database_process_manager:
 		while True:
 			d = self.request.recv()
 
-			print("receive")
-			print(d)
+			#print("receive")
+			#print(d)
 
 			symbol = d[0]
 

@@ -62,12 +62,14 @@ def register(symbol):
 
 		if symbol not in lock:
 			lock[symbol] = False
+		else:
+			lock[symbol] = False
 
-		#append it to the list. 
+		#append it to the list.
 	except Exception as e:
-		#means cannot connect. 
+		#means cannot connect.
 		print("Register,",e)
-		
+
 		#it could be database not linked 
 
 
