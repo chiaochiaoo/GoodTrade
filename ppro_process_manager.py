@@ -235,12 +235,12 @@ def process_and_send(lst,pipe):
 
 	now = datetime.now()
 	print(now)
-	print(now.hour,now.minute)
+	#print(now.hour,now.minute)
 	s = str(now.hour)+":"+str(now.minute)
 	print(s)
-	cur =timestamp(s)
-	print(cur)
-	print(cur,timestamp)
+	#cur =timestamp(s)
+	#print(cur)
+	#print(cur,timestamp)
 	if d["timestamp"]!=0 and timestamp - d["timestamp"] >30:
 		pipe.send(["Lagged",symbol])
 		register(symbol)
