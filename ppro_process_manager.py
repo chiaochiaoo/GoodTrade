@@ -251,7 +251,7 @@ def process_and_send(lst,pipe):
 	rec = timestamp_seconds(time)
 
 	#print(symbol,time,t,ts-rec)
-	if ts- rec >30:
+	if ts- rec >60:
 		pipe.send(["Lagged",symbol])
 		register(symbol)
 	else:
@@ -346,7 +346,6 @@ def getinfo(symbol,pipe):
 					high = float(find_between(r.text, "HighPrice=\"", "\""))
 					low = float(find_between(r.text, "LowPrice=\"", "\""))
 					vol = int(find_between(r.text, "Volume=\"", "\""))
-
 					price = float(find_between(r.text, "LastPrice=\"", "\""))
 
 					#print(time,Bidprice,Askprice,open_,high,low,vol,price)
