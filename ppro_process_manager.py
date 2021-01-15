@@ -249,9 +249,9 @@ def process_and_send(lst,pipe):
 	rec = timestamp_seconds(time)
 
 	print(symbol,time,t,ts-rec)
-	if ts- rec >30:
+	if ts- rec >5:
 		pipe.send(["Lagged",symbol])
-		register(symbol)
+		#register(symbol)
 
 
 	if abs(price-d["price"])/d["price"] < 0.005:
