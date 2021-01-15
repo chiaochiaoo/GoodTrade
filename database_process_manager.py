@@ -41,6 +41,7 @@ class database_process_manager:
 
 	def receive_start(self):
 		receive = threading.Thread(name="Thread: Database info receiver",target=self.receive_request, daemon=True)
+		receive.daemon = True
 		receive.start()
 
 	def send_request(self,symbol):
@@ -49,10 +50,10 @@ class database_process_manager:
 	def receive_request(self):
 
 		#need to add a while loop to count how many has received.
-		#deactivate it when it gets nothing to receive. 
+		#deactivate it when it gets nothing to receive.
 
 		print("Database Online: Receiving Starts")
-		while True: 
+		while True:
 			d = self.request.recv()
 
 			# print("receive")
