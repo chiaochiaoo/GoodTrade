@@ -272,7 +272,15 @@ class scanner(pannel):
 						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=d[1][i][j],width=width[j]))
 						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 					else:
-						self.nasdaq[i].append(tk.Button(self.NT_scanner_frame ,text="Add",width=width[j],command= lambda k=d[1][i][1]: self.tickers_manager.add_symbol_reg_list(k+".NQ")))
+						sy = ""
+						if d[1][i][2] == "NY":
+							sy = d[1][i][1] +".NY"
+						elif d[1][i][2] == "AM" or d[1][i][2] == "P" or d[1][i][2] == "Z":
+							sy = d[1][i][1] +".AM"
+						elif d[1][i][2] == "Q" or d[1][i][2] == "S" or d[1][i][2] == "G":
+							sy = d[1][i][1] +".NQ"
+
+						self.nasdaq[i].append(tk.Button(self.NT_scanner_frame ,text="Add",width=width[j],command= lambda k=sy: self.tickers_manager.add_symbol_reg_list(k)))
 						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 
 			self.rebind(self.NT_scanner_canvas,self.NT_scanner_frame)
