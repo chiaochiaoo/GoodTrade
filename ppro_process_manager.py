@@ -234,8 +234,8 @@ def process_and_send(lst,pipe):
 	#here;s the false print check. 0.005
 	d = data[symbol]
 
-	now = datetime.now()
-	cur =timestamp(str(now.minute)+":"+str(now.second))
+	# now = datetime.now()
+	# cur =timestamp(str(now.minute)+":"+str(now.second))
 	if d["timestamp"]!=0 and timestamp - d["timestamp"] >30:
 		pipe.send(["Lagged",symbol])
 		register(symbol)
