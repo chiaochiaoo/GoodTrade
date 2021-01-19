@@ -52,6 +52,8 @@ class Symbol_data_manager:
 
 		self.symbol_price_opennow = {}
 
+		self.symbol_price_prevclose_to_now= {}
+
 		### Update these upon new ticks 
 		self.minute_count = {}
 		self.minute_data = {}
@@ -130,6 +132,14 @@ class Symbol_data_manager:
 		self.symbol_data_breakout_eval = {}
 
 
+		self.symbol_data_prev_close_dis ={}
+		self.symbol_data_prev_close_val ={}
+		self.symbol_data_prev_close_range ={}
+		self.symbol_data_prev_close_std ={}
+		self.symbol_data_prev_close_eval = {}
+
+		self.symbol_data_ATR = {}
+
 		#alerts
 		self.symbol_last_alert = {}
 		self.symbol_last_alert_time ={}
@@ -146,7 +156,8 @@ class Symbol_data_manager:
 		self.symbol_data_normal5_vol_val,
 		self.symbol_data_openhigh_std,self.symbol_data_openlow_std,self.symbol_data_range_std,
 		self.symbol_data_first5_std,self.symbol_data_first5_vol_std,self.symbol_data_normal5_std,
-		self.symbol_data_normal5_vol_std]
+		self.symbol_data_normal5_vol_std,
+		self.symbol_data_prev_close_val,self.symbol_data_prev_close_range,self.symbol_data_prev_close_std,self.symbol_data_ATR]
 		self.data_ready = {}
 
 		self.update_list = [self.symbol_status,self.symbol_price,self.symbol_update_time,
@@ -160,7 +171,8 @@ class Symbol_data_manager:
 		self.symbol_price_openhigh,
 		self.symbol_price_openlow,
 		self.first_5_min_range,
-		self.first_5_min_volume]
+		self.first_5_min_volume,
+		self.symbol_price_prevclose_to_now]
 
 		self.init_data()
 
@@ -200,8 +212,9 @@ class Symbol_data_manager:
 		self.symbol_price_openhigh[i] = DoubleVar()
 		self.symbol_price_openlow[i] = DoubleVar()
 		self.symbol_price_opennow[i] = DoubleVar()
+		self.symbol_price_prevclose_to_now[i] = DoubleVar()
 
-		self.minute_count[i] = 0 
+		self.minute_count[i] = 0
 		self.minute_data[i] = {"high":[],"low":[],"vol":[]}
 		self.minute_timestamp[i] = []
 		self.minute_timestamp_val[i] =DoubleVar()
@@ -267,6 +280,17 @@ class Symbol_data_manager:
 		self.symbol_data_openhigh_eval[i] = StringVar()
 		self.symbol_data_openlow_eval[i] = StringVar()
 		self.symbol_data_range_eval[i] = StringVar()
+
+
+		###newly added
+
+		self.symbol_data_prev_close_dis[i] = []
+		self.symbol_data_prev_close_val[i] = DoubleVar()
+		self.symbol_data_prev_close_range[i] = StringVar()
+		self.symbol_data_prev_close_std[i]  = DoubleVar()
+		self.symbol_data_prev_close_eval[i] = StringVar()
+
+		self.symbol_data_ATR[i] = DoubleVar()
 
 
 		###

@@ -90,7 +90,7 @@ def multi_processing_database(pipe_receive):
 
 	while True:
 		symbol = pipe_receive.recv()
-		#unpack. 
+		#unpack.
 		print("Database processing:",symbol)
 
 		file = "data/"+symbol+"_"+today+".txt"
@@ -154,13 +154,32 @@ def fetch_data(symbol):
 		openhigh_=[] #data.symbol_data_openlow_dis[i]
 		openlow_=[] #data.symbol_data_range_dis[i]
 
+		ATR = []
+		previous_close = []
+
 		d = r.splitlines()[-14:]
+
+		prv_close = 0
 
 		for line in d:
 			lst=line.split(",")
 			range_.append(float(lst[H])-float(lst[L]))
 			openhigh_.append(float(lst[H])-float(lst[O]))
 			openlow_.append(float(lst[O])-float(lst[L]))
+
+			###ATR
+			ra =  float(lst[H])-float(lst[L])
+			o =  abs( float(lst[H])-float(lst[C]))
+			c =  abs( float(lst[L])-float(lst[C]))
+			tr = max(ra,o,c)
+			ATR.append(tr)
+
+			if prev_close!=0:
+				gap = round(float(lst[O])-prev_close,2)
+				previous_close.append(gap)
+
+			prev_close = float(lst[C])
+
 
 		print(symbol,"Fetch range data complete:",len(range_),"days")
 
@@ -169,19 +188,21 @@ def fetch_data(symbol):
 		openhigh_range=str(round(min(openhigh_),3))+"-"+str(round(max(openhigh_),3))
 		openlow_range=str(round(min(openlow_),3))+"-"+str(round(max(openlow_),3))
 		range_range=str(round(min(range_),3))+"-"+str(round(max(range_),3))
+		prev_close_range= str(round(min(previous_close),3))+"-"+str(round(max(previous_close),3))
 
 		openhigh_val=round(np.mean(openhigh_),3)
 		openlow_val=round(np.mean(openlow_),3)
 		range_val=round(np.mean(range_),3)
+		prev_close_val = round(np.mean(np.abs(prev_close_range)),3)
 
 		openhigh_std=round(np.std(openhigh_),3)
 		openlow_std=round(np.std(openlow_),3)
 		range_std=round(np.std(range_),3)
+		prev_close_std = round(np.std(np.abs(prev_close_range)),3)
 
+		ATR = np.mean(ATR)
 
-
-
-		###ADD the first 5 here. seperate them later. 
+		###ADD the first 5 here. seperate them later.
 
 		postbody = "http://api.kibot.com/?action=history&symbol="+req+"&interval=5&period=14&regularsession=1&user=sajali26@hotmail.com&password=guupu4upu"
 		r= request(postbody, symbol)
@@ -234,7 +255,8 @@ def fetch_data(symbol):
 
 			data_list = [symbol,openhigh_range,openlow_range,range_range,first5_range,first5_vol_range,normal5_range,normal5_vol_range,
 					 openhigh_val,openlow_val,range_val,first5_val,first5_vol_val,normal5_val,normal5_vol_val,
-					 openhigh_std,openlow_std,range_std,first5_std,first5_vol_std,normal5_std,normal5_vol_std]
+					 openhigh_std,openlow_std,range_std,first5_std,first5_vol_std,normal5_std,normal5_vol_std,
+					 prev_close_val,prev_close_range,prev_close_std,ATR]
 
 			return data_list
 

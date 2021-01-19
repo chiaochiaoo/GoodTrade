@@ -217,6 +217,8 @@ def init(symbol,price):
 	d["range"] = 0
 	d["last_5_range"] = 0
 
+	d["prev_close_gap"] = 0
+
 	d["volume"] = 0
 	#only after open
 	d["open"] = 0
@@ -234,7 +236,7 @@ def init(symbol,price):
 def process_and_send(lst,pipe):
 
 	global lock
-	status,symbol,time,timestamp,price,open_,high,low,vol  = lst[0],lst[1],lst[2],lst[3],lst[4],lst[5],lst[6],lst[7],lst[8]
+	status,symbol,time,timestamp,price,open_,high,low,vol,prev_close  = lst[0],lst[1],lst[2],lst[3],lst[4],lst[5],lst[6],lst[7],lst[8],lst[9]
 
 	global data
 
@@ -253,7 +255,8 @@ def process_and_send(lst,pipe):
 	#print(symbol,time,t,ts-rec)
 	if ts- rec >60:
 		pipe.send(["Lagged",symbol])
-		register(symbol)
+		if ts< 57600:
+			register(symbol)
 	else:
 
 		if abs(price-d["price"])/d["price"] < 0.005:
@@ -282,8 +285,11 @@ def process_and_send(lst,pipe):
 				d["low"] = low
 
 			d["range"] = round(d["high"] - d["low"],3)
-			
-			# now update the datalists. 
+
+			d["prev_close_gap"] = price-prev_close
+
+
+			# now update the datalists.
 			if timestamp not in d["timetamps"]:
 				if len(d["timetamps"])==0:
 					d["timetamps"].append(timestamp-1)
@@ -313,7 +319,7 @@ def process_and_send(lst,pipe):
 
 			pipe.send([status,symbol,price,time,timestamp,d["high"],d["low"],\
 			d["range"],d["last_5_range"],d["vol"],d["open"],d["oh"],d["ol"],
-			d["f5r"],d["f5v"]])
+			d["f5r"],d["f5v"],d["prev_close_gap"]])
 
 	lock[symbol] = False
 
@@ -346,6 +352,7 @@ def getinfo(symbol,pipe):
 					high = float(find_between(r.text, "HighPrice=\"", "\""))
 					low = float(find_between(r.text, "LowPrice=\"", "\""))
 					vol = int(find_between(r.text, "Volume=\"", "\""))
+					prev_close = float(find_between(r.text, "ClosePrice=\"", "\""))
 
 					price = float(find_between(r.text, "LastPrice=\"", "\""))
 
@@ -357,7 +364,7 @@ def getinfo(symbol,pipe):
 					#print(time,Bidprice,Askprice,open_,high,low,vol,price)
 					ts = timestamp(time[:5])
 
-					process_and_send(["Connected",symbol,time,ts,price,open_,high,low,vol],pipe)
+					process_and_send(["Connected",symbol,time,ts,price,open_,high,low,vol,prev_close],pipe)
 
 				#pipe.send(output)
 
