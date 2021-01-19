@@ -10,7 +10,7 @@ class ppro_process_manager:
 	def __init__(self,request_pipe):
 		#need to track. 1 min range/ volume. 5 min range/volume.
 		#self.depositLabel['text'] = 'change the value'
-		#fetch this 
+		#fetch this
 		self.request = request_pipe
 
 		self.reg_list = []
@@ -29,6 +29,8 @@ class ppro_process_manager:
 		self.data_list = s.update_list
 		self.symbols = s.get_list()
 
+		self.ppro_status = s.ppro_status
+
 		#########
 		self.supoort = s.symbol_data_support
 		self.resistance = s.symbol_data_resistance
@@ -38,6 +40,7 @@ class ppro_process_manager:
 			self.register(i)
 
 		self.init_info()
+		self.init = True
 		self.receive_start()
 
 	def receive_start(self):
@@ -57,8 +60,13 @@ class ppro_process_manager:
 
 			if status == "message":
 				print(d[1])
+				if d[1] == "Connection established.":
+					if self.init:
+						self.ppro_status.set("Ppro Status: Connected")
+				elif d[1] == "Conection failed. try again in 3 sec.":
+					if self.init:
+						self.ppro_status.set("Ppro Status: Disconnected. Reconnecting...")
 			else:
-
 				symbol = d[1]
 
 				self.data_list[0][symbol].set(status)

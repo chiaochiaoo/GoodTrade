@@ -119,8 +119,13 @@ class ticker_manager(pannel):
 		self.symbol.configure(pady="0")
 		self.symbol.configure(text='''Add Symbol''')
 
+		#"Ppro Status: "+"Connecting"
+		self.ppro_status = ttk.Label(frame, textvariable=data.ppro_status)
+		self.ppro_status.place(x = 200, y =12)
+		#data.ppro_status.set("Hello")
+
 		self.ticker_stats = ttk.Label(frame, text="Current Registered Tickers: "+str(self.ticker_count))
-		self.ticker_stats.place(x = 200, y =12)
+		self.ticker_stats.place(x = 500, y =12)
 
 		#############Registration Window ####################
 
