@@ -159,7 +159,7 @@ def fetch_data(symbol):
 
 		d = r.splitlines()[-14:]
 
-		prv_close = 0
+		prev_close = 0
 
 		for line in d:
 			lst=line.split(",")
@@ -188,17 +188,17 @@ def fetch_data(symbol):
 		openhigh_range=str(round(min(openhigh_),3))+"-"+str(round(max(openhigh_),3))
 		openlow_range=str(round(min(openlow_),3))+"-"+str(round(max(openlow_),3))
 		range_range=str(round(min(range_),3))+"-"+str(round(max(range_),3))
-		prev_close_range= str(round(min(previous_close),3))+"-"+str(round(max(previous_close),3))
+		prev_close_range= str(round(min(previous_close),3))+" - "+str(round(max(previous_close),3))
 
 		openhigh_val=round(np.mean(openhigh_),3)
 		openlow_val=round(np.mean(openlow_),3)
 		range_val=round(np.mean(range_),3)
-		prev_close_val = round(np.mean(np.abs(prev_close_range)),3)
+		prev_close_val = round(np.mean(np.abs(previous_close)),3)
 
 		openhigh_std=round(np.std(openhigh_),3)
 		openlow_std=round(np.std(openlow_),3)
 		range_std=round(np.std(range_),3)
-		prev_close_std = round(np.std(np.abs(prev_close_range)),3)
+		prev_close_std = round(np.std(np.abs(previous_close)),3)
 
 		ATR = np.mean(ATR)
 

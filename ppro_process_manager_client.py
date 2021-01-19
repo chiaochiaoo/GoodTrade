@@ -80,7 +80,7 @@ class ppro_process_manager:
 					#print(d)
 					if len(d)-1 == len(self.data_list):
 						for i in range(1,len(self.data_list)):
-							print(self.data_list[i][symbol].get())
+							#print(self.data_list[i][symbol].get())
 							self.data_list[i][symbol].set(d[i+1])
 							# if self.data_list[i][symbol].get() != d[i+1]:
 							#  	self.data_list[i][symbol].set(d[i+1])

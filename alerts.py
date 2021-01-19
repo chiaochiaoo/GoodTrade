@@ -587,7 +587,7 @@ class prevclose(alert):
 		super().__init__(frame,data,alert_panel)
 
 		self.labels = ["Ticker","Status","Prev Close","Cur Range","H. Avg","H. Std","H. Range","Evaluation"]
-		self.width = [8,10,7,7,7,7,7,9,15]
+		self.width = [8,10,7,7,7,7,7,12,15]
 		self.labels_creator(self.frame)
 
 	def add_symbol(self,symbol):
