@@ -283,7 +283,7 @@ def process_and_send(lst,pipe):
 
 		d["range"] = round(d["high"] - d["low"],3)
 
-		d["prev_close_gap"] = price-prev_close
+		d["prev_close_gap"] = round(price-prev_close,3)
 
 		# now update the datalists.
 		if timestamp not in d["timetamps"]:

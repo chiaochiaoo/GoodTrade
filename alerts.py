@@ -611,7 +611,7 @@ class prevclose(alert):
 
 		#cur, mean, std. symbol, time.
 		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type]
-		labels = [symbol,status,cur_range,prev_close,hist_avg,hist_std,hist_range,eva]
+		labels = [symbol,status,prev_close,cur_range,hist_avg,hist_std,hist_range,eva]
 
 
 		alert_positions = [alert_position]
