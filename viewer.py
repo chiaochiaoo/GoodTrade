@@ -240,42 +240,46 @@ class ticker_manager(pannel):
 
 if __name__ == '__main__':
 
-	multiprocessing.freeze_support()
+	try:
+		multiprocessing.freeze_support()
 
 
-	#### SCANNER SUB PROCESS####
-	request_scanner, receive_pipe = multiprocessing.Pipe()
-	p = multiprocessing.Process(target=multi_processing_scanner, args=(receive_pipe,),daemon=True)
-	p.daemon=True
-	p.start()
+		#### SCANNER SUB PROCESS####
+		request_scanner, receive_pipe = multiprocessing.Pipe()
+		p = multiprocessing.Process(target=multi_processing_scanner, args=(receive_pipe,),daemon=True)
+		p.daemon=True
+		p.start()
 
-	s = scanner_process_manager(request_scanner)
+		s = scanner_process_manager(request_scanner)
 
-	#### DATABASE SUB PROCESS####
+		#### DATABASE SUB PROCESS####
 
-	request_database, receive_database = multiprocessing.Pipe()
-	d = multiprocessing.Process(target=multi_processing_database, args=(receive_database,),daemon=True)
-	d.daemon=True
-	d.start()
+		request_database, receive_database = multiprocessing.Pipe()
+		d = multiprocessing.Process(target=multi_processing_database, args=(receive_database,),daemon=True)
+		d.daemon=True
+		d.start()
 
-	d = database_process_manager(request_database)
+		d = database_process_manager(request_database)
 
-	### INFO FETCH SUB PROCESS####
+		### INFO FETCH SUB PROCESS####
 
-	request_pipe, receive_pipe = multiprocessing.Pipe()
-	p2 = multiprocessing.Process(target=multi_processing_price, args=(receive_pipe,),daemon=True)
-	p2.daemon=True
-	p2.start()
+		request_pipe, receive_pipe = multiprocessing.Pipe()
+		p2 = multiprocessing.Process(target=multi_processing_price, args=(receive_pipe,),daemon=True)
+		p2.daemon=True
+		p2.start()
 
-	ppro = ppro_process_manager(request_pipe)
+		ppro = ppro_process_manager(request_pipe)
 
-	### scanner pannel needs the manager. 
-	
-	root = tk.Tk() 
-	root.title("GoodTrade") 
-	root.geometry("1400x700")
-	root.minsize(1200, 600)
-	root.maxsize(3000, 1500)
+		### scanner pannel needs the manager. 
+		
+		root = tk.Tk() 
+		root.title("GoodTrade") 
+		root.geometry("1400x700")
+		root.minsize(1200, 600)
+		root.maxsize(3000, 1500)
 
-	view = viewer(root,s,d,ppro)
-	root.mainloop()
+		view = viewer(root,s,d,ppro)
+		root.mainloop()
+	except Exception as e:
+		print("Error",e)
+		# logf.write("Error:{0} \n".format( str(e)))
