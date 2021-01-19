@@ -50,9 +50,11 @@ class viewer:
 		self.tab7 = tk.Canvas(self.tabControl)
 		self.tab8 = tk.Canvas(self.tabControl)
 		self.tab9 = tk.Canvas(self.tabControl)
+		self.tab10 = tk.Canvas(self.tabControl)
 
 		self.tabControl.add(self.tab1, text ='Tickers Manager') 
 		self.tabControl.add(self.tab8, text ='All alerts') 
+		self.tabControl.add(self.tab10, text ='Prev Close') 
 		self.tabControl.add(self.tab5, text ='High-Low')
 		self.tabControl.add(self.tab6, text ='Open-High')
 		self.tabControl.add(self.tab7, text ='Open-Low')
@@ -64,7 +66,7 @@ class viewer:
 
 		#self.ticker_management_init(self.tab1)
 		self.all_alerts = all_alerts(self.tab8)
-		
+
 		self.open_high_pannel = openhigh(self.tab6,self.data,self.all_alerts)
 
 		self.high_low_pannel = highlow(self.tab5,self.data,self.all_alerts)
@@ -74,10 +76,12 @@ class viewer:
 		self.er = extremrange(self.tab2,self.data,self.all_alerts)
 		self.ev = extremevolume(self.tab3,self.data,self.all_alerts)
 
+		self.pv = prevclose(self.tab10,self.data,self.all_alerts)
+
 		self.br = breakout(self.tab9,self.data,self.all_alerts)
 
 		#alerts  =[self.open_high_pannel]
-		alerts = [self.high_low_pannel,self.open_high_pannel,self.open_low_pannel,self.first_5,self.er,self.ev,self.br]
+		alerts = [self.high_low_pannel,self.open_high_pannel,self.open_low_pannel,self.first_5,self.er,self.ev,self.br,self.pv]
 
 		self.tm = ticker_manager(self.tab1,self.data,alerts)
 		
