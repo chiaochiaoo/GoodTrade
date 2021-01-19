@@ -229,10 +229,16 @@ class ticker_manager(pannel):
 
 	def add_symbol_reg_list(self,symbol):
 
-		if symbol not in self.tickers:
 
-			self.data.add(symbol)
-			self.add_symbol_label(symbol)
+		try:
+			if symbol not in self.tickers:
+
+				self.data.add(symbol)
+				self.add_symbol_label(symbol)
+
+
+		except Exception as e:
+			print("Error",e)
 
 #a seperate thread on its own. 
 
