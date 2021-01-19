@@ -33,7 +33,7 @@ class Symbol_data_manager:
 		self.ppro = None
 
 		self.ppro_status = StringVar()#.set("Ppro status: Connecting")
-		self.ppro_status.set("Ppro status: Connecting")
+		self.ppro_status.set("Ppro Status: Connecting")
 
 		self.auto_support_resistance = {} 
 		self.auto_trade = {}

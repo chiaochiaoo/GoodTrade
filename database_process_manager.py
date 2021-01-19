@@ -133,13 +133,11 @@ def fetch_data(symbol):
 	# 	if self.lock[symbol]==False:
 	# 		self.lock[symbol] = True
 
-	
-
 	req = symbol.split(".")[0]
 	i = symbol
 
 	#range data.
-	postbody = "http://api.kibot.com/?action=history&symbol="+req+"&interval=daily&period=14&regularsession=1&user=sajali26@hotmail.com&password=guupu4upu"
+	postbody = "http://api.kibot.com/?action=history&symbol="+req+"&interval=daily&period=30&regularsession=1&user=sajali26@hotmail.com&password=guupu4upu"
 	r= request(postbody, symbol)
 
 	if r=="":
@@ -152,31 +150,33 @@ def fetch_data(symbol):
 		O,H,L,C,V =1,2,3,4,5
 
 
-		a=[] #data.symbol_data_openhigh_dis[i]
-		b=[] #data.symbol_data_openlow_dis[i]
-		c=[] #data.symbol_data_range_dis[i]
+		range_=[] #data.symbol_data_openhigh_dis[i]
+		openhigh_=[] #data.symbol_data_openlow_dis[i]
+		openlow_=[] #data.symbol_data_range_dis[i]
 
-		for line in r.splitlines():
+		d = r.splitlines()[-14:]
+
+		for line in d:
 			lst=line.split(",")
-			a.append(float(lst[H])-float(lst[L]))
-			b.append(float(lst[H])-float(lst[O]))
-			c.append(float(lst[O])-float(lst[L]))
+			range_.append(float(lst[H])-float(lst[L]))
+			openhigh_.append(float(lst[H])-float(lst[O]))
+			openlow_.append(float(lst[O])-float(lst[L]))
 
-		print(symbol,"Fetch range data complete:",len(a),"days")
+		print(symbol,"Fetch range data complete:",len(range_),"days")
 
 
 		#set the var.
-		openhigh_range=str(round(min(a),3))+"-"+str(round(max(a),3))
-		openlow_range=str(round(min(b),3))+"-"+str(round(max(b),3))
-		range_range=str(round(min(c),3))+"-"+str(round(max(c),3))
+		openhigh_range=str(round(min(openhigh_),3))+"-"+str(round(max(openhigh_),3))
+		openlow_range=str(round(min(openlow_),3))+"-"+str(round(max(openlow_),3))
+		range_range=str(round(min(range_),3))+"-"+str(round(max(range_),3))
 
-		openhigh_val=round(np.mean(a),3)
-		openlow_val=round(np.mean(b),3)
-		range_val=round(np.mean(c),3)
+		openhigh_val=round(np.mean(openhigh_),3)
+		openlow_val=round(np.mean(openlow_),3)
+		range_val=round(np.mean(range_),3)
 
-		openhigh_std=round(np.std(a),3)
-		openlow_std=round(np.std(b),3)
-		range_std=round(np.std(c),3)
+		openhigh_std=round(np.std(openhigh_),3)
+		openlow_std=round(np.std(openlow_),3)
+		range_std=round(np.std(range_),3)
 
 
 
@@ -187,7 +187,7 @@ def fetch_data(symbol):
 		r= request(postbody, symbol)
 
 		if r!="":
-			
+
 			a=[]#data.symbol_data_first5_dis[i]
 			b=[]#data.symbol_data_first5_vol_dis[i]
 

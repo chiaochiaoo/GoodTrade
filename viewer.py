@@ -140,6 +140,9 @@ class ticker_manager(pannel):
 
 		self.init_reg_list()
 
+	
+
+		
 	def init_reg_list(self):
 
 		ticks = self.data.get_list()
@@ -153,10 +156,10 @@ class ticker_manager(pannel):
 	def delete_symbol_reg_list(self,symbol):
 
 		if symbol in self.tickers:
-			
+
 			#1. remove it from the list.
 			self.data.delete(symbol)
-			
+
 			for i in self.tickers_tracers[symbol]:
 				#print("viewer removing",i[0].get(),i[1])
 				i[0].trace_vdelete("w",i[1])
@@ -171,7 +174,7 @@ class ticker_manager(pannel):
 			self.ticker_stats["text"] = "Current Registered Tickers: "+str(self.ticker_count)
 
 			self.rebind(self.canvas,self.frame)
-			
+
 		for i in self.alerts:
 			i.delete_symbol(symbol)
 		return True
