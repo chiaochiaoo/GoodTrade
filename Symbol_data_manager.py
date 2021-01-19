@@ -52,6 +52,7 @@ class Symbol_data_manager:
 
 		self.symbol_price_opennow = {}
 
+		self.symbol_price_prevclose = {}
 		self.symbol_price_prevclose_to_now= {}
 
 		### Update these upon new ticks 
@@ -172,6 +173,7 @@ class Symbol_data_manager:
 		self.symbol_price_openlow,
 		self.first_5_min_range,
 		self.first_5_min_volume,
+		self.symbol_price_prevclose,
 		self.symbol_price_prevclose_to_now]
 
 		self.init_data()
@@ -213,6 +215,8 @@ class Symbol_data_manager:
 		self.symbol_price_openlow[i] = DoubleVar()
 		self.symbol_price_opennow[i] = DoubleVar()
 		self.symbol_price_prevclose_to_now[i] = DoubleVar()
+
+		self.symbol_price_prevclose[i] = DoubleVar()
 
 		self.minute_count[i] = 0
 		self.minute_data[i] = {"high":[],"low":[],"vol":[]}

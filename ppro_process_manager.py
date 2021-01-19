@@ -217,6 +217,7 @@ def init(symbol,price):
 	d["range"] = 0
 	d["last_5_range"] = 0
 
+	d["prev_close"] = 0
 	d["prev_close_gap"] = 0
 
 	d["volume"] = 0
@@ -251,75 +252,87 @@ def process_and_send(lst,pipe):
 	ts = now.hour*3600 + now.minute*60 + now.second
 	t = str(now.minute) +":" + str(now.second)
 	rec = timestamp_seconds(time)
+	ms = now.hour*60 + now.minute
+	latency = ts-rec
 
-	#print(symbol,time,t,ts-rec)
-	if ts- rec >60:
-		pipe.send(["Lagged",symbol])
-		if ts< 57600:
-			register(symbol)
-	else:
+	if abs(price-d["price"])/d["price"] < 0.005:
 
-		if abs(price-d["price"])/d["price"] < 0.005:
+		d = data[symbol]
 
-			d = data[symbol]
+		d["timestamp"] = timestamp
+		d["time"] = time
+		d["price"] = price
+		d["open"] = open_
+		d["prev_close"] = prev_close
 
-			d["timestamp"] = timestamp
-			d["time"] = time
-			d["price"] = price
-			d["open"] = open_
+		d["oh"] = round(high - open_,3)
+		d["ol"] = round(open_ - low,3)
 
-			d["oh"] = round(high - open_,3)
-			d["ol"] = round(open_ - low,3)
+		if timestamp <570:
+			if price<d["low"]:
+				d["low"] = price
+			if price>d["high"]:
+				d["high"] = price
+			d["open"] = 0
+			d["oh"] = 0
+			d["ol"] = 0
 
-			if timestamp <570:
-				if price<d["low"]:
-					d["low"] = price
-				if price>d["high"]:
-					d["high"] = price
-				d["open"] = 0
-				d["oh"] = 0
-				d["ol"] = 0
+		else:
+			d["high"] = high
+			d["low"] = low
 
+		d["range"] = round(d["high"] - d["low"],3)
+
+		d["prev_close_gap"] = price-prev_close
+
+		# now update the datalists.
+		if timestamp not in d["timetamps"]:
+			if len(d["timetamps"])==0:
+				d["timetamps"].append(timestamp-1)
 			else:
-				d["high"] = high
-				d["low"] = low
+				d["timetamps"].append(timestamp)
+			d["highs"].append(price)
+			d["lows"].append(price)
+			d["vols"].append(vol)
+		else:
+			if price >= d["highs"][-1]:
+				d["highs"][-1] = price
+			if price <= d["lows"][-1]:
+				d["lows"][-1] = price
+			d["vols"][-1] = vol
 
-			d["range"] = round(d["high"] - d["low"],3)
+		#print(d["timetamps"],d["highs"],d["lows"],d["vols"])
+		#last 5 range
+		d["last_5_range"] = round(max(d["highs"][-5:]) - min(d["lows"][-5:]),3)
+		# last 5 volume
+		index = min(len(d["vols"]), 5)
+		d["vol"] = round((d["vols"][-1] - d["vols"][-index])/1000,2)
 
-			d["prev_close_gap"] = price-prev_close
-
-
-			# now update the datalists.
-			if timestamp not in d["timetamps"]:
-				if len(d["timetamps"])==0:
-					d["timetamps"].append(timestamp-1)
-				else:
-					d["timetamps"].append(timestamp)
-				d["highs"].append(price)
-				d["lows"].append(price)
-				d["vols"].append(vol)
-			else:
-				if price >= d["highs"][-1]:
-					d["highs"][-1] = price
-				if price <= d["lows"][-1]:
-					d["lows"][-1] = price
-				d["vols"][-1] = vol
-
-			#print(d["timetamps"],d["highs"],d["lows"],d["vols"])
-			#last 5 range
-			d["last_5_range"] = round(max(d["highs"][-5:]) - min(d["lows"][-5:]),3)
-			# last 5 volume
-			index = min(len(d["vols"]), 5)
-			d["vol"] = round((d["vols"][-1] - d["vols"][-index])/1000,2)
-			
-			if timestamp <575:
-				d["f5r"] = d["last_5_range"]
-				d["f5v"] = d["vol"]
+		if timestamp <575:
+			d["f5r"] = d["last_5_range"]
+			d["f5v"] = d["vol"]
 
 
-			pipe.send([status,symbol,price,time,timestamp,d["high"],d["low"],\
+		#check if the data is lagged. Premarket. Real. Aftermarket.
+		register_again = False
+		#normal
+		if ms<570 or ms>960:
+			if latency >60:
+				status = "Lagged"
+				register_again = True
+
+		#premarket
+		else:
+			if latency >30:
+				status = "Lagged"
+				register_again = True
+
+		pipe.send([status,symbol,price,time,timestamp,d["high"],d["low"],\
 			d["range"],d["last_5_range"],d["vol"],d["open"],d["oh"],d["ol"],
-			d["f5r"],d["f5v"],d["prev_close_gap"]])
+			d["f5r"],d["f5v"],d["prev_close"],d["prev_close_gap"]])
+
+		if register_again:
+			register(symbol)
 
 	lock[symbol] = False
 
