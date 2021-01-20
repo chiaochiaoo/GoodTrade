@@ -269,17 +269,18 @@ def process_and_send(lst,pipe):
 		d["ol"] = round(open_ - low,3)
 
 		if timestamp <570:
-			if price<d["low"]:
-				d["low"] = price
-			if price>d["high"]:
-				d["high"] = price
+			# if price<d["low"]:
+			# 	d["low"] = price
+			# if price>d["high"]:
+			# 	d["high"] = price
 			d["open"] = 0
 			d["oh"] = 0
 			d["ol"] = 0
 
-		else:
-			d["high"] = high
-			d["low"] = low
+		#else:
+
+		d["high"] = high
+		d["low"] = low
 
 		d["range"] = round(d["high"] - d["low"],3)
 
