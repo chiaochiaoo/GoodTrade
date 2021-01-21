@@ -224,6 +224,7 @@ class alert(pannel):
 				symbol= alerts_vals[0]
 				time= alerts_vals[1].get()
 				alert_type = alerts_vals[5]
+				alert_val = alerts_vals[6]
 
 				minute= time[:5]
 				second = time[:8]
@@ -360,12 +361,13 @@ class alert(pannel):
 
 					#color.
 					#cur = abs(cur)
+					alert_val.set(cur)
 
 					if cur <0.5:
 						eval_label["background"]="white"
 
 					elif cur>0.5 and cur<1:
-						
+
 						alert_str = "Moderate "+alert_type
 						eval_label["background"]="#97FEA8"
 
@@ -401,7 +403,7 @@ class alert_map(pannel):
 		super().__init__(frame)
 
 		self.labels = ["Ticker","Status","Prev Close","High-Low","Open-High","Open-Low","Open Range","Open Vol","5m Range","5m Vol"]
-		self.width = [8,10,10,10,10,10,10,10,10,10]
+		self.width = [8,10,8,8,8,8,8,8,8,8]
 		self.labels_creator(self.frame)
 
 		self.alert_base = []
@@ -512,6 +514,8 @@ class highlow(alert):
 		eva= self.data.symbol_data_range_eval[symbol]
 		time = self.data.symbol_update_time[symbol]
 
+		alert_val = self.data.alert_hl_val[symbol]
+
 		data_ready = self.data.data_ready[symbol]
 
 		value_position = 2
@@ -519,7 +523,7 @@ class highlow(alert):
 		alert_type = "Intraday Range"
 
 		#cur, mean, std. symbol, time. 
-		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type]
+		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type,alert_val]
 		labels = [symbol,status,cur_range,cur_high,cur_low,hist_avg,hist_std,hist_range,eva]
 
 
@@ -559,12 +563,14 @@ class openhigh(alert):
 
 		data_ready = self.data.data_ready[symbol]
 
+		alert_val = self.data.alert_oh_val[symbol]
+
 		value_position = 2
 		alert_position = 8
 		alert_type = "Intraday Open-High"
 
 		#cur, mean, std. symbol, time. 
-		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type]
+		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type,alert_val]
 		labels = [symbol,status,cur_range,cur_open,cur_high,hist_avg,hist_std,hist_range,eva]
 
 
@@ -604,12 +610,14 @@ class openlow(alert):
 
 		data_ready = self.data.data_ready[symbol]
 
+		alert_val = self.data.alert_ol_val[symbol]
+
 		value_position = 2
 		alert_position = 8
 		alert_type = "Intraday Open-Low"
 
 		#cur, mean, std. symbol, time. 
-		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type]
+		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type,alert_val]
 		labels = [symbol,status,cur_range,cur_open,cur_low,hist_avg,hist_std,hist_range,eva]
 
 
@@ -699,12 +707,14 @@ class prevclose(alert):
 
 		data_ready = self.data.data_ready[symbol]
 
+		alert_val = self.data.alert_prev_val[symbol]
+
 		value_position = 2
 		alert_position = 7
 		alert_type = "Change Since Prev Close"
 
 		#cur, mean, std. symbol, time.
-		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type]
+		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type,alert_val]
 		labels = [symbol,status,prev_close,cur_range,hist_avg,hist_std,hist_range,eva]
 
 
@@ -753,13 +763,16 @@ class firstfive(alert):
 
 		data_ready = self.data.data_ready[symbol]
 
+		alert_val1 = self.data.alert_openning_rg_val[symbol]
+		alert_val2 = self.data.alert_openning_vol_val[symbol]
+
 
 		labels = [symbol,status,cur_range,hist_avg,hist_std,hist_range,cur_vol,hist_v_avg,hist_v_std,hist_v_range,eva,eva2]
 
 		value_position = 2
 		alert_position = 10
 		alert_type = "Opening Rg"
-		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type]
+		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type,alert_val1]
 		#cur, mean, std. symbol, time. 
 		
 
@@ -767,7 +780,7 @@ class firstfive(alert):
 		alert_position2 = 11
 
 		alert_type2 = "Opening Vol"
-		alertvals2= [symbol,time,cur_vol,hist_v_avg,hist_v_std,alert_type2]
+		alertvals2= [symbol,time,cur_vol,hist_v_avg,hist_v_std,alert_type2,alert_val2]
 
 
 		alert_positions = [alert_position,alert_position2]
@@ -809,12 +822,14 @@ class extremrange(alert):
 
 		data_ready = self.data.data_ready[symbol]
 
+		alert_val = self.data.alert_recent5_rg[symbol]
+
 		value_position = 2
 		alert_position = 6
 		alert_type = "Intraday Range"
 		alert_time = 0
 		#cur, mean, std. symbol, time. 
-		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type,alert_time]
+		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type,alert_val]
 		labels = [symbol,status,cur_range,hist_avg,hist_std,hist_range,eva]
 
 		alert_positions = [alert_position]
@@ -862,8 +877,9 @@ class extremevolume(alert):
 
 		alert_time = 0
 
+		alert_val = self.data.alert_recent5_vol[symbol]
 		#cur, mean, std. symbol, time. 
-		alertvals= [symbol,time,cur_vol,hist_avg,hist_std,alert_type,alert_time]
+		alertvals= [symbol,time,cur_vol,hist_avg,hist_std,alert_type,alert_val]
 		labels = [symbol,status,cur_vol,hist_avg,hist_std,hist_range,eva]
 
 		#any alert will need a threshold. deviation. std. or type.
