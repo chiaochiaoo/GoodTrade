@@ -396,6 +396,99 @@ class alert(pannel):
 			print("Alert Error:",e)
 
 
+class alert_map(pannel):
+	def __init__(self,frame,data):
+		super().__init__(frame)
+
+		self.labels = ["Ticker","Status","Prev Close","High-Low","Open-High","Open-Low","Open Range","Open Vol","5m Range","5m Vol"]
+		self.width = [8,10,10,10,10,10,10,10,10,10]
+		self.labels_creator(self.frame)
+
+		self.alert_base = []
+
+		self.data = data
+
+	def add_symbol(self,symbol):
+
+		#init the alert value
+
+		l = self.label_count
+
+		self.tickers_labels[symbol] = []
+		self.tickers_tracers[symbol] = []
+		i = symbol
+
+
+		info = [i,\
+			self.data.symbol_status[symbol],\
+			self.data.alert_prev_val[symbol],\
+			self.data.alert_hl_val[symbol],\
+			self.data.alert_oh_val[symbol],
+			self.data.alert_ol_val[symbol],
+			self.data.alert_openning_rg_val[symbol],
+			self.data.alert_openning_vol_val[symbol],
+			self.data.alert_recent5_rg[symbol],
+			self.data.alert_recent5_vol[symbol]]
+
+		for j in range(len(info)):
+			if j >0:
+				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=info[j],width=self.width[j]))
+			else:
+				self.tickers_labels[i].append(tk.Label(self.frame ,text=info[j],width=self.width[j]))
+
+			if j >1:
+				m=info[j].trace('w', lambda *_, val=info[j],label=self.tickers_labels[i][j]: color_bind(val,label))
+				self.tickers_tracers[i].append((info[j],m))
+
+			self.label_default_configure(self.tickers_labels[i][j])
+			self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
+
+		#self.ticker_count +=1
+		self.label_count +=1
+
+		self.rebind(self.canvas,self.frame)
+
+	def delete_symbol(symbol):
+		for i in self.tickers_tracers[symbol]:
+			i[0].trace_vdelete("w",i[1])
+
+
+		for i in self.tickers_labels[symbol]:
+			i.destroy()
+
+		self.tickers_labels.pop(symbol,None)
+
+		self.rebind(self.canvas,self.frame)
+
+	def hex_to_string(int):
+		a = hex(int)[-2:]
+		a = a.replace("x","0")
+
+		return a
+
+	def hexcolor(level):
+		code = int(510*(level))
+		print(code,"_")
+		if code >255:
+			first_part = code-255
+			return "#FF"+hex_to_string(255-first_part)+"00"
+		else:
+			return "#FF"+"FF"+hex_to_string(255-code)
+
+
+	def color_bind(val,label):
+
+		val = val.get()
+
+		#get color code.
+		if val>3:
+			val = 1
+		else:
+			val = val/3
+
+		label["background"] = hexcolor(val)
+
+
 
 class highlow(alert):
 
@@ -785,7 +878,6 @@ class extremevolume(alert):
 		super().add_symbol(symbol,labels,alert_positions,alerts,data_ready)
 
 	#find a way to bound the special checking value to. hmm. every update.
-
 
 
 class breakout(alert):

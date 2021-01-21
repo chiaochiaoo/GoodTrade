@@ -151,6 +151,8 @@ class Symbol_data_manager:
 		self.alert_ol_val = {}
 		self.alert_openning_rg_val = {}
 		self.alert_openning_vol_val ={}
+		self.alert_recent5_rg = {}
+		self.alert_recent5_vol = {}
 
 
 		#mark this when a symbol datastructure is completely loaded. 
@@ -317,6 +319,8 @@ class Symbol_data_manager:
 		self.alert_hl_val[i] = DoubleVar()
 		self.alert_oh_val[i] = DoubleVar()
 		self.alert_ol_val[i] = DoubleVar()
+		self.alert_recent5_rg[i] = DoubleVar()
+		self.alert_recent5_vol[i] = DoubleVar()
 		self.alert_openning_rg_val[i] = DoubleVar()
 		self.alert_openning_vol_val[i] = DoubleVar()
 		#self.ppro.register(i)

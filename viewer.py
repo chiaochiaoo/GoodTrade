@@ -51,9 +51,12 @@ class viewer:
 		self.tab8 = tk.Canvas(self.tabControl)
 		self.tab9 = tk.Canvas(self.tabControl)
 		self.tab10 = tk.Canvas(self.tabControl)
+		self.tab11 = tk.Canvas(self.tabControl)
+
 
 		self.tabControl.add(self.tab1, text ='Tickers Manager') 
 		self.tabControl.add(self.tab8, text ='All alerts') 
+		self.tabControl.add(self.tab11, text ='Alerts map') 
 		self.tabControl.add(self.tab10, text ='Prev Close') 
 		self.tabControl.add(self.tab5, text ='High-Low')
 		self.tabControl.add(self.tab6, text ='Open-High')
@@ -79,9 +82,9 @@ class viewer:
 		self.pv = prevclose(self.tab10,self.data,self.all_alerts)
 
 		self.br = breakout(self.tab9,self.data,self.all_alerts)
-
+		self.am = alert_map(self.tab11,self.data)
 		#alerts  =[self.open_high_pannel]
-		alerts = [self.high_low_pannel,self.open_high_pannel,self.open_low_pannel,self.first_5,self.er,self.ev,self.br,self.pv]
+		alerts = [self.high_low_pannel,self.open_high_pannel,self.open_low_pannel,self.first_5,self.er,self.ev,self.br,self.pv,self.am]
 
 		self.tm = ticker_manager(self.tab1,self.data,alerts)
 		
@@ -258,46 +261,46 @@ class ticker_manager(pannel):
 
 if __name__ == '__main__':
 
-	try:
-		multiprocessing.freeze_support()
+	#try:
+	multiprocessing.freeze_support()
 
 
-		#### SCANNER SUB PROCESS####
-		request_scanner, receive_pipe = multiprocessing.Pipe()
-		p = multiprocessing.Process(target=multi_processing_scanner, args=(receive_pipe,),daemon=True)
-		p.daemon=True
-		p.start()
+	#### SCANNER SUB PROCESS####
+	request_scanner, receive_pipe = multiprocessing.Pipe()
+	p = multiprocessing.Process(target=multi_processing_scanner, args=(receive_pipe,),daemon=True)
+	p.daemon=True
+	p.start()
 
-		s = scanner_process_manager(request_scanner)
+	s = scanner_process_manager(request_scanner)
 
-		#### DATABASE SUB PROCESS####
+	#### DATABASE SUB PROCESS####
 
-		request_database, receive_database = multiprocessing.Pipe()
-		d = multiprocessing.Process(target=multi_processing_database, args=(receive_database,),daemon=True)
-		d.daemon=True
-		d.start()
+	request_database, receive_database = multiprocessing.Pipe()
+	d = multiprocessing.Process(target=multi_processing_database, args=(receive_database,),daemon=True)
+	d.daemon=True
+	d.start()
 
-		d = database_process_manager(request_database)
+	d = database_process_manager(request_database)
 
-		### INFO FETCH SUB PROCESS####
+	### INFO FETCH SUB PROCESS####
 
-		request_pipe, receive_pipe = multiprocessing.Pipe()
-		p2 = multiprocessing.Process(target=multi_processing_price, args=(receive_pipe,),daemon=True)
-		p2.daemon=True
-		p2.start()
+	request_pipe, receive_pipe = multiprocessing.Pipe()
+	p2 = multiprocessing.Process(target=multi_processing_price, args=(receive_pipe,),daemon=True)
+	p2.daemon=True
+	p2.start()
 
-		ppro = ppro_process_manager(request_pipe)
+	ppro = ppro_process_manager(request_pipe)
 
-		### scanner pannel needs the manager. 
-		
-		root = tk.Tk() 
-		root.title("GoodTrade") 
-		root.geometry("1400x700")
-		root.minsize(1200, 600)
-		root.maxsize(3000, 1500)
+	### scanner pannel needs the manager. 
+	
+	root = tk.Tk() 
+	root.title("GoodTrade") 
+	root.geometry("1400x700")
+	root.minsize(1200, 600)
+	root.maxsize(3000, 1500)
 
-		view = viewer(root,s,d,ppro)
-		root.mainloop()
-	except Exception as e:
-		print("Error",e)
-		# logf.write("Error:{0} \n".format( str(e)))
+	view = viewer(root,s,d,ppro)
+	root.mainloop()
+	# except Exception as e:
+	# 	print("Error",e)
+	# 	# logf.write("Error:{0} \n".format( str(e)))
