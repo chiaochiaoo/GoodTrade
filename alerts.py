@@ -344,7 +344,7 @@ class alert(pannel):
 
 				else:
 
-					cur_price= round(alerts_vals[2].get(),3)
+					cur_price= abs(round(alerts_vals[2].get(),3))
 					mean= round(alerts_vals[3].get(),3)
 					std=  round(alerts_vals[4].get(),3)
 
