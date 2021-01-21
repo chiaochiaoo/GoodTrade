@@ -5,6 +5,7 @@ import multiprocessing
 import os.path
 from datetime import date
 import json
+import time
 
 from Symbol_data_manager import *
 
@@ -98,6 +99,7 @@ def multi_processing_database(pipe_receive):
 		if os.path.isfile(file):
 			with open(file) as json_file:
 				data = json.load(json_file)
+			time.sleep(0.1)
 		else:
 			data = fetch_data(symbol)
 			with open(file, 'w') as outfile:

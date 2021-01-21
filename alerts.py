@@ -352,7 +352,7 @@ class alert(pannel):
 
 
 					if std != 0:
-						cur = round((cur_price-mean)/std,3)
+						cur = round((cur_price-mean)/std,1)
 						eval_string.set(str(cur)+" from mean")
 					else:
 						cur = 0
