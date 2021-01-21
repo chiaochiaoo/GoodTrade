@@ -39,6 +39,7 @@ class database_process_manager:
 			self.send_request(i)
 
 		self.receive_start()
+		self.init = True
 
 	def receive_start(self):
 		receive = threading.Thread(name="Thread: Database info receiver",target=self.receive_request, daemon=True)
@@ -54,6 +55,7 @@ class database_process_manager:
 		#deactivate it when it gets nothing to receive.
 
 		print("Database Online: Receiving Starts")
+		time.sleep(2)
 		while True:
 			d = self.request.recv()
 
@@ -99,7 +101,7 @@ def multi_processing_database(pipe_receive):
 		if os.path.isfile(file):
 			with open(file) as json_file:
 				data = json.load(json_file)
-			time.sleep(0.1)
+			#time.sleep(0.1)
 		else:
 			data = fetch_data(symbol)
 			with open(file, 'w') as outfile:
