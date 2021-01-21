@@ -145,6 +145,12 @@ class Symbol_data_manager:
 		self.symbol_last_alert = {}
 		self.symbol_last_alert_time ={}
 
+		self.alert_prev_val = {}
+		self.alert_hl_val = {}
+		self.alert_oh_val = {}
+		self.alert_ol_val = {}
+		self.alert_openning_rg_val = {}
+		self.alert_openning_vol_val ={}
 
 
 		#mark this when a symbol datastructure is completely loaded. 
@@ -307,6 +313,12 @@ class Symbol_data_manager:
 		self.symbol_last_alert[i] = StringVar()
 		self.symbol_last_alert_time[i] = StringVar()
 
+		self.alert_prev_val[i] = DoubleVar()
+		self.alert_hl_val[i] = DoubleVar()
+		self.alert_oh_val[i] = DoubleVar()
+		self.alert_ol_val[i] = DoubleVar()
+		self.alert_openning_rg_val[i] = DoubleVar()
+		self.alert_openning_vol_val[i] = DoubleVar()
 		#self.ppro.register(i)
 		# reg = threading.Thread(target=register,args=(i,), daemon=True)
 		# reg.start()
