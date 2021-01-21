@@ -55,7 +55,7 @@ class database_process_manager:
 		#deactivate it when it gets nothing to receive.
 
 		print("Database Online: Receiving Starts")
-		time.sleep(2)
+		time.sleep(5)
 		while True:
 			d = self.request.recv()
 
