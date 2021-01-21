@@ -4,6 +4,34 @@ from pannel import *
 from Symbol_data_manager import *
 
 
+def hex_to_string(int):
+	a = hex(int)[-2:]
+	a = a.replace("x","0")
+
+	return a
+
+def hexcolor(level):
+	code = int(510*(level))
+	print(code,"_")
+	if code >255:
+		first_part = code-255
+		return "#FF"+hex_to_string(255-first_part)+"00"
+	else:
+		return "#FF"+"FF"+hex_to_string(255-code)
+
+
+def color_bind(val,label):
+
+	val = val.get()
+
+	#get color code.
+	if val>3:
+		val = 1
+	else:
+		val = val/3
+
+	label["background"] = hexcolor(val)
+
 def to_number(str):
 
 	try:
@@ -462,33 +490,7 @@ class alert_map(pannel):
 
 		self.rebind(self.canvas,self.frame)
 
-	def hex_to_string(int):
-		a = hex(int)[-2:]
-		a = a.replace("x","0")
 
-		return a
-
-	def hexcolor(level):
-		code = int(510*(level))
-		print(code,"_")
-		if code >255:
-			first_part = code-255
-			return "#FF"+hex_to_string(255-first_part)+"00"
-		else:
-			return "#FF"+"FF"+hex_to_string(255-code)
-
-
-	def color_bind(val,label):
-
-		val = val.get()
-
-		#get color code.
-		if val>3:
-			val = 1
-		else:
-			val = val/3
-
-		label["background"] = hexcolor(val)
 
 
 
