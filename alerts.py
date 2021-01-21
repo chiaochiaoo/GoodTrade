@@ -12,7 +12,7 @@ def hex_to_string(int):
 
 def hexcolor(level):
 	code = int(510*(level))
-	print(code,"_")
+	#print(code,"_")
 	if code >255:
 		first_part = code-255
 		return "#FF"+hex_to_string(255-first_part)+"00"
@@ -27,6 +27,8 @@ def color_bind(val,label):
 	#get color code.
 	if val>3:
 		val = 1
+	elif val<0:
+		val = 0
 	else:
 		val = val/3
 
@@ -252,7 +254,6 @@ class alert(pannel):
 				symbol= alerts_vals[0]
 				time= alerts_vals[1].get()
 				alert_type = alerts_vals[5]
-				alert_val = alerts_vals[6]
 
 				minute= time[:5]
 				second = time[:8]
@@ -389,6 +390,7 @@ class alert(pannel):
 
 					#color.
 					#cur = abs(cur)
+					alert_val = alerts_vals[6]
 					alert_val.set(cur)
 
 					if cur <0.5:
