@@ -359,7 +359,7 @@ class alert(pannel):
 						eval_string.set("Unable to process std 0")
 
 					#color.
-					cur = abs(cur)
+					#cur = abs(cur)
 
 					if cur <0.5:
 						eval_label["background"]="white"
