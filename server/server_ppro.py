@@ -42,11 +42,10 @@ def market_scanner(queue):
 	while True:
 		for i in ticks:
 			reg = threading.Thread(target=getinfo,args=(queue,i+".NQ"), daemon=True)
- 			reg.start()
- 			count+=1
- 			if count%threadshold ==0:
- 				time.sleep(6)
-
+			reg.start()
+			count+=1
+			if count%threadshold ==0:
+				time.sleep(6)
 
 
 
