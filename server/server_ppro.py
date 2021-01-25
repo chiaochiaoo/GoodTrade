@@ -149,7 +149,7 @@ queue = Queue()
 ms = threading.Thread(target=market_scanner,args=(queue,), daemon=True)
 ms.start()
 
-while not queue.empty():
+while True:
     data = queue.get()
     print(data)
 
