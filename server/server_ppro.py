@@ -5,11 +5,7 @@ from queue import Queue
 import time
 
 #### Update the info from the Finviz ####
-global connection_error
-global lock
-lock = {}
 
-queue = Queue()
 
 
 
@@ -22,7 +18,7 @@ queue = Queue()
 
 
 def market_scanner(queue):
-
+	threadshold = 50
 	a = pd.read_csv('nasdaq.csv', index_col=0)
 	a = a.set_index('Ticker')
 
@@ -30,6 +26,7 @@ def market_scanner(queue):
 
 	#50 a second. 
 	count = 0
+
 
 	while True:
 		for i in ticks:
@@ -143,15 +140,20 @@ def getinfo(symbol,pipe):
 				lock[symbol] = False
 
 
+global connection_error
+global lock
+lock = {}
 
-ms = threading.Thread(target=market_scanner,args=(queue), daemon=True)
+queue = Queue()
+
+ms = threading.Thread(target=market_scanner,args=(queue,), daemon=True)
 ms.start()
 
 while not queue.empty():
     data = queue.get()
     print(data)
 
-threadshold = 50
+
 
 
 # a = pd.read_csv('nasdaq.csv', index_col=0)
