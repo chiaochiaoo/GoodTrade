@@ -3,6 +3,7 @@ import pandas as pd
 import threading
 from queue import Queue
 import time
+import requests
 
 #### Update the info from the Finviz ####
 
@@ -20,7 +21,8 @@ import time
 def market_scanner(queue):
 	threadshold = 50
 	a = pd.read_csv('nasdaq.csv', index_col=0)
-	a = a.set_index('Ticker')
+	# print(a)
+	# a = a.set_index('Ticker')
 
 	ticks = a.index
 
@@ -30,7 +32,7 @@ def market_scanner(queue):
 
 	while True:
 		for i in ticks:
-			reg = threading.Thread(target=getinfo,args=(queue,i+".NQ"), daemon=True)
+			reg = threading.Thread(target=getinfo,args=(i+".NQ",queue), daemon=True)
 			reg.start()
 			count+=1
 			if count%threadshold ==0:
@@ -86,9 +88,11 @@ def timestamp_seconds(s):
 
 def getinfo(symbol,pipe):
 
-	global black_list
-
+	global lock
 	global connection_error
+
+	if symbol not in lock:
+		lock[symbol] = False
 
 	if not connection_error:
 
@@ -141,6 +145,7 @@ def getinfo(symbol,pipe):
 
 
 global connection_error
+connection_error = False
 global lock
 lock = {}
 
