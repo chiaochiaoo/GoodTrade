@@ -288,7 +288,7 @@ class alert(pannel):
 
 							been = seconds - self.breakout_time[symbol]
 
-							print(seconds,self.breakout_time[symbol],been)
+							#print(seconds,self.breakout_time[symbol],been)
 
 							alert_str = "Support "+alert_type +" :"+str(been)+" sec ago"
 
