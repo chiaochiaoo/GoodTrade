@@ -36,7 +36,8 @@ def market_scanner(queue):
 			reg.start()
 			count+=1
 			if count%threadshold ==0:
-				time.sleep(6)
+				print("Sleep for 2 second")
+				time.sleep(2)
 
 ###### Update the info from PPRO. ##################
 def find_between(data, first, last):
