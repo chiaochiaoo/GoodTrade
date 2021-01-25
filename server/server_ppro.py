@@ -18,26 +18,34 @@ import requests
 # 	reg.start()
 
 
-def market_scanner(queue):
+def market_scanner(queue,sync_lock):
+
+	global sync_number
+
 	threadshold = 50
 	a = pd.read_csv('nasdaq.csv', index_col=0)
 	# print(a)
 	# a = a.set_index('Ticker')
-
 	ticks = a.index
 
 	#50 a second. 
 	count = 0
 
-
 	while True:
 		for i in ticks:
+
+			while sync_number >30:
+				time.sleep(2)
+
 			reg = threading.Thread(target=getinfo,args=(i+".NQ",queue), daemon=True)
 			reg.start()
 			count+=1
-			if count%threadshold ==0:
-				print("Sleep for 2 second")
-				time.sleep(2)
+
+			if count%10 == 0:
+				with sync_lock:
+					sync_number	+= 10			
+
+
 
 ###### Update the info from PPRO. ##################
 def find_between(data, first, last):
@@ -150,14 +158,29 @@ connection_error = False
 global lock
 lock = {}
 
+
+
+
+sync_lock = threading.Lock()
 queue = Queue()
 
-ms = threading.Thread(target=market_scanner,args=(queue,), daemon=True)
+global sync_number
+sync_number = 0
+
+ms = threading.Thread(target=market_scanner,args=(queue,sync_lock), daemon=True)
 ms.start()
 
+count = 0
 while True:
     data = queue.get()
     print(data)
+
+    count +=1 
+
+    if count%10 == 0:
+    	print("Simaltaneous process:",sync_number)
+    	with sync_lock:
+    		sync_number -=10
 
 
 
