@@ -21,14 +21,6 @@ queue = Queue()
 # 	reg.start()
 
 
-ms = threading.Thread(target=market_scanner,args=(queue), daemon=True)
-ms.start()
-
-while not queue.empty():
-    data = queue.get()
-    print(data)
-
-threadshold = 50
 def market_scanner(queue):
 
 	a = pd.read_csv('nasdaq.csv', index_col=0)
@@ -46,8 +38,6 @@ def market_scanner(queue):
 			count+=1
 			if count%threadshold ==0:
 				time.sleep(6)
-
-
 
 ###### Update the info from PPRO. ##################
 def find_between(data, first, last):
@@ -154,6 +144,14 @@ def getinfo(symbol,pipe):
 
 
 
+ms = threading.Thread(target=market_scanner,args=(queue), daemon=True)
+ms.start()
+
+while not queue.empty():
+    data = queue.get()
+    print(data)
+
+threadshold = 50
 
 
 # a = pd.read_csv('nasdaq.csv', index_col=0)
