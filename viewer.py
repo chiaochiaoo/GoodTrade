@@ -184,6 +184,7 @@ class ticker_manager(pannel):
 
 		for i in self.alerts:
 			i.delete_symbol(symbol)
+
 		return True
 
 

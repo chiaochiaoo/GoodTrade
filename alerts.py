@@ -480,10 +480,9 @@ class alert_map(pannel):
 
 		self.rebind(self.canvas,self.frame)
 
-	def delete_symbol(symbol):
+	def delete_symbol(self,symbol):
 		for i in self.tickers_tracers[symbol]:
 			i[0].trace_vdelete("w",i[1])
-
 
 		for i in self.tickers_labels[symbol]:
 			i.destroy()
@@ -491,8 +490,6 @@ class alert_map(pannel):
 		self.tickers_labels.pop(symbol,None)
 
 		self.rebind(self.canvas,self.frame)
-
-
 
 
 
