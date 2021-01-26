@@ -102,6 +102,7 @@ def multi_processing_scanner(pipe_receive):
 	#self.pannel.status_nasdaqchange("Ready")
 
 	while True:
+
 		receive_things = pipe_receive.recv()
 
 		order_type = receive_things[0]
@@ -165,6 +166,12 @@ def multi_processing_scanner(pipe_receive):
 					#self.pannel.status_nasdaqchange("Problem fetching data")
 					sucess = False
 
+		elif order_type =="terminate":
+			try:
+				driver.quit()
+			except:
+				pass
+			pipe_receive.send("termination successful")
 
 
 def refreshstocks(cond,market_,type_,cap):

@@ -17,7 +17,7 @@ from database_process_manager import *
 #from database_functions import *
 
 from ppro_process_manager import *
-
+import sys
 
 
 
@@ -257,37 +257,45 @@ class ticker_manager(pannel):
 
 #a seperate thread on its own. 
 
+from tkinter import messagebox
+
+
+def on_closing():
+    if messagebox.askokcancel("Quit", "Do you want to quit?"):
+        root.destroy()
+        "Destroyed"
 
 
 if __name__ == '__main__':
 
 	#try:
+
 	multiprocessing.freeze_support()
 
 
 	#### SCANNER SUB PROCESS####
 	request_scanner, receive_pipe = multiprocessing.Pipe()
-	p = multiprocessing.Process(target=multi_processing_scanner, args=(receive_pipe,),daemon=True)
-	p.daemon=True
-	p.start()
+	process_scanner = multiprocessing.Process(target=multi_processing_scanner, args=(receive_pipe,),daemon=True)
+	process_scanner.daemon=True
+	process_scanner.start()
 
 	s = scanner_process_manager(request_scanner)
 
 	#### DATABASE SUB PROCESS####
 
 	request_database, receive_database = multiprocessing.Pipe()
-	d = multiprocessing.Process(target=multi_processing_database, args=(receive_database,),daemon=True)
-	d.daemon=True
-	d.start()
+	process_database = multiprocessing.Process(target=multi_processing_database, args=(receive_database,),daemon=True)
+	process_database.daemon=True
+	process_database.start()
 
 	d = database_process_manager(request_database)
 
 	### INFO FETCH SUB PROCESS####
 
 	request_pipe, receive_pipe = multiprocessing.Pipe()
-	p2 = multiprocessing.Process(target=multi_processing_price, args=(receive_pipe,),daemon=True)
-	p2.daemon=True
-	p2.start()
+	process_ppro = multiprocessing.Process(target=multi_processing_price, args=(receive_pipe,),daemon=True)
+	process_ppro.daemon=True
+	process_ppro.start()
 
 	ppro = ppro_process_manager(request_pipe)
 
@@ -299,8 +307,24 @@ if __name__ == '__main__':
 	root.minsize(1200, 600)
 	root.maxsize(3000, 1500)
 
+	root.protocol("WM_DELETE_WINDOW", on_closing)
+
 	view = viewer(root,s,d,ppro)
 	root.mainloop()
-	# except Exception as e:
-	# 	print("Error",e)
-	# 	# logf.write("Error:{0} \n".format( str(e)))
+
+	print("Main process terminated")
+
+
+	request_scanner.send(["terminate"])
+	process_database.terminate()
+	process_ppro.terminate()
+
+	request_scanner.recv()
+	process_scanner.terminate()
+	process_scanner.join()
+	process_database.join()
+	process_ppro.join()
+	print("All subprocesses terminated")
+	
+	os._exit(1) 
+	print("exit")
