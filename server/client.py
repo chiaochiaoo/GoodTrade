@@ -32,7 +32,8 @@ while connection:
 		if len(part) < 256:
 			break
 
-	k = pickle.loads(b"".join(data))
+	try:
+		k = pickle.loads(b"".join(data))
 	print(k)
 
 print("Server disconnected")
