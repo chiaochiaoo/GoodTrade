@@ -8,50 +8,54 @@ import time
 print(socket.gethostname())
 HOST = '10.29.10.132'  # The server's hostname or IP address
 PORT = 65421       # The port used by the server
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
 
 
 while True:
 
-	print("Trying to connect to the server")
-	connected = False
+	try:
 
-	while not connected:
-		try:
-			s.connect((HOST, PORT))
-			connected = True
-		except:
-			print("Cannot connected. Try again in 2 seconds.")
-			time.sleep(2)
+		print("Trying to connect to the server")
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		connected = False
 
-
-
-	connection = True
-	print("Connection Successful")
-	while connection:
-		try:
-			s.sendall(b'Alive check')
-		except:
-			connection = False
-			break
-		data = []
-		while True:
+		while not connected:
 			try:
-				part = s.recv(2048)
+				s.connect((HOST, PORT))
+				connected = True
+			except:
+				print("Cannot connected. Try again in 2 seconds.")
+				time.sleep(2)
+
+
+
+		connection = True
+		print("Connection Successful")
+		while connection:
+			try:
+				s.sendall(b'Alive check')
 			except:
 				connection = False
 				break
-			#if not part: break
-			data.append(part)
-			if len(part) < 2048:
-				#try to assemble it, if successful.jump. else, get more. 
+			data = []
+			while True:
 				try:
-					k = pickle.loads(b"".join(data))
-					break
+					part = s.recv(2048)
 				except:
-					pass
-		print(k)
+					connection = False
+					break
+				#if not part: break
+				data.append(part)
+				if len(part) < 2048:
+					#try to assemble it, if successful.jump. else, get more. 
+					try:
+						k = pickle.loads(b"".join(data))
+						break
+					except:
+						pass
+			print(k)
 
-	print("Server disconnected")
-
+		print("Server disconnected")
+	except Exception as e:
+		print(e)
 	#restarted the whole thing 

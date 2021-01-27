@@ -113,7 +113,7 @@ def getinfo(symbol,pipe):
 			c= requests.get(p)
 
 			#print(symbol+" started")
-			#time.sleep(0.5)
+			time.sleep(0.5)
 			p="http://localhost:8080/GetLv1?symbol="+symbol
 			r= requests.get(p)
 			#print(symbol+" request complete")
@@ -200,7 +200,7 @@ def ppro_server(pipe):
 
 			pipe.send(df)
 			#send it over pipe
-			#df.to_csv("Test.csv")
+			df.to_csv("Test.csv")
 
 			time.sleep(2)
 			new_run = True
