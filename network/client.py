@@ -17,8 +17,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 	    if len(part) < 4096:
 	    	break
 
+
     k = pickle.loads(data)
-    print(data)
+    print(k)
 
 
 def recvall(sock):
