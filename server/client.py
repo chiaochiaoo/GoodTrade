@@ -42,7 +42,6 @@ while True:
 				connection = False
 				break
 			#if not part: break
-			print(len(part))
 			data.append(part)
 			if len(part) < 2048:
 				#try to assemble it, if successful.jump. else, get more. 
