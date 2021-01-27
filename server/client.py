@@ -12,13 +12,14 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST, PORT))
 
 connection = True
+print("Connection Successful")
 while connection:
 	try:
 		s.sendall(b'Alive check')
 	except:
 		connection = False
 		break
-	data = b''
+	data = []
 	while True:
 		try:
 			part = s.recv(256)
@@ -26,11 +27,11 @@ while connection:
 			connection = False
 			break
 		#if not part: break
-		data += part
+		data.append(part)
 		if len(part) < 256:
 			break
 
-	k = pickle.loads(data)
+	k = pickle.loads(b"".join(data))
 	print(k)
 
 print("Server disconnected")
