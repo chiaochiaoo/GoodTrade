@@ -1,9 +1,10 @@
 
 import socket
 import pickle
+import pandas as pd
 
 HOST = '10.29.10.132'  # The server's hostname or IP address
-PORT = 65436       # The port used by the server
+PORT = 65433       # The port used by the server
 
 print(socket.gethostname())
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
