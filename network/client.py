@@ -3,7 +3,7 @@ import socket
 import pickle
 
 HOST = '10.29.10.132'  # The server's hostname or IP address
-PORT = 65438       # The port used by the server
+PORT = 65437       # The port used by the server
 
 print(socket.gethostname())
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
