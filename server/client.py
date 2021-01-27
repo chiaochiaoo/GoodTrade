@@ -21,14 +21,14 @@ while connection:
 	data = b''
 	while True:
 		try:
-			part = s.recv(1024)
+			part = s.recv(256)
 		except:
 			connection = False
 			break
-		if not part: break
+		#if not part: break
 		data += part
-		# if len(part) < 1024:
-		# 	break
+		if len(part) < 256:
+			break
 
 	k = pickle.loads(data)
 	print(k)
