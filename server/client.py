@@ -25,9 +25,10 @@ while connection:
 		except:
 			connection = False
 			break
+		if not part: break
 		data += part
-		if len(part) < 1024:
-			break
+		# if len(part) < 1024:
+		# 	break
 
 	k = pickle.loads(data)
 	print(k)
