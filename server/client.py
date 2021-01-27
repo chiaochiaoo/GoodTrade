@@ -27,6 +27,7 @@ while connection:
 			connection = False
 			break
 		#if not part: break
+		print(len(part))
 		data.append(part)
 		if len(part) < 256:
 			break
