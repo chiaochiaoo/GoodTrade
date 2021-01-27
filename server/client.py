@@ -34,6 +34,8 @@ while connection:
 
 	try:
 		k = pickle.loads(b"".join(data))
+	except:
+		pass
 	print(k)
 
 print("Server disconnected")
