@@ -43,7 +43,7 @@ def market_scanner(queue,symbols,sync_lock):
 			new_run = False
 			for i in symbols:
 				# print(i,sync_number)
-				while sync_number > 800:
+				while sync_number > 500:
 					time.sleep(1)
 
 				if i not in bad_list:
@@ -107,20 +107,41 @@ def getinfo(symbol,pipe):
 
 	if not lock[symbol]:
 		try:
+			success= False
 			lock[symbol] = True
 			#######################################################################
 			p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
 			c= requests.get(p)
 
 			#print(symbol+" started")
-			time.sleep(0.5)
+			time.sleep(1)
 			p="http://localhost:8080/GetLv1?symbol="+symbol
 			r= requests.get(p)
 			#print(symbol+" request complete")
 			#print(r.text)"
 
-			if r.text =="<Response><Content>No data available symbol</Content></Response>":
-				bad_list.append(symbol)
+			response = r.text
+
+			failure_count = 0
+			while response =="<Response><Content>No data available symbol</Content></Response>":
+				#bad_list.append(symbol)
+				#try again 
+				try:
+					p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
+					c= requests.get(p)
+					# time.sleep(2)
+					p="http://localhost:8080/GetLv1?symbol="+symbol
+					r= requests.get(p)
+					response = r.text
+					failure_count += 1
+
+					if failure_count == 3:
+						lock[symbol] = False
+						pipe.put(["Error",symbol])
+						return False
+				except:
+					failure_count += 1
+
 
 			time_=find_between(r.text, "MarketTime=\"", "\"")[:-4]
 			open_ = float(find_between(r.text, "OpenPrice=\"", "\""))
@@ -139,10 +160,10 @@ def getinfo(symbol,pipe):
 
 			pipe.put(["Connected",symbol,time_,price,open_,high,low,prev_close,ts])
 			lock[symbol] = False
-			# p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
-			# r= requests.get(p)
+				# p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
+				# r= requests.get(p)
 
-			#print(symbol+" complete")
+				#print(symbol+" complete")
 
 		except Exception as e:
 			print("ERROR on",symbol,e)
@@ -190,6 +211,8 @@ def ppro_server(pipe):
 	ms = threading.Thread(target=market_scanner,args=(queue,symbols,sync_lock,), daemon=True)
 	ms.start()
 
+	bad_count = 0
+
 	while True:
 
 		if count % total_count ==0:
@@ -204,6 +227,8 @@ def ppro_server(pipe):
 
 			time.sleep(2)
 			new_run = True
+			print("Bad count total:",bad_count)
+			bad_count=0
 
 		data = queue.get()
 
@@ -222,6 +247,9 @@ def ppro_server(pipe):
 			timestamp = data[8]
 
 			df.loc[symbol,['Ppro Time','Ppro Timestamp',"Price","Open","High","Low","Prev Close P"]]=[time_,timestamp,price,open_,high,low,prev_close]
+
+		elif status =="Error":
+			bad_count +=1
 
 		count +=1 
 		with sync_lock:

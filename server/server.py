@@ -6,7 +6,7 @@ from queue import Queue
 import time
 
 HOST = '10.29.10.132'  # Standard loopback interface address (localhost)
-PORT = 65421        # Port to listen on (non-privileged ports are > 1023)
+PORT = 65422        # Port to listen on (non-privileged ports are > 1023)
 
 global client_count
 client_count = 0
@@ -17,14 +17,24 @@ client_queue = []
 global client_queue_lock
 client_queue_lock = threading.Lock()
 
+global package 
+
+package = [0]
+
 def client_connection(conn,addr,queue):
 
 	global client_count
 	global client_queue
 	global client_queue_lock
+	global package
 
 	print('Connected by', addr)
 	connection = True
+
+
+	if not isinstance(package[0], int):
+		conn.sendall(package[0])
+
 	while connection:
 		#data better be pickeled already 
 		#pickle.dumps(a)
@@ -49,6 +59,7 @@ def distribute_center(pipe):
 
 	global client_queue
 	global client_queue_lock
+	global package
 
 	while True:
 
@@ -56,6 +67,8 @@ def distribute_center(pipe):
 		data = pipe.recv()
 
 		data = pickle.dumps(data)
+
+		package[0] = data
 		#2. distribute it to all. 
 		with client_queue_lock:
 			cy = client_queue[:]

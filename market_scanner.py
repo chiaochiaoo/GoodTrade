@@ -8,6 +8,7 @@ import time
 import multiprocessing
 import threading
 from pannel import *
+import datetime
 
 def client_market_scanner(pipe):
 	while True:
@@ -94,7 +95,7 @@ class market_scanner:
 		self.pipe = pipe
 
 		self.setting = ttk.LabelFrame(root,text="Market Heatmap Setting") 
-		self.setting.place(x=10,y=10,height=80,width=780)
+		self.setting.place(x=10,y=10,height=80,relwidth=1)
 
 		self.market = tk.StringVar(self.setting)
 		self.choices_m = {'All Markets','Nasdaq','NYSE','AMEX'}
@@ -128,8 +129,17 @@ class market_scanner:
 		self.menu1 = ttk.Label(self.setting, text="Min Rel.Volume").grid(row = 1, column = 4)
 		self.om3.grid(row = 2, column =4)
 
+
+		self.status = tk.StringVar()
+		self.status.set("Status:")
+		self.ppro_status = ttk.Label(self.setting, textvariable=self.status)
+		self.ppro_status.place(x = 600, y =12)
+
+
 		self.setting = ttk.LabelFrame(root,text="Market Heatmap") 
-		self.setting.place(x=10,y=85,height=800,width=780)
+		self.setting.place(x=10,y=85,relheight=1,relwidth=1)
+
+
 
 		self.tabControl = ttk.Notebook(self.setting)
 		self.tabControl.place(x=10,rely=0,relheight=1,relwidth=1)
@@ -145,6 +155,11 @@ class market_scanner:
 
 
 		self.tab1_buttons = []
+		self.tab2_buttons = []
+		self.tab3_buttons = []
+		self.tab4_buttons = []
+
+		self.tabs=[self.tab1_buttons,self.tab2_buttons,self.tab3_buttons,self.tab4_buttons]
 
 		receiver = threading.Thread(target=self.receive, daemon=True)
 		receiver.start()
@@ -161,14 +176,19 @@ class market_scanner:
 
 			if d[0] =="msg":
 				print(d[1])
+				self.status.set("Status:"+d[1])
 			if d[0] =="pkg":
 				print("new package arrived")
+				today = datetime.datetime.strftime(datetime.datetime.today() , '%H:%M:%S')
+				self.status.set("Status:"+" Updated at "+today)
 				pkg = d[1]
 
 				self.delete()
-				self.add_(pkg)
+				self.add_(pkg,self.tab1,"Close-price-ATR",self.tab1_buttons)
+				self.add_(pkg,self.tab2,"Open-High-ATR",self.tab2_buttons)
+				self.add_(pkg,self.tab3,"Open-Low-ATR",self.tab3_buttons)
+				self.add_(pkg,self.tab4,"High-Low-ATR",self.tab4_buttons)
 
-			
 			#update each. 
 
 			#delete all first
@@ -176,40 +196,43 @@ class market_scanner:
 			#add new ones. 
 
 	def delete(self):
-		for i in self.tab1_buttons:
-			i.destroy()
+		for j in self.tabs:
+			for i in j:
+				i.destroy()
 
-	def add_(self,a):
+
+	def add_(self,a,pannel,type_,lst):
 		sectors = a["Sector"].unique()
 		row = 1
+
 		for i in sectors:
 			n = a.loc[a["Sector"]==i]
-			n =n.sort_values("Close-price-ATR",ascending=False)
+			n =n.sort_values(type_,ascending=False)
 			n = n.iloc[:25]
 			#take top 20.
 			count = 1
-			frame = ttk.Label(self.tab1,text=i) 
+			frame = ttk.Label(pannel,text=i) 
 			frame.grid(row=row, column=count,padx=0)
 			count +=1
 			row +=1
 
-			maxx = max(n['Close-price-ATR'])
+			maxx = max(n[type_])
 			for index,j in n.iterrows():
-				symbol = tk.Button(self.tab1) #,command=loadsymbol
+				symbol = tk.Button(pannel) #,command=loadsymbol
 				symbol.configure(activebackground="#ececec")
 				symbol.configure(activeforeground="#000000")
-				symbol.configure(background=hexcolor(j['Close-price-ATR']/maxx))
+				symbol.configure(background=hexcolor(j[type_]/maxx))
 				symbol.configure(disabledforeground="#a3a3a3")
 				symbol.configure(foreground="#000000")
 				symbol.configure(highlightbackground="#d9d9d9")
 				symbol.configure(highlightcolor="black")
 				symbol.configure(pady="0")
-				symbol.configure(text=j.name+" "+str(j['Close-price-ATR']))
+				symbol.configure(text=j.name+" "+str(j[type_]))
 				symbol.grid(row= row, column=count,padx=0)
 
-				self.tab1_buttons.append(symbol)
+				lst.append(symbol)
 
-				if count == 8:
+				if count == 20:
 					count = 1
 					row +=1
 				count +=1
@@ -217,7 +240,7 @@ class market_scanner:
 			row +=4
 
 
-		self.rebind(self.canvas,self.frame)
+
 
 
 
@@ -233,9 +256,9 @@ if __name__ == '__main__':
 
 	root = tk.Tk() 
 	root.title("GoodTrade Market Scanner") 
-	root.geometry("800x400")
-	root.minsize(1400, 1200)
-	root.maxsize(1800, 900)
+	root.geometry("1200x800")
+	root.minsize(1800, 1200)
+	root.maxsize(1800, 1200)
 
 	view = market_scanner(root,request_scanner)
 	root.mainloop()
