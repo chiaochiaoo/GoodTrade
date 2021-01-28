@@ -9,6 +9,7 @@ import multiprocessing
 import threading
 from pannel import *
 import datetime
+import os
 
 def client_market_scanner(pipe):
 	while True:
@@ -239,7 +240,7 @@ class market_scanner:
 
 
 			n =n.sort_values(type_,ascending=False)
-			n = n.iloc[:25]
+			n = n.iloc[:38]
 			#take top 20.
 			count = 1
 			frame = ttk.Label(pannel,text=i) 
@@ -293,3 +294,6 @@ if __name__ == '__main__':
 
 	view = market_scanner(root,request_scanner)
 	root.mainloop()
+	process_scanner.terminate()
+	process_scanner.join()
+	os._exit(1) 
