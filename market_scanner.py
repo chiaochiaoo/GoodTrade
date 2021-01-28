@@ -168,7 +168,7 @@ class market_scanner:
 		self.tab3_buttons = []
 		self.tab4_buttons = []
 
-		self.tabs=[self.tab1_buttons,self.tab2_buttons,self.tab3_buttons,self.tab4_buttons]
+		self.tabs=[self.tab1,self.tab2,self.tab3,self.tab4]
 
 		receiver = threading.Thread(target=self.receive, daemon=True)
 		receiver.start()
@@ -205,15 +205,19 @@ class market_scanner:
 			#add new ones. 
 
 	def delete(self):
-		for j in self.tabs:
-			for i in j:
-				try:
-					i.grid_forget()
-					i.destroy()
-				except Exception as e:
-					pass
-					#print(e)
-			j = []
+		for i in self.tabs:
+			for widget in i.winfo_children():
+				widget.destroy()
+
+		# for j in self.tabs:
+		# 	for i in j:
+		# 		try:
+		# 			i.grid_forget()
+		# 			i.destroy()
+		# 		except Exception as e:
+		# 			pass
+		# 			#print(e)
+		# 	j = []
 
 
 	def add_(self,a,pannel,type_,lst):
@@ -245,7 +249,7 @@ class market_scanner:
 				symbol.configure(text=j.name+" "+str(j[type_]))
 				symbol.grid(row= row, column=count,padx=0)
 
-				lst.append(symbol)
+				#lst.append(symbol)
 
 				if count == 20:
 					count = 1
