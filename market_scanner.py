@@ -232,6 +232,8 @@ class market_scanner:
 
 			if type_ == "Open-High-ATR" or "Open-Low-ATR":
 				n = a.loc[(a["Sector"]==i)&(a["Open"]!=0)]
+			elif  type_ == "Close-price-ATR":
+				n = a.loc[(a["Sector"]==i)&(a["Prev Close P"]!=0)]
 			else:
 				n = a.loc[a["Sector"]==i]
 
