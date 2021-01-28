@@ -121,13 +121,22 @@ class market_scanner:
 		self.menu1 = ttk.Label(self.setting, text="Country").grid(row = 1, column = 3)
 		self.om3.grid(row = 2, column =3)
 
+
+		self.mc = tk.StringVar(self.setting)
+		self.mc_choice = {'Any','Small & above','medium & above','large & above'}
+		self.mc.set('Any') 
+
+		self.om4 = tk.OptionMenu(self.setting, self.mc, *sorted(self.mc_choice))
+		self.menu4 = ttk.Label(self.setting, text="Market Cap").grid(row = 1, column = 4)
+		self.om4.grid(row = 2, column =4)
+
 		self.relv = tk.StringVar(self.setting)
 		self.relv_choice = {'0.5 above','1 above','2 above','Any'}
 		self.relv.set('Any') 
 
-		self.om3 = tk.OptionMenu(self.setting, self.country, *sorted(self.relv_choice))
-		self.menu1 = ttk.Label(self.setting, text="Min Rel.Volume").grid(row = 1, column = 4)
-		self.om3.grid(row = 2, column =4)
+		self.om3 = tk.OptionMenu(self.setting, self.relv, *sorted(self.relv_choice))
+		self.menu1 = ttk.Label(self.setting, text="Min Rel.Volume").grid(row = 1, column = 5)
+		self.om3.grid(row = 2, column =5)
 
 
 		self.status = tk.StringVar()
@@ -198,7 +207,8 @@ class market_scanner:
 	def delete(self):
 		for j in self.tabs:
 			for i in j:
-				i.destroy()
+				i.grid_forget()
+				#destroy()
 			j = []
 
 
