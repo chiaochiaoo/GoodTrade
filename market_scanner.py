@@ -199,11 +199,7 @@ class market_scanner:
 		for j in self.tabs:
 			for i in j:
 				i.destroy()
-
-		self.tab1_buttons = []
-		self.tab2_buttons = []
-		self.tab3_buttons = []
-		self.tab4_buttons = []
+			j = []
 
 
 	def add_(self,a,pannel,type_,lst):
