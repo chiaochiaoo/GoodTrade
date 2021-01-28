@@ -107,7 +107,7 @@ class market_scanner:
 
 		self.sector = tk.StringVar(self.setting)
 		self.choices2 = {'All Sectors','Consumer Defensive','Financial','Industrials','Technology','Healthcare','Communication Services','Utilities','Real Estate','Energy','Basic Materials','Consumer Cyclical'}
-		self.sector.set('Technology') 
+		self.sector.set('All Sectors') 
 
 		self.om2 = tk.OptionMenu(self.setting, self.sector, *sorted(self.choices2))
 		self.menu2 = ttk.Label(self.setting, text="Sector").grid(row = 1, column = 2)
@@ -207,8 +207,12 @@ class market_scanner:
 	def delete(self):
 		for j in self.tabs:
 			for i in j:
-				i.grid_forget()
-				#destroy()
+				try:
+					i.grid_forget()
+					i.destroy()
+				except Exception as e:
+					pass
+					#print(e)
 			j = []
 
 
