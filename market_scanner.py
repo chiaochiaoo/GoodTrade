@@ -219,13 +219,23 @@ class market_scanner:
 		# 			#print(e)
 		# 	j = []
 
+# self.add_(pkg,self.tab1,"Close-price-ATR",self.tab1_buttons)
+# self.add_(pkg,self.tab2,"Open-High-ATR",self.tab2_buttons)
+# self.add_(pkg,self.tab3,"Open-Low-ATR",self.tab3_buttons)
+# self.add_(pkg,self.tab4,"High-Low-ATR",self.tab4_buttons)
 
 	def add_(self,a,pannel,type_,lst):
 		sectors = a["Sector"].unique()
 		row = 1
 
 		for i in sectors:
-			n = a.loc[a["Sector"]==i]
+
+			if type_ == "Open-High-ATR" or "Open-Low-ATR":
+				n = a.loc[(a["Sector"]==i)&(a["Open"]!=0)]
+			else:
+				n = a.loc[a["Sector"]==i]
+
+
 			n =n.sort_values(type_,ascending=False)
 			n = n.iloc[:25]
 			#take top 20.
