@@ -231,16 +231,21 @@ class market_scanner:
 
 		for i in sectors:
 
-			if type_ == "Open-High-ATR" or "Open-Low-ATR":
+			if type_ == "Open-High-ATR" or type_ == "Open-Low-ATR":
 				n = a.loc[(a["Sector"]==i)&(a["Open"]!=0)]
-			elif  type_ == "Close-price-ATR":
-				n = a.loc[(a["Sector"]==i)&(a["Prev Close P"]!=0)]
+				n = n.loc[n[type_]>1.5]
+			elif type_ == "Close-price-ATR":
+				n = a.loc[(a["Sector"]==i)&(a["Prev Close P"]!=0)&(a["Price"]!=0)]
+				n = n.loc[n[type_]>1.2]
+			elif type_ == "High-Low-ATR":
+				n = a.loc[a["Sector"]==i]
+				n = n.loc[n[type_]>2]
 			else:
 				n = a.loc[a["Sector"]==i]
 
 
 			n =n.sort_values(type_,ascending=False)
-			n = n.iloc[:38]
+			#n = n.iloc[:38]
 			#take top 20.
 			count = 1
 			frame = ttk.Label(pannel,text=i) 
@@ -248,7 +253,11 @@ class market_scanner:
 			count +=1
 			row +=1
 
-			maxx = max(n[type_])
+			try:
+				maxx = max(n[type_])
+			except:
+				maxx = 0
+
 			for index,j in n.iterrows():
 				symbol = tk.Button(pannel) #,command=loadsymbol
 				symbol.configure(activebackground="#ececec")
