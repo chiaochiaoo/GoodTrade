@@ -76,17 +76,18 @@ def register(symbol):
 
 def deregister(symbol):
 	global reg_count
-	try:
-		p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
-		r= requests.get(p)
-		p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=TOS"
-		r= requests.get(p)
-		reg_count-=1
-		print(symbol,"deregister","total:",reg_count)
-		reg_list.pop(p)
+	global reg_list
+	#try:
+	p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=L1"
+	r= requests.get(p)
+	p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=TOS"
+	r= requests.get(p)
+	reg_count-=1
+	print(symbol,"deregister","total:",reg_count)
+	reg_list.remove(symbol)
 
-	except Exception as e:
-		print("Dereg",symbol,e)
+	# except Exception as e:
+	# 	print("Dereg",symbol,e)
 
 def multi_processing_price(pipe_receive):
 
@@ -168,7 +169,7 @@ def multi_processing_price(pipe_receive):
 				info = threading.Thread(target=getinfo,args=(i,pipe_receive,), daemon=True)
 				info.start()
 
-			print("Registed list:",reg_list)
+			#print("Registed list:",reg_list)
 			time.sleep(2.5)
 			#send each dictionary. 
 			#pipe_receive.send(data)
@@ -205,6 +206,7 @@ def timestamp_seconds(s):
 #IF STILL THE SAME TIME, TRY TO reregister?
 
 def init(symbol,price):
+
 	global data
 	data[symbol] = {}
 	d = data[symbol]
@@ -271,10 +273,6 @@ def process_and_send(lst,pipe):
 		d["ol"] = round(open_ - low,3)
 
 		if timestamp <570:
-			# if price<d["low"]:
-			# 	d["low"] = price
-			# if price>d["high"]:
-			# 	d["high"] = price
 			d["open"] = 0
 			d["oh"] = 0
 			d["ol"] = 0
@@ -321,7 +319,6 @@ def process_and_send(lst,pipe):
 			if latency >60:
 				status = "Lagged"
 				register_again = True
-
 		#premarket
 		else:
 			if latency >30:
@@ -380,6 +377,7 @@ def getinfo(symbol,pipe):
 					ts = timestamp(time[:5])
 
 					try:
+						a=1
 						process_and_send(["Connected",symbol,time,ts,price,open_,high,low,vol,prev_close],pipe)
 					except Exception as e:
 						print("Process error",e)
