@@ -58,7 +58,8 @@ def register(symbol):
 		reg_count+=1
 		print(symbol,"registerd ","total:",reg_count)
 
-		reg_list.append(symbol)
+		if symbol not in reg_list:
+			reg_list.append(symbol)
 
 		if symbol not in lock:
 			lock[symbol] = False
@@ -167,6 +168,7 @@ def multi_processing_price(pipe_receive):
 				info = threading.Thread(target=getinfo,args=(i,pipe_receive,), daemon=True)
 				info.start()
 
+			print("Registed list:",reg_list)
 			time.sleep(2.5)
 			#send each dictionary. 
 			#pipe_receive.send(data)
