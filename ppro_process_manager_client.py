@@ -58,6 +58,8 @@ class ppro_process_manager:
 
 			status = d[0]
 
+
+
 			if status == "message":
 				print(d[1])
 				if d[1] == "Connection established.":
@@ -67,8 +69,10 @@ class ppro_process_manager:
 					if self.init:
 						self.ppro_status.set("Ppro Status: Disconnected. Reconnecting...")
 			else:
-				symbol = d[1]
 
+
+				symbol = d[1]
+				#print("receive",symbol)
 				self.data_list[0][symbol].set(status)
 
 				#	pipe.send([status,symbol,price,time,timestamp,

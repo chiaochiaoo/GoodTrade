@@ -166,10 +166,13 @@ def multi_processing_price(pipe_receive):
 			#try to register again the ones that have ppro errors. 
 			#bulk cmds. get updates on these symbols. on finish, send it back to client. 
 			for i in reg_list:
+
+				#if prev thread didn't die, kill it and start a new one. 
+				#print("sending",i)
 				info = threading.Thread(target=getinfo,args=(i,pipe_receive,), daemon=True)
 				info.start()
 
-			print("Registed list:",reg_list)
+			#print("Registed list:",reg_list)
 			time.sleep(2.5)
 			#send each dictionary. 
 			#pipe_receive.send(data)
@@ -259,78 +262,80 @@ def process_and_send(lst,pipe):
 	ms = now.hour*60 + now.minute
 	latency = ts-rec
 
-	if abs(price-d["price"])/d["price"] < 0.005:
+	#if abs(price-d["price"])/d["price"] < 0.02:
 
-		d = data[symbol]
+	d = data[symbol]
 
-		d["timestamp"] = timestamp
-		d["time"] = time
-		d["price"] = price
-		d["open"] = open_
-		d["prev_close"] = prev_close
+	d["timestamp"] = timestamp
+	d["time"] = time
+	d["price"] = price
+	d["open"] = open_
+	d["prev_close"] = prev_close
 
-		d["oh"] = round(high - open_,3)
-		d["ol"] = round(open_ - low,3)
+	d["oh"] = round(high - open_,3)
+	d["ol"] = round(open_ - low,3)
 
-		if timestamp <570:
-			d["open"] = 0
-			d["oh"] = 0
-			d["ol"] = 0
+	if timestamp <570:
+		d["open"] = 0
+		d["oh"] = 0
+		d["ol"] = 0
 
-		#else:
-		d["high"] = high
-		d["low"] = low
+	#else:
+	d["high"] = high
+	d["low"] = low
 
-		d["range"] = round(d["high"] - d["low"],3)
-		d["prev_close_gap"] = round(price-prev_close,3)
+	d["range"] = round(d["high"] - d["low"],3)
+	d["prev_close_gap"] = round(price-prev_close,3)
 
-		# now update the datalists.
-		if timestamp not in d["timetamps"]:
-			if len(d["timetamps"])==0:
-				d["timetamps"].append(timestamp-1)
-			else:
-				d["timetamps"].append(timestamp)
-			d["highs"].append(price)
-			d["lows"].append(price)
-			d["vols"].append(vol)
+	# now update the datalists.
+	if timestamp not in d["timetamps"]:
+		if len(d["timetamps"])==0:
+			d["timetamps"].append(timestamp-1)
 		else:
-			if price >= d["highs"][-1]:
-				d["highs"][-1] = price
-			if price <= d["lows"][-1]:
-				d["lows"][-1] = price
-			d["vols"][-1] = vol
+			d["timetamps"].append(timestamp)
+		d["highs"].append(price)
+		d["lows"].append(price)
+		d["vols"].append(vol)
+	else:
+		if price >= d["highs"][-1]:
+			d["highs"][-1] = price
+		if price <= d["lows"][-1]:
+			d["lows"][-1] = price
+		d["vols"][-1] = vol
 
-		#print(d["timetamps"],d["highs"],d["lows"],d["vols"])
-		#last 5 range
-		d["last_5_range"] = round(max(d["highs"][-5:]) - min(d["lows"][-5:]),3)
-		# last 5 volume
-		index = min(len(d["vols"]), 5)
-		d["vol"] = round((d["vols"][-1] - d["vols"][-index])/1000,2)
+	#print(d["timetamps"],d["highs"],d["lows"],d["vols"])
+	#last 5 range
+	d["last_5_range"] = round(max(d["highs"][-5:]) - min(d["lows"][-5:]),3)
+	# last 5 volume
+	index = min(len(d["vols"]), 5)
+	d["vol"] = round((d["vols"][-1] - d["vols"][-index])/1000,2)
 
-		if timestamp <575:
-			d["f5r"] = d["last_5_range"]
-			d["f5v"] = d["vol"]
+	if timestamp <575:
+		d["f5r"] = d["last_5_range"]
+		d["f5v"] = d["vol"]
 
 
-		#check if the data is lagged. Premarket. Real. Aftermarket.
-		register_again = False
-		#normal
-		if ms<570 or ms>960:
-			if latency >60:
-				status = "Lagged"
-				register_again = True
-		#premarket
-		else:
-			if latency >30:
-				status = "Lagged"
-				register_again = True
+	#check if the data is lagged. Premarket. Real. Aftermarket.
+	register_again = False
+	#normal
+	if ms<570 or ms>960:
+		if latency >60:
+			status = "Lagged"
+			register_again = True
+	#premarket
+	else:
+		if latency >30:
+			status = "Lagged"
+			register_again = True
 
-		pipe.send([status,symbol,price,time,timestamp,d["high"],d["low"],\
-			d["range"],d["last_5_range"],d["vol"],d["open"],d["oh"],d["ol"],
-			d["f5r"],d["f5v"],d["prev_close"],d["prev_close_gap"]])
+	pipe.send([status,symbol,price,time,timestamp,d["high"],d["low"],\
+		d["range"],d["last_5_range"],d["vol"],d["open"],d["oh"],d["ol"],
+		d["f5r"],d["f5v"],d["prev_close"],d["prev_close_gap"]])
 
-		if register_again:
-			register(symbol)
+	#print("sent",symbol)
+
+	if register_again:
+		register(symbol)
 
 	lock[symbol] = False
 
@@ -357,16 +362,18 @@ def getinfo(symbol,pipe):
 				else:
 
 					time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
-					# Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
-					# Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
-					#price = round((Bidprice+Askprice)/2,4)
+
 					open_ = float(find_between(r.text, "OpenPrice=\"", "\""))
 					high = float(find_between(r.text, "HighPrice=\"", "\""))
 					low = float(find_between(r.text, "LowPrice=\"", "\""))
 					vol = int(find_between(r.text, "Volume=\"", "\""))
 					prev_close = float(find_between(r.text, "ClosePrice=\"", "\""))
 
-					price = float(find_between(r.text, "LastPrice=\"", "\""))
+					Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
+					Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
+					price = round((Bidprice+Askprice)/2,4)
+
+					#price = float(find_between(r.text, "LastPrice=\"", "\""))
 
 					if price<1:
 						price = round(price,3)
@@ -389,6 +396,9 @@ def getinfo(symbol,pipe):
 				connection_error = True
 				pipe.send(["Ppro Error",symbol])
 				lock[symbol] = False
+
+		else:
+			print(symbol,"blocked call")
 
 
 
