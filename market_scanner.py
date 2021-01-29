@@ -115,8 +115,8 @@ class market_scanner:
 		self.om2.grid(row = 2, column =2)
 
 		self.country = tk.StringVar(self.setting)
-		self.choices = {'All countries','US','Canada','China','UK'}
-		self.country.set('All countries') 
+		self.choices = {'Any','USA','Canada','China','UK'}
+		self.country.set('Any') 
 
 		self.om3 = tk.OptionMenu(self.setting, self.country, *sorted(self.choices))
 		self.menu1 = ttk.Label(self.setting, text="Country").grid(row = 1, column = 3)
@@ -124,7 +124,7 @@ class market_scanner:
 
 
 		self.mc = tk.StringVar(self.setting)
-		self.mc_choice = {'Any','Small & above','medium & above','large & above'}
+		self.mc_choice = {'Any','Small','Small & above','Medium','Medium & above','Large'}
 		self.mc.set('Any') 
 
 		self.om4 = tk.OptionMenu(self.setting, self.mc, *sorted(self.mc_choice))
@@ -145,11 +145,22 @@ class market_scanner:
 		self.ppro_status = ttk.Label(self.setting, textvariable=self.status)
 		self.ppro_status.place(x = 600, y =12)
 
+		self.refresh = tk.Button(self.setting,command= lambda: self.refresh_pannel()) #,command=self.loadsymbol
+		self.refresh.grid(row = 2, column =7)#.place(x=700, y=12, height=30, width=80, bordermode='ignore')
+		self.refresh.configure(activebackground="#ececec")
+		self.refresh.configure(activeforeground="#000000")
+		self.refresh.configure(background="#d9d9d9")
+		self.refresh.configure(disabledforeground="#a3a3a3")
+		self.refresh.configure(foreground="#000000")
+		self.refresh.configure(highlightbackground="#d9d9d9")
+		self.refresh.configure(highlightcolor="black")
+		self.refresh.configure(pady="0")
+		self.refresh.configure(text='''Apply filter''')
 
 		self.setting = ttk.LabelFrame(root,text="Market Heatmap") 
 		self.setting.place(x=10,y=85,relheight=1,relwidth=1)
 
-
+		self.in_progress = False
 
 		self.tabControl = ttk.Notebook(self.setting)
 		self.tabControl.place(x=10,rely=0,relheight=1,relwidth=1)
@@ -171,16 +182,33 @@ class market_scanner:
 
 		self.tabs=[self.tab1,self.tab2,self.tab3,self.tab4]
 
+		self.data = None
+
 		receiver = threading.Thread(target=self.receive, daemon=True)
 		receiver.start()
 
 
+	def refresh_pannel(self):
+
+		print("progress:",self.in_progress)
+		if self.in_progress == False:
+			self.in_progress == True
+			self.delete()
+			pkg = self.filter(self.data)
+			self.add_(pkg,self.tab1,"Close-price-ATR",self.tab1_buttons)
+			self.add_(pkg,self.tab2,"Open-High-ATR",self.tab2_buttons)
+			self.add_(pkg,self.tab3,"Open-Low-ATR",self.tab3_buttons)
+			self.add_(pkg,self.tab4,"High-Low-ATR",self.tab4_buttons)
+			self.in_progress == False
+		else:
+			self.status.set("Status: System updating, please wait..")
+		print("progress:",self.in_progress)
 	def rebind(self,canvas,frame):
 		canvas.update_idletasks()
 		canvas.config(scrollregion=frame.bbox()) 
 
 	def receive(self):
-
+		count = 0
 		while True:
 			d = self.pipe.recv()
 
@@ -188,17 +216,20 @@ class market_scanner:
 				print(d[1])
 				self.status.set("Status:"+d[1])
 			if d[0] =="pkg":
+
+				
 				print("new package arrived")
 				today = datetime.datetime.strftime(datetime.datetime.today() , '%H:%M:%S')
 				self.status.set("Status:"+" Updated at "+today)
 				pkg = d[1]
 
-				self.delete()
-				self.add_(pkg,self.tab1,"Close-price-ATR",self.tab1_buttons)
-				self.add_(pkg,self.tab2,"Open-High-ATR",self.tab2_buttons)
-				self.add_(pkg,self.tab3,"Open-Low-ATR",self.tab3_buttons)
-				self.add_(pkg,self.tab4,"High-Low-ATR",self.tab4_buttons)
+				self.data = pkg
 
+				print("building start")
+				if count %3 == 0:
+					self.refresh_pannel()
+				count +=1
+				print("building finish")
 			#update each. 
 
 			#delete all first
@@ -225,7 +256,32 @@ class market_scanner:
 # self.add_(pkg,self.tab3,"Open-Low-ATR",self.tab3_buttons)
 # self.add_(pkg,self.tab4,"High-Low-ATR",self.tab4_buttons)
 
+
+	def filter(self,a):
+
+		country = self.country.get() 
+		if country != 'Any':
+			a = a.loc[a["Country"]==country]
+
+		mc = self.mc.get()
+
+		if mc != 'Any':
+			if mc =="Small":
+				a = a.loc[a["Market Cap"]==2]
+			elif mc =="Small & above":
+				a = a.loc[a["Market Cap"]>=2]
+			elif mc =="Medium":
+				a = a.loc[a["Market Cap"]==3]
+			elif mc =="Medium & above":
+				a = a.loc[a["Market Cap"]>=3]
+			elif mc =="Large":
+				a = a.loc[a["Market Cap"]==4]
+
+		return a
+
 	def add_(self,a,pannel,type_,lst):
+
+		#lets filter them out. Market Cap. Country.
 		sectors = a["Sector"].unique()
 		row = 1
 
