@@ -356,6 +356,7 @@ def getinfo(symbol,pipe):
 					print("No symbol found")
 					black_list.append(symbol)
 					pipe.send(["Unfound",symbol])
+					lock[symbol] = False
 				else:
 
 					time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
