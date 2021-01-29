@@ -233,19 +233,19 @@ class market_scanner:
 
 			if type_ == "Open-High-ATR" or type_ == "Open-Low-ATR":
 				n = a.loc[(a["Sector"]==i)&(a["Open"]!=0)]
-				n = n.loc[n[type_]>1.5]
+				n = n.loc[n[type_]>0.5]
 			elif type_ == "Close-price-ATR":
 				n = a.loc[(a["Sector"]==i)&(a["Prev Close P"]!=0)&(a["Price"]!=0)]
-				n = n.loc[n[type_]>1.2]
+				n = n.loc[n[type_]>0.5]
 			elif type_ == "High-Low-ATR":
 				n = a.loc[a["Sector"]==i]
-				n = n.loc[n[type_]>2]
+				n = n.loc[n[type_]>0.5]
 			else:
 				n = a.loc[a["Sector"]==i]
 
 
 			n =n.sort_values(type_,ascending=False)
-			#n = n.iloc[:38]
+			n = n.iloc[:30]
 			#take top 20.
 			count = 1
 			frame = ttk.Label(pannel,text=i) 
