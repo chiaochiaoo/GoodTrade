@@ -169,7 +169,7 @@ def multi_processing_price(pipe_receive):
 				info = threading.Thread(target=getinfo,args=(i,pipe_receive,), daemon=True)
 				info.start()
 
-			#print("Registed list:",reg_list)
+			print("Registed list:",reg_list)
 			time.sleep(2.5)
 			#send each dictionary. 
 			#pipe_receive.send(data)
@@ -347,7 +347,7 @@ def getinfo(symbol,pipe):
 				#######################################################################
 				lock[symbol] = True
 				p="http://localhost:8080/GetLv1?symbol="+symbol
-				r= requests.get(p)
+				r= requests.get(p,timeout=2)
 
 				if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
 					print("No symbol found")
