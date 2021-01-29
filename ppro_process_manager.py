@@ -379,8 +379,11 @@ def getinfo(symbol,pipe):
 					#print(time,Bidprice,Askprice,open_,high,low,vol,price)
 					ts = timestamp(time[:5])
 
-					process_and_send(["Connected",symbol,time,ts,price,open_,high,low,vol,prev_close],pipe)
-
+					try:
+						process_and_send(["Connected",symbol,time,ts,price,open_,high,low,vol,prev_close],pipe)
+					except Exception as e:
+						print("Process error",e)
+						lock[symbol] = False
 				#pipe.send(output)
 
 			except Exception as e:
