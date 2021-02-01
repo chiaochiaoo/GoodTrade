@@ -304,10 +304,14 @@ class market_scanner:
 			n = n.iloc[:30]
 			#take top 20.
 			count = 1
+			frame = ttk.Label(pannel,text="") 
+			frame.grid(row=row, column=count,padx=0)
+
+			row +=1
 			frame = ttk.Label(pannel,text=i) 
 			frame.grid(row=row, column=count,padx=0)
 			count +=1
-			row +=1
+			#row +=1
 
 			try:
 				maxx = max(n[type_])
@@ -354,7 +358,7 @@ if __name__ == '__main__':
 	root = tk.Tk() 
 	root.title("GoodTrade Market Scanner") 
 	root.geometry("1200x800")
-	root.minsize(1800, 1200)
+	root.minsize(1200, 800)
 	root.maxsize(1800, 1200)
 
 	view = market_scanner(root,request_scanner)
