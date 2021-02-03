@@ -193,9 +193,14 @@ class alert(pannel):
 				m=format[j].trace('w', lambda *_, text=format[j],label=self.tickers_labels[i][j]: self.status_change_color(text,label))
 				self.tickers_tracers[i].append((format[j],m))
 
-			elif j ==2 or j ==3:
+			elif j ==2 :
 				self.tickers_labels[i].append(tk.Checkbutton(self.frame,variable=format[j]))
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
+				format[j].set(self.auto_range.get())
+			elif j ==3:
+				self.tickers_labels[i].append(tk.Checkbutton(self.frame,variable=format[j]))
+				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
+				format[j].set(self.auto_trade.get())
 				#self.tickers_labels[i][j].configure(text='Auto range detection')
 			#text filed for hmm,,,entry, 
 			elif j ==4 or j ==5:
@@ -911,11 +916,14 @@ class breakout(alert):
 		self.checker = tk.Checkbutton(frame,variable=self.data.all_auto)
 		self.checker.place(x=5, y=5, height=30, width=150, bordermode='ignore')
 		self.checker.configure(text='Auto range detection')
-
+		self.checker.toggle()
 
 		self.checker2 = tk.Checkbutton(frame,variable=self.data.all_auto_trade)
 		self.checker2.place(x=175, y=5, height=30, width=150, bordermode='ignore')
 		self.checker2.configure(text='Auto Trade Breakout')
+
+		self.auto_range = self.data.all_auto
+		self.auto_trade =self.data.all_auto_trade
 
 
 		self.data.all_auto.trace('w', lambda *_,vals=self.data.auto_support_resistance,val=self.data.all_auto: self.set_auto(vals,val))
@@ -925,6 +933,7 @@ class breakout(alert):
 	def set_auto(self,vals,val):
 
 		v = val.get()
+		print(v)
 		self.data.toggle_all(vals,v)
 
 

@@ -131,13 +131,21 @@ class market_scanner:
 		self.menu4 = ttk.Label(self.setting, text="Market Cap").grid(row = 1, column = 4)
 		self.om4.grid(row = 2, column =4)
 
-		self.relv = tk.StringVar(self.setting)
-		self.relv_choice = {'0.5 above','1 above','2 above','Any'}
-		self.relv.set('Any') 
+		self.liq = tk.StringVar(self.setting)
+		self.liq_choice = {'within 2 minutes','within 5 minutes','within 10 minutes','Any'}
+		self.liq.set('Any') 
 
-		self.om3 = tk.OptionMenu(self.setting, self.relv, *sorted(self.relv_choice))
-		self.menu1 = ttk.Label(self.setting, text="Min Rel.Volume").grid(row = 1, column = 5)
-		self.om3.grid(row = 2, column =5)
+		self.om5 = tk.OptionMenu(self.setting, self.liq, *sorted(self.liq_choice))
+		self.menu5 = ttk.Label(self.setting, text="Min Liquidity").grid(row = 1, column = 5)
+		self.om5.grid(row = 2, column =5)
+
+		# self.relv = tk.StringVar(self.setting)
+		# self.relv_choice = {'0.5 above','1 above','2 above','Any'}
+		# self.relv.set('Any') 
+
+		# self.om3 = tk.OptionMenu(self.setting, self.relv, *sorted(self.relv_choice))
+		# self.menu1 = ttk.Label(self.setting, text="Min Rel.Volume").grid(row = 1, column = 5)
+		# self.om3.grid(row = 2, column =5)
 
 
 		self.status = tk.StringVar()
@@ -263,6 +271,29 @@ class market_scanner:
 		if country != 'Any':
 			a = a.loc[a["Country"]==country]
 
+
+		self.liq = tk.StringVar(self.setting)
+		self.liq_choice = {'within 2 minutes','within 5 minutes','within 10 minutes','Any'}
+		self.liq.set('Any') 
+
+
+
+		liq = self.liq.get()
+
+		if liq != 'Any':
+			#get current time 
+			now = datetime.now()
+			ts = now.hour*60 + now.minute
+
+			print(ts)
+			if liq =="within 2 minutes":
+				a = a.loc[a["Ppro Timestamp"]>=ts-3]
+			elif liq =="within 5 minutes":
+				a = a.loc[a["Ppro Timestamp"]>=ts-5]
+			elif liq =="within 10 minutes":
+				a = a.loc[a["Ppro Timestamp"]>=ts-10]
+
+
 		mc = self.mc.get()
 
 		if mc != 'Any':
@@ -276,6 +307,9 @@ class market_scanner:
 				a = a.loc[a["Market Cap"]>=3]
 			elif mc =="Large":
 				a = a.loc[a["Market Cap"]==4]
+
+
+
 
 		return a
 
