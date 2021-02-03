@@ -9,6 +9,7 @@ import multiprocessing
 import threading
 from pannel import *
 import datetime
+
 import os
 
 def client_market_scanner(pipe):
@@ -132,8 +133,8 @@ class market_scanner:
 		self.om4.grid(row = 2, column =4)
 
 		self.liq = tk.StringVar(self.setting)
-		self.liq_choice = {'within 2 minutes','within 5 minutes','within 10 minutes','Any'}
-		self.liq.set('Any') 
+		self.liq_choice = {'last tick within 1 minute','last tick within 3 minutes','last tick within 10 minutes','Any'}
+		self.liq.set('last tick within 1 minute') 
 
 		self.om5 = tk.OptionMenu(self.setting, self.liq, *sorted(self.liq_choice))
 		self.menu5 = ttk.Label(self.setting, text="Min Liquidity").grid(row = 1, column = 5)
@@ -272,25 +273,20 @@ class market_scanner:
 			a = a.loc[a["Country"]==country]
 
 
-		self.liq = tk.StringVar(self.setting)
-		self.liq_choice = {'within 2 minutes','within 5 minutes','within 10 minutes','Any'}
-		self.liq.set('Any') 
-
-
-
 		liq = self.liq.get()
+
 
 		if liq != 'Any':
 			#get current time 
-			now = datetime.now()
+			now = datetime.datetime.now()
 			ts = now.hour*60 + now.minute
 
 			print(ts)
-			if liq =="within 2 minutes":
+			if liq =="last tick within 1 minute":
+				a = a.loc[a["Ppro Timestamp"]>=ts-1]
+			elif liq =="last tick within 3 minutes":
 				a = a.loc[a["Ppro Timestamp"]>=ts-3]
-			elif liq =="within 5 minutes":
-				a = a.loc[a["Ppro Timestamp"]>=ts-5]
-			elif liq =="within 10 minutes":
+			elif liq =="last tick within 10 minutes":
 				a = a.loc[a["Ppro Timestamp"]>=ts-10]
 
 
