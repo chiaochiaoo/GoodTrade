@@ -322,7 +322,7 @@ class market_scanner:
 				n = n.loc[n[type_]>0.5]
 			elif type_ == "Close-price-ATR":
 				n = a.loc[(a["Sector"]==i)&(a["Prev Close P"]!=0)&(a["Price"]!=0)]
-				n = n.loc[n[type_]>0.1]
+				n = n.loc[n[type_]>0.5]
 			elif type_ == "High-Low-ATR":
 				n = a.loc[a["Sector"]==i]
 				n = n.loc[n[type_]>0.5]
@@ -359,7 +359,15 @@ class market_scanner:
 				symbol.configure(highlightbackground="#d9d9d9")
 				symbol.configure(highlightcolor="black")
 				symbol.configure(pady="0")
-				symbol.configure(text=j.name+" "+str(j[type_]))
+
+				if type_ == "Close-price-ATR":
+					if j["Prev Close P"]-j["Price"]>0:
+						sign = " ↓"
+					else:
+						sign = " ↑"
+					symbol.configure(text=j.name+" "+str(j[type_]) +sign)
+				else:
+					symbol.configure(text=j.name+" "+str(j[type_]))
 				symbol.grid(row= row, column=count,padx=0)
 
 				#lst.append(symbol)↑↓
