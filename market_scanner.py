@@ -329,7 +329,7 @@ class market_scanner:
 			else:
 				n = a.loc[a["Sector"]==i]
 
-			print("after filtering:",len(n))
+			#print("after filtering:",len(n))
 
 			n =n.sort_values(type_,ascending=False)
 			n = n.iloc[:30]
@@ -362,7 +362,7 @@ class market_scanner:
 				symbol.configure(text=j.name+" "+str(j[type_]))
 				symbol.grid(row= row, column=count,padx=0)
 
-				#lst.append(symbol)
+				#lst.append(symbol)↑↓
 
 				if count == 20:
 					count = 1
