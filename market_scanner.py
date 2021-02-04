@@ -281,7 +281,7 @@ class market_scanner:
 			now = datetime.datetime.now()
 			ts = now.hour*60 + now.minute
 
-			print(ts)
+			
 			if liq =="last tick within 1 minute":
 				a = a.loc[a["Ppro Timestamp"]>=ts-1]
 			elif liq =="last tick within 3 minutes":
@@ -304,7 +304,7 @@ class market_scanner:
 			elif mc =="Large":
 				a = a.loc[a["Market Cap"]==4]
 
-
+		print("before filtering:",len(a))
 
 
 		return a
@@ -322,13 +322,14 @@ class market_scanner:
 				n = n.loc[n[type_]>0.5]
 			elif type_ == "Close-price-ATR":
 				n = a.loc[(a["Sector"]==i)&(a["Prev Close P"]!=0)&(a["Price"]!=0)]
-				n = n.loc[n[type_]>0.5]
+				n = n.loc[n[type_]>0.1]
 			elif type_ == "High-Low-ATR":
 				n = a.loc[a["Sector"]==i]
 				n = n.loc[n[type_]>0.5]
 			else:
 				n = a.loc[a["Sector"]==i]
 
+			print("after filtering:",len(n))
 
 			n =n.sort_values(type_,ascending=False)
 			n = n.iloc[:30]
