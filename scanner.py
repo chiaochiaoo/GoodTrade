@@ -20,6 +20,8 @@ class scanner(pannel):
 		self.nasdaq_trader_symbols = []
 		self.nasdaq_trader_list = {}
 
+		self.nasdaq_trader_ranking = []
+
 		self.tabControl = ttk.Notebook(root)
 		self.tabControl.place(x=0,rely=0.01,relheight=1,width=500)
 
@@ -313,6 +315,23 @@ class scanner(pannel):
 
 		#print(d[3])
 
+		# self.nasdaq_trader_symbols = []
+		# self.nasdaq_trader_list = {}
+		# self.nasdaq_trader_ranking = []
+
+
+		# check the ranking from 10 minutes ago. Eliminate auto Refresh. 
+
+		ranking = {}
+		for i in range(len(d[1])):
+			#print(d[1][i][1],d[1][i][0])
+			ranking[d[1][i][1]] = int(d[1][i][0])
+
+		self.nasdaq_trader_symbols.append(ranking)
+
+		if len(self.nasdaq_trader_symbols)>10:
+			self.nasdaq_trader_symbols.pop(0)
+
 		self.recreate_labels(self.NT_scanner_frame)
 		self.nasdaq = []
 
@@ -322,7 +341,21 @@ class scanner(pannel):
 			for i in range(len(d[1])):
 				self.nasdaq.append([])
 				for j in range(len(width)):
-					if j!= len(width)-1:
+					if j == 1:
+						#check the ranking. decide color. 
+						prev_ranking = self.nasdaq_trader_symbols[0]
+
+						#if ranking is ahead. print up how many, and give color
+						diff = prev_ranking[d[1][i][j]] -ranking[d[1][i][j]]
+						if diff>0:
+							tex = d[1][i][j]+" ↑"+str(diff)
+							self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=tex,width=width[j]))
+							self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+						#else just normal. 
+						else:
+							self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=d[1][i][j],width=width[j]))
+							self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+					elif j!= len(width)-1:
 						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=d[1][i][j],width=width[j]))
 						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 					else:
@@ -414,4 +447,6 @@ class scanner(pannel):
 			else:
 				self.status_change("Please retry")
 				self.scanner_process_manager.adding_comlete()
+
+
 
