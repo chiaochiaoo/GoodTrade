@@ -360,9 +360,9 @@ class scanner(pannel):
 							self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=d[1][i][j],width=width[j]))
 							self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 						#else just normal. 
-					
 
-					elif j>1 and j!= len(width)-1:
+
+					elif j==0 or j!= len(width)-1:
 						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=d[1][i][j],width=width[j]))
 						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 					else:
