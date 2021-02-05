@@ -356,7 +356,12 @@ class scanner(pannel):
 							diff = prev_ranking[symbol] -ranking[symbol]
 							if diff>0:
 								tex = d[1][i][j]+" ↑"+str(diff)
-								self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=tex,width=width[j],background="#97FEA8"))
+								color = "#97FEA8"
+								if diff >3: 
+									color = "#BDFE10"
+								if diff >5:
+									color = "#FC3DC8"
+								self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=tex,width=width[j],background=color))
 								self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 							else:
 								self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=d[1][i][j],width=width[j]))
