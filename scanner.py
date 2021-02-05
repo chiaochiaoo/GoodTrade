@@ -335,7 +335,7 @@ class scanner(pannel):
 		self.recreate_labels(self.NT_scanner_frame)
 		self.nasdaq = []
 
-		width = [3,5,10,10,10,10,5]
+		width = [3,8,9,10,10,10,5]
 
 		if 1:
 			for i in range(len(d[1])):
