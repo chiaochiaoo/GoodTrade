@@ -337,7 +337,7 @@ class scanner(pannel):
 
 		width = [3,5,10,10,10,10,5]
 
-		try:
+		if 1:
 			for i in range(len(d[1])):
 				self.nasdaq.append([])
 				for j in range(len(width)):
@@ -353,11 +353,16 @@ class scanner(pannel):
 								tex = d[1][i][j]+" ↑"+str(diff)
 								self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=tex,width=width[j],background="#97FEA8"))
 								self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-						#else just normal. 
+							else:
+								self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=d[1][i][j],width=width[j]))
+								self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 						else:
 							self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=d[1][i][j],width=width[j]))
 							self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-					elif j!= len(width)-1:
+						#else just normal. 
+					
+
+					elif j>1 and j!= len(width)-1:
 						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=d[1][i][j],width=width[j]))
 						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 					else:
@@ -402,8 +407,8 @@ class scanner(pannel):
 
 			self.NT_update_time.set(d[3])
 
-		except Exception as e:
-			print("Adding Nasdaq labels error",e)
+		# except Exception as e:
+		# 	print("Adding Nasdaq labels error",e)
 
 		self.scanner_process_manager.updating_comlete()
 
