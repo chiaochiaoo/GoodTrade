@@ -346,11 +346,13 @@ class scanner(pannel):
 						prev_ranking = self.nasdaq_trader_symbols[0]
 
 						#if ranking is ahead. print up how many, and give color
-						diff = prev_ranking[d[1][i][j]] -ranking[d[1][i][j]]
-						if diff>0:
-							tex = d[1][i][j]+" ↑"+str(diff)
-							self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=tex,width=width[j]))
-							self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+						symbol = d[1][i][j]
+						if symbol in prev_ranking:
+							diff = prev_ranking[symbol] -ranking[symbol]
+							if diff>0:
+								tex = d[1][i][j]+" ↑"+str(diff)
+								self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=tex,width=width[j],background="#97FEA8"))
+								self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 						#else just normal. 
 						else:
 							self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=d[1][i][j],width=width[j]))
