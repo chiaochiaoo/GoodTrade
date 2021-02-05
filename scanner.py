@@ -19,7 +19,7 @@ class scanner(pannel):
 
 		self.nasdaq_trader_symbols = []
 		self.nasdaq_trader_list = {}
-
+		self.nasdaq_trader_symbols_ranking = []
 		self.nasdaq_trader_ranking = []
 
 		self.tabControl = ttk.Notebook(root)
@@ -327,10 +327,10 @@ class scanner(pannel):
 			#print(d[1][i][1],d[1][i][0])
 			ranking[d[1][i][1]] = int(d[1][i][0])
 
-		self.nasdaq_trader_symbols.append(ranking)
+		self.nasdaq_trader_symbols_ranking.append(ranking)
 
-		if len(self.nasdaq_trader_symbols)>10:
-			self.nasdaq_trader_symbols.pop(0)
+		if len(self.nasdaq_trader_symbols_ranking)>10:
+			self.nasdaq_trader_symbols_ranking.pop(0)
 
 		self.recreate_labels(self.NT_scanner_frame)
 		self.nasdaq = []
@@ -343,10 +343,15 @@ class scanner(pannel):
 				for j in range(len(width)):
 					if j == 1:
 						#check the ranking. decide color. 
-						prev_ranking = self.nasdaq_trader_symbols[0]
+						prev_ranking = self.nasdaq_trader_symbols_ranking[0]
 
 						#if ranking is ahead. print up how many, and give color
 						symbol = d[1][i][j]
+
+						# print(type(prev_ranking))
+						# print(prev_ranking)
+						# print(prev_ranking[symbol])
+						
 						if symbol in prev_ranking:
 							diff = prev_ranking[symbol] -ranking[symbol]
 							if diff>0:
