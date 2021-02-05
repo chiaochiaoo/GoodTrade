@@ -33,6 +33,9 @@ class scanner_process_manager:
 		self.request = request_pipe
 		self.pannel = None
 
+		auto_refresh = threading.Thread(target=self.auto_refresh_nasdaq_trader, daemon=True)
+		auto_refresh.start()
+
 	def set_pannel(self,scanner_pannel):
 		self.pannel = scanner_pannel
 
@@ -56,6 +59,15 @@ class scanner_process_manager:
 			receive = threading.Thread(name="Reiceive info",target=self.receive_request, daemon=True)
 			receive.start()
 
+
+	def auto_refresh_nasdaq_trader(self):
+
+		time.sleep(10)
+		while True:
+			self.refresh_nasdaq_trader()
+			time.sleep(60)
+
+
 	def refresh_nasdaq_trader(self):
 
 		if(self.downloading2 == True):
@@ -67,6 +79,8 @@ class scanner_process_manager:
 
 			receive = threading.Thread(name="Reiceive info",target=self.receive_request, daemon=True)
 			receive.start()
+
+
 
 
 	def receive_request(self):
@@ -159,7 +173,7 @@ def multi_processing_scanner(pipe_receive):
 					except:
 						data2 = []
 
-					pipe_receive.send(["Nasdaq",data,data2,str(t)])
+					pipe_receive.send(["Nasdaq",data,data2,str(t)[:-4]])
 					#self.pannel.status_nasdaqchange("Fetching complete")
 					sucess= True
 				except:

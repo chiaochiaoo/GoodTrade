@@ -15,6 +15,11 @@ class scanner(pannel):
 
 		super()
 
+
+
+		self.nasdaq_trader_symbols = []
+		self.nasdaq_trader_list = {}
+
 		self.tabControl = ttk.Notebook(root)
 		self.tabControl.place(x=0,rely=0.01,relheight=1,width=500)
 
@@ -24,15 +29,27 @@ class scanner(pannel):
 		self.tabControl.add(self.tab1, text ='Finviz') 
 		self.tabControl.add(self.tab2, text ='Nasdaq Trader') 
 
-
-
 		############################### Nasdaq Trader ############################################
-
 
 		self.nasdaq = []
 
 		self.NT_refresh = ttk.Button(self.tab2,
 			text ="Refresh",command=self.refresh_nasdaq).place(relx=0.01, rely=0.01, height=25, width=70)
+
+
+		self.add_amount = tk.StringVar(self.tab2)
+		self.add_choices = {'Top 5','Top 10','Top 20','Top 50','All'}
+		self.add_amount.set('Top 5') 
+
+		self.op = tk.OptionMenu(self.tab2, self.add_amount, *sorted(self.add_choices))
+		#self.menu1 = ttk.Label(self.setting, text="Country").grid(row = 1, column = 3)
+		self.op.place(x=295, rely=0.01, height=25, width=70)
+
+		self.add_button = ttk.Button(self.tab2,
+			text ="Add",command=self.add_symbols).place(x=380, rely=0.01, height=25, width=70)
+
+
+
 
 		self.NT_update_time = tk.StringVar(root)
 		self.NT_update_time.set('Last updated') 
@@ -62,17 +79,9 @@ class scanner(pannel):
 		self.NT_scanner_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
 		self.NT_scanner_canvas.create_window(0, 0, window=self.NT_scanner_frame, anchor=tk.NW)
 
-		for i in range(len(labels)): #Rows
-			self.b = tk.Button(self.NT_scanner_frame, text=labels[i],width=width[i])#,command=self.rank
-			self.b.configure(activebackground="#f9f9f9")
-			self.b.configure(activeforeground="black")
-			self.b.configure(background="#d9d9d9")
-			self.b.configure(disabledforeground="#a3a3a3")
-			self.b.configure(relief="ridge")
-			self.b.configure(foreground="#000000")
-			self.b.configure(highlightbackground="#d9d9d9")
-			self.b.configure(highlightcolor="black")
-			self.b.grid(row=1, column=i)
+
+		self.recreate_labels(self.NT_scanner_frame)
+
 
 
 		self.NT_scanner_canvas2 = tk.Canvas(self.after)
@@ -96,10 +105,6 @@ class scanner(pannel):
 			self.b.configure(highlightbackground="#d9d9d9")
 			self.b.configure(highlightcolor="black")
 			self.b.grid(row=1, column=i)
-
-
-
-
 
 
 		############################### Finviz ############################################
@@ -197,6 +202,44 @@ class scanner(pannel):
 		self.rebind(self.scanner_canvas,self.scanner_frame)
 
 
+	def add_symbols(self):
+
+
+		s = self.add_amount.get()
+
+		l = []
+		if s == 'Top 5':
+			l = self.nasdaq_trader_symbols[:5]
+		elif s == 'Top 10':
+			l = self.nasdaq_trader_symbols[:10]
+		elif s == 'Top 20':
+			l = self.nasdaq_trader_symbols[:20]
+		elif s == 'Top 50':
+			l = self.nasdaq_trader_symbols[:50]
+		elif s == 'All':
+			l = self.nasdaq_trader_symbols
+
+		for i in l:
+			self.tickers_manager.add_symbol_reg_list(i)
+
+
+
+	def recreate_labels(self,frame):
+		width = [3,5,10,10,10,10,5]
+		labels = ["Rank","Symbol","MKT Center","Matched Shares","Last Matched","Open Orders","Add"]
+
+		for i in range(len(labels)): #Rows
+			self.b = tk.Button(frame, text=labels[i],width=width[i])#,command=self.rank
+			self.b.configure(activebackground="#f9f9f9")
+			self.b.configure(activeforeground="black")
+			self.b.configure(background="#d9d9d9")
+			self.b.configure(disabledforeground="#a3a3a3")
+			self.b.configure(relief="ridge")
+			self.b.configure(foreground="#000000")
+			self.b.configure(highlightbackground="#d9d9d9")
+			self.b.configure(highlightcolor="black")
+			self.b.grid(row=1, column=i)
+
 
 	def status_change(self,var):
 		self.status.set(var)
@@ -235,10 +278,15 @@ class scanner(pannel):
 
 	def delete_old_labels_nasdaq(self):
 
-		if len(self.nasdaq)>0:
-			for i in self.nasdaq:
-				for j in i:
-					j.destroy()
+
+		#i needs to be canvas. 
+		for widget in self.NT_scanner_frame.winfo_children():
+				widget.destroy()
+
+		# if len(self.nasdaq)>0:
+		# 	for i in self.nasdaq:
+		# 		for j in i:
+		# 			j.destroy()
 
 	def refresh(self):
 
@@ -253,13 +301,19 @@ class scanner(pannel):
 		self.scanner_process_manager.send_request(cond,market_,type_,cap)
 
 
+	#every 1 minute? i am relectant to do it here. 
 	def refresh_nasdaq(self):
-		self.delete_old_labels_nasdaq()
+		#self.delete_old_labels_nasdaq()
 		self.scanner_process_manager.refresh_nasdaq_trader()
 
 	def add_nasdaq_labels(self,d):
 
+
+		self.delete_old_labels_nasdaq()
+
 		#print(d[3])
+
+		self.recreate_labels(self.NT_scanner_frame)
 		self.nasdaq = []
 
 		width = [3,5,10,10,10,10,5]
@@ -283,6 +337,8 @@ class scanner(pannel):
 						self.nasdaq[i].append(tk.Button(self.NT_scanner_frame ,text="Add",width=width[j],command= lambda k=sy: self.tickers_manager.add_symbol_reg_list(k)))
 						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 
+						self.nasdaq_trader_symbols.append(sy)
+
 			self.rebind(self.NT_scanner_canvas,self.NT_scanner_frame)
 
 
@@ -303,12 +359,10 @@ class scanner(pannel):
 							sy = d[2][i][1] +".NQ"
 
 
-
 						self.nasdaq[i+l].append(tk.Button(self.NT_scanner_frame2,text="Add",width=width[j],command= lambda k=sy: self.tickers_manager.add_symbol_reg_list(k)))
 						self.nasdaq[i+l][j].grid(row=i+2, column=j,padx=0)
 
 			self.rebind(self.NT_scanner_canvas2,self.NT_scanner_frame2)
-
 
 
 			self.NT_update_time.set(d[3])
