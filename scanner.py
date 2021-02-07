@@ -15,7 +15,9 @@ class scanner(pannel):
 
 		super()
 
-
+		#mark if already created. if so, just update the infos. 
+		self.nasdaq_trader_created_1 = False
+		self.nasdaq_trader_created_2 = False
 
 		self.nasdaq_trader_symbols = []
 		self.nasdaq_trader_list = {}
@@ -30,14 +32,13 @@ class scanner(pannel):
 
 		self.tabControl.add(self.tab1, text ='Finviz') 
 		self.tabControl.add(self.tab2, text ='Nasdaq Trader') 
-
+		self.nasdaq = []
 		############################### Nasdaq Trader ############################################
 
 		self.nasdaq = []
 
 		self.NT_refresh = ttk.Button(self.tab2,
 			text ="Refresh",command=self.refresh_nasdaq).place(relx=0.01, rely=0.01, height=25, width=70)
-
 
 		self.add_amount = tk.StringVar(self.tab2)
 		self.add_choices = {'Top 5','Top 10','Top 20','Top 50','All'}
@@ -96,18 +97,8 @@ class scanner(pannel):
 		self.NT_scanner_frame2.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
 		self.NT_scanner_canvas2.create_window(0, 0, window=self.NT_scanner_frame2, anchor=tk.NW)
 
-		for i in range(len(labels)): #Rows
-			self.b = tk.Button(self.NT_scanner_frame2, text=labels[i],width=width[i])#,command=self.rank
-			self.b.configure(activebackground="#f9f9f9")
-			self.b.configure(activeforeground="black")
-			self.b.configure(background="#d9d9d9")
-			self.b.configure(disabledforeground="#a3a3a3")
-			self.b.configure(relief="ridge")
-			self.b.configure(foreground="#000000")
-			self.b.configure(highlightbackground="#d9d9d9")
-			self.b.configure(highlightcolor="black")
-			self.b.grid(row=1, column=i)
 
+		self.recreate_labels(self.NT_scanner_frame2)
 
 		############################### Finviz ############################################
 
@@ -272,15 +263,12 @@ class scanner(pannel):
 	#Steps2. Synchonous Version. - Just need to let it load, and then call it and sne,.d
 
 	def delete_old_lables(self):
-
 		if len(self.info)>0:
 			for i in self.info:
 				for j in i:
 					j.destroy()
 
 	def delete_old_labels_nasdaq(self):
-
-
 		#i needs to be canvas. 
 		for widget in self.NT_scanner_frame.winfo_children():
 				widget.destroy()
@@ -289,6 +277,18 @@ class scanner(pannel):
 		# 	for i in self.nasdaq:
 		# 		for j in i:
 		# 			j.destroy()
+
+	def market_suffix_nasdaq_trader(self,symbol,market):
+
+		sy = ""
+		if market == "NY":
+			sy =symbol +".NY"
+		elif market == "AM" or market == "P" or market == "Z":
+			sy = symbol +".AM"
+		elif market == "Q" or market == "S" or market == "G":
+			sy = symbol +".NQ"
+
+		return sy
 
 	def refresh(self):
 
@@ -311,16 +311,13 @@ class scanner(pannel):
 	def add_nasdaq_labels(self,d):
 
 
-		self.delete_old_labels_nasdaq()
-
-		#print(d[3])
-
-		# self.nasdaq_trader_symbols = []
-		# self.nasdaq_trader_list = {}
-		# self.nasdaq_trader_ranking = []
-
+		# self.nasdaq_trader_created_1 = False
+		# self.nasdaq_trader_created_2 = False
+		#self.delete_old_labels_nasdaq()
 
 		# check the ranking from 10 minutes ago. Eliminate auto Refresh. 
+
+		print("Nasdaq Trader refreshed")
 
 		ranking = {}
 		for i in range(len(d[1])):
@@ -332,87 +329,88 @@ class scanner(pannel):
 		if len(self.nasdaq_trader_symbols_ranking)>10:
 			self.nasdaq_trader_symbols_ranking.pop(0)
 
-		self.recreate_labels(self.NT_scanner_frame)
-		self.nasdaq = []
-
-		width = [3,8,9,10,10,10,5]
+		self.nasdaq_trader_symbols = []
+		width = [3,8,4,10,10,10,5]
 
 		if 1:
-			for i in range(len(d[1])):
-				self.nasdaq.append([])
-				for j in range(len(width)):
-					if j == 1:
-						#check the ranking. decide color. 
-						prev_ranking = self.nasdaq_trader_symbols_ranking[0]
+			if len(d[1])>50 and self.nasdaq_trader_created_1 == False:
 
-						#if ranking is ahead. print up how many, and give color
-						symbol = d[1][i][j]
+				for i in range(len(d[1])):
+					self.nasdaq.append([])
+					for j in range(len(width)):
+						if j == 1:
+							self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=d[1][i][j],width=width[j],background="SystemButtonFace"))
+							self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+							#else just normal. 
 
-						# print(type(prev_ranking))
-						# print(prev_ranking)
-						# print(prev_ranking[symbol])
-						
-						if symbol in prev_ranking:
-							diff = prev_ranking[symbol] -ranking[symbol]
-							if diff>0:
-								tex = d[1][i][j]+" ↑"+str(diff)
-								color = "#97FEA8"
-								if diff >3: 
-									color = "#BDFE10"
-								if diff >5:
-									color = "#FC3DC8"
-								self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=tex,width=width[j],background=color))
-								self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-							else:
-								self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=d[1][i][j],width=width[j]))
-								self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-						else:
+						elif j==0 or j!= len(width)-1:
 							self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=d[1][i][j],width=width[j]))
 							self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-						#else just normal. 
+						else:
+							sy = self.market_suffix_nasdaq_trader(d[1][i][1],d[1][i][2])
 
+							self.nasdaq[i].append(tk.Button(self.NT_scanner_frame ,text="Add",width=width[j],command= lambda k=sy: self.tickers_manager.add_symbol_reg_list(k)))
+							self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+							self.nasdaq_trader_symbols.append(sy)
+				self.nasdaq_trader_created_1 = True
+				self.rebind(self.NT_scanner_canvas,self.NT_scanner_frame)
+			else:
+				for i in range(len(d[1])):
+					for j in range(len(width)):
+						if j == 1:
+							#check the ranking. decide color. 
+							prev_ranking = self.nasdaq_trader_symbols_ranking[0]
 
-					elif j==0 or j!= len(width)-1:
-						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=d[1][i][j],width=width[j]))
-						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-					else:
-						sy = ""
-						if d[1][i][2] == "NY":
-							sy = d[1][i][1] +".NY"
-						elif d[1][i][2] == "AM" or d[1][i][2] == "P" or d[1][i][2] == "Z":
-							sy = d[1][i][1] +".AM"
-						elif d[1][i][2] == "Q" or d[1][i][2] == "S" or d[1][i][2] == "G":
-							sy = d[1][i][1] +".NQ"
+							#if ranking is ahead. print up how many, and give color
+							symbol = d[1][i][j]
+							
+							if symbol in prev_ranking:
+								diff = prev_ranking[symbol] -ranking[symbol]
+								if diff>0:
+									tex = d[1][i][j]+" ↑"+str(diff)
+									color = "#97FEA8"
+									if diff >3: 
+										color = "#BDFE10"
+									if diff >5:
+										color = "#FC3DC8"
+									self.nasdaq[i][j]["text"]=tex
+									self.nasdaq[i][j]["background"]=color
+								else:
+									self.nasdaq[i][j]["text"]=symbol
+									self.nasdaq[i][j]["background"]="SystemButtonFace"
+							else:
+								self.nasdaq[i][j]["text"]=symbol
+								self.nasdaq[i][j]["background"]="SystemButtonFace"
+							#else just normal. 
 
-						self.nasdaq[i].append(tk.Button(self.NT_scanner_frame ,text="Add",width=width[j],command= lambda k=sy: self.tickers_manager.add_symbol_reg_list(k)))
-						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+						elif j==0 or j!= len(width)-1:
+							#just update the text.
+							self.nasdaq[i][j]["text"] = d[1][i][j]
+							# self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=d[1][i][j],width=width[j]))
+							# self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+						else:
+							sy = self.market_suffix_nasdaq_trader(d[1][i][1],d[1][i][2])
+							self.nasdaq[i][j]["command"] = lambda k=sy: self.tickers_manager.add_symbol_reg_list(k)
 
-						self.nasdaq_trader_symbols.append(sy)
+							self.nasdaq_trader_symbols.append(sy)
 
-			self.rebind(self.NT_scanner_canvas,self.NT_scanner_frame)
+			if len(d[2])>50 and self.nasdaq_trader_created_2 == False:
+				l = len(self.nasdaq)
+				for i in range(len(d[2])):
+					self.nasdaq.append([])
+					for j in range(len(width)):
+						if j!= len(width)-1:
+							self.nasdaq[i+l].append(tk.Label(self.NT_scanner_frame2,text=d[2][i][j],width=width[j]))
+							self.nasdaq[i+l][j].grid(row=i+2, column=j,padx=0)
+						else:
+							sy = self.market_suffix_nasdaq_trader(d[2][i][1],d[2][i][2])
 
+							self.nasdaq[i+l].append(tk.Button(self.NT_scanner_frame2,text="Add",width=width[j],command= lambda k=sy: self.tickers_manager.add_symbol_reg_list(k)))
+							self.nasdaq[i+l][j].grid(row=i+2, column=j,padx=0)
+				self.nasdaq_trader_created_2 = True
+				self.rebind(self.NT_scanner_canvas2,self.NT_scanner_frame2)
 
-			l = len(self.nasdaq)
-			for i in range(len(d[2])):
-				self.nasdaq.append([])
-				for j in range(len(width)):
-					if j!= len(width)-1:
-						self.nasdaq[i+l].append(tk.Label(self.NT_scanner_frame2,text=d[2][i][j],width=width[j]))
-						self.nasdaq[i+l][j].grid(row=i+2, column=j,padx=0)
-					else:
-						sy = ""
-						if d[2][i][2] == "NY":
-							sy = d[2][i][1] +".NY"
-						elif d[2][i][2] == "AM" or d[2][i][2] == "P" or d[2][i][2] == "Z":
-							sy = d[2][i][1] +".AM"
-						elif d[2][i][2] == "Q" or d[2][i][2] == "S" or d[2][i][2] == "G":
-							sy = d[2][i][1] +".NQ"
-
-
-						self.nasdaq[i+l].append(tk.Button(self.NT_scanner_frame2,text="Add",width=width[j],command= lambda k=sy: self.tickers_manager.add_symbol_reg_list(k)))
-						self.nasdaq[i+l][j].grid(row=i+2, column=j,padx=0)
-
-			self.rebind(self.NT_scanner_canvas2,self.NT_scanner_frame2)
+			#else:
 
 
 			self.NT_update_time.set(d[3])
