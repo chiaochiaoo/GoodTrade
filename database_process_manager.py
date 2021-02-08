@@ -212,23 +212,29 @@ def fetch_data(symbol):
 		r= request(postbody, symbol)
 
 		if r!="":
-
 			a=[]#data.symbol_data_first5_dis[i]
 			b=[]#data.symbol_data_first5_vol_dis[i]
 
 			c=[]#data.symbol_data_normal5_dis[i]
 			d=[]#data.symbol_data_normal5_vol_dis[i]
 
-			for line in r.splitlines():
-				lst=line.split(",")
+			if r[:3]=="402":
+				print("Not authorize to",symbol)
+				a=[0]#data.symbol_data_first5_dis[i]
+				b=[0]#data.symbol_data_first5_vol_dis[i]
 
-				r = round(float(lst[3])-float(lst[4]),3)
-				v = int(lst[6])
-				if lst[1]=='09:30':
-					a.append(r)
-					b.append(v)
-				c.append(r)
-				d.append(v)
+				c=[0]#data.symbol_data_normal5_dis[i]
+				d=[0]#data.symbol_data_normal5_vol_dis[i]
+			else:
+				for line in r.splitlines():
+					lst=line.split(",")
+					r = round(float(lst[3])-float(lst[4]),3)
+					v = int(lst[6])
+					if lst[1]=='09:30':
+						a.append(r)
+						b.append(v)
+					c.append(r)
+					d.append(v)
 
 
 			print(symbol,"Fetch 5-min  data complete:",len(a),"days")
