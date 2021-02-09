@@ -209,11 +209,11 @@ def client_scanner(pipe):
 			pipe.send(["msg","Connection Successful"])
 			print("Scanner server Connection Successful")
 			while connection:
-				try:
-					s.sendall(b'Alive check')
-				except:
-					connection = False
-					break
+				# try:
+				# 	s.sendall(b'Alive check')
+				# except:
+				# 	connection = False
+				# 	break
 				data = []
 				print("Scanner client: taking data")
 				while True:
@@ -233,7 +233,7 @@ def client_scanner(pipe):
 						except:
 							pass
 				#k is received. 
-				print("Scanner client: taking data success",k)
+				print("Scanner client: taking data success")
 				pipe.send(["pkg",k])
 			print("Server disconnected")
 			pipe.send(["msg","Server disconnected"])
