@@ -57,7 +57,7 @@ class scanner(pannel):
 
 		self.NT_stat = ttk.Label(self.tab2, textvariable=self.NT_update_time).place(x=95, rely=0.01, height=25, width=200)
 
-		width = [3,5,10,10,10,10,5]
+		width = [3,7,7,11,11,10,5]
 		labels = ["Rank","Symbol","MKT Center","Matched Shares","Last Matched","Open Orders","Add"]
 
 		self.NT = ttk.Notebook(self.tab2)

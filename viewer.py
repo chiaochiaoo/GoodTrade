@@ -277,13 +277,13 @@ if __name__ == '__main__':
 	#### SCANNER SUB PROCESS####
 	request_scanner, receive_pipe = multiprocessing.Pipe()
 
-	# process_scanner = multiprocessing.Process(target=multi_processing_scanner, args=(receive_pipe,),daemon=True)
-	# process_scanner.daemon=True
-	# process_scanner.start()
-	
-	process_scanner = multiprocessing.Process(target=client_scanner, args=(receive_pipe,),daemon=True)
+	process_scanner = multiprocessing.Process(target=multi_processing_scanner, args=(receive_pipe,),daemon=True)
 	process_scanner.daemon=True
 	process_scanner.start()
+
+	process_scanner_b = multiprocessing.Process(target=client_scanner, args=(receive_pipe,),daemon=True)
+	process_scanner_b.daemon=True
+	process_scanner_b.start()
 
 	s = scanner_process_manager(request_scanner)
 
@@ -324,6 +324,7 @@ if __name__ == '__main__':
 	request_scanner.send(["terminate"])
 	process_database.terminate()
 	process_ppro.terminate()
+	process_scanner_b.terminate()
 
 	request_scanner.recv()
 	process_scanner.terminate()
