@@ -190,57 +190,57 @@ def client_scanner(pipe):
 		HOST = '10.29.10.132'  # The server's hostname or IP address
 		PORT = 65423       # The port used by the server
 
-		try:
-			print("Trying to connect to the Scanner server")
-			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			connected = False
+	
+		print("Trying to connect to the Scanner server")
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		connected = False
 
-			while not connected:
+		while not connected:
+			try:
+				s.connect((HOST, PORT))
+				connected = True
+			except:
+				#pipe.send(["msg","Cannot connected. Try again in 2 seconds."])
+				print("Cannot connect Scanner server. Try again in 2 seconds.")
+				time.sleep(2)
+
+
+		connection = True
+		pipe.send(["msg","Connection Successful"])
+		print("Scanner server Connection Successful")
+		while connection:
+			# try:
+			# 	s.sendall(b'Alive check')
+			# except:
+			# 	connection = False
+			# 	break
+			data = []
+			print("Scanner client: taking data")
+			while True:
 				try:
-					s.connect((HOST, PORT))
-					connected = True
+					part = s.recv(2048)
 				except:
-					#pipe.send(["msg","Cannot connected. Try again in 2 seconds."])
-					print("Cannot connect Scanner server. Try again in 2 seconds.")
-					time.sleep(2)
-
-
-			connection = True
-			pipe.send(["msg","Connection Successful"])
-			print("Scanner server Connection Successful")
-			while connection:
-				# try:
-				# 	s.sendall(b'Alive check')
-				# except:
-				# 	connection = False
-				# 	break
-				data = []
-				print("Scanner client: taking data")
-				while True:
+					connection = False
+					break
+				#if not part: break
+				print("Scanner, hello")
+				data.append(part)
+				if len(part) < 2048:
+					#try to assemble it, if successful.jump. else, get more. 
 					try:
-						part = s.recv(2048)
-					except:
-						connection = False
+						k = pickle.loads(b"".join(data))
+						#k = pd.read_pickle(b"".join(data))
 						break
-					#if not part: break
-					print("Scanner, hello")
-					data.append(part)
-					if len(part) < 2048:
-						#try to assemble it, if successful.jump. else, get more. 
-						try:
-							k = pickle.loads(b"".join(data))
-							#k = pd.read_pickle(b"".join(data))
-							break
-						except:
-							pass
-				#k is received. 
-				print("Scanner client: taking data success")
-				pipe.send(["pkg",k])
-			print("Server disconnected")
-			pipe.send(["msg","Server disconnected"])
-		except Exception as e:
-			pipe.send(["msg",e])
-			print(e)
+					except:
+						pass
+			#k is received. 
+			print("Scanner client: taking data success")
+			pipe.send(["pkg",k])
+		print("Server disconnected")
+		pipe.send(["msg","Server disconnected"])
+		# except Exception as e:
+		# 	pipe.send(["msg",e])
+		# 	print(e)
 		#restarted the whole thing 
 
 
