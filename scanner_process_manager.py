@@ -63,7 +63,7 @@ class scanner_process_manager:
 		while True:
 			d = self.request.recv()
 			count +=1
-			print("manager info received",count,d[1])
+			#print("manager info received",count,d[1])
 
 			if d[0]=="pkg":
 				try:
