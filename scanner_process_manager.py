@@ -215,6 +215,7 @@ def client_scanner(pipe):
 					connection = False
 					break
 				data = []
+				print("Scanner client: taking data")
 				while True:
 					try:
 						part = s.recv(2048)
@@ -232,6 +233,7 @@ def client_scanner(pipe):
 						except:
 							pass
 				#k is received. 
+				print("Scanner client: taking data success")
 				pipe.send(["pkg",k])
 			print("Server disconnected")
 			pipe.send(["msg","Server disconnected"])
