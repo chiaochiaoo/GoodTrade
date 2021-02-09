@@ -2,6 +2,7 @@ import requests
 import multiprocessing
 import threading
 import time
+import json
 from datetime import datetime
 
 from Symbol_data_manager import *
@@ -28,7 +29,77 @@ global connection_error
 #### send the updates back to the client.
 ############################################################
 
+def round_up(i):
 
+	if i<1:
+		return round(i,3)
+	else:
+		return round(i,2)
+
+def fetch_yahoo(symbol):
+	url = "https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-chart"
+
+	querystring = {"region":"US","interval":"1m","symbol":symbol,"range":"1d"}
+
+	headers = {
+		'x-rapidapi-host': "apidojo-yahoo-finance-v1.p.rapidapi.com",
+		'x-rapidapi-key': "ecb76c89e1mshc1fe02b7259bd58p19ddf6jsnaad53d5c4ecb"
+		}
+
+	response = requests.request("GET", url, headers=headers, params=querystring)
+	res = json.loads(response.text)
+
+	ts =[]
+	#print(res['chart']['result'][0]['indicators']['quote'][0])
+	for i in res['chart']['result'][0]['timestamp']:
+		ts.append(datetime.fromtimestamp(i).strftime('%H:%M'))
+
+	#if it has 09:30. 
+	high,low,m_high,m_low,f5,f5v = 0,0,0,0,0,0
+	if "09:30" in ts:
+		start = ts.index("09:30")
+		
+		high = np.array(res['chart']['result'][0]['indicators']['quote'][0]["high"][:start])
+		low = np.array(res['chart']['result'][0]['indicators']['quote'][0]["low"][:start])
+
+		high = np.max(high[high != np.array(None)])
+		low = np.min(low[low != np.array(None)])
+
+
+		m_high = np.array(res['chart']['result'][0]['indicators']['quote'][0]["high"][start:])
+		m_low = np.array(res['chart']['result'][0]['indicators']['quote'][0]["low"][start:])
+
+		m_high = round_up(np.max(m_high[m_high != np.array(None)]))
+		m_low = round_up(np.min(m_low[m_low != np.array(None)]))
+
+
+		f5_high = np.array(res['chart']['result'][0]['indicators']['quote'][0]["high"][start:start+6])
+		f5_low = np.array(res['chart']['result'][0]['indicators']['quote'][0]["low"][start:start+6])
+
+		f5_high = round_up(np.max(f5_high[f5_high != np.array(None)]))
+		f5_low = round_up(np.min(f5_low[f5_low != np.array(None)]))
+
+
+		f5_v = np.array(res['chart']['result'][0]['indicators']['quote'][0]["volume"][start:start+6])
+		
+		f5 = round_up(f5_high-f5_low) 
+
+		f5v = np.sum(f5_v[f5_v != np.array(None)])/1000
+
+	
+
+	else:
+		high = np.array(res['chart']['result'][0]['indicators']['quote'][0]["high"])
+		low = np.array(res['chart']['result'][0]['indicators']['quote'][0]["low"])
+
+		high = round_up(np.max(high[high != np.array(None)]))
+		low = round_up(np.min(low[low != np.array(None)]))
+		m_high=high
+		m_low=low
+
+
+
+	return high,low,m_high,m_low,f5,f5v
 def test_register():
 	try:
 		p="http://localhost:8080/Deregister?symbol=AAPL.NQ&feedtype=L1"
@@ -42,9 +113,9 @@ def test_register():
 		return True
 
 def register(symbol):
+
 	global reg_count
 	global reg_list
-
 	global lock
 
 	try:
@@ -211,6 +282,15 @@ def timestamp_seconds(s):
 def init(symbol,price):
 
 	global data
+
+	#PH,PL,H,L
+	range_data=[]
+	try:
+		range_data=fetch_yahoo(symbol.split(".")[0])
+	except:
+		print("Yahoo fetching",symbol,"error")
+		range_data=[price,price,price,price]
+	
 	data[symbol] = {}
 	d = data[symbol]
 
@@ -218,8 +298,12 @@ def init(symbol,price):
 	d["timestamp"] =0
 	d["time"] = ""
 
-	d["high"] = price
-	d["low"] = price
+	#here I need to access the data from database. 
+	d["high"] = range_data[2]
+	d["low"] = range_data[3]
+
+	d["phigh"] = range_data[0]
+	d["plow"] =range_data[1]
 
 	d["range"] = 0
 	d["last_5_range"] = 0
@@ -233,8 +317,8 @@ def init(symbol,price):
 	d["oh"] = 0
 	d["ol"] = 0
 
-	d["f5r"] = 0
-	d["f5v"] = 0
+	d["f5r"] = range_data[4]
+	d["f5v"] = range_data[5]
 
 	d["timetamps"] = []
 	d["highs"] = []
@@ -244,7 +328,7 @@ def init(symbol,price):
 def process_and_send(lst,pipe):
 
 	global lock
-	status,symbol,time,timestamp,price,open_,high,low,vol,prev_close  = lst[0],lst[1],lst[2],lst[3],lst[4],lst[5],lst[6],lst[7],lst[8],lst[9]
+	status,symbol,time,timestamp,price,open_,vol,prev_close  = lst[0],lst[1],lst[2],lst[3],lst[4],lst[5],lst[6],lst[7]
 
 	global data
 
@@ -272,19 +356,30 @@ def process_and_send(lst,pipe):
 	d["open"] = open_
 	d["prev_close"] = prev_close
 
-	d["oh"] = round(high - open_,3)
-	d["ol"] = round(open_ - low,3)
+	#else:
+	#here I set them. 
+	if price > d["high"]:
+		d["high"] = price
+		if timestamp <570:
+			d["phigh"] = d["high"]
+	if price < d["low"]:
+		d["low"] = price
+		if timestamp <570:
+			d["plow"] = d["plow"]
+
+	d["range"] = round(d["high"] - d["low"],3)
+	#print("check",d["range"],d["high"],d["low"],d["phigh"],d["plow"])
 
 	if timestamp <570:
 		d["open"] = 0
 		d["oh"] = 0
 		d["ol"] = 0
+	else:
+		d["oh"] = round(d["high"] - open_,3)
+		d["ol"] = round(open_ - d["low"],3)
 
-	#else:
-	d["high"] = high
-	d["low"] = low
 
-	d["range"] = round(d["high"] - d["low"],3)
+
 	d["prev_close_gap"] = round(price-prev_close,3)
 
 	# now update the datalists.
@@ -328,7 +423,7 @@ def process_and_send(lst,pipe):
 			status = "Lagged"
 			register_again = True
 
-	pipe.send([status,symbol,price,time,timestamp,d["high"],d["low"],\
+	pipe.send([status,symbol,price,time,timestamp,d["high"],d["low"],d["phigh"],d["plow"],\
 		d["range"],d["last_5_range"],d["vol"],d["open"],d["oh"],d["ol"],
 		d["f5r"],d["f5v"],d["prev_close"],d["prev_close_gap"]])
 
@@ -364,8 +459,10 @@ def getinfo(symbol,pipe):
 					time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
 
 					open_ = float(find_between(r.text, "OpenPrice=\"", "\""))
-					high = float(find_between(r.text, "HighPrice=\"", "\""))
-					low = float(find_between(r.text, "LowPrice=\"", "\""))
+
+					# high = float(find_between(r.text, "HighPrice=\"", "\""))
+					# low = float(find_between(r.text, "LowPrice=\"", "\""))
+
 					vol = int(find_between(r.text, "Volume=\"", "\""))
 					prev_close = float(find_between(r.text, "ClosePrice=\"", "\""))
 
@@ -384,10 +481,9 @@ def getinfo(symbol,pipe):
 					ts = timestamp(time[:5])
 
 					try:
-						a=1
-						process_and_send(["Connected",symbol,time,ts,price,open_,high,low,vol,prev_close],pipe)
+						process_and_send(["Connected",symbol,time,ts,price,open_,vol,prev_close],pipe)
 					except Exception as e:
-						print("Process error",e)
+						print("PPro Process error",e)
 						lock[symbol] = False
 				#pipe.send(output)
 
@@ -452,10 +548,7 @@ def sell_market_order(symbol,share):
 # 		print(request_pipe.recv())
 
 
-
-
-
-
+# print(fetch_yahoo("aapl"))
 
 
 
@@ -465,4 +558,3 @@ def sell_market_order(symbol,share):
 # 1. check if pipe/queue is empty.
 	 #if not, register/deregister these symbols. 
 # 2. For each of these register symbols,fetch the updates for it! 
-

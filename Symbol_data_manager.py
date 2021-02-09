@@ -50,6 +50,9 @@ class Symbol_data_manager:
 		self.symbol_price_openhigh = {}
 		self.symbol_price_openlow = {}
 
+		self.symbol_price_premarket_high = {}
+		self.symbol_price_premarket_low = {}
+
 		self.symbol_price_opennow = {}
 
 		self.symbol_price_prevclose = {}
@@ -169,10 +172,14 @@ class Symbol_data_manager:
 		self.symbol_data_prev_close_val,self.symbol_data_prev_close_range,self.symbol_data_prev_close_std,self.symbol_data_ATR]
 		self.data_ready = {}
 
+		#self.symbol_price_high,self.symbol_price_low,self.symbol_price_premarket_high,self.symbol_price_premarket_low
+
 		self.update_list = [self.symbol_status,self.symbol_price,self.symbol_update_time,
 		self.minute_timestamp_val,
 		self.symbol_price_high,
 		self.symbol_price_low ,
+		self.symbol_price_premarket_high,
+		self.symbol_price_premarket_low,
 		self.symbol_price_range,
 		self.last_5_min_range,
 		self.last_5_min_volume,
@@ -223,6 +230,9 @@ class Symbol_data_manager:
 		self.symbol_price_openlow[i] = DoubleVar()
 		self.symbol_price_opennow[i] = DoubleVar()
 		self.symbol_price_prevclose_to_now[i] = DoubleVar()
+
+		self.symbol_price_premarket_high[i] = DoubleVar()
+		self.symbol_price_premarket_low[i] = DoubleVar()
 
 		self.symbol_price_prevclose[i] = DoubleVar()
 

@@ -107,6 +107,7 @@ def multi_processing_database(pipe_receive):
 			with open(file, 'w') as outfile:
 				json.dump(data, outfile)
 
+		#data append the yahooooo data.
 
 		pipe_receive.send(data)
 
@@ -269,6 +270,7 @@ def fetch_data(symbol):
 					 prev_close_val,prev_close_range,prev_close_std,ATR]
 
 			return data_list
+
 
 
 # if __name__ == '__main__':

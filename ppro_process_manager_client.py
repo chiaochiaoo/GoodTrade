@@ -89,26 +89,29 @@ class ppro_process_manager:
 							# if self.data_list[i][symbol].get() != d[i+1]:
 							#  	self.data_list[i][symbol].set(d[i+1])
 
+		# 				#	pipe.send([status,symbol,price,time,timestamp,d["high"],d["low"],d["phigh"],d["plow"],\
+		# d["range"],d["last_5_range"],d["vol"],d["open"],d["oh"],d["ol"],
+		# d["f5r"],d["f5v"],d["prev_close"],d["prev_close_gap"]])
+
 						if self.auto_support_resistance[symbol].get() == 1:
 							timestamp = d[4]
-							high = d[5]
-							low = d[6]
-
+							high = d[7]
+							low = d[8]
 							#need to check if its the same as previous set. if not, that means it's manually changed. 
-							if timestamp < 570:
+							#if timestamp < 570:
 
-								if symbol in temp:
-									cur = (self.resistance[symbol].get(),self.supoort[symbol].get())
-									if cur != temp[symbol]:
-										self.auto_support_resistance[symbol].set(0)
-									else:
-										temp[symbol] = (high,low)
-										self.resistance[symbol].set(high)
-										self.supoort[symbol].set(low)
+							if symbol in temp:
+								cur = (self.resistance[symbol].get(),self.supoort[symbol].get())
+								if cur != temp[symbol]:
+									self.auto_support_resistance[symbol].set(0)
 								else:
 									temp[symbol] = (high,low)
 									self.resistance[symbol].set(high)
 									self.supoort[symbol].set(low)
+							else:
+								temp[symbol] = (high,low)
+								self.resistance[symbol].set(high)
+								self.supoort[symbol].set(low)
 		#grab all info. 
 
 		# take input

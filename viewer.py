@@ -64,7 +64,7 @@ class viewer:
 		self.tabControl.add(self.tab2, text ='Extreme Range') 
 		self.tabControl.add(self.tab3, text ='Extreme Volume') 
 		self.tabControl.add(self.tab4, text ='First five minutes')
-		self.tabControl.add(self.tab9, text ='Breakout')
+		self.tabControl.add(self.tab9, text ='Premarket Breakout')
 		self.tabControl.pack(expand = 1, fill ="both") 
 
 		#self.ticker_management_init(self.tab1)
