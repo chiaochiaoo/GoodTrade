@@ -280,6 +280,11 @@ if __name__ == '__main__':
 	process_scanner.daemon=True
 	process_scanner.start()
 
+
+	process_scanner = multiprocessing.Process(target=client_scanner, args=(receive_pipe,),daemon=True)
+	process_scanner.daemon=True
+	process_scanner.start()
+
 	s = scanner_process_manager(request_scanner)
 
 	#### DATABASE SUB PROCESS####
