@@ -71,6 +71,9 @@ class scanner_process_manager:
 				except Exception as e:
 					print("Error updating Nasdaq:",e)
 
+			elif d[0] =="termination":
+				break
+
 			else:
 				try:
 					self.pannel.add_labels(d)
@@ -105,6 +108,7 @@ def multi_processing_scanner(pipe_receive):
 
 		elif order_type =="terminate":
 			try:
+				pipe_receive.send(["termination"])
 				driver.quit()
 			except:
 				pass
