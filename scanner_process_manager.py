@@ -223,6 +223,7 @@ def client_scanner(pipe):
 						connection = False
 						break
 					#if not part: break
+					print("Scanner, hello")
 					data.append(part)
 					if len(part) < 2048:
 						#try to assemble it, if successful.jump. else, get more. 
