@@ -59,10 +59,12 @@ class scanner_process_manager:
 
 	def receive_request(self):
 
+		count = 0
 		while True:
 			print("manager reciving....:")
 			d = self.request.recv()
-			print("manager info received",d)
+			count +=1
+			print("manager info received",count,d[:1])
 
 		#print(d)
 		#check if it is normal type?
