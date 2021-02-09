@@ -221,8 +221,7 @@ def client_scanner(pipe):
 						break
 					except:
 						pass
-			#k is received. 
-			print("Scanner client: taking data success",k[:5])
+			#k is received. #
 			pipe.send(["pkg",k])
 		print("Server disconnected")
 		pipe.send(["msg","Server disconnected"])
