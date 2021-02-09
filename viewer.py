@@ -276,9 +276,10 @@ if __name__ == '__main__':
 
 	#### SCANNER SUB PROCESS####
 	request_scanner, receive_pipe = multiprocessing.Pipe()
-	process_scanner = multiprocessing.Process(target=multi_processing_scanner, args=(receive_pipe,),daemon=True)
-	process_scanner.daemon=True
-	process_scanner.start()
+	
+	# process_scanner = multiprocessing.Process(target=multi_processing_scanner, args=(receive_pipe,),daemon=True)
+	# process_scanner.daemon=True
+	# process_scanner.start()
 
 
 	process_scanner = multiprocessing.Process(target=client_scanner, args=(receive_pipe,),daemon=True)
