@@ -63,13 +63,19 @@ class scanner_process_manager:
 		while True:
 			d = self.request.recv()
 			count +=1
-			print("manager info received",count,d[:1])
+			#print("manager info received",count,d[:1])
 
 			if d[0]=="pkg":
-				self.pannel.add_nasdaq_labels(d[1])
+				try:
+					self.pannel.add_nasdaq_labels(d[1])
+				except Exception e:
+					print("Error updating Nasdaq:",e)
 
 			else:
-				self.pannel.add_labels(d)
+				try:
+					self.pannel.add_labels(d)
+				except Exception e:
+					print("Error updating finviz:",e)
 
 		#print(d)
 		#check if it is normal type?

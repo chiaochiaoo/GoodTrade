@@ -37,8 +37,8 @@ class scanner(pannel):
 
 		self.nasdaq = []
 
-		self.NT_refresh = ttk.Button(self.tab2,
-			text ="Refresh",command=self.refresh_nasdaq).place(relx=0.01, rely=0.01, height=25, width=70)
+		# self.NT_refresh = ttk.Button(self.tab2,
+		# 	text ="Refresh",command=self.refresh_nasdaq).place(relx=0.01, rely=0.01, height=25, width=70)
 
 		self.add_amount = tk.StringVar(self.tab2)
 		self.add_choices = {'Top 5','Top 10','Top 20','Top 50','All'}
@@ -55,7 +55,7 @@ class scanner(pannel):
 		self.NT_update_time = tk.StringVar(root)
 		self.NT_update_time.set('Last updated') 
 
-		self.NT_stat = ttk.Label(self.tab2, textvariable=self.NT_update_time).place(x=95, rely=0.01, height=25, width=200)
+		self.NT_stat = ttk.Label(self.tab2, textvariable=self.NT_update_time).place(x=10, rely=0.01, height=25, width=200)
 
 		width = [3,7,7,11,11,10,5]
 		labels = ["Rank","Symbol","MKT Center","Matched Shares","Last Matched","Open Orders","Add"]
