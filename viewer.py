@@ -287,6 +287,9 @@ if __name__ == '__main__':
 
 	s = scanner_process_manager(request_scanner)
 
+	while 1:
+		a=1
+
 	#### DATABASE SUB PROCESS####
 
 	# request_database, receive_database = multiprocessing.Pipe()
