@@ -61,10 +61,12 @@ class scanner_process_manager:
 
 		count = 0
 		while True:
-			print("manager reciving....:")
 			d = self.request.recv()
 			count +=1
 			print("manager info received",count,d[:1])
+
+			if d[0]=="pkg":
+				self.pannel.add_nasdaq_labels(d[1])
 
 		#print(d)
 		#check if it is normal type?
@@ -76,24 +78,6 @@ class scanner_process_manager:
 def multi_processing_scanner(pipe_receive):
 
 	sucess = False
-
-	while not sucess:
-
-		try:
-			PATH = "./network/chromedriver.exe"
-			driver = webdriver.Chrome(PATH)
-			driver.get('http://www.nasdaqtrader.com/')
-			# driver.find_element_by_id('tab4').click()
-			# time.sleep(1)
-			# driver.find_element_by_id('ahButton').click()
-			time.sleep(1)
-			sucess= True
-			print("Database online")
-		except:
-			#self.pannel.status_nasdaqchange("Problem accessing server")
-			sucess= False
-
-	#self.pannel.status_nasdaqchange("Ready")
 
 	while True:
 
@@ -228,7 +212,6 @@ def client_scanner(pipe):
 					connection = False
 					break
 				#if not part: break
-				print("Scanner, hello")
 				data.append(part)
 				if len(part) < 2048:
 					#try to assemble it, if successful.jump. else, get more. 

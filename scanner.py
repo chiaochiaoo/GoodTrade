@@ -17,7 +17,7 @@ class scanner(pannel):
 
 		#mark if already created. if so, just update the infos. 
 		self.nasdaq_trader_created_1 = False
-		self.nasdaq_trader_created_2 = False
+
 
 		self.nasdaq_trader_symbols = []
 		self.nasdaq_trader_list = {}
@@ -52,8 +52,6 @@ class scanner(pannel):
 			text ="Add",command=self.add_symbols).place(x=380, rely=0.01, height=25, width=70)
 
 
-
-
 		self.NT_update_time = tk.StringVar(root)
 		self.NT_update_time.set('Last updated') 
 
@@ -69,7 +67,6 @@ class scanner(pannel):
 		self.after = tk.Canvas(self.NT)
 
 		self.NT.add(self.all, text ='All Sessions')
-		self.NT.add(self.after, text ='After Hours')
 
 
 		self.NT_scanner_canvas = tk.Canvas(self.all)
@@ -85,20 +82,6 @@ class scanner(pannel):
 
 		self.recreate_labels(self.NT_scanner_frame)
 
-
-
-		self.NT_scanner_canvas2 = tk.Canvas(self.after)
-		self.NT_scanner_canvas2.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
-		self.scroll = tk.Scrollbar(self.after)
-		self.scroll.config(orient=tk.VERTICAL, command=self.NT_scanner_canvas2.yview)
-		self.scroll.pack(side=tk.RIGHT,fill="y")
-		self.NT_scanner_canvas2.configure(yscrollcommand=self.scroll.set)
-		self.NT_scanner_frame2 = tk.Frame(self.NT_scanner_canvas2)
-		self.NT_scanner_frame2.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
-		self.NT_scanner_canvas2.create_window(0, 0, window=self.NT_scanner_frame2, anchor=tk.NW)
-
-
-		self.recreate_labels(self.NT_scanner_frame2)
 
 		############################### Finviz ############################################
 
@@ -394,26 +377,10 @@ class scanner(pannel):
 
 							self.nasdaq_trader_symbols.append(sy)
 
-			if len(d[2])>50 and self.nasdaq_trader_created_2 == False:
-				l = len(self.nasdaq)
-				for i in range(len(d[2])):
-					self.nasdaq.append([])
-					for j in range(len(width)):
-						if j!= len(width)-1:
-							self.nasdaq[i+l].append(tk.Label(self.NT_scanner_frame2,text=d[2][i][j],width=width[j]))
-							self.nasdaq[i+l][j].grid(row=i+2, column=j,padx=0)
-						else:
-							sy = self.market_suffix_nasdaq_trader(d[2][i][1],d[2][i][2])
-
-							self.nasdaq[i+l].append(tk.Button(self.NT_scanner_frame2,text="Add",width=width[j],command= lambda k=sy: self.tickers_manager.add_symbol_reg_list(k)))
-							self.nasdaq[i+l][j].grid(row=i+2, column=j,padx=0)
-				self.nasdaq_trader_created_2 = True
-				self.rebind(self.NT_scanner_canvas2,self.NT_scanner_frame2)
-
 			#else:
 
 
-			self.NT_update_time.set(d[3])
+			self.NT_update_time.set(d[2])
 
 		# except Exception as e:
 		# 	print("Adding Nasdaq labels error",e)
