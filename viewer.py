@@ -331,6 +331,7 @@ if __name__ == '__main__':
 	process_scanner.join()
 	process_database.join()
 	process_ppro.join()
+	process_scanner_b.join()
 	print("All subprocesses terminated")
 	
 	os._exit(1) 
