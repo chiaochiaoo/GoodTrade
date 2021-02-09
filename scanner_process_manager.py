@@ -59,7 +59,8 @@ class scanner_process_manager:
 
 	def receive_request(self):
 
-		while 1:
+		while True:
+			print("manager reciving....:")
 			d = self.request.recv()
 			print("manager info received",d)
 
