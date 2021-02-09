@@ -68,6 +68,9 @@ class scanner_process_manager:
 			if d[0]=="pkg":
 				self.pannel.add_nasdaq_labels(d[1])
 
+			else:
+				self.pannel.add_labels(d)
+
 		#print(d)
 		#check if it is normal type?
 		# if d[0]=="Nasdaq":
