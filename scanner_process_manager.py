@@ -59,6 +59,7 @@ class scanner_process_manager:
 
 	def receive_request(self):
 		d = self.request.recv()
+		print("manager info received")
 		print(d)
 
 		#print(d)
