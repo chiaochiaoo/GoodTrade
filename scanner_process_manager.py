@@ -63,10 +63,10 @@ class scanner_process_manager:
 
 		#print(d)
 		#check if it is normal type?
-		if d[0]=="Nasdaq":
-			self.pannel.add_nasdaq_labels(d)
-		else:
-			self.pannel.add_labels(d)
+		# if d[0]=="Nasdaq":
+		# 	self.pannel.add_nasdaq_labels(d)
+		# else:
+		# 	self.pannel.add_labels(d)
 
 def multi_processing_scanner(pipe_receive):
 
@@ -183,6 +183,8 @@ def refreshstocks(cond,market_,type_,cap):
 
 ###client just indefinitely fetch the package. ###
 def client_scanner(pipe):
+
+	k=""
 	while True:
 
 		HOST = '10.29.10.132'  # The server's hostname or IP address
