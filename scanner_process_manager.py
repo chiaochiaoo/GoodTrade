@@ -68,13 +68,13 @@ class scanner_process_manager:
 			if d[0]=="pkg":
 				try:
 					self.pannel.add_nasdaq_labels(d[1])
-				except Exception e:
+				except Exception as e:
 					print("Error updating Nasdaq:",e)
 
 			else:
 				try:
 					self.pannel.add_labels(d)
-				except Exception e:
+				except Exception as e:
 					print("Error updating finviz:",e)
 
 		#print(d)
