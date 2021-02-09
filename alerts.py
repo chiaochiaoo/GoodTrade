@@ -281,7 +281,7 @@ class alert(pannel):
 
 					#print("breakout check:",cur_price,support,resistance)
 
-					if support != 0.00 and resistance != 0.00 and ts>565:
+					if support != 0.00 and resistance != 0.00 and ts>569:
 						#print(support,resistance,cur_price)
 
 						if cur_price<support and cur_price<resistance and self.alerts[symbol][alert_type]!=2:
