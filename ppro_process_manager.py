@@ -32,7 +32,7 @@ global connection_error
 def round_up(i):
 
 	if i<1:
-		return round(i,3)
+		return round(i,4)
 	else:
 		return round(i,2)
 
@@ -54,10 +54,11 @@ def fetch_yahoo(symbol):
 	for i in res['chart']['result'][0]['timestamp']:
 		ts.append(datetime.fromtimestamp(i).strftime('%H:%M'))
 
+	#print(ts)
 	#if it has 09:30. 
 	high,low,m_high,m_low,f5,f5v = 0,0,0,0,0,0
-	if "09:30" in ts:
-		start = ts.index("09:30")
+	if "09:29" in ts:
+		start = ts.index("09:29")
 		
 		high = np.array(res['chart']['result'][0]['indicators']['quote'][0]["high"][:start])
 		low = np.array(res['chart']['result'][0]['indicators']['quote'][0]["low"][:start])
@@ -279,21 +280,43 @@ def timestamp_seconds(s):
 		return 0
 #IF STILL THE SAME TIME, TRY TO reregister?
 
-def init(symbol,price):
+#call the thing at 9:30 and start from there. 
+
+#this high low is from ppro.
+def init(symbol,price,ppro_high,ppro_low,timestamp):
 
 	global data
 
 	#PH,PL,H,L
 	range_data=[]
-	try:
-		#range_data=fetch_yahoo(symbol.split(".")[0])
-		range_data=[price,price,0,0,0,0]
-	except:
-		print("Yahoo fetching",symbol,"error")
-		range_data=[price,price,0,0,0,0]
-	
+
+
 	data[symbol] = {}
 	d = data[symbol]
+
+	if timestamp <571:
+		d["phigh"] = ppro_high
+		d["plow"] = ppro_low
+		d["high"] = ppro_high
+		d["low"] = ppro_low
+		d["f5r"] = 0
+		d["f5v"] = 0
+	else:
+		try:
+			range_data=fetch_yahoo(symbol.split(".")[0])
+		except:
+			print("Yahoo fetching",symbol,"error")
+			range_data=[price,price,0,0,0,0]
+
+		#return high,low,m_high,m_low,f5,f5v
+		d["phigh"] = range_data[0]
+		d["plow"] =range_data[1]
+		d["high"] = range_data[2]
+		d["low"] = range_data[3]
+		d["f5r"] = range_data[4]
+		d["f5v"] = range_data[5]
+
+	#print(symbol,d["phigh"],d["plow"],d["high"],d["low"])
 
 	d["price"]=price
 	d["timestamp"] =0
@@ -305,11 +328,6 @@ def init(symbol,price):
 	d["vols"]=[]
 
 	#here I need to access the data from database. 
-	d["high"] = range_data[2]
-	d["low"] = range_data[3]
-
-	d["phigh"] = range_data[0]
-	d["plow"] =range_data[1]
 
 	d["range"] = 0
 	d["last_5_range"] = 0
@@ -323,9 +341,6 @@ def init(symbol,price):
 	d["oh"] = 0
 	d["ol"] = 0
 
-	d["f5r"] = range_data[4]
-	d["f5v"] = range_data[5]
-
 
 
 def process_and_send(lst,pipe):
@@ -336,7 +351,7 @@ def process_and_send(lst,pipe):
 	global data
 
 	if symbol not in data:
-		init(symbol,price)
+		init(symbol,price,high,low,timestamp)
 
 	#here;s the false print check. 0.005
 	d = data[symbol]
@@ -361,9 +376,6 @@ def process_and_send(lst,pipe):
 
 	#else:
 	#here I set them. 
-
-	d["high"] =high
-	d["low"] = low
 
 	if price > d["high"]:
 		d["high"] = price
@@ -407,12 +419,12 @@ def process_and_send(lst,pipe):
 
 	#print(d["timetamps"],d["highs"],d["lows"],d["vols"])
 	#last 5 range
-	d["last_5_range"] = round(max(d["highs"][-5:]) - min(d["lows"][-5:]),3)
+	d["last_5_range"] = round_up(max(d["highs"][-5:]) - min(d["lows"][-5:]))
 	# last 5 volume
 	index = min(len(d["vols"]), 5)
 	d["vol"] = round((d["vols"][-1] - d["vols"][-index])/1000,2)
 
-	if timestamp <575:
+	if timestamp>569 and timestamp <575:
 		d["f5r"] = d["last_5_range"]
 		d["f5v"] = d["vol"]
 
@@ -558,7 +570,7 @@ def sell_market_order(symbol,share):
 # 		print(request_pipe.recv())
 
 
-# print(fetch_yahoo("aapl"))
+#print(fetch_yahoo("aapl"))
 
 
 
