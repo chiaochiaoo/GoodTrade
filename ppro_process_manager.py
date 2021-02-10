@@ -286,10 +286,11 @@ def init(symbol,price):
 	#PH,PL,H,L
 	range_data=[]
 	try:
-		range_data=fetch_yahoo(symbol.split(".")[0])
+		#range_data=fetch_yahoo(symbol.split(".")[0])
+		range_data=[price,price,0,0,0,0]
 	except:
 		print("Yahoo fetching",symbol,"error")
-		range_data=[price,price,price,price]
+		range_data=[price,price,0,0,0,0]
 	
 	data[symbol] = {}
 	d = data[symbol]
@@ -297,6 +298,11 @@ def init(symbol,price):
 	d["price"]=price
 	d["timestamp"] =0
 	d["time"] = ""
+
+	d["timestamps"] = []
+	d["highs"] = []
+	d["lows"] = []
+	d["vols"]=[]
 
 	#here I need to access the data from database. 
 	d["high"] = range_data[2]
@@ -320,15 +326,12 @@ def init(symbol,price):
 	d["f5r"] = range_data[4]
 	d["f5v"] = range_data[5]
 
-	d["timestamps"] = []
-	d["highs"] = []
-	d["lows"] = []
-	d["vols"]=[]
+
 
 def process_and_send(lst,pipe):
 
 	global lock
-	status,symbol,time,timestamp,price,open_,vol,prev_close  = lst[0],lst[1],lst[2],lst[3],lst[4],lst[5],lst[6],lst[7]
+	status,symbol,time,timestamp,price,high,low,open_,vol,prev_close  = lst[0],lst[1],lst[2],lst[3],lst[4],lst[5],lst[6],lst[7],lst[8],lst[9]
 
 	global data
 
@@ -358,14 +361,19 @@ def process_and_send(lst,pipe):
 
 	#else:
 	#here I set them. 
+
+	d["high"] =high
+	d["low"] = low
+
 	if price > d["high"]:
 		d["high"] = price
-		if timestamp <570:
-			d["phigh"] = d["high"]
+
 	if price < d["low"]:
-		d["low"] = price
-		if timestamp <570:
-			d["plow"] = d["plow"]
+		d["low"] = price			
+
+	if timestamp <570:
+		d["phigh"] = d["high"]
+		d["plow"] = d["low"]
 
 	d["range"] = round(d["high"] - d["low"],3)
 	#print("check",d["range"],d["high"],d["low"],d["phigh"],d["plow"])
@@ -377,7 +385,6 @@ def process_and_send(lst,pipe):
 	else:
 		d["oh"] = round(d["high"] - open_,3)
 		d["ol"] = round(open_ - d["low"],3)
-
 
 
 	d["prev_close_gap"] = round(price-prev_close,3)
@@ -443,56 +450,58 @@ def getinfo(symbol,pipe):
 	if not connection_error:
 
 		if not lock[symbol]:
-			try:
-				#######################################################################
-				lock[symbol] = True
-				p="http://localhost:8080/GetLv1?symbol="+symbol
-				r= requests.get(p,timeout=2)
+			#try:
+			#######################################################################
+			lock[symbol] = True
+			p="http://localhost:8080/GetLv1?symbol="+symbol
+			r= requests.get(p,timeout=2)
 
-				if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
-					print("No symbol found")
-					black_list.append(symbol)
-					pipe.send(["Unfound",symbol])
-					lock[symbol] = False
+			if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
+				print("No symbol found")
+				black_list.append(symbol)
+				pipe.send(["Unfound",symbol])
+				lock[symbol] = False
+			else:
+
+				time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
+
+				open_ = float(find_between(r.text, "OpenPrice=\"", "\""))
+
+				high = float(find_between(r.text, "HighPrice=\"", "\""))
+				low = float(find_between(r.text, "LowPrice=\"", "\""))
+
+				vol = int(find_between(r.text, "Volume=\"", "\""))
+				prev_close = float(find_between(r.text, "ClosePrice=\"", "\""))
+
+				Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
+				Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
+				price = round((Bidprice+Askprice)/2,4)
+
+				#price = float(find_between(r.text, "LastPrice=\"", "\""))
+
+				if price<1:
+					price = round(price,3)
 				else:
+					price = round(price,2)
 
-					time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
+				#print(time,Bidprice,Askprice,open_,high,low,vol,price)
+				ts = timestamp(time[:5])
 
-					open_ = float(find_between(r.text, "OpenPrice=\"", "\""))
+				process_and_send(["Connected",symbol,time,ts,price,high,low,open_,vol,prev_close],pipe)
 
-					# high = float(find_between(r.text, "HighPrice=\"", "\""))
-					# low = float(find_between(r.text, "LowPrice=\"", "\""))
-
-					vol = int(find_between(r.text, "Volume=\"", "\""))
-					prev_close = float(find_between(r.text, "ClosePrice=\"", "\""))
-
-					Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
-					Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
-					price = round((Bidprice+Askprice)/2,4)
-
-					#price = float(find_between(r.text, "LastPrice=\"", "\""))
-
-					if price<1:
-						price = round(price,3)
-					else:
-						price = round(price,2)
-
-					#print(time,Bidprice,Askprice,open_,high,low,vol,price)
-					ts = timestamp(time[:5])
-
-					#process_and_send(["Connected",symbol,time,ts,price,open_,vol,prev_close],pipe)
-					try:
-						process_and_send(["Connected",symbol,time,ts,price,open_,vol,prev_close],pipe)
-					except Exception as e:
-						print("PPro Process error",e)
-						lock[symbol] = False
+				try:
+					pass
+					#process_and_send(["Connected",symbol,time,ts,price,high,low,open_,vol,prev_close],pipe)
+				except Exception as e:
+					print("PPro Process error",e)
+					lock[symbol] = False
 			#pipe.send(output)
 
-			except Exception as e:
-				print("Get info error:",e)
-				connection_error = True
-				pipe.send(["Ppro Error",symbol])
-				lock[symbol] = False
+			# except Exception as e:
+			# 	print("Get info error:",e)
+			# 	connection_error = True
+			# 	pipe.send(["Ppro Error",symbol])
+			# 	lock[symbol] = False
 
 		else:
 			print(symbol,"blocked call")
