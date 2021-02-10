@@ -320,7 +320,7 @@ def init(symbol,price):
 	d["f5r"] = range_data[4]
 	d["f5v"] = range_data[5]
 
-	d["timetamps"] = []
+	d["timestamps"] = []
 	d["highs"] = []
 	d["lows"] = []
 	d["vols"]=[]
@@ -383,11 +383,11 @@ def process_and_send(lst,pipe):
 	d["prev_close_gap"] = round(price-prev_close,3)
 
 	# now update the datalists.
-	if timestamp not in d["timetamps"]:
-		if len(d["timetamps"])==0:
-			d["timetamps"].append(timestamp-1)
+	if timestamp not in d["timestamps"]:
+		if len(d["timestamps"])==0:
+			d["timestamps"].append(timestamp-1)
 		else:
-			d["timetamps"].append(timestamp)
+			d["timestamps"].append(timestamp)
 		d["highs"].append(price)
 		d["lows"].append(price)
 		d["vols"].append(vol)
@@ -443,55 +443,56 @@ def getinfo(symbol,pipe):
 	if not connection_error:
 
 		if not lock[symbol]:
-			try:
-				#######################################################################
-				lock[symbol] = True
-				p="http://localhost:8080/GetLv1?symbol="+symbol
-				r= requests.get(p,timeout=2)
+			#try:
+			#######################################################################
+			lock[symbol] = True
+			p="http://localhost:8080/GetLv1?symbol="+symbol
+			r= requests.get(p,timeout=2)
 
-				if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
-					print("No symbol found")
-					black_list.append(symbol)
-					pipe.send(["Unfound",symbol])
-					lock[symbol] = False
-				else:
-
-					time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
-
-					open_ = float(find_between(r.text, "OpenPrice=\"", "\""))
-
-					# high = float(find_between(r.text, "HighPrice=\"", "\""))
-					# low = float(find_between(r.text, "LowPrice=\"", "\""))
-
-					vol = int(find_between(r.text, "Volume=\"", "\""))
-					prev_close = float(find_between(r.text, "ClosePrice=\"", "\""))
-
-					Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
-					Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
-					price = round((Bidprice+Askprice)/2,4)
-
-					#price = float(find_between(r.text, "LastPrice=\"", "\""))
-
-					if price<1:
-						price = round(price,3)
-					else:
-						price = round(price,2)
-
-					#print(time,Bidprice,Askprice,open_,high,low,vol,price)
-					ts = timestamp(time[:5])
-
-					try:
-						process_and_send(["Connected",symbol,time,ts,price,open_,vol,prev_close],pipe)
-					except Exception as e:
-						print("PPro Process error",e)
-						lock[symbol] = False
-				#pipe.send(output)
-
-			except Exception as e:
-				print("Get info error:",e)
-				connection_error = True
-				pipe.send(["Ppro Error",symbol])
+			if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
+				print("No symbol found")
+				black_list.append(symbol)
+				pipe.send(["Unfound",symbol])
 				lock[symbol] = False
+			else:
+
+				time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
+
+				open_ = float(find_between(r.text, "OpenPrice=\"", "\""))
+
+				# high = float(find_between(r.text, "HighPrice=\"", "\""))
+				# low = float(find_between(r.text, "LowPrice=\"", "\""))
+
+				vol = int(find_between(r.text, "Volume=\"", "\""))
+				prev_close = float(find_between(r.text, "ClosePrice=\"", "\""))
+
+				Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
+				Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
+				price = round((Bidprice+Askprice)/2,4)
+
+				#price = float(find_between(r.text, "LastPrice=\"", "\""))
+
+				if price<1:
+					price = round(price,3)
+				else:
+					price = round(price,2)
+
+				#print(time,Bidprice,Askprice,open_,high,low,vol,price)
+				ts = timestamp(time[:5])
+
+				process_and_send(["Connected",symbol,time,ts,price,open_,vol,prev_close],pipe)
+				# try:
+				# 	process_and_send(["Connected",symbol,time,ts,price,open_,vol,prev_close],pipe)
+				# except Exception as e:
+				# 	print("PPro Process error",e)
+				# 	lock[symbol] = False
+			#pipe.send(output)
+
+			# except Exception as e:
+			# 	print("Get info error:",e)
+			# 	connection_error = True
+			# 	pipe.send(["Ppro Error",symbol])
+			# 	lock[symbol] = False
 
 		else:
 			print(symbol,"blocked call")
