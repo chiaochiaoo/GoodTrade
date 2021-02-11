@@ -113,13 +113,16 @@ def test_register():
 	try:
 		p="http://localhost:8080/Deregister?symbol=AAPL.NQ&feedtype=L1"
 		r= requests.get(p)
-		if "Response" in r.text:
-			return False
-		else:
+		print(r.status_code)
+		#print(r)
+		if r.status_code==200:
 			return True
+		else:
+			return False
 
 	except Exception as e:
 		return True
+	#Invalid Request
 
 def register(symbol):
 
@@ -479,55 +482,54 @@ def getinfo(symbol,pipe):
 	if not connection_error:
 
 		if not lock[symbol]:
-			#try:
-			#######################################################################
-			lock[symbol] = True
-			p="http://localhost:8080/GetLv1?symbol="+symbol
-			r= requests.get(p,timeout=2)
+			try:
+				lock[symbol] = True
+				p="http://localhost:8080/GetLv1?symbol="+symbol
+				r= requests.get(p,timeout=2)
 
-			if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
-				print("No symbol found")
-				black_list.append(symbol)
-				pipe.send(["Unfound",symbol])
-				lock[symbol] = False
-			else:
-
-				time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
-
-				open_ = float(find_between(r.text, "OpenPrice=\"", "\""))
-
-				high = float(find_between(r.text, "HighPrice=\"", "\""))
-				low = float(find_between(r.text, "LowPrice=\"", "\""))
-
-				vol = int(find_between(r.text, "Volume=\"", "\""))
-				prev_close = float(find_between(r.text, "ClosePrice=\"", "\""))
-
-				Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
-				Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
-				price = round((Bidprice+Askprice)/2,4)
-
-				#price = float(find_between(r.text, "LastPrice=\"", "\""))
-
-				if price<1:
-					price = round(price,3)
-				else:
-					price = round(price,2)
-
-				#print(time,Bidprice,Askprice,open_,high,low,vol,price)
-				ts = timestamp(time[:5])
-
-				try:
-					process_and_send(["Connected",symbol,time,ts,price,high,low,open_,vol,prev_close],pipe)
-				except Exception as e:
-					print("PPro Process error",e)
+				if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
+					print("No symbol found")
+					black_list.append(symbol)
+					pipe.send(["Unfound",symbol])
 					lock[symbol] = False
+				else:
+
+					time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
+
+					open_ = float(find_between(r.text, "OpenPrice=\"", "\""))
+
+					high = float(find_between(r.text, "HighPrice=\"", "\""))
+					low = float(find_between(r.text, "LowPrice=\"", "\""))
+
+					vol = int(find_between(r.text, "Volume=\"", "\""))
+					prev_close = float(find_between(r.text, "ClosePrice=\"", "\""))
+
+					Bidprice= float(find_between(r.text, "BidPrice=\"", "\""))
+					Askprice= float(find_between(r.text, "AskPrice=\"", "\""))
+					price = round((Bidprice+Askprice)/2,4)
+
+					#price = float(find_between(r.text, "LastPrice=\"", "\""))
+
+					if price<1:
+						price = round(price,3)
+					else:
+						price = round(price,2)
+
+					#print(time,Bidprice,Askprice,open_,high,low,vol,price)
+					ts = timestamp(time[:5])
+
+					try:
+						process_and_send(["Connected",symbol,time,ts,price,high,low,open_,vol,prev_close],pipe)
+					except Exception as e:
+						print("PPro Process error",e)
+						lock[symbol] = False
 			#pipe.send(output)
 
-			# except Exception as e:
-			# 	print("Get info error:",e)
-			# 	connection_error = True
-			# 	pipe.send(["Ppro Error",symbol])
-			# 	lock[symbol] = False
+			except Exception as e:
+				print("Get info error:",e)
+				connection_error = True
+				pipe.send(["Ppro Error",symbol])
+				lock[symbol] = False
 
 		else:
 			print(symbol,"blocked call")
