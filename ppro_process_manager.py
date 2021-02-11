@@ -507,11 +507,8 @@ def getinfo(symbol,pipe):
 				#print(time,Bidprice,Askprice,open_,high,low,vol,price)
 				ts = timestamp(time[:5])
 
-				process_and_send(["Connected",symbol,time,ts,price,high,low,open_,vol,prev_close],pipe)
-
 				try:
-					pass
-					#process_and_send(["Connected",symbol,time,ts,price,high,low,open_,vol,prev_close],pipe)
+					process_and_send(["Connected",symbol,time,ts,price,high,low,open_,vol,prev_close],pipe)
 				except Exception as e:
 					print("PPro Process error",e)
 					lock[symbol] = False
