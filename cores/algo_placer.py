@@ -28,15 +28,29 @@ class algo_placer:
 		self.symbol = tk.Label(root,text="Trigger type: "+triggers)
 		self.symbol.place(x=10,y=30)
 
+
+		############### ENTRY ################
 		self.entry = ttk.LabelFrame(root,text="Entry") 
 		self.entry.place(x=10,y=60,height=100,width=200)
 
-		self.target = ttk.LabelFrame(root,text="Stoploss") 
-		self.target.place(x=220,y=60,height=100,width=200)
+		################ STOP LOSS######################
+		self.stop = ttk.LabelFrame(root,text="Stoploss") 
+		self.stop.place(x=220,y=60,height=100,width=200)
 
-		self.stop = ttk.LabelFrame(root,text="Position Management") 
-		self.stop.place(x=440,y=60,height=100,width=200)	
+		tk.Label(self.stop,text="Stoploss type: ").place(x=10, y=10)
 
+		self.stop_type = tk.StringVar(self.stop)
+		self.stop_type_choices = {'','','','','On Capital loss'}
+		self.stop_type.set('Top 5') 
+
+		self.stop_type_ui = tk.OptionMenu(self.stop, self.stop_type, *sorted(self.stop_type_choices))
+		#self.menu1 = ttk.Label(self.setting, text="Country").grid(row = 1, column = 3)
+		self.stop_type_ui.place(x=10, y=30) #height=25, width=70)
+
+
+		######################################
+		self.position_management = ttk.LabelFrame(root,text="Position Management") 
+		self.position_management.place(x=440,y=60,height=100,width=200)	
 
 		self.start()
 
@@ -96,4 +110,4 @@ class algo_placer:
 
 
 
-algo_placer("AAPL.NQ","Breakout")
+algo_placer("AAPL.NQ","Breakout on Resistance on 134.45 for 60 secs")
