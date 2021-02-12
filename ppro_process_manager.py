@@ -116,9 +116,9 @@ def test_register():
 		print(r.status_code)
 		#print(r)
 		if r.status_code==200:
-			return True
-		else:
 			return False
+		else:
+			return True
 
 	except Exception as e:
 		return True
