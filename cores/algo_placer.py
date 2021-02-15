@@ -178,7 +178,7 @@ class stop:
 
 				amount = round(float_plus(entry)-float_plus(stoplevel.get()),2)
 			else:
-				amount = round(float_plus(stoplevel.get())-entry),2
+				amount = round(float_plus(stoplevel.get())-float_plus(entry),2)
 				
 
 			if amount <0:
@@ -312,8 +312,6 @@ class stop:
 		self.stop_level.trace('w', lambda *_, stoplevel=self.stop_level,perrisk=self.risk_per_share,totalrisk=self.total_risk: self.stoplevel_to_per_risk(stoplevel,perrisk,totalrisk))
 		self.risk_per_share.trace('w', lambda *_, stoplevel=self.stop_level,perrisk=self.risk_per_share,totalrisk=self.total_risk: self.perrisk_to_stoplevel(stoplevel,perrisk,totalrisk))
 		self.total_risk.trace('w', lambda *_, stoplevel=self.stop_level,perrisk=self.risk_per_share,totalrisk=self.total_risk: self.total_risk_to_shares(stoplevel,perrisk,totalrisk))
-		# self.shares.trace('w', lambda *_, capital=self.capital,shares=self.shares,price=self.entry_price: self.shares_to_capital(capital,shares,price))
-		# self.capital.trace('w', lambda *_, capital=self.capital,shares=self.shares,price=self.entry_price: self.capital_to_shares(capital,shares,price))
 
 		#type,ordertype,price,shares. 
 		self.values = []
@@ -341,17 +339,17 @@ class algo_placer:
 
 		############### ENTRY ################
 		self.entryFrame = ttk.LabelFrame(root,text="Entry") 
-		self.entryFrame.place(x=10,y=60,height=300,width=250)
+		self.entryFrame.place(x=10,y=60,height=200,width=250)
 
 
 		self.stopFrame = ttk.LabelFrame(root,text="Stop") 
-		self.stopFrame.place(x=260,y=60,height=300,width=250)
+		self.stopFrame.place(x=260,y=60,height=200,width=250)
+
+		self.positionManager = ttk.LabelFrame(root,text="Position Management") 
+		self.positionManager.place(x=510,y=60,height=200,width=250)
 
 
 		self.entry = entry(self.entryFrame,entry_price)
-
-
-
 		self.stop = stop(self.stopFrame,entry_price)
 
 
