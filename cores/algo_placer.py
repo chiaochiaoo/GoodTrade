@@ -163,30 +163,52 @@ class stop:
 			self.sync_lock = False
 
 	def perrisk_to_stoplevel(self,stoplevel,perrisk,totalrisk):
-		if (self.sync_lock==False) and shares.get()!="" and price.get()!="":
+
+		pass
+
+		entry_type,entry,shares = self.entry.get_all_infos()
+
+		if (self.sync_lock==False) and entry!="" and shares!="":
 
 			self.sync_lock = True
+			if entry_type =="Long":
+				amount = str(round(float(entry)-float(stoplevel.get()),2))
+			else:
+				amount = str(round(float(stoplevel.get())-entry),2)
+				
 
-			amount = str(round(int(shares.get())*float(price.get()),2))
-			print(amount)
-			capital.set(amount)
-			# capital.get()
-			# shares.get()
+			total = round(float(amount)*int(shares),2)
+			perrisk.set(amount)
+			totalrisk.set(total)
+
+			print(totalrisk.get())
+
 			self.sync_lock = False
 
 	############ THIS ONE CHANGES the entry column
 	def total_risk_to_shares(self,stoplevel,perrisk,totalrisk):
 
-		if (self.sync_lock==False) and price.get()!="" and shares.get()!="":
+		pass
+
+		entry_type,entry,shares = self.entry.get_all_infos()
+
+		if (self.sync_lock==False) and entry!="" and shares!="":
 
 			self.sync_lock = True
+			if entry_type =="Long":
+				amount = str(round(float(entry)-float(stoplevel.get()),2))
+			else:
+				amount = str(round(float(stoplevel.get())-entry),2)
+				
 
-			amount = str(round(int(shares.get())*float(price.get()),2))
-			print(amount)
-			capital.set(amount)
-			# capital.get()
-			# shares.get()
+			total = round(float(amount)*int(shares),2)
+			perrisk.set(amount)
+			totalrisk.set(total)
+
+			print(totalrisk.get())
+
 			self.sync_lock = False
+
 
 	def deactivate_entry(self,options,entry):
 
