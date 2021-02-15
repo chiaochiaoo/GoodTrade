@@ -149,7 +149,6 @@ class entry:
 		#type,ordertype,price,shares. 
 		self.values = []
 
-
 class stop:
 
 
@@ -316,17 +315,15 @@ class stop:
 		#type,ordertype,price,shares. 
 		self.values = []
 
-
-
 class algo_placer:
 
 	def __init__(self,symbol,triggers,entry_price=None):
 
 		root = tk.Tk() 
 		root.title("Algo Placer: "+symbol) 
-		root.geometry("700x400")
+		root.geometry("780x280")
 		#root.minsize(600, 400)
-		root.maxsize(700, 400)
+		#root.maxsize(900, 280)
 
 		self.root = root
 
@@ -339,14 +336,14 @@ class algo_placer:
 
 		############### ENTRY ################
 		self.entryFrame = ttk.LabelFrame(root,text="Entry") 
-		self.entryFrame.place(x=10,y=60,height=200,width=250)
+		self.entryFrame.place(x=10,y=60,height=150,width=250)
 
 
 		self.stopFrame = ttk.LabelFrame(root,text="Stop") 
-		self.stopFrame.place(x=260,y=60,height=200,width=250)
+		self.stopFrame.place(x=260,y=60,height=150,width=250)
 
 		self.positionManager = ttk.LabelFrame(root,text="Position Management") 
-		self.positionManager.place(x=510,y=60,height=200,width=250)
+		self.positionManager.place(x=510,y=60,height=150,width=250)
 
 
 		self.entry = entry(self.entryFrame,entry_price)
@@ -356,10 +353,16 @@ class algo_placer:
 		self.entry.set_stop_pannel(self.stop)
 		self.stop.set_entry_pannel(self.entry)
 
-
 		######################################
 		# self.position_management = ttk.LabelFrame(root,text="Position Management") 
 		# self.position_management.place(x=440,y=60,height=100,width=200)	
+
+
+		self.place= tk.Button(root ,text="Place algo",width=10,bg="#5BFF80")
+		self.place.place(x=110,y=220,height=40,width=80)
+
+		self.place= tk.Button(root ,text="Cancel",width=10)
+		self.place.place(x=310,y=220,height=40,width=80)
 
 		self.start()
 
@@ -370,51 +373,6 @@ class algo_placer:
 	def start(self):
 
 		self.root.mainloop() 
-
-# 		super().__init__(frame)
-
-# 		self.alerts = alerts
-
-# 		self.Entry1 = tk.Entry(frame)
-# 		self.Entry1.place(x=5, y=5, height=30, width=80, bordermode='ignore')
-# 		self.Entry1.configure(background="white")
-# 		self.Entry1.configure(cursor="fleur")
-# 		self.Entry1.configure(disabledforeground="#a3a3a3")
-# 		self.Entry1.configure(font="TkFixedFont")
-# 		self.Entry1.configure(foreground="#000000")
-# 		self.Entry1.configure(insertbackground="black")
-
-# 		self.symbol = tk.Button(frame,command= lambda: self.add_symbol_reg_list(self.Entry1.get().upper())) #,command=self.loadsymbol
-# 		self.symbol.place(x=105, y=5, height=30, width=80, bordermode='ignore')
-# 		self.symbol.configure(activebackground="#ececec")
-# 		self.symbol.configure(activeforeground="#000000")
-# 		self.symbol.configure(background="#d9d9d9")
-# 		self.symbol.configure(disabledforeground="#a3a3a3")
-# 		self.symbol.configure(foreground="#000000")
-# 		self.symbol.configure(highlightbackground="#d9d9d9")
-# 		self.symbol.configure(highlightcolor="black")
-# 		self.symbol.configure(pady="0")
-# 		self.symbol.configure(text='''Add Symbol''')
-
-# 		#"Ppro Status: "+"Connecting"
-# 		self.ppro_status = ttk.Label(frame, textvariable=data.ppro_status)
-# 		self.ppro_status.place(x = 200, y =12)
-# 		#data.ppro_status.set("Hello")
-
-# 		self.ticker_stats = ttk.Label(frame, text="Current Registered Tickers: "+str(self.ticker_count))
-# 		self.ticker_stats.place(x = 500, y =12)
-
-# 		#############Registration Window ####################
-
-# 		self.data = data
-
-
-# 		self.width = [8,10,12,10,24,10,10]
-# 		self.labels = ["Ticker","Status","Last update","Price","Last Alert","Last Alert time","Remove"]
-
-# 		#init the labels. 
-# 		self.labels_creator(self.frame)
-
 
 
 algo_placer("AAPL.NQ","Breakout on Resistance on 134.45 for 60 secs",134.45)
