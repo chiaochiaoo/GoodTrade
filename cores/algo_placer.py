@@ -42,8 +42,6 @@ class entry:
 			#print(amount)
 			shares.set(amount)
 
-			# capital.get()
-			# shares.get()
 			self.sync_lock = False
 
 	def shares_to_capital(self,capital,shares,price):
@@ -53,11 +51,11 @@ class entry:
 
 			amount = str(round(int_plus(shares.get())*float_plus(price.get()),2))
 
-			print(shares.get(),amount,float_plus(price.get()),int_plus(shares.get()))
 			capital.set(amount)
 
-			# capital.get()
-			# shares.get()
+			#broadcast to shares. 
+			self.stop.entry_to_stop(shares.get())
+
 			self.sync_lock = False
 
 	def price_to_capital(self,capital,shares,price):
@@ -154,6 +152,17 @@ class entry:
 class stop:
 
 
+	def entry_to_stop(self,shares):
+
+		if (self.sync_lock==False) and self.risk_per_share.get()!="":
+			self.sync_lock = True
+
+			total = round(float_plus(self.risk_per_share.get())*int_plus(shares),2)
+
+			self.total_risk.set(str(total))
+			self.sync_lock = False
+
+
 	def stoplevel_to_per_risk(self,stoplevel,perrisk,totalrisk):
 
 		entry_type,entry,shares = self.entry.get_all_infos()
@@ -161,18 +170,25 @@ class stop:
 		if (self.sync_lock==False) and entry!="":
 
 			self.sync_lock = True
+
+			
 			if entry_type =="Long":
-				#print(entry,stoplevel.get())
-				amount = str(round(float_plus(entry)-float_plus(stoplevel.get()),2))
+
+				amount = round(float_plus(entry)-float_plus(stoplevel.get()),2)
 			else:
-				amount = str(round(float_plus(stoplevel.get())-entry),2)
+				amount = round(float_plus(stoplevel.get())-entry),2
 				
 
-			total = round(float_plus(amount)*int_plus(shares),2)
-			perrisk.set(amount)
-			totalrisk.set(total)
+			if amount <0:
+				self.stop_level_status["text"]="invalid level"
+			else:
+				self.stop_level_status["text"]=""
+				total = round(amount*int_plus(shares),2)
+				perrisk.set(amount)
+				totalrisk.set(total)
 
-			#print(totalrisk.get())
+
+				#print(totalrisk.get())
 
 			self.sync_lock = False
 
@@ -200,7 +216,7 @@ class stop:
 	############ THIS ONE CHANGES the entry column
 	def total_risk_to_shares(self,stoplevel,perrisk,totalrisk):
 
-		#entry_type,entry,shares = self.entry.get_all_infos()
+
 
 		if (self.sync_lock==False) and perrisk.get()!="" and totalrisk.get()!="":
 
@@ -273,6 +289,9 @@ class stop:
 		self.stop_level_entry=tk.Entry(frame,width=10,textvariable=self.stop_level,validate='all', validatecommand=(float_check, '%P'))
 		self.stop_level_entry.grid(row=row,column=2) #
 
+		self.stop_level_status = tk.Label(frame,text="")
+		self.stop_level_status.grid(row=row,column=3)
+
 		row+=1
 		tk.Label(frame,text="Risk per share: ").grid(row=row,column=1)
 
@@ -332,6 +351,9 @@ class algo_placer:
 
 
 		self.stop = stop(self.stopFrame,entry_price)
+
+
+		self.entry.set_stop_pannel(self.stop)
 		self.stop.set_entry_pannel(self.entry)
 
 
