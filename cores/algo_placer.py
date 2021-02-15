@@ -12,11 +12,54 @@ import sys
 
 class entry:
 
+	def get_all_infos(self):
+		return self.entry_type.get(),self.entry_price.get(),self.shares.get()
 
 	def capital_to_shares(self,capital,shares,price):
-		print(capital.get(),shares.get(),price)
-	def shares_to_capital(self,capital,shares):
-		pass
+
+		if (self.sync_lock==False) and capital.get()!="" and price.get()!="":
+
+			self.sync_lock = True
+
+			try:
+				amount = str(int(int(capital.get())//float(price.get())))
+				#print(amount)
+				shares.set(amount)
+			except:
+				pass
+			# capital.get()
+			# shares.get()
+			self.sync_lock = False
+
+	def shares_to_capital(self,capital,shares,price):
+		if (self.sync_lock==False) and shares.get()!="" and price.get()!="":
+
+			self.sync_lock = True
+
+			try:
+				amount = str(round(int(shares.get())*float(price.get()),2))
+				#print(amount)
+				capital.set(amount)
+			except:
+				pass
+			# capital.get()
+			# shares.get()
+			self.sync_lock = False
+
+	def price_to_capital(self,capital,shares,price):
+
+		if (self.sync_lock==False) and price.get()!="" and shares.get()!="":
+
+			self.sync_lock = True
+			try:
+				amount = str(round(int(shares.get())*float(price.get()),2))
+				#print(amount)
+				capital.set(amount)
+			except:
+				pass
+			# capital.get()
+			# shares.get()
+			self.sync_lock = False
 
 	def deactivate_entry(self,options,entry):
 
@@ -27,7 +70,6 @@ class entry:
 			entry["state"]="disabled"
 		elif options =="Limit":
 			entry["state"]='normal'
-
 
 	def int_check(self, P):
 		if str.isdigit(P) or P=="":
@@ -42,10 +84,14 @@ class entry:
 		except:
 			return False
 
+	def set_stop_pannel(self,stop):
+		self.stop = stop
+
 	def __init__(self,frame,entry_price=None):
 
 		row = 1
-		
+			
+		self.sync_lock = False
 
 		self.entry_type = tk.StringVar(frame)
 		self.entry_type_choices = {'Long','Short'}
@@ -60,7 +106,6 @@ class entry:
 
 		self.shares = tk.StringVar(frame)
 		self.capital = tk.StringVar(frame)
-
 
 
 		int_check = (frame.register(self.int_check))
@@ -85,14 +130,146 @@ class entry:
 		tk.Entry(frame,width=10,textvariable=self.capital,validate='all', validatecommand=(int_check, '%P')).grid(row=row,column=2)
 			
 
+		self.entry_price.trace('w', lambda *_, capital=self.capital,shares=self.shares,price=self.entry_price: self.price_to_capital(capital,shares,price))
+		self.shares.trace('w', lambda *_, capital=self.capital,shares=self.shares,price=self.entry_price: self.shares_to_capital(capital,shares,price))
 		self.capital.trace('w', lambda *_, capital=self.capital,shares=self.shares,price=self.entry_price: self.capital_to_shares(capital,shares,price))
-
-
-		
-
 
 		#type,ordertype,price,shares. 
 		self.values = []
+
+
+class stop:
+
+
+	def stoplevel_to_per_risk(self,stoplevel,perrisk,totalrisk):
+
+		entry_type,entry,shares = self.entry.get_all_infos()
+
+		if (self.sync_lock==False) and entry!="" and shares!="":
+
+			self.sync_lock = True
+			if entry_type =="Long":
+				amount = str(round(float(entry)-float(stoplevel.get()),2))
+			else:
+				amount = str(round(float(stoplevel.get())-entry),2)
+				
+
+			total = round(float(amount)*int(shares),2)
+			perrisk.set(amount)
+			totalrisk.set(total)
+
+			print(totalrisk.get())
+
+			self.sync_lock = False
+
+	def perrisk_to_stoplevel(self,stoplevel,perrisk,totalrisk):
+		if (self.sync_lock==False) and shares.get()!="" and price.get()!="":
+
+			self.sync_lock = True
+
+			amount = str(round(int(shares.get())*float(price.get()),2))
+			print(amount)
+			capital.set(amount)
+			# capital.get()
+			# shares.get()
+			self.sync_lock = False
+
+	############ THIS ONE CHANGES the entry column
+	def total_risk_to_shares(self,stoplevel,perrisk,totalrisk):
+
+		if (self.sync_lock==False) and price.get()!="" and shares.get()!="":
+
+			self.sync_lock = True
+
+			amount = str(round(int(shares.get())*float(price.get()),2))
+			print(amount)
+			capital.set(amount)
+			# capital.get()
+			# shares.get()
+			self.sync_lock = False
+
+	def deactivate_entry(self,options,entry):
+
+		options=options.get()
+		#print(options.get(),entry)
+
+		if options == "Market":
+			entry["state"]="disabled"
+		elif options =="Limit":
+			entry["state"]='normal'
+
+	def int_check(self, P):
+		if str.isdigit(P) or P=="":
+			return True
+		else:
+			return False
+
+	def float_check(self,P):
+		try:
+			a = float(P)
+			return True
+		except:
+			return False
+
+	def set_entry_pannel(self,entry):
+		self.entry = entry
+
+	def __init__(self,frame,entry_price=None):
+
+		row = 1
+			
+		self.sync_lock = False
+
+		self.stop_type = tk.StringVar(frame)
+		self.stop_type_choices = {'Mid','Ask','Bid','Trailing'}
+		self.stop_type.set('Mid') 
+
+
+		self.stop_level = tk.StringVar(frame)
+		self.stop_level.set(entry_price)
+
+		self.risk_per_share =  tk.StringVar(frame)
+		self.total_risk  =  tk.StringVar(frame)
+
+
+		int_check = (frame.register(self.int_check))
+		float_check =(frame.register(self.float_check))
+
+
+		tk.Label(frame,text="Stop type: ").grid(row=row,column=1)
+		tk.OptionMenu(frame, self.stop_type, *sorted(self.stop_type_choices)).grid(row=row,column=2)
+
+		row+=1
+		tk.Label(frame,text="Stop Level: ").grid(row=row,column=1)
+
+		self.stop_level_entry=tk.Entry(frame,width=10,textvariable=self.stop_level,validate='all', validatecommand=(float_check, '%P'))
+		self.stop_level_entry.grid(row=row,column=2) #
+
+		row+=1
+		tk.Label(frame,text="Risk per share: ").grid(row=row,column=1)
+
+		self.Riskpershare_entry=tk.Entry(frame,width=10,textvariable=self.risk_per_share,validate='all', validatecommand=(float_check, '%P'))
+		self.Riskpershare_entry.grid(row=row,column=2)
+
+		row+=1
+		tk.Label(frame,text="Total risk: ").grid(row=row,column=1)
+
+		self.Totalrisk_entry=tk.Entry(frame,width=10,textvariable=self.total_risk,validate='all', validatecommand=(float_check, '%P'))
+		self.Totalrisk_entry.grid(row=row,column=2)
+
+
+		#self.order_type.trace('w', lambda *_, string=self.order_type,entry=self.price_entry: self.deactivate_entry(string,entry))
+
+		self.stop_level.trace('w', lambda *_, stoplevel=self.stop_level,perrisk=self.risk_per_share,totalrisk=self.total_risk: self.stoplevel_to_per_risk(stoplevel,perrisk,totalrisk))
+		self.risk_per_share.trace('w', lambda *_, stoplevel=self.stop_level,perrisk=self.risk_per_share,totalrisk=self.total_risk: self.perrisk_to_stoplevel(stoplevel,perrisk,totalrisk))
+		self.total_risk.trace('w', lambda *_, stoplevel=self.stop_level,perrisk=self.risk_per_share,totalrisk=self.total_risk: self.total_risk_to_shares(stoplevel,perrisk,totalrisk))
+		# self.shares.trace('w', lambda *_, capital=self.capital,shares=self.shares,price=self.entry_price: self.shares_to_capital(capital,shares,price))
+		# self.capital.trace('w', lambda *_, capital=self.capital,shares=self.shares,price=self.entry_price: self.capital_to_shares(capital,shares,price))
+
+		#type,ordertype,price,shares. 
+		self.values = []
+
+
 
 class algo_placer:
 
@@ -115,30 +292,24 @@ class algo_placer:
 
 		############### ENTRY ################
 		self.entryFrame = ttk.LabelFrame(root,text="Entry") 
-		self.entryFrame.place(x=10,y=60,height=300,width=300)
+		self.entryFrame.place(x=10,y=60,height=300,width=250)
+
+
+		self.stopFrame = ttk.LabelFrame(root,text="Stop") 
+		self.stopFrame.place(x=260,y=60,height=300,width=250)
 
 
 		self.entry = entry(self.entryFrame,entry_price)
 
 
-		################ STOP LOSS######################
-		self.stop = ttk.LabelFrame(root,text="Stoploss") 
-		self.stop.place(x=320,y=60,height=100,width=200)
 
-		tk.Label(self.stop,text="Stoploss type: ").place(x=10, y=10)
-
-		self.stop_type = tk.StringVar(self.stop)
-		self.stop_type_choices = {'','','','','On Capital loss'}
-		self.stop_type.set('Top 5') 
-
-		self.stop_type_ui = tk.OptionMenu(self.stop, self.stop_type, *sorted(self.stop_type_choices))
-		#self.menu1 = ttk.Label(self.setting, text="Country").grid(row = 1, column = 3)
-		self.stop_type_ui.place(x=10, y=30) #height=25, width=70)
+		self.stop = stop(self.stopFrame,entry_price)
+		self.stop.set_entry_pannel(self.entry)
 
 
 		######################################
-		self.position_management = ttk.LabelFrame(root,text="Position Management") 
-		self.position_management.place(x=440,y=60,height=100,width=200)	
+		# self.position_management = ttk.LabelFrame(root,text="Position Management") 
+		# self.position_management.place(x=440,y=60,height=100,width=200)	
 
 		self.start()
 
