@@ -9,8 +9,24 @@ import threading
 import sys
 
 
+def float_plus(f):
+	try:
+		return float(f)
+	except:
+		return 0
+
+def int_plus(i):
+	try:
+		return int(i)
+	except:
+		return 0
 
 class entry:
+
+	def set_share(self,value):
+
+		self.shares.set(value)
+
 
 	def get_all_infos(self):
 		return self.entry_type.get(),self.entry_price.get(),self.shares.get()
@@ -21,12 +37,11 @@ class entry:
 
 			self.sync_lock = True
 
-			try:
-				amount = str(int(int(capital.get())//float(price.get())))
-				#print(amount)
-				shares.set(amount)
-			except:
-				pass
+	
+			amount = str(int(int_plus(capital.get())//float_plus(price.get())))
+			#print(amount)
+			shares.set(amount)
+
 			# capital.get()
 			# shares.get()
 			self.sync_lock = False
@@ -36,12 +51,11 @@ class entry:
 
 			self.sync_lock = True
 
-			try:
-				amount = str(round(int(shares.get())*float(price.get()),2))
-				#print(amount)
-				capital.set(amount)
-			except:
-				pass
+			amount = str(round(int_plus(shares.get())*float_plus(price.get()),2))
+
+			print(shares.get(),amount,float_plus(price.get()),int_plus(shares.get()))
+			capital.set(amount)
+
 			# capital.get()
 			# shares.get()
 			self.sync_lock = False
@@ -51,12 +65,11 @@ class entry:
 		if (self.sync_lock==False) and price.get()!="" and shares.get()!="":
 
 			self.sync_lock = True
-			try:
-				amount = str(round(int(shares.get())*float(price.get()),2))
-				#print(amount)
-				capital.set(amount)
-			except:
-				pass
+	
+			amount = str(round(int_plus(shares.get())*float_plus(price.get()),2))
+			#print(amount)
+			capital.set(amount)
+
 			# capital.get()
 			# shares.get()
 			self.sync_lock = False
@@ -145,67 +158,57 @@ class stop:
 
 		entry_type,entry,shares = self.entry.get_all_infos()
 
-		if (self.sync_lock==False) and entry!="" and shares!="":
+		if (self.sync_lock==False) and entry!="":
 
 			self.sync_lock = True
 			if entry_type =="Long":
-				amount = str(round(float(entry)-float(stoplevel.get()),2))
+				#print(entry,stoplevel.get())
+				amount = str(round(float_plus(entry)-float_plus(stoplevel.get()),2))
 			else:
-				amount = str(round(float(stoplevel.get())-entry),2)
+				amount = str(round(float_plus(stoplevel.get())-entry),2)
 				
 
-			total = round(float(amount)*int(shares),2)
+			total = round(float_plus(amount)*int_plus(shares),2)
 			perrisk.set(amount)
 			totalrisk.set(total)
 
-			print(totalrisk.get())
+			#print(totalrisk.get())
 
 			self.sync_lock = False
 
 	def perrisk_to_stoplevel(self,stoplevel,perrisk,totalrisk):
 
-		pass
-
 		entry_type,entry,shares = self.entry.get_all_infos()
 
-		if (self.sync_lock==False) and entry!="" and shares!="":
+		if (self.sync_lock==False) and entry!="":
 
 			self.sync_lock = True
 			if entry_type =="Long":
-				amount = str(round(float(entry)-float(stoplevel.get()),2))
+				#stop level.
+				amount = str(round(float_plus(entry)-float_plus(perrisk.get()),2))
 			else:
-				amount = str(round(float(stoplevel.get())-entry),2)
+				amount = str(round(float_plus(perrisk.get())-float_plus(entry),2))
 				
-
-			total = round(float(amount)*int(shares),2)
-			perrisk.set(amount)
+			total = round(float_plus(perrisk.get())*int_plus(shares),2)
+			stoplevel.set(amount)
 			totalrisk.set(total)
 
-			print(totalrisk.get())
+			#print(totalrisk.get())
 
 			self.sync_lock = False
 
 	############ THIS ONE CHANGES the entry column
 	def total_risk_to_shares(self,stoplevel,perrisk,totalrisk):
 
-		pass
+		#entry_type,entry,shares = self.entry.get_all_infos()
 
-		entry_type,entry,shares = self.entry.get_all_infos()
-
-		if (self.sync_lock==False) and entry!="" and shares!="":
+		if (self.sync_lock==False) and perrisk.get()!="" and totalrisk.get()!="":
 
 			self.sync_lock = True
-			if entry_type =="Long":
-				amount = str(round(float(entry)-float(stoplevel.get()),2))
-			else:
-				amount = str(round(float(stoplevel.get())-entry),2)
-				
 
-			total = round(float(amount)*int(shares),2)
-			perrisk.set(amount)
-			totalrisk.set(total)
+			share = int(float_plus(totalrisk.get())//float_plus(perrisk.get()))
 
-			print(totalrisk.get())
+			self.entry.set_share(str(share))
 
 			self.sync_lock = False
 
@@ -227,11 +230,14 @@ class stop:
 			return False
 
 	def float_check(self,P):
-		try:
-			a = float(P)
+		if P=="":
 			return True
-		except:
-			return False
+		else:
+			try:
+				a = float(P)
+				return True
+			except:
+				return False
 
 	def set_entry_pannel(self,entry):
 		self.entry = entry
