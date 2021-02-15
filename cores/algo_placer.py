@@ -10,9 +10,93 @@ import sys
 
 
 
+class entry:
+
+
+	def capital_to_shares(self,capital,shares,price):
+		print(capital.get(),shares.get(),price)
+	def shares_to_capital(self,capital,shares):
+		pass
+
+	def deactivate_entry(self,options,entry):
+
+		options=options.get()
+		#print(options.get(),entry)
+
+		if options == "Market":
+			entry["state"]="disabled"
+		elif options =="Limit":
+			entry["state"]='normal'
+
+
+	def int_check(self, P):
+		if str.isdigit(P) or P=="":
+			return True
+		else:
+			return False
+
+	def float_check(self,P):
+		try:
+			a = float(P)
+			return True
+		except:
+			return False
+
+	def __init__(self,frame,entry_price=None):
+
+		row = 1
+		
+
+		self.entry_type = tk.StringVar(frame)
+		self.entry_type_choices = {'Long','Short'}
+		self.entry_type.set('Long') 
+
+		self.order_type = tk.StringVar(frame)
+		self.order_type_choices = {'Market','Limit'}
+		self.order_type.set('Market') 
+
+		self.entry_price = tk.StringVar(frame)
+		self.entry_price.set(entry_price)
+
+		self.shares = tk.StringVar(frame)
+		self.capital = tk.StringVar(frame)
+
+
+
+		int_check = (frame.register(self.int_check))
+		float_check =(frame.register(self.float_check))
+
+		tk.Label(frame,text="Entry type: ").grid(row=row,column=1)
+		tk.OptionMenu(frame, self.entry_type, *sorted(self.entry_type_choices)).grid(row=row,column=2)
+
+		row+=1
+		tk.Label(frame,text="Order type: ").grid(row=row,column=1)
+		tk.OptionMenu(frame, self.order_type, *sorted(self.order_type_choices)).grid(row=row,column=2)
+		self.price_entry=tk.Entry(frame,width=10,textvariable=self.entry_price,state="disabled",validate='all', validatecommand=(float_check, '%P'))
+		self.price_entry.grid(row=row,column=3)
+		self.order_type.trace('w', lambda *_, string=self.order_type,entry=self.price_entry: self.deactivate_entry(string,entry))
+
+		row+=1
+
+		tk.Label(frame,text="Shares: ").grid(row=row,column=1)
+		tk.Entry(frame,width=10,textvariable=self.shares,validate='all', validatecommand=(int_check, '%P')).grid(row=row,column=2)
+		row+=1
+		tk.Label(frame,text="Capital: ").grid(row=row,column=1)
+		tk.Entry(frame,width=10,textvariable=self.capital,validate='all', validatecommand=(int_check, '%P')).grid(row=row,column=2)
+			
+
+		self.capital.trace('w', lambda *_, capital=self.capital,shares=self.shares,price=self.entry_price: self.capital_to_shares(capital,shares,price))
+
+
+		
+
+
+		#type,ordertype,price,shares. 
+		self.values = []
+
 class algo_placer:
 
-	def __init__(self,symbol,triggers):
+	def __init__(self,symbol,triggers,entry_price=None):
 
 		root = tk.Tk() 
 		root.title("Algo Placer: "+symbol) 
@@ -30,12 +114,16 @@ class algo_placer:
 
 
 		############### ENTRY ################
-		self.entry = ttk.LabelFrame(root,text="Entry") 
-		self.entry.place(x=10,y=60,height=100,width=200)
+		self.entryFrame = ttk.LabelFrame(root,text="Entry") 
+		self.entryFrame.place(x=10,y=60,height=300,width=300)
+
+
+		self.entry = entry(self.entryFrame,entry_price)
+
 
 		################ STOP LOSS######################
 		self.stop = ttk.LabelFrame(root,text="Stoploss") 
-		self.stop.place(x=220,y=60,height=100,width=200)
+		self.stop.place(x=320,y=60,height=100,width=200)
 
 		tk.Label(self.stop,text="Stoploss type: ").place(x=10, y=10)
 
@@ -60,10 +148,8 @@ class algo_placer:
 
 	def start(self):
 
-		self.root.mainloop()
+		self.root.mainloop() 
 
-# class ticker_manager(pannel):
-# 	def __init__(self,frame,data,alerts):
 # 		super().__init__(frame)
 
 # 		self.alerts = alerts
@@ -110,4 +196,4 @@ class algo_placer:
 
 
 
-algo_placer("AAPL.NQ","Breakout on Resistance on 134.45 for 60 secs")
+algo_placer("AAPL.NQ","Breakout on Resistance on 134.45 for 60 secs",134.45)
