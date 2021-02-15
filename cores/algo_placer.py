@@ -41,6 +41,7 @@ class entry:
 			amount = str(int(int_plus(capital.get())//float_plus(price.get())))
 			#print(amount)
 			shares.set(amount)
+			self.stop.entry_to_stop(amount)
 
 			self.sync_lock = False
 
@@ -150,6 +151,7 @@ class entry:
 
 
 class stop:
+
 
 
 	def entry_to_stop(self,shares):
