@@ -356,7 +356,7 @@ class algo_placer:
 	def __init__(self,symbol,description,entry_price=None,stop_price=None,position=None,capital=None,total_risk=None):
 
 
-		#print(position,capital,total_risk)
+		print(symbol,position,capital,total_risk)
 
 		# root = tk.Tk() 
 		# root.title("Algo Placer: "+symbol) 
@@ -447,4 +447,11 @@ def main():
 if __name__ == '__main__':
     #main()
 #symbol, break out discription. 
-	algo_placer("AAPL.NQ","Breakout on Resistance on 134.45 for 60 secs",134.45,133.45,None,100)
+	root = tk.Tk()
+
+	#symbol,description,entry_price=None,stop_price=None,position=None,capital=None,total_risk=None)
+	#algo_placer(symbol,description,entry,stop,position,None,risk)
+	#algo_placer("AAPL.NQ","Breakout on Resistance on 134.45 for 60 secs",134.45,133.45,"Long",None,10.0)
+
+	algo_placer('QQQ.NQ', 'Breakout on Resistance on 338.85 for 0 sec', 338.85, 336.45, 'Long', None, 5050.0)
+	root.mainloop()
