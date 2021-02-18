@@ -3,6 +3,7 @@ from tkinter import ttk
 
 import socket
 import pickle
+import numpy as np
 import pandas as pd
 import time
 import multiprocessing
@@ -140,6 +141,15 @@ class market_scanner:
 		self.menu5 = ttk.Label(self.setting, text="Min Liquidity").grid(row = 1, column = 5)
 		self.om5.grid(row = 2, column =5)
 
+
+		self.pos = tk.StringVar(self.setting)
+		self.pos_choice = {'Any','At High','Near High','Near Low','At Low'}
+		self.pos.set('Any') 
+
+		self.om6 = tk.OptionMenu(self.setting, self.pos, *sorted(self.pos_choice))
+		self.menu6 = ttk.Label(self.setting, text="Position filter").grid(row = 1, column = 6)
+		self.om6.grid(row = 2, column =6)
+
 		# self.relv = tk.StringVar(self.setting)
 		# self.relv_choice = {'0.5 above','1 above','2 above','Any'}
 		# self.relv.set('Any') 
@@ -152,7 +162,7 @@ class market_scanner:
 		self.status = tk.StringVar()
 		self.status.set("Status:")
 		self.ppro_status = ttk.Label(self.setting, textvariable=self.status)
-		self.ppro_status.place(x = 600, y =12)
+		self.ppro_status.place(x = 650, y =12)
 
 		self.refresh = tk.Button(self.setting,command= lambda: self.refresh_pannel()) #,command=self.loadsymbol
 		self.refresh.grid(row = 2, column =7)#.place(x=700, y=12, height=30, width=80, bordermode='ignore')
@@ -268,10 +278,31 @@ class market_scanner:
 
 	def filter(self,a):
 
+
+
+		#add additional colom to a.
+
+		#
+		######################
+
 		country = self.country.get() 
 		if country != 'Any':
 			a = a.loc[a["Country"]==country]
 
+
+		#'Any','At High','Near High','Near Low','At Low'
+		pos = self.pos.get()
+
+		if pos != 'Any':
+
+			if pos == 'At High':
+				a = a.loc[a["Current-Pos"]>=0.97]
+			elif pos == 'Near High':
+				a = a.loc[(a["Current-Pos"]<0.97)&(a["Current-Pos"]>0.9)]
+			elif pos == 'Near Low':
+				a = a.loc[(a["Current-Pos"]<0.1)&(a["Current-Pos"]>0.03)]
+			elif pos == 'At Low':
+				a = a.loc[a["Current-Pos"]<=0.03]
 
 		liq = self.liq.get()
 
@@ -289,7 +320,6 @@ class market_scanner:
 			elif liq =="last tick within 10 minutes":
 				a = a.loc[a["Ppro Timestamp"]>=ts-10]
 
-
 		mc = self.mc.get()
 
 		if mc != 'Any':
@@ -304,7 +334,7 @@ class market_scanner:
 			elif mc =="Large":
 				a = a.loc[a["Market Cap"]==4]
 
-		print("before filtering:",len(a))
+		print("after filtering:",len(a))
 
 
 		return a
@@ -372,7 +402,7 @@ class market_scanner:
 
 				#lst.append(symbol)↑↓
 
-				if count == 20:
+				if count == 15:
 					count = 1
 					row +=1
 				count +=1
