@@ -214,6 +214,8 @@ class market_scanner:
 			self.in_progress == True
 			self.delete()
 			pkg = self.filter(self.data)
+
+			pkg.to_csv("Test.csv")
 			self.add_(pkg,self.tab1,"Close-price-ATR",self.tab1_buttons)
 			self.add_(pkg,self.tab2,"Open-High-ATR",self.tab2_buttons)
 			self.add_(pkg,self.tab3,"Open-Low-ATR",self.tab3_buttons)
@@ -284,6 +286,13 @@ class market_scanner:
 
 		#
 		######################
+
+		#get rid of price 0
+
+		a = a.loc[a["Price"]>0]
+
+
+		#####
 
 		country = self.country.get() 
 		if country != 'Any':
