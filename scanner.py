@@ -336,7 +336,7 @@ class scanner(pannel):
 						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 
 						if roc5>0:
-							tex = info[j]+" ↑"+str(diff)
+							tex = info[j]+" ↑"+str(roc5)
 							if int(roc10)>0:
 								tex = tex+" ↑"+str(roc10)
 							if int(roc30)>0:
@@ -380,7 +380,7 @@ class scanner(pannel):
 						self.nasdaq[i][j]["text"] = info[j]
 					elif j ==1:
 						if roc5>0:
-							tex = info[j]+" ↑"+str(diff)
+							tex = info[j]+" ↑"+str(roc5)
 							if int(roc10)>0:
 								tex = tex+" ↑"+str(roc10)
 							if int(roc30)>0:
