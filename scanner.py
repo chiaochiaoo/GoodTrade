@@ -374,7 +374,7 @@ class scanner(pannel):
 				roc10 = row['rank10']
 				roc30 = row['rank30']
 				status = row['status']
-
+				market = symbol[-2:]
 				info = [rank,index,market,price,status,symbol]
 
 				for j in range(len(width)):
