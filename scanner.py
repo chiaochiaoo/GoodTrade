@@ -306,6 +306,10 @@ class scanner(pannel):
 		self.nasdaq_trader_symbols = []
 
 		i = -1
+		
+		timestamp = df[2]
+		df = df[1]
+
 
 		if self.nasdaq_trader_created == False:
 			
@@ -397,7 +401,7 @@ class scanner(pannel):
 						self.nasdaq[i][j]["command"] = lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)
 
 
-		self.NT_update_time.set(df[2])
+		self.NT_update_time.set(timestamp)
 
 		self.scanner_process_manager.updating_comlete()
 
