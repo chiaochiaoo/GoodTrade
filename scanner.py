@@ -1,8 +1,9 @@
 import tkinter as tk                     
 from tkinter import ttk 
 import threading
-from pannel import *
+import pandas as pd
 
+from pannel import *
 from scanner_process_manager import *
 
 
@@ -16,8 +17,7 @@ class scanner(pannel):
 		super()
 
 		#mark if already created. if so, just update the infos. 
-		self.nasdaq_trader_created_1 = False
-
+		self.nasdaq_trader_created = False
 
 		self.nasdaq_trader_symbols = []
 		self.nasdaq_trader_list = {}
@@ -64,9 +64,14 @@ class scanner(pannel):
 		self.NT.place(x=0,rely=0.05,relheight=1,width=500)
 
 		self.all = tk.Canvas(self.NT)
-		self.after = tk.Canvas(self.NT)
+		self.fastmover = tk.Canvas(self.NT)
+		self.newhigh = tk.Canvas(self.NT)
+		self.newlow = tk.Canvas(self.NT)
 
-		self.NT.add(self.all, text ='All Sessions')
+		self.NT.add(self.all, text ='All')
+		self.NT.add(self.fastmover, text ='FastMover')
+		self.NT.add(self.newhigh, text ='New High')
+		self.NT.add(self.newlow, text ='New Low')
 
 
 		self.NT_scanner_canvas = tk.Canvas(self.all)
@@ -78,7 +83,6 @@ class scanner(pannel):
 		self.NT_scanner_frame = tk.Frame(self.NT_scanner_canvas)
 		self.NT_scanner_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
 		self.NT_scanner_canvas.create_window(0, 0, window=self.NT_scanner_frame, anchor=tk.NW)
-
 
 		self.recreate_labels(self.NT_scanner_frame)
 
@@ -178,6 +182,9 @@ class scanner(pannel):
 		self.rebind(self.scanner_canvas,self.scanner_frame)
 
 
+		# df = pd.read_csv("test.csv",index_col=0)
+		# self.add_nasdaq_labels(df)
+
 	def add_symbols(self):
 
 
@@ -199,10 +206,9 @@ class scanner(pannel):
 			self.tickers_manager.add_symbol_reg_list(i)
 
 
-
 	def recreate_labels(self,frame):
-		width = [3,5,10,10,10,10,5]
-		labels = ["Rank","Symbol","MKT Center","Matched Shares","Last Matched","Open Orders","Add"]
+		width = [5,12,8,20,5]
+		labels = ["Rank","Symbol","Price","Status","Add"]
 
 		for i in range(len(labels)): #Rows
 			self.b = tk.Button(frame, text=labels[i],width=width[i])#,command=self.rank
@@ -291,101 +297,106 @@ class scanner(pannel):
 		#self.delete_old_labels_nasdaq()
 		self.scanner_process_manager.refresh_nasdaq_trader()
 
-	def add_nasdaq_labels(self,d):
 
+	def add_nasdaq_labels(self,df):
 
-		# self.nasdaq_trader_created_1 = False
-		# self.nasdaq_trader_created_2 = False
-		#self.delete_old_labels_nasdaq()
+		
 
-		# check the ranking from 10 minutes ago. Eliminate auto Refresh. 
-
-		print("Nasdaq Trader refreshed")
-
-		ranking = {}
-		for i in range(len(d[1])):
-			#print(d[1][i][1],d[1][i][0])
-			ranking[d[1][i][1]] = int(d[1][i][0])
-
-		self.nasdaq_trader_symbols_ranking.append(ranking)
-
-		if len(self.nasdaq_trader_symbols_ranking)>10:
-			self.nasdaq_trader_symbols_ranking.pop(0)
+		width = [5,12,8,20,5]
 
 		self.nasdaq_trader_symbols = []
-		width = [3,8,4,10,10,10,5]
 
-		if 1:
-			if len(d[1])>50 and self.nasdaq_trader_created_1 == False:
+		if self.nasdaq_trader_created == False:
+			
+			i = -1
+			for index, row in df.iterrows():
 
-				for i in range(len(d[1])):
-					self.nasdaq.append([])
-					for j in range(len(width)):
-						if j == 1:
-							self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=d[1][i][j],width=width[j],background="SystemButtonFace"))
-							self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-							#else just normal. 
+				rank = row['rank']
+				symbol = row['symbol']
+				price = row['price']
+				roc5 = row['rank5']
+				roc10 = row['rank10']
+				roc30 = row['rank30']
+				status = row['status']
+				i+=1
 
-						elif j==0 or j!= len(width)-1:
-							self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=d[1][i][j],width=width[j]))
-							self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+				info = [rank,index,price,status,symbol]
+				self.nasdaq.append([])
+
+				for j in range(len(width)):
+					if j ==0 or j==2 or j==3:
+						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=info[j],width=width[j]))
+						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+					elif j ==1:
+						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=info[j],width=width[j],background="SystemButtonFace"))
+						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+
+						if roc5>0:
+							tex = info[j]+" ↑"+str(diff)
+							if int(roc10)>0:
+								tex = tex+" ↑"+str(roc10)
+							if int(roc30)>0:
+								tex = tex+" ↑"+str(roc30)
+
+							color = "#97FEA8"
+							if roc5 >3: 
+								color = "#BDFE10"
+							if roc5 >5:
+								color = "#FC3DC8"
+							self.nasdaq[i][j]["text"]=tex
+							self.nasdaq[i][j]["background"]=color
 						else:
-							sy = self.market_suffix_nasdaq_trader(d[1][i][1],d[1][i][2])
+							self.nasdaq[i][j]["text"]=index
+							self.nasdaq[i][j]["background"]="SystemButtonFace"
+					elif j ==4:
 
-							self.nasdaq[i].append(tk.Button(self.NT_scanner_frame ,text="Add",width=width[j],command= lambda k=sy: self.tickers_manager.add_symbol_reg_list(k)))
-							self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-							self.nasdaq_trader_symbols.append(sy)
-				self.nasdaq_trader_created_1 = True
-				self.rebind(self.NT_scanner_canvas,self.NT_scanner_frame)
-			else:
-				for i in range(len(d[1])):
-					for j in range(len(width)):
-						if j == 1:
-							#check the ranking. decide color. 
-							prev_ranking = self.nasdaq_trader_symbols_ranking[0]
+						self.nasdaq[i].append(tk.Button(self.NT_scanner_frame ,text="Add",width=width[j],command= lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)))
+						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+						self.nasdaq_trader_symbols.append(symbol)
 
-							#if ranking is ahead. print up how many, and give color
-							symbol = d[1][i][j]
-							
-							if symbol in prev_ranking:
-								diff = prev_ranking[symbol] -ranking[symbol]
-								if diff>0:
-									tex = d[1][i][j]+" ↑"+str(diff)
-									color = "#97FEA8"
-									if diff >3: 
-										color = "#BDFE10"
-									if diff >5:
-										color = "#FC3DC8"
-									self.nasdaq[i][j]["text"]=tex
-									self.nasdaq[i][j]["background"]=color
-								else:
-									self.nasdaq[i][j]["text"]=symbol
-									self.nasdaq[i][j]["background"]="SystemButtonFace"
-							else:
-								self.nasdaq[i][j]["text"]=symbol
-								self.nasdaq[i][j]["background"]="SystemButtonFace"
-							#else just normal. 
 
-						elif j==0 or j!= len(width)-1:
-							#just update the text.
-							self.nasdaq[i][j]["text"] = d[1][i][j]
-							# self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=d[1][i][j],width=width[j]))
-							# self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+			self.nasdaq_trader_created = True
+			self.rebind(self.NT_scanner_canvas,self.NT_scanner_frame)
+
+		else:
+			for index, row in df.iterrows():
+
+				rank = row['rank']
+				symbol = row['symbol']
+				price = row['price']
+				roc5 = row['rank5']
+				roc10 = row['rank10']
+				roc30 = row['rank30']
+				status = row['status']
+
+				info = [rank,index,price,status,symbol]
+
+				for j in range(len(width)):
+					if j ==0 or j==2 or j==3:
+						self.nasdaq[i][j]["text"] = info[j]
+					elif j ==1:
+						if roc5>0:
+							tex = info[j]+" ↑"+str(diff)
+							if int(roc10)>0:
+								tex = tex+" ↑"+str(roc10)
+							if int(roc30)>0:
+								tex = tex+" ↑"+str(roc30)
+
+							color = "#97FEA8"
+							if roc5 >3: 
+								color = "#BDFE10"
+							if roc5 >5:
+								color = "#FC3DC8"
+							self.nasdaq[i][j]["text"]=tex
+							self.nasdaq[i][j]["background"]=color
 						else:
-							sy = self.market_suffix_nasdaq_trader(d[1][i][1],d[1][i][2])
-							self.nasdaq[i][j]["command"] = lambda k=sy: self.tickers_manager.add_symbol_reg_list(k)
+							self.nasdaq[i][j]["text"]=index
+							self.nasdaq[i][j]["background"]="SystemButtonFace"
+					elif j ==4:
+						self.nasdaq_trader_symbols.append(symbol)
+						self.nasdaq[i][j]["command"] = lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)
 
-							self.nasdaq_trader_symbols.append(sy)
 
-			#else:
-
-
-			self.NT_update_time.set(d[2])
-
-		# except Exception as e:
-		# 	print("Adding Nasdaq labels error",e)
-
-		self.scanner_process_manager.updating_comlete()
 
 	def add_labels(self,d):
 		#This is where it adds the labels.
@@ -429,6 +440,3 @@ class scanner(pannel):
 			else:
 				self.status_change("Please retry")
 				self.scanner_process_manager.adding_comlete()
-
-
-
