@@ -301,3 +301,35 @@ def fetch_data(symbol):
 	# print(data1==data2)
 
 
+# symbol = "USO"
+# req = "USO"
+# postbody = "http://api.kibot.com/?action=history&symbol="+req+"&interval=daily&period=30&regularsession=1&user=sajali26@hotmail.com&password=guupu4upu"
+# r= request(postbody, symbol)
+
+
+# O,H,L,C,V =1,2,3,4,5
+
+
+# range_=[] #data.symbol_data_openhigh_dis[i]
+# openhigh_=[] #data.symbol_data_openlow_dis[i]
+# openlow_=[] #data.symbol_data_range_dis[i]
+
+# ATR = []
+# previous_close = []
+
+# d = r.splitlines()[-14:]
+
+# prev_close = 0
+
+# for line in d:
+# 	lst=line.split(",")
+# 	range_.append(round(float(lst[H])-float(lst[L]),2))
+# 	openhigh_.append(float(lst[H])-float(lst[O]))
+# 	openlow_.append(float(lst[O])-float(lst[L]))
+
+# 	###ATR
+# 	ra =  float(lst[H])-float(lst[L])
+
+# print("Ranges from last 14 days:",range_)
+# print("Avg",round(np.mean(range_),2))
+# print("Std",round(np.std(range_),2))

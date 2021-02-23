@@ -23,11 +23,13 @@ reg_list = []
 data = {}
 
 global connection_error
-############################################################
-#### pipe in, symbol. if symbol not reg, reg. if reg, dereg.
-#### main loop. for each reg, thread out and return.
-#### send the updates back to the client.
-############################################################
+
+
+##################################################################
+####  pipe in, symbol. if symbol not reg, reg. if reg, dereg  ####
+####  main loop. for each reg, thread out and return.		  ####
+####  send the updates back to the client.					  ####
+##################################################################
 
 def round_up(i):
 
@@ -312,8 +314,6 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 		d["low"] = ppro_low
 		d["f5r"] = 0
 		d["f5v"] = 0
-
-	
 
 	else:
 		retry_times = 10

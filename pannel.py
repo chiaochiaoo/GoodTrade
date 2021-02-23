@@ -21,8 +21,7 @@ class pannel:
 		self.scroll2.pack(side=tk.RIGHT,fill="y")
 
 		self.canvas.configure(yscrollcommand=self.scroll2.set)
-		#self.scanner_canvas.bind('<Configure>', lambda e: self.scanner_canvas.configure(scrollregion = self.scanner_canvas.bbox('all')))
-
+		
 		self.frame = tk.Frame(self.canvas)
 		self.frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
 

@@ -207,8 +207,8 @@ class scanner(pannel):
 
 
 	def recreate_labels(self,frame):
-		width = [5,12,8,20,5]
-		labels = ["Rank","Symbol","Price","Status","Add"]
+		width = [5,12,5,8,20,5]
+		labels = ["Rank","Symbol","Market","Price","Status","Add"]
 
 		for i in range(len(labels)): #Rows
 			self.b = tk.Button(frame, text=labels[i],width=width[i])#,command=self.rank
@@ -301,7 +301,7 @@ class scanner(pannel):
 	def add_nasdaq_labels(self,df):
 
 
-		width = [5,12,8,20,5]
+		width = [5,12,5,8,20,5]
 
 		self.nasdaq_trader_symbols = []
 
@@ -323,12 +323,14 @@ class scanner(pannel):
 				roc10 = row['rank10']
 				roc30 = row['rank30']
 				status = row['status']
+
+				market = symbol[-2:]
 				
-				info = [rank,index,price,status,symbol]
+				info = [rank,index,market,price,status,symbol]
 				self.nasdaq.append([])
 
 				for j in range(len(width)):
-					if j ==0 or j==2 or j==3:
+					if j ==0 or j==2 or j==3 or j==4:
 						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=info[j],width=width[j]))
 						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 					elif j ==1:
@@ -352,7 +354,7 @@ class scanner(pannel):
 						else:
 							self.nasdaq[i][j]["text"]=index
 							self.nasdaq[i][j]["background"]="SystemButtonFace"
-					elif j ==4:
+					elif j ==5:
 
 						self.nasdaq[i].append(tk.Button(self.NT_scanner_frame ,text="Add",width=width[j],command= lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)))
 						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
@@ -376,7 +378,7 @@ class scanner(pannel):
 				info = [rank,index,price,status,symbol]
 
 				for j in range(len(width)):
-					if j ==0 or j==2 or j==3:
+					if j ==0 or j==2 or j==3 or j==4:
 						self.nasdaq[i][j]["text"] = info[j]
 					elif j ==1:
 						if roc5>0:
@@ -396,7 +398,7 @@ class scanner(pannel):
 						else:
 							self.nasdaq[i][j]["text"]=index
 							self.nasdaq[i][j]["background"]="SystemButtonFace"
-					elif j ==4:
+					elif j ==5:
 						self.nasdaq_trader_symbols.append(symbol)
 						self.nasdaq[i][j]["command"] = lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)
 
