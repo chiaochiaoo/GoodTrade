@@ -397,6 +397,9 @@ class scanner(pannel):
 						self.nasdaq[i][j]["command"] = lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)
 
 
+		self.NT_update_time.set(df[2])
+
+		self.scanner_process_manager.updating_comlete()
 
 
 	def add_labels(self,d):
