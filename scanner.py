@@ -300,17 +300,18 @@ class scanner(pannel):
 
 	def add_nasdaq_labels(self,df):
 
-		
 
 		width = [5,12,8,20,5]
 
 		self.nasdaq_trader_symbols = []
 
+		i = -1
+
 		if self.nasdaq_trader_created == False:
 			
-			i = -1
+			
 			for index, row in df.iterrows():
-
+				i+=1
 				rank = row['rank']
 				symbol = row['symbol']
 				price = row['price']
@@ -318,8 +319,7 @@ class scanner(pannel):
 				roc10 = row['rank10']
 				roc30 = row['rank30']
 				status = row['status']
-				i+=1
-
+				
 				info = [rank,index,price,status,symbol]
 				self.nasdaq.append([])
 
@@ -360,7 +360,7 @@ class scanner(pannel):
 
 		else:
 			for index, row in df.iterrows():
-
+				i+=1
 				rank = row['rank']
 				symbol = row['symbol']
 				price = row['price']
@@ -395,6 +395,7 @@ class scanner(pannel):
 					elif j ==4:
 						self.nasdaq_trader_symbols.append(symbol)
 						self.nasdaq[i][j]["command"] = lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)
+
 
 
 
