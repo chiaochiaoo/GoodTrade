@@ -375,7 +375,7 @@ class scanner(pannel):
 				roc30 = row['rank30']
 				status = row['status']
 
-				info = [rank,index,price,status,symbol]
+				info = [rank,index,market,price,status,symbol]
 
 				for j in range(len(width)):
 					if j ==0 or j==2 or j==3 or j==4:
