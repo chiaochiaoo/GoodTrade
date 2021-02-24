@@ -5,7 +5,7 @@ import threading
 from queue import Queue
 import time
 
-HOST = '10.29.10.132'  # Standard loopback interface address (localhost)
+HOST = '10.29.10.133'  # Standard loopback interface address (localhost)
 PORT = 65422        # Port to listen on (non-privileged ports are > 1023)
 
 global client_count
@@ -86,6 +86,9 @@ def server_start(pipe):
 	dc = threading.Thread(target=distribute_center,args=(pipe,), daemon=True)
 	dc.start()
 
+	HOST = '10.29.10.132'  # Standard loopback interface address (localhost)
+	PORT = 65422        # Port to listen on (non-privileged ports are > 1023)
+
 	try:
 		s=  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		#s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -98,6 +101,7 @@ def server_start(pipe):
 			queue = Queue()
 			with client_queue_lock:
 				client_queue.append(queue)
+				
 			reg = threading.Thread(target=client_connection,args=(conn,addr,queue,), daemon=True)
 			reg.start()
 	except Exception as e:
