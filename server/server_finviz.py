@@ -10,6 +10,24 @@ import requests
 
 #takes 10 minutes. at least it works. 
 
+def market_cap_identify(i):
+    
+    if i == '-' : return 0
+    
+    else:
+        cap = i[-1]
+        num = float(i[:-1])
+        #print(cap,num)
+        if cap =='B':
+            if num >=10: return 4
+            else:  return 3
+        elif cap =='M':
+            if num>1000:return 3
+            if num<1000 and num>250:return 2
+            if num<250:return 1
+        else:
+            print("Need help")
+
 #Run at 6 PM? 
 def update_data(pd,symbols):
 
@@ -20,14 +38,15 @@ def update_data(pd,symbols):
 			a=finviz.get_stock(i)
 			pd.loc[i,'ATR'] = a["ATR"]
 			pd.loc[i,'Prev Close'] = a["Prev Close"]
+			pd.loc[i,'Market Cap'] = market_cap_identify(a['Market Cap'])
 			count+=1
 			print("Process",count)
-
 		except Exception as e:
 			not_found.append(i)
 			
 	print("Not found:",not_found)
-	pd.to_csv("test.csv") 
+	pd.to_csv("test_update.csv") 
+	print("saved")
 
 
 #no go.
@@ -48,30 +67,14 @@ def update_data_batch():
 #update_data()
 ###### Update the info from PPRO. ##################
 
-
-
-
-###################################
-
 a = pd.read_csv('nasdaq_ppro_live - nasdaq_ppro_live.csv', index_col=0)
-
-ticks = a.index
-
-for i in ticks:
-	try:
-		p="http://localhost:8080/Register?symbol="+i+".NQ&feedtype=L1"
-		c= requests.get(p,timeout=0.01)
-		print(i,"Good")
-	except:
-		try:
-			print(i,"no good try again")
-			c= requests.get(p,timeout=0.05)
-			print(i,"good now")
-		except:
-			print("still no good")
+#a = a.set_index('Ticker')
 
 
-
+update_data(a,a.index)
+while True:
+	a=1
+###################################
 
 
 

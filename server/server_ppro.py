@@ -9,6 +9,11 @@ import multiprocessing
 import numpy as np
 from server import *
 
+
+SYNC_CAP = 500
+
+
+
 def time_stamp(s):
 
 	p = s.split(":")
@@ -26,10 +31,12 @@ def market_scanner(queue,symbols,sync_lock):
 	global lock
 	global bad_list
 	global new_run
+	global SYNC_CAP
+	global start
 
 	count = 0
-	roun = 1
 
+	round_ = 1
 	while True:
 		#Deal with the last round, problematics
 		for i in bad_list:
@@ -37,14 +44,12 @@ def market_scanner(queue,symbols,sync_lock):
 				symbols.remove(i[:-3])
 		bad_list = []
 
-		if new_run:
-			print("Starting round: ",roun,"")
-			start = time.time()
+		if 1:
 			new_run = False
 			for i in symbols:
 				# print(i,sync_number)
-				while sync_number > 500:
-					time.sleep(1)
+				while sync_number > SYNC_CAP:
+					time.sleep(0.5)
 
 				if i not in bad_list:
 					reg = threading.Thread(target=getinfo, args=(i + ".NQ", queue), daemon=True)
@@ -53,9 +58,10 @@ def market_scanner(queue,symbols,sync_lock):
 					# time.sleep(0.1)
 					with sync_lock:
 						sync_number += 1
-			end = time.time()
-			roun+=1
-			print("Finished round",roun,"used:",round(end - start,2))
+			# end = time.time()
+			
+			# print("Finished round",roun,"used:",round(end - start,2))
+			round_ +=1
 			time.sleep(4)
 		else:
 			print("waiting to finish the last run.")
@@ -109,19 +115,22 @@ def getinfo(symbol,pipe):
 		try:
 			success= False
 			lock[symbol] = True
+
 			#######################################################################
+
+			# p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
+			# c= requests.get(p)
+			# time.sleep(1)
+			#print(symbol+" started")
+
 			p="http://localhost:8080/Register?symbol="+symbol+"&feedtype=L1"
 			c= requests.get(p)
 
-			#print(symbol+" started")
-			time.sleep(1)
 			p="http://localhost:8080/GetLv1?symbol="+symbol
 			r= requests.get(p)
 			#print(symbol+" request complete")
 			#print(r.text)"
-
 			response = r.text
-
 			failure_count = 0
 			while response =="<Response><Content>No data available symbol</Content></Response>":
 				#bad_list.append(symbol)
@@ -135,7 +144,7 @@ def getinfo(symbol,pipe):
 					response = r.text
 					failure_count += 1
 
-					if failure_count == 3:
+					if failure_count == 2:
 						lock[symbol] = False
 						pipe.put(["Error",symbol])
 						return False
@@ -145,18 +154,37 @@ def getinfo(symbol,pipe):
 
 			time_=find_between(r.text, "MarketTime=\"", "\"")[:-4]
 			open_ = float(find_between(r.text, "OpenPrice=\"", "\""))
-			high = float(find_between(r.text, "HighPrice=\"", "\""))
-			low = float(find_between(r.text, "LowPrice=\"", "\""))
+			high = float(find_between(r.text, "MaxPrice=\"", "\""))
+			low = float(find_between(r.text, "MinPrice=\"", "\""))
 
 			ts = time_stamp(time_[:5])
 			#vol = int(find_between(r.text, "Volume=\"", "\""))
 			prev_close = float(find_between(r.text, "ClosePrice=\"", "\""))
-			price = float(find_between(r.text, "LastPrice=\"", "\""))
 
-			if price<1:
-				price = round(price,3)
+			bid = float(find_between(r.text, "BidPrice=\"", "\""))
+			ask = float(find_between(r.text, "AskPrice=\"", "\""))
+
+			if bid!=0 and ask!=0 and high!=0 and low!=0:
+				if (ask-bid)/bid >0.05:
+					price = 0
+
+				elif ask == bid:
+					price = 0
+
+				elif (high-low)/low <0.02:
+					price = 0
+				else:
+					price = round((ask+bid)/2,2)
+					if price<1:
+						price = round(price,3)
+					else:
+						price = round(price,2)
+
 			else:
-				price = round(price,2)
+				price = 0
+
+
+
 
 			pipe.put(["Connected",symbol,time_,price,open_,high,low,prev_close,ts])
 			lock[symbol] = False
@@ -201,11 +229,13 @@ def ppro_server(pipe):
 	global sync_number
 	global new_run
 
-	df = pd.read_csv('nasdaq_ppro_live - nasdaq_ppro_live.csv', index_col=0)
+	df = pd.read_csv('nasdaq_01_28.csv', index_col=0)
 	df['Ppro Timestamp'] = 0
 	symbols = list(df.index)
 
 	total_count = len(symbols)
+
+	round_ = 1
 
 	count = 0
 	ms = threading.Thread(target=market_scanner,args=(queue,symbols,sync_lock,), daemon=True)
@@ -213,21 +243,31 @@ def ppro_server(pipe):
 
 	bad_count = 0
 
+	start = time.time()
 	while True:
 
-		if count % total_count ==0:
+		#SEND THE PROCESSING UNIT TO A THREAD.
+		if count % total_count ==0 and count >0:
 			df["Close-price-ATR"]= np.round(np.abs(df["Prev Close P"] - df["Price"])/df["ATR"],2)
 			df["High-Low-ATR"] =  np.round(np.abs(df["High"] - df["Low"])/df["ATR"],2)
 			df["Open-High-ATR"]= np.round(np.abs(df["Open"] - df["High"])/df["ATR"],2)
 			df["Open-Low-ATR"]= np.round(np.abs(df["Open"] - df["Low"])/df["ATR"],2)
 
-			pipe.send(df)
-			#send it over pipe
-			df.to_csv("Test.csv")
+			df["Current-Pos"] = np.round((df["Price"]-df["Low"])/(df["High"]-df["Low"]),4)
+			#i can add more. 
 
-			time.sleep(2)
+
+			#send it over pipe
+			pipe.send(df)
+			
+
+			df.to_csv("Test.csv")
 			new_run = True
-			print("Bad count total:",bad_count)
+			end = time.time()
+			print("Finished round",round_,"used:",round(end - start,2),"Bad count:",bad_count)
+			round_ +=1
+			print("Starting round: ",round_,"")
+			start = time.time()
 			bad_count=0
 
 		data = queue.get()
@@ -272,6 +312,8 @@ if __name__ == '__main__':
 	#main process  run the server. s
 	ppro_server(request_pipe)
 
+	server.terminate()
+	server.join()
 # df = pd.read_csv('nasdaq.csv', index_col=0)
 # df = df.set_index('Ticker')
 
