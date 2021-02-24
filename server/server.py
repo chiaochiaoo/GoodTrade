@@ -86,7 +86,7 @@ def server_start(pipe):
 	dc = threading.Thread(target=distribute_center,args=(pipe,), daemon=True)
 	dc.start()
 
-	HOST = '10.29.10.132'  # Standard loopback interface address (localhost)
+	HOST = '10.29.10.133'  # Standard loopback interface address (localhost)
 	PORT = 65422        # Port to listen on (non-privileged ports are > 1023)
 
 	try:
