@@ -134,27 +134,26 @@ def ReleaseKey(hexKeyCode):
 def AltTab():
     """Press Alt+Tab and hold Alt key for 2 seconds
     in order to see the overlay.
-    """
-    PressKey(VK_MENU)   # Alt
-    time.sleep(2)
+    """				
+    #PressKey(VK_MENU)   # Alt
     PressKey(VK_TAB)    # Tab
-    ReleaseKey(VK_TAB)  # Tab~
-    time.sleep(2)
-    ReleaseKey(VK_MENU) # Alt~
+    time.sleep(0.5)
+    ReleaseKey(VK_TAB)  # Tab~						
+   # ReleaseKey(VK_MENU) # Alt~				
 
-import clipboard
+import clipboard				
 import pyperclip
 
 if __name__ == "__main__":
 	time.sleep(1)
-	# AltTab()	
-	# AltTab()	
-	# AltTab()	
-	# AltTab()	
+	AltTab()	
+	AltTab()	
+	AltTab()	
+	AltTab()	
 
 
 	# clipboard.copy("abc")  # now the clipboard content will be string "abc"
 	# clipboard.paste()		
 
-	pyperclip.copy('xxx')
-	pyperclip.paste()
+	# pyperclip.copy('xxx')
+	# pyperclip.paste()
