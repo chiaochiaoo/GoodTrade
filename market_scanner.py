@@ -16,7 +16,7 @@ import os
 def client_market_scanner(pipe):
 	while True:
 
-		HOST = '10.29.10.132'  # The server's hostname or IP address
+		HOST = '10.29.10.133'  # The server's hostname or IP address
 		PORT = 65422       # The port used by the server
 
 		try:
@@ -63,6 +63,7 @@ def client_market_scanner(pipe):
 						except:
 							pass
 				#k is received. 
+				print(k)
 				pipe.send(["pkg",k])
 			print("Server disconnected")
 			pipe.send(["msg","Server disconnected"])
@@ -232,10 +233,13 @@ class market_scanner:
 		count = 0
 		while True:
 			d = self.pipe.recv()
-
+			print(d)
 			if d[0] =="msg":
-				print(d[1])
-				self.status.set("Status:"+d[1])
+				print(d)
+				try:
+					self.status.set("Status:"+d[1])
+				except:
+					pass
 			if d[0] =="pkg":
 
 				
