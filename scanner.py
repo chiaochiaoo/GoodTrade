@@ -299,7 +299,7 @@ class scanner(pannel):
 
 
 	def add_nasdaq_labels_init(self,df):
-
+		i = -1
 		for index, row in df.iterrows():
 			i+=1
 			rank = row['rank']
@@ -350,6 +350,7 @@ class scanner(pannel):
 		self.rebind(self.NT_scanner_canvas,self.NT_scanner_frame)
 
 	def add_nasdaq_labels_update(self,df):
+		i = -1
 		for index, row in df.iterrows():
 			i+=1
 			rank = row['rank']
@@ -397,7 +398,6 @@ class scanner(pannel):
 
 		width = [5,12,5,8,20,5]
 		self.nasdaq_trader_symbols = []
-		i = -1
 		
 		timestamp = df[2]
 		df = df[1]
