@@ -298,111 +298,120 @@ class scanner(pannel):
 		self.scanner_process_manager.refresh_nasdaq_trader()
 
 
+	def add_nasdaq_labels_init(df):
+
+		for index, row in df.iterrows():
+			i+=1
+			rank = row['rank']
+			symbol = row['symbol']
+			price = row['price']
+			roc5 = row['rank5']
+			roc10 = row['rank10']
+			roc30 = row['rank30']
+			status = row['status']
+
+			market = symbol[-2:]
+			
+			info = [rank,index,market,price,status,symbol]
+			self.nasdaq.append([])
+
+			for j in range(len(width)):
+				if j ==0 or j==2 or j==3 or j==4:
+					self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=info[j],width=width[j]))
+					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+				elif j ==1:
+					self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=info[j],width=width[j],background="SystemButtonFace"))
+					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+
+					if roc5>0:
+						tex = info[j]+" ↑"+str(roc5)
+						if int(roc10)>0:
+							tex = tex+" ↑"+str(roc10)
+						if int(roc30)>0:
+							tex = tex+" ↑"+str(roc30)
+
+						color = "#97FEA8"
+						if roc5 >3: 
+							color = "#BDFE10"
+						if roc5 >5:
+							color = "#FC3DC8"
+						self.nasdaq[i][j]["text"]=tex
+						self.nasdaq[i][j]["background"]=color
+					else:
+						self.nasdaq[i][j]["text"]=index
+						self.nasdaq[i][j]["background"]="SystemButtonFace"
+				elif j ==5:
+
+					self.nasdaq[i].append(tk.Button(self.NT_scanner_frame ,text="Add",width=width[j],command= lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)))
+					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+					self.nasdaq_trader_symbols.append(symbol)
+
+		self.nasdaq_trader_created = True
+		self.rebind(self.NT_scanner_canvas,self.NT_scanner_frame)
+
+	def add_nasdaq_labels_update(df):
+		for index, row in df.iterrows():
+			i+=1
+			rank = row['rank']
+			symbol = row['symbol']
+			price = row['price']
+			roc5 = row['rank5']
+			roc10 = row['rank10']
+			roc30 = row['rank30']
+			status = row['status']
+			market = symbol[-2:]
+			info = [rank,index,market,price,status,symbol]
+
+			for j in range(len(width)):
+				if j ==0 or j==2 or j==3 or j==4:
+					self.nasdaq[i][j]["text"] = info[j]
+				elif j ==1:
+					if roc5>0:
+						tex = info[j]+" ↑"+str(roc5)
+						if int(roc10)>0:
+							tex = tex+" ↑"+str(roc10)
+						if int(roc30)>0:
+							tex = tex+" ↑"+str(roc30)
+
+						color = "#97FEA8"
+						if roc5 >3: 
+							color = "#BDFE10"
+						if roc5 >5:
+							color = "#FC3DC8"
+						self.nasdaq[i][j]["text"]=tex
+						self.nasdaq[i][j]["background"]=color
+					else:
+						self.nasdaq[i][j]["text"]=index
+						self.nasdaq[i][j]["background"]="SystemButtonFace"
+				elif j ==5:
+					self.nasdaq_trader_symbols.append(symbol)
+					self.nasdaq[i][j]["command"] = lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)
+
+	def nasdaq_labels_sort(self,df):
+		
+		return df
+		#df.sort_values(by='col1', ascending=False)
+
+
 	def add_nasdaq_labels(self,df):
 
-
 		width = [5,12,5,8,20,5]
-
 		self.nasdaq_trader_symbols = []
-
 		i = -1
 		
 		timestamp = df[2]
 		df = df[1]
 
+		#call the sort.
+		#check if added.
+		#update. 
+		df = self.nasdaq_labels_sort(df)
 
 		if self.nasdaq_trader_created == False:
-			
-			
-			for index, row in df.iterrows():
-				i+=1
-				rank = row['rank']
-				symbol = row['symbol']
-				price = row['price']
-				roc5 = row['rank5']
-				roc10 = row['rank10']
-				roc30 = row['rank30']
-				status = row['status']
-
-				market = symbol[-2:]
-				
-				info = [rank,index,market,price,status,symbol]
-				self.nasdaq.append([])
-
-				for j in range(len(width)):
-					if j ==0 or j==2 or j==3 or j==4:
-						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=info[j],width=width[j]))
-						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-					elif j ==1:
-						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=info[j],width=width[j],background="SystemButtonFace"))
-						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-
-						if roc5>0:
-							tex = info[j]+" ↑"+str(roc5)
-							if int(roc10)>0:
-								tex = tex+" ↑"+str(roc10)
-							if int(roc30)>0:
-								tex = tex+" ↑"+str(roc30)
-
-							color = "#97FEA8"
-							if roc5 >3: 
-								color = "#BDFE10"
-							if roc5 >5:
-								color = "#FC3DC8"
-							self.nasdaq[i][j]["text"]=tex
-							self.nasdaq[i][j]["background"]=color
-						else:
-							self.nasdaq[i][j]["text"]=index
-							self.nasdaq[i][j]["background"]="SystemButtonFace"
-					elif j ==5:
-
-						self.nasdaq[i].append(tk.Button(self.NT_scanner_frame ,text="Add",width=width[j],command= lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)))
-						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-						self.nasdaq_trader_symbols.append(symbol)
-
-
-			self.nasdaq_trader_created = True
-			self.rebind(self.NT_scanner_canvas,self.NT_scanner_frame)
-
+			add_nasdaq_labels_init(df)
 		else:
-			for index, row in df.iterrows():
-				i+=1
-				rank = row['rank']
-				symbol = row['symbol']
-				price = row['price']
-				roc5 = row['rank5']
-				roc10 = row['rank10']
-				roc30 = row['rank30']
-				status = row['status']
-				market = symbol[-2:]
-				info = [rank,index,market,price,status,symbol]
-
-				for j in range(len(width)):
-					if j ==0 or j==2 or j==3 or j==4:
-						self.nasdaq[i][j]["text"] = info[j]
-					elif j ==1:
-						if roc5>0:
-							tex = info[j]+" ↑"+str(roc5)
-							if int(roc10)>0:
-								tex = tex+" ↑"+str(roc10)
-							if int(roc30)>0:
-								tex = tex+" ↑"+str(roc30)
-
-							color = "#97FEA8"
-							if roc5 >3: 
-								color = "#BDFE10"
-							if roc5 >5:
-								color = "#FC3DC8"
-							self.nasdaq[i][j]["text"]=tex
-							self.nasdaq[i][j]["background"]=color
-						else:
-							self.nasdaq[i][j]["text"]=index
-							self.nasdaq[i][j]["background"]="SystemButtonFace"
-					elif j ==5:
-						self.nasdaq_trader_symbols.append(symbol)
-						self.nasdaq[i][j]["command"] = lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)
-
-
+			add_nasdaq_labels_update(df)
+			
 		self.NT_update_time.set(timestamp)
 
 		self.scanner_process_manager.updating_comlete()
@@ -450,3 +459,17 @@ class scanner(pannel):
 			else:
 				self.status_change("Please retry")
 				self.scanner_process_manager.adding_comlete()
+
+
+
+df=pd.read_csv("test.csv",index_col=0)
+
+df=df.sort_values(by="rank",ascending=False)
+
+
+df.loc["VIOT","status"] = ""
+
+df=df.sort_values(by=["rank","status"],ascending=False)
+
+print(df)
+
