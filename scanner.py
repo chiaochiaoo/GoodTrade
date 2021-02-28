@@ -408,9 +408,9 @@ class scanner(pannel):
 		df = self.nasdaq_labels_sort(df)
 
 		if self.nasdaq_trader_created == False:
-			add_nasdaq_labels_init(df)
+			self.add_nasdaq_labels_init(df)
 		else:
-			add_nasdaq_labels_update(df)
+			self.add_nasdaq_labels_update(df)
 			
 		self.NT_update_time.set(timestamp)
 
