@@ -462,14 +462,14 @@ class scanner(pannel):
 
 
 
-df=pd.read_csv("test.csv",index_col=0)
+# df=pd.read_csv("test.csv",index_col=0)
 
-df=df.sort_values(by="rank",ascending=False)
+# df=df.sort_values(by="rank",ascending=False)
 
 
-df.loc["VIOT","status"] = ""
+# df.loc["VIOT","status"] = ""
 
-df=df.sort_values(by=["rank","status"],ascending=False)
+# df=df.sort_values(by=["rank","status"],ascending=False)
 
-print(df)
+# print(df)
 
