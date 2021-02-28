@@ -298,7 +298,7 @@ class scanner(pannel):
 		self.scanner_process_manager.refresh_nasdaq_trader()
 
 
-	def add_nasdaq_labels_init(df):
+	def add_nasdaq_labels_init(self,df):
 
 		for index, row in df.iterrows():
 			i+=1
@@ -349,7 +349,7 @@ class scanner(pannel):
 		self.nasdaq_trader_created = True
 		self.rebind(self.NT_scanner_canvas,self.NT_scanner_frame)
 
-	def add_nasdaq_labels_update(df):
+	def add_nasdaq_labels_update(self,df):
 		for index, row in df.iterrows():
 			i+=1
 			rank = row['rank']
