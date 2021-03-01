@@ -485,7 +485,7 @@ class scanner(pannel):
 		i = -1
 		width = [5,12,5,8,20,5]
 
-		if df!=None and self.nasdaq_trader_created==True:
+		if self.nasdaq_trader_created==True:
 			for index, row in df.iterrows():
 				i+=1
 				rank = row['rank']
