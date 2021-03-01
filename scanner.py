@@ -272,7 +272,7 @@ class scanner(pannel):
 	def market_button(self):
 
 
-		if self.df !=None:
+		if self.nasdaq_trader_created == True:
 			for i in range(len(self.market_sort)):
 				if self.market_sort[i] == 2:
 					self.market_sort[i] = 0
@@ -293,7 +293,7 @@ class scanner(pannel):
 
 	def status_button(self):
 
-		if self.df !=None:
+		if self.nasdaq_trader_created == True:
 
 			for key in self.status_code:
 				if  self.status_code[key] == self.status_num-1:
@@ -337,7 +337,7 @@ class scanner(pannel):
 	def nasdaq_labels_sort(self):
 
 
-		if self.df!=None:
+		if self.nasdaq_trader_created == True:
 			if self.sorting_order == "rank":
 				self.sorting_rank()
 			elif self.sorting_order == "speed":
