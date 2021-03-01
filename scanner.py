@@ -60,18 +60,19 @@ class scanner(pannel):
 		width = [3,7,7,11,11,10,5]
 		labels = ["Rank","Symbol","MKT Center","Matched Shares","Last Matched","Open Orders","Add"]
 
-		self.NT = ttk.Notebook(self.tab2)
-		self.NT.place(x=0,rely=0.05,relheight=1,width=500)
+		#self.NT = ttk.Notebook(self.tab2)
+		#self.NT.place(x=0,rely=0.05,relheight=1,width=500)
 
-		self.all = tk.Canvas(self.NT)
-		self.fastmover = tk.Canvas(self.NT)
-		self.newhigh = tk.Canvas(self.NT)
-		self.newlow = tk.Canvas(self.NT)
+		self.all = tk.Canvas(self.tab2)
+		self.all.place(x=0,rely=0.05,relheight=1,width=500)
+		# self.fastmover = tk.Canvas(self.NT)
+		# self.newhigh = tk.Canvas(self.NT)
+		# self.newlow = tk.Canvas(self.NT)
 
-		self.NT.add(self.all, text ='All')
-		self.NT.add(self.fastmover, text ='FastMover')
-		self.NT.add(self.newhigh, text ='New High')
-		self.NT.add(self.newlow, text ='New Low')
+		#self.NT.add(self.all, text ='All')
+		# self.NT.add(self.fastmover, text ='FastMover')
+		# self.NT.add(self.newhigh, text ='New High')
+		# self.NT.add(self.newlow, text ='New Low')
 
 
 		self.NT_scanner_canvas = tk.Canvas(self.all)
@@ -83,6 +84,8 @@ class scanner(pannel):
 		self.NT_scanner_frame = tk.Frame(self.NT_scanner_canvas)
 		self.NT_scanner_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
 		self.NT_scanner_canvas.create_window(0, 0, window=self.NT_scanner_frame, anchor=tk.NW)
+
+		self.df = None
 
 		self.recreate_labels(self.NT_scanner_frame)
 
@@ -181,9 +184,8 @@ class scanner(pannel):
 
 		self.rebind(self.scanner_canvas,self.scanner_frame)
 
-
 		# df = pd.read_csv("test.csv",index_col=0)
-		# self.add_nasdaq_labels(df)
+		# self.add_nasdaq_labels(["d",df,"csc"])
 
 	def add_symbols(self):
 
@@ -207,8 +209,23 @@ class scanner(pannel):
 
 
 	def recreate_labels(self,frame):
+
+		self.buttons =[]
 		width = [5,12,5,8,20,5]
 		labels = ["Rank","Symbol","Market","Price","Status","Add"]
+
+		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
+
+		self.status_code = {}
+		self.status_num = 0
+
+		self.status_sort = False
+		self.price_sort = False
+		self.speed_sort = False
+
+		self.rank_sort = False
+
+		self.sorting_order = None
 
 		for i in range(len(labels)): #Rows
 			self.b = tk.Button(frame, text=labels[i],width=width[i])#,command=self.rank
@@ -221,7 +238,118 @@ class scanner(pannel):
 			self.b.configure(highlightbackground="#d9d9d9")
 			self.b.configure(highlightcolor="black")
 			self.b.grid(row=1, column=i)
+			self.buttons.append(self.b)
 
+		self.buttons[0]["command"] = self.rank_button
+		self.buttons[1]["command"] = self.speed_button
+		self.buttons[2]["command"] = self.market_button
+		self.buttons[3]["command"] = self.price_button
+		self.buttons[4]["command"] = self.status_button
+
+
+	def change_sorting_order(self,order):
+		self.sorting_order = order
+		self.nasdaq_labels_sort()
+		self.add_nasdaq_labels_update()
+
+
+	def rank_button(self):
+		if self.rank_sort==True:
+			self.rank_sort = False
+		else:
+			self.rank_sort = True
+
+		self.change_sorting_order("rank")
+
+	def price_button(self):
+		if self.price_sort==True:
+			self.price_sort = False
+		else:
+			self.price_sort = True
+
+		self.change_sorting_order("price")
+
+	def market_button(self):
+
+
+		if self.df !=None:
+			for i in range(len(self.market_sort)):
+				if self.market_sort[i] == 2:
+					self.market_sort[i] = 0
+				else:
+					self.market_sort[i] +=1 
+
+			self.df.loc[self.df["market"]==2,"market"]=3
+			self.df.loc[self.df["market"]==1,"market"]=2
+			self.df.loc[self.df["market"]==0,"market"]=1
+			self.df.loc[self.df["market"]==3,"market"]=0
+
+			self.change_sorting_order("market")
+
+		#change current values. 
+
+	def speed_button(self):
+		self.change_sorting_order("speed")
+
+	def status_button(self):
+
+		if self.df !=None:
+
+			for key in self.status_code:
+				if  self.status_code[key] == self.status_num-1:
+					self.status_code[key] = 0
+				else:
+					self.status_code[key] +=1 
+
+			#update all the status code. 
+
+			for key in self.status_code:
+				self.df.loc[self.df["status"]==key,"status_code"]=self.status_code[key]
+
+			self.change_sorting_order("status")
+
+	def sorting_rank(self):
+
+		if self.rank_sort==True:
+			self.df=self.df.sort_values(by=["rank"],ascending=False)
+		else:
+			self.df=self.df.sort_values(by=["rank"],ascending=True)
+
+
+	def sorting_market(self):
+		self.df = self.df.sort_values(by=["market","rank5","status"],ascending=False)
+		#just change the values. 
+
+	def sorting_price(self):
+
+		if self.price_sort==True:
+			self.df=self.df.sort_values(by=["price"],ascending=False)
+		else:
+			self.df=self.df.sort_values(by=["price"],ascending=True)
+
+
+	def sorting_speed(self):
+		self.df = self.df.sort_values(by=["rank5","status"],ascending=False)
+
+	def sortign_status(self):
+		self.df = self.df.sort_values(by=["status_code","rank5"],ascending=False)
+
+	def nasdaq_labels_sort(self):
+
+
+		if self.df!=None:
+			if self.sorting_order == "rank":
+				self.sorting_rank()
+			elif self.sorting_order == "speed":
+				self.sorting_speed()
+			elif self.sorting_order == "market":
+				self.sorting_market()
+			elif self.sorting_order == "status":
+				self.sortign_status()
+			elif self.sorting_order == "price":
+				self.sorting_price()
+
+		#df.sort_values(by='col1', ascending=False)
 
 	def status_change(self,var):
 		self.status.set(var)
@@ -291,14 +419,14 @@ class scanner(pannel):
 		self.delete_old_lables()
 		self.scanner_process_manager.send_request(cond,market_,type_,cap)
 
-
 	#every 1 minute? i am relectant to do it here. 
 	def refresh_nasdaq(self):
 		#self.delete_old_labels_nasdaq()
 		self.scanner_process_manager.refresh_nasdaq_trader()
 
+	def add_nasdaq_labels_init(self):
 
-	def add_nasdaq_labels_init(self,df):
+		df = self.df
 		i = -1
 		width = [5,12,5,8,20,5]
 		for index, row in df.iterrows():
@@ -350,69 +478,83 @@ class scanner(pannel):
 		self.nasdaq_trader_created = True
 		self.rebind(self.NT_scanner_canvas,self.NT_scanner_frame)
 
-	def add_nasdaq_labels_update(self,df):
+	def add_nasdaq_labels_update(self):
+
+		df = self.df
+
 		i = -1
 		width = [5,12,5,8,20,5]
-		for index, row in df.iterrows():
-			i+=1
-			rank = row['rank']
-			symbol = row['symbol']
-			price = row['price']
-			roc5 = row['rank5']
-			roc10 = row['rank10']
-			roc30 = row['rank30']
-			status = row['status']
-			market = symbol[-2:]
-			info = [rank,index,market,price,status,symbol]
 
-			for j in range(len(width)):
-				if j ==0 or j==2 or j==3 or j==4:
-					self.nasdaq[i][j]["text"] = info[j]
-				elif j ==1:
-					if roc5>0:
-						tex = info[j]+" ↑"+str(roc5)
-						if int(roc10)>0:
-							tex = tex+" ↑"+str(roc10)
-						if int(roc30)>0:
-							tex = tex+" ↑"+str(roc30)
+		if df!=None and self.nasdaq_trader_created==True:
+			for index, row in df.iterrows():
+				i+=1
+				rank = row['rank']
+				symbol = row['symbol']
+				price = row['price']
+				roc5 = row['rank5']
+				roc10 = row['rank10']
+				roc30 = row['rank30']
+				status = row['status']
+				market = symbol[-2:]
+				info = [rank,index,market,price,status,symbol]
 
-						color = "#97FEA8"
-						if roc5 >3: 
-							color = "#BDFE10"
-						if roc5 >5:
-							color = "#FC3DC8"
-						self.nasdaq[i][j]["text"]=tex
-						self.nasdaq[i][j]["background"]=color
-					else:
-						self.nasdaq[i][j]["text"]=index
-						self.nasdaq[i][j]["background"]="SystemButtonFace"
-				elif j ==5:
-					self.nasdaq_trader_symbols.append(symbol)
-					self.nasdaq[i][j]["command"] = lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)
+				for j in range(len(width)):
+					if j ==0 or j==2 or j==3 or j==4:
+						self.nasdaq[i][j]["text"] = info[j]
+					elif j ==1:
+						if roc5>0:
+							tex = info[j]+" ↑"+str(roc5)
+							if int(roc10)>0:
+								tex = tex+" ↑"+str(roc10)
+							if int(roc30)>0:
+								tex = tex+" ↑"+str(roc30)
 
-	def nasdaq_labels_sort(self,df):
-		
-		return df
-		#df.sort_values(by='col1', ascending=False)
+							color = "#97FEA8"
+							if roc5 >3: 
+								color = "#BDFE10"
+							if roc5 >5:
+								color = "#FC3DC8"
+							self.nasdaq[i][j]["text"]=tex
+							self.nasdaq[i][j]["background"]=color
+						else:
+							self.nasdaq[i][j]["text"]=index
+							self.nasdaq[i][j]["background"]="SystemButtonFace"
+					elif j ==5:
+						self.nasdaq_trader_symbols.append(symbol)
+						self.nasdaq[i][j]["command"] = lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)
 
 
 	def add_nasdaq_labels(self,df):
-
 
 		self.nasdaq_trader_symbols = []
 		
 		timestamp = df[2]
 		df = df[1]
 
+		df.loc[df["market"]=='NQ',"market"] = self.market_sort[0]
+		df.loc[df["market"]=='NY',"market"] = self.market_sort[1]
+		df.loc[df["market"]=='AM',"market"] = self.market_sort[2]
+
+		statuts = df['status'].unique()
+		for i in statuts:
+			if i not in self.status_code:
+				self.status_code[i]=self.status_num
+				self.status_num+=1
+
+		for key in self.status_code:
+			df.loc[df["status"]==key,"status_code"] =  self.status_code[key]
+
+
+		self.df = df
 		#call the sort.
 		#check if added.
 		#update. 
-		df = self.nasdaq_labels_sort(df)
+		self.nasdaq_labels_sort()
 
 		if self.nasdaq_trader_created == False:
-			self.add_nasdaq_labels_init(df)
+			self.add_nasdaq_labels_init()
 		else:
-			self.add_nasdaq_labels_update(df)
+			self.add_nasdaq_labels_update()
 			
 		self.NT_update_time.set(timestamp)
 
@@ -466,9 +608,15 @@ class scanner(pannel):
 
 # df=pd.read_csv("test.csv",index_col=0)
 
-# df=df.sort_values(by="rank",ascending=False)
+# # df=df.sort_values(by="rank",ascending=False)
 
 
+
+# df.loc[df["rank"]==2,"rank5"]=5
+
+
+# print(df.loc[df["status"]=='New'])
+# print(df)
 # df.loc["VIOT","status"] = ""
 
 # df=df.sort_values(by=["rank","status"],ascending=False)
