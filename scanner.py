@@ -521,6 +521,8 @@ class scanner(pannel):
 		self.nasdaq_trader_created = True
 		self.rebind(self.NT_scanner_canvas,self.NT_scanner_frame)
 
+		print("pannel created")
+
 	def add_nasdaq_labels_update(self):
 
 		df = self.df
@@ -528,6 +530,7 @@ class scanner(pannel):
 		i = -1
 		width = [5,14,5,8,8,20,5]
 
+		self.update_pd()
 		if self.nasdaq_trader_created==True:
 			for index, row in df.iterrows():
 				i+=1
@@ -597,7 +600,7 @@ class scanner(pannel):
 					elif j ==5:
 						self.nasdaq_trader_symbols.append(symbol)
 						self.nasdaq[i][j]["command"] = lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)
-
+			print("pannel updated")
 	#This is where every update comes in. 
 
 
@@ -675,6 +678,7 @@ class scanner(pannel):
 		self.nasdaq_labels_sort()
 
 		if self.nasdaq_trader_created == False:
+			time.sleep(5)
 			self.add_nasdaq_labels_init()
 		else:
 			self.add_nasdaq_labels_update()
