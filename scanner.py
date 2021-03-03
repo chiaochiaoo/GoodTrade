@@ -65,8 +65,6 @@ class scanner(pannel):
 
 		self.NT_stat = ttk.Label(self.tab2, textvariable=self.NT_update_time).place(x=10, rely=0.01, height=25, width=200)
 
-		width = [3,7,7,11,11,10,5]
-		labels = ["Rank","Symbol","MKT Center","Matched Shares","Last Matched","Open Orders","Add"]
 
 		#self.NT = ttk.Notebook(self.tab2)
 		#self.NT.place(x=0,rely=0.05,relheight=1,width=500)
@@ -225,8 +223,8 @@ class scanner(pannel):
 	def recreate_labels(self,frame):
 
 		self.buttons =[]
-		width = [5,12,5,8,20,5]
-		labels = ["Rank","Symbol","Market","Price","Status","Add"]
+		width = [5,14,5,8,8,20,5]
+		labels = ["Rank","Symbol","Market","Price","Since Close%","Status","Add"]
 
 		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
 
@@ -258,7 +256,7 @@ class scanner(pannel):
 		self.buttons[1]["command"] = self.speed_button
 		self.buttons[2]["command"] = self.market_button
 		self.buttons[3]["command"] = self.price_button
-		self.buttons[4]["command"] = self.status_button
+		self.buttons[5]["command"] = self.status_button
 
 
 	def change_sorting_order(self,order):
@@ -429,7 +427,7 @@ class scanner(pannel):
 
 		df = self.df
 		i = -1
-		width = [5,12,5,8,20,5]
+		width = [5,14,5,8,8,20,5]
 		for index, row in df.iterrows():
 			i+=1
 			rank = row['rank']
@@ -463,7 +461,23 @@ class scanner(pannel):
 
 					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 
+				#close
 				elif j ==4:
+
+					try:
+						var = self.data.get_close_percentage(symbol)
+					except:
+						var == None
+
+					if var != None:
+						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=width[j]))
+					else:
+						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=width[j]))
+
+					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+
+
+				elif j ==5:
 
 					try:
 						var = self.data.get_position_status(symbol)
@@ -512,7 +526,7 @@ class scanner(pannel):
 		df = self.df
 
 		i = -1
-		width = [5,12,5,8,20,5]
+		width = [5,14,5,8,8,20,5]
 
 		if self.nasdaq_trader_created==True:
 			for index, row in df.iterrows():
@@ -542,6 +556,16 @@ class scanner(pannel):
 							self.nasdaq[i][j]["text"] = "NA"
 
 					elif j == 4:
+						try:
+							var = self.data.get_close_percentage(symbol)
+						except:
+							var == None
+
+						if var != None :
+							self.nasdaq[i][j]["textvariable"] = info[j]
+						else:
+							self.nasdaq[i][j]["text"] = "NA"
+					elif j == 5:
 						try:
 							var = self.data.get_position_status(symbol)
 						except:
