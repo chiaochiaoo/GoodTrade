@@ -24,7 +24,8 @@ data = {}
 
 global connection_error
 
-
+global yahoo_same_time
+yahoo_same_time = 0
 ##################################################################
 ####  pipe in, symbol. if symbol not reg, reg. if reg, dereg  ####
 ####  main loop. for each reg, thread out and return.		  ####
@@ -39,6 +40,7 @@ def round_up(i):
 		return round(i,2)
 
 def fetch_yahoo(symbol):
+
 	url = "https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-chart"
 
 	querystring = {"region":"US","interval":"1m","symbol":symbol,"range":"1d"}
@@ -159,7 +161,6 @@ def register(symbol):
 
 		#it could be database not linked 
 
-
 def deregister(symbol):
 	global reg_count
 	global reg_list
@@ -255,8 +256,9 @@ def multi_processing_price(pipe_receive):
 
 				#if prev thread didn't die, kill it and start a new one. 
 				#print("sending",i)
-				info = threading.Thread(target=getinfo,args=(i,pipe_receive,), daemon=True)
-				info.start()
+				if i not in black_list:
+					info = threading.Thread(target=getinfo,args=(i,pipe_receive,), daemon=True)
+					info.start()
 
 			#print("Registed list:",reg_list)
 			time.sleep(2.5)
@@ -300,6 +302,7 @@ def timestamp_seconds(s):
 def init(symbol,price,ppro_high,ppro_low,timestamp):
 
 	global data
+	global yahoo_same_time
 
 	#PH,PL,H,L
 	range_data=[]
@@ -317,16 +320,19 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 		d["f5v"] = 0
 
 	else:
-		retry_times = 10
+		retry_times = 30
 		success = False
 		while not success:
 			try:
 				range_data=fetch_yahoo(symbol[:-3])
 				success = True
+				print("yahoo success on ",symbol)
 			except:
+				yahoo_same_time-=1
 				retry_times -=1 
 				range_data=[price,price,price,price,0,0]
-				time.sleep(1)
+				time.sleep(3)
+				print("yahoo not success on ",symbol,"re try")
 				if retry_times ==0:success = True
 
 		#return high,low,m_high,m_low,f5,f5v
@@ -362,6 +368,9 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 	d["oh"] = 0
 	d["ol"] = 0
 
+	d["status"] = ""
+
+	d["pos_range"] = 0.5
 
 
 def process_and_send(lst,pipe):
@@ -463,9 +472,44 @@ def process_and_send(lst,pipe):
 			status = "Lagged"
 			register_again = True
 
+
+	### POSITION READ ###
+
+	if (d["high"]-d["low"])/(d["low"]+0.000001) <0.02:
+		d["pos_range"] = 0.5
+	else:
+		d["pos_range"] = round((price-d["low"])/(d["high"]-d["low"]+0.0001),2)
+
+
+	if d["pos_range"]>=0.97:
+		d["status"]="New High"
+
+	if d["pos_range"]<=0.03:
+		d["status"]="New Low"
+
+	if d["pos_range"]<0.97 and d["pos_range"]>=0.9:
+		d["status"]="Near High"
+
+	if d["pos_range"]>0.03 and d["pos_range"]<=0.1:
+		d["status"]="Near Low"
+
+	###############################################
+
+	if len(d["highs"])>5:
+		change_high = d["highs"][-1] - d["highs"][-5]
+		change_low = d["lows"][-1] - d["lows"][-5]
+
+		if d["pos_range"]<=0.1 and d["pos_range"]>0.01 and change_high>0 and change_low>0:
+			d["status"]="Low Reversing"
+
+		if d["pos_range"]>=0.9 and d["pos_range"]<=0.99 and change_high<0 and change_low<0:
+			d["status"]="High Reversing"
+
+
+
 	pipe.send([status,symbol,price,time,timestamp,d["high"],d["low"],d["phigh"],d["plow"],\
 		d["range"],d["last_5_range"],d["vol"],d["open"],d["oh"],d["ol"],
-		d["f5r"],d["f5v"],d["prev_close"],d["prev_close_gap"]])
+		d["f5r"],d["f5v"],d["prev_close"],d["prev_close_gap"],d["status"]])
 
 	#print("sent",symbol)
 
@@ -587,7 +631,7 @@ def sell_market_order(symbol,share):
 # 		print(request_pipe.recv())
 
 # high,low,m_high,m_low,f5,f5v
-#print(fetch_yahoo("AAPL"))
+# print(fetch_yahoo("AAPL"))
 
 # a=[8.42, 8.61, 9.27, 9.07, 8.71, 9.0, 8.95, 8.84, 8.8, 8.79, 8.82, 8.88, 8.85, 8.8, 8.72, 8.66, 8.53, 8.5, 8.53, 8.46, 8.41, 8.4, 8.39, 8.49, 8.49, 8.48, 8.49, 8.59, 8.65, 8.59, 8.59, 8.58, 8.56, 8.48, 8.46, 8.44, 8.38, 8.28, 8.4, 8.39, 8.33, 8.4, 8.37, 8.4, 8.3, 8.29, 8.3, 8.31, 8.36, 8.34, 8.37, 8.38, 8.35, 8.31, 8.32, 8.32, 8.32, 8.3, 8.27, 8.27, 8.2, 8.23, 8.1, 7.95, 7.98, 7.98, 7.98, 7.93, 7.9, 7.86, 7.86, 7.9, 7.94, 8.1, 8.1, 8.1, 8.08, 8.07, 8.03, 7.95, 7.9, 7.91, 7.9, 8.0, 8.03, 8.14, 8.21, 8.12, 8.08, 8.1, 8.09, 8.05, 8.02, 8.02, 8.0, 7.96, 7.9, 7.93, 7.95, 7.92, 7.97, 7.92, 7.91, 7.95, 7.93, 7.95, 7.98, 8.0, 8.0, 8.08, 8.08, 8.08, 8.07, 8.06, 8.04, 8.05, 8.04, 8.04, 8.02, 8.03, 8.03, 8.02, 8.0, 8.0, 8.03, 8.03, 8.03, 8.03, 8.04, 8.04, 8.07, 8.1, 8.15, 8.18, 8.2, 8.2, 8.18, 8.18, 8.18, 8.2, 8.2, 8.18, 8.18, 8.19, 8.17, 8.15, 8.14, 8.14, 8.18, 8.15, 8.16, 8.18, 8.18, 8.18, 8.18, 8.18, 8.18, 8.18, 8.22, 8.22, 8.28, 8.33, 8.35, 8.3, 8.27, 8.32, 8.35, 8.34, 8.3, 8.22, 8.25, 8.27, 8.27, 8.27, 8.25, 8.26, 8.21, 8.2, 8.17, 8.18, 8.2, 8.19, 8.19, 8.17, 8.07, 8.05, 8.05, 8.08, 8.12, 8.14, 8.14, 8.14, 8.16, 8.15, 8.17, 8.19, 8.19, 8.19, 8.18, 8.16, 8.18, 8.22, 8.23, 8.2, 8.19, 8.18, 8.19, 8.21, 8.21, 8.19, 8.19, 8.2, 8.19, 8.19, 8.18, 8.18, 8.14, 8.15, 8.15, 8.15, 8.08, 8.06, 8.06, 8.02, 8.03, 8.05, 8.06, 8.05, 8.08, 8.07, 8.08, 8.08, 8.11, 8.13, 8.15, 8.16, 8.17, 8.17, 8.17, 8.2499, 8.17, 8.17, 8.17, 8.18, 8.16, 8.13, 8.13, 8.12, 8.13, 8.13, 8.13, 8.14, 8.13, 8.13, 8.13, 8.13, 8.11, 8.12, 8.12, 8.13, 8.13, 8.14, 8.13, 8.14, 8.15, 8.15, 8.15, 8.15, 8.15, 8.16, 8.15, 8.15, 8.16, 8.16, 8.16, 8.16, 8.16, 8.17, 8.18, 8.19, 8.23, 8.3, 8.3, 8.29, 8.29, 8.29, 8.28, 8.28, 8.29, 8.29, 8.26, 8.26, 8.26, 8.24, 8.24, 8.3, 8.3, 8.3, 8.3, 8.3, 8.29, 8.28, 8.24, 8.22, 8.17, 8.1999, 8.2, 8.19, 8.17, 8.16, 8.12, 8.13, 8.13, 8.12, 8.11, 8.11, 8.14, 8.16, 8.21, 8.21, 8.25, 8.24, 8.23, 8.27, 8.27, 8.27, 8.37, 8.38, 8.380000114440918, 7.830100059509277, 8.0, 8.0, 8.039999961853027, 8.0, 7.940000057220459, 7.889900207519531, 7.699999809265137, 7.699999809265137, 8.010000228881836, 7.979899883270264, 7.949999809265137, 8.0, 8.050000190734863, 8.03499984741211, 8.026000022888184, 8.0, 8.0, 8.020000457763672, 8.039999961853027, 8.034799575805664, 8.086999893188477, 8.0649995803833, 8.079999923706055, 8.079999923706055, 8.140000343322754, 8.18910026550293, 8.210000038146973, 8.25, 8.350000381469727, 8.350000381469727, 8.5, 8.5, 8.5, 8.470000267028809, 8.489999771118164, 8.489999771118164, 8.449999809265137, 8.444700241088867, 8.34000015258789, 8.23009967803955, 8.180000305175781, 8.1451997756958, 8.140000343322754, 8.109999656677246, 8.050000190734863, 8.025899887084961, 8.079999923706055, 8.100000381469727, 8.100000381469727, 8.050000190734863, 8.009400367736816, 7.901599884033203, 7.752200126647949, 7.690000057220459, 7.690000057220459, 7.949999809265137, 8.079999923706055, 8.050000190734863, 7.96999979019165, 7.909999847412109, 7.800000190734863, 7.824999809265137, 7.860000133514404, 7.820000171661377, 7.820000171661377, 7.819399833679199, 7.807000160217285, 7.75, 7.721099853515625, 7.730000019073486, 7.760000228881836, 7.760000228881836, 7.730000019073486, 7.621099948883057, 7.550000190734863, 7.510000228881836, 7.449999809265137, 7.420000076293945, 7.519999980926514, 7.589000225067139, 7.599999904632568, 7.75, 7.829699993133545, 7.849999904632568, 7.840000152587891, 7.849999904632568, 7.860000133514404, 7.849999904632568, None, 7.820000171661377]
 
@@ -602,3 +646,5 @@ def sell_market_order(symbol,share):
 # 1. check if pipe/queue is empty.
 	 #if not, register/deregister these symbols. 
 # 2. For each of these register symbols,fetch the updates for it! 
+# request_pipe, receive_pipe = multiprocessing.Pipe()
+# multi_processing_price(receive_pipe)

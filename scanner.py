@@ -6,23 +6,29 @@ import pandas as pd
 from pannel import *
 from scanner_process_manager import *
 
+from tkinter import *
 
 def status_change(var,label):
 	label["text"] = "Current Status: "+var.get()
 
 class scanner(pannel):
 
-	def __init__(self,root,tickers_manager,scanner_process:scanner_process_manager):
+	def __init__(self,root,tickers_manager,scanner_process:scanner_process_manager,data):
 
 		super()
 
+		self.data = data
 		#mark if already created. if so, just update the infos. 
 		self.nasdaq_trader_created = False
+
+		self.symbols_registry = []
 
 		self.nasdaq_trader_symbols = []
 		self.nasdaq_trader_list = {}
 		self.nasdaq_trader_symbols_ranking = []
 		self.nasdaq_trader_ranking = []
+
+		self.extra_count = 101
 
 		self.tabControl = ttk.Notebook(root)
 		self.tabControl.place(x=0,rely=0.01,relheight=1,width=500)
@@ -35,10 +41,12 @@ class scanner(pannel):
 		self.nasdaq = []
 		############################### Nasdaq Trader ############################################
 
-		self.nasdaq = []
 
 		# self.NT_refresh = ttk.Button(self.tab2,
 		# 	text ="Refresh",command=self.refresh_nasdaq).place(relx=0.01, rely=0.01, height=25, width=70)
+
+
+		self.update_in_progress = False
 
 		self.add_amount = tk.StringVar(self.tab2)
 		self.add_choices = {'Top 5','Top 10','Top 20','Top 50','All'}
@@ -184,6 +192,10 @@ class scanner(pannel):
 
 		self.rebind(self.scanner_canvas,self.scanner_frame)
 
+
+		# reg = threading.Thread(target=self.alwasy_update,args=(), daemon=True)
+		# reg.start()
+
 		# df = pd.read_csv("test.csv",index_col=0)
 		# self.add_nasdaq_labels(["d",df,"csc"])
 
@@ -207,6 +219,8 @@ class scanner(pannel):
 		for i in l:
 			self.tickers_manager.add_symbol_reg_list(i)
 
+	# def set_data_manager(self,dm):
+	# 	self.data = dm
 
 	def recreate_labels(self,frame):
 
@@ -308,6 +322,8 @@ class scanner(pannel):
 
 			self.change_sorting_order("status")
 
+		print(self.status_code)
+
 	def sorting_rank(self):
 
 		if self.rank_sort==True:
@@ -333,6 +349,7 @@ class scanner(pannel):
 
 	def sortign_status(self):
 		self.df = self.df.sort_values(by=["status_code","rank5"],ascending=False)
+
 
 	def nasdaq_labels_sort(self):
 
@@ -407,22 +424,6 @@ class scanner(pannel):
 
 		return sy
 
-	def refresh(self):
-
-		#this is where it downloads the stock info. Turn this into multi processing. just allocate the info and send it.
-
-		cond = "sh_relvol_o"+self.relv.get()
-		market_ = self.market.get()
-		type_ = self.signal.get()
-		cap = self.markcap.get()
-
-		self.delete_old_lables()
-		self.scanner_process_manager.send_request(cond,market_,type_,cap)
-
-	#every 1 minute? i am relectant to do it here. 
-	def refresh_nasdaq(self):
-		#self.delete_old_labels_nasdaq()
-		self.scanner_process_manager.refresh_nasdaq_trader()
 
 	def add_nasdaq_labels_init(self):
 
@@ -445,9 +446,37 @@ class scanner(pannel):
 			self.nasdaq.append([])
 
 			for j in range(len(width)):
-				if j ==0 or j==2 or j==3 or j==4:
+				if j ==0 or j==2:
 					self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=info[j],width=width[j]))
 					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+
+				elif j ==3:
+					try:
+						var =  self.data.get_symbol_price(symbol)
+					except:
+						var == None
+
+					if var != None:
+						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=width[j]))
+					else:
+						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=width[j]))
+
+					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+
+				elif j ==4:
+
+					try:
+						var = self.data.get_position_status(symbol)
+					except:
+						var == None
+
+					if var != None:
+						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=width[j]))
+					else:
+						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=width[j]))
+
+					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+
 				elif j ==1:
 					self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=info[j],width=width[j],background="SystemButtonFace"))
 					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
@@ -499,8 +528,30 @@ class scanner(pannel):
 				info = [rank,index,market,price,status,symbol]
 
 				for j in range(len(width)):
-					if j ==0 or j==2 or j==3 or j==4:
+					if j ==0 or j==2:
 						self.nasdaq[i][j]["text"] = info[j]
+					elif j == 3:
+						try:
+							var =  self.data.get_symbol_price(symbol)
+						except:
+							var == None
+
+						if var != None and int(var.get())!=0:
+							self.nasdaq[i][j]["textvariable"] = info[j]
+						else:
+							self.nasdaq[i][j]["text"] = "NA"
+
+					elif j == 4:
+						try:
+							var = self.data.get_position_status(symbol)
+						except:
+							var == None
+
+						if var != None :
+							self.nasdaq[i][j]["textvariable"] = info[j]
+						else:
+							self.nasdaq[i][j]["text"] = "NA"
+
 					elif j ==1:
 						if roc5>0:
 							tex = info[j]+" ↑"+str(roc5)
@@ -523,6 +574,49 @@ class scanner(pannel):
 						self.nasdaq_trader_symbols.append(symbol)
 						self.nasdaq[i][j]["command"] = lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)
 
+	#This is where every update comes in. 
+
+
+	#gives the SDM price and status to pd. 
+	# call this every 5 seconds
+	def update_pd(self):
+
+		#grab the data from symbol and update df.
+		# status. price. 
+		#row['symbol']
+		df = self.df
+		if self.nasdaq_trader_created==True and self.update_in_progress==False:
+			self.update_in_progress = True 
+			for index, row in df.iterrows():
+				symbol = row["symbol"]
+				try:
+					var = self.data.get_position_status(symbol)
+				except:
+					var == None
+
+				if var != None:
+					df.loc[index,"status"] = var.get()
+				else:
+					df.loc[index,"status"] = ""
+
+			statuts = df['status'].unique()
+
+			for i in statuts:
+				if i not in self.status_code:
+					self.status_code[i]=self.status_num
+					self.status_num+=1
+
+			for key in self.status_code:
+				df.loc[df["status"]==key,"status_code"] =  self.status_code[key]
+
+		self.update_in_progress = False
+
+	def alwasy_update(self):
+
+		while True:
+			#self.update_pd()
+			time.sleep(10)
+
 
 	def add_nasdaq_labels(self,df):
 
@@ -531,21 +625,26 @@ class scanner(pannel):
 		timestamp = df[2]
 		df = df[1]
 
+		#df = df[df.market =='NQ'].copy()
+
 		df.loc[df["market"]=='NQ',"market"] = self.market_sort[0]
 		df.loc[df["market"]=='NY',"market"] = self.market_sort[1]
 		df.loc[df["market"]=='AM',"market"] = self.market_sort[2]
 
-		statuts = df['status'].unique()
-		for i in statuts:
-			if i not in self.status_code:
-				self.status_code[i]=self.status_num
-				self.status_num+=1
-
-		for key in self.status_code:
-			df.loc[df["status"]==key,"status_code"] =  self.status_code[key]
-
+		#registration 
 
 		self.df = df
+
+		for index, row in df.iterrows():
+				if row['symbol'] not in self.symbols_registry:
+					self.data.partial_register(row['symbol'])
+
+		#update the SDM data to the PD
+
+		self.update_pd()
+
+		#update the infos from SDM
+
 		#call the sort.
 		#check if added.
 		#update. 
@@ -560,6 +659,22 @@ class scanner(pannel):
 
 		self.scanner_process_manager.updating_comlete()
 
+	def refresh(self):
+
+		#this is where it downloads the stock info. Turn this into multi processing. just allocate the info and send it.
+
+		cond = "sh_relvol_o"+self.relv.get()
+		market_ = self.market.get()
+		type_ = self.signal.get()
+		cap = self.markcap.get()
+
+		self.delete_old_lables()
+		self.scanner_process_manager.send_request(cond,market_,type_,cap)
+
+	#every 1 minute? i am relectant to do it here. 
+	def refresh_nasdaq(self):
+		#self.delete_old_labels_nasdaq()
+		self.scanner_process_manager.refresh_nasdaq_trader()
 
 	def add_labels(self,d):
 		#This is where it adds the labels.
@@ -608,10 +723,17 @@ class scanner(pannel):
 
 # df=pd.read_csv("test.csv",index_col=0)
 
-# # df=df.sort_values(by="rank",ascending=False)
+# # # # df=df.sort_values(by="rank",ascending=False)
 
+# print(df)
 
-
+# print(df)
+# i=0
+# for item,row in df.iterrows():
+# 	#print(item,row)
+# 	df.loc[item,"rank"] =i
+# 	i+=1 
+# print(df)
 # df.loc[df["rank"]==2,"rank5"]=5
 
 
