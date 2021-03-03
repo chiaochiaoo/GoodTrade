@@ -466,7 +466,7 @@ def process_and_send(lst,pipe):
 	if ms<570 or ms>960:
 		if latency >60:
 			status = "Lagged"
-			register_again = True
+			register_again = False
 	#premarket
 	else:
 		if latency >30:

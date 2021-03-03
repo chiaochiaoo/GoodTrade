@@ -223,7 +223,7 @@ class scanner(pannel):
 	def recreate_labels(self,frame):
 
 		self.buttons =[]
-		width = [5,14,5,8,8,20,5]
+		width = [5,14,5,8,12,20,5]
 		labels = ["Rank","Symbol","Market","Price","Since Close%","Status","Add"]
 
 		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
