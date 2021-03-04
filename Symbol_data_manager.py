@@ -26,8 +26,6 @@ class Symbol_data_manager:
 		#These filed need to be initilized. 
 
 		self.symbol_init =[]
-
-
 		#system
 
 		self.ppro = None
@@ -135,7 +133,6 @@ class Symbol_data_manager:
 		self.symbol_data_support_resistance_range = {}
 		self.symbol_data_breakout_eval = {}
 
-
 		self.symbol_data_prev_close_dis ={}
 		self.symbol_data_prev_close_val ={}
 		self.symbol_data_prev_close_range ={}
@@ -158,6 +155,19 @@ class Symbol_data_manager:
 		self.alert_recent5_vol = {}
 
 
+		#algos.
+
+		self.algo_breakout = {}
+
+		#####
+
+		self.symbol_position_status = {}
+		self.symbol_percentage_since_close = {}
+		self.symbol_percentage_since_open = {}
+
+
+
+
 		#mark this when a symbol datastructure is completely loaded. 
 
 		self.data_list = [self.symbol_data_openhigh_range,self.symbol_data_openlow_range,self.symbol_data_range_range,
@@ -174,6 +184,8 @@ class Symbol_data_manager:
 
 		#self.symbol_price_high,self.symbol_price_low,self.symbol_price_premarket_high,self.symbol_price_premarket_low
 
+		#['Connected', 'QQQ.NQ', 310.64, '14:06:46', 846, 321.5, 310.47, 321.5, 310.47, 11.03, 0.0, 0.0, 317.27, 4.23, 6.8, 0, 0, 318.4, -7.76, 'New Low']
+
 		self.update_list = [self.symbol_status,self.symbol_price,self.symbol_update_time,
 		self.minute_timestamp_val,
 		self.symbol_price_high,
@@ -189,7 +201,10 @@ class Symbol_data_manager:
 		self.first_5_min_range,
 		self.first_5_min_volume,
 		self.symbol_price_prevclose,
-		self.symbol_price_prevclose_to_now]
+		self.symbol_price_prevclose_to_now,
+		self.symbol_percentage_since_close,
+		self.symbol_percentage_since_open,
+		self.symbol_position_status]
 
 		self.init_data()
 
@@ -203,6 +218,37 @@ class Symbol_data_manager:
 		for i in self.symbols:
 			self.init_symbol(i)
 
+	def get_symbol_price(self,symbol):
+
+		if symbol in self.symbol_init:
+			return self.symbol_price[symbol]
+		else:
+			print("Cannot find symbol",symbol)
+			return None
+
+	def get_open_percentage(self,symbol):
+
+		if symbol in self.symbol_init:
+			return self.symbol_percentage_since_open[symbol]
+		else:
+			print("Cannot find symbol",symbol)
+			return None
+
+	def get_position_status(self,symbol):
+
+		if symbol in self.symbol_init:
+			return self.symbol_position_status[symbol]
+		else:
+			print("Cannot find symbol",symbol)
+			return None
+
+	def get_close_percentage(self,symbol):
+
+		if symbol in self.symbol_init:
+			return self.symbol_percentage_since_close[symbol]
+		else:
+			print("Cannot find symbol",symbol)
+			return None
 
 	def set_ppro_manager(self,ppro):
 		self.ppro = ppro
@@ -333,9 +379,35 @@ class Symbol_data_manager:
 		self.alert_recent5_vol[i] = DoubleVar()
 		self.alert_openning_rg_val[i] = DoubleVar()
 		self.alert_openning_vol_val[i] = DoubleVar()
+
+		#algo
+
+		self.symbol_position_status[i] = StringVar()
+
+		self.symbol_percentage_since_close[i] = DoubleVar()
+		self.symbol_percentage_since_open[i] = DoubleVar()
+
+		self.symbol_init.append(i)
+
+		self.init_breakout_algo(i)
 		#self.ppro.register(i)
 		# reg = threading.Thread(target=register,args=(i,), daemon=True)
 		# reg.start()
+
+	def init_breakout_algo(self,i):
+
+
+		#algo status,Trigger timer, Trigger type,###
+		self.algo_breakout[i] = []
+
+		#Algo status
+		self.algo_breakout[i].append(StringVar())
+		self.algo_breakout[i][0].set("Pending")
+		#Timer
+		self.algo_breakout[i].append(StringVar())
+		self.algo_breakout[i][1].set(0)
+		#Type. 
+		self.algo_breakout[i].append(StringVar())
 
 	def change_status(self,symbol,status):
 		self.symbol_status[symbol].set(status)
@@ -344,17 +416,38 @@ class Symbol_data_manager:
 		self.symbol_status_color[symbol].set(color)
 
 
+	#seems i need dua channel? probably not! just stick with it then. 
+
+	def partial_register(self,symbol):
+		if symbol not in self.symbol_init:
+			self.init_symbol(symbol)
+			self.ppro.register(symbol)
+			print("partial registering:",symbol)
+
+	def if_registered(self,symbol):
+
+		return symbol in self.symbol_init
+
+
 	def add(self,symbol):
-		self.init_symbol(symbol)
-		self.symbols.append(symbol)
-		self.save()
 
-		self.database.send_request(symbol)
-		self.ppro.register(symbol)
+		#check if already registered.
 
-		print("registering:",symbol)
+		if symbol not in self.symbols:
 
+			if symbol not in self.symbol_init:
+				self.init_symbol(symbol)
 
+			self.symbols.append(symbol)
+			self.save()
+
+			self.database.send_request(symbol)
+			self.ppro.register(symbol)
+
+			print("full registering:",symbol)
+			#print(self.symbol_position_status)
+		else:
+			print("Trying register:",symbol," already registered")
 
 	def delete(self,symbol):
 		if symbol in self.symbols:

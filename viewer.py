@@ -5,6 +5,7 @@ import numpy as np
 import os
 import time
 import threading
+import sys
 
 from alerts import *
 from pannel import *
@@ -12,18 +13,15 @@ from Symbol_data_manager import *
 
 from scanner import *
 from scanner_process_manager import *
-
 from database_process_manager import *
-#from database_functions import *
-
+from tkinter import messagebox
 from ppro_process_manager import *
-import sys
-
+from cores.algo_manager_comms import *
 
 
 class viewer:
 
-	def __init__(self,root,scanner_process,database_process,ppro_process):
+	def __init__(self,root,scanner_process,database_process,ppro_process,algo_comm):
 
 		self.data = Symbol_data_manager()
 
@@ -33,12 +31,11 @@ class viewer:
 		self.ppro = ppro_process
 		self.ppro.set_symbols_manager(self.data)
 
-
 		self.data.set_database_manager(self.db)
 		self.data.set_ppro_manager(self.ppro)
 
 		self.listening = ttk.LabelFrame(root,text="Listener") 
-		self.listening.place(x=500,rely=0.05,relheight=1,width=900)
+		self.listening.place(x=600,rely=0.05,relheight=1,width=1300)
 
 		self.tabControl = ttk.Notebook(self.listening)
 		self.tab1 = tk.Canvas(self.tabControl)
@@ -81,7 +78,7 @@ class viewer:
 
 		self.pv = prevclose(self.tab10,self.data,self.all_alerts)
 
-		self.br = breakout(self.tab9,self.data,self.all_alerts)
+		self.br = breakout(self.tab9,self.data,self.all_alerts,algo_comm)
 		self.am = alert_map(self.tab11,self.data)
 		#alerts  =[self.open_high_pannel]
 		alerts = [self.high_low_pannel,self.open_high_pannel,self.open_low_pannel,self.first_5,self.er,self.ev,self.br,self.pv,self.am]
@@ -89,13 +86,9 @@ class viewer:
 		self.tm = ticker_manager(self.tab1,self.data,alerts)
 		
 
-		self.scanner_pannel = scanner(root,self.tm,scanner_process)
+		self.scanner_pannel = scanner(root,self.tm,scanner_process,self.data)
 
 		scanner_process.set_pannel(self.scanner_pannel)
-
-
-		# sm = price_updater(self.data)
-		# sm.start()
 
 
 
@@ -258,7 +251,7 @@ class ticker_manager(pannel):
 
 #a seperate thread on its own. 
 
-from tkinter import messagebox
+
 
 
 def on_closing():
@@ -296,7 +289,7 @@ if __name__ == '__main__':
 
 	d = database_process_manager(request_database)
 
-	### INFO FETCH SUB PROCESS####
+	### ppro update SUB PROCESS####
 
 	request_pipe, receive_pipe = multiprocessing.Pipe()
 	process_ppro = multiprocessing.Process(target=multi_processing_price, args=(receive_pipe,),daemon=True)
@@ -306,16 +299,24 @@ if __name__ == '__main__':
 	ppro = ppro_process_manager(request_pipe)
 
 	### scanner pannel needs the manager. 
+
+
+	### algo comms 
+	server_side_comm, client_side_comm = multiprocessing.Pipe()
+	algo_comm_link = multiprocessing.Process(target=algo_manager_commlink, args=(client_side_comm,),daemon=True)
+	algo_comm_link.daemon=True
+	algo_comm_link.start()
+
 	
 	root = tk.Tk() 
 	root.title("GoodTrade") 
-	root.geometry("1400x700")
-	root.minsize(1200, 600)
+	root.geometry("1800x700")
+	root.minsize(1500, 600)
 	root.maxsize(3000, 1500)
 
 	root.protocol("WM_DELETE_WINDOW", on_closing)
 
-	view = viewer(root,s,d,ppro)
+	view = viewer(root,s,d,ppro,server_side_comm)
 	root.mainloop()
 
 	print("Main process terminated")
@@ -324,14 +325,15 @@ if __name__ == '__main__':
 	request_scanner.send(["terminate"])
 	process_database.terminate()
 	process_ppro.terminate()
-	process_scanner_b.terminate()
 
 	request_scanner.recv()
 	process_scanner.terminate()
 	process_scanner.join()
 	process_database.join()
 	process_ppro.join()
-	process_scanner_b.join()
+
+	algo_comm_link.terminate()
+	algo_comm_link.join()
 	print("All subprocesses terminated")
 	
 	os._exit(1) 
