@@ -705,7 +705,7 @@ class scanner(pannel):
 		timestamp = df[2]
 		df = df[1]
 
-		df = df[df.market =='NQ'][:20].copy()
+		#df = df[df.market =='NQ'][:20].copy()
 
 		df.loc[df["market"]=='NQ',"market"] = self.market_sort[0]
 		df.loc[df["market"]=='NY',"market"] = self.market_sort[1]
