@@ -224,8 +224,8 @@ class scanner(pannel):
 	def recreate_labels(self,frame):
 
 		self.buttons =[]
-		width = [4,15,5,6,11,11,15,5]
-		labels = ["Rank","Symbol","Market","Price","Since Close%","Since Open%","Status","Add"]
+		width = [4,15,5,6,6,6,6,15,5]
+		labels = ["Rank","Symbol","Market","Price","SC%","SO%","L5R%","Status","Add"]
 
 		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
 
@@ -459,7 +459,7 @@ class scanner(pannel):
 
 		df = self.df
 		i = -1
-		width = [3,14,5,6,8,6,15,5]
+		width = [3,14,5,6,6,6,6,15,5]
 		for index, row in df.iterrows():
 			i+=1
 			rank = row['rank']
@@ -521,8 +521,20 @@ class scanner(pannel):
 						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=width[j]))
 
 					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-
 				elif j ==6:
+
+					try:
+						var = self.data.get_last_5_range_percentage(symbol)
+					except:
+						var == None
+
+					if var != None:
+						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=width[j]))
+					else:
+						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=width[j]))
+
+					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+				elif j ==7:
 
 					try:
 						var = self.data.get_position_status(symbol)
@@ -573,7 +585,7 @@ class scanner(pannel):
 		df = self.df
 
 		i = -1
-		width = [3,14,5,6,8,6,15,5]
+		width = [3,14,5,6,6,6,6,15,5]
 
 		self.update_pd()
 
@@ -624,7 +636,19 @@ class scanner(pannel):
 							self.nasdaq[i][j]["textvariable"] = var
 						else:
 							self.nasdaq[i][j]["text"] = "NA"
+
 					elif j == 6:
+						try:
+							var = self.data.get_last_5_range_percentage(symbol)
+						except:
+							var == None
+
+						if var != None :
+							self.nasdaq[i][j]["textvariable"] = var
+						else:
+							self.nasdaq[i][j]["text"] = "NA"
+
+					elif j == 7:
 						try:
 							var = self.data.get_position_status(symbol)
 						except:

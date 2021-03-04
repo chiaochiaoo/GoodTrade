@@ -164,7 +164,7 @@ class Symbol_data_manager:
 		self.symbol_position_status = {}
 		self.symbol_percentage_since_close = {}
 		self.symbol_percentage_since_open = {}
-
+		self.symbol_percentage_last_5 = {}
 
 
 
@@ -204,6 +204,7 @@ class Symbol_data_manager:
 		self.symbol_price_prevclose_to_now,
 		self.symbol_percentage_since_close,
 		self.symbol_percentage_since_open,
+		self.symbol_percentage_last_5,
 		self.symbol_position_status]
 
 		self.init_data()
@@ -249,6 +250,13 @@ class Symbol_data_manager:
 		else:
 			print("Cannot find symbol",symbol)
 			return None
+
+	def get_last_5_range_percentage(self,symbol):
+		if symbol in self.symbol_init:
+			return self.symbol_percentage_last_5[symbol]
+		else:
+			print("Cannot find symbol",symbol)
+			return None		
 
 	def set_ppro_manager(self,ppro):
 		self.ppro = ppro
@@ -386,6 +394,7 @@ class Symbol_data_manager:
 
 		self.symbol_percentage_since_close[i] = DoubleVar()
 		self.symbol_percentage_since_open[i] = DoubleVar()
+		self.symbol_percentage_last_5[i] = DoubleVar()
 
 		self.symbol_init.append(i)
 
