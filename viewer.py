@@ -16,7 +16,7 @@ from scanner_process_manager import *
 from database_process_manager import *
 from tkinter import messagebox
 from ppro_process_manager import *
-from cores.algo_manager_comms import *
+#from cores.algo_manager_comms import *
 
 
 class viewer:
@@ -78,7 +78,7 @@ class viewer:
 
 		self.pv = prevclose(self.tab10,self.data,self.all_alerts)
 
-		self.br = breakout(self.tab9,self.data,self.all_alerts,algo_comm)
+		self.br = breakout(self.tab9,self.data,self.all_alerts)#algo_comm
 		self.am = alert_map(self.tab11,self.data)
 		#alerts  =[self.open_high_pannel]
 		alerts = [self.high_low_pannel,self.open_high_pannel,self.open_low_pannel,self.first_5,self.er,self.ev,self.br,self.pv,self.am]
@@ -303,9 +303,9 @@ if __name__ == '__main__':
 
 	### algo comms 
 	server_side_comm, client_side_comm = multiprocessing.Pipe()
-	algo_comm_link = multiprocessing.Process(target=algo_manager_commlink, args=(client_side_comm,),daemon=True)
-	algo_comm_link.daemon=True
-	algo_comm_link.start()
+	# algo_comm_link = multiprocessing.Process(target=algo_manager_commlink, args=(client_side_comm,),daemon=True)
+	# algo_comm_link.daemon=True
+	# algo_comm_link.start()
 
 	
 	root = tk.Tk() 
