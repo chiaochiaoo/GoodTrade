@@ -243,6 +243,8 @@ class scanner(pannel):
 		self.close_sort = False
 		self.open_sort = False
 
+		self.last_5 = False
+
 		for i in range(len(labels)): #Rows
 			self.b = tk.Button(frame, text=labels[i],width=width[i])#,command=self.rank
 			self.b.configure(activebackground="#f9f9f9")
@@ -337,10 +339,10 @@ class scanner(pannel):
 		self.change_sorting_order("close")
 
 	def last5_button(self):
-		if self.close_sort==True:
-			self.close_sort = False
+		if self.last_5==True:
+			self.last_5 = False
 		else:
-			self.close_sort = True
+			self.last_5 = True
 		self.change_sorting_order("last5")
 
 
@@ -390,7 +392,7 @@ class scanner(pannel):
 			self.df = self.df.sort_values(by=["open"],ascending=True)
 
 	def sorting_last5(self):
-		if self.open_sort==True:
+		if self.last_5==True:
 			self.df = self.df.sort_values(by=["last5"],ascending=False)
 		else:
 			self.df = self.df.sort_values(by=["last5"],ascending=True)
