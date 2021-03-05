@@ -262,7 +262,9 @@ class scanner(pannel):
 		self.buttons[3]["command"] = self.price_button
 		self.buttons[4]["command"] = self.close_button
 		self.buttons[5]["command"] = self.open_button
-		self.buttons[6]["command"] = self.status_button
+		self.buttons[6]["command"] = self.last5_button
+
+		self.buttons[7]["command"] = self.status_button
 
 
 	def change_sorting_order(self,order):
@@ -334,6 +336,14 @@ class scanner(pannel):
 			self.close_sort = True
 		self.change_sorting_order("close")
 
+	def last5_button(self):
+		if self.close_sort==True:
+			self.close_sort = False
+		else:
+			self.close_sort = True
+		self.change_sorting_order("last5")
+
+
 	def open_button(self):
 		if self.open_sort==True:
 			self.open_sort = False
@@ -379,6 +389,11 @@ class scanner(pannel):
 		else:
 			self.df = self.df.sort_values(by=["open"],ascending=True)
 
+	def sorting_last5(self):
+		if self.open_sort==True:
+			self.df = self.df.sort_values(by=["last5"],ascending=False)
+		else:
+			self.df = self.df.sort_values(by=["last5"],ascending=True)
 
 	def nasdaq_labels_sort(self):
 
@@ -397,6 +412,8 @@ class scanner(pannel):
 				self.sorting_close()
 			elif self.sorting_order == "open":
 				self.sorting_open()
+			elif self.sorting_order =="last5":
+				self.sorting_last5()
 
 		#df.sort_values(by='col1', ascending=False)
 
@@ -699,15 +716,18 @@ class scanner(pannel):
 				status = self.data.get_position_status(symbol)
 				close_ = self.data.get_close_percentage(symbol)
 				open_ = self.data.get_open_percentage(symbol)
+				last5 = self.data.get_last_5_range_percentage(symbol)
 
 				if status != None:
 					df.loc[index,"status"] = status.get()
 					df.loc[index,"close"] = close_.get()
 					df.loc[index,"open"] = open_.get()
+					df.loc[index,"last5"] = last5.get()
 				else:
 					df.loc[index,"status"] = ""
 					df.loc[index,"close"] = 0
 					df.loc[index,"open"] = 0
+					df.loc[index,"last5"] = 0
 
 			statuts = df['status'].unique()
 
