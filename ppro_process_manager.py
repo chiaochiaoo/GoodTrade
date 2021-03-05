@@ -365,8 +365,6 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 	d["prev_close_percentage"] = 0
 
 
-
-
 	d["open_percentage"] = 0
 
 	d["volume"] = 0
@@ -514,7 +512,10 @@ def process_and_send(lst,pipe):
 		if d["pos_range"]>=0.9 and d["pos_range"]<=0.99 and change_high<0 and change_low<0:
 			d["status"]="High Reversing"
 
-	d["prev_close_percentage"] = round(d["prev_close_gap"]*100/(prev_close+0.0000000001),2)
+	if prev_close!=0:
+		d["prev_close_percentage"] = round(d["prev_close_gap"]*100/(prev_close+0.0000000001),2)
+	else:
+		d["prev_close_percentage"] = 0
 	d["last_5_range_percentage"] = round(d["last_5_range"]*100/(price+0.00000001),2)
 
 	pipe.send([status,symbol,price,time,timestamp,d["high"],d["low"],d["phigh"],d["plow"],\
