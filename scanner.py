@@ -848,7 +848,7 @@ class scanner(pannel):
 
 
 
-df=pd.read_csv("test.csv",index_col=0)
+#df=pd.read_csv("test.csv",index_col=0)
 
 # # # # df=df.sort_values(by="rank",ascending=False)
 
