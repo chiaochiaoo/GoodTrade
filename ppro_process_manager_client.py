@@ -70,7 +70,7 @@ class ppro_process_manager:
 						self.ppro_status.set("Ppro Status: Disconnected. Reconnecting...")
 			else:
 
-				print(d)
+				#print(d)
 				symbol = d[1]
 				#print("receive",symbol)
 				self.data_list[0][symbol].set(status)
