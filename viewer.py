@@ -21,7 +21,7 @@ from ppro_process_manager import *
 
 class viewer:
 
-	def __init__(self,root,scanner_process,database_process,ppro_process,algo_comm):
+	def __init__(self,root,scanner_process,database_process,ppro_process,algo_comm,authen_comm):
 
 		self.data = Symbol_data_manager()
 
@@ -78,12 +78,12 @@ class viewer:
 
 		self.pv = prevclose(self.tab10,self.data,self.all_alerts)
 
-		self.br = breakout(self.tab9,self.data,self.all_alerts)#algo_comm
+		self.br = breakout(self.tab9,self.data,self.all_alerts,algo_comm)#algo_comm
 		self.am = alert_map(self.tab11,self.data)
 		#alerts  =[self.open_high_pannel]
 		alerts = [self.high_low_pannel,self.open_high_pannel,self.open_low_pannel,self.first_5,self.er,self.ev,self.br,self.pv,self.am]
 
-		self.tm = ticker_manager(self.tab1,self.data,alerts)
+		self.tm = ticker_manager(self.tab1,self.data,alerts,authen_comm)
 		
 
 		self.scanner_pannel = scanner(root,self.tm,scanner_process,self.data)
@@ -93,8 +93,10 @@ class viewer:
 
 
 class ticker_manager(pannel):
-	def __init__(self,frame,data,alerts):
+	def __init__(self,frame,data,alerts,authen_comm):
 		super().__init__(frame)
+
+		self.authen = authen_comm
 
 		self.alerts = alerts
 
@@ -124,8 +126,14 @@ class ticker_manager(pannel):
 		self.ppro_status.place(x = 200, y =12)
 		#data.ppro_status.set("Hello")
 
+		self.trader_stats = ttk.Label(frame, text="User Authentication:")
+		self.trader_stats.place(x = 400, y =12)
+
+		self.permission_stats = ttk.Label(frame, text="Permission Status:")
+		self.permission_stats.place(x = 600, y =12)
+
 		self.ticker_stats = ttk.Label(frame, text="Current Registered Tickers: "+str(self.ticker_count))
-		self.ticker_stats.place(x = 500, y =12)
+		#self.ticker_stats.place(x = 800, y =12)
 
 		#############Registration Window ####################
 
@@ -140,7 +148,8 @@ class ticker_manager(pannel):
 
 		self.init_reg_list()
 
-	
+		data = threading.Thread(target=self.recv, daemon=True)
+		data.start()
 
 		
 	def init_reg_list(self):
@@ -249,15 +258,70 @@ class ticker_manager(pannel):
 		except Exception as e:
 			print("Error",e)
 
+	def recv(self):
+		k=self.authen.recv()
+		name=k[0]
+		per=k[1]
+		sta=k[2]
+		self.trader_stats["text"]= "User Authentication: "+name
+		self.permission_stats["text"]="Permission Status:"+per
 #a seperate thread on its own. 
-
-
-
 
 def on_closing():
     if messagebox.askokcancel("Quit", "Do you want to quit?"):
         root.destroy()
         "Destroyed"
+
+
+def authentication(pipe):
+    k=""
+
+    HOST = '10.29.10.135'  # Standard loopback interface address (localhost)
+    PORT = 65400        # Port to listen on (non-privileged ports are > 1023)
+
+
+    print("Trying to connect to the Authentication server")
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    connected = False
+
+    while not connected:
+        try:
+            s.connect((HOST, PORT))
+            connected = True
+        except:
+            #pipe.send(["msg","Cannot connected. Try again in 2 seconds."])
+            print("Cannot connect Authentication server. Try again in 2 seconds.")
+            time.sleep(2)
+
+
+    connection = True
+    #pipe.send(["msg","Connection Successful"])
+    print("Authentication server Connection Successful")
+
+    data=[]
+
+    while connection:
+        try:
+            part = s.recv(2048)
+        except:
+            connection = False
+            break
+        #if not part: break 
+        data.append(part)
+        if len(part) < 2048:
+            #try to assemble it, if successful.jump. else, get more. 
+            try:
+                k = pickle.loads(b"".join(data))
+                #k = pd.read_pickle(b"".join(data))
+                data=[]
+                pipe.send(k)
+            except:
+                pass
+    #pipe.send(["msg","Server disconnected"])
+    # except Exception as e:
+    #   pipe.send(["msg",e])
+    #   print(e)
+    #restarted the whole thing 
 
 
 if __name__ == '__main__':
@@ -307,6 +371,12 @@ if __name__ == '__main__':
 	# algo_comm_link.daemon=True
 	# algo_comm_link.start()
 
+	authen_comm, authen_clientside_comm = multiprocessing.Pipe()
+	auth = multiprocessing.Process(target=authentication, args=(authen_comm,),daemon=True)
+	auth.daemon=True
+	auth.start()
+
+
 	
 	root = tk.Tk() 
 	root.title("GoodTrade") 
@@ -316,7 +386,7 @@ if __name__ == '__main__':
 
 	root.protocol("WM_DELETE_WINDOW", on_closing)
 
-	view = viewer(root,s,d,ppro,server_side_comm)
+	view = viewer(root,s,d,ppro,server_side_comm,authen_clientside_comm)
 	root.mainloop()
 
 	print("Main process terminated")
