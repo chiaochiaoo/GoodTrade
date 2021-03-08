@@ -6,16 +6,16 @@ import os
 import time
 import threading
 import sys
-
-from alerts import *
-from pannel import *
-from Symbol_data_manager import *
-
-from scanner import *
-from scanner_process_manager import *
-from database_process_manager import *
 from tkinter import messagebox
-from ppro_process_manager import *
+
+
+from modules.alerts import *
+from modules.pannel import *
+from modules.Symbol_data_manager import *
+from modules.scanner import *
+from modules.scanner_process_manager import *
+from modules.database_process_manager import *
+from modules.ppro_process_manager import *
 #from cores.algo_manager_comms import *
 
 
