@@ -67,7 +67,7 @@ class ppro_process_manager:
 						self.ppro_status.set("Ppro Status: Connected")
 				elif d[1] == "Conection failed. try again in 3 sec.":
 					if self.init:
-						self.ppro_status.set("Ppro Status: Disconnected. Reconnecting...")
+						self.ppro_status.set("Ppro Status: Reconnecting..")
 			else:
 
 				#print(d)
