@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import os
 import time
+from datetime import datetime
 import threading
 
 import sys
@@ -84,6 +85,14 @@ class entry:
 		self.values = []
 
 
+	def get_shares(self):
+
+		try:
+			m = int(self.shares.get())
+			return m
+		except:
+			return 0
+
 	def set_share(self,value):
 
 		self.shares.set(value)
@@ -98,8 +107,10 @@ class entry:
 
 			self.sync_lock = True
 
-	
-			amount = str(int(int_plus(capital.get())//float_plus(price.get())))
+			try:
+				amount = str(int(int_plus(capital.get())//float_plus(price.get())))
+			except:
+				amount = 0
 			#print(amount)
 			shares.set(amount)
 			self.stop.entry_to_stop(amount)
@@ -349,15 +360,72 @@ class stop:
 			self.total_risk.set(self.totalrisk)
 
 
+	def get_totalrisk(self):
+
+		try:
+			m = float(self.total_risk.get())
+
+			return m
+		except:
+			return 0
+
+
 
 class algo_placer:
 
+	def on_close(self):
+		self.root.destroy()
+
+	def on_send(self):
+		#print("sending information")
+
+		#id,symbol,type,position,shares,total_risk.
+		valid,info = self.get_info()
+
+		if not valid:
+			print("Not good.",info)
+		else:
+			#create an id. 
+			id_ = info[0]+str(time.time())[-7:]
+			info.insert(0,id_)
+
+			info.insert(0,"New order")
+			#print(info)
+			self.commlink.send(info)
+
+		#id, symbol, type, status, description, position, shares, risk$
+
+		#in the future. wait for confirmation.
+		self.root.destroy()
+
+
+	def get_info(self):
+
+		#symbol, descrptipn,position,shares,risk. 
+		info = [self.symbol,self.type,"Pending",self.description,self.position,self.entry.get_shares(),self.stop.get_totalrisk()]
+
+		#if any of them is not set. or 0. false. 
+		valid = True
+		for i in info:
+			if i is None or i==0:
+				valid = False
+				break
+
+		return valid,info
+
 	#if the entry type is given. lock it. 
-	def __init__(self,symbol,description,entry_price=None,stop_price=None,position=None,capital=None,total_risk=None):
+	def __init__(self,commlink,type_,symbol,description,entry_price=None,stop_price=None,position=None,capital=None,total_risk=None):
 
+		#self.algo_commlink,type_,symbol,description,entry,stop,position,None,risk
+		print(type_,symbol,description)
+		#print(symbol,position,capital,total_risk)
+		self.id = None
+		self.symbol = symbol
+		self.description = description
+		self.type = type_
 
-		print(symbol,position,capital,total_risk)
-
+		self.commlink = commlink
+		self.position = position
 		# root = tk.Tk() 
 		# root.title("Algo Placer: "+symbol) 
 		# root.geometry("780x280")
@@ -366,11 +434,8 @@ class algo_placer:
 		root = tk.Toplevel(width=780,height=280)
 		self.root = root
 
-		self.symbol = tk.Label(root,text="Symbol: "+symbol)
-		self.symbol.place(x=10,y=10)
-
-		self.symbol = tk.Label(root,text="Trigger type: "+description)
-		self.symbol.place(x=10,y=30)
+		tk.Label(root,text="Symbol: "+symbol).place(x=10,y=10)
+		tk.Label(root,text="Trigger type: "+description).place(x=10,y=30)
 
 
 		############### ENTRY ################
@@ -397,10 +462,10 @@ class algo_placer:
 		# self.position_management.place(x=440,y=60,height=100,width=200)	
 
 
-		self.place= tk.Button(root ,text="Place algo",width=10,bg="#5BFF80")
+		self.place= tk.Button(root ,text="Place algo",width=10,bg="#5BFF80",command=self.on_send)
 		self.place.place(x=110,y=220,height=40,width=80)
 
-		self.place= tk.Button(root ,text="Cancel",width=10)
+		self.place= tk.Button(root ,text="Cancel",width=10,command=self.on_close)
 		self.place.place(x=310,y=220,height=40,width=80)
 
 		#self.start()
@@ -445,13 +510,14 @@ def main():
     root.mainloop()
 
 if __name__ == '__main__':
-    #main()
+
 #symbol, break out discription. 
 	root = tk.Tk()
+
 
 	#symbol,description,entry_price=None,stop_price=None,position=None,capital=None,total_risk=None)
 	#algo_placer(symbol,description,entry,stop,position,None,risk)
 	#algo_placer("AAPL.NQ","Breakout on Resistance on 134.45 for 60 secs",134.45,133.45,"Long",None,10.0)
 
-	algo_placer('QQQ.NQ', 'Breakout on Resistance on 338.85 for 0 sec', 338.85, 336.45, 'Long', None, 5050.0)
+	algo_placer(None,'QQQ.NQ', 'Breakout on Resistance on 338.85 for 0 sec', 338.85, 336.45, 'Long', None, 5050.0)
 	root.mainloop()
