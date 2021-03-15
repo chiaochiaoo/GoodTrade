@@ -106,7 +106,6 @@ def buy_market_order(symbol,share):
     else:
         print("Error sending buy order")
 
-
 def sell_market_order(symbol,share):
     r = requests.post('http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(share))
     if r.status_code == 200:
@@ -151,6 +150,9 @@ class algo_manager(pannel):
 		self.current_share = {}
 		self.realized = {}
 		self.unrealized = {}
+
+
+		self.order_book = {}
 
 
 		super().__init__(root)
@@ -214,7 +216,7 @@ class algo_manager(pannel):
 
 		if message_type =="New order": 
 
-			id_,symbol,type_,status,des,pos,share,risk = d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8] 
+			id_,symbol,type_,status,des,pos,order_type,order_price,share,risk = d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10]
 
 			print(id_,"added to new order")
 			if id_ not in self.orders:
@@ -229,6 +231,8 @@ class algo_manager(pannel):
 				self.unrealized[id_] = tk.StringVar()
 				self.unrealized[id_].set("0")
 
+				self.order_book[id_] = [order_type,pos,order_price,share,symbol]
+
 				#avoid repetitive order. 
 				l = [symbol,self.algo_status[id_],des,pos,self.current_share[id_],share,risk,self.realized[id_],self.unrealized[id_]]
 				#1,4,7
@@ -238,8 +242,28 @@ class algo_manager(pannel):
 
 		elif message_type =="Confirmed":
 			id_ = d[1]
-			print(id_,"confirmed")
+			print(id_,"confirmed and is a go")
 
+			order = self.order_book[id_] 
+
+			type_ = order[0]
+			pos = order[1]
+			order_price = order[2]
+			share = order[3]
+			symbol = order[4]
+
+			if type_ == "Market":
+
+				if pos=="Long":
+					buy_market_order(symbol,share)
+				elif pos =="Short":
+					sell_market_order(symbol,share)
+			elif type_ =="Limit":
+				if pos=="Long":
+					buy_limit_order(symbol,order_price,share)
+				elif pos =="Short":
+					sell_market_order(symbol,order_price,share)
+					
 	#info= 
 	#symbol,status,type,position,curretn,shares,risk,p/l
 	def add_new_labels(self,info):

@@ -402,7 +402,9 @@ class algo_placer:
 	def get_info(self):
 
 		#symbol, descrptipn,position,shares,risk. 
-		info = [self.symbol,self.type,"Pending",self.description,self.position,self.entry.get_shares(),self.stop.get_totalrisk()]
+
+		entry_type,entry_price,shares = self.entry.get_all_infos()
+		info = [self.symbol,self.type,"Pending",self.description,self.position,entry_type,entry_price,shares,self.stop.get_totalrisk()]
 
 		#if any of them is not set. or 0. false. 
 		valid = True
