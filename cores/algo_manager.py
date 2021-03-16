@@ -100,6 +100,17 @@ def hexcolor(level):
 
 # 	def 
 
+
+
+
+def flatten_symbol(symbol):
+    r = requests.post('http://localhost:8080/Flatten?symbol='+str(symbol))
+    if r.status_code == 200:
+        print('flatten Success!')
+        return True
+    else:
+        print("flatten Failure")
+
 def buy_market_order(symbol,share):
     r = requests.post('http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Buy ARCX Market DAY&shares='+str(share))
     if r.status_code == 200:
@@ -163,6 +174,8 @@ class algo_manager(pannel):
 
 		self.unrealized = {}
 		self.unrealized_data = {}
+		self.unrealized_pshr ={}
+		self.unrealized_pshr_data={}
 
 		self.order_book = {}
 
@@ -175,8 +188,8 @@ class algo_manager(pannel):
 
 		super().__init__(root)
 
-		self.width = [10,10,30,10,10,12,6,8,8,6]
-		self.labels = ["Symbol","Algo status","Type","Position","Holding","Risk","Realized","Unrealized","flatten"]
+		self.width = [10,10,30,8,8,8,8,8,8,8,6]
+		self.labels = ["Symbol","Algo status","description","Risk","Position","SzIn","AvgPx","UPshr","U","R","flatten"]
 
 		self.pipe = gt_pipe
 
@@ -211,14 +224,26 @@ class algo_manager(pannel):
 
 	#this pipe tracks the current price, P/L. order status.
 
+	def flatten_symbol(self,symbol):
+
+		flatten = threading.Thread(target=flatten_symbol,args=(symbol,), daemon=True)
+		flatten.start()
+		id_=self.active_order[symbol]
+		#self.current_share_data[id_]=0
+		self.deregister(symbol)
+
+		#convert U to R.
+		## HOW I DO THAT? !!
+
+		#self.update_display(id_)
+
 	def update_display(self,id_):
 
 		self.current_share[id_].set(str(self.current_share_data[id_])+"/"+str(self.target_share_data[id_]))
-
 		self.realized[id_].set(str(self.realized_data[id_]))
-
 		self.unrealized[id_].set(str(self.unrealized_data[id_]))
-
+		self.unrealized_pshr[id_].set(str(self.unrealized_pshr_data[id_]))
+		self.average_price[id_].set(str(self.average_price_data[id_]))
 
 	def order_pipe_listener(self):
 		while True:
@@ -236,17 +261,36 @@ class algo_manager(pannel):
 				symbol = data["symbol"]
 				price = data["price"]
 				shares = data["shares"]
+				side = data["side"]
 
 				id_ = self.active_order[symbol]
 
+				#if same side, add. if wrong side.take off.
+				#same side.
+
 				current = self.current_share_data[id_]
-				self.current_share_data[id_] = current+shares
+				print("symbol",symbol,"side:",side,"shares",shares,"price",price)
+				if (self.position[id_]=="Long" and side =="B") or (self.position[id_]=="Short" and (side =="S" or side=="T")):
 
-				if current ==0:
-					self.average_price_data[id_] = round(price,2)
+					self.current_share_data[id_] = current+shares
+
+					if current ==0:
+						self.average_price_data[id_] = round(price,2)
+					else:
+						self.average_price_data[id_] = round(((self.average_price_data[id_]*current)+(price*shares))/self.current_share_data[id_],2)
+
+				#Taking shares off. assume it's all gone. -- NO. NO
 				else:
-					self.average_price_data[id_] = round(((self.average_price_data[id_]*current)+(price*shares))/self.current_share_data[id_],2)
+					self.current_share_data[id_] = current-shares	
 
+					print("curren shares:",self.current_share_data[id_] )			
+
+					if self.position[id_]=="Long":
+						self.realized_data[id_] += (price-self.average_price_data[id_])*shares
+					elif self.position[id_]=="Short":
+						self.realized_data[id_] += (self.average_price_data[id_]-price)*shares
+
+					self.realized_data[id_]= round(self.realized_data[id_],2)
 				self.update_display(id_)
 
 
@@ -259,21 +303,27 @@ class algo_manager(pannel):
 				ask = data["ask"]
 
 				#get position
-				id_ = self.active_order[symbol]
 
-				if self.position[id_]=="Long":
-					price = bid
-					gain = round((price-self.average_price_data[id_])*self.current_share_data[id_],2)
+				if symbol in self.active_order:
 
-				elif  self.position[id_]=="Short":
-					price = ask
-					gain = round((self.average_price_data[id_]-price)*self.current_share_data[id_],2)
+					id_ = self.active_order[symbol]
 
-				#loss:
-				#print(gain)
-				self.unrealized_data[id_] = gain
-				
-				self.update_display(id_)
+					if self.position[id_]=="Long":
+						price = bid
+						gain = round((price-self.average_price_data[id_]),2)
+
+					elif self.position[id_]=="Short":
+						price = ask
+						gain = round(self.average_price_data[id_]-price,2)
+
+					#loss:
+					#print(gain)
+					self.unrealized_pshr_data[id_] = gain
+					self.unrealized_data[id_] = round(gain*self.current_share_data[id_],2)
+					
+					self.update_display(id_)
+
+			
 
 	def add_order(self,d):
 
@@ -312,12 +362,21 @@ class algo_manager(pannel):
 					self.unrealized[id_].set("0")
 					self.unrealized_data[id_] = 0
 
+					self.unrealized_pshr[id_] = tk.StringVar()
+					self.unrealized_pshr[id_].set("0")
+					self.unrealized_pshr_data[id_] = 0
+
+					self.average_price[id_] = tk.StringVar()
+					self.average_price[id_].set("N/A")
+
 					self.average_price_data[id_] = 0
 
 					self.order_book[id_] = [order_type,pos,order_price,share,symbol]
 
 					#avoid repetitive order. 
-					l = [symbol,self.algo_status[id_],des,pos,self.current_share[id_],risk,self.realized[id_],self.unrealized[id_]]
+					#self.labels = ["Symbol","Algo status","description","Risk","Position","SzIn","AvgPx","R","UPshr","U","flatten"]
+
+					l = [symbol,self.algo_status[id_],des,risk,pos,self.current_share[id_],self.average_price[id_],self.unrealized[id_],self.unrealized_pshr[id_],self.realized[id_]]
 					#1,4,7
 					self.add_new_labels(l)
 				else:
@@ -328,7 +387,7 @@ class algo_manager(pannel):
 				print(id_,"confirmed and is a go")
 
 				if id_ not in self.order_book:
-					print("Cannot find order",order)
+					print("Cannot find order",id_)
 				else:
 					order = self.order_book[id_] 
 
@@ -337,6 +396,9 @@ class algo_manager(pannel):
 					order_price = order[2]
 					share = order[3]
 					symbol = order[4]
+
+					self.active_order[symbol] = id_
+					self.position[id_] = pos
 
 					if type_ == "Market":
 
@@ -361,9 +423,7 @@ class algo_manager(pannel):
 					self.register(symbol)
 
 
-					self.active_order[symbol] = id_
-					self.average_price[id_] = 0
-					self.position[id_] = pos
+
 						
 	#info= 
 	#symbol,status,type,position,curretn,shares,risk,p/l
@@ -376,7 +436,7 @@ class algo_manager(pannel):
 		#add in tickers.
 		print("LENGTH",len(info))
 		for j in range(len(info)):
-			if j == 1 or j ==4 or j ==7 or j==8:
+			if j == 1 or j ==5 or j ==6 or j==7  or j==8 or j==9:
 				self.tickers_labels[i].append(tk.Label(self.deployment_frame ,textvariable=info[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
@@ -388,7 +448,7 @@ class algo_manager(pannel):
 			#else: #command = lambda s=symbol: self.delete_symbol_reg_list(s))
 
 		j+=1
-		self.tickers_labels[i].append(tk.Button(self.deployment_frame ,text="flatten",width=self.width[j]))
+		self.tickers_labels[i].append(tk.Button(self.deployment_frame ,text="flatten",width=self.width[j],command= lambda k=i:self.flatten_symbol(k)))
 		self.label_default_configure(self.tickers_labels[i][j])
 		self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 
@@ -486,7 +546,7 @@ if __name__ == '__main__':
 	#try:
 	multiprocessing.freeze_support()
 
-	port =4682
+	port =4605
 
 	goodtrade_pipe, receive_pipe = multiprocessing.Pipe()
 
