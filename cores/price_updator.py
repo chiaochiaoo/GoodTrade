@@ -23,7 +23,11 @@ def find_between(data, first, last):
 	except ValueError:
 		return data
 
-class price_updator:
+
+### Take L1 quote,
+### Track order status 
+
+class order_listener:
 
 	def __init__(self,pipe=None):
 
@@ -46,8 +50,6 @@ class price_updator:
 		if symbol in self.symbols:
 			self.symbols.remove(symbol)
 			self.register_to_ppro(symbol, False)
-
-
 
 
 	def register_to_ppro(self,symbol,status):

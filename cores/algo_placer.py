@@ -99,6 +99,7 @@ class entry:
 
 
 	def get_all_infos(self):
+		print(self.entry_type.get(),self.order_type.get(),self.entry_price.get(),self.shares.get())
 		return self.entry_type.get(),self.order_type.get(),self.entry_price.get(),self.shares.get()
 
 	def capital_to_shares(self,capital,shares,price):
@@ -390,7 +391,7 @@ class algo_placer:
 			info.insert(0,id_)
 
 			info.insert(0,"New order")
-			#print(info)
+			print(info)
 			self.commlink.send(info)
 
 		#id, symbol, type, status, description, position, shares, risk$
@@ -404,7 +405,7 @@ class algo_placer:
 		#symbol, descrptipn,position,shares,risk. 
 
 		entry_type,order_type,entry_price,shares = self.entry.get_all_infos()
-		info = [self.symbol,self.type,"Pending",self.description,self.position,entry_type,entry_price,shares,self.stop.get_totalrisk()]
+		info = [self.symbol,self.type,"Pending",self.description,self.position,order_type,entry_price,shares,self.stop.get_totalrisk()]
 
 		#if any of them is not set. or 0. false. 
 		valid = True
@@ -521,5 +522,7 @@ if __name__ == '__main__':
 	#algo_placer(symbol,description,entry,stop,position,None,risk)
 	#algo_placer("AAPL.NQ","Breakout on Resistance on 134.45 for 60 secs",134.45,133.45,"Long",None,10.0)
 
-	algo_placer(None,'QQQ.NQ', 'Breakout on Resistance on 338.85 for 0 sec', 338.85, 336.45, 'Long', None, 5050.0)
+#	def __init__(self,commlink,type_,symbol,description,entry_price=None,stop_price=None,position=None,capital=None,total_risk=None):
+
+	algo_placer(None,'QQQ.NQ',"Break up", 'Breakout on Resistance on 338.85 for 0 sec', 338.85, 336.45, 'Long', None, 5050.0)
 	root.mainloop()

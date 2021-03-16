@@ -62,7 +62,7 @@ class algo_process_manager_client:
 
 			if message_type =="New order":
 				id_, symbol, type_, status, description, position ,order_type,order_price,shares, risk = info[1],info[2],info[3],info[4],info[5],info[6],info[7],info[8],info[9],info[10]
-				print("Algo manager :",id_, symbol, type_, status, description, position ,order_type,order_price,shares, risk)
+				print("Algo manager :",id_, symbol, type_, status, description, position ,order_type,order_price,shares, risk )
 
 				self.process_pipe.send(info)
 
