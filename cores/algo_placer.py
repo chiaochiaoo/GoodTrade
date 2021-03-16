@@ -262,7 +262,7 @@ class stop:
 
 		if self.entry != None:
 
-			entry_type,entry,shares = self.entry.get_all_infos()
+			entry_type,order_type,entry,shares = self.entry.get_all_infos()
 
 			if (self.sync_lock==False) and entry!="":
 
