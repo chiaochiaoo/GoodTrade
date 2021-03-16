@@ -443,7 +443,11 @@ def process_and_send(lst,pipe):
 	else:
 		d["oh"] = round(d["high"] - open_,3)
 		d["ol"] = round(open_ - d["low"],3)
-		d["open_percentage"] =  round(((price-open_)*100/open_),2)
+		if open_!=0:
+			d["open_percentage"] =  round(((price-open_)*100/open_),2)
+		else:
+			d["open_percentage"] = 0
+
 
 
 	d["prev_close_gap"] = round(price-prev_close,3)
