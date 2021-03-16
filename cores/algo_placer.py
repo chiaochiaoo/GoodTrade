@@ -99,7 +99,7 @@ class entry:
 
 
 	def get_all_infos(self):
-		return self.entry_type.get(),self.entry_price.get(),self.shares.get()
+		return self.entry_type.get(),self.order_type.get(),self.entry_price.get(),self.shares.get()
 
 	def capital_to_shares(self,capital,shares,price):
 
@@ -403,7 +403,7 @@ class algo_placer:
 
 		#symbol, descrptipn,position,shares,risk. 
 
-		entry_type,entry_price,shares = self.entry.get_all_infos()
+		entry_type,order_type,entry_price,shares = self.entry.get_all_infos()
 		info = [self.symbol,self.type,"Pending",self.description,self.position,entry_type,entry_price,shares,self.stop.get_totalrisk()]
 
 		#if any of them is not set. or 0. false. 
