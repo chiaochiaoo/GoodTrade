@@ -265,10 +265,10 @@ class alert(pannel):
 
 		#'Break Up','Break Down','Any'
 		description_break_up = "Break Resistance on "+str(resistence)+" for "+timer_trade+" sec"
-		info_up = [symbol,description_break_up,resistence,support,"Long",risk]
+		info_up = [symbol,"Breakup",description_break_up,resistence,support,"Long",risk]
 
 		description_break_down = "Break Support on "+str(support)+" for "+timer_trade+" sec"
-		info_down = [symbol,description_break_down,support,resistence,"Short",risk]
+		info_down = [symbol,"Breakdown",description_break_down,support,resistence,"Short",risk]
 		if type_trade =='Break Up':
 
 			self.place_trade(info_up)
@@ -289,11 +289,11 @@ class alert(pannel):
 	def place_trade(self,info):
 		#print("placing:",info)
 
-		symbol,description,entry,stop,position,risk = info[0],info[1],info[2],info[3],info[4],info[5]
+		symbol,type_,description,entry,stop,position,risk = info[0],info[1],info[2],info[3],info[4],info[5],info[6]
 
 		#	def __init__(commlink,symbol,description,entry_price=None,stop_price=None,position=None,capital=None,total_risk=None):
 
-		algo_placer(self.algo_commlink,symbol,description,entry,stop,position,None,risk)
+		algo_placer(self.algo_commlink,type_,symbol,description,entry,stop,position,None,risk)
 
 
 	def delete_symbol(self,symbol):
@@ -372,6 +372,17 @@ class alert(pannel):
 							self.set_latest_alert(symbol, alert_str, time)
 
 
+							if self.data.algo_breakout_down[symbol].get()!="" and self.data.algo_breakout_status[symbol].get()=="Pending":
+
+								timer = int(self.data.algo_breakout_timer[symbol].get())
+								if timer ==0:
+									#send id.
+									order_id = self.data.algo_breakout_down[symbol].get()
+
+									self.data.algo_breakout_status[symbol].set("Confirmed")
+
+									print(order_id,"confirmed")
+									self.confirm_trade(order_id)
 
 						elif cur_price>resistance and cur_price>support and self.alerts[symbol][alert_type]!=1 :
 
@@ -393,7 +404,18 @@ class alert(pannel):
 							self.alert_pannel.add_alerts([symbol,time,alert_str])
 							self.set_latest_alert(symbol, alert_str, time)
 
+							#send out confirm.
 
+							if self.data.algo_breakout_up[symbol].get()!="" and self.data.algo_breakout_status[symbol].get()=="Pending":
+
+								timer = int(self.data.algo_breakout_timer[symbol].get())
+								if timer ==0:
+									#send id.
+									order_id = self.data.algo_breakout_up[symbol].get()
+									self.data.algo_breakout_status[symbol].set("Confirmed")
+
+									print(order_id,"confirmed")
+									self.confirm_trade(order_id)
 
 						elif cur_price<resistance and cur_price>support and self.alerts[symbol][alert_type]!=0 :
 
@@ -417,6 +439,22 @@ class alert(pannel):
 								else:
 									alert_str = "Support "+alert_type +" :"+str(been//60)+" min ago"
 								eval_string.set(alert_str)
+
+
+								if self.data.algo_breakout_down[symbol].get()!="" and self.data.algo_breakout_status[symbol].get()=="Pending":
+
+									timer = int(self.data.algo_breakout_timer[symbol].get())
+									if been>=timer :
+										#send id.
+										order_id = self.data.algo_breakout_down[symbol].get()
+
+										self.data.algo_breakout_status[symbol].set("Confirmed")
+
+										print(order_id,"confirmed")
+
+										self.confirm_trade(order_id)
+
+
 							if self.alerts[symbol][alert_type]==1:
 
 								if been<60:
@@ -425,6 +463,19 @@ class alert(pannel):
 									alert_str = "Resistance "+alert_type +" :"+str(been//60)+" min ago"	
 
 								eval_string.set(alert_str)
+
+
+								if self.data.algo_breakout_up[symbol].get()!="" and self.data.algo_breakout_status[symbol].get()=="Pending":
+
+									timer = int(self.data.algo_breakout_timer[symbol].get())
+									if been>=timer :
+										#send id.
+										order_id = self.data.algo_breakout_up[symbol].get()
+										self.data.algo_breakout_status[symbol].set("Confirmed")
+
+										print(order_id,"confirmed")
+
+										self.confirm_trade(order_id)
 
 							if self.alerts[symbol][alert_type]!=0:
 								if been>60 and been<180:
@@ -443,8 +494,6 @@ class alert(pannel):
 									eval_label["background"]="#FF5B5B"
 								if been>600:
 									eval_label["background"]="red"
-
-
 
 				else:
 
@@ -501,6 +550,10 @@ class alert(pannel):
 		except Exception as e:
 			print("Alert Error:",e)
 
+
+	def confirm_trade(self,order_id):
+
+		self.algo_commlink.send(["Confirmed",order_id])
 
 class alert_map(pannel):
 	def __init__(self,frame,data):
@@ -1057,8 +1110,8 @@ class breakout(alert):
 
 		time = self.data.symbol_update_time[symbol]
 
-		algo_data = self.data.algo_breakout[symbol]
-		algo_status,trigger_timer,trigger_type = algo_data[0],algo_data[1],algo_data[2]
+		algo_data = self.data.algo_breakout_type[symbol]
+		algo_status,trigger_timer,trigger_type = self.data.algo_breakout_status[symbol],self.data.algo_breakout_timer[symbol],self.data.algo_breakout_type[symbol]
 
 		data_ready = self.data.data_ready[symbol]
 

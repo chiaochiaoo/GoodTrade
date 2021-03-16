@@ -159,6 +159,12 @@ class Symbol_data_manager:
 
 		self.algo_breakout = {}
 
+
+		self.algo_breakout_status = {}
+		self.algo_breakout_up = {}
+		self.algo_breakout_down = {}
+		self.algo_breakout_timer = {}
+		self.algo_breakout_type = {}
 		#####
 
 		self.symbol_position_status = {}
@@ -407,23 +413,46 @@ class Symbol_data_manager:
 
 
 		#algo status,Trigger timer, Trigger type,###
-		self.algo_breakout[i] = []
+		# self.algo_breakout[i] = []
 
-		#Algo status
-		self.algo_breakout[i].append(StringVar())
-		self.algo_breakout[i][0].set("Pending")
-		#Timer
-		self.algo_breakout[i].append(StringVar())
-		self.algo_breakout[i][1].set(0)
-		#Type. 
-		self.algo_breakout[i].append(StringVar())
+		# #Algo status
+		# self.algo_breakout[i].append(StringVar())
+		# self.algo_breakout[i][0].set("None")
+
+		# #Timer
+		# self.algo_breakout[i].append(StringVar())
+		# self.algo_breakout[i][1].set(0)
+
+		# #Type. 
+		# self.algo_breakout[i].append(StringVar())
+
+		#order number
+
+		# self.algo_breakout_status = {}
+		# self.algo_breakout_up = {}
+		# self.algo_breakout_down = {}
+
+
+		self.algo_breakout_status[i] = StringVar()
+		self.algo_breakout_status[i].set("None")
+
+		self.algo_breakout_timer[i] = StringVar()
+		self.algo_breakout_timer[i].set(0)
+
+		self.algo_breakout_type[i] = StringVar()
+
+		#the ids. 
+		self.algo_breakout_up[i] = StringVar()
+		self.algo_breakout_up[i].set("")
+		self.algo_breakout_down[i] = StringVar()
+		self.algo_breakout_down[i].set("")
 
 	def change_status(self,symbol,status):
 		self.symbol_status[symbol].set(status)
 
+
 	def change_status_color(self,symbol,color):
 		self.symbol_status_color[symbol].set(color)
-
 
 	#seems i need dua channel? probably not! just stick with it then. 
 

@@ -16,12 +16,12 @@ from modules.scanner import *
 from modules.scanner_process_manager import *
 from modules.database_process_manager import *
 from modules.ppro_process_manager import *
-#from cores.algo_manager_comms import *
-
+from cores.algo_manager_comms import *
+from cores.algo_process_manager_client import *
 
 class viewer:
 
-	def __init__(self,root,scanner_process,database_process,ppro_process,algo_comm,authen_comm):
+	def __init__(self,root,scanner_process,database_process,ppro_process,algo_comm,authen_comm,algo_manager):
 
 		self.data = Symbol_data_manager()
 
@@ -33,6 +33,10 @@ class viewer:
 
 		self.data.set_database_manager(self.db)
 		self.data.set_ppro_manager(self.ppro)
+
+
+		self.algo_manager = algo_manager
+		self.algo_manager.set_symbols_manager(self.data)
 
 		self.listening = ttk.LabelFrame(root,text="Listener") 
 		self.listening.place(x=600,rely=0.05,relheight=1,width=1300)
@@ -78,7 +82,7 @@ class viewer:
 
 		self.pv = prevclose(self.tab10,self.data,self.all_alerts)
 
-		self.br = breakout(self.tab9,self.data,self.all_alerts)#algo_comm #,algo_comm
+		self.br = breakout(self.tab9,self.data,self.all_alerts,algo_comm)#algo_comm #,algo_comm
 		self.am = alert_map(self.tab11,self.data)
 		#alerts  =[self.open_high_pannel]
 		alerts = [self.high_low_pannel,self.open_high_pannel,self.open_low_pannel,self.first_5,self.er,self.ev,self.br,self.pv,self.am]
@@ -365,11 +369,7 @@ if __name__ == '__main__':
 	### scanner pannel needs the manager. 
 
 
-	### algo comms 
-	server_side_comm, client_side_comm = multiprocessing.Pipe()
-	# algo_comm_link = multiprocessing.Process(target=algo_manager_commlink, args=(client_side_comm,),daemon=True)
-	# algo_comm_link.daemon=True
-	# algo_comm_link.start()
+
 
 	authen_comm, authen_clientside_comm = multiprocessing.Pipe()
 	auth = multiprocessing.Process(target=authentication, args=(authen_comm,),daemon=True)
@@ -377,6 +377,16 @@ if __name__ == '__main__':
 	auth.start()
 
 
+	### algo comms 
+	algo_manager_comm, algo_manager_thread_comm = multiprocessing.Pipe()
+
+	algo_manager_receive_comm, algo_manager_process_comm = multiprocessing.Pipe()
+	
+	algo_comm_link = multiprocessing.Process(target=algo_manager_commlink, args=(algo_manager_receive_comm,),daemon=True)
+	algo_comm_link.daemon=True
+	algo_comm_link.start()
+
+	algo_manager = algo_process_manager_client(algo_manager_thread_comm,algo_manager_process_comm)
 	
 	root = tk.Tk() 
 	root.title("GoodTrade") 
@@ -386,7 +396,7 @@ if __name__ == '__main__':
 
 	root.protocol("WM_DELETE_WINDOW", on_closing)
 
-	view = viewer(root,s,d,ppro,server_side_comm,authen_clientside_comm)
+	view = viewer(root,s,d,ppro,algo_manager_comm,authen_clientside_comm,algo_manager)
 	root.mainloop()
 
 	print("Main process terminated")
