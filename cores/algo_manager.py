@@ -17,6 +17,7 @@ import os
 
 from algo_ppro_manager import *
 
+
 def algo_manager_voxcom(pipe):
 
 	#tries to establish commuc
@@ -72,124 +73,71 @@ def algo_manager_voxcom(pipe):
 			print(e)
 		#restarted the whole thing 
 
-
-def hex_to_string(int):
-	a = hex(int)[-2:]
-	a = a.replace("x","0")
-
-	return a
-
-def hexcolor(level):
-	try:
-		code = int(510*(level))
-		if code >255:
-			first_part = code-255
-			return "#FF"+hex_to_string(255-first_part)+"00"
-		else:
-			return "#FF"+"FF"+hex_to_string(255-code)
-	except:
-		return "#FFFFFF"
-
-
-
-# class order_manager():
-
-# 	def __init__(self):
-		
-# 		self.orders = {}
-
-# 	def 
-
-
-
-
-def flatten_symbol(symbol):
-    r = requests.post('http://localhost:8080/Flatten?symbol='+str(symbol))
-    if r.status_code == 200:
-        print('flatten Success!')
-        return True
-    else:
-        print("flatten Failure")
-
-def buy_market_order(symbol,share):
-    r = requests.post('http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Buy ARCX Market DAY&shares='+str(share))
-    if r.status_code == 200:
-        print('buy market order Success!')
-        return True
-    else:
-        print("Error sending buy order")
-
-def sell_market_order(symbol,share):
-    r = requests.post('http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(share))
-    if r.status_code == 200:
-        print('sell market order Success!')
-        #print(r.text)
-        return True
-    else:
-        print("Error sending sell order")
-
-def buy_limit_order(symbol, price,share):
-    price = round(price,2)
-    r = requests.post('http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Buy ARCX Limit DAY&shares='+str(share))
-    if r.status_code == 200:
-        print('buy limit order Success! at',price)
-
-        return True
-    else:
-        print("Error sending buy order")
-
-
-def sell_limit_order(symbol, price,share):
-    price = round(price,2)
-    r = requests.post('http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Sell->Short ARCX Limit DAY&shares='+str(share))
-    if r.status_code == 200:
-        print('sell limit order Success! at ',price)
-        return True
-    else:
-        print("Error sending sell order")
-
-
-
-
 class algo_manager(pannel):
 
 
 
 	def __init__(self,root,port,gt_pipe,order_pipe):
 
-		self.symbols = []
 
 		self.port = port
+		self.symbols = []
+		self.orders_registry = []
 
-		self.orders = []
-		
-		self.algo_status = {}
-		
-		self.current_share = {}
-		self.current_share_data = {}
-		self.target_share_data = {}
 
-		self.realized = {}
-		self.realized_data ={}
+		# SYMBOL ATTRIBUTE. Getting symbol -> ID 
 
-		self.unrealized = {}
-		self.unrealized_data = {}
-		self.unrealized_pshr ={}
-		self.unrealized_pshr_data={}
-
-		self.order_book = {}
-
-		self.average_price = {}
-		self.average_price_data = {}
-
-		self.risk_data = {}
-
-		self.position = {}
-		#input symbol, get id (active.)
 		self.active_order = {}
 
+		# ORDER ATTRIBUTE. Init upon receiving. 
+
+		
+		# Tk Strings. 
+
+		# Actual data. 
+
+		#		l = [(symbol,id_),self.algo_status[id_],des,risk,pos,self.current_share[id_],self.average_price[id_],self.unrealized[id_],self.unrealized_pshr[id_],self.realized[id_]]
+		
+
+		#self.algo_status = {} #Pending, Running,Cancled,Complete.
+		#self.order_status = {}
+
+		self.tk_strings=["algo_status","realized","shares","unrealized","unrealized_pshr","average_price"]
+		self.tk_labels=["symbol","algo_status","description","risk","position","shares","average_price","Upshr","U","R"]
+
+		self.order_tkstring = {}
+		self.order_tklabels = {}
+
+
+		self.realized = {}
+		self.current_share = {}
+		self.target_share = {}
+		self.unrealized = {}
+		self.unrealized_pshr ={}
+		self.average_price = {}
+		self.risk = {}
+		self.position = {}
+
+		self.holdings= {}
+
+		self.order_info = {}
+
+
+		# self.current_share_data = {}
+		# self.target_share_data = {}
+		# self.realized_data ={}
+		# self.unrealized_data = {}
+		# self.unrealized_pshr_data={}
+		# self.average_price_data = {}
+		# self.risk_data = {}
+
+		
+
+		#input symbol, get id (active.)
+
+
 		###if a symbol is running, or already flattened.
-		self.flatten = {}
+		
 
 		super().__init__(root)
 
@@ -229,122 +177,37 @@ class algo_manager(pannel):
 
 	#this pipe tracks the current price, P/L. order status.
 
-	def flatten_symbol(self,symbol):
+	def flatten_symbol(self,symbol,id_=None,status_text=None):
 
-		self.active_order.remove(symbol)
-		flatten = threading.Thread(target=flatten_symbol,args=(symbol,), daemon=True)
-		flatten.start()
-		id_=self.active_order[symbol]
-		#self.current_share_data[id_]=0
-		self.deregister(symbol)
+		#check if this order is running.
+		running = self.check_order_running(id_,symbol)
+		if running:
+			flatten = threading.Thread(target=flatten_symbol,args=(symbol,), daemon=True)
+			flatten.start()
+			#self.current_share_data[id_]=0
 
-
-
-		#convert U to R.
-		## HOW I DO THAT? !!
-
-		#self.update_display(id_)
-
-	def update_display(self,id_):
-
-		self.current_share[id_].set(str(self.current_share_data[id_])+"/"+str(self.target_share_data[id_]))
-		self.realized[id_].set(str(self.realized_data[id_]))
-		self.unrealized[id_].set(str(self.unrealized_data[id_]))
-		self.unrealized_pshr[id_].set(str(self.unrealized_pshr_data[id_]))
-		self.average_price[id_].set(str(self.average_price_data[id_]))
-
-	def order_pipe_listener(self):
-		while True:
-			d = self.order_pipe.recv()
+			dereg = threading.Thread(target=self.deregister,args=(symbol,), daemon=True)
+			dereg.start()
 
 
-			if d[0] =="msg":
+		if id_!= None and status_text!= None:
+			if id_ in self.orders_registry:
+				self.orders_registry.remove(id_)
 
-				print(d[1])
-
-			if d[0] =="order confirm":
-				#get symbol,price, shares.
-				# maybe filled. maybe partial filled.
-				data = d[1]
-				symbol = data["symbol"]
-				price = data["price"]
-				shares = data["shares"]
-				side = data["side"]
-
-				id_ = self.active_order[symbol]
-
-				#if same side, add. if wrong side.take off.
-				#same side.
-
-				current = self.current_share_data[id_]
-				print("symbol",symbol,"side:",side,"shares",shares,"price",price)
-				if (self.position[id_]=="Long" and side =="B") or (self.position[id_]=="Short" and (side =="S" or side=="T")):
-
-					self.current_share_data[id_] = current+shares
-
-					if current ==0:
-						self.average_price_data[id_] = round(price,2)
-					else:
-						self.average_price_data[id_] = round(((self.average_price_data[id_]*current)+(price*shares))/self.current_share_data[id_],2)
-
-				#Taking shares off. assume it's all gone. -- NO. NO
+				current_status = status_text.get()
+				if current_status=="Running":
+					status_text.set("Done")
+				elif current_status=="Pending":
+					status_text.set("Canceled")
 				else:
-					self.current_share_data[id_] = current-shares	
-
-					print("curren shares:",self.current_share_data[id_] )			
-
-					if self.position[id_]=="Long":
-						self.realized_data[id_] += (price-self.average_price_data[id_])*shares
-					elif self.position[id_]=="Short":
-						self.realized_data[id_] += (self.average_price_data[id_]-price)*shares
-
-					self.realized_data[id_]= round(self.realized_data[id_],2)
-				self.update_display(id_)
+					status_text.set("Done.")
 
 
-			if d[0] =="order update":
 
-				#update the quote, unrealized. 
-				data = d[1]
-				symbol = data["symbol"]
-				bid = data["bid"]
-				ask = data["ask"]
-
-				#get position
-
-				if symbol in self.active_order:
-
-					id_ = self.active_order[symbol]
-
-					if self.position[id_]=="Long":
-						price = bid
-						gain = round((price-self.average_price_data[id_]),2)
-
-					elif self.position[id_]=="Short":
-						price = ask
-						gain = round(self.average_price_data[id_]-price,2)
-
-					#loss:
-					#print(gain)
-					self.unrealized_pshr_data[id_] = gain
-					self.unrealized_data[id_] = round(gain*self.current_share_data[id_],2)
-
-
-					#if ...loss is enough. flatten.
-
-					if self.unrealized_data[id_] <= self.risk_data[id_]:
-						self.flatten_symbol(symbol)
-					
-					self.update_display(id_)
-
-			
-
-	def add_order(self,d):
+	def goodtrade_listener(self,d):
 
 		#['id', 'QQQ.NQ', 'Breakout on Support on 0.0 for 0 sec', 'Short', 20, 20.0]
 		#handle database. and add labels. 
-
-
 		#id, symbol, type, status, description, position, shares, risk$
 
 		if d!=None:
@@ -353,124 +216,309 @@ class algo_manager(pannel):
 
 			if message_type =="New order": 
 
-				#['New order', 'Break up2268503', 'Break up', 'QQQ.NQ', 'Pending', 'Breakout on Resistance on 338.85 for 0 sec', 'Long', 'Market', '338.85', '2104', 5050.0]
-				id_,symbol,type_,status,des,pos,order_type,order_price,share,risk = d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10]
-
-				print(id_,"added to new order")
-				if id_ not in self.orders:
-					self.orders.append(id_)
-					self.algo_status[id_] = tk.StringVar()
-					self.algo_status[id_].set(status)
-
-					self.current_share[id_] = tk.StringVar()
-					self.current_share[id_].set("0/"+str(share))
-
-					self.current_share_data[id_] = 0
-					self.target_share_data[id_] = share
-
-					self.realized[id_] = tk.StringVar()
-					self.realized[id_].set("0")
-					self.realized_data[id_] = 0
-
-					self.unrealized[id_] = tk.StringVar()
-					self.unrealized[id_].set("0")
-					self.unrealized_data[id_] = 0
-
-					self.unrealized_pshr[id_] = tk.StringVar()
-					self.unrealized_pshr[id_].set("0")
-					self.unrealized_pshr_data[id_] = 0
-
-					self.average_price[id_] = tk.StringVar()
-					self.average_price[id_].set("N/A")
-
-					self.average_price_data[id_] = 0
-
-					self.risk_data[id_] = -risk
-
-					self.order_book[id_] = [order_type,pos,order_price,share,symbol]
-
-					#avoid repetitive order. 
-					#self.labels = ["Symbol","Algo status","description","Risk","Position","SzIn","AvgPx","R","UPshr","U","flatten"]
-
-					l = [symbol,self.algo_status[id_],des,risk,pos,self.current_share[id_],self.average_price[id_],self.unrealized[id_],self.unrealized_pshr[id_],self.realized[id_]]
-					#1,4,7
-					self.add_new_labels(l)
-				else:
-					print("adding order failed")
+				self.order_creation(d)
 
 			elif message_type =="Confirmed":
-				id_ = d[1]
-				print(id_,"confirmed and is a go")
 
-				if id_ not in self.order_book:
-					print("Cannot find order",id_)
+				self.order_confirmation(d)
+
+		else:
+			print("Missing package.")
+
+	def order_creation(self,d):
+
+		#['New order', 'Break up2268503', 'Break up', 'QQQ.NQ', 'Pending', 'Breakout on Resistance on 338.85 for 0 sec', 'Long', 'Market', '338.85', '2104', 5050.0]
+		id_,symbol,type_,status,des,pos,order_type,order_price,share,risk = d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10]
+
+		print(id_,"added to new order")
+		if id_ not in self.orders_registry:
+
+			self.orders_registry.append(id_)
+
+			#create the tkstring.
+
+			self.order_tkstring[id_] = {}
+
+			self.order_tkstring[id_]["algo_status"] = tk.StringVar()
+			self.order_tkstring[id_]["algo_status"].set(status)
+
+			self.order_tkstring[id_]["current_share"] = tk.StringVar()
+			self.order_tkstring[id_]["current_share"].set("0/"+str(share))
+
+			self.order_tkstring[id_]["realized"] = tk.StringVar()
+			self.order_tkstring[id_]["realized"].set("0")
+
+			self.order_tkstring[id_]["unrealized"] = tk.StringVar()
+			self.order_tkstring[id_]["unrealized"].set("0")
+
+			self.order_tkstring[id_]["unrealized_pshr"] = tk.StringVar()
+			self.order_tkstring[id_]["unrealized_pshr"].set("0")
+
+			self.order_tkstring[id_]["average_price"] = tk.StringVar()
+			self.order_tkstring[id_]["average_price"].set("N/A")
+
+			#Initilize the data values. 
+
+			self.realized[id_] = 0
+			self.current_share[id_] = 0
+			self.target_share[id_] = share
+			self.unrealized[id_] = 0
+			self.unrealized_pshr[id_] = 0
+			self.average_price[id_] = 0
+			self.risk[id_] = -risk
+			self.position[id_] = pos
+
+			self.order_info[id_] = [order_type,pos,order_price,share,symbol]
+
+			#turns the order. 
+
+			l = [(symbol,id_),\
+			self.order_tkstring[id_]["algo_status"],\
+			des,\
+			risk,\
+			pos,\
+			self.order_tkstring[id_]["current_share"],\
+			self.order_tkstring[id_]["average_price"],\
+			self.order_tkstring[id_]["unrealized"],\
+			self.order_tkstring[id_]["unrealized_pshr"],\
+			self.order_tkstring[id_]["realized"]]
+
+
+			self.order_ui_creation(l)
+		else:
+			print("adding order failed")
+
+	def order_ui_creation(self,info):
+		i = info[0][0]
+		id_ = info[0][1]
+		status = info[1]
+		l = self.label_count
+
+		#self.tickers_labels[i]=[]
+		self.tickers_tracers[i] = []
+		self.order_tklabels[id_] = {}
+
+		#add in tickers.
+		print("LENGTH",len(info))
+		for j in range(len(info)):
+			#if j == 1 or j ==5 or j ==6 or j==7  or j==8 or j==9:
+			label_name = self.tk_labels[j]
+
+			if j == 0:
+				self.order_tklabels[id_][label_name] =tk.Label(self.deployment_frame ,text=info[j][0],width=self.width[j])		
+			else:
+				if str(type(info[j]))=="<class 'tkinter.StringVar'>":
+					self.order_tklabels[id_][label_name]=tk.Label(self.deployment_frame ,textvariable=info[j],width=self.width[j])
 				else:
-					order = self.order_book[id_] 
+					self.order_tklabels[id_][label_name]=tk.Label(self.deployment_frame ,text=info[j],width=self.width[j])
 
-					type_ = order[0]
-					pos = order[1]
-					order_price = order[2]
-					share = order[3]
-					symbol = order[4]
+			self.label_default_configure(self.order_tklabels[id_][label_name])
+			self.order_tklabels[id_][label_name].grid(row= l+2, column=j,padx=0)
 
-					self.active_order[symbol] = id_
-					self.position[id_] = pos
-					self.flatten[id_] = False
+			#else: #command = lambda s=symbol: self.delete_symbol_reg_list(s))
 
-					if type_ == "Market":
+		j+=1
+		flatten=tk.Button(self.deployment_frame ,text="flatten",width=self.width[j],command= lambda k=i:self.flatten_symbol(k,id_,status))
+		self.label_default_configure(flatten)
+		flatten.grid(row= l+2, column=j,padx=0)
 
-						if pos=="Long":
-							buy_market_order(symbol,share)
-							
-							self.active_order[symbol] = id_
-						elif pos =="Short":
-							sell_market_order(symbol,share)
+		self.label_count +=1
 
-						self.algo_status[id_].set("Running")
-							
-					elif type_ =="Limit":
-						if pos=="Long":
-							buy_limit_order(symbol,order_price,share)
-							
-						elif pos =="Short":
-							sell_market_order(symbol,order_price,share)
+	def check_running_order(self,id_,symbol):
 
-						self.algo_status[id_].set("Placed")
+		if symbol in self.active_order:
 
-					self.register(symbol)
+			#ust be ""
+			if self.active_order[symbol] =="":
+				return False
+			else:
+				return True
 
+		else:
+			return False
+
+	#return true if current order is running.
+	def check_order_running(self,id_,symbol):
+
+		if symbol in self.active_order:
+			return self.active_order[symbol] ==id_
+		else:
+			return False
+
+
+	def order_confirmation(self,d):
+		id_ = d[1]
+		print(id_,"confirmed and is a go")
+
+		#wrong place to look at.
+		if id_ not in self.orders_registry:
+			print("Cannot find order",id_)
+		else:
+			order = self.order_info[id_] 
+
+			type_ = order[0]
+			pos = order[1]
+			order_price = order[2]
+			share = order[3]
+			symbol = order[4]
+
+
+			self.holdings[id_] = []
+			#initilize a trade on a symbol. 
+
+			#check : if a position already on a symbol. cancle on the trade. 
+
+			if not self.check_running_order(id_,symbol):
+
+				self.active_order[symbol] = id_
+
+				if type_ == "Market":
+
+					if pos=="Long":
+						buy_market_order(symbol,share)
+						
+						self.active_order[symbol] = id_
+					elif pos =="Short":
+						sell_market_order(symbol,share)
+
+					self.order_tkstring[id_]["algo_status"].set("Running")
+
+					self.order_tklabels[id_]["algo_status"]["background"] = "#97FEA8" #set the label to be, green.
+						
+				elif type_ =="Limit":
+					if pos=="Long":
+						buy_limit_order(symbol,order_price,share)
+						
+					elif pos =="Short":
+						sell_market_order(symbol,order_price,share)
+
+					self.order_tkstring[id_].set("Placed")
+
+					self.order_tklabels[id_]["algo_status"]["background"] = "yellow" #set the label to be yellow
+				self.register(symbol)
+
+	def order_pipe_listener(self):
+		while True:
+			d = self.order_pipe.recv()
+
+
+			if d[0] =="msg":
+				print(d[1])
+
+			if d[0] =="order confirm":
+				#get symbol,price, shares.
+				# maybe filled. maybe partial filled.
+				self.ppro_order_confirmation(d[1])
+
+			if d[0] =="order update":
+
+				#update the quote, unrealized. 
+				self.ppro_order_update(d[1])
+			
+
+	def ppro_order_confirmation(self,data):
+
+		symbol = data["symbol"]
+		price = data["price"]
+		shares = data["shares"]
+		side = data["side"]
+
+		id_ = self.active_order[symbol]
+
+		#if same side, add. if wrong side.take off.
+		#same side.
+
+		current = self.current_share[id_]
+
+		print("symbol",symbol,"side:",side,"shares",shares,"price",price)
+		if (self.position[id_]=="Long" and side =="B") or (self.position[id_]=="Short" and (side =="S" or side=="T")):
+
+			self.current_share[id_] = current+shares
+
+			if current ==0:
+				self.average_price[id_] = round(price,2)
+			else:
+				self.average_price[id_] = round(((self.average_price[id_]*current)+(price*shares))/self.current_share[id_],2)
+
+			for i in range(shares):
+				self.holdings[id_].append(price)
+
+		#Taking shares off. assume it's all gone. -- NO. NO
+		else:
+			self.current_share[id_] = current-shares	
+
+			print("curren shares:",self.current_share[id_] )			
+
+			if self.position[id_]=="Long":
+				#self.realized[id_] += (price-self.average_price[id_])*shares
+				gain = 0
+
+				for i in range(shares):
+					try:
+						gain += price-self.holdings.pop()
+					except:
+						print("Holding calculation error")
+			elif self.position[id_]=="Short":
+				for i in range(shares):
+					try:
+						gain += self.holdings.pop() - price	
+					except:
+						print("Holding calculation error")			
+				#self.realized[id_] += (self.average_price[id_]-price)*shares
+			self.realized[id_]+=gain
+			self.realized[id_]= round(self.realized[id_],2)
+
+			print("realized:",self.realized[id_])
+
+			#finish a trade if current share is 0.
+
+			if self.current_share[id_] == 0:
+				self.unrealized[id_] = 0
+				self.unrealized_pshr[id_] = 0
+
+		self.update_display(id_)
+
+	def ppro_order_update(self,data):
+
+		symbol = data["symbol"]
+		bid = data["bid"]
+		ask = data["ask"]
+
+		#get position
+
+		if symbol in self.active_order:
+
+			id_ = self.active_order[symbol]
+
+			if self.position[id_]=="Long":
+				price = bid
+				gain = round((price-self.average_price[id_]),2)
+
+			elif self.position[id_]=="Short":
+				price = ask
+				gain = round(self.average_price[id_]-price,2)
+
+			#loss:
+			#print(gain)
+			self.unrealized_pshr[id_] = gain
+			self.unrealized[id_] = round(gain*self.current_share[id_],2)
+
+			#if ...loss is enough. flatten.
+			print(gain,self.unrealized[id_])
+
+			if self.unrealized[id_] <= self.risk[id_]:
+				self.flatten_symbol(symbol,id_,self.order_tkstring["algo_status"])
+			
+			self.update_display(id_)
 
 
 						
 	#info= 
 	#symbol,status,type,position,curretn,shares,risk,p/l
-	def add_new_labels(self,info):
-		i = info[0]
-		l = self.label_count
 
-		self.tickers_labels[i]=[]
-		self.tickers_tracers[i] = []
-		#add in tickers.
-		print("LENGTH",len(info))
-		for j in range(len(info)):
-			if j == 1 or j ==5 or j ==6 or j==7  or j==8 or j==9:
-				self.tickers_labels[i].append(tk.Label(self.deployment_frame ,textvariable=info[j],width=self.width[j]))
-				self.label_default_configure(self.tickers_labels[i][j])
-				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 
-			elif j != (len(info)-1):
-				self.tickers_labels[i].append(tk.Label(self.deployment_frame ,text=info[j],width=self.width[j]))
-				self.label_default_configure(self.tickers_labels[i][j])
-				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
-			#else: #command = lambda s=symbol: self.delete_symbol_reg_list(s))
+	#Utilities. 
 
-		j+=1
-		self.tickers_labels[i].append(tk.Button(self.deployment_frame ,text="flatten",width=self.width[j],command= lambda k=i:self.flatten_symbol(k)))
-		self.label_default_configure(self.tickers_labels[i][j])
-		self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
-
-		self.ticker_count +=1
-		self.label_count +=1
 
 	def recreate_labels(self):
 
@@ -485,6 +533,39 @@ class algo_manager(pannel):
 			self.b.configure(highlightbackground="#d9d9d9")
 			self.b.configure(highlightcolor="black")
 			self.b.grid(row=1, column=i)
+
+	def update_display(self,id_):
+
+		#need to update, current_share, realized,unrealized,unlreaized per, and avg price. 
+		#
+		#"algo_status","realized","shares","unrealized","unrealized_pshr","average_price"
+
+		self.order_tkstring[id_]["current_share"].set(str(self.current_share[id_])+"/"+str(self.target_share[id_]))
+		self.order_tkstring[id_]["realized"].set(str(self.realized[id_]))
+		self.order_tkstring[id_]["unrealized"].set(str(self.unrealized[id_]))
+		self.order_tkstring[id_]["unrealized_pshr"].set(str(self.unrealized_pshr[id_]))
+
+		#check color.f9f9f9
+		if self.unrealized_pshr[id_]>0:
+			self.order_tklabels[id_]["Upshr"]["background"] = "#3DFC68"
+			self.order_tklabels[id_]["U"]["background"] = "#3DFC68"
+		elif self.unrealized_pshr[id_]<0:
+			self.order_tklabels[id_]["Upshr"]["background"] = "#FC433D"
+			self.order_tklabels[id_]["U"]["background"] = "#FC433D"
+		else:
+			self.order_tklabels[id_]["Upshr"]["background"] = "#f9f9f9"
+			self.order_tklabels[id_]["U"]["background"] = "#f9f9f9"
+
+		if self.realized[id_]==0:
+			self.order_tklabels[id_]["realized"]["background"] = "#f9f9f9"
+		elif self.realized[id_]>0:
+			self.order_tklabels[id_]["realized"]["background"] = "#3DFC68"
+		elif self.realized[id_]<0:
+			self.order_tklabels[id_]["realized"]["background"] = "#FC433D"
+
+		self.order_tkstring[id_]["average_price"] = tk.StringVar()
+		self.order_tkstring[id_]["average_price"].set(str(self.average_price[id_]))
+
 
 
 	def rebind(self,canvas,frame):
@@ -505,8 +586,7 @@ class algo_manager(pannel):
 					print(e)
 			if d[0] =="pkg":
 				print("new package arrived",d)
-
-				self.add_order(d[1])
+				self.goodtrade_listener(d[1])
 
 	def delete(self):
 		for i in self.tabs:
@@ -556,14 +636,19 @@ class algo_manager(pannel):
 			print("register failed")
 			return False
 
+
+
+
+
 if __name__ == '__main__':
 
 
 # 	sell_limit_order("AAPL.NQ",150,2)
 	#try:
+
 	multiprocessing.freeze_support()
 
-	port =4605
+	port =4608
 
 	goodtrade_pipe, receive_pipe = multiprocessing.Pipe()
 
@@ -593,4 +678,8 @@ if __name__ == '__main__':
 
 	algo_voxcom.terminate()
 	algo_voxcom.join()
+
+	algo_ppro_manager.terminate()
+	algo_ppro_manager.join()
+
 	os._exit(1) 

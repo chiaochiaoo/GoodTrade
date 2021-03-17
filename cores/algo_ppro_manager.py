@@ -97,6 +97,68 @@ def decode_l1(stream_data,pipe):
 	data["ask"]= float(ask)
 	pipe.send(["order update",data])
 
+
+def hex_to_string(int):
+	a = hex(int)[-2:]
+	a = a.replace("x","0")
+
+	return a
+
+def hexcolor(level):
+	try:
+		code = int(510*(level))
+		if code >255:
+			first_part = code-255
+			return "#FF"+hex_to_string(255-first_part)+"00"
+		else:
+			return "#FF"+"FF"+hex_to_string(255-code)
+	except:
+		return "#FFFFFF"
+
+def flatten_symbol(symbol):
+    r = requests.post('http://localhost:8080/Flatten?symbol='+str(symbol))
+    if r.status_code == 200:
+        print('flatten Success!')
+        return True
+    else:
+        print("flatten Failure")
+
+def buy_market_order(symbol,share):
+    r = requests.post('http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Buy ARCX Market DAY&shares='+str(share))
+    if r.status_code == 200:
+        print('buy market order Success!')
+        return True
+    else:
+        print("Error sending buy order")
+
+def sell_market_order(symbol,share):
+    r = requests.post('http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(share))
+    if r.status_code == 200:
+        print('sell market order Success!')
+        #print(r.text)
+        return True
+    else:
+        print("Error sending sell order")
+
+def buy_limit_order(symbol, price,share):
+    price = round(price,2)
+    r = requests.post('http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Buy ARCX Limit DAY&shares='+str(share))
+    if r.status_code == 200:
+        print('buy limit order Success! at',price)
+
+        return True
+    else:
+        print("Error sending buy order")
+
+def sell_limit_order(symbol, price,share):
+    price = round(price,2)
+    r = requests.post('http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Sell->Short ARCX Limit DAY&shares='+str(share))
+    if r.status_code == 200:
+        print('sell limit order Success! at ',price)
+        return True
+    else:
+        print("Error sending sell order")
+
 #p=price_updator()
 #p.deregister("AAPL.NQ")
 #p.listener()
@@ -105,3 +167,39 @@ def decode_l1(stream_data,pipe):
 # print(find_between(test, "Side=", ","))
 # print(find_between(test, "Price=", ","))
 # print(find_between(test, "Price=", ","))
+
+
+		# self.algo_status[id_] = tk.StringVar()
+		# self.algo_status[id_].set(status)
+
+		# self.current_share[id_] = tk.StringVar()
+		# self.current_share[id_].set("0/"+str(share))
+
+		# self.current_share_data[id_] = 0
+		# self.target_share_data[id_] = share
+
+		# self.realized[id_] = tk.StringVar()
+		# self.realized[id_].set("0")
+		# self.realized_data[id_] = 0
+
+		# self.unrealized[id_] = tk.StringVar()
+		# self.unrealized[id_].set("0")
+		# self.unrealized_data[id_] = 0
+
+		# self.unrealized_pshr[id_] = tk.StringVar()
+		# self.unrealized_pshr[id_].set("0")
+		# self.unrealized_pshr_data[id_] = 0
+
+		# self.average_price[id_] = tk.StringVar()
+		# self.average_price[id_].set("N/A")
+
+		# self.average_price_data[id_] = 0
+
+		# self.risk_data[id_] = -risk
+
+		# self.order_info[id_] = [order_type,pos,order_price,share,symbol]
+
+
+#		self.tk_strings=["algo_status","realized","shares","unrealized","unrealized_pshr","average_price"]
+# a=[1,2,3,4]
+# print(a.pop())
