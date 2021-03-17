@@ -182,9 +182,14 @@ class algo_manager(pannel):
 		self.average_price = {}
 		self.average_price_data = {}
 
+		self.risk_data = {}
+
 		self.position = {}
 		#input symbol, get id (active.)
 		self.active_order = {}
+
+		###if a symbol is running, or already flattened.
+		self.flatten = {}
 
 		super().__init__(root)
 
@@ -226,11 +231,14 @@ class algo_manager(pannel):
 
 	def flatten_symbol(self,symbol):
 
+		self.active_order.remove(symbol)
 		flatten = threading.Thread(target=flatten_symbol,args=(symbol,), daemon=True)
 		flatten.start()
 		id_=self.active_order[symbol]
 		#self.current_share_data[id_]=0
 		self.deregister(symbol)
+
+
 
 		#convert U to R.
 		## HOW I DO THAT? !!
@@ -320,6 +328,12 @@ class algo_manager(pannel):
 					#print(gain)
 					self.unrealized_pshr_data[id_] = gain
 					self.unrealized_data[id_] = round(gain*self.current_share_data[id_],2)
+
+
+					#if ...loss is enough. flatten.
+
+					if self.unrealized_data[id_] <= self.risk_data[id_]:
+						self.flatten_symbol(symbol)
 					
 					self.update_display(id_)
 
@@ -371,6 +385,8 @@ class algo_manager(pannel):
 
 					self.average_price_data[id_] = 0
 
+					self.risk_data[id_] = -risk
+
 					self.order_book[id_] = [order_type,pos,order_price,share,symbol]
 
 					#avoid repetitive order. 
@@ -399,6 +415,7 @@ class algo_manager(pannel):
 
 					self.active_order[symbol] = id_
 					self.position[id_] = pos
+					self.flatten[id_] = False
 
 					if type_ == "Market":
 

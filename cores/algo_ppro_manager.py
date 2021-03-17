@@ -27,9 +27,6 @@ def find_between(data, first, last):
 ### Take L1 quote,
 ### Track order status 
 
-
-
-
 	# def communication(self):
 		
 	# 	#register, deregister trade.
