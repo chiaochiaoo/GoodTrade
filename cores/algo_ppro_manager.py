@@ -201,5 +201,3 @@ def sell_limit_order(symbol, price,share):
 
 
 #		self.tk_strings=["algo_status","realized","shares","unrealized","unrealized_pshr","average_price"]
-# a=[1,2,3,4]
-# print(a.pop())

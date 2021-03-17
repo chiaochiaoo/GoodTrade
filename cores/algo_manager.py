@@ -103,7 +103,7 @@ class algo_manager(pannel):
 		#self.order_status = {}
 
 		self.tk_strings=["algo_status","realized","shares","unrealized","unrealized_pshr","average_price"]
-		self.tk_labels=["symbol","algo_status","description","risk","position","shares","average_price","Upshr","U","R"]
+		self.tk_labels=["symbol","algo_status","description","risk","position","shares","average_price","unrealized_pshr","unrealized","realized"]
 
 		self.order_tkstring = {}
 		self.order_tklabels = {}
@@ -454,16 +454,16 @@ class algo_manager(pannel):
 				gain = 0
 
 				for i in range(shares):
-					try:
-						gain += price-self.holdings.pop()
-					except:
-						print("Holding calculation error")
+					#try:
+					gain += price-self.holdings[id_].pop()
+					#except:
+					#	print("Holding calculation error")
 			elif self.position[id_]=="Short":
 				for i in range(shares):
-					try:
-						gain += self.holdings.pop() - price	
-					except:
-						print("Holding calculation error")			
+					#try:
+					gain += self.holdings[id_].pop() - price	
+					#except:
+					#	print("Holding calculation error")			
 				#self.realized[id_] += (self.average_price[id_]-price)*shares
 			self.realized[id_]+=gain
 			self.realized[id_]= round(self.realized[id_],2)
@@ -476,6 +476,7 @@ class algo_manager(pannel):
 				self.unrealized[id_] = 0
 				self.unrealized_pshr[id_] = 0
 
+		#print(self.holdings[id_])
 		self.update_display(id_)
 
 	def ppro_order_update(self,data):
@@ -507,7 +508,7 @@ class algo_manager(pannel):
 			print(gain,self.unrealized[id_])
 
 			if self.unrealized[id_] <= self.risk[id_]:
-				self.flatten_symbol(symbol,id_,self.order_tkstring["algo_status"])
+				self.flatten_symbol(symbol,id_,self.order_tkstring[id_]["algo_status"])
 			
 			self.update_display(id_)
 
@@ -547,17 +548,17 @@ class algo_manager(pannel):
 
 		#check color.f9f9f9
 		if self.unrealized_pshr[id_]>0:
-			self.order_tklabels[id_]["Upshr"]["background"] = "#3DFC68"
-			self.order_tklabels[id_]["U"]["background"] = "#3DFC68"
+			self.order_tklabels[id_]["unrealized_pshr"]["background"] = "#3DFC68"
+			self.order_tklabels[id_]["unrealized"]["background"] = "#3DFC68"
 		elif self.unrealized_pshr[id_]<0:
-			self.order_tklabels[id_]["Upshr"]["background"] = "#FC433D"
-			self.order_tklabels[id_]["U"]["background"] = "#FC433D"
+			self.order_tklabels[id_]["unrealized_pshr"]["background"] = "#FC433D"
+			self.order_tklabels[id_]["unrealized"]["background"] = "#FC433D"
 		else:
-			self.order_tklabels[id_]["Upshr"]["background"] = "#f9f9f9"
-			self.order_tklabels[id_]["U"]["background"] = "#f9f9f9"
+			self.order_tklabels[id_]["unrealized_pshr"]["background"] = "#d9d9d9"
+			self.order_tklabels[id_]["unrealized"]["background"] = "#d9d9d9"
 
 		if self.realized[id_]==0:
-			self.order_tklabels[id_]["realized"]["background"] = "#f9f9f9"
+			self.order_tklabels[id_]["realized"]["background"] = "#d9d9d9"
 		elif self.realized[id_]>0:
 			self.order_tklabels[id_]["realized"]["background"] = "#3DFC68"
 		elif self.realized[id_]<0:
@@ -648,7 +649,7 @@ if __name__ == '__main__':
 
 	multiprocessing.freeze_support()
 
-	port =4608
+	port =4609
 
 	goodtrade_pipe, receive_pipe = multiprocessing.Pipe()
 
