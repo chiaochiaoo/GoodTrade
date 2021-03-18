@@ -186,18 +186,14 @@ class algo_manager(pannel):
 			flatten.start()
 			#self.current_share_data[id_]=0
 
-			dereg = threading.Thread(target=self.deregister,args=(symbol,), daemon=True)
-			dereg.start()
-
-
 		if id_!= None and status_text!= None:
 			if id_ in self.orders_registry:
 				self.orders_registry.remove(id_)
 				current_status = status_text.get()
 				if current_status=="Pending":
 					status_text.set("Canceled")
-				else:
-					status_text.set("Done.")
+				# else:
+				# 	status_text.set("Done.")
 
 
 
@@ -437,9 +433,9 @@ class algo_manager(pannel):
 					self.current_share[id_] = current+shares
 
 					if current ==0:
-						self.average_price[id_] = round(price,2)
+						self.average_price[id_] = round(price,3)
 					else:
-						self.average_price[id_] = round(((self.average_price[id_]*current)+(price*shares))/self.current_share[id_],2)
+						self.average_price[id_] = round(((self.average_price[id_]*current)+(price*shares))/self.current_share[id_],3)
 
 					for i in range(shares):
 						self.holdings[id_].append(price)
@@ -449,10 +445,10 @@ class algo_manager(pannel):
 					self.current_share[id_] = current-shares	
 
 					print("curren shares:",self.current_share[id_] )			
-
+					gain = 0
 					if self.position[id_]=="Long":
 						#self.realized[id_] += (price-self.average_price[id_])*shares
-						gain = 0
+						
 
 						for i in range(shares):
 							try:
@@ -467,7 +463,7 @@ class algo_manager(pannel):
 							#	print("Holding calculation error")			
 						#self.realized[id_] += (self.average_price[id_]-price)*shares
 					self.realized[id_]+=gain
-					self.realized[id_]= round(self.realized[id_],2)
+					self.realized[id_]= round(self.realized[id_],4)
 
 					print("realized:",self.realized[id_])
 
@@ -481,6 +477,10 @@ class algo_manager(pannel):
 						current_status = self.order_tkstring[id_]["algo_status"].get()
 						if current_status=="Running":
 							self.order_tkstring[id_]["algo_status"].set("Done")
+
+						#dont support multiple symbol on the same trade yet.
+						dereg = threading.Thread(target=self.deregister,args=(symbol,), daemon=True)
+						dereg.start()
 
 						#deactive the order.
 						self.active_order[symbol]= ""
@@ -503,16 +503,16 @@ class algo_manager(pannel):
 
 				if self.position[id_]=="Long":
 					price = bid
-					gain = round((price-self.average_price[id_]),2)
+					gain = round((price-self.average_price[id_]),4)
 
 				elif self.position[id_]=="Short":
 					price = ask
-					gain = round(self.average_price[id_]-price,2)
+					gain = round(self.average_price[id_]-price,4)
 
 				#loss:
 				#print(gain)
 				self.unrealized_pshr[id_] = gain
-				self.unrealized[id_] = round(gain*self.current_share[id_],2)
+				self.unrealized[id_] = round(gain*self.current_share[id_],4)
 
 				#if ...loss is enough. flatten.
 				#print(gain,self.unrealized[id_])
