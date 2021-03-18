@@ -455,10 +455,10 @@ class algo_manager(pannel):
 						gain = 0
 
 						for i in range(shares):
-							#try:
-							gain += price-self.holdings[id_].pop()
-							#except:
-							#	print("Holding calculation error")
+							try:
+								gain += price-self.holdings[id_].pop()
+							except:
+								print("Holding calculation error")
 					elif self.position[id_]=="Short":
 						for i in range(shares):
 							#try:
@@ -481,6 +481,9 @@ class algo_manager(pannel):
 						current_status = self.order_tkstring[id_]["algo_status"].get()
 						if current_status=="Running":
 							self.order_tkstring[id_]["algo_status"].set("Done")
+
+						#deactive the order.
+						self.active_order[symbol]= ""
 
 				#print(self.holdings[id_])
 				self.update_display(id_)
