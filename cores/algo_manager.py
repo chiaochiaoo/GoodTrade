@@ -193,7 +193,7 @@ class algo_manager(pannel):
 		if id_!= None and status_text!= None:
 			if id_ in self.orders_registry:
 				self.orders_registry.remove(id_)
-
+				current_status = status_text.get()
 				if current_status=="Pending":
 					status_text.set("Canceled")
 				else:
@@ -420,66 +420,70 @@ class algo_manager(pannel):
 		shares = data["shares"]
 		side = data["side"]
 
-		id_ = self.active_order[symbol]
+		if symbol in self.active_order:
 
-		#if same side, add. if wrong side.take off.
-		#same side.
+			if self.active_order[symbol]!= "":
 
-		current = self.current_share[id_]
+				id_ = self.active_order[symbol]
 
-		print("symbol",symbol,"side:",side,"shares",shares,"price",price)
-		if (self.position[id_]=="Long" and side =="B") or (self.position[id_]=="Short" and (side =="S" or side=="T")):
+				#if same side, add. if wrong side.take off.
+				#same side.
 
-			self.current_share[id_] = current+shares
+				current = self.current_share[id_]
 
-			if current ==0:
-				self.average_price[id_] = round(price,2)
-			else:
-				self.average_price[id_] = round(((self.average_price[id_]*current)+(price*shares))/self.current_share[id_],2)
+				print("symbol",symbol,"side:",side,"shares",shares,"price",price)
+				if (self.position[id_]=="Long" and side =="B") or (self.position[id_]=="Short" and (side =="S" or side=="T")):
 
-			for i in range(shares):
-				self.holdings[id_].append(price)
+					self.current_share[id_] = current+shares
 
-		#Taking shares off. assume it's all gone. -- NO. NO
-		else:
-			self.current_share[id_] = current-shares	
+					if current ==0:
+						self.average_price[id_] = round(price,2)
+					else:
+						self.average_price[id_] = round(((self.average_price[id_]*current)+(price*shares))/self.current_share[id_],2)
 
-			print("curren shares:",self.current_share[id_] )			
+					for i in range(shares):
+						self.holdings[id_].append(price)
 
-			if self.position[id_]=="Long":
-				#self.realized[id_] += (price-self.average_price[id_])*shares
-				gain = 0
+				#Taking shares off. assume it's all gone. -- NO. NO
+				else:
+					self.current_share[id_] = current-shares	
 
-				for i in range(shares):
-					#try:
-					gain += price-self.holdings[id_].pop()
-					#except:
-					#	print("Holding calculation error")
-			elif self.position[id_]=="Short":
-				for i in range(shares):
-					#try:
-					gain += self.holdings[id_].pop() - price	
-					#except:
-					#	print("Holding calculation error")			
-				#self.realized[id_] += (self.average_price[id_]-price)*shares
-			self.realized[id_]+=gain
-			self.realized[id_]= round(self.realized[id_],2)
+					print("curren shares:",self.current_share[id_] )			
 
-			print("realized:",self.realized[id_])
+					if self.position[id_]=="Long":
+						#self.realized[id_] += (price-self.average_price[id_])*shares
+						gain = 0
 
-			#finish a trade if current share is 0.
+						for i in range(shares):
+							#try:
+							gain += price-self.holdings[id_].pop()
+							#except:
+							#	print("Holding calculation error")
+					elif self.position[id_]=="Short":
+						for i in range(shares):
+							#try:
+							gain += self.holdings[id_].pop() - price	
+							#except:
+							#	print("Holding calculation error")			
+						#self.realized[id_] += (self.average_price[id_]-price)*shares
+					self.realized[id_]+=gain
+					self.realized[id_]= round(self.realized[id_],2)
 
-			if self.current_share[id_] == 0:
-				self.unrealized[id_] = 0
-				self.unrealized_pshr[id_] = 0
+					print("realized:",self.realized[id_])
 
-				#mark it done.
-				current_status = self.order_tkstring[id_]["algo_status"].get()
-				if current_status=="Running":
-					self.order_tkstring[id_]["algo_status"].set("Done")
+					#finish a trade if current share is 0.
 
-		#print(self.holdings[id_])
-		self.update_display(id_)
+					if self.current_share[id_] == 0:
+						self.unrealized[id_] = 0
+						self.unrealized_pshr[id_] = 0
+
+						#mark it done.
+						current_status = self.order_tkstring[id_]["algo_status"].get()
+						if current_status=="Running":
+							self.order_tkstring[id_]["algo_status"].set("Done")
+
+				#print(self.holdings[id_])
+				self.update_display(id_)
 
 	def ppro_order_update(self,data):
 
@@ -508,7 +512,7 @@ class algo_manager(pannel):
 				self.unrealized[id_] = round(gain*self.current_share[id_],2)
 
 				#if ...loss is enough. flatten.
-				print(gain,self.unrealized[id_])
+				#print(gain,self.unrealized[id_])
 
 				if self.unrealized[id_] <= self.risk[id_]:
 					self.flatten_symbol(symbol,id_,self.order_tkstring[id_]["algo_status"])
@@ -548,6 +552,7 @@ class algo_manager(pannel):
 		self.order_tkstring[id_]["realized"].set(str(self.realized[id_]))
 		self.order_tkstring[id_]["unrealized"].set(str(self.unrealized[id_]))
 		self.order_tkstring[id_]["unrealized_pshr"].set(str(self.unrealized_pshr[id_]))
+		self.order_tkstring[id_]["unrealized_pshr"].set(self.average_price[id_])
 
 		#check color.f9f9f9
 		if self.unrealized_pshr[id_]>0:
