@@ -276,8 +276,8 @@ class algo_manager(pannel):
 			pos,\
 			self.order_tkstring[id_]["current_share"],\
 			self.order_tkstring[id_]["average_price"],\
-			self.order_tkstring[id_]["unrealized"],\
 			self.order_tkstring[id_]["unrealized_pshr"],\
+			self.order_tkstring[id_]["unrealized"],\
 			self.order_tkstring[id_]["realized"]]
 
 
@@ -547,12 +547,15 @@ class algo_manager(pannel):
 		#need to update, current_share, realized,unrealized,unlreaized per, and avg price. 
 		#
 		#"algo_status","realized","shares","unrealized","unrealized_pshr","average_price"
+		#print()
+
+		#print(self.average_price[id_],self.unrealized[id_].get(),self.unrealized_pshr[id_].get())
 
 		self.order_tkstring[id_]["current_share"].set(str(self.current_share[id_])+"/"+str(self.target_share[id_]))
 		self.order_tkstring[id_]["realized"].set(str(self.realized[id_]))
 		self.order_tkstring[id_]["unrealized"].set(str(self.unrealized[id_]))
 		self.order_tkstring[id_]["unrealized_pshr"].set(str(self.unrealized_pshr[id_]))
-		self.order_tkstring[id_]["unrealized_pshr"].set(self.average_price[id_])
+		self.order_tkstring[id_]["average_price"].set(self.average_price[id_])
 
 		#check color.f9f9f9
 		if self.unrealized_pshr[id_]>0:
@@ -571,9 +574,6 @@ class algo_manager(pannel):
 			self.order_tklabels[id_]["realized"]["background"] = "#3DFC68"
 		elif self.realized[id_]<0:
 			self.order_tklabels[id_]["realized"]["background"] = "#FC433D"
-
-		self.order_tkstring[id_]["average_price"] = tk.StringVar()
-		self.order_tkstring[id_]["average_price"].set(str(self.average_price[id_]))
 
 
 
