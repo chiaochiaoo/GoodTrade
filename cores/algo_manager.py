@@ -568,8 +568,8 @@ class algo_manager(pannel):
 			self.order_tklabels[id_]["unrealized_pshr"]["background"] = "#FC433D"
 			self.order_tklabels[id_]["unrealized"]["background"] = "#FC433D"
 		else:
-			self.order_tklabels[id_]["unrealized_pshr"]["background"] = "#d9d9d9"
-			self.order_tklabels[id_]["unrealized"]["background"] = "#d9d9d9"
+			self.order_tklabels[id_]["unrealized_pshr"]["background"] = "#ECF57C"
+			self.order_tklabels[id_]["unrealized"]["background"] = "#ECF57C"
 
 		if self.realized[id_]==0:
 			self.order_tklabels[id_]["realized"]["background"] = "#d9d9d9"

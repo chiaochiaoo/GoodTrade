@@ -58,7 +58,7 @@ class entry:
 
 		if position != None:
 			self.entry_type.set(position)
-			self.entry_choice["state"]="disabled"
+			#self.entry_choice["state"]="disabled"
 
 		row+=1
 		tk.Label(frame,text="Order type: ").grid(row=row,column=1)
