@@ -194,10 +194,7 @@ class algo_manager(pannel):
 			if id_ in self.orders_registry:
 				self.orders_registry.remove(id_)
 
-				current_status = status_text.get()
-				if current_status=="Running":
-					status_text.set("Done")
-				elif current_status=="Pending":
+				if current_status=="Pending":
 					status_text.set("Canceled")
 				else:
 					status_text.set("Done.")
@@ -476,6 +473,11 @@ class algo_manager(pannel):
 				self.unrealized[id_] = 0
 				self.unrealized_pshr[id_] = 0
 
+				#mark it done.
+				current_status = self.order_tkstring[id_]["algo_status"].get()
+				if current_status=="Running":
+					self.order_tkstring[id_]["algo_status"].set("Done")
+
 		#print(self.holdings[id_])
 		self.update_display(id_)
 
@@ -489,28 +491,29 @@ class algo_manager(pannel):
 
 		if symbol in self.active_order:
 
-			id_ = self.active_order[symbol]
+			if self.active_order[symbol]!= "":
+				id_ = self.active_order[symbol]
 
-			if self.position[id_]=="Long":
-				price = bid
-				gain = round((price-self.average_price[id_]),2)
+				if self.position[id_]=="Long":
+					price = bid
+					gain = round((price-self.average_price[id_]),2)
 
-			elif self.position[id_]=="Short":
-				price = ask
-				gain = round(self.average_price[id_]-price,2)
+				elif self.position[id_]=="Short":
+					price = ask
+					gain = round(self.average_price[id_]-price,2)
 
-			#loss:
-			#print(gain)
-			self.unrealized_pshr[id_] = gain
-			self.unrealized[id_] = round(gain*self.current_share[id_],2)
+				#loss:
+				#print(gain)
+				self.unrealized_pshr[id_] = gain
+				self.unrealized[id_] = round(gain*self.current_share[id_],2)
 
-			#if ...loss is enough. flatten.
-			print(gain,self.unrealized[id_])
+				#if ...loss is enough. flatten.
+				print(gain,self.unrealized[id_])
 
-			if self.unrealized[id_] <= self.risk[id_]:
-				self.flatten_symbol(symbol,id_,self.order_tkstring[id_]["algo_status"])
-			
-			self.update_display(id_)
+				if self.unrealized[id_] <= self.risk[id_]:
+					self.flatten_symbol(symbol,id_,self.order_tkstring[id_]["algo_status"])
+				
+				self.update_display(id_)
 
 
 						
