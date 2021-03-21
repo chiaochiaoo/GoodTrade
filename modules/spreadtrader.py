@@ -33,18 +33,34 @@ class spread_trader(pannel):
 		self.spread_lists = ttk.Notebook(self.main)
 		self.spread_lists.place(x=0,rely=0.1,relheight=0.9,relwidth=1)
 
-		#
 
-		# self.op = tk.OptionMenu(self.tab2, self.add_amount, *sorted(self.add_choices))
-		# #self.menu1 = ttk.Label(self.setting, text="Country").grid(row = 1, column = 3)
-		# self.op.place(x=295, rely=0.01, height=25, width=70)
+		self.symbol1 = tk.StringVar(self.main)
+		self.symbol2 = tk.StringVar(self.main)
+
+		self.symbolist = {'Unselected','SPY.AM','QQQ.NQ','USO.AM'}
+
+		self.symbol1.set('Unselected') 
+		self.symbol2.set('Unselected') 
+
+		self.op1 = tk.OptionMenu(self.main, self.symbol1,*sorted(self.symbolist))
+		self.op1_sub = ttk.Label(self.main, text="Symbol 1").grid(row = 1, column = 1)
+		self.op1.grid(row = 2, column =1)
+		#self.op1.place(x=25, y=40, height=30, width=100)
+
+		self.op2 = tk.OptionMenu(self.main, self.symbol2,*sorted(self.symbolist))
+		self.op2_sub = ttk.Label(self.main, text="Symbol 2").grid(row = 1, column = 2)
+		self.op2.grid(row = 2, column =2)
+		#self.menu1 = ttk.Label(self.setting, text="Country").grid(row = 1, column = 3)
+
+		self.refresh_symbols = ttk.Button(self.main,text ="Refresh Symbol",width=15).grid(row = 1, column = 3)#.place(relx=0.01, rely=0.01, height=25, width=70)
+		self.add_symbols = ttk.Button(self.main,text ="Create pair",command=self.create_new_tab,width=15).grid(row =2, column = 3)#.place(relx=0.01, rely=0.01, height=25, width=70)
 
 		#a button
 		#two lists.
 		# an add symbol
 
 
-
+		self.tabs = {}
 
 		# self.tab1 = tk.Canvas(self.tabControl)
 		# self.tab2 = tk.Canvas(self.tabControl)
@@ -58,19 +74,12 @@ class spread_trader(pannel):
 		# ############################### Nasdaq Trader ############################################
 
 
-		# # self.NT_refresh = ttk.Button(self.tab2,
-		# # 	text ="Refresh",command=self.refresh_nasdaq).place(relx=0.01, rely=0.01, height=25, width=70)
+
 
 
 		# self.update_in_progress = False
 
-		# self.add_amount = tk.StringVar(self.tab2)
-		# self.add_choices = {'Top 5','Top 10','Top 20','Top 50','All'}
-		# self.add_amount.set('Top 5') 
 
-		# self.op = tk.OptionMenu(self.tab2, self.add_amount, *sorted(self.add_choices))
-		# #self.menu1 = ttk.Label(self.setting, text="Country").grid(row = 1, column = 3)
-		# self.op.place(x=295, rely=0.01, height=25, width=70)
 
 		# self.add_button = ttk.Button(self.tab2,
 		# 	text ="Add").place(x=380, rely=0.01, height=25, width=70)
@@ -108,6 +117,20 @@ class spread_trader(pannel):
 		# 	self.b.grid(row=1, column=i)
 
 		# self.rebind(self.scanner_canvas,self.scanner_frame)
+
+
+	def create_new_tab(self):
+
+
+		pair_name = self.symbol1.get()[:-3]+self.symbol2.get()[:-3]
+		self.tabs[pair_name] = tk.Canvas(self.spread_lists)
+
+		self.spread_lists.add(self.tabs[pair_name], text =pair_name) 
+
+		# self.tab1 = tk.Canvas(self.tabControl)
+		# self.tab2 = tk.Canvas(self.tabControl)
+
+		# 
 
 
 root = tk.Tk() 
