@@ -236,12 +236,56 @@ class spread:
 		self.roc15 = 0
 
 
-root = tk.Tk() 
-root.title("GoodTrade PairTrader") 
+# root = tk.Tk() 
+# root.title("GoodTrade PairTrader") 
 
 
-s = spread_trader(root,None,None)
-root.geometry("700x800")
-root.minsize(1000, 800)
-root.maxsize(1800, 1200)
-root.mainloop()
+# s = spread_trader(root,None,None)
+# root.geometry("700x800")
+# root.minsize(1000, 800)
+# root.maxsize(1800, 1200)
+# root.mainloop()
+
+import numpy as np
+
+ts = []
+ps = []
+s=["QQQ","SPY"]
+
+for i in s:
+    timestamp,price = SVF.fetch_data_yahoo(i)
+    ts.append(timestamp[:-2])
+    ps.append(price[:-2])
+
+print(ts,ps)
+
+
+#MUST SYNC THE DATA.
+if len(ts[1]) > len(ts[0]):
+    for i in range(len(ts[1])-len(ts[0])):
+        ps[0].append(ps[0][-1])
+    ts[0] = ts[1][:]
+else:
+    for i in range(len(ts[0])-len(ts[1])):
+        ps[1].append(ps[1][-1])
+    ts[1] = ts[0][:]
+
+#Now let's set init.
+
+#Spread.
+# print(ps[0])
+# print(ps[1])
+c1 = (np.array(ps[0])-ps[0][0])*100/ps[0][0]
+c2 = (np.array(ps[1])-ps[1][0])*100/ps[1][0]
+
+
+
+intra_spread = list(c1 - c2)
+
+# self.intra_spread_MA5 = list(chiao.SMA(self.intra_spread, 5))
+# self.intra_spread_MA15 = list(chiao.SMA(self.intra_spread, 15))
+cur_minute_list = ts[0][:]
+
+#Time 
+print(intra_spread)
+print(cur_minute_list)
