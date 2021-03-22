@@ -2,7 +2,8 @@ import tkinter as tk
 from tkinter import ttk 
 import threading
 import pandas as pd
-
+import database as db
+import Spread_viewer_function as SVF
 # from modules.pannel import *
 # from modules.scanner_process_manager import *
 
@@ -118,19 +119,34 @@ class spread_trader(pannel):
 
 		# self.rebind(self.scanner_canvas,self.scanner_frame)
 
+	def validation(self):
+
+		if self.symbol1.get()[:-3]!=self.symbol2.get()[:-3]:
+			if self.symbol1.get()!='Unselected':
+				return True
+
+		return False
 
 	def create_new_tab(self):
 
 
-		pair_name = self.symbol1.get()[:-3]+self.symbol2.get()[:-3]
-		self.tabs[pair_name] = tk.Canvas(self.spread_lists)
+		if self.validation():
+			pair_name = self.symbol1.get()[:-3]+self.symbol2.get()[:-3]
+			self.tabs[pair_name] = tk.Canvas(self.spread_lists)
 
-		self.spread_lists.add(self.tabs[pair_name], text =pair_name) 
+			self.spread_lists.add(self.tabs[pair_name], text =pair_name) 
 
-		# self.tab1 = tk.Canvas(self.tabControl)
-		# self.tab2 = tk.Canvas(self.tabControl)
+			symbols = [self.symbol1.get()[:-3],self.symbol2.get()[:-3]]
 
-		# 
+			m_dis,w_dis,roc1l,roc5l,roc15l = SVF.find_info(symbols)
+
+			#successful 
+			print(m_dis,w_dis,roc1l,roc5l,roc15l)
+
+			# self.tab1 = tk.Canvas(self.tabControl)
+			# self.tab2 = tk.Canvas(self.tabControl)
+
+			# 
 
 
 root = tk.Tk() 
