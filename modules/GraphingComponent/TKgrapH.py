@@ -1,10 +1,12 @@
 import matplotlib
-matplotlib.use('TkAgg')
+
 import numpy as np
+matplotlib.use('TkAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
-from tkinter import *
 import matplotlib.animation as animation
+from tkinter import *
+
 class mclass:
     def __init__(self,  window):
         self.window = window
