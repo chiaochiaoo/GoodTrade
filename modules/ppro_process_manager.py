@@ -514,6 +514,10 @@ def process_and_send(lst,pipe):
 	if d["pos_range"]>0.01 and d["pos_range"]<=0.04:
 		d["status"]="Near Low"
 
+	#################################################
+	if d["pos_range"]<0.96 and d["pos_range"]>0.4:
+		d["status"] = ""
+
 	###############################################
 
 	if len(d["highs"])>5:
