@@ -25,10 +25,12 @@ class mclass:
         self.v.append(self.v[-1]+1)
         #self.a.scatter(self.v,self.x,color='red')
         self.line.set_data(self.v, self.x)
+        self.line2.set_data(i,[0,1])
         #self.a.set_ylim(0, self.v)
         #self.a.set_xlim(0,self.p[-1]+1)
         self.ac.set_ylim(0, self.v[-1])
         print(i)
+        print(self.line2.get_data())
 
     def plot (self):
         self.x=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -42,6 +44,8 @@ class mclass:
         self.line,=self.ac.plot(self.v,self.x,color='blue')
 
         self.ac.set_ylim(0, self.v[-1])
+
+        self.line2 = self.ac.axvline(x=1,color="r")
 
         # self.a.invert_yaxis()
 
