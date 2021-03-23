@@ -503,3 +503,9 @@ class Symbol_data_manager:
 
 	def get_count(self):
 		return len(self.symbols)
+
+
+
+
+
+
