@@ -54,7 +54,7 @@ class spread_trader(pannel):
 		self.data = data
 		#mark if already created. if so, just update the infos. 
 
-
+		self.tab_count = 0
 		#a giant labelframe
 
 		self.main = ttk.LabelFrame(root,text="Spread")
@@ -89,12 +89,12 @@ class spread_trader(pannel):
 		#a button
 		#two lists.
 		# an add symbol
-### SC QQQ
-### SC SPY
-### AVG. C
-###
-###
-###
+		### SC QQQ
+		### SC SPY
+		### AVG. C
+		###
+		###
+		###
 
 		self.tabs = {}
 
@@ -184,70 +184,16 @@ class spread_trader(pannel):
 
 			#Only update is Current Max Spread. 
 			#And Current Spread.
-			#Current Spread graph. etc. 
+			#Current Spread graph. etc. \\\\\\
+			exsit=False
+			if self.tab_count>0:
+				exsit= True
+
+			pair = spread(symbol1, symbol2,self.data,self.tabs[pair_name],exsit)
+			self.tab_count+=1
 
 
-			outlier = dict(linewidth=3, color='darkgoldenrod',marker='o')
-			plt.style.use("seaborn-darkgrid")
-			f = plt.figure(1,figsize=(10,8))
-			f.canvas.set_window_title('SPREAD MONITOR')
-			min_form = DateFormatter("%H:%M")
-			sec_form = DateFormatter("%M:%S")
-			gs = f.add_gridspec(4, 4)
 
-
-			pair = spread(symbol1, symbol2,self.data)
-
-			spread_data,spread_time,current_spread = pair.get_current_data()
-			m_dis,w_dis,roc1l,roc5l,roc15l = pair.get_hist_data()
-
-
-			spread_time = pd.to_datetime(spread_time,format='%H:%M')
-
-			spread_ = f.add_subplot(gs[0,:-1])
-			spread_.tick_params(axis='both', which='major', labelsize=8)
-			spread_line,=spread_.plot(spread_time,spread_data)
-
-			spread_.xaxis.set_major_formatter(min_form)
-			spread_.yaxis.set_major_formatter(mtick.PercentFormatter())
-			spread_.set_title('IntraDay Spread')
-
-			max_spread_d = f.add_subplot(gs[1,0])
-			max_spread_d.set_title('Spread Today')
-			max_spread_d.boxplot([], flierprops=outlier,vert=False, whis=1)
-			cur_spread1 = max_spread_d.axvline(x=current_spread,color="r")
-
-			max_spread_w = f.add_subplot(gs[1,1])
-			max_spread_w.set_title('Spread Weekly')
-			max_spread_w.boxplot(w_dis, flierprops=outlier,vert=False, whis=1)
-			cur_spread2 = max_spread_w.axvline(x=current_spread,color="r")
-
-			max_spread_m = f.add_subplot(gs[1,2])
-			max_spread_m.set_title('Spread Monthly')
-			max_spread_m.boxplot(m_dis, flierprops=outlier,vert=False, whis=1)
-			cur_spread3 = max_spread_m.axvline(x=current_spread,color="r")
-
-			roc1 = f.add_subplot(gs[2,0])
-			roc1.set_title('Change 1 min')
-			roc1.boxplot(roc1l, flierprops=outlier,vert=False, whis=2.5)
-			roc1_ = roc1.axvline(x=0,color="r")
-
-			roc5 = f.add_subplot(gs[2,1])
-			roc5.set_title('Change 5 min')
-			roc5.boxplot(roc5l, flierprops=outlier,vert=False, whis=1.5)
-			roc5_ = roc5.axvline(x=0,color="r")
-
-			roc15 =f.add_subplot(gs[2,2])
-			roc15.set_title('Change 15 min')
-			roc15.boxplot(roc15l, flierprops=outlier,vert=False, whis=1.5)
-			roc15_ = roc15.axvline(x=0,color="r")
-
-			pair.set_graphical_components([[cur_spread1,cur_spread2,cur_spread3],[spread_line,roc1_,roc5_,roc15_]]) 
-		
-
-			plt.tight_layout()
-			plotcanvas = FigureCanvasTkAgg(f, self.tabs[pair_name])
-			plotcanvas.get_tk_widget().grid(column=1, row=1)
 
 			# self.tab1 = tk.Canvas(self.tabControl)
 			# self.tab2 = tk.Canvas(self.tabControl)
@@ -258,11 +204,12 @@ class spread_trader(pannel):
 
 class spread:
 
-	def __init__(self,symbol1,symbol2,data:Symbol_data_manager):
+	def __init__(self,symbol1,symbol2,data:Symbol_data_manager,pannel,exsit):
 
 		self.data = data
-
+		self.exsit = exsit
 		self.trace = []
+		self.pannel = pannel
 
 		self.symbol1= symbol1
 		self.symbol2= symbol2 
@@ -279,29 +226,30 @@ class spread:
 		self.roc5 = 0
 		self.roc15 = 0
 
+		self.lock = False
+
 		#necessary data.
 
 		#m_dis,w_dis,roc1l,roc5l,roc15l
 		symbols = [self.symbol1[:-3],self.symbol2[:-3]]
-		self.m_dis,self.w_dis,self.roc1l,self.roc5l,self.roc15l = SVF.find_info(symbols)
+		self.m_dis,self.w_dis,self.roc1l,self.roc5l,self.roc15l = SVF.find_info(symbols)#[],[],[],[],[] #
 
-		now = datetime.now()
-		ts=now.hour*60 + now.minute
-		print(ts)
-		if ts>570:
-			self.fetch_missing_data()
 
-			#missing data fetched
 
-			print("missing data fetched ")
-		self.lock = False
+		# now = datetime.now()
+		# ts=now.hour*60 + now.minute
+		# print(ts)
+		# if ts>570:
+		# 	self.fetch_missing_data()
+
+		# 	#missing data fetched
+
+		# 	print("missing data fetched ")
+		
+		self.create_graphs()
 
 		#if this is created after 9:30.
 		# if before 9:30. 
-
-
-
-
 
 
 		#set the graph. 
@@ -313,6 +261,72 @@ class spread:
 		# m=self.data.symbol_price[symbol2].trace('w', self.spread_update)
 		# self.trace.append(m)
 
+	def create_graphs(self):
+
+		if self.exsit:
+			plt.clf()
+		symbol1	= self.symbol1
+		symbol2 = self.symbol2
+
+		self.outlier = dict(linewidth=3, color='darkgoldenrod',marker='o')
+		plt.style.use("seaborn-darkgrid")
+
+		self.f = plt.figure(1,figsize=(12,8))
+
+		self.min_form = DateFormatter("%H:%M")
+
+		self.gs = self.f.add_gridspec(4, 4)
+
+		# spread_data,spread_time,current_spread = self.get_current_data()
+		# m_dis,w_dis,roc1l,roc5l,roc15l = self.get_hist_data()
+
+		spread_time = pd.to_datetime(self.minutes,format='%H:%M')
+
+		self.spread_ = self.f.add_subplot(self.gs[0,:-1])
+		self.spread_.tick_params(axis='both', which='major', labelsize=8)
+		self.spread_line,=self.spread_.plot(spread_time,self.spreads)
+
+		self.spread_.xaxis.set_major_formatter(self.min_form)
+		self.spread_.yaxis.set_major_formatter(mtick.PercentFormatter())
+		self.spread_.set_title('IntraDay Spread')
+
+		self.max_spread_d = self.f.add_subplot(self.gs[1,0])
+		self.max_spread_d.set_title('Spread Today')
+		self.max_spread_d.boxplot(self.spreads, flierprops=self.outlier,vert=False, whis=1)
+		self.cur_spread1 = self.max_spread_d.axvline(x=self.current_spread,color="r")
+
+		self.max_spread_w = self.f.add_subplot(self.gs[1,1])
+		self.max_spread_w.set_title('Spread Weekly')
+		self.max_spread_w.boxplot(self.w_dis, flierprops=self.outlier,vert=False, whis=1)
+		self.cur_spread2 = self.max_spread_w.axvline(x=self.current_spread,color="r")
+
+		self.max_spread_m = self.f.add_subplot(self.gs[1,2])
+		self.max_spread_m.set_title('Spread Monthly')
+		self.max_spread_m.boxplot(self.m_dis, flierprops=self.outlier,vert=False, whis=1)
+		self.cur_spread3 = self.max_spread_m.axvline(x=self.current_spread,color="r")
+
+		self.roc1_box = self.f.add_subplot(self.gs[2,0])
+		self.roc1_box.set_title('Change 1 min')
+		self.roc1_box.boxplot(self.roc1l, flierprops=self.outlier,vert=False, whis=2.5)
+		self.roc1_ = self.roc1_box.axvline(x=self.roc1,color="r")
+
+		self.roc5_box = self.f.add_subplot(self.gs[2,1])
+		self.roc5_box.set_title('Change 5 min')
+		self.roc5_box.boxplot(self.roc5l, flierprops=self.outlier,vert=False, whis=1.5)
+		self.roc5_ = self.roc5_box.axvline(x=self.roc5,color="r")
+
+		self.roc15_box =self.f.add_subplot(self.gs[2,2])
+		self.roc15_box.set_title('Change 15 min')
+		self.roc15_box.boxplot(self.roc15l, flierprops=self.outlier,vert=False, whis=1.5)
+		self.roc15_ = self.roc15_box.axvline(x=self.roc15,color="r")
+
+		#self.set_graphical_components([[cur_spread1,cur_spread2,cur_spread3],[spread_line,roc1_,roc5_,roc15_]]) 
+	
+		plt.tight_layout()
+
+		plotcanvas = FigureCanvasTkAgg(self.f, self.pannel)
+		plotcanvas.get_tk_widget().grid(column=1, row=1)
+
 
 	def get_hist_data(self):
 
@@ -321,16 +335,6 @@ class spread:
 	def get_current_data(self):
 
 		return 	self.spreads,self.minutes,self.current_spread
-		
-
-	def set_graphical_components(self,gc):
-
-		#unpack
-		self.current_spread_graph_list = gc[0]
-		self.intraday_spread_graph = gc[1][0]
-		self.roc1_graph =  gc[1][1]
-		self.roc5_graph =  gc[1][2]
-		self.roc15_graph =  gc[1][3]
 
 
 	def fetch_missing_data(self):
@@ -371,11 +375,25 @@ class spread:
 
 		cur_minute_list = ts[0][:]
 
-		#Time 
 		self.spreads = intra_spread
 		self.minutes = cur_minute_list
 		self.current_minute = cur_minute_list[-1]
 		self.current_spread = intra_spread[-1]
+
+		if len(intra_spread)>0: 
+
+			self.roc1 = self.current_spread - self.spreads[-1]      
+			len_ = min(5, len(self.spreads)-1)
+
+			#print(len_,self.intra_spread[-len_],self.spread)
+			self.roc5 = self.current_spread- self.spreads[-len_] 
+
+			len_ = min(15, len(self.spreads)-1)
+			#print(len_,self.intra_spread[-len_],self.spread)
+			self.roc15 = self.current_spread-self.spreads[-len_] 
+
+		#Time 
+
 
 	#when either of the price is updated. this is called. 
 	def spread_update(self):
@@ -391,15 +409,15 @@ class spread:
 			self.current_spread = self.data.symbol_percentage_since_open[self.symbol1] - self.data.symbol_percentage_since_open[self.symbol2]
 
 
-			if len(self.intra_spread)>0: 
+			if len(self.spreads)>0: 
 
 				self.roc1 = self.current_spread - self.spreads[-1]      
-				len_ = min(5, len(self.intra_spread)-1)
+				len_ = min(5, len(self.spreads)-1)
 
 				#print(len_,self.intra_spread[-len_],self.spread)
 				self.roc5 = self.current_spread- self.spreads[-len_] 
 
-				len_ = min(15, len(self.intra_spread)-1)
+				len_ = min(15, len(self.spreads)-1)
 				#print(len_,self.intra_spread[-len_],self.spread)
 				self.roc15 = self.current_spread-self.spreads[-len_] 
 
