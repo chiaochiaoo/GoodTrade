@@ -28,6 +28,15 @@ import matplotlib.ticker as mtick
 
 from tkinter import *
 
+def timestamp(s):
+
+	p = s.split(":")
+	try:
+		x = int(p[0])*60+int(p[1])
+		return x
+	except Exception as e:
+		print(e)
+		return 0
 
 def ts_to_str(timestamp):
 	
@@ -74,7 +83,7 @@ class spread_trader(pannel):
 		self.symbol1 = tk.StringVar(self.main)
 		self.symbol2 = tk.StringVar(self.main)
 
-		self.symbolist = {'Unselected','SPY.AM','QQQ.NQ','USO.AM','SMH.AM','KRE.AM'}
+		self.refresh_symbol_list()
 
 		self.symbol1.set('Unselected') 
 		self.symbol2.set('Unselected') 
@@ -89,7 +98,7 @@ class spread_trader(pannel):
 		self.op2.grid(row = 2, column =2)
 		#self.menu1 = ttk.Label(self.setting, text="Country").grid(row = 1, column = 3)
 
-		self.refresh_symbols = ttk.Button(self.main,text ="Refresh Symbol",width=15).grid(row = 1, column = 3)#.place(relx=0.01, rely=0.01, height=25, width=70)
+		self.refresh_symbols = ttk.Button(self.main,text ="Refresh Symbol",width=15,command=self.refresh_symbol_list).grid(row = 1, column = 3)#.place(relx=0.01, rely=0.01, height=25, width=70)
 		self.add_symbols = ttk.Button(self.main,text ="Create pair",command=self.create_new_tab,width=15).grid(row =2, column = 3)#.place(relx=0.01, rely=0.01, height=25, width=70)
 
 		#a button
@@ -159,6 +168,9 @@ class spread_trader(pannel):
 		# 	self.b.grid(row=1, column=i)
 
 		# self.rebind(self.scanner_canvas,self.scanner_frame)
+
+	def refresh_symbol_list(self):
+		self.symbolist = set(self.data.get_list())
 
 	def validation(self):
 
@@ -234,6 +246,7 @@ class spread:
 
 		self.lock = False
 
+		self.i= 0
 		#necessary data.
 
 		#m_dis,w_dis,roc1l,roc5l,roc15l
@@ -242,15 +255,15 @@ class spread:
 
 
 
-		# now = datetime.now()
-		# ts=now.hour*60 + now.minute
-		# print(ts)
-		# if ts>570:
-		# 	self.fetch_missing_data()
+		now = datetime.now()
+		ts=now.hour*60 + now.minute
+		print(ts)
+		if ts>570:
+			self.fetch_missing_data()
 
-		# 	#missing data fetched
+			#missing data fetched
 
-		# 	print("missing data fetched ")
+			print("missing data fetched ")
 		
 		self.create_graphs()
 
@@ -261,11 +274,7 @@ class spread:
 		#set the graph. 
 
 		#m=self.data.symbol_price[symbol1].trace('w', lambda *_, text=info[j],label=self.tickers_labels[i][j]: self.status_change_color(text,label))
-		# m=self.data.symbol_price[symbol1].trace('w', self.spread_update)
-		# self.trace.append(m)
 
-		# m=self.data.symbol_price[symbol2].trace('w', self.spread_update)
-		# self.trace.append(m)
 
 	def create_graphs(self):
 
@@ -277,7 +286,7 @@ class spread:
 		self.outlier = dict(linewidth=3, color='darkgoldenrod',marker='o')
 		plt.style.use("seaborn-darkgrid")
 
-		self.f = plt.figure(1,figsize=(12,8))
+		self.f = plt.figure(1,figsize=(10,9))
 
 		self.min_form = DateFormatter("%H:%M")
 
@@ -333,6 +342,12 @@ class spread:
 		plotcanvas = FigureCanvasTkAgg(self.f, self.pannel)
 		plotcanvas.get_tk_widget().grid(column=1, row=1)
 
+		m=self.data.symbol_price[symbol1].trace('w', self.spread_update)
+		self.trace.append(m)
+
+		m=self.data.symbol_price[symbol2].trace('w', self.spread_update)
+		self.trace.append(m)
+
 
 	def get_hist_data(self):
 
@@ -350,8 +365,8 @@ class spread:
 		s=[self.symbol1[:-3],self.symbol2[:-3]]
 
 		for i in s:
-			timestamp,price = SVF.fetch_data_yahoo(i)
-			ts.append(timestamp[:-2])
+			times,price = SVF.fetch_data_yahoo(i)
+			ts.append(times[:-2])
 			ps.append(price[:-2])
 
 		#print(ts,ps)
@@ -383,7 +398,8 @@ class spread:
 
 		self.spreads = intra_spread
 		self.minutes = cur_minute_list
-		self.current_minute = cur_minute_list[-1]
+		print(cur_minute_list[-1])
+		self.current_minute = timestamp(cur_minute_list[-1])
 		self.current_spread = intra_spread[-1]
 
 		if len(intra_spread)>0: 
@@ -402,8 +418,11 @@ class spread:
 
 
 	#when either of the price is updated. this is called. 
-	def spread_update(self):
+	def spread_update(self,a,b,c):
+
+		#print(a,b,c)
 		if self.lock == False:
+
 			self.lock = True
 
 			#update the data.
@@ -411,31 +430,55 @@ class spread:
 			now = datetime.now()
 			ts = now.hour*60 + now.minute
 
-			self.current_minute = ts
-			self.current_spread = self.data.symbol_percentage_since_open[self.symbol1] - self.data.symbol_percentage_since_open[self.symbol2]
+			#ts = self.current_minute+1
 
+			
+			self.current_spread = float(self.data.symbol_percentage_since_open[self.symbol1].get()) - float(self.data.symbol_percentage_since_open[self.symbol2].get())
 
-			if len(self.spreads)>0: 
+			if self.current_spread !=0:
+				if len(self.spreads)>0: 
 
-				self.roc1 = self.current_spread - self.spreads[-1]      
-				len_ = min(5, len(self.spreads)-1)
+					self.roc1 = self.current_spread - self.spreads[-1]      
+					len_ = min(5, len(self.spreads)-1)
 
-				#print(len_,self.intra_spread[-len_],self.spread)
-				self.roc5 = self.current_spread- self.spreads[-len_] 
+					#print(len_,self.intra_spread[-len_],self.spread)
+					self.roc5 = self.current_spread- self.spreads[-len_] 
 
-				len_ = min(15, len(self.spreads)-1)
-				#print(len_,self.intra_spread[-len_],self.spread)
-				self.roc15 = self.current_spread-self.spreads[-len_] 
+					len_ = min(15, len(self.spreads)-1)
+					#print(len_,self.intra_spread[-len_],self.spread)
+					self.roc15 = self.current_spread-self.spreads[-len_] 
 
-			if ts>self.current_minute:
-				self.spreads.append(self.current_spread)
-				self.time.append(ts_to_str(self.current_minute))
+				print("spread-update",ts,self.minutes[-5:],self.current_spread,self.roc1,self.roc5,self.roc15)
 
+				if ts>self.current_minute:
+					self.spreads.append(self.current_spread)
+					self.minutes.append(ts_to_str(ts))
 
+				self.current_minute = ts
+
+				self.update_graph()
 			self.lock = False
 
 	def update_graph(self):
-		pass
+		
+		spread_time = pd.to_datetime(self.minutes,format='%H:%M')
+
+		self.spread_line.set_data(spread_time,self.spreads)
+
+		self.spread_.set_xlim(spread_time[0], spread_time[-1])
+		#print(spread_time[:-5])
+		#self.spread_.tick_params(axis='both', which='major', labelsize=8)
+		#self.spread_.xaxis.set_major_formatter(self.min_form)
+
+		self.cur_spread1.set_data(self.current_spread,[0,1])
+		self.cur_spread2.set_data(self.current_spread,[0,1])
+		self.cur_spread3.set_data(self.current_spread,[0,1])
+		self.roc1_.set_data(self.roc1,[0,1])
+		self.roc5_.set_data(self.roc5,[0,1])
+		self.roc15_.set_data(self.roc15,[0,1])
+
+		self.f.canvas.draw()
+
 
 # root = tk.Tk() 
 # root.title("GoodTrade PairTrader") 
