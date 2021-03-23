@@ -89,7 +89,12 @@ class spread_trader(pannel):
 		#a button
 		#two lists.
 		# an add symbol
-
+### SC QQQ
+### SC SPY
+### AVG. C
+###
+###
+###
 
 		self.tabs = {}
 
