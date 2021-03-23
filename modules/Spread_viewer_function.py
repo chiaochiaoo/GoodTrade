@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import database as db
+from . import database as db
 import json
 import pandas as pd
 from datetime import datetime

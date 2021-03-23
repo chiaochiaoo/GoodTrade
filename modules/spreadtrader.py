@@ -2,16 +2,22 @@ import tkinter as tk
 from tkinter import ttk 
 import threading
 import pandas as pd
-import database as db
-import Spread_viewer_function as SVF
 import numpy as np
-
 from datetime import datetime
 
-from Symbol_data_manager import *
 
-# from modules.pannel import *
-# from modules.scanner_process_manager import *
+
+from modules.pannel import *
+from modules.Symbol_data_manager import *
+import modules.database as db
+import modules.Spread_viewer_function as SVF
+
+#import Spread_viewer_function as SVF
+#from modules.scanner_process_manager import *
+#from pannel import *
+#from Symbol_data_manager import *
+#import database as db
+
 
 from matplotlib import pyplot as plt
 import matplotlib.animation as animation
@@ -19,7 +25,7 @@ from matplotlib import style
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.dates import DateFormatter
 import matplotlib.ticker as mtick
-from pannel import *
+
 from tkinter import *
 
 
@@ -47,7 +53,7 @@ def status_change(var,label):
 
 class spread_trader(pannel):
 
-	def __init__(self,root,tickers_manager,data):
+	def __init__(self,root,data):
 
 		super()
 
@@ -431,13 +437,13 @@ class spread:
 	def update_graph(self):
 		pass
 
-root = tk.Tk() 
-root.title("GoodTrade PairTrader") 
+# root = tk.Tk() 
+# root.title("GoodTrade PairTrader") 
 
-s = spread_trader(root,None,None)
-root.geometry("700x800")
-root.minsize(1000, 800)
-root.maxsize(1800, 1200)
-root.mainloop()
+# s = spread_trader(root,None)
+# root.geometry("700x800")
+# root.minsize(1000, 800)
+# root.maxsize(1800, 1200)
+# root.mainloop()
 
 #spread("SPY.AM", "QQQ.NQ", None)

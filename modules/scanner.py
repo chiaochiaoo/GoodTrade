@@ -746,6 +746,7 @@ class scanner(pannel):
 
 	def add_nasdaq_labels(self,df):
 
+		return True
 		self.nasdaq_trader_symbols = []
 		
 		timestamp = df[2]

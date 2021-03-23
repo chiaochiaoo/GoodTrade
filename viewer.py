@@ -10,12 +10,17 @@ from tkinter import messagebox
 
 
 from modules.alerts import *
-from modules.pannel import *
+from modules.pannel import *	
 from modules.Symbol_data_manager import *
+
+from modules.Symbol_data_manager import *
+from modules.spreadtrader import *
+
 from modules.scanner import *
 from modules.scanner_process_manager import *
 from modules.database_process_manager import *
 from modules.ppro_process_manager import *
+
 from cores.algo_manager_comms import *
 from cores.algo_process_manager_client import *
 
@@ -54,6 +59,7 @@ class viewer:
 		self.tab10 = tk.Canvas(self.tabControl)
 		self.tab11 = tk.Canvas(self.tabControl)
 
+		self.tab12 = tk.Canvas(self.tabControl)
 
 		self.tabControl.add(self.tab1, text ='Tickers Manager') 
 		self.tabControl.add(self.tab8, text ='All alerts') 
@@ -66,6 +72,9 @@ class viewer:
 		self.tabControl.add(self.tab3, text ='Extreme Volume') 
 		self.tabControl.add(self.tab4, text ='First five minutes')
 		self.tabControl.add(self.tab9, text ='Premarket Breakout')
+
+		self.tabControl.add(self.tab12,text='Pair Trader')
+
 		self.tabControl.pack(expand = 1, fill ="both") 
 
 		#self.ticker_management_init(self.tab1)
@@ -89,6 +98,7 @@ class viewer:
 
 		self.tm = ticker_manager(self.tab1,self.data,alerts,authen_comm)
 		
+		self.pair =  spread_trader(self.tab12,self.data)
 
 		self.scanner_pannel = scanner(root,self.tm,scanner_process,self.data)
 

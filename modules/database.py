@@ -2,8 +2,8 @@ import time
 import random
 import subprocess
 import datetime
-import Meta_extractor_lib
-import Spread_extractor_lib
+from . import Meta_extractor_lib
+from . import Spread_extractor_lib
 import pandas as pd
 import numpy as np
 import os
