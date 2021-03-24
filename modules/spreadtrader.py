@@ -233,7 +233,7 @@ class spread:
 
 		#m_dis,w_dis,roc1l,roc5l,roc15l
 		symbols = [self.symbol1[:-3],self.symbol2[:-3]]
-		self.m_dis,self.w_dis,self.roc1l,self.roc5l,self.roc15l = [],[],[],[],[] #SVF.find_info(symbols)
+		self.m_dis,self.w_dis,self.roc1l,self.roc5l,self.roc15l = SVF.find_info(symbols) #[],[],[],[],[] #
 
 
 
@@ -243,15 +243,13 @@ class spread:
 		self.chart = ttk.LabelFrame(self.pannel)
 		self.chart.place(relx=0.8,y=0,relheight=1,relwidth=0.2)
 
-		# now = datetime.now()
-		# ts=now.hour*60 + now.minute
-		# print(ts)
-		# if ts>570:
-		# 	self.fetch_missing_data()
+		now = datetime.now()
+		ts=now.hour*60 + now.minute
+		#print(ts)
+		if ts>570:
+			self.fetch_missing_data()
 
-			#missing data fetched
-
-			# print("missing data fetched ")
+			print("missing data fetched ")
 		
 		self.create_graphs()
 
