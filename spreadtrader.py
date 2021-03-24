@@ -205,7 +205,6 @@ class spread:
 	def __init__(self,symbol1,symbol2,data:Symbol_data_manager,pannel,exsit):
 
 
-
 		self.data = data
 		self.exsit = exsit
 		self.trace = []
@@ -230,10 +229,11 @@ class spread:
 
 		self.i= 0
 		#necessary data.
+		self.col = 0
 
 		#m_dis,w_dis,roc1l,roc5l,roc15l
 		symbols = [self.symbol1[:-3],self.symbol2[:-3]]
-		self.m_dis,self.w_dis,self.roc1l,self.roc5l,self.roc15l = [],[],[],[],[] #SVF.find_info(symbols)
+		self.m_dis,self.w_dis,self.roc1l,self.roc5l,self.roc15l = SVF.find_info(symbols) #[],[],[],[],[] #
 
 
 
@@ -243,15 +243,13 @@ class spread:
 		self.chart = ttk.LabelFrame(self.pannel)
 		self.chart.place(relx=0.8,y=0,relheight=1,relwidth=0.2)
 
-		# now = datetime.now()
-		# ts=now.hour*60 + now.minute
-		# print(ts)
-		# if ts>570:
-		# 	self.fetch_missing_data()
+		now = datetime.now()
+		ts=now.hour*60 + now.minute
+		#print(ts)
+		if ts>570:
+			self.fetch_missing_data()
 
-			#missing data fetched
-
-			# print("missing data fetched ")
+			print("missing data fetched ")
 		
 		self.create_graphs()
 
@@ -265,6 +263,16 @@ class spread:
 		#m=self.data.symbol_price[symbol1].trace('w', lambda *_, text=info[j],label=self.tickers_labels[i][j]: self.status_change_color(text,label))
 
 	def create_chart(self):
+
+
+		#self.col+=1
+
+		self.b=tk.Button(self.chart,text="Pair Research")
+		self.b.grid(row=self.col,column=0)
+
+		self.b=tk.Button(self.chart,text="Close Chart")
+		self.b.grid(row=self.col,column=1)
+		self.col+=1
 
 		#width = [8,12,10,6,10,10]
 		labels = ["Attribute","SC:"+self.symbol1[:-3],"SC:"+self.symbol2[:-3],"Price Ratio","Avg. 5m Cor","Avg. 15m Cor"]
@@ -281,8 +289,7 @@ class spread:
 			self.b.configure(foreground="#000000")
 			self.b.configure(highlightbackground="#d9d9d9")
 			self.b.configure(highlightcolor="black")
-			self.b.grid(row=i, column=0)
-
+			self.b.grid(row=self.col, column=0)
 
 			if i>=len(values)-1:
 				t = ""
@@ -298,9 +305,9 @@ class spread:
 			self.b.configure(foreground="#000000")
 			self.b.configure(highlightbackground="#d9d9d9")
 			self.b.configure(highlightcolor="black")
-			self.b.grid(row=i, column=1)
+			self.b.grid(row=self.col, column=1)
 
-
+			self.col +=1
 	def create_graphs(self):
 
 		if self.exsit:
@@ -340,25 +347,41 @@ class spread:
 		self.max_spread_w.boxplot(self.w_dis, flierprops=self.outlier,vert=False, whis=1)
 		self.cur_spread2 = self.max_spread_w.axvline(x=self.current_spread,color="r")
 
+		self.w_dis_min = min(self.w_dis)
+		self.w_dis_max = max(self.w_dis)
+
 		self.max_spread_m = self.f.add_subplot(self.gs[1,2])
 		self.max_spread_m.set_title('Spread Monthly')
 		self.max_spread_m.boxplot(self.m_dis, flierprops=self.outlier,vert=False, whis=1)
 		self.cur_spread3 = self.max_spread_m.axvline(x=self.current_spread,color="r")
+
+		self.m_dis_min = min(self.m_dis)
+		self.m_dis_max = max(self.m_dis)
 
 		self.roc1_box = self.f.add_subplot(self.gs[2,0])
 		self.roc1_box.set_title('Change 1 min')
 		self.roc1_box.boxplot(self.roc1l, flierprops=self.outlier,vert=False, whis=2.5)
 		self.roc1_ = self.roc1_box.axvline(x=self.roc1,color="r")
 
+		self.roc1l_min = min(self.roc1l)
+		self.roc1l_max = max(self.roc1l)
+
 		self.roc5_box = self.f.add_subplot(self.gs[2,1])
 		self.roc5_box.set_title('Change 5 min')
 		self.roc5_box.boxplot(self.roc5l, flierprops=self.outlier,vert=False, whis=1.5)
 		self.roc5_ = self.roc5_box.axvline(x=self.roc5,color="r")
 
+		self.roc5l_min = min(self.roc5l)
+		self.roc5l_max = max(self.roc5l)
+
 		self.roc15_box =self.f.add_subplot(self.gs[2,2])
 		self.roc15_box.set_title('Change 15 min')
 		self.roc15_box.boxplot(self.roc15l, flierprops=self.outlier,vert=False, whis=1.5)
 		self.roc15_ = self.roc15_box.axvline(x=self.roc15,color="r")
+
+		self.roc15l_min = min(self.roc15l)
+		self.roc15l_max = max(self.roc15l)
+
 
 		#self.set_graphical_components([[cur_spread1,cur_spread2,cur_spread3],[spread_line,roc1_,roc5_,roc15_]]) 
 	
@@ -459,31 +482,32 @@ class spread:
 
 			#ts = self.current_minute+1
 
+			if ts>=570:
 			
-			self.current_spread = float(self.data.symbol_percentage_since_open[self.symbol1].get()) - float(self.data.symbol_percentage_since_open[self.symbol2].get())
+				self.current_spread = float(self.data.symbol_percentage_since_open[self.symbol1].get()) - float(self.data.symbol_percentage_since_open[self.symbol2].get())
 
-			if self.current_spread !=0:
-				if len(self.spreads)>0: 
+				if self.current_spread !=0:
+					if len(self.spreads)>0: 
 
-					self.roc1 = self.current_spread - self.spreads[-1]      
-					len_ = min(5, len(self.spreads)-1)
+						self.roc1 = self.current_spread - self.spreads[-1]      
+						len_ = min(5, len(self.spreads)-1)
 
-					#print(len_,self.intra_spread[-len_],self.spread)
-					self.roc5 = self.current_spread- self.spreads[-len_] 
+						#print(len_,self.intra_spread[-len_],self.spread)
+						self.roc5 = self.current_spread- self.spreads[-len_] 
 
-					len_ = min(15, len(self.spreads)-1)
-					#print(len_,self.intra_spread[-len_],self.spread)
-					self.roc15 = self.current_spread-self.spreads[-len_] 
+						len_ = min(15, len(self.spreads)-1)
+						#print(len_,self.intra_spread[-len_],self.spread)
+						self.roc15 = self.current_spread-self.spreads[-len_] 
 
-				print("spread-update",ts,self.minutes[-5:],self.current_spread,self.roc1,self.roc5,self.roc15)
+					print("spread-update",ts,self.minutes[-3:],len(self.minutes),len(self.spreads),self.current_spread,self.roc1,self.roc5,self.roc15)
 
-				if ts>self.current_minute:
-					self.spreads.append(self.current_spread)
-					self.minutes.append(ts_to_str(ts))
+					if ts>self.current_minute:
+						self.spreads.append(self.current_spread)
+						self.minutes.append(ts_to_str(ts))
 
-				self.current_minute = ts
+						self.current_minute = ts
 
-				self.update_graph()
+					self.update_graph()
 			self.lock = False
 
 	def update_graph(self):
@@ -492,7 +516,9 @@ class spread:
 
 		self.spread_line.set_data(spread_time,self.spreads)
 
+		#can i set a bit ahead of time?
 		self.spread_.set_xlim(spread_time[0], spread_time[-1])
+		self.spread_.set_ylim(min(self.spreads)-0.1,max(self.spreads)+0.1)
 		#print(spread_time[:-5])
 		#self.spread_.tick_params(axis='both', which='major', labelsize=8)
 		#self.spread_.xaxis.set_major_formatter(self.min_form)
@@ -504,7 +530,23 @@ class spread:
 		self.roc5_.set_data(self.roc5,[0,1])
 		self.roc15_.set_data(self.roc15,[0,1])
 
+
+		# self.max_spread_d.set_xlim(min(self.spreads)-0.1,max(self.spreads)+0.1)
+		# self.max_spread_w.set_xlim(min(self.current_spread,self.w_dis_min)-0.1,max(self.current_spread,self.w_dis_min)+0.1)
+		# self.max_spread_m.set_xlim(min(self.current_spread,self.m_dis_min)-0.1,max(self.current_spread,self.m_dis_min)+0.1)
+
+		#self.max_spread_d.set_xlim(min(self.spreads)-0.1,max(self.spreads)+0.1)
+		self.max_spread_w.set_xlim(min(self.w_dis)-0.5,max(self.w_dis)+0.5)
+		self.max_spread_m.set_xlim(min(self.m_dis)-0.5,max(self.w_dis)+0.5)
+
+
+		self.roc1_box.set_xlim(min(self.roc1,self.roc1l_min)-0.1,max(self.roc1,self.roc1l_max)+0.1)
+		self.roc5_box.set_xlim(min(self.roc5,self.roc5l_min)-0.1,max(self.roc5,self.roc5l_max)+0.1)
+		self.roc15_box.set_xlim(min(self.roc15,self.roc15l_min)-0.1,max(self.roc15,self.roc15l_max)+0.1)
+
+
 		self.f.canvas.draw()
+
 
 
 root = tk.Tk() 
@@ -515,5 +557,3 @@ root.geometry("700x800")
 root.minsize(1000, 800)
 root.maxsize(1800, 1200)
 root.mainloop()
-
-spread("SPY.AM", "QQQ.NQ", None)

@@ -205,7 +205,6 @@ class spread:
 	def __init__(self,symbol1,symbol2,data:Symbol_data_manager,pannel,exsit):
 
 
-
 		self.data = data
 		self.exsit = exsit
 		self.trace = []
@@ -230,6 +229,7 @@ class spread:
 
 		self.i= 0
 		#necessary data.
+		self.col = 0
 
 		#m_dis,w_dis,roc1l,roc5l,roc15l
 		symbols = [self.symbol1[:-3],self.symbol2[:-3]]
@@ -264,6 +264,23 @@ class spread:
 
 	def create_chart(self):
 
+
+		#self.col+=1
+
+		self.b=tk.Button(self.chart,text="Pair Research")
+		self.b.grid(row=self.col,column=0)
+
+		self.b=tk.Button(self.chart,text="Back Test")
+		self.b.grid(row=self.col,column=1)
+		self.col+=1
+
+		self.b=tk.Button(self.chart,text="Create Algo")
+		self.b.grid(row=self.col,column=0)
+
+		self.b=tk.Button(self.chart,text="Close Chart")
+		self.b.grid(row=self.col,column=1)
+		self.col+=1
+
 		#width = [8,12,10,6,10,10]
 		labels = ["Attribute","SC:"+self.symbol1[:-3],"SC:"+self.symbol2[:-3],"Price Ratio","Avg. 5m Cor","Avg. 15m Cor"]
 		values = ["Value","","","",""]
@@ -279,8 +296,7 @@ class spread:
 			self.b.configure(foreground="#000000")
 			self.b.configure(highlightbackground="#d9d9d9")
 			self.b.configure(highlightcolor="black")
-			self.b.grid(row=i, column=0)
-
+			self.b.grid(row=self.col, column=0)
 
 			if i>=len(values)-1:
 				t = ""
@@ -296,9 +312,9 @@ class spread:
 			self.b.configure(foreground="#000000")
 			self.b.configure(highlightbackground="#d9d9d9")
 			self.b.configure(highlightcolor="black")
-			self.b.grid(row=i, column=1)
+			self.b.grid(row=self.col, column=1)
 
-
+			self.col +=1
 	def create_graphs(self):
 
 		if self.exsit:
@@ -537,3 +553,6 @@ class spread:
 
 
 		self.f.canvas.draw()
+
+
+
