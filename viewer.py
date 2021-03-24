@@ -412,18 +412,29 @@ if __name__ == '__main__':
 	print("Main process terminated")
 
 
+
 	request_scanner.send(["terminate"])
 	process_database.terminate()
 	process_ppro.terminate()
 
 	request_scanner.recv()
+
+
 	process_scanner.terminate()
 	process_scanner.join()
+
+	process_scanner_b.terminate()
+	process_scanner.join()
+	
 	process_database.join()
 	process_ppro.join()
 
 	algo_comm_link.terminate()
 	algo_comm_link.join()
+
+	auth.terminate()
+	auth.join()
+
 	print("All subprocesses terminated")
 	
 	os._exit(1) 

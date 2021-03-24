@@ -149,27 +149,13 @@ class spread_trader(pannel):
 
 
 
-		# width = [8,12,10,6,10,10]
-		# labels = ["Ticker","Cur.V","Avg.V","Rel.V","%"+"since close","Add to list"]
-
-		# self.info = []
-
-		# for i in range(len(labels)): #Rows
-		# 	self.b = tk.Button(self.scanner_frame, text=labels[i],width=width[i])#,command=self.rank
-		# 	self.b.configure(activebackground="#f9f9f9")
-		# 	self.b.configure(activeforeground="black")
-		# 	self.b.configure(background="#d9d9d9")
-		# 	self.b.configure(disabledforeground="#a3a3a3")
-		# 	self.b.configure(relief="ridge")
-		# 	self.b.configure(foreground="#000000")
-		# 	self.b.configure(highlightbackground="#d9d9d9")
-		# 	self.b.configure(highlightcolor="black")
-		# 	self.b.grid(row=1, column=i)
-
-		# self.rebind(self.scanner_canvas,self.scanner_frame)
 
 	def refresh_symbol_list(self):
-		self.symbolist = set(self.data.get_list())
+
+		if self.data!=None:
+			self.symbolist = set(self.data.get_list())
+		else:
+			self.symbolist= ["SPY.AM","QQQ.NQ"]
 
 	def validation(self):
 
@@ -189,13 +175,8 @@ class spread_trader(pannel):
 			pair_name = symbol1[:-3]+symbol2[:-3]
 			self.tabs[pair_name] = tk.Canvas(self.spread_lists)
 
-
-			# self.graph = ttk.LabelFrame(self.tabs[pair_name])
-			# self.graph.place(relx=0,y=0,relheight=1,relwidth=0.8)
-
 			self.spread_lists.add(self.tabs[pair_name], text =pair_name) 
 
-			
 
 			#For majortiy just once set.
 
@@ -222,6 +203,8 @@ class spread_trader(pannel):
 class spread:
 
 	def __init__(self,symbol1,symbol2,data:Symbol_data_manager,pannel,exsit):
+
+
 
 		self.data = data
 		self.exsit = exsit
@@ -250,22 +233,29 @@ class spread:
 
 		#m_dis,w_dis,roc1l,roc5l,roc15l
 		symbols = [self.symbol1[:-3],self.symbol2[:-3]]
-		self.m_dis,self.w_dis,self.roc1l,self.roc5l,self.roc15l = SVF.find_info(symbols)#[],[],[],[],[] #
+		self.m_dis,self.w_dis,self.roc1l,self.roc5l,self.roc15l = [],[],[],[],[] #SVF.find_info(symbols)
 
 
 
-		now = datetime.now()
-		ts=now.hour*60 + now.minute
-		print(ts)
-		if ts>570:
-			self.fetch_missing_data()
+		self.graph = ttk.LabelFrame(self.pannel)
+		self.graph.place(relx=0,y=0,relheight=1,relwidth=0.8)
+
+		self.chart = ttk.LabelFrame(self.pannel)
+		self.chart.place(relx=0.8,y=0,relheight=1,relwidth=0.2)
+
+		# now = datetime.now()
+		# ts=now.hour*60 + now.minute
+		# print(ts)
+		# if ts>570:
+		# 	self.fetch_missing_data()
 
 			#missing data fetched
 
-			print("missing data fetched ")
+			# print("missing data fetched ")
 		
 		self.create_graphs()
 
+		self.create_chart()
 		#if this is created after 9:30.
 		# if before 9:30. 
 
@@ -273,6 +263,42 @@ class spread:
 		#set the graph. 
 
 		#m=self.data.symbol_price[symbol1].trace('w', lambda *_, text=info[j],label=self.tickers_labels[i][j]: self.status_change_color(text,label))
+
+	def create_chart(self):
+
+		#width = [8,12,10,6,10,10]
+		labels = ["Attribute","SC:"+self.symbol1[:-3],"SC:"+self.symbol2[:-3],"Price Ratio","Avg. 5m Cor","Avg. 15m Cor"]
+		values = ["Value","","","",""]
+		self.info = []
+
+		for i in range(len(labels)): #Rows
+			self.b = tk.Label(self.chart, text=labels[i],width=12)#,command=self.rank
+			self.b.configure(activebackground="#f9f9f9")
+			self.b.configure(activeforeground="black")
+			self.b.configure(background="#d9d9d9")
+			self.b.configure(disabledforeground="#a3a3a3")
+			self.b.configure(relief="ridge")
+			self.b.configure(foreground="#000000")
+			self.b.configure(highlightbackground="#d9d9d9")
+			self.b.configure(highlightcolor="black")
+			self.b.grid(row=i, column=0)
+
+
+			if i>=len(values)-1:
+				t = ""
+			else:
+				t=values[i]
+
+			self.b = tk.Label(self.chart, text=t,width=13)#,command=self.rank
+			self.b.configure(activebackground="#f9f9f9")
+			self.b.configure(activeforeground="black")
+			self.b.configure(background="#d9d9d9")
+			self.b.configure(disabledforeground="#a3a3a3")
+			self.b.configure(relief="ridge")
+			self.b.configure(foreground="#000000")
+			self.b.configure(highlightbackground="#d9d9d9")
+			self.b.configure(highlightcolor="black")
+			self.b.grid(row=i, column=1)
 
 
 	def create_graphs(self):
@@ -338,14 +364,16 @@ class spread:
 	
 		plt.tight_layout()
 
-		plotcanvas = FigureCanvasTkAgg(self.f, self.pannel)
+		plotcanvas = FigureCanvasTkAgg(self.f, self.graph)
 		plotcanvas.get_tk_widget().grid(column=1, row=1)
 
-		m=self.data.symbol_price[symbol1].trace('w', self.spread_update)
-		self.trace.append(m)
+		if self.data!=None:
 
-		m=self.data.symbol_price[symbol2].trace('w', self.spread_update)
-		self.trace.append(m)
+			m=self.data.symbol_price[symbol1].trace('w', self.spread_update)
+			self.trace.append(m)
+
+			m=self.data.symbol_price[symbol2].trace('w', self.spread_update)
+			self.trace.append(m)
 
 
 	def get_hist_data(self):
@@ -479,13 +507,13 @@ class spread:
 		self.f.canvas.draw()
 
 
-# root = tk.Tk() 
-# root.title("GoodTrade PairTrader") 
+root = tk.Tk() 
+root.title("GoodTrade PairTrader") 
 
-# s = spread_trader(root,None)
-# root.geometry("700x800")
-# root.minsize(1000, 800)
-# root.maxsize(1800, 1200)
-# root.mainloop()
+s = spread_trader(root,None)
+root.geometry("700x800")
+root.minsize(1000, 800)
+root.maxsize(1800, 1200)
+root.mainloop()
 
-#spread("SPY.AM", "QQQ.NQ", None)
+spread("SPY.AM", "QQQ.NQ", None)
