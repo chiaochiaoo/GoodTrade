@@ -8,6 +8,9 @@ import requests
 import tkinter as tk                     
 from tkinter import ttk 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import os
+import sys
+
 timestamp = []
 for i in range(240,1201):
 	timestamp.append(i)
@@ -155,7 +158,7 @@ def new_window(symbol1=None,symbol2=None):
 	root.title("GoodTrade PairTrader Researcher") 
 
 	#s = spread_trader(root,None,True)
-	r = researcher(root)
+	r = researcher(root,symbol1,symbol2)
 	root.geometry("1000x600")
 	#root.minsize(600, 700)
 	root.maxsize(1000, 600)
@@ -180,7 +183,7 @@ def download(symbols,days,regular):
 
 
 class researcher:
-	def __init__(self,root):
+	def __init__(self,root,symbol1=None,symbol2=None):
 		self.root = root
 
 		self.config = ttk.LabelFrame(root,text="Parameters")
@@ -211,17 +214,32 @@ class researcher:
 		self.l2.grid(row = 1, column =2)
 		self.l3.grid(row = 1, column =3)
 
-		self.symbol1 = ttk.Entry(self.config,text="ww")
+
+		self.s1 = tk.StringVar()
+		self.s2 = tk.StringVar()
+		self.d = tk.StringVar()
+		if symbol1!=None:
+			self.s1.set(symbol1)
+		if symbol2!=None:
+			self.s2.set(symbol2)
+
+		self.symbol1 = ttk.Entry(self.config,textvariable=self.s1)
 		self.symbol1.grid(row = 2, column =1)
 
-		self.symbol2 = ttk.Entry(self.config)
+		self.symbol2 = ttk.Entry(self.config,textvariable=self.s2)
 		self.symbol2.grid(row = 2, column =2)
+
 
 		self.days = ttk.Entry(self.config)
 		self.days.grid(row = 2, column =3)
 
 		self.button = ttk.Button(self.config,text="Analyze",command=self.get_chart)
 		self.button.grid(row = 2, column =5)
+
+		if symbol1!=None and symbol2!=None:
+			self.d.set("7")
+
+			self.get_chart()
 
 
 	def get_chart(self):
@@ -284,6 +302,8 @@ class researcher:
 
 		else:
 			print("failed")
+
+
 new_window()
 
 
