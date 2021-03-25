@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 
-
+import time
 
 from modules.pannel import *
 from modules.Symbol_data_manager import *
@@ -98,55 +98,11 @@ class spread_trader(pannel):
 		self.op2.grid(row = 2, column =2)
 		#self.menu1 = ttk.Label(self.setting, text="Country").grid(row = 1, column = 3)
 
-		self.refresh_symbols = ttk.Button(self.main,text ="Refresh Symbol",width=15,command=self.refresh_symbol_list).grid(row = 1, column = 3)#.place(relx=0.01, rely=0.01, height=25, width=70)
+		self.refresh_symbols = ttk.Button(self.main,text ="Refresh Symbol",width=15,command=self.refresh_options).grid(row = 1, column = 3)#.place(relx=0.01, rely=0.01, height=25, width=70)
 		self.add_symbols = ttk.Button(self.main,text ="Create pair",command=self.create_new_tab,width=15).grid(row =2, column = 3)#.place(relx=0.01, rely=0.01, height=25, width=70)
 
-		#a button
-		#two lists.
-		# an add symbol
-		### SC QQQ
-		### SC SPY
-		### AVG. C
-		###
-		###
-		###
 
 		self.tabs = {}
-
-		# self.tab1 = tk.Canvas(self.tabControl)
-		# self.tab2 = tk.Canvas(self.tabControl)
-
-		# self.tabControl.add(self.tab2, text ='Nasdaq Trader') 
-		# self.tabControl.add(self.tab1, text ='Finviz') 
-
-
-		
-		# self.nasdaq = []
-		# ############################### Nasdaq Trader ############################################
-
-
-
-
-		# self.update_in_progress = False
-
-
-
-		# self.add_button = ttk.Button(self.tab2,
-		# 	text ="Add").place(x=380, rely=0.01, height=25, width=70)
-
-
-		# self.NT_update_time = tk.StringVar(root)
-		# self.NT_update_time.set('Last updated') 
-
-		# self.NT_stat = ttk.Label(self.tab2, textvariable=self.NT_update_time).place(x=10, rely=0.01, height=25, width=200)
-
-
-		# #self.NT = ttk.Notebook(self.tab2)
-		# #self.NT.place(x=0,rely=0.05,relheight=1,width=500)
-
-		# self.all = tk.Canvas(self.tab2)
-		# self.all.place(x=0,rely=0.05,relheight=1,width=600)
-
 
 
 
@@ -156,6 +112,18 @@ class spread_trader(pannel):
 			self.symbolist = set(self.data.get_list())
 		else:
 			self.symbolist= ["SPY.AM","QQQ.NQ"]
+
+	def refresh_options(self):
+
+		self.refresh_symbol_list()
+		self.op1['menu'].delete(0, 'end')
+		self.op2['menu'].delete(0, 'end')
+		# Insert list of new options (tk._setit hooks them up to var)
+
+		for choice in self.symbolist:
+			 self.op1['menu'].add_command(label=choice, command=tk._setit(self.symbol1, choice))
+			 self.op2['menu'].add_command(label=choice, command=tk._setit(self.symbol2, choice))
+					
 
 	def validation(self):
 
@@ -210,9 +178,11 @@ class spread:
 		self.trace = []
 		self.pannel = pannel
 
+
+
 		self.symbol1= symbol1
 		self.symbol2= symbol2 
-
+		self.ratio = tk.StringVar()
 		self.spreads = []
 		self.minutes = []
 
@@ -257,10 +227,58 @@ class spread:
 		#if this is created after 9:30.
 		# if before 9:30. 
 
-
+		reg = threading.Thread(target=self.calculate_ratio, daemon=True)
+		reg.start()
 		#set the graph. 
 
 		#m=self.data.symbol_price[symbol1].trace('w', lambda *_, text=info[j],label=self.tickers_labels[i][j]: self.status_change_color(text,label))
+
+
+	def calculate_ratio(self):
+
+		while True:
+			a=self.data.symbol_status[self.symbol1].get()
+			b=self.data.symbol_status[self.symbol2].get()
+
+			if a==b and a=="Connected":
+				break
+			else:
+				time.sleep(5)
+
+		print("Price get.")
+		price1= float(self.data.symbol_price[self.symbol1].get())
+		price2= float(self.data.symbol_price[self.symbol2].get())
+
+		ratio = self.ratio_compute(price1,price2)
+
+		s = str(ratio[0])+":"+str(ratio[1])
+		self.ratio.set(s)
+
+	def ratio_compute(self,a,b):
+		a_=[]
+		b_=[]
+		turn = 0
+		while True:
+			if turn==0:
+				a_.append(a)
+				#print(a_)
+			else:
+				b_.append(b)
+				#print(b_)
+
+			#check differentce. who's losing, who's turn is it.
+			ratio = (b*len(b_))/(a*len(a_))
+			#print(ratio)
+			if ratio>0.998 and ratio<1.002:
+				break
+			else:
+				if ratio>1:
+					turn=0
+				else:
+					turn=1
+
+		return (len(a_),len(b_))
+
 
 	def create_chart(self):
 
@@ -282,12 +300,23 @@ class spread:
 		self.col+=1
 
 		#width = [8,12,10,6,10,10]
-		labels = ["Attribute","SC:"+self.symbol1[:-3],"SC:"+self.symbol2[:-3],"Price Ratio","Avg. 5m Cor","Avg. 15m Cor"]
-		values = ["Value","","","",""]
+
+		labels ={"Attribute":"Value",\
+				 "SC:"+self.symbol1[:-3]:self.data.symbol_percentage_since_open[self.symbol1],
+				 "SC:"+self.symbol2[:-3]:self.data.symbol_percentage_since_open[self.symbol2],
+				 "SO:"+self.symbol1[:-3]:self.data.symbol_percentage_since_close[self.symbol1],
+				 "SO:"+self.symbol2[:-3]:self.data.symbol_percentage_since_close[self.symbol2],
+				 "Price Ratio":self.ratio,
+				 "Avg. 5m Cor":"",
+				 "Avg. 15m Cor":"",
+				 "Avg. Linearity":""
+				 }
+
+		#str(type(info[j]))=="<class 'tkinter.StringVar'>":
 		self.info = []
 
-		for i in range(len(labels)): #Rows
-			self.b = tk.Label(self.chart, text=labels[i],width=12)#,command=self.rank
+		for key in labels: #Rows
+			self.b = tk.Label(self.chart, text=key,width=12)#,command=self.rank
 			self.b.configure(activebackground="#f9f9f9")
 			self.b.configure(activeforeground="black")
 			self.b.configure(background="#d9d9d9")
@@ -298,12 +327,11 @@ class spread:
 			self.b.configure(highlightcolor="black")
 			self.b.grid(row=self.col, column=0)
 
-			if i>=len(values)-1:
-				t = ""
+			if str(type(labels[key]))=="<class 'tkinter.StringVar'>" or str(type(labels[key]))=="<class 'tkinter.DoubleVar'>":
+				self.b = tk.Label(self.chart, textvariable=labels[key],width=10)#,command=self.rank
+				
 			else:
-				t=values[i]
-
-			self.b = tk.Label(self.chart, text=t,width=13)#,command=self.rank
+				self.b = tk.Label(self.chart, text=labels[key],width=10)#,command=self.rank
 			self.b.configure(activebackground="#f9f9f9")
 			self.b.configure(activeforeground="black")
 			self.b.configure(background="#d9d9d9")
@@ -315,6 +343,7 @@ class spread:
 			self.b.grid(row=self.col, column=1)
 
 			self.col +=1
+
 	def create_graphs(self):
 
 		if self.exsit:
