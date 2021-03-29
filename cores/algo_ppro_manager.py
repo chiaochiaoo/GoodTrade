@@ -141,7 +141,7 @@ def sell_market_order(symbol,share):
         print("Error sending sell order")
 
 def buy_limit_order(symbol, price,share):
-    price = round(price,2)
+    price = round(float(price),2)
     r = requests.post('http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Buy ARCX Limit DAY&shares='+str(share))
     if r.status_code == 200:
         print('buy limit order Success! at',price)
@@ -151,7 +151,7 @@ def buy_limit_order(symbol, price,share):
         print("Error sending buy order")
 
 def sell_limit_order(symbol, price,share):
-    price = round(price,2)
+    price = round(float(price),2)
     r = requests.post('http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Sell->Short ARCX Limit DAY&shares='+str(share))
     if r.status_code == 200:
         print('sell limit order Success! at ',price)

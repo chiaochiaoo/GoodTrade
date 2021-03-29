@@ -195,8 +195,6 @@ class algo_manager(pannel):
 				# else:
 				# 	status_text.set("Done.")
 
-
-
 	def goodtrade_listener(self,d):
 
 		#['id', 'QQQ.NQ', 'Breakout on Support on 0.0 for 0 sec', 'Short', 20, 20.0]
@@ -359,7 +357,7 @@ class algo_manager(pannel):
 			self.holdings[id_] = []
 			#initilize a trade on a symbol. 
 
-			#check : if a position already on a symbol. cancle on the trade. 
+			#check : if a position already on a symbol. cancle the previous order? 
 
 			if not self.check_running_order(id_,symbol):
 
@@ -385,11 +383,61 @@ class algo_manager(pannel):
 					elif pos =="Short":
 						sell_market_order(symbol,order_price,share)
 
-					self.order_tkstring[id_].set("Placed")
+					self.order_tkstring[id_]["algo_status"].set("Placed")
+
+					#self.order_tkstring[id_].set("Placed")
 
 					self.order_tklabels[id_]["algo_status"]["background"] = "yellow" #set the label to be yellow
 				self.register(symbol)
 
+			else:
+				conflicting_order = threading.Thread(target=self.conflicting_order,args=(id_,type_,pos,order_price,share,symbol), daemon=True)
+				conflicting_order.start()				
+				#should be a thread.
+
+
+
+	def conflicting_order(self,id_,type_, pos,price,share,symbol):
+
+		flatten_symbol(symbol)
+
+		previous_order = self.active_order[symbol]
+
+		while True:
+			if self.current_share[previous_order]==0:
+				break
+			else:
+				time.sleep(0.1)
+
+		self.active_order[symbol] = id_
+
+		if type_ == "Market":
+
+			if pos=="Long":
+				buy_market_order(symbol,share)
+				
+				self.active_order[symbol] = id_
+			elif pos =="Short":
+				sell_market_order(symbol,share)
+
+			self.order_tkstring[id_]["algo_status"].set("Running")
+
+			self.order_tklabels[id_]["algo_status"]["background"] = "#97FEA8" #set the label to be, green.
+				
+		elif type_ =="Limit":
+			if pos=="Long":
+				buy_limit_order(symbol,order_price,share)
+				
+			elif pos =="Short":
+				sell_market_order(symbol,order_price,share)
+
+			self.order_tkstring[id_]["algo_status"].set("Placed")
+
+			#self.order_tkstring[id_].set("Placed")
+
+			self.order_tklabels[id_]["algo_status"]["background"] = "yellow" #set the label to be yellow
+		self.register(symbol)
+			
 	def order_pipe_listener(self):
 		while True:
 			d = self.order_pipe.recv()
@@ -409,6 +457,7 @@ class algo_manager(pannel):
 				self.ppro_order_update(d[1])
 			
 
+	#when there is a change of quantity of an order. 
 	def ppro_order_confirmation(self,data):
 
 		symbol = data["symbol"]
@@ -479,8 +528,8 @@ class algo_manager(pannel):
 							self.order_tkstring[id_]["algo_status"].set("Done")
 
 						#dont support multiple symbol on the same trade yet.
-						dereg = threading.Thread(target=self.deregister,args=(symbol,), daemon=True)
-						dereg.start()
+						# dereg = threading.Thread(target=self.deregister,args=(symbol,), daemon=True)
+						# dereg.start()
 
 						#deactive the order.
 						self.active_order[symbol]= ""
@@ -488,6 +537,7 @@ class algo_manager(pannel):
 				#print(self.holdings[id_])
 				self.update_display(id_)
 
+	#update the current status of a current order. 
 	def ppro_order_update(self,data):
 
 		symbol = data["symbol"]
