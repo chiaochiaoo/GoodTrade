@@ -610,7 +610,7 @@ class scanner(pannel):
 		df = self.df
 
 		i = -1
-		width = [3,14,5,6,6,6,6,15,5]
+
 
 		self.update_pd()
 
@@ -628,7 +628,7 @@ class scanner(pannel):
 				since = row['fa']
 				info = [rank,index,market,price,since,status,symbol]
 
-				for j in range(len(width)):
+				for j in range(len(self.width)):
 					if j ==0 or j==2 or j==4:
 						self.nasdaq[i][j]["text"] = info[j]
 					elif j == 3:
