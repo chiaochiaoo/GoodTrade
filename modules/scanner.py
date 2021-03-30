@@ -83,7 +83,6 @@ class scanner(pannel):
 		# self.NT.add(self.newhigh, text ='New High')
 		# self.NT.add(self.newlow, text ='New Low')
 
-
 		self.NT_scanner_canvas = tk.Canvas(self.all)
 		self.NT_scanner_canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
 		self.scroll = tk.Scrollbar(self.all)
@@ -248,6 +247,8 @@ class scanner(pannel):
 
 		self.last_5 = False
 
+		self.since_sort= False
+
 		for i in range(len(self.labels)): #Rows
 			self.b = tk.Button(frame, text=self.labels[i],width=self.nasdaq_width[i])#,command=self.rank
 			self.b.configure(activebackground="#f9f9f9")
@@ -266,7 +267,7 @@ class scanner(pannel):
 		self.buttons[2]["command"] = self.market_button
 		self.buttons[3]["command"] = self.price_button
 
-		
+		self.buttons[4]["command"] = self.since_button
 		self.buttons[5]["command"] = self.close_button
 		self.buttons[6]["command"] = self.open_button
 		self.buttons[7]["command"] = self.last5_button
@@ -286,6 +287,14 @@ class scanner(pannel):
 			self.rank_sort = True
 
 		self.change_sorting_order("rank")
+
+	def since_button(self):
+		if self.since_sort==True:
+			self.since_sort = False
+		else:
+			self.since_sort = True
+
+		self.change_sorting_order("since")
 
 	def price_button(self):
 		if self.price_sort==True:
@@ -358,6 +367,13 @@ class scanner(pannel):
 			self.open_sort = True
 		self.change_sorting_order("open")
 
+
+	def sorting_since(self):
+		if self.since_sort==True:
+			self.df=self.df.sort_values(by=["fats"],ascending=False)
+		else:
+			self.df=self.df.sort_values(by=["fats"],ascending=True)		
+
 	def sorting_rank(self):
 
 		if self.rank_sort==True:
@@ -421,6 +437,8 @@ class scanner(pannel):
 				self.sorting_open()
 			elif self.sorting_order =="last5":
 				self.sorting_last5()
+			elif self.sorting_order =="since":
+				self.sorting_since()
 
 		#df.sort_values(by='col1', ascending=False)
 
@@ -484,138 +502,11 @@ class scanner(pannel):
 		df = self.df
 		i = -1
 		#width = [3,14,5,6,4,6,6,6,10,5]
+
+		#print("init",len(self.df))
 		for index, row in df.iterrows():
 			i+=1
-			rank = row['rank']
-			symbol = row['symbol']
-			price = row['price']
-			roc5 = row['rank5']
-			roc10 = row['rank10']
-			roc30 = row['rank30']
-			status = row['status']
-			since = row['fa']
-
-			market = symbol[-2:]
-			
-			info = [rank,index,market,price,since,status,symbol]
-			self.nasdaq.append([])
-
-
-			for j in range(len(self.nasdaq_width)):
-				if j ==0 or j==2 or j==4:
-					self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=info[j],width=self.nasdaq_width[j]))
-					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-
-				elif j ==3:
-					try:
-						var =  self.data.get_symbol_price(symbol)
-					except:
-						var == None
-
-					if var != None:
-						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=self.nasdaq_width[j]))
-					else:
-						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=self.nasdaq_width[j]))
-
-					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-				#close
-				elif j ==5:
-
-					try:
-						var = self.data.get_close_percentage(symbol)
-					except:
-						var == None
-
-					if var != None:
-						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=self.nasdaq_width[j]))
-					else:
-						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=self.nasdaq_width[j]))
-
-					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-
-				elif j ==6:
-
-					try:
-						var = self.data.get_open_percentage(symbol)
-					except:
-						var == None
-
-					if var != None:
-						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=self.nasdaq_width[j]))
-					else:
-						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=self.nasdaq_width[j]))
-
-					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-				elif j ==7:
-
-					try:
-						var = self.data.get_last_5_range_percentage(symbol)
-					except:
-						var == None
-
-					if var != None:
-						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=self.nasdaq_width[j]))
-					else:
-						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=self.nasdaq_width[j]))
-
-					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-				elif j ==8:
-
-					try:
-						var = self.data.get_position_status(symbol)
-					except:
-						var == None
-
-					if var != None:
-						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=self.nasdaq_width[j]))
-					else:
-						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=self.nasdaq_width[j]))
-
-					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-
-				elif j ==1:
-					self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=info[j],width=self.nasdaq_width[j],background="SystemButtonFace"))
-					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-
-					if roc5>0:
-						tex = info[j]+" ↑"+str(roc5)
-						if int(roc10)>0:
-							tex = tex+" ↑"+str(roc10)
-						if int(roc30)>0:
-							tex = tex+" ↑"+str(roc30)
-
-						color = "#97FEA8"
-						if roc5 >3: 
-							color = "#BDFE10"
-						if roc5 >5:
-							color = "#FC3DC8"
-						self.nasdaq[i][j]["text"]=tex
-						self.nasdaq[i][j]["background"]=color
-					else:
-						self.nasdaq[i][j]["text"]=index
-						self.nasdaq[i][j]["background"]="SystemButtonFace"
-				else:
-
-					self.nasdaq[i].append(tk.Button(self.NT_scanner_frame ,text="Add",width=self.nasdaq_width[j],command= lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)))
-					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-					self.nasdaq_trader_symbols.append(symbol)
-
-		self.nasdaq_trader_created = True
-		self.rebind(self.NT_scanner_canvas,self.NT_scanner_frame)
-
-		print("pannel created")
-
-	def add_nasdaq_labels_update(self):
-
-		df = self.df
-
-		i = -1
-
-		self.update_pd()
-
-		if self.nasdaq_trader_created==True:
-			for index, row in df.iterrows():
-				i+=1
+			if i<=100:
 				rank = row['rank']
 				symbol = row['symbol']
 				price = row['price']
@@ -623,69 +514,89 @@ class scanner(pannel):
 				roc10 = row['rank10']
 				roc30 = row['rank30']
 				status = row['status']
-				market = symbol[-2:]
 				since = row['fa']
+
+				market = symbol[-2:]
+				
 				info = [rank,index,market,price,since,status,symbol]
+				self.nasdaq.append([])
 
 				for j in range(len(self.nasdaq_width)):
-					#print(j)
 					if j ==0 or j==2 or j==4:
-						self.nasdaq[i][j]["text"] = info[j]
-					elif j == 3:
+						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=info[j],width=self.nasdaq_width[j]))
+						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+
+					elif j ==3:
 						try:
 							var =  self.data.get_symbol_price(symbol)
 						except:
 							var == None
 
 						if var != None:
-							self.nasdaq[i][j]["textvariable"] = var
+							self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=self.nasdaq_width[j]))
 						else:
-							self.nasdaq[i][j]["text"] = "NA"
+							self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=self.nasdaq_width[j]))
 
-					elif j == 5:
+						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+					#close
+					elif j ==5:
+
 						try:
 							var = self.data.get_close_percentage(symbol)
 						except:
 							var == None
 
-						if var != None :
-							self.nasdaq[i][j]["textvariable"] = var
+						if var != None:
+							self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=self.nasdaq_width[j]))
 						else:
-							self.nasdaq[i][j]["text"] = "NA"
-					elif j == 6:
+							self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=self.nasdaq_width[j]))
+
+						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+
+					elif j ==6:
+
 						try:
 							var = self.data.get_open_percentage(symbol)
 						except:
 							var == None
 
-						if var != None :
-							self.nasdaq[i][j]["textvariable"] = var
+						if var != None:
+							self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=self.nasdaq_width[j]))
 						else:
-							self.nasdaq[i][j]["text"] = "NA"
+							self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=self.nasdaq_width[j]))
 
-					elif j == 7:
+						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+					elif j ==7:
+
 						try:
 							var = self.data.get_last_5_range_percentage(symbol)
 						except:
 							var == None
 
-						if var != None :
-							self.nasdaq[i][j]["textvariable"] = var
+						if var != None:
+							self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=self.nasdaq_width[j]))
 						else:
-							self.nasdaq[i][j]["text"] = "NA"
+							self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=self.nasdaq_width[j]))
 
-					elif j == 8:
+						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+					elif j ==8:
+
 						try:
 							var = self.data.get_position_status(symbol)
 						except:
 							var == None
 
-						if var != None :
-							self.nasdaq[i][j]["textvariable"] = var
+						if var != None:
+							self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=self.nasdaq_width[j]))
 						else:
-							self.nasdaq[i][j]["text"] = "NA"
+							self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=self.nasdaq_width[j]))
+
+						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 
 					elif j ==1:
+						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=info[j],width=self.nasdaq_width[j],background="SystemButtonFace"))
+						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
+
 						if roc5>0:
 							tex = info[j]+" ↑"+str(roc5)
 							if int(roc10)>0:
@@ -703,9 +614,122 @@ class scanner(pannel):
 						else:
 							self.nasdaq[i][j]["text"]=index
 							self.nasdaq[i][j]["background"]="SystemButtonFace"
-					elif j ==9:
+					elif j==9:
+
+						self.nasdaq[i].append(tk.Button(self.NT_scanner_frame ,text="Add",width=self.nasdaq_width[j],command= lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)))
+						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 						self.nasdaq_trader_symbols.append(symbol)
-						self.nasdaq[i][j]["command"] = lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)
+
+		self.nasdaq_trader_created = True
+		self.rebind(self.NT_scanner_canvas,self.NT_scanner_frame)
+
+		print("pannel created")
+
+	def add_nasdaq_labels_update(self):
+
+		df = self.df
+
+		i = -1
+
+		self.update_pd()
+
+		if self.nasdaq_trader_created==True:
+
+
+			for index, row in df.iterrows():
+				i+=1
+				if i<=100:
+					rank = row['rank']
+					symbol = row['symbol']
+					price = row['price']
+					roc5 = row['rank5']
+					roc10 = row['rank10']
+					roc30 = row['rank30']
+					status = row['status']
+					market = symbol[-2:]
+					since = row['fa']
+					info = [rank,index,market,price,since,status,symbol]
+
+				
+					for j in range(len(self.nasdaq_width)):
+
+						if j ==0 or j==2 or j==4:
+							self.nasdaq[i][j]["text"] = info[j]
+						elif j == 3:
+							try:
+								var =  self.data.get_symbol_price(symbol)
+							except:
+								var == None
+
+							if var != None:
+								self.nasdaq[i][j]["textvariable"] = var
+							else:
+								self.nasdaq[i][j]["text"] = "NA"
+
+						elif j == 5:
+							try:
+								var = self.data.get_close_percentage(symbol)
+							except:
+								var == None
+
+							if var != None :
+								self.nasdaq[i][j]["textvariable"] = var
+							else:
+								self.nasdaq[i][j]["text"] = "NA"
+						elif j == 6:
+							try:
+								var = self.data.get_open_percentage(symbol)
+							except:
+								var == None
+
+							if var != None :
+								self.nasdaq[i][j]["textvariable"] = var
+							else:
+								self.nasdaq[i][j]["text"] = "NA"
+
+						elif j == 7:
+							try:
+								var = self.data.get_last_5_range_percentage(symbol)
+							except:
+								var == None
+
+							if var != None :
+								self.nasdaq[i][j]["textvariable"] = var
+							else:
+								self.nasdaq[i][j]["text"] = "NA"
+
+						elif j == 8:
+							try:
+								var = self.data.get_position_status(symbol)
+							except:
+								var == None
+
+							if var != None :
+								self.nasdaq[i][j]["textvariable"] = var
+							else:
+								self.nasdaq[i][j]["text"] = "NA"
+
+						elif j ==1:
+							if roc5>0:
+								tex = info[j]+" ↑"+str(roc5)
+								if int(roc10)>0:
+									tex = tex+" ↑"+str(roc10)
+								if int(roc30)>0:
+									tex = tex+" ↑"+str(roc30)
+
+								color = "#97FEA8"
+								if roc5 >3: 
+									color = "#BDFE10"
+								if roc5 >5:
+									color = "#FC3DC8"
+								self.nasdaq[i][j]["text"]=tex
+								self.nasdaq[i][j]["background"]=color
+							else:
+								self.nasdaq[i][j]["text"]=index
+								self.nasdaq[i][j]["background"]="SystemButtonFace"
+						elif j ==9:
+							self.nasdaq_trader_symbols.append(symbol)
+							self.nasdaq[i][j]["command"] = lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)
 			print("pannel updated")
 	#This is where every update comes in. 
 
@@ -774,28 +798,28 @@ class scanner(pannel):
 		#registration 
 
 		self.df = df
-		print("1")
+
 		for index, row in df.iterrows():
 				if row['symbol'] not in self.symbols_registry:
 					self.data.partial_register(row['symbol'])
-		print("2")
+
 		#update the SDM data to the PD
 
 		self.update_pd()
-		print("3")
+
 		#update the infos from SDM
 
 		#call the sort.
 		#check if added.
 		#update. 
 		self.nasdaq_labels_sort()
-		print("4")
+
 		if self.nasdaq_trader_created == False:
 			time.sleep(5)
 			self.add_nasdaq_labels_init()
 		else:
 			self.add_nasdaq_labels_update()
-		print("5")
+
 		self.NT_update_time.set(timestamp)
 
 		self.scanner_process_manager.updating_comlete()
