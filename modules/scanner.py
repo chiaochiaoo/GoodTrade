@@ -8,6 +8,8 @@ from modules.scanner_process_manager import *
 
 from tkinter import *
 
+TEST = False
+
 def status_change(var,label):
 	label["text"] = "Current Status: "+var.get()
 
@@ -746,7 +748,8 @@ class scanner(pannel):
 
 	def add_nasdaq_labels(self,df):
 
-		#return True
+		if TEST:
+			return True
 		self.nasdaq_trader_symbols = []
 		
 		timestamp = df[2]
