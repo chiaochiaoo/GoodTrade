@@ -265,11 +265,13 @@ class scanner(pannel):
 		self.buttons[1]["command"] = self.speed_button
 		self.buttons[2]["command"] = self.market_button
 		self.buttons[3]["command"] = self.price_button
-		self.buttons[4]["command"] = self.close_button
-		self.buttons[5]["command"] = self.open_button
-		self.buttons[6]["command"] = self.last5_button
 
-		self.buttons[7]["command"] = self.status_button
+		
+		self.buttons[5]["command"] = self.close_button
+		self.buttons[6]["command"] = self.open_button
+		self.buttons[7]["command"] = self.last5_button
+
+		self.buttons[8]["command"] = self.status_button
 
 
 	def change_sorting_order(self,order):
