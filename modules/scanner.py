@@ -611,7 +611,6 @@ class scanner(pannel):
 
 		i = -1
 
-
 		self.update_pd()
 
 		if self.nasdaq_trader_created==True:
@@ -629,6 +628,7 @@ class scanner(pannel):
 				info = [rank,index,market,price,since,status,symbol]
 
 				for j in range(len(self.nasdaq_width)):
+					#print(j)
 					if j ==0 or j==2 or j==4:
 						self.nasdaq[i][j]["text"] = info[j]
 					elif j == 3:
@@ -703,7 +703,7 @@ class scanner(pannel):
 						else:
 							self.nasdaq[i][j]["text"]=index
 							self.nasdaq[i][j]["background"]="SystemButtonFace"
-					else:
+					elif j ==9:
 						self.nasdaq_trader_symbols.append(symbol)
 						self.nasdaq[i][j]["command"] = lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)
 			print("pannel updated")
@@ -774,28 +774,28 @@ class scanner(pannel):
 		#registration 
 
 		self.df = df
-
+		print("1")
 		for index, row in df.iterrows():
 				if row['symbol'] not in self.symbols_registry:
 					self.data.partial_register(row['symbol'])
-
+		print("2")
 		#update the SDM data to the PD
 
 		self.update_pd()
-
+		print("3")
 		#update the infos from SDM
 
 		#call the sort.
 		#check if added.
 		#update. 
 		self.nasdaq_labels_sort()
-
+		print("4")
 		if self.nasdaq_trader_created == False:
 			time.sleep(5)
 			self.add_nasdaq_labels_init()
 		else:
 			self.add_nasdaq_labels_update()
-			
+		print("5")
 		self.NT_update_time.set(timestamp)
 
 		self.scanner_process_manager.updating_comlete()
