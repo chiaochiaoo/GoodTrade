@@ -265,35 +265,33 @@ class alert(pannel):
 
 		#'Break Up','Break Down','Any'
 		description_break_up = "Break Resistance on "+str(resistence)+" for "+timer_trade+" sec"
-		info_up = [symbol,"Breakup",description_break_up,resistence,support,"Long",risk]
+		info_up = ["Breakup",symbol,description_break_up,resistence,support,"Long",None,risk]
 
 		description_break_down = "Break Support on "+str(support)+" for "+timer_trade+" sec"
-		info_down = [symbol,"Breakdown",description_break_down,support,resistence,"Short",risk]
+		info_down = ["Breakdown",symbol,description_break_down,support,resistence,"Short",None,risk]
+
+		#type_,symbol,description,entry_price,stop_price,position,capital,total_risk
 		if type_trade =='Break Up':
 
-			self.place_trade(info_up)
+			self.place_trade([info_up])
 
 		elif  type_trade =='Break Dn':
 
-			self.place_trade(info_down)
+			self.place_trade([info_down])
 
 		else:
-			self.place_trade(info_up)
-			self.place_trade(info_down)
+			self.place_trade([info_up,info_down])
 			# p1 = threading.Thread(target=self.place_trade(info_up), daemon=True)
 			# p1.start()
 			# p2 = threading.Thread(target=self.place_trade(info_down), daemon=True)
 			# p2.start()
 		
 
-	def place_trade(self,info):
+	def place_trade(self,infos):
 		#print("placing:",info)
+		#type_,symbol,description,entry_price,stop_price,position,capital,total_risk
 
-		symbol,type_,description,entry,stop,position,risk = info[0],info[1],info[2],info[3],info[4],info[5],info[6]
-
-		#	def __init__(commlink,symbol,description,entry_price=None,stop_price=None,position=None,capital=None,total_risk=None):
-
-		algo_placer(self.algo_commlink,type_,symbol,description,entry,stop,position,None,risk)
+		algo_placer(self.algo_commlink,infos)
 
 
 	def delete_symbol(self,symbol):

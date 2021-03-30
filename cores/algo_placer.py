@@ -372,33 +372,37 @@ class stop:
 
 
 
-class algo_placer:
+class algo_window:
 
-	def on_close(self):
-		self.root.destroy()
+	def __init__(self,root,type_,symbol,description,entry_price,stop_price,position,capital,total_risk):
 
-	def on_send(self):
-		#print("sending information")
+		self.id = None
+		self.symbol = symbol
+		self.description = description
+		self.type = type_
+		self.position = position
 
-		#id,symbol,type,position,shares,total_risk.
-		valid,info = self.get_info()
+		self.root=root
 
-		if not valid:
-			print("Not good.",info)
-		else:
-			#create an id. 
-			id_ = info[0]+str(time.time())[-7:]
-			info.insert(0,id_)
+		tk.Label(self.root,text="Symbol: "+symbol).place(x=10,y=10)
+		tk.Label(self.root,text="Trigger type: "+description).place(x=10,y=30)
 
-			info.insert(0,"New order")
-			print(info)
-			self.commlink.send(info)
+		############### ENTRY ################
+		self.entryFrame = ttk.LabelFrame(self.root,text="Entry") 
+		self.entryFrame.place(x=10,y=60,height=150,width=250)
 
-		#id, symbol, type, status, description, position, shares, risk$
 
-		#in the future. wait for confirmation.
-		self.root.destroy()
+		self.stopFrame = ttk.LabelFrame(self.root,text="Stop") 
+		self.stopFrame.place(x=260,y=60,height=150,width=250)
 
+		self.positionManager = ttk.LabelFrame(self.root,text="Position Management") 
+		self.positionManager.place(x=510,y=60,height=150,width=250)
+
+		self.entry = entry(self.entryFrame,entry_price,position,capital)
+		self.stop = stop(self.stopFrame,stop_price,total_risk)
+
+		self.entry.set_stop_pannel(self.stop)
+		self.stop.set_entry_pannel(self.entry)
 
 	def get_info(self):
 
@@ -416,70 +420,64 @@ class algo_placer:
 
 		return valid,info
 
+class algo_placer:
+
+	def on_close(self):
+		self.root.destroy()
+
+	def on_send(self):
+		#print("sending information")
+
+		#id,symbol,type,position,shares,total_risk.
+
+		for i in self.orders_book:
+			valid,info = i.get_info()
+
+			if not valid:
+				print("Not good.",info)
+			else:
+				#create an id. 
+				id_ =info[0]+ info[1]+str(time.time())[-7:]
+				info.insert(0,id_)
+
+				info.insert(0,"New order")
+				print(info)
+
+				if self.commlink!= None:
+					self.commlink.send(info)
+
+		#id, symbol, type, status, description, position, shares, risk$
+
+		#in the future. wait for confirmation.
+		self.root.destroy()
+
 	#if the entry type is given. lock it. 
-	def __init__(self,commlink,type_,symbol,description,entry_price=None,stop_price=None,position=None,capital=None,total_risk=None):
+	def __init__(self,commlink,orders):
 
 		#self.algo_commlink,type_,symbol,description,entry,stop,position,None,risk
-		print(type_,symbol,description)
-		#print(symbol,position,capital,total_risk)
-		self.id = None
-		self.symbol = symbol
-		self.description = description
-		self.type = type_
 
-		self.commlink = commlink
-		self.position = position
-		# root = tk.Tk() 
-		# root.title("Algo Placer: "+symbol) 
-		# root.geometry("780x280")
-		#root.minsize(600, 400)
-		#root.maxsize(900, 280)
-		root = tk.Toplevel(width=780,height=280)
+		block = len(orders)
+
+		root = tk.Toplevel(width=780,height=250*block+60)
 		self.root = root
+		self.commlink = commlink
 
-		tk.Label(root,text="Symbol: "+symbol).place(x=10,y=10)
-		tk.Label(root,text="Trigger type: "+description).place(x=10,y=30)
+		self.orders_book = []
 
-
-		############### ENTRY ################
-		self.entryFrame = ttk.LabelFrame(root,text="Entry") 
-		self.entryFrame.place(x=10,y=60,height=150,width=250)
-
-
-		self.stopFrame = ttk.LabelFrame(root,text="Stop") 
-		self.stopFrame.place(x=260,y=60,height=150,width=250)
-
-		self.positionManager = ttk.LabelFrame(root,text="Position Management") 
-		self.positionManager.place(x=510,y=60,height=150,width=250)
-
-
-		self.entry = entry(self.entryFrame,entry_price,position,capital)
-		self.stop = stop(self.stopFrame,stop_price,total_risk)
-
-
-		self.entry.set_stop_pannel(self.stop)
-		self.stop.set_entry_pannel(self.entry)
-
-		######################################
-		# self.position_management = ttk.LabelFrame(root,text="Position Management") 
-		# self.position_management.place(x=440,y=60,height=100,width=200)	
-
+		k = 0
+		for i in orders:
+			type_,symbol,description,entry_price,stop_price,position,capital,total_risk = i[0],i[1],i[2],i[3],i[4],i[5],i[6],i[7]
+			self.frame= tk.LabelFrame(self.root)
+			self.frame.place(x=0,y=250*k,height=250,width=780)
+			self.orders_book.append(algo_window(self.frame,type_,symbol,description,entry_price,stop_price,position,capital,total_risk))
+			k+=1
 
 		self.place= tk.Button(root ,text="Place algo",width=10,bg="#5BFF80",command=self.on_send)
-		self.place.place(x=110,y=220,height=40,width=80)
+		self.place.place(x=110,y=250*block+10,height=40,width=80)
 
 		self.place= tk.Button(root ,text="Cancel",width=10,command=self.on_close)
-		self.place.place(x=310,y=220,height=40,width=80)
+		self.place.place(x=310,y=250*block+10,height=40,width=80)
 
-		#self.start()
-
-		# sm = price_updater(self.data)
-		# sm.start()
-
-
-	# def start(self):
-
-	# 	self.root.mainloop() 
 
 
 import tkinter as tk
@@ -523,6 +521,6 @@ if __name__ == '__main__':
 	#algo_placer("AAPL.NQ","Breakout on Resistance on 134.45 for 60 secs",134.45,133.45,"Long",None,10.0)
 
 #	def __init__(self,commlink,type_,symbol,description,entry_price=None,stop_price=None,position=None,capital=None,total_risk=None):
-
-	algo_placer(None,'QQQ.NQ',"Break up", 'Breakout on Resistance on 338.85 for 0 sec', 338.85, 336.45, 'Long', None, 5050.0)
+	
+	algo_placer(None,[["Break up",'QQQ.NQ','Breakout on Resistance on 338.85 for 0 sec', 338.85, 336.45, 'Long', None, 5050.0],["Break down",'QQQ.NQ','Breakout on Support on 338.85 for 0 sec', 338.85, 336.45, 'Long', None, 5050.0]])
 	root.mainloop()
