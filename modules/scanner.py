@@ -628,7 +628,7 @@ class scanner(pannel):
 				info = [rank,index,market,price,status,symbol]
 
 				for j in range(len(width)):
-					if j ==0 or j==2:
+					if j ==0 or j==2 or j==4:
 						self.nasdaq[i][j]["text"] = info[j]
 					elif j == 3:
 						try:
@@ -641,7 +641,7 @@ class scanner(pannel):
 						else:
 							self.nasdaq[i][j]["text"] = "NA"
 
-					elif j == 4:
+					elif j == 5:
 						try:
 							var = self.data.get_close_percentage(symbol)
 						except:
@@ -651,7 +651,7 @@ class scanner(pannel):
 							self.nasdaq[i][j]["textvariable"] = var
 						else:
 							self.nasdaq[i][j]["text"] = "NA"
-					elif j == 5:
+					elif j == 6:
 						try:
 							var = self.data.get_open_percentage(symbol)
 						except:
@@ -662,7 +662,7 @@ class scanner(pannel):
 						else:
 							self.nasdaq[i][j]["text"] = "NA"
 
-					elif j == 6:
+					elif j == 7:
 						try:
 							var = self.data.get_last_5_range_percentage(symbol)
 						except:
@@ -673,7 +673,7 @@ class scanner(pannel):
 						else:
 							self.nasdaq[i][j]["text"] = "NA"
 
-					elif j == 7:
+					elif j == 8:
 						try:
 							var = self.data.get_position_status(symbol)
 						except:
