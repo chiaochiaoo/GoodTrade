@@ -750,8 +750,11 @@ class scanner(pannel):
 
 	def add_nasdaq_labels(self,df):
 
+		print("receive new data")
 		if TEST:
+			self.NT_update_time.set("Scanner disabled")
 			return True
+
 		self.nasdaq_trader_symbols = []
 		
 		timestamp = df[2]
