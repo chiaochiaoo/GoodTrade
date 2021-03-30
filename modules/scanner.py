@@ -226,8 +226,9 @@ class scanner(pannel):
 	def recreate_labels(self,frame):
 
 		self.buttons =[]
-		width = [4,15,5,6,6,6,6,15,5]
-		labels = ["Rank","Symbol","Market","Price","SC%","SO%","L5R%","Status","Add"]
+				#3,14,5,6,4,6,6,6,10,5
+		self.nasdaq_width = [4,14,5,6,4,6,6,6,12,5]
+		self.labels = ["Rank","Symbol","Market","Price","Since","SC%","SO%","L5R%","Status","Add"]
 
 		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
 
@@ -247,8 +248,8 @@ class scanner(pannel):
 
 		self.last_5 = False
 
-		for i in range(len(labels)): #Rows
-			self.b = tk.Button(frame, text=labels[i],width=width[i])#,command=self.rank
+		for i in range(len(self.labels)): #Rows
+			self.b = tk.Button(frame, text=self.labels[i],width=self.nasdaq_width[i])#,command=self.rank
 			self.b.configure(activebackground="#f9f9f9")
 			self.b.configure(activeforeground="black")
 			self.b.configure(background="#d9d9d9")
@@ -480,7 +481,7 @@ class scanner(pannel):
 
 		df = self.df
 		i = -1
-		width = [3,14,5,6,6,6,6,15,5]
+		#width = [3,14,5,6,4,6,6,6,10,5]
 		for index, row in df.iterrows():
 			i+=1
 			rank = row['rank']
@@ -490,15 +491,17 @@ class scanner(pannel):
 			roc10 = row['rank10']
 			roc30 = row['rank30']
 			status = row['status']
+			since = row['fa']
 
 			market = symbol[-2:]
 			
-			info = [rank,index,market,price,status,symbol]
+			info = [rank,index,market,price,since,status,symbol]
 			self.nasdaq.append([])
 
-			for j in range(len(width)):
-				if j ==0 or j==2:
-					self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=info[j],width=width[j]))
+
+			for j in range(len(self.nasdaq_width)):
+				if j ==0 or j==2 or j==4:
+					self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=info[j],width=self.nasdaq_width[j]))
 					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 
 				elif j ==3:
@@ -508,14 +511,13 @@ class scanner(pannel):
 						var == None
 
 					if var != None:
-						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=width[j]))
+						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=self.nasdaq_width[j]))
 					else:
-						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=width[j]))
+						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=self.nasdaq_width[j]))
 
 					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-
 				#close
-				elif j ==4:
+				elif j ==5:
 
 					try:
 						var = self.data.get_close_percentage(symbol)
@@ -523,13 +525,13 @@ class scanner(pannel):
 						var == None
 
 					if var != None:
-						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=width[j]))
+						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=self.nasdaq_width[j]))
 					else:
-						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=width[j]))
+						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=self.nasdaq_width[j]))
 
 					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 
-				elif j ==5:
+				elif j ==6:
 
 					try:
 						var = self.data.get_open_percentage(symbol)
@@ -537,12 +539,12 @@ class scanner(pannel):
 						var == None
 
 					if var != None:
-						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=width[j]))
+						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=self.nasdaq_width[j]))
 					else:
-						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=width[j]))
+						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=self.nasdaq_width[j]))
 
 					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-				elif j ==6:
+				elif j ==7:
 
 					try:
 						var = self.data.get_last_5_range_percentage(symbol)
@@ -550,12 +552,12 @@ class scanner(pannel):
 						var == None
 
 					if var != None:
-						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=width[j]))
+						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=self.nasdaq_width[j]))
 					else:
-						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=width[j]))
+						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=self.nasdaq_width[j]))
 
 					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-				elif j ==7:
+				elif j ==8:
 
 					try:
 						var = self.data.get_position_status(symbol)
@@ -563,14 +565,14 @@ class scanner(pannel):
 						var == None
 
 					if var != None:
-						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=width[j]))
+						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,textvariable=var,width=self.nasdaq_width[j]))
 					else:
-						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=width[j]))
+						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=self.nasdaq_width[j]))
 
 					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 
 				elif j ==1:
-					self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=info[j],width=width[j],background="SystemButtonFace"))
+					self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=info[j],width=self.nasdaq_width[j],background="SystemButtonFace"))
 					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 
 					if roc5>0:
@@ -592,7 +594,7 @@ class scanner(pannel):
 						self.nasdaq[i][j]["background"]="SystemButtonFace"
 				else:
 
-					self.nasdaq[i].append(tk.Button(self.NT_scanner_frame ,text="Add",width=width[j],command= lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)))
+					self.nasdaq[i].append(tk.Button(self.NT_scanner_frame ,text="Add",width=self.nasdaq_width[j],command= lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)))
 					self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 					self.nasdaq_trader_symbols.append(symbol)
 
