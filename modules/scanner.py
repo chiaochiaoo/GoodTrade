@@ -628,7 +628,7 @@ class scanner(pannel):
 				since = row['fa']
 				info = [rank,index,market,price,since,status,symbol]
 
-				for j in range(len(self.width)):
+				for j in range(len(self.nasdaq_width)):
 					if j ==0 or j==2 or j==4:
 						self.nasdaq[i][j]["text"] = info[j]
 					elif j == 3:
