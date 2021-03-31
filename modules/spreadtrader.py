@@ -535,13 +535,13 @@ class spread:
 						#print(len_,self.intra_spread[-len_],self.spread)
 						self.roc15 = self.current_spread-self.spreads[-len_] 
 
-					print("spread-update",ts,self.spreads[-5:],len(self.minutes),len(self.spreads),self.current_spread,float(self.data.symbol_percentage_since_open[self.symbol1].get()),float(self.data.symbol_percentage_since_open[self.symbol2].get()),self.roc1,self.roc5,self.roc15)
 
 					if ts>self.current_minute:
 						self.spreads.append(self.current_spread)
 						self.minutes.append(ts_to_str(ts))
-
 						self.current_minute = ts
+
+						print("spread-update",ts,self.spreads[-5:],len(self.minutes),len(self.spreads),self.current_spread,self.roc1,self.roc5,self.roc15)
 
 					self.update_graph()
 			self.lock = False
