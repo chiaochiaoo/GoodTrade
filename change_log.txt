@@ -1,0 +1,7 @@
+-
+Add a requests procedure that, once a symbols is returned unfound. Stop sending further request.
+
+
+Alert:
+
+Only when a higher serverity is reached, an alert is upgraded.

@@ -351,7 +351,8 @@ class alert(pannel):
 					if support != 0.00 and resistance != 0.00 and ts>569:
 						#print(support,resistance,cur_price)
 
-						confirmation = ["Pending","Confirmed"]
+						break_up_confirmation = ["Pending","BreakDn"]
+						break_down_confirmation = ["Pending","BreakUp"]
 						if cur_price<support and cur_price<resistance and self.alerts[symbol][alert_type]!=2:
 
 							self.alerts[symbol][alert_type] = 2
@@ -371,14 +372,14 @@ class alert(pannel):
 							self.set_latest_alert(symbol, alert_str, time)
 
 
-							if self.data.algo_breakout_down[symbol].get()!="" and self.data.algo_breakout_status[symbol].get() in confirmation:
+							if self.data.algo_breakout_down[symbol].get()!="" and self.data.algo_breakout_status[symbol].get() in break_down_confirmation:
 
 								timer = int(self.data.algo_breakout_timer[symbol].get())
 								if timer ==0:
 									#send id.
 									order_id = self.data.algo_breakout_down[symbol].get()
 
-									self.data.algo_breakout_status[symbol].set("Confirmed")
+									self.data.algo_breakout_status[symbol].set("BreakDn")
 
 									print(order_id,"confirmed")
 									self.confirm_trade(order_id)
@@ -405,13 +406,13 @@ class alert(pannel):
 
 							#send out confirm.
 
-							if self.data.algo_breakout_up[symbol].get()!=""  and self.data.algo_breakout_status[symbol].get() in confirmation:
+							if self.data.algo_breakout_up[symbol].get()!=""  and self.data.algo_breakout_status[symbol].get() in break_up_confirmation:
 
 								timer = int(self.data.algo_breakout_timer[symbol].get())
 								if timer ==0:
 									#send id.
 									order_id = self.data.algo_breakout_up[symbol].get()
-									self.data.algo_breakout_status[symbol].set("Confirmed")
+									self.data.algo_breakout_status[symbol].set("BreakUp")
 
 									print(order_id,"confirmed")
 									self.confirm_trade(order_id)
@@ -440,14 +441,14 @@ class alert(pannel):
 								eval_string.set(alert_str)
 
 
-								if self.data.algo_breakout_down[symbol].get()!="" and self.data.algo_breakout_status[symbol].get()=="Pending":
+								if self.data.algo_breakout_down[symbol].get()!="" and self.data.algo_breakout_status[symbol].get() in break_down_confirmation:
 
 									timer = int(self.data.algo_breakout_timer[symbol].get())
 									if been>=timer :
 										#send id.
 										order_id = self.data.algo_breakout_down[symbol].get()
 
-										self.data.algo_breakout_status[symbol].set("Confirmed")
+										self.data.algo_breakout_status[symbol].set("BreakDn")
 
 										print(order_id,"confirmed")
 
@@ -464,13 +465,13 @@ class alert(pannel):
 								eval_string.set(alert_str)
 
 
-								if self.data.algo_breakout_up[symbol].get()!="" and self.data.algo_breakout_status[symbol].get()=="Pending":
+								if self.data.algo_breakout_up[symbol].get()!="" and self.data.algo_breakout_status[symbol].get() in break_up_confirmation:
 
 									timer = int(self.data.algo_breakout_timer[symbol].get())
 									if been>=timer :
 										#send id.
 										order_id = self.data.algo_breakout_up[symbol].get()
-										self.data.algo_breakout_status[symbol].set("Confirmed")
+										self.data.algo_breakout_status[symbol].set("BreakUp")
 
 										print(order_id,"confirmed")
 

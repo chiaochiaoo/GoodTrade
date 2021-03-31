@@ -222,6 +222,7 @@ class algo_manager(pannel):
 		id_,symbol,type_,status,des,pos,order_type,order_price,share,risk = d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10]
 
 		print(id_,"added to new order")
+
 		if id_ not in self.orders_registry:
 
 			self.orders_registry.append(id_)
@@ -315,7 +316,7 @@ class algo_manager(pannel):
 
 		self.label_count +=1
 
-	def check_running_order(self,id_,symbol):
+	def check_running_order(self,symbol):
 
 		if symbol in self.active_order:
 
@@ -358,43 +359,52 @@ class algo_manager(pannel):
 			#initilize a trade on a symbol. 
 
 			#check : if a position already on a symbol. cancle the previous order? 
+			#has to be on the opposite side.
+			#Not current order is running. 
 
-			if not self.check_running_order(id_,symbol):
-
-				self.active_order[symbol] = id_
-
-				if type_ == "Market":
-
-					if pos=="Long":
-						buy_market_order(symbol,share)
-						
-						self.active_order[symbol] = id_
-					elif pos =="Short":
-						sell_market_order(symbol,share)
-
-					self.order_tkstring[id_]["algo_status"].set("Running")
-
-					self.order_tklabels[id_]["algo_status"]["background"] = "#97FEA8" #set the label to be, green.
-						
-				elif type_ =="Limit":
-					if pos=="Long":
-						buy_limit_order(symbol,order_price,share)
-						
-					elif pos =="Short":
-						sell_market_order(symbol,order_price,share)
-
-					self.order_tkstring[id_]["algo_status"].set("Placed")
-
-					#self.order_tkstring[id_].set("Placed")
-
-					self.order_tklabels[id_]["algo_status"]["background"] = "yellow" #set the label to be yellow
-				self.register(symbol)
-
+			if not self.check_running_order(symbol):
+				self.order_execution(id_,type_,symbol,share,pos,order_price)
 			else:
-				conflicting_order = threading.Thread(target=self.conflicting_order,args=(id_,type_,pos,order_price,share,symbol), daemon=True)
-				conflicting_order.start()				
+				current_order = self.order_info[self.active_order[symbol]]
+				pos_ = order[1]
+				
+				if pos_!= pos:	
+					conflicting_order = threading.Thread(target=self.conflicting_order,args=(id_,type_,pos,order_price,share,symbol), daemon=True)
+					conflicting_order.start()	
+				else:
+					print("Already containning one running order.")		
 				#should be a thread.
 
+	def order_execution(self,id_,type_,symbol,share,pos,order_price):
+
+		self.active_order[symbol] = id_
+
+		if type_ == "Market":
+
+			if pos=="Long":
+				buy_market_order(symbol,share)
+				
+				self.active_order[symbol] = id_
+			elif pos =="Short":
+				sell_market_order(symbol,share)
+
+			self.order_tkstring[id_]["algo_status"].set("Running")
+
+			self.order_tklabels[id_]["algo_status"]["background"] = "#97FEA8" #set the label to be, green.
+				
+		elif type_ =="Limit":
+			if pos=="Long":
+				buy_limit_order(symbol,order_price,share)
+				
+			elif pos =="Short":
+				sell_market_order(symbol,order_price,share)
+
+			self.order_tkstring[id_]["algo_status"].set("Placed")
+
+			#self.order_tkstring[id_].set("Placed")
+
+			self.order_tklabels[id_]["algo_status"]["background"] = "yellow" #set the label to be yellow
+		self.register(symbol)
 
 
 	def conflicting_order(self,id_,type_, pos,price,share,symbol):
