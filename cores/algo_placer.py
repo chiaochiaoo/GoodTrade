@@ -52,6 +52,7 @@ class entry:
 		int_check = (frame.register(self.int_check))
 		float_check =(frame.register(self.float_check))
 
+
 		tk.Label(frame,text="Entry type: ").grid(row=row,column=1)
 		self.entry_choice=tk.OptionMenu(frame, self.entry_type, *sorted(self.entry_type_choices))
 		self.entry_choice.grid(row=row,column=2)
@@ -400,6 +401,17 @@ class algo_window:
 
 		self.entry = entry(self.entryFrame,entry_price,position,capital)
 		self.stop = stop(self.stopFrame,stop_price,total_risk)
+
+
+		self.ManagementStrategy = tk.StringVar(self.positionManager)
+		self.ManagementStrategy_choice = {'None','Opening BreakOut','ATR envelop'}
+		self.ManagementStrategy.set('Opening BreakOut')
+
+		tk.Label(self.positionManager ,text="Managment Strategy Select: ").grid(row=1,column=1)
+		self.entry_choice=tk.OptionMenu(self.positionManager , self.ManagementStrategy, *sorted(self.ManagementStrategy_choice))
+		self.entry_choice.grid(row=2,column=1)
+
+
 
 		self.entry.set_stop_pannel(self.stop)
 		self.stop.set_entry_pannel(self.entry)
