@@ -363,15 +363,15 @@ class algo_manager(pannel):
 			#Not current order is running. 
 
 			if not self.check_running_order(symbol):
-				self.order_execution(id_,type_,symbol,share,pos,order_price)
+				if self.order_tkstring[id_]["algo_status"].get()=="Pending":
+					self.order_execution(id_,type_,symbol,share,pos,order_price)
 			else:
 
 				####check what is going on? #### THINK THINK THINK. 
-
 				current_order = self.order_info[self.active_order[symbol]]
 				pos_ = current_order[1]
 				
-				if pos_!= pos:	
+				if pos_!= pos and self.order_tkstring[id_]["algo_status"].get()=="Pending":
 					conflicting_order = threading.Thread(target=self.conflicting_order,args=(id_,type_,pos,order_price,share,symbol), daemon=True)
 					conflicting_order.start()	
 				else:
