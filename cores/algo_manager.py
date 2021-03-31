@@ -365,6 +365,9 @@ class algo_manager(pannel):
 			if not self.check_running_order(symbol):
 				self.order_execution(id_,type_,symbol,share,pos,order_price)
 			else:
+
+				####check what is going on? #### THINK THINK THINK. 
+
 				current_order = self.order_info[self.active_order[symbol]]
 				pos_ = order[1]
 				
