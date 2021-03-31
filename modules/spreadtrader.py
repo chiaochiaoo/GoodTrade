@@ -302,10 +302,10 @@ class spread:
 		#width = [8,12,10,6,10,10]
 
 		labels ={"Attribute":"Value",\
-				 "SC:"+self.symbol1[:-3]:self.data.symbol_percentage_since_open[self.symbol1],
-				 "SC:"+self.symbol2[:-3]:self.data.symbol_percentage_since_open[self.symbol2],
-				 "SO:"+self.symbol1[:-3]:self.data.symbol_percentage_since_close[self.symbol1],
-				 "SO:"+self.symbol2[:-3]:self.data.symbol_percentage_since_close[self.symbol2],
+				 "SC:"+self.symbol1[:-3]:self.data.symbol_percentage_since_close[self.symbol1],
+				 "SC:"+self.symbol2[:-3]:self.data.symbol_percentage_since_close[self.symbol2],
+				 "SO:"+self.symbol1[:-3]:self.data.symbol_percentage_since_open[self.symbol1],
+				 "SO:"+self.symbol2[:-3]:self.data.symbol_percentage_since_open[self.symbol2],
 				 "Price Ratio":self.ratio,
 				 "Avg. 5m Cor":"",
 				 "Avg. 15m Cor":"",
@@ -469,9 +469,9 @@ class spread:
 
 		#Now let's set init.
 
-		#Spread.
-		# print(ps[0])
-		# print(ps[1])
+		# #Spread.
+		# print("open",ps[0][0])
+		# print("open",ps[1][0])
 		c1 = (np.array(ps[0])-ps[0][0])*100/ps[0][0]
 		c2 = (np.array(ps[1])-ps[1][0])*100/ps[1][0]
 
@@ -535,7 +535,7 @@ class spread:
 						#print(len_,self.intra_spread[-len_],self.spread)
 						self.roc15 = self.current_spread-self.spreads[-len_] 
 
-					print("spread-update",ts,self.minutes[-3:],len(self.minutes),len(self.spreads),self.current_spread,self.roc1,self.roc5,self.roc15)
+					print("spread-update",ts,self.spreads[-5:],len(self.minutes),len(self.spreads),self.current_spread,float(self.data.symbol_percentage_since_open[self.symbol1].get()),float(self.data.symbol_percentage_since_open[self.symbol2].get()),self.roc1,self.roc5,self.roc15)
 
 					if ts>self.current_minute:
 						self.spreads.append(self.current_spread)
@@ -555,6 +555,11 @@ class spread:
 		#can i set a bit ahead of time?
 		self.spread_.set_xlim(spread_time[0], spread_time[-1])
 		self.spread_.set_ylim(min(self.spreads)-0.1,max(self.spreads)+0.1)
+
+		#self.max_spread_d
+		self.max_spread_d.cla()
+		self.max_spread_d.boxplot(self.spreads, flierprops=self.outlier,vert=False, whis=1)
+        
 		#print(spread_time[:-5])
 		#self.spread_.tick_params(axis='both', which='major', labelsize=8)
 		#self.spread_.xaxis.set_major_formatter(self.min_form)
