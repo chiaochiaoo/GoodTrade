@@ -369,7 +369,7 @@ class algo_manager(pannel):
 				####check what is going on? #### THINK THINK THINK. 
 
 				current_order = self.order_info[self.active_order[symbol]]
-				pos_ = order[1]
+				pos_ = current_order[1]
 				
 				if pos_!= pos:	
 					conflicting_order = threading.Thread(target=self.conflicting_order,args=(id_,type_,pos,order_price,share,symbol), daemon=True)
