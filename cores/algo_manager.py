@@ -41,8 +41,7 @@ def algo_manager_voxcom(pipe):
 					time.sleep(2)
 
 			connection = True
-			pipe.send(["msg","Connection Successful"])
-			print("Connection Successful")
+			pipe.send(["msg","Connected"])
 
 			while connection:
 
@@ -73,31 +72,21 @@ def algo_manager_voxcom(pipe):
 			print(e)
 		#restarted the whole thing 
 
+
 class algo_manager(pannel):
-
-
 
 	def __init__(self,root,port,gt_pipe,order_pipe):
 
+		self.pipe = gt_pipe
+		self.order_pipe = order_pipe
 
 		self.port = port
 		self.symbols = []
 		self.orders_registry = []
 
-
 		# SYMBOL ATTRIBUTE. Getting symbol -> ID 
 
 		self.active_order = {}
-
-		# ORDER ATTRIBUTE. Init upon receiving. 
-
-		
-		# Tk Strings. 
-
-		# Actual data. 
-
-		#		l = [(symbol,id_),self.algo_status[id_],des,risk,pos,self.current_share[id_],self.average_price[id_],self.unrealized[id_],self.unrealized_pshr[id_],self.realized[id_]]
-		
 
 		#self.algo_status = {} #Pending, Running,Cancled,Complete.
 		#self.order_status = {}
@@ -121,32 +110,39 @@ class algo_manager(pannel):
 		self.holdings= {}
 
 		self.order_info = {}
-
-
-		# self.current_share_data = {}
-		# self.target_share_data = {}
-		# self.realized_data ={}
-		# self.unrealized_data = {}
-		# self.unrealized_pshr_data={}
-		# self.average_price_data = {}
-		# self.risk_data = {}
-
 		
-
-		#input symbol, get id (active.)
-
-
-		###if a symbol is running, or already flattened.
-		
-
 		super().__init__(root)
 
-		self.width = [10,10,30,8,8,8,8,8,8,8,6]
-		self.labels = ["Symbol","Algo status","description","Risk","Position","SzIn","AvgPx","UPshr","U","R","flatten"]
+		self.init_pannel()
 
-		self.pipe = gt_pipe
+		receiver = threading.Thread(target=self.receive, daemon=True)
+		receiver.start()
 
-		self.order_pipe = order_pipe
+		receiver2 = threading.Thread(target=self.order_pipe_listener, daemon=True)
+		receiver2.start()
+
+		self.in_progress = False
+
+
+	#UI COMPONENT
+	def init_pannel(self):
+
+		# self.width = [10,10,30,8,8,8,8,8,8,8,6]
+		# self.labels = []
+
+		self.labels = {"Symbol":10,\
+						"Algo status":10,\
+						"description":30,\
+						"Risk":8,\
+						"Position":8,\
+						"SzIn":8,\
+						"AvgPx":8,\
+						"UPshr":8,\
+						"U":8,\
+						"R":8,\
+						"flatten":6}
+
+		self.width = list(self.labels.values())
 
 		self.setting = ttk.LabelFrame(root,text="Algo Manager") 
 		self.setting.place(x=10,y=10,height=80,relwidth=0.95)
@@ -156,26 +152,38 @@ class algo_manager(pannel):
 		self.ppro_status = ttk.Label(self.setting, textvariable=self.status)
 		self.ppro_status.place(x = 20, y =12)
 
-		self.deployment_frame = ttk.LabelFrame(root,text="Algos deployment") 
-		self.deployment_frame.place(x=10,y=85,relheight=1,relwidth=0.95)
+		self.deployment_panel = ttk.LabelFrame(root,text="Algos deployment") 
+		self.deployment_panel.place(x=10,y=85,relheight=0.85,relwidth=0.98)
 
-		self.in_progress = False
+		self.dev_canvas = tk.Canvas(self.deployment_panel)
+		self.dev_canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
 
+		self.scroll = tk.Scrollbar(self.deployment_panel)
+		self.scroll.config(orient=tk.VERTICAL, command=self.dev_canvas.yview)
+		self.scroll.pack(side=tk.RIGHT,fill="y")
+		self.dev_canvas.configure(yscrollcommand=self.scroll.set)
+
+		self.deployment_frame = tk.Frame(self.dev_canvas)
+		self.deployment_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
+		self.dev_canvas.create_window(0, 0, window=self.deployment_frame, anchor=tk.NW)
+
+		self.main_app_status = tk.StringVar()
+		self.main_app_status.set("Main :")
+
+		self.ppro_status = tk.StringVar()
+		self.ppro_status.set("Ppro :")
+
+		self.main_status = ttk.Label(self.setting, textvariable=self.main_app_status)
+		self.main_status.place(x = 20, y =12)
+
+		self.ppro_status_ = ttk.Label(self.setting, textvariable=self.ppro_status)
+		self.ppro_status_.place(x = 20, y =32)
+
+		self.rebind(self.dev_canvas,self.deployment_frame)
 		self.recreate_labels()
-
-		#self.add_order(['id', 'QQQ.NQ', 'Breakout on Support on 0.0 for 0 sec', 'Short', 20, 20.0])
-
-
-		receiver = threading.Thread(target=self.receive, daemon=True)
-		receiver.start()
-
-		receiver2 = threading.Thread(target=self.order_pipe_listener, daemon=True)
-		receiver2.start()
-
-		self.register_order_listener()
-
-
-	#this pipe tracks the current price, P/L. order status.
+		#test
+		# for i in range(40):
+		# 	self.order_creation(['id', i, i, 20, 20.0,1,1,1,1,1,1,1,1,1])
 
 	def flatten_symbol(self,symbol,id_=None,status_text=None):
 
@@ -316,6 +324,8 @@ class algo_manager(pannel):
 
 		self.label_count +=1
 
+		self.rebind(self.dev_canvas,self.deployment_frame)
+
 	def check_running_order(self,symbol):
 
 		if symbol in self.active_order:
@@ -337,12 +347,13 @@ class algo_manager(pannel):
 		else:
 			return False
 
+		
 
 	def order_confirmation(self,d):
 		id_ = d[1]
 		print(id_,"confirmed and is a go")
 
-		#wrong place to look at.
+
 		if id_ not in self.orders_registry:
 			print("Cannot find order",id_)
 		else:
@@ -456,6 +467,17 @@ class algo_manager(pannel):
 			d = self.order_pipe.recv()
 
 
+			if d[0] =="status":
+				try:
+					self.ppro_status.set("Ppro : "+str(d[1]))
+
+					if str(d[1])=="Connected":
+						self.ppro_status_["background"] = "#97FEA8"
+					else:
+						self.ppro_status_["background"] = "red"
+				except Exception as e:
+					print(e)
+
 			if d[0] =="msg":
 				print(d[1])
 
@@ -501,6 +523,13 @@ class algo_manager(pannel):
 
 					for i in range(shares):
 						self.holdings[id_].append(price)
+
+					#check how long it took
+					# print(self.current_share[id_],self.target_share[id_])
+					# if str(self.current_share[id_]) == str(self.target_share[id_]):
+					# 	done = time.time()
+					# 	elapsed = done - self.start
+					# 	print("order time taken:",elapsed)
 
 				#Taking shares off. assume it's all gone. -- NO. NO
 				else:
@@ -550,6 +579,8 @@ class algo_manager(pannel):
 				#print(self.holdings[id_])
 				self.update_display(id_)
 
+
+
 	#update the current status of a current order. 
 	def ppro_order_update(self,data):
 
@@ -596,8 +627,11 @@ class algo_manager(pannel):
 
 	def recreate_labels(self):
 
-		for i in range(len(self.labels)): #Rows
-			self.b = tk.Button(self.deployment_frame, text=self.labels[i],width=self.width[i])#,command=self.rank
+		l = list(self.labels.keys())
+		w = list(self.labels.values())
+
+		for i in range(len(l)): #Rows
+			self.b = tk.Button(self.deployment_frame, text=l[i],width=w[i])#,command=self.rank
 			self.b.configure(activebackground="#f9f9f9")
 			self.b.configure(activeforeground="black")
 			self.b.configure(background="#d9d9d9")
@@ -616,6 +650,8 @@ class algo_manager(pannel):
 		#print()
 
 		#print(self.average_price[id_],self.unrealized[id_].get(),self.unrealized_pshr[id_].get())
+		#print(id_,self.current_share[id_],self.average_price[id_],self.unrealized_pshr[id_],self.unrealized[id_])
+		#
 
 		self.order_tkstring[id_]["current_share"].set(str(self.current_share[id_])+"/"+str(self.target_share[id_]))
 		self.order_tkstring[id_]["realized"].set(str(self.realized[id_]))
@@ -656,7 +692,11 @@ class algo_manager(pannel):
 			if d[0] =="msg":
 				print(d[1])
 				try:
-					self.status.set("Status: "+str(d[1]))
+					self.main_app_status.set("Main: "+str(d[1]))
+					if str(d[1])=="Connected":
+						self.main_status["background"] = "#97FEA8"
+					else:
+						self.main_status["background"] = "red"
 				except Exception as e:
 					print(e)
 			if d[0] =="pkg":
@@ -697,22 +737,7 @@ class algo_manager(pannel):
 			print("register failed")
 			return False
 
-	def register_order_listener(self):
-
-		postbody = "http://localhost:8080/SetOutput?region=1&feedtype=OSTAT&output="+ str(self.port)+"&status=on"
-
-		try:
-			r= requests.get(postbody)
-			if r.status_code==200:
-				return True
-			else:
-				return False
-		except:
-			print("register failed")
-			return False
-
-
-
+		#Invalid Request		
 
 
 if __name__ == '__main__':
@@ -747,7 +772,7 @@ if __name__ == '__main__':
 
 	view = algo_manager(root,port,goodtrade_pipe,ppro_pipe)
 
-	receive_pipe.send(['New order', 'Break up2268503', 'Break up', 'QQQ.NQ', 'Pending', 'Breakout on Resistance on 338.85 for 0 sec', 'Long', 'Market', '338.85', '2104', 5050.0])
+	#receive_pipe.send(['New order', 'Break up2268503', 'Break up', 'QQQ.NQ', 'Pending', 'Breakout on Resistance on 338.85 for 0 sec', 'Long', 'Market', '338.85', '2104', 5050.0])
 
 	root.mainloop()
 

@@ -51,6 +51,9 @@ def algo_ppro_manager(port,pipe):
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	sock.bind((UDP_IP, UDP_PORT))
 
+	ppro_conn = threading.Thread(target=ppro_connection_service,args=(pipe,port), daemon=True)
+	ppro_conn.start()
+
 	print("Socket Created:",sock)
 	
 	work=False
@@ -68,6 +71,59 @@ def algo_ppro_manager(port,pipe):
 		elif type_ =="L1":
 			decode_l1(stream_data,pipe)
 
+
+
+def ppro_connection_service(pipe,port):
+
+	#keep running and don't stop
+	state = False
+	while True:
+
+		if test_register():
+			pipe.send(["status","Connected"])
+			if state == False:
+				print("Ppro connected. Registering OSTAT")
+				i = 3
+				while i >0:
+					if register_order_listener(port):
+						print("OSTAT registered")
+						state = True
+						break
+					else:
+						print("OSTAT registeration failed")
+					i-=1 
+		else:
+			pipe.send(["status","Disconnected"])
+			state = False
+
+			
+def test_register():
+	try:
+		p="http://localhost:8080/Register?symbol=QQQ.NQ&feedtype=L1"
+		r= requests.get(p)
+		#print(r.status_code)
+		#print(r)
+		if r.status_code==200:
+			return True
+		else:
+			return False
+
+	except Exception as e:
+		return False
+
+def register_order_listener(port):
+
+	postbody = "http://localhost:8080/SetOutput?region=1&feedtype=OSTAT&output="+ str(port)+"&status=on"
+
+	try:
+		r= requests.get(postbody)
+		if r.status_code==200:
+			return True
+		else:
+			return False
+	except:
+		print("register failed")
+		return False
 
 def decode_order(stream_data,pipe):
 	if "OrderState" in stream_data:
@@ -116,48 +172,64 @@ def hexcolor(level):
 		return "#FFFFFF"
 
 def flatten_symbol(symbol):
-    r = requests.post('http://localhost:8080/Flatten?symbol='+str(symbol))
-    if r.status_code == 200:
-        print('flatten Success!')
-        return True
-    else:
-        print("flatten Failure")
+
+	r = 'http://localhost:8080/Flatten?symbol='+str(symbol)
+	sucess='flatten '+symbol+' Success!'
+	failure='flatten '+symbol+' Failure.'
+   
+	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,),daemon=True)
+	req.start()
 
 def buy_market_order(symbol,share):
-    r = requests.post('http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Buy ARCX Market DAY&shares='+str(share))
-    if r.status_code == 200:
-        print('buy market order Success!')
-        return True
-    else:
-        print("Error sending buy order")
+
+	
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Buy ARCX Market DAY&shares='+str(share)
+	sucess='buy market order success on'+symbol
+	failure="Error buy order on"+symbol
+   
+	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,),daemon=True)
+	req.start()
+
 
 def sell_market_order(symbol,share):
-    r = requests.post('http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(share))
-    if r.status_code == 200:
-        print('sell market order Success!')
-        #print(r.text)
-        return True
-    else:
-        print("Error sending sell order")
+
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(share)
+	sucess='sell market order success on'+symbol
+	failure="Error sell order on"+symbol
+   
+	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,),daemon=True)
+	req.start()
+
 
 def buy_limit_order(symbol, price,share):
-    price = round(float(price),2)
-    r = requests.post('http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Buy ARCX Limit DAY&shares='+str(share))
-    if r.status_code == 200:
-        print('buy limit order Success! at',price)
 
-        return True
-    else:
-        print("Error sending buy order")
+	price = round(float(price),2)
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Buy ARCX Limit DAY&shares='+str(share)
+	sucess='buy limit order success on'+symbol
+	failure="Error buy limit order on"+symbol
+   
+	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,),daemon=True)
+	req.start()
+
 
 def sell_limit_order(symbol, price,share):
-    price = round(float(price),2)
-    r = requests.post('http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Sell->Short ARCX Limit DAY&shares='+str(share))
-    if r.status_code == 200:
-        print('sell limit order Success! at ',price)
-        return True
-    else:
-        print("Error sending sell order")
+	price = round(float(price),2)
+
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Sell->Short ARCX Limit DAY&shares='+str(share)
+	sucess='sell limit order success on'+symbol
+	failure="Error sell limit order on"+symbol
+   
+	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,),daemon=True)
+	req.start()
+
+def ppro_request(request,success=None,failure=None):
+	r = requests.post(request)
+	if r.status_code ==200:
+		print(success)
+		return True
+	else:
+		print(failure)
+		return False
 
 #p=price_updator()
 #p.deregister("AAPL.NQ")
