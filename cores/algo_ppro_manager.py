@@ -43,6 +43,7 @@ def find_between(data, first, last):
 	# 	#takes in request from algo manager
 
 	# #process all the update and send to pipe.
+
 def algo_ppro_manager(port,pipe):
 
 	UDP_IP = "localhost"
@@ -127,6 +128,7 @@ def register_order_listener(port):
 
 def decode_order(stream_data,pipe):
 	if "OrderState" in stream_data:
+		#print(stream_data)
 		state = find_between(stream_data, "OrderState=", ",")
 		if state =="Filled" or state =="Partially Filled":
 			symbol = find_between(stream_data, "Symbol=", ",")
@@ -141,6 +143,18 @@ def decode_order(stream_data,pipe):
 			data["shares"]= int(share)
 
 			pipe.send(["order confirm",data])
+
+		if state =="Rejected":
+			symbol = find_between(stream_data, "Symbol=", ",")
+			side = find_between(stream_data, "Side=", ",")
+			info = find_between(stream_data, "InfoText=", ",")
+			data ={}
+			data["symbol"]= symbol
+			data["side"]= side
+			data["info"]=info
+
+			pipe.send(["order rejected",data])
+
 
 def decode_l1(stream_data,pipe):
 	symbol = find_between(stream_data, "Symbol=", ",")
@@ -231,45 +245,3 @@ def ppro_request(request,success=None,failure=None):
 		print(failure)
 		return False
 
-#p=price_updator()
-#p.deregister("AAPL.NQ")
-#p.listener()
-
-# print(find_between(test, "Symbol=", ","))
-# print(find_between(test, "Side=", ","))
-# print(find_between(test, "Price=", ","))
-# print(find_between(test, "Price=", ","))
-
-
-		# self.algo_status[id_] = tk.StringVar()
-		# self.algo_status[id_].set(status)
-
-		# self.current_share[id_] = tk.StringVar()
-		# self.current_share[id_].set("0/"+str(share))
-
-		# self.current_share_data[id_] = 0
-		# self.target_share_data[id_] = share
-
-		# self.realized[id_] = tk.StringVar()
-		# self.realized[id_].set("0")
-		# self.realized_data[id_] = 0
-
-		# self.unrealized[id_] = tk.StringVar()
-		# self.unrealized[id_].set("0")
-		# self.unrealized_data[id_] = 0
-
-		# self.unrealized_pshr[id_] = tk.StringVar()
-		# self.unrealized_pshr[id_].set("0")
-		# self.unrealized_pshr_data[id_] = 0
-
-		# self.average_price[id_] = tk.StringVar()
-		# self.average_price[id_].set("N/A")
-
-		# self.average_price_data[id_] = 0
-
-		# self.risk_data[id_] = -risk
-
-		# self.order_info[id_] = [order_type,pos,order_price,share,symbol]
-
-
-#		self.tk_strings=["algo_status","realized","shares","unrealized","unrealized_pshr","average_price"]

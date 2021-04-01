@@ -82,8 +82,12 @@ class algo_manager(pannel):
 
 		self.port = port
 		self.symbols = []
+
+		#a list of all id.
 		self.orders_registry = []
 
+		# Symbol+Side = id. 
+		self.order_book = {}
 		# SYMBOL ATTRIBUTE. Getting symbol -> ID 
 
 		self.active_order = {}
@@ -235,6 +239,10 @@ class algo_manager(pannel):
 
 			self.orders_registry.append(id_)
 
+			side = ""
+			if pos =="Long": side ="B"
+			elif pos =="Short": side ="S"
+			self.order_book[symbol+side] = id_
 			#create the tkstring.
 
 			self.order_tkstring[id_] = {}
@@ -490,6 +498,10 @@ class algo_manager(pannel):
 
 				#update the quote, unrealized. 
 				self.ppro_order_update(d[1])
+
+			if d[0] =="order rejected":
+
+				self.ppro_order_rejection(d[1])
 			
 
 	#when there is a change of quantity of an order. 
@@ -617,7 +629,18 @@ class algo_manager(pannel):
 				self.update_display(id_)
 
 
-						
+	def ppro_order_rejection(self,data):
+
+		symbol=data["symbol"] 
+		side=data["side"] 
+		info=data["info"]
+
+		print(symbol,"rejected:",info)
+		#get the order id. 
+		id_ = self.order_book[symbol+side]
+
+		self.order_tkstring[id_]["algo_status"].set("Rejected")
+		self.order_tklabels[id_]["algo_status"]["background"] = "red"
 	#info= 
 	#symbol,status,type,position,curretn,shares,risk,p/l
 
