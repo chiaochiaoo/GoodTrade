@@ -17,7 +17,6 @@ import os
 
 from algo_ppro_manager import *
 
-
 def algo_manager_voxcom(pipe):
 
 	#tries to establish commuc
@@ -72,7 +71,6 @@ def algo_manager_voxcom(pipe):
 			print(e)
 		#restarted the whole thing 
 
-
 class algo_manager(pannel):
 
 	def __init__(self,root,port,gt_pipe,order_pipe):
@@ -126,7 +124,6 @@ class algo_manager(pannel):
 		receiver2.start()
 
 		self.in_progress = False
-
 
 	#UI COMPONENT
 	def init_pannel(self):
@@ -337,7 +334,6 @@ class algo_manager(pannel):
 	def check_running_order(self,symbol):
 
 		if symbol in self.active_order:
-
 			#ust be ""
 			if self.active_order[symbol] =="":
 				return False
@@ -426,6 +422,9 @@ class algo_manager(pannel):
 			#self.order_tkstring[id_].set("Placed")
 
 			self.order_tklabels[id_]["algo_status"]["background"] = "yellow" #set the label to be yellow
+
+
+		#I should register the symbol the moment it comes in.
 		self.register(symbol)
 
 
@@ -591,8 +590,6 @@ class algo_manager(pannel):
 				#print(self.holdings[id_])
 				self.update_display(id_)
 
-
-
 	#update the current status of a current order. 
 	def ppro_order_update(self,data):
 
@@ -628,7 +625,6 @@ class algo_manager(pannel):
 				
 				self.update_display(id_)
 
-
 	def ppro_order_rejection(self,data):
 
 		symbol=data["symbol"] 
@@ -644,9 +640,7 @@ class algo_manager(pannel):
 	#info= 
 	#symbol,status,type,position,curretn,shares,risk,p/l
 
-
 	#Utilities. 
-
 
 	def recreate_labels(self):
 
@@ -701,7 +695,6 @@ class algo_manager(pannel):
 			self.order_tklabels[id_]["realized"]["background"] = "#FC433D"
 
 
-
 	def rebind(self,canvas,frame):
 		canvas.update_idletasks()
 		canvas.config(scrollregion=frame.bbox()) 
@@ -731,11 +724,12 @@ class algo_manager(pannel):
 			for widget in i.winfo_children():
 				widget.destroy()
 
-
 	def register(self,symbol):
 		if symbol not in self.symbols:
 			self.symbols.append(symbol)
-			self.register_to_ppro(symbol, True)			
+			req = threading.Thread(target=self.register_to_ppro, args=(symbol, True,),daemon=True)
+			req.start()
+			
 
 	def deregister(self,symbol):
 
