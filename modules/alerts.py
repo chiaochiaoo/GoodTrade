@@ -264,10 +264,10 @@ class alert(pannel):
 
 
 		#'Break Up','Break Down','Any'
-		description_break_up = "Break Resistance on "+str(resistence)+" for "+timer_trade+" sec"
+		description_break_up = "Break Resistance on "+str(resistence)
 		info_up = ["Breakup",symbol,description_break_up,resistence,support,"Long",None,risk]
 
-		description_break_down = "Break Support on "+str(support)+" for "+timer_trade+" sec"
+		description_break_down = "Break Support on "+str(support)
 		info_down = ["Breakdown",symbol,description_break_down,support,resistence,"Short",None,risk]
 
 		#type_,symbol,description,entry_price,stop_price,position,capital,total_risk
