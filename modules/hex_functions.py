@@ -22,13 +22,11 @@ def hexcolor_red(level):
 			return "#FF"+"FF"+hex_to_string(255-code)
 
 	else:
-		code = int(510*(level))
-		#print(code,"_")
-		if code >255:
-			first_part = code-255
-			return "#"+hex_to_string(255-first_part)+"FF"+"00"
-		else:
-			return "#11"+"FF"+"00"
+		code = int(255*(abs(level)))
+		first_part = 255-code
+
+		return "#"+hex_to_string(first_part)+"FF"+hex_to_string(first_part)
+
 			#return "#"+hex_to_string(255-code)+"FF"+"FF"
 #print(times#tamp_seconds("13:23:46"))
 
@@ -37,15 +35,15 @@ if __name__ == '__main__':
 
 
 	root = tk.Tk()
-
-	for i in range(0,10):
-
+	k=1
+	for i in range(10,-1,-1):
+		print(i)
 		a=tk.Label(root ,text=-i,width=5,background=hexcolor_red(-i/10))
-		a.grid(column=1,row=i)
-
+		a.grid(column=1,row=k)
+		k+=1
 	for i in range(0,10):
 
 		a=tk.Label(root ,text=i,width=5,background=hexcolor_red(i/10))
-		a.grid(column=1,row=i+10)
-
+		a.grid(column=1,row=k)
+		k+=1
 	root.mainloop()
