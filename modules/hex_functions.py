@@ -37,7 +37,7 @@ if __name__ == '__main__':
 	root = tk.Tk()
 	k=1
 	for i in range(10,-1,-1):
-		print(i)
+		print(-i/10)
 		a=tk.Label(root ,text=-i,width=5,background=hexcolor_red(-i/10))
 		a.grid(column=1,row=k)
 		k+=1
