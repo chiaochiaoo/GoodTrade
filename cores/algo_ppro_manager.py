@@ -23,6 +23,22 @@ def find_between(data, first, last):
 	except ValueError:
 		return data
 
+def hex_to_string(int):
+	a = hex(int)[-2:]
+	a = a.replace("x","0")
+
+	return a
+
+#1-5 is good 
+def hexcolor_red(level):
+	code = int(510*(level))
+	print(code,"_")
+	if code >255:
+		first_part = code-255
+		return "#FF"+hex_to_string(255-first_part)+"00"
+	else:
+		return "#FF"+"FF"+hex_to_string(255-code)
+
 
 ### Take L1 quote,
 ### Track order status 
@@ -135,6 +151,7 @@ def decode_order(stream_data,pipe):
 			side = find_between(stream_data, "Side=", ",")
 			price = find_between(stream_data, "Price=", ",")
 			share = find_between(stream_data, "Shares=", ",")
+			if side =="T": side ="S"
 
 			data ={}
 			data["symbol"]= symbol
@@ -149,11 +166,12 @@ def decode_order(stream_data,pipe):
 			side = find_between(stream_data, "Side=", ",")
 			info = find_between(stream_data, "InfoText=", ",")
 			data ={}
+			if side =="T": side ="S"
 			data["symbol"]= symbol
 			data["side"]= side
 			data["info"]=info
 
-			pipe.send(["order rejected",data])
+			pipe.send(["order rejected",info])
 
 
 def decode_l1(stream_data,pipe):
@@ -236,12 +254,51 @@ def sell_limit_order(symbol, price,share):
 	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,),daemon=True)
 	req.start()
 
-def ppro_request(request,success=None,failure=None):
+def ppro_request(request,success=None,failure=None,traceid=False,symbol=None):
 	r = requests.post(request)
 	if r.status_code ==200:
 		print(success)
+
+		if traceid==True:
+			print(get_order_id(find_between(r.text,"<Content>","</Content>")))  #need to grab the request id. obtain the order id. assign it to the symbol.the 
+
 		return True
 	else:
 		print(failure)
 		return False
 
+def get_order_id(request_number):
+	req = "localhost:8080/GetOrderNumber?requestid="+str(request_number)
+	r = requests.post(req)
+	if r.status_code ==200:
+		print(find_between(r.text,"<Content>","</Content>"))
+
+####need to trace the order number to trace the stop id number. 
+def stoporder_to_market_buy(symbol,price,share):
+
+	price = round(float(price),2)
+	#r = 'localhost:8080/SendSwiftStop?symbol=&ordername=ARCA Buy ARCX Market DAY&shares=&referenceprice=ask&swiftstopprice='
+	r='http://localhost:8080/SendSwiftStop?symbol='+symbol+'&ordername=ARCA%20Buy%20ARCX%20Market%20DAY&shares='+str(share)+'&referenceprice=ask&swiftstopprice='+str(price)
+	#print(r)
+	sucess='stoporder buy market order success on'+symbol
+	failure="Error stoporder buy market"+symbol
+   
+	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,True,symbol),daemon=True)
+	req.start()
+
+
+def stoporder_to_market_sell(symbol,price,share):
+
+	price = round(float(price),2)
+	#http://localhost:8080/SendSwiftStop?symbol=AAPL.NQ&ordername=ARCA%20Sell-%3EShort%20ARCX%20Market%20DAY&shares=10&referenceprice=bid&swiftstopprice=140.0
+	#r= 'http://localhost:8080/SendSwiftStop?symbol='+symbol+'&ordername=ARCA%20Sell'+'-'+'%'+'3E'+'Short%20ARCX%20Market%20DAY&shares='+str(share)+'&referenceprice=bid&swiftstopprice'+str(price)
+	#r = 'localhost:8080/SendSwiftStop?symbol='+symbol+'&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(share)+'&referenceprice=bid&swiftstopprice='+str(price)
+	r= 'http://localhost:8080/SendSwiftStop?symbol='+symbol+'&ordername=ARCA%20Sell-%3EShort%20ARCX%20Market%20DAY&shares='+str(share)+'&referenceprice=bid&swiftstopprice='+str(price)
+	sucess='stoporder sell market order success on'+symbol
+	failure="Error sell order on"+symbol
+   
+	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,True,symbol),daemon=True)
+	req.start()
+
+#sell_market_order("QQQ.NQ",10)
+#get_order_id(3535810)
