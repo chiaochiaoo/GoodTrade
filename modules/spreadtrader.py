@@ -110,8 +110,11 @@ class spread_trader(pannel):
 
 		if self.data!=None:
 			self.symbolist = set(self.data.get_list())
+
+			if len(self.symbolist)==0:
+				self.symbolist = set(" ")
 		else:
-			self.symbolist= ["SPY.AM","QQQ.NQ"]
+			self.symbolist= set(" ")
 
 	def refresh_options(self):
 
