@@ -208,7 +208,8 @@ def fetch_data(symbol):
 		range_std=round(np.std(range_),3)
 		prev_close_std = round(np.std(np.abs(previous_close)),3)
 
-		ATR = round(np.mean(ATR),2)
+		ATR = np.mean(ATR)
+		ATR = round(ATR,2)
 
 		###ADD the first 5 here. seperate them later.
 
