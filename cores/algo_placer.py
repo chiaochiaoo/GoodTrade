@@ -42,7 +42,7 @@ class entry:
 		self.order_type_choices = {'Market','Limit'}
 		self.order_type.set('Market') 
 
-		self.entry_price = tk.StringVar(frame)
+		self.entry_price = tk.DoubleVar(frame)
 		self.entry_price.set(entry_price)
 
 		self.shares = tk.StringVar(frame)
@@ -361,6 +361,14 @@ class stop:
 		if self.totalrisk!= None:
 			self.total_risk.set(self.totalrisk)
 
+	def get_stoplevel(self):
+
+		try:
+			m = float(self.stop_level.get())
+
+			return m
+		except:
+			return 0
 
 	def get_totalrisk(self):
 
@@ -375,14 +383,14 @@ class stop:
 
 class algo_window:
 
-	def __init__(self,root,type_,symbol,description,entry_price,stop_price,position,capital,total_risk):
+	def __init__(self,root,type_,symbol,description,entry_price,stop_price,position,capital,total_risk,data_list):
 
 		self.id = None
 		self.symbol = symbol
 		self.description = description
 		self.type = type_
 		self.position = position
-
+		self.data_list = data_list
 		self.root=root
 
 		tk.Label(self.root,text="Symbol: "+symbol).place(x=10,y=10)
@@ -421,7 +429,7 @@ class algo_window:
 		#symbol, descrptipn,position,shares,risk. 
 
 		entry_type,order_type,entry_price,shares = self.entry.get_all_infos()
-		info = [self.symbol,self.type,"Pending",self.description,self.position,order_type,entry_price,shares,self.stop.get_totalrisk()]
+		info = [self.symbol,self.type,"Pending",self.description,self.position,order_type,entry_price,shares,self.stop.get_totalrisk(),self.stop.get_stoplevel(),self.data_list]
 
 		#if any of them is not set. or 0. false. 
 		valid = True
@@ -478,10 +486,10 @@ class algo_placer:
 
 		k = 0
 		for i in orders:
-			type_,symbol,description,entry_price,stop_price,position,capital,total_risk = i[0],i[1],i[2],i[3],i[4],i[5],i[6],i[7]
+			type_,symbol,description,entry_price,stop_price,position,capital,total_risk,datalist = i[0],i[1],i[2],i[3],i[4],i[5],i[6],i[7],i[8]
 			self.frame= tk.LabelFrame(self.root)
 			self.frame.place(x=0,y=250*k,height=250,width=780)
-			self.orders_book.append(algo_window(self.frame,type_,symbol,description,entry_price,stop_price,position,capital,total_risk))
+			self.orders_book.append(algo_window(self.frame,type_,symbol,description,entry_price,stop_price,position,capital,total_risk,datalist))
 			k+=1
 
 		self.place= tk.Button(root ,text="Place algo",width=10,bg="#5BFF80",command=self.on_send)

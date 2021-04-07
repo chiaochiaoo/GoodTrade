@@ -218,13 +218,13 @@ class alert(pannel):
 				self.tickers_tracers[i].append((format[value_position],m))
 
 			#trigger type
-			elif j==9:
+			elif j==10:
 				self.trigger_types = {'Break Up','Break Dn','Any level'}
 				format[j].set('Any level') 
 				self.tickers_labels[i].append(tk.OptionMenu(self.frame, format[j], *sorted(self.trigger_types)))
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 			#Trigger timer
-			elif j==10:
+			elif j==11:
 				self.tickers_labels[i].append(tk.Entry(self.frame ,textvariable=format[j],width=self.width[j]))
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 
@@ -252,9 +252,10 @@ class alert(pannel):
 		self.rebind(self.canvas,self.frame)
 
 		#algo_placer("AAPL.NQ","Breakout on Resistance on 134.45 for 60 secs",134.45,133.45,500)
+
 	def break_out_trade(self,info):
 
-		symbol,support,resistence,timer_trade,type_trade,default_risk = info[0],info[1].get(),info[2].get(),info[3].get(),info[4].get(),info[5].get()
+		symbol,support,resistence,timer_trade,type_trade,default_risk = info[0],float(info[1].get()),float(info[2].get()),info[3].get(),info[4].get(),info[5].get()
 
 		risk = None
 		try:
@@ -262,13 +263,23 @@ class alert(pannel):
 		except:
 			risk = None
 
+		atr,oha,ohs,ola,ols = self.data.symbol_data_ATR[symbol].get(),\
+		self.data.symbol_data_openhigh_val[symbol].get(),\
+		self.data.symbol_data_openhigh_std[symbol].get(),\
+		self.data.symbol_data_openlow_val[symbol].get(),\
+		self.data.symbol_data_openlow_std[symbol].get()
 
+		data_list = {"ATR":atr,
+					 "OHavg":oha,
+					 "OHstd":ohs,
+					 "OLavg":ola,
+					 "OLstd":ols}
 		#'Break Up','Break Down','Any'
 		description_break_up = "Break Resistance on "+str(resistence)
-		info_up = ["Breakup",symbol,description_break_up,resistence,support,"Long",None,risk]
+		info_up = ["Breakup",symbol,description_break_up,resistence,support,"Long",None,risk,data_list]
 
 		description_break_down = "Break Support on "+str(support)
-		info_down = ["Breakdown",symbol,description_break_down,support,resistence,"Short",None,risk]
+		info_down = ["Breakdown",symbol,description_break_down,support,resistence,"Short",None,risk,data_list]
 
 		#type_,symbol,description,entry_price,stop_price,position,capital,total_risk
 		if type_trade =='Break Up':
@@ -1030,8 +1041,8 @@ class breakout(alert):
 
 		super().__init__(frame,data,alert_panel,commlink)
 
-		self.labels = ["Ticker","Status","AR","Support","Resistance ","Range","Cur Price","Evaluation","Algo Status","Trigger Type","Trigger Timer","Configure Entry",]
-		self.width = [8,10,4,10,10,10,10,25,10,10,10,12]
+		self.labels = ["Ticker","Status","AR","Support","Resistance ","Range","ATR","Cur Price","Evaluation","Algo Status","Trigger Type","Trigger Timer","Configure Entry",]
+		self.width = [8,10,4,7,7,7,7,7,25,10,10,10,12]
 		self.labels_creator(self.frame)
 
 
@@ -1097,6 +1108,7 @@ class breakout(alert):
 
 		range_ = self.data.symbol_data_support_resistance_range[symbol]
 
+		atr = self.data.symbol_data_ATR[symbol]
 		self.tickers_tracers[symbol] = []
 
 		m=support.trace('w', lambda *_, support=support,resist=resistance,rg=range_: self.range_tracker(support,resist,rg))
@@ -1104,6 +1116,7 @@ class breakout(alert):
 
 		n=resistance.trace('w', lambda *_, support=support,resist=resistance,rg=range_: self.range_tracker(support,resist,rg))
 		self.tickers_tracers[symbol].append((resistance,n))
+
 
 
 		eva= self.data.symbol_data_breakout_eval[symbol]
@@ -1115,8 +1128,8 @@ class breakout(alert):
 
 		data_ready = self.data.data_ready[symbol]
 
-		value_position = 6
-		alert_position = 7
+		value_position = 7
+		alert_position = 8
 		alert_type = "breakout"
 
 		alert_time = 0
@@ -1124,7 +1137,7 @@ class breakout(alert):
 
 		#cur, mean, std. symbol, time. 
 		alertvals= [symbol,time,cur_price,support,resistance ,alert_type]
-		labels = [symbol,status,checker,support,resistance ,range_,cur_price,eva,algo_status,trigger_type,trigger_timer]
+		labels = [symbol,status,checker,support,resistance ,range_,atr,cur_price,eva,algo_status,trigger_type,trigger_timer]
 
 		#any alert will need a threshold. deviation. std. or type.
 

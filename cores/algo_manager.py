@@ -10,12 +10,21 @@ import threading
 from pannel import *
 import datetime
 import time
-
+from queue import Queue
 import requests
 
 import os
 
 from algo_ppro_manager import *
+from hex_functions import *
+
+
+GREEN = "#97FEA8"
+DEFAULT = "#d9d9d9"
+LIGHTYELLOW = "#fef0b8"
+YELLOW =  "#ECF57C"
+STRONGGREEN = "#3DFC68"
+STRONGRED = "#FC433D"
 
 def algo_manager_voxcom(pipe):
 
@@ -35,7 +44,7 @@ def algo_manager_voxcom(pipe):
 					s.connect((HOST, PORT))
 					connected = True
 				except:
-					pipe.send(["msg","Cannot connected. Try again in 2 seconds."])
+					pipe.send(["msg","Disconnected"])
 					print("Cannot connected. Try again in 2 seconds.")
 					time.sleep(2)
 
@@ -69,36 +78,55 @@ def algo_manager_voxcom(pipe):
 		except Exception as e:
 			pipe.send(["msg",e])
 			print(e)
-		#restarted the whole thing 
-
 class algo_manager(pannel):
 
-	def __init__(self,root,port,gt_pipe,order_pipe):
+	def __init__(self,root,port,gt_pipe,order_pipe,order_send_pipe):  #send stuff via recv and take from order_pipe.
+
+
+		self.status={"Canceled":"Canceled","Done":"Done","Running":"Running","Pending":"Pending","Deployed":"Deployed","Rejected":"Rejected","Deploying":"Deploying"}
+
+		self.stoporder_book = []
+		self.stoporder_book_lock = threading.Lock()
+		self.stoporder_to_id ={}
+		self.id_to_stoporder = {}
 
 		self.pipe = gt_pipe
 		self.order_pipe = order_pipe
+
+		self.order_send_pipe = order_send_pipe
 
 		self.port = port
 		self.symbols = []
 
 		#a list of all id.
 		self.orders_registry = []
+		self.orders_symbol = {}   # ID -> Symbol
 
 		# Symbol+Side = id. 
 		self.order_book = {}
-		# SYMBOL ATTRIBUTE. Getting symbol -> ID 
 
-		self.active_order = {}
+		self.stoporder = {}
+		# SYMBOL ATTRIBUTE. Getting symbol -> ID 
+		self.running_order = {} #one symbol -> just 1 order.
+
+		self.activated_order = {} #one symbol -> at most 2 orders. 
 
 		#self.algo_status = {} #Pending, Running,Cancled,Complete.
 		#self.order_status = {}
 
 		self.tk_strings=["algo_status","realized","shares","unrealized","unrealized_pshr","average_price"]
-		self.tk_labels=["symbol","algo_status","description","risk","position","shares","average_price","unrealized_pshr","unrealized","realized"]
+		self.tk_labels=["symbol","algo_status","description","AR","break_at","stoplevel","position","act_r/est_r","average_price","shares","AM","pxtgt1","pxtgt2","pxtgt3","unrealized_pshr","unrealized","realized"]
 
 		self.order_tkstring = {}
 		self.order_tklabels = {}
 
+		self.data_list = {}
+
+		#needed. 
+
+		self.auto_range = {}
+		self.break_at = {}
+		self.stoplevel = {}
 
 		self.realized = {}
 		self.current_share = {}
@@ -106,10 +134,18 @@ class algo_manager(pannel):
 		self.unrealized = {}
 		self.unrealized_pshr ={}
 		self.average_price = {}
-		self.risk = {}
+
+		self.auto_manage = {}
+		self.price_levels = {}
+		self.price_current_level = {}
+
+		self.act_risk= {}
+		self.est_risk = {}
+
 		self.position = {}
 
-		self.holdings= {}
+
+		self.holdings= {}  ###literally have that many shares. 
 
 		self.order_info = {}
 		
@@ -133,28 +169,74 @@ class algo_manager(pannel):
 
 		self.labels = {"Symbol":10,\
 						"Algo status":10,\
-						"description":30,\
-						"Risk":8,\
+						"description":25,\
+						"AR":4,\
+						"Break at":8,\
+						"Stop level":8,\
 						"Position":8,\
+						"Act R/Est R":8,\
+						"AvgPx":10,\
 						"SzIn":8,\
-						"AvgPx":8,\
+						"AM":4,\
+						"PxTgt 1":8,\
+						"PxTgt 2":8,\
+						"PxTgt 3":8,\
 						"UPshr":8,\
 						"U":8,\
 						"R":8,\
-						"flatten":6}
+						"flatten":10}
 
 		self.width = list(self.labels.values())
 
 		self.setting = ttk.LabelFrame(root,text="Algo Manager") 
-		self.setting.place(x=10,y=10,height=80,relwidth=0.95)
+		self.setting.place(x=10,y=10,height=250,width=180)
 
-		self.status = tk.StringVar()
-		self.status.set("Status:")
-		self.ppro_status = ttk.Label(self.setting, textvariable=self.status)
-		self.ppro_status.place(x = 20, y =12)
 
-		self.deployment_panel = ttk.LabelFrame(root,text="Algos deployment") 
-		self.deployment_panel.place(x=10,y=85,relheight=0.85,relwidth=0.98)
+		self.main_app_status = tk.StringVar()
+		self.main_app_status.set("Main :")
+
+		self.ppro_status = tk.StringVar()
+		self.ppro_status.set("Ppro :")
+
+		self.algo_count_number = 0
+		self.algo_count_string = tk.StringVar()
+		self.algo_count_string.set("Activated Algos:"+str(self.algo_count_number))
+
+		self.main_status = ttk.Label(self.setting, textvariable=self.main_app_status)
+		self.main_status.grid(column=1,row=1,padx=10)
+		#self.main_status.place(x = 20, y =12)
+
+		self.ppro_status_ = ttk.Label(self.setting, textvariable=self.ppro_status)
+		self.ppro_status_.grid(column=1,row=2,padx=10)
+		#self.ppro_status_.place(x = 20, y =32)
+
+
+		self.algo_count_ = ttk.Label(self.setting, textvariable=self.algo_count_string)
+		self.algo_count_.grid(column=1,row=3,padx=10)
+
+		self.algo_deploy = ttk.Button(self.setting, text="Deploy all algo",command=self.deploy_all_stoporders)
+		self.algo_deploy.grid(column=1,row=4)
+
+		self.algo_cancel = ttk.Button(self.setting, text="Unmount all algo",command=self.cancel_all_stoporders)
+		self.algo_cancel.grid(column=1,row=5)
+
+		self.algo_cancel = ttk.Button(self.setting, text="Flatten all algo",command=self.cancel_all_stoporders)
+		self.algo_cancel.grid(column=1,row=6)
+
+		self.algo_cancel = ttk.Button(self.setting, text="Cancel all algo",command=self.cancel_all_stoporders)
+		self.algo_cancel.grid(column=1,row=7)
+
+		self.total_u = tk.StringVar()
+		self.total_r = tk.StringVar()
+
+
+		self.log_panel = ttk.LabelFrame(root,text="Logs") 
+		self.log_panel.place(x=10,y=250,relheight=0.8,width=180)
+
+
+
+		self.deployment_panel = ttk.LabelFrame(root,text="Algo deployment") 
+		self.deployment_panel.place(x=200,y=10,relheight=0.85,relwidth=0.95)
 
 		self.dev_canvas = tk.Canvas(self.deployment_panel)
 		self.dev_canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
@@ -168,23 +250,19 @@ class algo_manager(pannel):
 		self.deployment_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
 		self.dev_canvas.create_window(0, 0, window=self.deployment_frame, anchor=tk.NW)
 
-		self.main_app_status = tk.StringVar()
-		self.main_app_status.set("Main :")
-
-		self.ppro_status = tk.StringVar()
-		self.ppro_status.set("Ppro :")
-
-		self.main_status = ttk.Label(self.setting, textvariable=self.main_app_status)
-		self.main_status.place(x = 20, y =12)
-
-		self.ppro_status_ = ttk.Label(self.setting, textvariable=self.ppro_status)
-		self.ppro_status_.place(x = 20, y =32)
 
 		self.rebind(self.dev_canvas,self.deployment_frame)
 		self.recreate_labels()
 		#test
 		# for i in range(40):
 		# 	self.order_creation(['id', i, i, 20, 20.0,1,1,1,1,1,1,1,1,1])
+
+
+	def cancel_all(self):
+
+		for i in self.orders_registry:
+				print(i)
+
 
 	def flatten_symbol(self,symbol,id_=None,status_text=None):
 
@@ -195,40 +273,32 @@ class algo_manager(pannel):
 			flatten.start()
 			#self.current_share_data[id_]=0
 
-		if id_!= None and status_text!= None:
-			if id_ in self.orders_registry:
-				self.orders_registry.remove(id_)
-				current_status = status_text.get()
-				if current_status=="Pending":
-					status_text.set("Canceled")
-				# else:
-				# 	status_text.set("Done.")
-
-	def goodtrade_listener(self,d):
-
-		#['id', 'QQQ.NQ', 'Breakout on Support on 0.0 for 0 sec', 'Short', 20, 20.0]
-		#handle database. and add labels. 
-		#id, symbol, type, status, description, position, shares, risk$
-
-		if d!=None:
-
-			message_type = d[0]
-
-			if message_type =="New order": 
-
-				self.order_creation(d)
-
-			elif message_type =="Confirmed":
-
-				self.order_confirmation(d)
-
 		else:
-			print("Missing package.")
+			if id_!= None and status_text!= None:
+				if id_ in self.orders_registry:
+					self.orders_registry.remove(id_)
+
+					#if current order is not running. 
+					self.mark_off_algo(id_,self.status["Canceled"])
+					# current_status = status_text.get()
+					# if current_status=="Pending":
+					# 	status_text.set("Canceled")
+					# 	self.modify_algo_count(-1)
+					# else:
+					# 	status_text.set("Done.")
+
+
+	def order_update(self,d):
+
+	#necessary level updates. 
+		pass
 
 	def order_creation(self,d):
 
 		#['New order', 'Break up2268503', 'Break up', 'QQQ.NQ', 'Pending', 'Breakout on Resistance on 338.85 for 0 sec', 'Long', 'Market', '338.85', '2104', 5050.0]
-		id_,symbol,type_,status,des,pos,order_type,order_price,share,risk = d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10]
+
+		#need stop level. 
+		id_,symbol,type_,status,des,pos,order_type,order_price,share,risk,stoplevel,data_list = d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10],d[11],d[12]
 
 		print(id_,"added to new order")
 
@@ -240,6 +310,8 @@ class algo_manager(pannel):
 			if pos =="Long": side ="B"
 			elif pos =="Short": side ="S"
 			self.order_book[symbol+side] = id_
+
+			self.orders_symbol[id_] = symbol
 			#create the tkstring.
 
 			self.order_tkstring[id_] = {}
@@ -262,7 +334,27 @@ class algo_manager(pannel):
 			self.order_tkstring[id_]["average_price"] = tk.StringVar()
 			self.order_tkstring[id_]["average_price"].set("N/A")
 
+			self.order_tkstring[id_]["risk_ratio"] = tk.StringVar()
+			self.order_tkstring[id_]["risk_ratio"].set("0/"+str(risk))
 			#Initilize the data values. 
+
+			self.order_tkstring[id_]["auto_range"] = tk.BooleanVar(value=True)
+
+			self.order_tkstring[id_]["auto_manage"] = tk.BooleanVar(value=True)
+
+			self.break_at[id_] = order_price
+			self.stoplevel[id_] = stoplevel
+
+			self.order_tkstring[id_]["break_at"] = tk.StringVar()
+			self.order_tkstring[id_]["break_at"].set(self.break_at[id_])
+
+			self.order_tkstring[id_]["stoplevel"] = tk.StringVar()
+			self.order_tkstring[id_]["stoplevel"].set(self.stoplevel[id_])
+
+
+			self.order_tkstring[id_]["tgtpx1"] = tk.StringVar()
+			self.order_tkstring[id_]["tgtpx2"] = tk.StringVar()
+			self.order_tkstring[id_]["tgtpx3"] = tk.StringVar()
 
 			self.realized[id_] = 0
 			self.current_share[id_] = 0
@@ -270,26 +362,43 @@ class algo_manager(pannel):
 			self.unrealized[id_] = 0
 			self.unrealized_pshr[id_] = 0
 			self.average_price[id_] = 0
-			self.risk[id_] = -risk
+			self.est_risk[id_] =  risk
+			
 			self.position[id_] = pos
+			self.holdings[id_] = []
 
 			self.order_info[id_] = [order_type,pos,order_price,share,symbol]
 
+			self.data_list[id_] = data_list
+			print(self.data_list[id_])
 			#turns the order. 
+
+			self.price_current_level[id_] = 1
+			self.price_levels[id_] = {}
+			self.update_target_price(id_)
 
 			l = [(symbol,id_),\
 			self.order_tkstring[id_]["algo_status"],\
 			des,\
-			risk,\
+			self.order_tkstring[id_]["auto_range"],\
+			self.order_tkstring[id_]["break_at"],
+			self.order_tkstring[id_]["stoplevel"],\
 			pos,\
-			self.order_tkstring[id_]["current_share"],\
+			self.order_tkstring[id_]["risk_ratio"],\
 			self.order_tkstring[id_]["average_price"],\
+			self.order_tkstring[id_]["current_share"],\
+			self.order_tkstring[id_]["auto_manage"],\
+			self.order_tkstring[id_]["tgtpx1"],\
+			self.order_tkstring[id_]["tgtpx2"],\
+			self.order_tkstring[id_]["tgtpx3"],\
 			self.order_tkstring[id_]["unrealized_pshr"],\
 			self.order_tkstring[id_]["unrealized"],\
 			self.order_tkstring[id_]["realized"]]
 
 
+			self.modify_algo_count(1)
 			self.order_ui_creation(l)
+			self.register(symbol)
 		else:
 			print("adding order failed")
 
@@ -304,20 +413,31 @@ class algo_manager(pannel):
 		self.order_tklabels[id_] = {}
 
 		#add in tickers.
-		print("LENGTH",len(info))
+		#print("LENGTH",len(info))
 		for j in range(len(info)):
-			#if j == 1 or j ==5 or j ==6 or j==7  or j==8 or j==9:
+			#"symbol","algo_status","description","break_at","position","act_r/est_r","stoplevel","average_price","shares","pxtgt1","pxtgt1","pxtgt1","unrealized_pshr","unrealized","realized"
 			label_name = self.tk_labels[j]
 
-			if j == 0:
-				self.order_tklabels[id_][label_name] =tk.Label(self.deployment_frame ,text=info[j][0],width=self.width[j])		
+			if label_name == "symbol":
+				self.order_tklabels[id_][label_name] =tk.Button(self.deployment_frame ,text=info[j][0],width=self.width[j],command = lambda s=id_: self.deploy_stop_order(id_))	
+			elif label_name =="AR" or  label_name =="AM":
+				self.order_tklabels[id_][label_name] =tk.Checkbutton(self.deployment_frame,variable=info[j])
+			elif label_name =="algo_status":
+				self.order_tklabels[id_][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command = lambda s=id_: self.cancel_deployed(id_))
+			elif label_name == "break_at":
+				self.order_tklabels[id_][label_name] =tk.Entry(self.deployment_frame ,textvariable=info[j],width=self.width[j])	
+			elif label_name == "stoplevel":
+				self.order_tklabels[id_][label_name] =tk.Entry(self.deployment_frame ,textvariable=info[j],width=self.width[j])
 			else:
 				if str(type(info[j]))=="<class 'tkinter.StringVar'>":
-					self.order_tklabels[id_][label_name]=tk.Label(self.deployment_frame ,textvariable=info[j],width=self.width[j])
+					self.order_tklabels[id_][label_name]=tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
 				else:
-					self.order_tklabels[id_][label_name]=tk.Label(self.deployment_frame ,text=info[j],width=self.width[j])
+					self.order_tklabels[id_][label_name]=tk.Button(self.deployment_frame ,text=info[j],width=self.width[j])
 
-			self.label_default_configure(self.order_tklabels[id_][label_name])
+			try:
+				self.label_default_configure(self.order_tklabels[id_][label_name])
+			except:
+				pass
 			self.order_tklabels[id_][label_name].grid(row= l+2, column=j,padx=0)
 
 			#else: #command = lambda s=symbol: self.delete_symbol_reg_list(s))
@@ -331,11 +451,42 @@ class algo_manager(pannel):
 
 		self.rebind(self.dev_canvas,self.deployment_frame)
 
+	def update_target_price(self,id_): #call this whenever the break at price changes. 
+		price = self.break_at[id_]
+
+		coefficient = 1
+		if self.position[id_]=="Long":
+
+			ohv = self.data_list[id_]["OHavg"]
+			ohs = self.data_list[id_]["OHstd"]
+			print(self.data_list[id_],type(ohv),ohs,type(price))
+			self.price_levels[id_][0] = price
+			self.price_levels[id_][1] = round(price+max(ohv*0.5,ohv-ohs)*coefficient,2)
+			self.price_levels[id_][2] = round(price+ohv*coefficient,2)
+			self.price_levels[id_][3] =	round(price+max(ohv*1.5,ohv+ohs)*coefficient,2)
+		else:
+			olv = self.data_list[id_]["OHavg"]
+			ols = self.data_list[id_]["OHstd"]
+			self.price_levels[id_][0] = price
+			self.price_levels[id_][1] = round(price-max(olv*0.5,olv-ols)*coefficient,2)
+			self.price_levels[id_][2] = round(price-olv*coefficient,2)
+			self.price_levels[id_][3] =	round(price-max(olv*1.5,olv+ols)*coefficient,2)
+
+		#set the price levels. 
+		self.order_tkstring[id_]["tgtpx1"].set(self.price_levels[id_][1])
+		self.order_tkstring[id_]["tgtpx2"].set(self.price_levels[id_][2])
+		self.order_tkstring[id_]["tgtpx3"].set(self.price_levels[id_][3])
+
+	def modify_algo_count(self,num):
+		self.algo_count_number+=num
+		self.algo_count_string.set("Activated Algos:"+str(self.algo_count_number))
+
+
 	def check_running_order(self,symbol):
 
-		if symbol in self.active_order:
+		if symbol in self.running_order:
 			#ust be ""
-			if self.active_order[symbol] =="":
+			if self.running_order[symbol] =="":
 				return False
 			else:
 				return True
@@ -346,18 +497,17 @@ class algo_manager(pannel):
 	#return true if current order is running.
 	def check_order_running(self,id_,symbol):
 
-		if symbol in self.active_order:
-			return self.active_order[symbol] ==id_
+		if symbol in self.running_order:
+			return self.running_order[symbol] ==id_
 		else:
 			return False
 
 		
-
 	def order_confirmation(self,d):
 		id_ = d[1]
 		print(id_,"confirmed and is a go")
 
-
+		return True
 		if id_ not in self.orders_registry:
 			print("Cannot find order",id_)
 		else:
@@ -383,7 +533,7 @@ class algo_manager(pannel):
 			else:
 
 				####check what is going on? #### THINK THINK THINK. 
-				current_order = self.order_info[self.active_order[symbol]]
+				current_order = self.order_info[self.running_order[symbol]]
 				pos_ = current_order[1]
 				
 				if pos_!= pos and self.order_tkstring[id_]["algo_status"].get()=="Pending":
@@ -393,16 +543,17 @@ class algo_manager(pannel):
 					print("Already containning one running order.")		
 				#should be a thread.
 
+
 	def order_execution(self,id_,type_,symbol,share,pos,order_price):
 
-		self.active_order[symbol] = id_
+		self.running_order[symbol] = id_
 
 		if type_ == "Market":
 
 			if pos=="Long":
 				buy_market_order(symbol,share)
 				
-				self.active_order[symbol] = id_
+				self.running_order[symbol] = id_
 			elif pos =="Short":
 				sell_market_order(symbol,share)
 
@@ -427,12 +578,11 @@ class algo_manager(pannel):
 		#I should register the symbol the moment it comes in.
 		self.register(symbol)
 
-
 	def conflicting_order(self,id_,type_, pos,price,share,symbol):
 
 		flatten_symbol(symbol)
 
-		previous_order = self.active_order[symbol]
+		previous_order = self.running_order[symbol]
 
 		while True:
 			if self.current_share[previous_order]==0:
@@ -440,14 +590,14 @@ class algo_manager(pannel):
 			else:
 				time.sleep(0.1)
 
-		self.active_order[symbol] = id_
+		self.running_order[symbol] = id_
 
 		if type_ == "Market":
 
 			if pos=="Long":
 				buy_market_order(symbol,share)
 				
-				self.active_order[symbol] = id_
+				self.running_order[symbol] = id_
 			elif pos =="Short":
 				sell_market_order(symbol,share)
 
@@ -501,94 +651,212 @@ class algo_manager(pannel):
 			if d[0] =="order rejected":
 
 				self.ppro_order_rejection(d[1])
-			
 
+			if d[0] =="new stoporder":
+
+				self.ppro_append_new_stoporder(d[1])
+			
 	#when there is a change of quantity of an order. 
+
+
 	def ppro_order_confirmation(self,data):
 
 		symbol = data["symbol"]
 		price = data["price"]
 		shares = data["shares"]
 		side = data["side"]
+		code = symbol+side
+		print(symbol,price,shares,side)
 
-		if symbol in self.active_order:
+		#check if this activates an hidden order.
+		#######filter out irrelavant orders.
 
-			if self.active_order[symbol]!= "":
+		init = False
+		if symbol in self.running_order or code in self.order_book: 
+			#establish id for the ones not seet up.
+			if symbol not in self.running_order:
+				init = True
+			else:
+				if self.running_order[symbol] =="":
+					init = True
 
-				id_ = self.active_order[symbol]
+				
+			if init:
+				id_ = self.order_book[code]
+				self.running_order[symbol] = id_
+				self.order_tkstring[id_]["algo_status"].set("Running")
+				self.order_tklabels[id_]["algo_status"]["background"] = "#97FEA8" #set the label to be, green.	
 
-				#if same side, add. if wrong side.take off.
-				#same side.
+	
+			id_ = self.running_order[symbol]
+			current = self.current_share[id_]
+			print("symbol",symbol,"side:",side,"shares",shares,"price",price)
 
-				current = self.current_share[id_]
 
-				print("symbol",symbol,"side:",side,"shares",shares,"price",price)
-				if (self.position[id_]=="Long" and side =="B") or (self.position[id_]=="Short" and (side =="S" or side=="T")):
+			if (self.position[id_]=="Long" and side =="B") or (self.position[id_]=="Short" and (side =="S" or side=="T")):
+				self.ppro_order_loadup(id_,symbol,price,current,shares,side)
 
-					self.current_share[id_] = current+shares
+			else:
+				self.ppro_order_loadoff(id_,symbol,price,current,shares,side)
 
-					if current ==0:
-						self.average_price[id_] = round(price,3)
-					else:
-						self.average_price[id_] = round(((self.average_price[id_]*current)+(price*shares))/self.current_share[id_],3)
+			#print(self.holdings[id_])
+			self.update_display(id_)
 
-					for i in range(shares):
-						self.holdings[id_].append(price)
 
-					#check how long it took
-					# print(self.current_share[id_],self.target_share[id_])
-					# if str(self.current_share[id_]) == str(self.target_share[id_]):
-					# 	done = time.time()
-					# 	elapsed = done - self.start
-					# 	print("order time taken:",elapsed)
+	def ppro_order_loadup(self,id_,symbol,price,current,shares,side):
 
-				#Taking shares off. assume it's all gone. -- NO. NO
-				else:
-					self.current_share[id_] = current-shares	
+		self.current_share[id_] = current+shares
 
-					print("curren shares:",self.current_share[id_] )			
-					gain = 0
-					if self.position[id_]=="Long":
-						#self.realized[id_] += (price-self.average_price[id_])*shares
-						
+		if current ==0:
+			self.average_price[id_] = round(price,3)
+		else:
+			self.average_price[id_] = round(((self.average_price[id_]*current)+(price*shares))/self.current_share[id_],3)
 
-						for i in range(shares):
-							try:
-								gain += price-self.holdings[id_].pop()
-							except:
-								print("Holding calculation error")
-					elif self.position[id_]=="Short":
-						for i in range(shares):
-							#try:
-							gain += self.holdings[id_].pop() - price	
-							#except:
-							#	print("Holding calculation error")			
-						#self.realized[id_] += (self.average_price[id_]-price)*shares
-					self.realized[id_]+=gain
-					self.realized[id_]= round(self.realized[id_],4)
+		for i in range(shares):
+			self.holdings[id_].append(price)
 
-					print("realized:",self.realized[id_])
+		self.adjusting_risk(id_)
 
-					#finish a trade if current share is 0.
+	def ppro_order_loadoff(self,id_,symbol,price,current,shares,side):
 
-					if self.current_share[id_] == 0:
-						self.unrealized[id_] = 0
-						self.unrealized_pshr[id_] = 0
+		self.current_share[id_] = current-shares	
 
-						#mark it done.
-						current_status = self.order_tkstring[id_]["algo_status"].get()
-						if current_status=="Running":
-							self.order_tkstring[id_]["algo_status"].set("Done")
+		print("curren shares:",self.current_share[id_] )			
+		gain = 0
+		if self.position[id_]=="Long":
+			for i in range(shares):
+				try:
+					gain += price-self.holdings[id_].pop()
+				except:
+					print("Holding calculation error,holdings are empty.")
+		elif self.position[id_]=="Short":
+			for i in range(shares):
+				try:
+					gain += self.holdings[id_].pop() - price	
+				except:
+					print("Holding calculation error,holdings are empty.")	
 
-						#dont support multiple symbol on the same trade yet.
-						# dereg = threading.Thread(target=self.deregister,args=(symbol,), daemon=True)
-						# dereg.start()
+		self.realized[id_]+=gain
+		self.realized[id_]= round(self.realized[id_],4)
 
-						#deactive the order.
-						self.active_order[symbol]= ""
+		self.adjusting_risk(id_)
 
-				#print(self.holdings[id_])
-				self.update_display(id_)
+		print("realized:",self.realized[id_])
+
+		#finish a trade if current share is 0.
+
+		if self.current_share[id_] == 0:
+			self.unrealized[id_] = 0
+			self.unrealized_pshr[id_] = 0
+
+			#mark it done.
+			self.mark_off_algo(id_,self.status["Done"])
+
+			# current_status = self.order_tkstring[id_]["algo_status"].get()
+			# if current_status=="Running":
+			# 	self.order_tkstring[id_]["algo_status"].set("Done")
+			# 	self.modify_algo_count(-1)
+
+			# #dont support multiple symbol on the same trade yet.
+			# # dereg = threading.Thread(target=self.deregister,args=(symbol,), daemon=True)
+			# # dereg.start()
+
+			# #deactive the order.
+			# self.running_order[symbol]= ""
+
+	def ppro_append_new_stoporder(self,pkg):
+
+		stopid,symbol,side = pkg[0],pkg[1],pkg[2]
+		id_=self.order_book[symbol+side]
+
+		with self.stoporder_book_lock:
+			self.stoporder_book.append(stopid)
+
+		self.stoporder_to_id[stopid] = id_
+		self.id_to_stoporder[id_] = stopid
+
+		if self.order_tkstring[id_]["algo_status"].get()==self.status["Deploying"]:
+			self.order_tkstring[id_]["algo_status"].set(self.status["Deployed"])
+			self.order_tklabels[id_]["algo_status"]["background"] = YELLOW
+
+		self.stoporder[id_] = stopid
+
+		#change label into placed.
+
+
+
+		#assign this id to symbol+side? How can i trace the status of this stoporder???  
+
+	def deploy_stop_order(self,id_):
+
+		#can only deploy if the status is pending.
+
+		current_status= self.order_tkstring[id_]["algo_status"].get()
+		if current_status == self.status["Pending"]:
+
+			self.order_tkstring[id_]["algo_status"].set(self.status["Deploying"])
+			self.order_tklabels[id_]["algo_status"]["background"] = LIGHTYELLOW
+
+			break_price = self.break_at[id_]
+			share = self.target_share[id_]
+			pos = self.position[id_]
+			symbol = self.orders_symbol[id_]
+
+			if pos=="Long":
+				stoporder_to_market_buy(symbol,break_price,share,self.order_send_pipe)  #send back id via pipe.
+				
+				# self.running_order[symbol] = id_
+			elif pos =="Short":
+				stoporder_to_market_sell(symbol,break_price,share,self.order_send_pipe)
+		else:
+			print("Cannot deploy ",id_," Current status:",current_status)
+
+
+	def deploy_all_stoporders(self):
+
+		for i in self.orders_registry:
+			self.deploy_stop_order(i)
+
+	def cancel_deployed(self,id_):
+		#if there is an order deployed. 
+
+		if id_ in self.id_to_stoporder:
+			self.cancel_stoporder(self.id_to_stoporder[id_])
+
+	def cancel_stoporder(self,stopid):
+		# id_ -> stopid. .  
+		id_ = self.stoporder_to_id[stopid]
+		if self.order_tkstring[id_]["algo_status"].get()==self.status["Deployed"]:
+			cancel_stoporder(stopid)
+			self.order_tkstring[id_]["algo_status"].set(self.status["Pending"])
+			self.order_tklabels[id_]["algo_status"]["background"] = DEFAULT
+
+			with self.stoporder_book_lock:
+				self.stoporder_book.remove(stopid)
+
+
+	def cancel_all_stoporders(self):
+		###just look through all placed orders
+
+		print("Cancel:",len(self.stoporder_book))
+		cur = self.stoporder_book[:]
+		for i in cur:
+			self.cancel_stoporder(i)
+
+
+	def adjusting_risk(self,id_):
+		#calculate the actual risk.
+
+		self.act_risk[id_] = round((abs(self.average_price[id_] - self.stoplevel[id_])*self.current_share[id_]),2)
+
+		diff = self.act_risk[id_]-self.est_risk[id_]
+		ratio = diff/self.est_risk[id_]
+
+		self.order_tklabels[id_]["act_r/est_r"]["background"] = hexcolor_green_to_red(ratio)
+		self.order_tkstring[id_]["risk_ratio"].set(str(self.act_risk[id_])+"/"+str(self.est_risk[id_]))
+
+		if self.current_share[id_] == 0:
+			self.order_tklabels[id_]["act_r/est_r"]["background"] = DEFAULT
 
 	#update the current status of a current order. 
 	def ppro_order_update(self,data):
@@ -599,28 +867,72 @@ class algo_manager(pannel):
 
 		#get position
 
-		if symbol in self.active_order:
+		if symbol in self.running_order:
 
-			if self.active_order[symbol]!= "":
-				id_ = self.active_order[symbol]
+			if self.running_order[symbol]!= "":
+				id_ = self.running_order[symbol]
+
+				flatten = False
 
 				if self.position[id_]=="Long":
 					price = bid
 					gain = round((price-self.average_price[id_]),4)
 
+					if price <= self.stoplevel[id_]:
+						flatten=True
+
+					if self.order_tkstring[id_]["auto_manage"].get()==True:
+						current_level = self.price_current_level[id_]
+						if price >= self.price_levels[id_][current_level]:
+
+							print("target reached,level:",current_level)
+							#shake of 1/3 
+							share = self.current_share[id_]//3
+							if share==0: share = self.current_share[id_]  #if 0. get rid of everything.
+
+							sell_market_order(symbol,share)
+
+							self.stoplevel[id_] = self.price_levels[id_][current_level-1]
+							self.adjusting_risk(id_)
+
+							#move up one level if below 3
+							if self.price_current_level[id_]<3:
+								self.price_current_level[id_]+=1 
+
 				elif self.position[id_]=="Short":
 					price = ask
 					gain = round(self.average_price[id_]-price,4)
+					if price >= self.stoplevel[id_]:
+						flatten=True
 
-				#loss:
-				#print(gain)
-				self.unrealized_pshr[id_] = gain
-				self.unrealized[id_] = round(gain*self.current_share[id_],4)
+					if self.order_tkstring[id_]["auto_manage"].get()==True:
+						current_level = self.price_current_level[id_]
+						if price <= self.price_levels[id_][current_level]:
+
+							print("target reached,level:",current_level)
+							#shake of 1/3 
+							share = self.current_share[id_]//3
+							if share==0: share = self.current_share[id_]  #if 0. get rid of everything.
+							
+							buy_market_order(symbol,share)
+
+							self.stoplevel[id_] = self.price_levels[id_][current_level-1]
+							self.adjusting_risk(id_)
+
+							#move up one level if below 3
+							if self.price_current_level[id_]<3:
+								self.price_current_level[id_]+=1 
+
+
+
+				if self.current_share[id_] >0:
+					self.unrealized_pshr[id_] = gain
+					self.unrealized[id_] = round(gain*self.current_share[id_],4)
 
 				#if ...loss is enough. flatten.
 				#print(gain,self.unrealized[id_])
 
-				if self.unrealized[id_] <= self.risk[id_]:
+				if flatten and self.current_share[id_]>0:
 					self.flatten_symbol(symbol,id_,self.order_tkstring[id_]["algo_status"])
 				
 				self.update_display(id_)
@@ -635,12 +947,28 @@ class algo_manager(pannel):
 		#get the order id. 
 		id_ = self.order_book[symbol+side]
 
-		self.order_tkstring[id_]["algo_status"].set("Rejected")
-		self.order_tklabels[id_]["algo_status"]["background"] = "red"
-	#info= 
-	#symbol,status,type,position,curretn,shares,risk,p/l
-
+		self.mark_off_algo(id_,self.status["Rejected"])
 	#Utilities. 
+
+	#whether it is done, rejected, or cancled. should go here.
+	def mark_off_algo(self,id_,status):
+
+		print(status)
+		if status == "Rejected":
+			self.order_tkstring[id_]["algo_status"].set(status)
+			self.order_tklabels[id_]["algo_status"]["background"] = "red"
+			self.running_order[self.orders_symbol[id_]] = ""
+		elif status =="Done":
+			self.order_tkstring[id_]["algo_status"].set(status)
+			self.order_tklabels[id_]["algo_status"]["background"] = "#97FEA8"
+			self.running_order[self.orders_symbol[id_]] = ""
+		elif status =="Canceled":#canceled 
+
+			if self.order_tkstring[id_]["algo_status"].get() == "Pending":
+				self.order_tkstring[id_]["algo_status"].set(status)
+
+		
+		self.modify_algo_count(-1)
 
 	def recreate_labels(self):
 
@@ -648,7 +976,7 @@ class algo_manager(pannel):
 		w = list(self.labels.values())
 
 		for i in range(len(l)): #Rows
-			self.b = tk.Button(self.deployment_frame, text=l[i],width=w[i])#,command=self.rank
+			self.b = tk.Button(self.deployment_frame, text=l[i],width=w[i],height=2)#,command=self.rank
 			self.b.configure(activebackground="#f9f9f9")
 			self.b.configure(activeforeground="black")
 			self.b.configure(background="#d9d9d9")
@@ -668,7 +996,6 @@ class algo_manager(pannel):
 
 		#print(self.average_price[id_],self.unrealized[id_].get(),self.unrealized_pshr[id_].get())
 		#print(id_,self.current_share[id_],self.average_price[id_],self.unrealized_pshr[id_],self.unrealized[id_])
-		#
 
 		self.order_tkstring[id_]["current_share"].set(str(self.current_share[id_])+"/"+str(self.target_share[id_]))
 		self.order_tkstring[id_]["realized"].set(str(self.realized[id_]))
@@ -677,23 +1004,38 @@ class algo_manager(pannel):
 		self.order_tkstring[id_]["average_price"].set(self.average_price[id_])
 
 		#check color.f9f9f9
+
+
 		if self.unrealized_pshr[id_]>0:
-			self.order_tklabels[id_]["unrealized_pshr"]["background"] = "#3DFC68"
-			self.order_tklabels[id_]["unrealized"]["background"] = "#3DFC68"
+			self.order_tklabels[id_]["unrealized_pshr"]["background"] = STRONGGREEN
+			self.order_tklabels[id_]["unrealized"]["background"] = STRONGGREEN
 		elif self.unrealized_pshr[id_]<0:
-			self.order_tklabels[id_]["unrealized_pshr"]["background"] = "#FC433D"
-			self.order_tklabels[id_]["unrealized"]["background"] = "#FC433D"
+			self.order_tklabels[id_]["unrealized_pshr"]["background"] = STRONGRED
+			self.order_tklabels[id_]["unrealized"]["background"] = STRONGRED
 		else:
-			self.order_tklabels[id_]["unrealized_pshr"]["background"] = "#ECF57C"
-			self.order_tklabels[id_]["unrealized"]["background"] = "#ECF57C"
+			self.order_tklabels[id_]["unrealized_pshr"]["background"] = DEFAULT
+			self.order_tklabels[id_]["unrealized"]["background"] =DEFAULT
 
 		if self.realized[id_]==0:
-			self.order_tklabels[id_]["realized"]["background"] = "#d9d9d9"
+			self.order_tklabels[id_]["realized"]["background"] = DEFAULT
 		elif self.realized[id_]>0:
-			self.order_tklabels[id_]["realized"]["background"] = "#3DFC68"
+			self.order_tklabels[id_]["realized"]["background"] = STRONGGREEN
 		elif self.realized[id_]<0:
-			self.order_tklabels[id_]["realized"]["background"] = "#FC433D"
+			self.order_tklabels[id_]["realized"]["background"] = STRONGRED
 
+		current_level = self.price_current_level[id_]
+		if  current_level==1:
+			self.order_tklabels[id_]["pxtgt1"]["background"] = LIGHTYELLOW
+			self.order_tklabels[id_]["pxtgt2"]["background"] = DEFAULT
+			self.order_tklabels[id_]["pxtgt3"]["background"] = DEFAULT
+		elif  current_level==2:
+			self.order_tklabels[id_]["pxtgt1"]["background"] = DEFAULT
+			self.order_tklabels[id_]["pxtgt2"]["background"] = LIGHTYELLOW
+			self.order_tklabels[id_]["pxtgt3"]["background"] = DEFAULT
+		elif  current_level==3:
+			self.order_tklabels[id_]["pxtgt1"]["background"] = DEFAULT
+			self.order_tklabels[id_]["pxtgt2"]["background"] = DEFAULT
+			self.order_tklabels[id_]["pxtgt3"]["background"] = LIGHTYELLOW
 
 	def rebind(self,canvas,frame):
 		canvas.update_idletasks()
@@ -719,6 +1061,33 @@ class algo_manager(pannel):
 				print("new package arrived",d)
 				self.goodtrade_listener(d[1])
 
+	# def threads_manager(self):
+	# 	time.sleep(3)
+
+	# 	while True:
+	# 		update = self.internal_communication.get()
+
+	def goodtrade_listener(self,d):
+
+		#['id', 'QQQ.NQ', 'Breakout on Support on 0.0 for 0 sec', 'Short', 20, 20.0]
+		#handle database. and add labels. 
+		#id, symbol, type, status, description, position, shares, risk$
+
+		if d!=None:
+
+			message_type = d[0]
+
+			if message_type =="New order": 
+
+				self.order_creation(d)
+
+			elif message_type =="Confirmed":
+
+				self.order_confirmation(d)
+
+		else:
+			print("Missing package.")
+
 	def delete(self):
 		for i in self.tabs:
 			for widget in i.winfo_children():
@@ -739,6 +1108,7 @@ class algo_manager(pannel):
 
 	def register_to_ppro(self,symbol,status):
 
+		print("Registering",symbol,status)
 		if status == True:
 			postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&region=1&feedtype=L1&output=" + str(self.port)+"&status=on"
 		else:
@@ -760,8 +1130,6 @@ class algo_manager(pannel):
 if __name__ == '__main__':
 
 
-# 	sell_limit_order("AAPL.NQ",150,2)
-	#try:
 
 	multiprocessing.freeze_support()
 
@@ -783,11 +1151,11 @@ if __name__ == '__main__':
 
 	root = tk.Tk() 
 	root.title("GoodTrade Algo Manager") 
-	root.geometry("1000x800")
-	root.minsize(1000, 800)
+	root.geometry("1600x800")
+	root.minsize(1600, 800)
 	root.maxsize(1800, 1200)
 
-	view = algo_manager(root,port,goodtrade_pipe,ppro_pipe)
+	view = algo_manager(root,port,goodtrade_pipe,ppro_pipe,ppro_pipe_end)
 
 	#receive_pipe.send(['New order', 'Break up2268503', 'Break up', 'QQQ.NQ', 'Pending', 'Breakout on Resistance on 338.85 for 0 sec', 'Long', 'Market', '338.85', '2104', 5050.0])
 

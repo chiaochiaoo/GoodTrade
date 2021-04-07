@@ -7,6 +7,7 @@ from datetime import date
 import json
 import time
 
+#from Symbol_data_manager import *
 from modules.Symbol_data_manager import *
 
 
@@ -173,15 +174,17 @@ def fetch_data(symbol):
 			openlow_.append(float(lst[O])-float(lst[L]))
 
 			###ATR
-			ra =  float(lst[H])-float(lst[L])
-			o =  abs( float(lst[H])-float(lst[C]))
-			c =  abs( float(lst[L])-float(lst[C]))
-			tr = max(ra,o,c)
-			ATR.append(tr)
 
 			if prev_close!=0:
 				gap = round(float(lst[O])-prev_close,2)
 				previous_close.append(gap)
+
+				ra =  float(lst[H])-float(lst[L])
+				o =  abs(float(lst[H])-prev_close)
+				c =  abs(float(lst[L])-prev_close)
+				tr = max(ra,o,c)
+				ATR.append(tr)
+
 
 			prev_close = float(lst[C])
 
@@ -205,7 +208,7 @@ def fetch_data(symbol):
 		range_std=round(np.std(range_),3)
 		prev_close_std = round(np.std(np.abs(previous_close)),3)
 
-		ATR = np.mean(ATR)
+		ATR = round(np.mean(ATR),2)
 
 		###ADD the first 5 here. seperate them later.
 
@@ -274,7 +277,7 @@ def fetch_data(symbol):
 
 
 # if __name__ == '__main__':
-
+	
 	# multiprocessing.freeze_support()
 	# request_pipe, receive_pipe = multiprocessing.Pipe()
 	# p = multiprocessing.Process(target=multi_processing_database, args=(receive_pipe,),daemon=True)
@@ -333,3 +336,21 @@ def fetch_data(symbol):
 # print("Ranges from last 14 days:",range_)
 # print("Avg",round(np.mean(range_),2))
 # print("Std",round(np.std(range_),2))
+
+#print(fetch_data("nvda"))
+
+
+# 03/15/2021,514.29,528.27,510.685,528.12,
+# 03/16/2021,535.1,540.5,524.67,531.38,
+# 03/17/2021,521.59,538.13,519.58,533.98,
+# 03/18/2021,525.25,527.36,508.6817,508.79,
+# 03/19/2021,509.83,516.86,504.5,513.83,
+# 03/22/2021,517.43,535.78,516.27,527.45,
+# 03/23/2021,530.47,533.78,520.85,522.75,
+# 03/24/2021,526.99,526.99,505.47,505.49,
+# 03/25/2021,500.25,508.59,490.88,501.19,
+# 03/26/2021,502.16,514.25,494.94,513.83,
+# 03/29/2021,512,522.5,508,518.07,3885970
+# 03/30/2021,512.56,519.01,508.2,514.87,
+# 03/31/2021,520.48,538.82,519.3,533.93,
+# 04/01/2021,542.88,554.8,540.45,552.73,

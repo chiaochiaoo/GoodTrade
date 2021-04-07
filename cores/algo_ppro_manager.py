@@ -6,6 +6,26 @@ import threading
 
 
 # pipe out update .
+
+
+		#restarted the whole thing 
+def hexcolor_green_to_red(level):
+
+	if level>0:
+		code = int(510*(level))
+		#print(code,"_")
+		if code >255:
+			first_part = code-255
+			return "#FF"+hex_to_string(255-first_part)+"00"
+		else:
+			return "#FF"+"FF"+hex_to_string(255-code)
+
+	else:
+		code = int(255*(abs(level)))
+		first_part = 255-code
+
+		return "#"+hex_to_string(first_part)+"FF"+hex_to_string(first_part)
+
 def timestamp_seconds(s):
 
 	p = s.split(":")
@@ -254,51 +274,71 @@ def sell_limit_order(symbol, price,share):
 	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,),daemon=True)
 	req.start()
 
-def ppro_request(request,success=None,failure=None,traceid=False,symbol=None):
+def ppro_request(request,success=None,failure=None,traceid=False,symbol=None,side=None,pipe=None):
 	r = requests.post(request)
 	if r.status_code ==200:
-		print(success)
+		if success!=None:
+			print(success)
 
 		if traceid==True:
-			print(get_order_id(find_between(r.text,"<Content>","</Content>")))  #need to grab the request id. obtain the order id. assign it to the symbol.the 
+			get_order_id(find_between(r.text,"<Content>","</Content>"),symbol,side,pipe)  #need to grab the request id. obtain the order id. assign it to the symbol.the 
 
 		return True
 	else:
 		print(failure)
 		return False
 
-def get_order_id(request_number):
-	req = "localhost:8080/GetOrderNumber?requestid="+str(request_number)
+def get_order_id(request_number,symbol,side,pipe):
+	req = "http://localhost:8080/GetOrderNumber?requestid="+str(request_number)
 	r = requests.post(req)
 	if r.status_code ==200:
-		print(find_between(r.text,"<Content>","</Content>"))
+		#return id, symbol, and side. 
+		pipe.send(["new stoporder",[find_between(r.text,"<Content>","</Content>"),symbol,side]])
 
 ####need to trace the order number to trace the stop id number. 
-def stoporder_to_market_buy(symbol,price,share):
+def stoporder_to_market_buy(symbol,price,share,pipe=None):
 
 	price = round(float(price),2)
 	#r = 'localhost:8080/SendSwiftStop?symbol=&ordername=ARCA Buy ARCX Market DAY&shares=&referenceprice=ask&swiftstopprice='
 	r='http://localhost:8080/SendSwiftStop?symbol='+symbol+'&ordername=ARCA%20Buy%20ARCX%20Market%20DAY&shares='+str(share)+'&referenceprice=ask&swiftstopprice='+str(price)
 	#print(r)
-	sucess='stoporder buy market order success on'+symbol
+	sucess='stoporder buy market order success on '+symbol
 	failure="Error stoporder buy market"+symbol
    
-	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,True,symbol),daemon=True)
+	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,True,symbol,"B",pipe),daemon=True)
 	req.start()
 
 
-def stoporder_to_market_sell(symbol,price,share):
+def stoporder_to_market_sell(symbol,price,share,pipe=None):
 
 	price = round(float(price),2)
 	#http://localhost:8080/SendSwiftStop?symbol=AAPL.NQ&ordername=ARCA%20Sell-%3EShort%20ARCX%20Market%20DAY&shares=10&referenceprice=bid&swiftstopprice=140.0
 	#r= 'http://localhost:8080/SendSwiftStop?symbol='+symbol+'&ordername=ARCA%20Sell'+'-'+'%'+'3E'+'Short%20ARCX%20Market%20DAY&shares='+str(share)+'&referenceprice=bid&swiftstopprice'+str(price)
 	#r = 'localhost:8080/SendSwiftStop?symbol='+symbol+'&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(share)+'&referenceprice=bid&swiftstopprice='+str(price)
 	r= 'http://localhost:8080/SendSwiftStop?symbol='+symbol+'&ordername=ARCA%20Sell-%3EShort%20ARCX%20Market%20DAY&shares='+str(share)+'&referenceprice=bid&swiftstopprice='+str(price)
-	sucess='stoporder sell market order success on'+symbol
+	sucess='stoporder sell market order success on '+symbol
 	failure="Error sell order on"+symbol
    
-	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,True,symbol),daemon=True)
+	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,True,symbol,"S",pipe),daemon=True)
 	req.start()
 
-#sell_market_order("QQQ.NQ",10)
-#get_order_id(3535810)
+
+def cancel_stoporder(id_):
+
+	r="http://localhost:8080/CancelScript?scriptid="+str(id_)
+	sucess='cancellation successful'
+	failure="cancellation failed"
+
+	req = threading.Thread(target=ppro_request, args=(r,sucess,failure),daemon=True)
+	req.start()	
+
+#QIAOSUN_01000016S179196100000
+#cancel_stoporder("QIAOSUN_01000016S179196100000")
+#stoporder_to_market_sell("QQQ.NQ",340,10)
+
+# #get_order_id(3535810)
+# while True:
+#
+
+print(2//3)
+
