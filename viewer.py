@@ -154,8 +154,8 @@ class ticker_manager(pannel):
 		self.data = data
 
 
-		self.width = [8,10,12,10,24,10,10]
-		self.labels = ["Ticker","Status","Last update","Price","Last Alert","Last Alert time","Remove"]
+		self.width = [8,10,12,10,15,24,10,10]
+		self.labels = ["Ticker","Status","Last update","Price","Status","Last Alert","Last Alert time","Remove"]
 
 		#init the labels. 
 		self.labels_creator(self.frame)
@@ -211,11 +211,12 @@ class ticker_manager(pannel):
 
 		i = symbol
 		l = self.label_count
-
+		#["Ticker","Status","Last update","Price","Status","Last Alert","Last Alert time","Remove"]
 		info = [symbol,\
 				self.data.symbol_status[symbol],\
 				self.data.symbol_update_time[symbol],\
 				self.data.symbol_price[symbol],\
+				self.data.symbol_position_status[symbol],\
 				self.data.symbol_last_alert[symbol],\
 				self.data.symbol_last_alert_time[symbol],
 				""]
