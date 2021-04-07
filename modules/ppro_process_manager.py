@@ -501,9 +501,11 @@ def process_and_send(lst,pipe):
 	else:
 		d["pos_range"] = round((price-d["low"])/(d["high"]-d["low"]+0.0001),2)
 
+	d["status"] = ""
 
 	if d["pos_range"]>=0.99:
 		d["status"]="New High"
+		status_given = True
 
 	if d["pos_range"]<=0.01:
 		d["status"]="New Low"
@@ -515,9 +517,7 @@ def process_and_send(lst,pipe):
 		d["status"]="Near Low"
 
 	#################################################
-	if d["pos_range"]<0.96 and d["pos_range"]>0.4:
-		d["status"] = ""
-
+	#if d["pos_range"]<0.96 and d["pos_range"]>0.4:
 	###############################################
 
 	if len(d["highs"])>5:
