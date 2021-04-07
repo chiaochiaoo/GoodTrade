@@ -8,11 +8,10 @@ import time
 import multiprocessing
 import threading
 from pannel import *
-import datetime
 import time
 from queue import Queue
 import requests
-
+from datetime import datetime
 import os
 
 from algo_ppro_manager import *
@@ -96,7 +95,8 @@ class algo_manager(pannel):
 		self.order_send_pipe = order_send_pipe
 
 		self.port = port
-		self.symbols = []
+		self.symbols = []  #all registered symbols
+		self.symbols_orders = {} #all the orders which a symbols contain
 
 		#a list of all id.
 		self.orders_registry = []
@@ -161,7 +161,43 @@ class algo_manager(pannel):
 
 		self.in_progress = False
 
+		timer = threading.Thread(target=self.timer, daemon=True)
+		timer.start()
+
 	#UI COMPONENT
+
+
+	def timer(self):
+
+		#570  34200
+		#960  57600 
+		time.sleep(2)
+		#now = datetime.now()
+		timestamp = 34190
+
+		print("timer start")
+		while True:
+			now = datetime.now()
+			ts = now.hour*3600 + now.minute*60 + now.second
+			remain = timestamp - ts
+
+			minute = remain//60
+			seconds = remain%60
+
+			print(minute,seconds)
+			if minute>0:
+				self.algo_timer_string.set(str(minute)+" minutes and "+str(seconds)+" seconds")
+			else:
+				self.algo_timer_string.set(str(seconds)+" seconds")
+			if remain<0:
+				print("Trigger")
+				break
+
+			time.sleep(1)
+
+		self.algo_timer_string.set("Deployed")
+		self.deploy_all_stoporders()
+
 	def init_pannel(self):
 
 		# self.width = [10,10,30,8,8,8,8,8,8,8,6]
@@ -198,9 +234,13 @@ class algo_manager(pannel):
 		self.ppro_status = tk.StringVar()
 		self.ppro_status.set("Ppro :")
 
+
+
 		self.algo_count_number = 0
-		self.algo_count_string = tk.StringVar()
-		self.algo_count_string.set("Activated Algos:"+str(self.algo_count_number))
+		# self.algo_count_string.set("Activated Algos:"+str(self.algo_count_number))
+
+		# self.algo_count_ = ttk.Label(self.setting, textvariable=self.algo_count_string)
+		# self.algo_count_.grid(column=1,row=5,padx=10)
 
 		self.main_status = ttk.Label(self.setting, textvariable=self.main_app_status)
 		self.main_status.grid(column=1,row=1,padx=10)
@@ -210,30 +250,34 @@ class algo_manager(pannel):
 		self.ppro_status_.grid(column=1,row=2,padx=10)
 		#self.ppro_status_.place(x = 20, y =32)
 
+		self.algo_count_string = tk.StringVar()
 
-		self.algo_count_ = ttk.Label(self.setting, textvariable=self.algo_count_string)
-		self.algo_count_.grid(column=1,row=3,padx=10)
+		self.algo_timer_string = tk.StringVar()
+
+		self.timerc = ttk.Label(self.setting, text="Opening Algos deploy in:")
+		self.timerc.grid(column=1,row=3,padx=10)
+		self.timersx = ttk.Label(self.setting,  textvariable=self.algo_timer_string)
+		self.timersx.grid(column=1,row=4,padx=10)
+
+
 
 		self.algo_deploy = ttk.Button(self.setting, text="Deploy all algo",command=self.deploy_all_stoporders)
-		self.algo_deploy.grid(column=1,row=4)
+		self.algo_deploy.grid(column=1,row=6)
 
 		self.algo_cancel = ttk.Button(self.setting, text="Unmount all algo",command=self.cancel_all_stoporders)
-		self.algo_cancel.grid(column=1,row=5)
-
-		self.algo_cancel = ttk.Button(self.setting, text="Flatten all algo",command=self.cancel_all_stoporders)
-		self.algo_cancel.grid(column=1,row=6)
-
-		self.algo_cancel = ttk.Button(self.setting, text="Cancel all algo",command=self.cancel_all_stoporders)
 		self.algo_cancel.grid(column=1,row=7)
+
+		# self.algo_cancel = ttk.Button(self.setting, text="Flatten all algo",command=self.cancel_all_stoporders)
+		# self.algo_cancel.grid(column=1,row=6)
+
+		# self.algo_cancel = ttk.Button(self.setting, text="Cancel all algo",command=self.cancel_all_stoporders)
+		# self.algo_cancel.grid(column=1,row=7)
 
 		self.total_u = tk.StringVar()
 		self.total_r = tk.StringVar()
 
-
 		self.log_panel = ttk.LabelFrame(root,text="Logs") 
 		self.log_panel.place(x=10,y=250,relheight=0.8,width=180)
-
-
 
 		self.deployment_panel = ttk.LabelFrame(root,text="Algo deployment") 
 		self.deployment_panel.place(x=200,y=10,relheight=0.85,relwidth=0.95)
@@ -288,10 +332,6 @@ class algo_manager(pannel):
 					# 	status_text.set("Done.")
 
 
-	def order_update(self,d):
-
-	#necessary level updates. 
-		pass
 
 	def order_creation(self,d):
 
@@ -345,16 +385,16 @@ class algo_manager(pannel):
 			self.break_at[id_] = order_price
 			self.stoplevel[id_] = stoplevel
 
-			self.order_tkstring[id_]["break_at"] = tk.StringVar()
+			self.order_tkstring[id_]["break_at"] = tk.DoubleVar()
 			self.order_tkstring[id_]["break_at"].set(self.break_at[id_])
 
-			self.order_tkstring[id_]["stoplevel"] = tk.StringVar()
+			self.order_tkstring[id_]["stoplevel"] = tk.DoubleVar()
 			self.order_tkstring[id_]["stoplevel"].set(self.stoplevel[id_])
 
 
-			self.order_tkstring[id_]["tgtpx1"] = tk.StringVar()
-			self.order_tkstring[id_]["tgtpx2"] = tk.StringVar()
-			self.order_tkstring[id_]["tgtpx3"] = tk.StringVar()
+			self.order_tkstring[id_]["tgtpx1"] = tk.DoubleVar()
+			self.order_tkstring[id_]["tgtpx2"] = tk.DoubleVar()
+			self.order_tkstring[id_]["tgtpx3"] = tk.DoubleVar()
 
 			self.realized[id_] = 0
 			self.current_share[id_] = 0
@@ -396,11 +436,18 @@ class algo_manager(pannel):
 			self.order_tkstring[id_]["realized"]]
 
 
+			if symbol not in self.symbols_orders:
+				self.symbols_orders[symbol] = [id_]
+			else:
+				self.symbols_orders[symbol].append(id_)
+
 			self.modify_algo_count(1)
 			self.order_ui_creation(l)
 			self.register(symbol)
 		else:
 			print("adding order failed")
+
+
 
 	def order_ui_creation(self,info):
 		i = info[0][0]
@@ -424,10 +471,8 @@ class algo_manager(pannel):
 				self.order_tklabels[id_][label_name] =tk.Checkbutton(self.deployment_frame,variable=info[j])
 			elif label_name =="algo_status":
 				self.order_tklabels[id_][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command = lambda s=id_: self.cancel_deployed(id_))
-			elif label_name == "break_at":
+			elif label_name == "break_at" or label_name == "stoplevel" or label_name == "pxtgt1" or label_name == "pxtgt2" or label_name == "pxtgt3":
 				self.order_tklabels[id_][label_name] =tk.Entry(self.deployment_frame ,textvariable=info[j],width=self.width[j])	
-			elif label_name == "stoplevel":
-				self.order_tklabels[id_][label_name] =tk.Entry(self.deployment_frame ,textvariable=info[j],width=self.width[j])
 			else:
 				if str(type(info[j]))=="<class 'tkinter.StringVar'>":
 					self.order_tklabels[id_][label_name]=tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
@@ -450,6 +495,23 @@ class algo_manager(pannel):
 		self.label_count +=1
 
 		self.rebind(self.dev_canvas,self.deployment_frame)
+
+
+	def lock_entrys(self,id_,lock_or_not):
+
+		##Pending : Unlock.
+		if lock_or_not: 
+			state = "disabled"
+		else: 
+			state = "normal"
+		##Deployed: Lock.
+
+		self.order_tklabels[id_]["break_at"]["state"]=state
+		self.order_tklabels[id_]["stoplevel"]["state"]=state
+		# self.order_tklabels[id_]["pxtgt1"]["state"]=state
+		# self.order_tklabels[id_]["pxtgt2"]["state"]=state
+		# self.order_tklabels[id_]["pxtgt3"]["state"]=state
+
 
 	def update_target_price(self,id_): #call this whenever the break at price changes. 
 		price = self.break_at[id_]
@@ -502,7 +564,6 @@ class algo_manager(pannel):
 		else:
 			return False
 
-		
 	def order_confirmation(self,d):
 		id_ = d[1]
 		print(id_,"confirmed and is a go")
@@ -794,6 +855,16 @@ class algo_manager(pannel):
 		current_status= self.order_tkstring[id_]["algo_status"].get()
 		if current_status == self.status["Pending"]:
 
+			#refresh the datas.
+
+			self.lock_entrys(id_,True)
+			self.break_at[id_] = self.order_tkstring[id_]["break_at"].get()
+			self.stoplevel[id_] = self.order_tkstring[id_]["stoplevel"].get()
+			self.price_levels[id_][1] = self.order_tkstring[id_]["tgtpx1"].get()
+			self.price_levels[id_][2] = self.order_tkstring[id_]["tgtpx2"].get()
+			self.price_levels[id_][3] = self.order_tkstring[id_]["tgtpx3"].get()
+
+
 			self.order_tkstring[id_]["algo_status"].set(self.status["Deploying"])
 			self.order_tklabels[id_]["algo_status"]["background"] = LIGHTYELLOW
 
@@ -830,7 +901,7 @@ class algo_manager(pannel):
 			cancel_stoporder(stopid)
 			self.order_tkstring[id_]["algo_status"].set(self.status["Pending"])
 			self.order_tklabels[id_]["algo_status"]["background"] = DEFAULT
-
+			self.lock_entrys(id_,False)
 			with self.stoporder_book_lock:
 				self.stoporder_book.remove(stopid)
 
@@ -865,8 +936,40 @@ class algo_manager(pannel):
 		bid = data["bid"]
 		ask = data["ask"]
 
-		#get position
+		
+		#print(data)
+		####update the support and resistence here....
 
+		#iterate through all the orders attached to this symbol
+		# find the ones that are pending. 
+		# update necessary support and resistence levels. 
+		try:
+			if symbol in self.symbols_orders:
+				for id_ in self.symbols_orders[symbol]:
+					change = False
+					if self.order_tkstring[id_]["algo_status"].get() == "Pending":
+
+						#update the levels. low become
+						if self.position[id_] == "Long":
+							if ask>self.order_tkstring[id_]["break_at"].get():
+								self.order_tkstring[id_]["break_at"].set(ask)
+								change = True
+							if bid<self.order_tkstring[id_]["stoplevel"].get():
+								self.order_tkstring[id_]["stoplevel"].set(bid)
+								change = True
+						else:  #short
+							if bid<self.order_tkstring[id_]["break_at"].get():
+								self.order_tkstring[id_]["break_at"].set(ask)
+								change = True
+							if ask>self.order_tkstring[id_]["stoplevel"].get():
+								self.order_tkstring[id_]["stoplevel"].set(bid)
+								change = True
+						if change:
+							pass
+							#here I need to recaculate the estimate risk.
+							#self.adjusting_risk(id_)
+		except:
+			print("updating levels")
 		if symbol in self.running_order:
 
 			if self.running_order[symbol]!= "":
