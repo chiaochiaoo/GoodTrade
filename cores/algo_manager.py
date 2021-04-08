@@ -24,6 +24,7 @@ LIGHTYELLOW = "#fef0b8"
 YELLOW =  "#ECF57C"
 STRONGGREEN = "#3DFC68"
 STRONGRED = "#FC433D"
+DEEPGREEN = "#059a12"
 
 def algo_manager_voxcom(pipe):
 
