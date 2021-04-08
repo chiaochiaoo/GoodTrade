@@ -191,7 +191,7 @@ def decode_order(stream_data,pipe):
 			data["side"]= side
 			data["info"]=info
 
-			pipe.send(["order rejected",info])
+			pipe.send(["order rejected",data])
 
 
 def decode_l1(stream_data,pipe):
