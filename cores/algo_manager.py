@@ -302,12 +302,10 @@ class algo_manager(pannel):
 		# for i in range(40):
 		# 	self.order_creation(['id', i, i, 20, 20.0,1,1,1,1,1,1,1,1,1])
 
-
 	def cancel_all(self):
 
 		for i in self.orders_registry:
 				print(i)
-
 
 	def flatten_symbol(self,symbol,id_=None,status_text=None):
 
@@ -331,8 +329,6 @@ class algo_manager(pannel):
 					# 	self.modify_algo_count(-1)
 					# else:
 					# 	status_text.set("Done.")
-
-
 
 	def order_creation(self,d):
 
@@ -448,8 +444,6 @@ class algo_manager(pannel):
 		else:
 			print("adding order failed")
 
-
-
 	def order_ui_creation(self,info):
 		i = info[0][0]
 		id_ = info[0][1]
@@ -497,7 +491,6 @@ class algo_manager(pannel):
 
 		self.rebind(self.dev_canvas,self.deployment_frame)
 
-
 	def lock_entrys(self,id_,lock_or_not):
 
 		##Pending : Unlock.
@@ -513,27 +506,26 @@ class algo_manager(pannel):
 		# self.order_tklabels[id_]["pxtgt2"]["state"]=state
 		# self.order_tklabels[id_]["pxtgt3"]["state"]=state
 
-
 	def update_target_price(self,id_): #call this whenever the break at price changes. 
 		price = self.break_at[id_]
 
-		coefficient = 1
+		coefficient = 0.8
 		if self.position[id_]=="Long":
 
 			ohv = self.data_list[id_]["OHavg"]
 			ohs = self.data_list[id_]["OHstd"]
 			print(self.data_list[id_],type(ohv),ohs,type(price))
 			self.price_levels[id_][0] = price
-			self.price_levels[id_][1] = round(price+max(ohv*0.5,ohv-ohs)*coefficient,2)
+			self.price_levels[id_][1] = round(price+min(ohv*0.5,ohv-ohs)*coefficient,2)
 			self.price_levels[id_][2] = round(price+ohv*coefficient,2)
-			self.price_levels[id_][3] =	round(price+max(ohv*1.5,ohv+ohs)*coefficient,2)
+			self.price_levels[id_][3] =	round(price+min(ohv*1.2,ohv+ohs)*coefficient,2)
 		else:
 			olv = self.data_list[id_]["OHavg"]
 			ols = self.data_list[id_]["OHstd"]
 			self.price_levels[id_][0] = price
-			self.price_levels[id_][1] = round(price-max(olv*0.5,olv-ols)*coefficient,2)
+			self.price_levels[id_][1] = round(price-min(olv*0.5,olv-ols)*coefficient,2)
 			self.price_levels[id_][2] = round(price-olv*coefficient,2)
-			self.price_levels[id_][3] =	round(price-max(olv*1.5,olv+ols)*coefficient,2)
+			self.price_levels[id_][3] =	round(price-min(olv*1.2,olv+ols)*coefficient,2)
 
 		#set the price levels. 
 		self.order_tkstring[id_]["tgtpx1"].set(self.price_levels[id_][1])
@@ -799,7 +791,7 @@ class algo_manager(pannel):
 					print("Holding calculation error,holdings are empty.")	
 
 		self.realized[id_]+=gain
-		self.realized[id_]= round(self.realized[id_],4)
+		self.realized[id_]= round(self.realized[id_],2)
 
 		self.adjusting_risk(id_)
 
@@ -865,7 +857,6 @@ class algo_manager(pannel):
 			self.price_levels[id_][2] = self.order_tkstring[id_]["tgtpx2"].get()
 			self.price_levels[id_][3] = self.order_tkstring[id_]["tgtpx3"].get()
 
-
 			self.order_tkstring[id_]["algo_status"].set(self.status["Deploying"])
 			self.order_tklabels[id_]["algo_status"]["background"] = LIGHTYELLOW
 
@@ -919,7 +910,7 @@ class algo_manager(pannel):
 	def adjusting_risk(self,id_):
 		#calculate the actual risk.
 
-		self.act_risk[id_] = round((abs(self.average_price[id_] - self.stoplevel[id_])*self.current_share[id_]),2)
+		self.act_risk[id_] = round(((self.average_price[id_] - self.stoplevel[id_])*self.current_share[id_]),2)
 
 		diff = self.act_risk[id_]-self.est_risk[id_]
 		ratio = diff/self.est_risk[id_]
@@ -990,6 +981,7 @@ class algo_manager(pannel):
 						if price >= self.price_levels[id_][current_level]:
 
 							print("target reached,level:",current_level)
+							print("New stoploss:",self.price_levels[id_][current_level-1])
 							#shake of 1/3 
 							share = self.current_share[id_]//3
 							if share==0: share = self.current_share[id_]  #if 0. get rid of everything.
@@ -1010,6 +1002,7 @@ class algo_manager(pannel):
 						flatten=True
 
 					if self.order_tkstring[id_]["auto_manage"].get()==True:
+
 						current_level = self.price_current_level[id_]
 						if price <= self.price_levels[id_][current_level]:
 
@@ -1047,11 +1040,13 @@ class algo_manager(pannel):
 		side=data["side"] 
 		info=data["info"]
 
-		print(symbol,"rejected:",info)
+		
 		#get the order id. 
-		id_ = self.order_book[symbol+side]
 
-		self.mark_off_algo(id_,self.status["Rejected"])
+		if symbol+side in self.order_book:
+			id_ = self.order_book[symbol+side]
+			self.mark_off_algo(id_,self.status["Rejected"])
+			print(symbol,"rejected:",info)
 	#Utilities. 
 
 	#whether it is done, rejected, or cancled. should go here.
