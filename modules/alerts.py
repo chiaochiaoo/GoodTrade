@@ -237,10 +237,12 @@ class alert(pannel):
 		#command = lambda s=symbol: self.delete_symbol_reg_list(s))
 
 		#
-		#symbol, type,
+
+		#symbol,status,checker,support,resistance ,range_,atr,cur_price,eva,algo_status,trigger_type,trigger_timer]
+
 		support,resistence = format[3],format[4]
-		timer_trade = format[10]
-		type_trade = format[9]
+		timer_trade = format[11]
+		type_trade = format[10]
 
 		info = [symbol,support,resistence,timer_trade,type_trade,default_risk]
 		j+=1
@@ -257,6 +259,7 @@ class alert(pannel):
 
 		symbol,support,resistence,timer_trade,type_trade,default_risk = info[0],float(info[1].get()),float(info[2].get()),info[3].get(),info[4].get(),info[5].get()
 
+		print(symbol,support,resistence,timer_trade,type_trade,default_risk)
 		risk = None
 		try:
 			risk = float(default_risk)

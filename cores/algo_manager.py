@@ -506,6 +506,7 @@ class algo_manager(pannel):
 		# self.order_tklabels[id_]["pxtgt2"]["state"]=state
 		# self.order_tklabels[id_]["pxtgt3"]["state"]=state
 
+
 	def update_target_price(self,id_): #call this whenever the break at price changes. 
 		price = self.break_at[id_]
 
@@ -715,7 +716,6 @@ class algo_manager(pannel):
 			
 	#when there is a change of quantity of an order. 
 
-
 	def ppro_order_confirmation(self,data):
 
 		symbol = data["symbol"]
@@ -737,8 +737,8 @@ class algo_manager(pannel):
 				if self.running_order[symbol] =="":
 					init = True
 
-				
-			if init:
+			status = self.order_tkstring[id_]["algo_status"].get()
+			if init and status=="Deployed" or status=="Deploying":
 				id_ = self.order_book[code]
 				self.running_order[symbol] = id_
 				self.order_tkstring[id_]["algo_status"].set("Running")
@@ -910,10 +910,14 @@ class algo_manager(pannel):
 			self.cancel_stoporder(i)
 
 
+	#RISK, Size. 
 	def adjusting_risk(self,id_):
 		#calculate the actual risk.
 
-		self.act_risk[id_] = round(((self.average_price[id_] - self.stoplevel[id_])*self.current_share[id_]),2)
+		if self.position[id_] =="Long":
+			self.act_risk[id_] = round(((self.stoplevel[id_]-self.average_price[id_])*self.current_share[id_]),2)
+		else:
+			self.act_risk[id_] = round(((self.average_price[id_] - self.stoplevel[id_])*self.current_share[id_]),2)
 
 		diff = self.act_risk[id_]-self.est_risk[id_]
 		ratio = diff/self.est_risk[id_]
