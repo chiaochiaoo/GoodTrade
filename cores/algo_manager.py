@@ -509,23 +509,26 @@ class algo_manager(pannel):
 	def update_target_price(self,id_): #call this whenever the break at price changes. 
 		price = self.break_at[id_]
 
-		coefficient = 0.8
+		coefficient = 1
 		if self.position[id_]=="Long":
 
 			ohv = self.data_list[id_]["OHavg"]
 			ohs = self.data_list[id_]["OHstd"]
 			print(self.data_list[id_],type(ohv),ohs,type(price))
 			self.price_levels[id_][0] = price
-			self.price_levels[id_][1] = round(price+min(ohv*0.5,ohv-ohs)*coefficient,2)
-			self.price_levels[id_][2] = round(price+ohv*coefficient,2)
-			self.price_levels[id_][3] =	round(price+min(ohv*1.2,ohv+ohs)*coefficient,2)
+			self.price_levels[id_][1] = round(price+ohv*0.25,2)
+			self.price_levels[id_][2] = round(price+ohv*0.5,2)
+			self.price_levels[id_][3] =	round(price+ohv*0.75,2)
+			# self.price_levels[id_][1] = round(price+min(ohv*0.5,ohv-ohs)*coefficient,2)
+			# self.price_levels[id_][2] = round(price+ohv*coefficient,2)
+			# self.price_levels[id_][3] =	round(price+min(ohv*1.2,ohv+ohs)*coefficient,2)
 		else:
 			olv = self.data_list[id_]["OHavg"]
 			ols = self.data_list[id_]["OHstd"]
 			self.price_levels[id_][0] = price
-			self.price_levels[id_][1] = round(price-min(olv*0.5,olv-ols)*coefficient,2)
-			self.price_levels[id_][2] = round(price-olv*coefficient,2)
-			self.price_levels[id_][3] =	round(price-min(olv*1.2,olv+ols)*coefficient,2)
+			self.price_levels[id_][1] = round(price-olv*0.25,2)
+			self.price_levels[id_][2] = round(price-olv*0.5,2)
+			self.price_levels[id_][3] =	round(price-olv*0.75,2)
 
 		#set the price levels. 
 		self.order_tkstring[id_]["tgtpx1"].set(self.price_levels[id_][1])
