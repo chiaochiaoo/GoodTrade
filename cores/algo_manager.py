@@ -78,6 +78,7 @@ def algo_manager_voxcom(pipe):
 		except Exception as e:
 			pipe.send(["msg",e])
 			print(e)
+
 class algo_manager(pannel):
 
 	def __init__(self,root,port,gt_pipe,order_pipe,order_send_pipe):  #send stuff via recv and take from order_pipe.
@@ -281,7 +282,7 @@ class algo_manager(pannel):
 		self.log_panel.place(x=10,y=250,relheight=0.8,width=180)
 
 		self.deployment_panel = ttk.LabelFrame(root,text="Algo deployment") 
-		self.deployment_panel.place(x=200,y=10,relheight=0.85,relwidth=0.95)
+		self.deployment_panel.place(x=200,y=10,relheight=1,width=1400)
 
 		self.dev_canvas = tk.Canvas(self.deployment_panel)
 		self.dev_canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
@@ -300,7 +301,7 @@ class algo_manager(pannel):
 		self.recreate_labels()
 		#test
 		# for i in range(40):
-		# 	self.order_creation(['id', i, i, 20, 20.0,1,1,1,1,1,1,1,1,1])
+		# 	self.order_creation(['id', str(i), str(i), 20, 20.0,"Long",1,1,1,1,1,1,[1,1,1,1,1,1,1,1,1,1,1,1,1]])
 
 	def cancel_all(self):
 
@@ -912,6 +913,7 @@ class algo_manager(pannel):
 			self.cancel_stoporder(i)
 
 
+
 	#RISK, Size. 
 	def adjusting_risk(self,id_):
 		#calculate the actual risk.
@@ -929,6 +931,7 @@ class algo_manager(pannel):
 
 		if self.current_share[id_] == 0:
 			self.order_tklabels[id_]["act_r/est_r"]["background"] = DEFAULT
+
 
 	#update the current status of a current order. 
 	def ppro_order_update(self,data):
