@@ -917,9 +917,9 @@ class algo_manager(pannel):
 		#calculate the actual risk.
 
 		if self.position[id_] =="Long":
-			self.act_risk[id_] = round(((self.stoplevel[id_]-self.average_price[id_])*self.current_share[id_]),2)
+			self.act_risk[id_] = round(((self.average_price[id_]-self.stoplevel[id_])*self.current_share[id_]),2)
 		else:
-			self.act_risk[id_] = round(((self.average_price[id_] - self.stoplevel[id_])*self.current_share[id_]),2)
+			self.act_risk[id_] = round((( self.stoplevel[id_]-self.average_price[id_])*self.current_share[id_]),2)
 
 		diff = self.act_risk[id_]-self.est_risk[id_]
 		ratio = diff/self.est_risk[id_]
