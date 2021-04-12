@@ -737,7 +737,9 @@ class algo_manager(pannel):
 				if self.running_order[symbol] =="":
 					init = True
 
+			id_=self.order_book[symbol+side]
 			status = self.order_tkstring[id_]["algo_status"].get()
+
 			if init and status=="Deployed" or status=="Deploying":
 				id_ = self.order_book[code]
 				self.running_order[symbol] = id_
