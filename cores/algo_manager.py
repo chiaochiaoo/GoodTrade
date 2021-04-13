@@ -987,7 +987,7 @@ class algo_manager(pannel):
 							print("target reached,level:",current_level,"New stoploss:",self.price_levels[id_][current_level-1])
 							#shake of 1/3 
 							share = min(int(self.target_share[id_]//3),self.current_share[id_])
-							if share==0: share = self.current_share[id_]  #if 0. get rid of everything.
+							#if share==0: share = self.current_share[id_]  #if 0. get rid of everything.
 
 							sell_market_order(symbol,share)
 
@@ -1012,8 +1012,7 @@ class algo_manager(pannel):
 
 							print("target reached,level:",current_level)
 							#shake of 1/3 
-							share = self.current_share[id_]//3
-							if share==0: share = self.current_share[id_]  #if 0. get rid of everything.
+							share = min(int(self.target_share[id_]//3),self.current_share[id_])
 							
 							buy_market_order(symbol,share)
 
