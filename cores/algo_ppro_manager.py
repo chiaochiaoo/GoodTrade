@@ -295,6 +295,7 @@ def get_order_id(request_number,symbol,side,pipe):
 		#return id, symbol, and side. 
 		pipe.send(["new stoporder",[find_between(r.text,"<Content>","</Content>"),symbol,side]])
 
+
 ####need to trace the order number to trace the stop id number. 
 def stoporder_to_market_buy(symbol,price,share,pipe=None):
 
@@ -308,6 +309,13 @@ def stoporder_to_market_buy(symbol,price,share,pipe=None):
 	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,True,symbol,"B",pipe),daemon=True)
 	req.start()
 
+
+def get_stoporder_status(id_):
+
+	req = 'http://localhost:8080/GetScriptState?scriptid='+id_
+	r = requests.post(req)
+
+	return (find_between(r.text,"<Content>","</Content>"))
 
 def stoporder_to_market_sell(symbol,price,share,pipe=None):
 
@@ -340,5 +348,5 @@ def cancel_stoporder(id_):
 # while True:
 #
 
-print(2//3)
+
 

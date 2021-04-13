@@ -140,6 +140,8 @@ class algo_manager(pannel):
 		self.price_levels = {}
 		self.price_current_level = {}
 
+		self.id_lock = {}
+
 		self.act_risk= {}
 		self.est_risk = {}
 
@@ -350,6 +352,8 @@ class algo_manager(pannel):
 
 			self.orders_symbol[id_] = symbol
 			#create the tkstring.
+
+			self.id_lock[id_] = threading.Lock()
 
 			self.order_tkstring[id_] = {}
 
@@ -692,6 +696,7 @@ class algo_manager(pannel):
 		shares = data["shares"]
 		side = data["side"]
 		code = symbol+side
+
 		print(symbol,price,shares,side)
 
 		#check if this activates an hidden order.
@@ -703,7 +708,7 @@ class algo_manager(pannel):
 
 		if symbol in self.running_order or code in self.order_book: 
 			#establish id for the ones not seet up.
-			if symbol not in self.running_order:
+			if symbol not in self.running_order:  #i dont understand this part anymore.
 				init = True
 			else:
 				if self.running_order[symbol] =="":
@@ -712,32 +717,66 @@ class algo_manager(pannel):
 			id_=self.order_book[symbol+side]
 			status = self.order_tkstring[id_]["algo_status"].get()
 
-			if init and status=="Deployed" or status=="Deploying":
-				id_ = self.order_book[code]
-				self.running_order[symbol] = id_
-				self.order_tkstring[id_]["algo_status"].set("Running")
-				self.order_tklabels[id_]["algo_status"]["background"] = "#97FEA8" #set the label to be, green.	
-
-	
-			id_ = self.running_order[symbol]
-			#it's an order already got flattened...? fk. then id_ is nothing.
-
-			if id_ != "":
-				current = self.current_share[id_]
-				print("symbol",symbol,"side:",side,"shares",shares,"price",price)
-
-
-				if (self.position[id_]=="Long" and side =="B") or (self.position[id_]=="Short" and (side =="S" or side=="T")):
-					self.ppro_order_loadup(id_,symbol,price,current,shares,side)
-
-				else:
-					self.ppro_order_loadoff(id_,symbol,price,current,shares,side)
-
-				#print(self.holdings[id_])
-				self.update_display(id_)
+			if init:   #send a chekcing procedure. check if the stoporder is done. 
+				if status=="Deployed" or status=="Deploying":
+					act = threading.Thread(target=self.order_activation,args=(id_,symbol,price,shares,side), daemon=True)
+					act.start()
+					# id_ = self.order_book[code]
+					# self.running_order[symbol] = id_
+					# self.order_tkstring[id_]["algo_status"].set("Running")
+					# self.order_tklabels[id_]["algo_status"]["background"] = "#97FEA8" #set the label to be, green.	
 			else:
-				print("Unidentified orders:","symbol",symbol,"side:",side,"shares",shares,"price",price)
+				self.order_process(symbol,price,shares,side)
 
+
+	def order_process(self,symbol,price,shares,side):
+		id_ = self.running_order[symbol]
+		#it's an order already got flattened...? fk. then id_ is nothing.
+
+		if id_ != "":
+			current = self.current_share[id_]
+			print("symbol",symbol,"side:",side,"shares",shares,"price",price)
+
+
+			if (self.position[id_]=="Long" and side =="B") or (self.position[id_]=="Short" and (side =="S" or side=="T")):
+				self.ppro_order_loadup(id_,symbol,price,current,shares,side)
+
+			else:
+				self.ppro_order_loadoff(id_,symbol,price,current,shares,side)
+
+			#print(self.holdings[id_])
+			self.update_display(id_)
+		else:
+			print("Unidentified orders:","symbol",symbol,"side:",side,"shares",shares,"price",price)
+
+		#this should be a thread. 
+
+	def order_activation(self,id_,symbol,price,shares,side):
+
+		#wait until deployed.
+
+		#HOLD THE ID lock. 
+		with self.id_lock[id_]: #lock
+			#print(shares,"start")
+			while self.order_tkstring[id_]["algo_status"].get()=="Deploying":
+				time.sleep(0.5)
+
+			if self.order_tkstring[id_]["algo_status"].get()=="Running":
+				self.order_process(symbol,price,shares,side)
+
+			else:
+				stop_id = self.id_to_stoporder[id_]
+				status = get_stoporder_status(stop_id)
+
+				if status =="Done":
+					print(id_,"activated and is a go.")
+					id_ = self.order_book[symbol+side]
+					self.running_order[symbol] = id_
+					self.order_tkstring[id_]["algo_status"].set("Running")
+					self.order_tklabels[id_]["algo_status"]["background"] = "#97FEA8" #set the label to be, green.
+
+					self.order_process(symbol,price,shares,side)
+		#print(shares,"done")
 
 	def ppro_order_loadup(self,id_,symbol,price,current,shares,side):
 
@@ -757,7 +796,7 @@ class algo_manager(pannel):
 
 		self.current_share[id_] = current-shares	
 
-		print("curren shares:",self.current_share[id_] )			
+		print("current shares:",self.current_share[id_] )			
 		gain = 0
 		if self.position[id_]=="Long":
 			for i in range(shares):
@@ -781,7 +820,7 @@ class algo_manager(pannel):
 
 		#finish a trade if current share is 0.
 
-		if self.current_share[id_] == 0:
+		if self.current_share[id_] <= 0:
 			self.unrealized[id_] = 0
 			self.unrealized_pshr[id_] = 0
 
@@ -945,15 +984,14 @@ class algo_manager(pannel):
 
 						if price >= self.price_levels[id_][current_level]:
 
-							print("target reached,level:",current_level)
-							print("New stoploss:",self.price_levels[id_][current_level-1])
+							print("target reached,level:",current_level,"New stoploss:",self.price_levels[id_][current_level-1])
 							#shake of 1/3 
-							share = self.current_share[id_]//3
+							share = min(int(self.target_share[id_]//3),self.current_share[id_])
 							if share==0: share = self.current_share[id_]  #if 0. get rid of everything.
 
 							sell_market_order(symbol,share)
 
-							#self.stoplevel[id_] = self.price_levels[id_][current_level-1]
+							self.stoplevel[id_] = self.price_levels[id_][current_level-1]
 							self.adjusting_risk(id_)
 
 							#move up one level if below 3
@@ -979,7 +1017,7 @@ class algo_manager(pannel):
 							
 							buy_market_order(symbol,share)
 
-							#self.stoplevel[id_] = self.price_levels[id_][current_level-1]
+							self.stoplevel[id_] = self.price_levels[id_][current_level-1]
 							self.adjusting_risk(id_)
 
 							#move up one level if below 3
@@ -1044,6 +1082,7 @@ class algo_manager(pannel):
 								change = True
 						if change:
 							self.update_target_price(id_)
+							self.update_target_entry(id_)
 							#here I need to recaculate the estimate risk.
 							#self.adjusting_risk(id_)
 		except:
@@ -1091,6 +1130,14 @@ class algo_manager(pannel):
 		self.order_tkstring[id_]["tgtpx1"].set(self.price_levels[id_][1])
 		self.order_tkstring[id_]["tgtpx2"].set(self.price_levels[id_][2])
 		self.order_tkstring[id_]["tgtpx3"].set(self.price_levels[id_][3])
+
+	def update_target_entry(self,id_):
+
+		cur_risk = abs(self.stoplevel[id_] - self.break_at[id_])
+		shares = int(self.est_risk[id_]//cur_risk)
+		self.target_share[id_] = shares
+
+		self.order_tkstring[id_]["current_share"].set(str(self.current_share[id_])+"/"+str(self.target_share[id_]))
 
 	def mark_off_algo(self,id_,status):
 
@@ -1245,7 +1292,6 @@ class algo_manager(pannel):
 			req = threading.Thread(target=self.register_to_ppro, args=(symbol, True,),daemon=True)
 			req.start()
 			
-
 	def deregister(self,symbol):
 
 		if symbol in self.symbols:
