@@ -126,7 +126,6 @@ class algo_manager(pannel):
 
 		#needed. 
 
-		self.auto_range = {}
 		self.break_at = {}
 		self.stoplevel = {}
 
@@ -408,7 +407,7 @@ class algo_manager(pannel):
 			self.order_info[id_] = [order_type,pos,order_price,share,symbol]
 
 			self.data_list[id_] = data_list
-			print(self.data_list[id_])
+			#print(self.data_list[id_])
 			#turns the order. 
 
 			self.price_current_level[id_] = 1
@@ -507,40 +506,9 @@ class algo_manager(pannel):
 		# self.order_tklabels[id_]["pxtgt2"]["state"]=state
 		# self.order_tklabels[id_]["pxtgt3"]["state"]=state
 
-
-	def update_target_price(self,id_): #call this whenever the break at price changes. 
-		price = self.break_at[id_]
-
-		coefficient = 1
-		if self.position[id_]=="Long":
-
-			ohv = self.data_list[id_]["OHavg"]
-			ohs = self.data_list[id_]["OHstd"]
-			print(self.data_list[id_],type(ohv),ohs,type(price))
-			self.price_levels[id_][0] = price
-			self.price_levels[id_][1] = round(price+ohv*0.25,2)
-			self.price_levels[id_][2] = round(price+ohv*0.5,2)
-			self.price_levels[id_][3] =	round(price+ohv*0.75,2)
-			# self.price_levels[id_][1] = round(price+min(ohv*0.5,ohv-ohs)*coefficient,2)
-			# self.price_levels[id_][2] = round(price+ohv*coefficient,2)
-			# self.price_levels[id_][3] =	round(price+min(ohv*1.2,ohv+ohs)*coefficient,2)
-		else:
-			olv = self.data_list[id_]["OHavg"]
-			ols = self.data_list[id_]["OHstd"]
-			self.price_levels[id_][0] = price
-			self.price_levels[id_][1] = round(price-olv*0.25,2)
-			self.price_levels[id_][2] = round(price-olv*0.5,2)
-			self.price_levels[id_][3] =	round(price-olv*0.75,2)
-
-		#set the price levels. 
-		self.order_tkstring[id_]["tgtpx1"].set(self.price_levels[id_][1])
-		self.order_tkstring[id_]["tgtpx2"].set(self.price_levels[id_][2])
-		self.order_tkstring[id_]["tgtpx3"].set(self.price_levels[id_][3])
-
 	def modify_algo_count(self,num):
 		self.algo_count_number+=num
 		self.algo_count_string.set("Activated Algos:"+str(self.algo_count_number))
-
 
 	def check_running_order(self,symbol):
 
@@ -730,6 +698,9 @@ class algo_manager(pannel):
 		#######filter out irrelavant orders.
 
 		init = False
+
+		#breaks when handling an already finished order.
+
 		if symbol in self.running_order or code in self.order_book: 
 			#establish id for the ones not seet up.
 			if symbol not in self.running_order:
@@ -749,18 +720,23 @@ class algo_manager(pannel):
 
 	
 			id_ = self.running_order[symbol]
-			current = self.current_share[id_]
-			print("symbol",symbol,"side:",side,"shares",shares,"price",price)
+			#it's an order already got flattened...? fk. then id_ is nothing.
+
+			if id_ != "":
+				current = self.current_share[id_]
+				print("symbol",symbol,"side:",side,"shares",shares,"price",price)
 
 
-			if (self.position[id_]=="Long" and side =="B") or (self.position[id_]=="Short" and (side =="S" or side=="T")):
-				self.ppro_order_loadup(id_,symbol,price,current,shares,side)
+				if (self.position[id_]=="Long" and side =="B") or (self.position[id_]=="Short" and (side =="S" or side=="T")):
+					self.ppro_order_loadup(id_,symbol,price,current,shares,side)
 
+				else:
+					self.ppro_order_loadoff(id_,symbol,price,current,shares,side)
+
+				#print(self.holdings[id_])
+				self.update_display(id_)
 			else:
-				self.ppro_order_loadoff(id_,symbol,price,current,shares,side)
-
-			#print(self.holdings[id_])
-			self.update_display(id_)
+				print("Unidentified orders:","symbol",symbol,"side:",side,"shares",shares,"price",price)
 
 
 	def ppro_order_loadup(self,id_,symbol,price,current,shares,side):
@@ -855,7 +831,6 @@ class algo_manager(pannel):
 		if current_status == self.status["Pending"]:
 
 			#refresh the datas.
-
 			self.lock_entrys(id_,True)
 			self.break_at[id_] = self.order_tkstring[id_]["break_at"].get()
 			self.stoplevel[id_] = self.order_tkstring[id_]["stoplevel"].get()
@@ -903,7 +878,6 @@ class algo_manager(pannel):
 			with self.stoporder_book_lock:
 				self.stoporder_book.remove(stopid)
 
-
 	def cancel_all_stoporders(self):
 		###just look through all placed orders
 
@@ -911,8 +885,6 @@ class algo_manager(pannel):
 		cur = self.stoporder_book[:]
 		for i in cur:
 			self.cancel_stoporder(i)
-
-
 
 	#RISK, Size. 
 	def adjusting_risk(self,id_):
@@ -932,7 +904,6 @@ class algo_manager(pannel):
 		if self.current_share[id_] == 0:
 			self.order_tklabels[id_]["act_r/est_r"]["background"] = DEFAULT
 
-
 	#update the current status of a current order. 
 	def ppro_order_update(self,data):
 
@@ -947,38 +918,15 @@ class algo_manager(pannel):
 		#iterate through all the orders attached to this symbol
 		# find the ones that are pending. 
 		# update necessary support and resistence levels. 
-		try:
-			if symbol in self.symbols_orders:
-				for id_ in self.symbols_orders[symbol]:
-					change = False
-					if self.order_tkstring[id_]["algo_status"].get() == "Pending":
 
-						#update the levels. low become
-						if self.position[id_] == "Long":
-							if ask>self.order_tkstring[id_]["break_at"].get():
-								self.order_tkstring[id_]["break_at"].set(ask)
-								change = True
-							if bid<self.order_tkstring[id_]["stoplevel"].get():
-								self.order_tkstring[id_]["stoplevel"].set(bid)
-								change = True
-						else:  #short
-							if bid<self.order_tkstring[id_]["break_at"].get():
-								self.order_tkstring[id_]["break_at"].set(ask)
-								change = True
-							if ask>self.order_tkstring[id_]["stoplevel"].get():
-								self.order_tkstring[id_]["stoplevel"].set(bid)
-								change = True
-						if change:
-							pass
-							#here I need to recaculate the estimate risk.
-							#self.adjusting_risk(id_)
-		except:
-			print("updating levels")
+		self.refresh_support_resistence(symbol,ask,bid)
+
 		if symbol in self.running_order:
 
 			if self.running_order[symbol]!= "":
-				id_ = self.running_order[symbol]
 
+				id_ = self.running_order[symbol]
+				self.refresh_target_price_on_input(id_)
 				flatten = False
 
 				if self.position[id_]=="Long":
@@ -988,8 +936,13 @@ class algo_manager(pannel):
 					if price <= self.stoplevel[id_]:
 						flatten=True
 
-					if self.order_tkstring[id_]["auto_manage"].get()==True:
-						current_level = self.price_current_level[id_]
+
+					current_level = self.price_current_level[id_]
+
+					if self.order_tkstring[id_]["auto_manage"].get()==True  and current_level<4:
+						
+						
+
 						if price >= self.price_levels[id_][current_level]:
 
 							print("target reached,level:",current_level)
@@ -1000,12 +953,12 @@ class algo_manager(pannel):
 
 							sell_market_order(symbol,share)
 
-							self.stoplevel[id_] = self.price_levels[id_][current_level-1]
+							#self.stoplevel[id_] = self.price_levels[id_][current_level-1]
 							self.adjusting_risk(id_)
 
 							#move up one level if below 3
-							if self.price_current_level[id_]<3:
-								self.price_current_level[id_]+=1 
+
+							self.price_current_level[id_]+=1 
 
 				elif self.position[id_]=="Short":
 					price = ask
@@ -1013,9 +966,10 @@ class algo_manager(pannel):
 					if price >= self.stoplevel[id_]:
 						flatten=True
 
-					if self.order_tkstring[id_]["auto_manage"].get()==True:
+					current_level = self.price_current_level[id_]
+					if self.order_tkstring[id_]["auto_manage"].get()==True and current_level<4:
 
-						current_level = self.price_current_level[id_]
+						
 						if price <= self.price_levels[id_][current_level]:
 
 							print("target reached,level:",current_level)
@@ -1025,12 +979,12 @@ class algo_manager(pannel):
 							
 							buy_market_order(symbol,share)
 
-							self.stoplevel[id_] = self.price_levels[id_][current_level-1]
+							#self.stoplevel[id_] = self.price_levels[id_][current_level-1]
 							self.adjusting_risk(id_)
 
 							#move up one level if below 3
-							if self.price_current_level[id_]<3:
-								self.price_current_level[id_]+=1 
+
+							self.price_current_level[id_]+=1 
 
 
 
@@ -1046,6 +1000,7 @@ class algo_manager(pannel):
 				
 				self.update_display(id_)
 
+
 	def ppro_order_rejection(self,data):
 
 		symbol=data["symbol"] 
@@ -1059,9 +1014,84 @@ class algo_manager(pannel):
 			id_ = self.order_book[symbol+side]
 			self.mark_off_algo(id_,self.status["Rejected"])
 			print(symbol,"rejected:",info)
-	#Utilities. 
 
-	#whether it is done, rejected, or cancled. should go here.
+	#Utilities. 
+	def refresh_support_resistence(self,symbol,ask,bid):
+		try:
+			if symbol in self.symbols_orders:
+				for id_ in self.symbols_orders[symbol]:
+					change = False
+					if self.order_tkstring[id_]["algo_status"].get() == "Pending" and self.order_tkstring[id_]["auto_range"].get()==True:
+
+						#update the levels. low become
+						if self.position[id_] == "Long":
+							if ask>self.order_tkstring[id_]["break_at"].get():
+								self.order_tkstring[id_]["break_at"].set(ask)
+								self.break_at[id_]=ask
+								change = True
+							if bid<self.order_tkstring[id_]["stoplevel"].get():
+								self.order_tkstring[id_]["stoplevel"].set(bid)
+								self.stoplevel[id_]=ask
+								change = True
+						else:  #short
+							if bid<self.order_tkstring[id_]["break_at"].get():
+								self.order_tkstring[id_]["break_at"].set(bid)
+								self.break_at[id_]=bid
+								change = True
+							if ask>self.order_tkstring[id_]["stoplevel"].get():
+								self.order_tkstring[id_]["stoplevel"].set(ask)
+								self.stoplevel[id_]=ask
+								change = True
+						if change:
+							self.update_target_price(id_)
+							#here I need to recaculate the estimate risk.
+							#self.adjusting_risk(id_)
+		except:
+			print("updating levels errors on",symbol)
+
+
+
+	#whether it is done, rejected, or cancled. should go here
+
+	def refresh_target_price_on_input(self,id_):
+		try:
+			self.price_levels[id_][1]=float(self.order_tkstring[id_]["tgtpx1"].get())
+			self.price_levels[id_][2]=float(self.order_tkstring[id_]["tgtpx2"].get())
+			self.price_levels[id_][3]=float(self.order_tkstring[id_]["tgtpx3"].get())
+
+		except:
+			print("invalid price targets set for ",id_)
+
+	def update_target_price(self,id_): #call this whenever the break at price changes. 
+		price = self.break_at[id_]
+
+		coefficient = 1
+		if self.position[id_]=="Long":
+
+			ohv = self.data_list[id_]["OHavg"]
+			ohs = self.data_list[id_]["OHstd"]
+			#print(self.data_list[id_],type(ohv),ohs,type(price))
+			self.price_levels[id_][0] = price
+			self.price_levels[id_][1] = round(price+ohv*0.25,2)
+			self.price_levels[id_][2] = round(price+ohv*0.5,2)
+			self.price_levels[id_][3] =	round(price+ohv*0.75,2)
+			# self.price_levels[id_][1] = round(price+min(ohv*0.5,ohv-ohs)*coefficient,2)
+			# self.price_levels[id_][2] = round(price+ohv*coefficient,2)
+			# self.price_levels[id_][3] =	round(price+min(ohv*1.2,ohv+ohs)*coefficient,2)
+		else:
+			olv = self.data_list[id_]["OHavg"]
+			ols = self.data_list[id_]["OHstd"]
+			self.price_levels[id_][0] = price
+			self.price_levels[id_][1] = round(price-olv*0.25,2)
+			self.price_levels[id_][2] = round(price-olv*0.5,2)
+			self.price_levels[id_][3] =	round(price-olv*0.75,2)
+
+		#set the price levels. 
+		print(id_,"updating price levels.",price,self.price_levels[id_][1],self.price_levels[id_][2],self.price_levels[id_][3])
+		self.order_tkstring[id_]["tgtpx1"].set(self.price_levels[id_][1])
+		self.order_tkstring[id_]["tgtpx2"].set(self.price_levels[id_][2])
+		self.order_tkstring[id_]["tgtpx3"].set(self.price_levels[id_][3])
+
 	def mark_off_algo(self,id_,status):
 
 		print(status)
@@ -1147,6 +1177,11 @@ class algo_manager(pannel):
 			self.order_tklabels[id_]["pxtgt1"]["background"] = DEFAULT
 			self.order_tklabels[id_]["pxtgt2"]["background"] = DEFAULT
 			self.order_tklabels[id_]["pxtgt3"]["background"] = LIGHTYELLOW
+
+		elif current_level ==4:
+			self.order_tklabels[id_]["pxtgt1"]["background"] = DEFAULT
+			self.order_tklabels[id_]["pxtgt2"]["background"] = DEFAULT
+			self.order_tklabels[id_]["pxtgt3"]["background"] = DEFAULT	
 
 	def rebind(self,canvas,frame):
 		canvas.update_idletasks()
