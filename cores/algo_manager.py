@@ -866,7 +866,7 @@ class algo_manager(pannel):
 			self.order_tkstring[id_]["algo_status"].set(self.status["Deployed"])
 			self.order_tklabels[id_]["algo_status"]["background"] = YELLOW
 		else:
-			print(symbol,"WHY NOT????", self.order_tkstring[id_]["algo_status"].get())
+			print(symbol,"WHY NOT????", id_,self.order_tkstring[id_]["algo_status"].get())
 		self.stoporder[id_] = stopid
 
 		#change label into placed.
@@ -910,6 +910,7 @@ class algo_manager(pannel):
 
 	def deploy_all_stoporders(self):
 
+		print("Deploying all algos:",len(self.orders_registry))
 		for i in self.orders_registry:
 			self.deploy_stop_order(i)
 

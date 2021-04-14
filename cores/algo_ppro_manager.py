@@ -296,12 +296,12 @@ def get_order_id(request_number,symbol,side,pipe):
 		r = requests.post(req)
 		if r.status_code ==200:
 			#return id, symbol, and side. 
-			print(symbol,"stop id aquired")
+			print(symbol,side,"stop id aquired")
 			pipe.send(["new stoporder",[find_between(r.text,"<Content>","</Content>"),symbol,side]])
 			break
 		else:
 			count = count+1
-			print(symbol,"get id failed:",count)
+			print(symbol,side,"get id failed:",count)
 
 ####need to trace the order number to trace the stop id number. 
 def stoporder_to_market_buy(symbol,price,share,pipe=None):
