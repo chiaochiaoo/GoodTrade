@@ -986,7 +986,9 @@ class algo_manager(pannel):
 
 							print("target reached,level:",current_level,"New stoploss:",self.price_levels[id_][current_level-1])
 							#shake of 1/3 
-							share = min(int(self.target_share[id_]//3),self.current_share[id_])
+							share = min(int(int(self.target_share[id_])//3),self.current_share[id_])
+
+							if current_level==3: share=int(self.current_share[id_])
 							#if share==0: share = self.current_share[id_]  #if 0. get rid of everything.
 
 							sell_market_order(symbol,share)
@@ -1012,8 +1014,9 @@ class algo_manager(pannel):
 
 							print("target reached,level:",current_level)
 							#shake of 1/3 
-							share = min(int(self.target_share[id_]//3),self.current_share[id_])
-							
+							share = min(int(int(self.target_share[id_])//3),self.current_share[id_])
+							if current_level==3: share=int(self.current_share[id_])
+
 							buy_market_order(symbol,share)
 
 							self.stoplevel[id_] = self.price_levels[id_][current_level-1]
@@ -1110,9 +1113,9 @@ class algo_manager(pannel):
 			ohs = self.data_list[id_]["OHstd"]
 			#print(self.data_list[id_],type(ohv),ohs,type(price))
 			self.price_levels[id_][0] = price
-			self.price_levels[id_][1] = round(price+ohv*0.25,2)
-			self.price_levels[id_][2] = round(price+ohv*0.5,2)
-			self.price_levels[id_][3] =	round(price+ohv*0.75,2)
+			self.price_levels[id_][1] = round(price+ohv*0.2*coefficient,2)
+			self.price_levels[id_][2] = round(price+ohv*0.5*coefficient,2)
+			self.price_levels[id_][3] =	round(price+ohv*0.75*coefficient,2)
 			# self.price_levels[id_][1] = round(price+min(ohv*0.5,ohv-ohs)*coefficient,2)
 			# self.price_levels[id_][2] = round(price+ohv*coefficient,2)
 			# self.price_levels[id_][3] =	round(price+min(ohv*1.2,ohv+ohs)*coefficient,2)
@@ -1120,9 +1123,9 @@ class algo_manager(pannel):
 			olv = self.data_list[id_]["OHavg"]
 			ols = self.data_list[id_]["OHstd"]
 			self.price_levels[id_][0] = price
-			self.price_levels[id_][1] = round(price-olv*0.25,2)
-			self.price_levels[id_][2] = round(price-olv*0.5,2)
-			self.price_levels[id_][3] =	round(price-olv*0.75,2)
+			self.price_levels[id_][1] = round(price-olv*0.2*coefficient,2)
+			self.price_levels[id_][2] = round(price-olv*0.5*coefficient,2)
+			self.price_levels[id_][3] =	round(price-olv*0.75*coefficient,2)
 
 		#set the price levels. 
 		print(id_,"updating price levels.",price,self.price_levels[id_][1],self.price_levels[id_][2],self.price_levels[id_][3])
