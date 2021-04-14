@@ -26,6 +26,10 @@ STRONGGREEN = "#3DFC68"
 STRONGRED = "#FC433D"
 DEEPGREEN = "#059a12"
 
+global coecoefficient
+coefficient = 1
+
+
 def algo_manager_voxcom(pipe):
 
 	#tries to establish commuc
@@ -151,6 +155,9 @@ class algo_manager(pannel):
 		self.holdings= {}  ###literally have that many shares. 
 
 		self.order_info = {}
+
+
+		self.flatten_lock = {}
 		
 		super().__init__(root)
 
@@ -313,6 +320,8 @@ class algo_manager(pannel):
 
 		#check if this order is running.
 		running = self.check_order_running(id_,symbol)
+
+		#send once is good enough. 
 		if running:
 			flatten = threading.Thread(target=flatten_symbol,args=(symbol,), daemon=True)
 			flatten.start()
@@ -354,6 +363,8 @@ class algo_manager(pannel):
 			#create the tkstring.
 
 			self.id_lock[id_] = threading.Lock()
+
+			self.flatten_lock[id_] = threading.Lock()
 
 			self.order_tkstring[id_] = {}
 
@@ -685,6 +696,7 @@ class algo_manager(pannel):
 
 			if d[0] =="new stoporder":
 
+				#print("stop order received:",d[1])
 				self.ppro_append_new_stoporder(d[1])
 			
 	#when there is a change of quantity of an order. 
@@ -795,8 +807,7 @@ class algo_manager(pannel):
 	def ppro_order_loadoff(self,id_,symbol,price,current,shares,side):
 
 		self.current_share[id_] = current-shares	
-
-		print("current shares:",self.current_share[id_] )			
+		
 		gain = 0
 		if self.position[id_]=="Long":
 			for i in range(shares):
@@ -816,7 +827,7 @@ class algo_manager(pannel):
 
 		self.adjusting_risk(id_)
 
-		print("realized:",self.realized[id_])
+		print(symbol," sold:",shares," current shares:",self.current_share[id_],"realized:",self.realized[id_])
 
 		#finish a trade if current share is 0.
 
@@ -850,10 +861,12 @@ class algo_manager(pannel):
 		self.stoporder_to_id[stopid] = id_
 		self.id_to_stoporder[id_] = stopid
 
+		print(symbol,stopid)
 		if self.order_tkstring[id_]["algo_status"].get()==self.status["Deploying"]:
 			self.order_tkstring[id_]["algo_status"].set(self.status["Deployed"])
 			self.order_tklabels[id_]["algo_status"]["background"] = YELLOW
-
+		else:
+			print(symbol,"WHY NOT????", self.order_tkstring[id_]["algo_status"].get())
 		self.stoporder[id_] = stopid
 
 		#change label into placed.
@@ -1090,8 +1103,6 @@ class algo_manager(pannel):
 		except:
 			print("updating levels errors on",symbol)
 
-
-
 	#whether it is done, rejected, or cancled. should go here
 
 	def refresh_target_price_on_input(self,id_):
@@ -1106,7 +1117,8 @@ class algo_manager(pannel):
 	def update_target_price(self,id_): #call this whenever the break at price changes. 
 		price = self.break_at[id_]
 
-		coefficient = 1
+		global coecoefficient
+
 		if self.position[id_]=="Long":
 
 			ohv = self.data_list[id_]["OHavg"]
@@ -1120,15 +1132,15 @@ class algo_manager(pannel):
 			# self.price_levels[id_][2] = round(price+ohv*coefficient,2)
 			# self.price_levels[id_][3] =	round(price+min(ohv*1.2,ohv+ohs)*coefficient,2)
 		else:
-			olv = self.data_list[id_]["OHavg"]
-			ols = self.data_list[id_]["OHstd"]
+			olv = self.data_list[id_]["OLavg"]
+			ols = self.data_list[id_]["OLstd"]
 			self.price_levels[id_][0] = price
 			self.price_levels[id_][1] = round(price-olv*0.2*coefficient,2)
 			self.price_levels[id_][2] = round(price-olv*0.5*coefficient,2)
 			self.price_levels[id_][3] =	round(price-olv*0.75*coefficient,2)
 
 		#set the price levels. 
-		print(id_,"updating price levels.",price,self.price_levels[id_][1],self.price_levels[id_][2],self.price_levels[id_][3])
+		#print(id_,"updating price levels.",price,self.price_levels[id_][1],self.price_levels[id_][2],self.price_levels[id_][3])
 		self.order_tkstring[id_]["tgtpx1"].set(self.price_levels[id_][1])
 		self.order_tkstring[id_]["tgtpx2"].set(self.price_levels[id_][2])
 		self.order_tkstring[id_]["tgtpx3"].set(self.price_levels[id_][3])
@@ -1194,7 +1206,6 @@ class algo_manager(pannel):
 		self.order_tkstring[id_]["average_price"].set(self.average_price[id_])
 
 		#check color.f9f9f9
-
 
 		if self.unrealized_pshr[id_]>0:
 			self.order_tklabels[id_]["unrealized_pshr"]["background"] = STRONGGREEN

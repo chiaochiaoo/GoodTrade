@@ -277,8 +277,9 @@ def sell_limit_order(symbol, price,share):
 def ppro_request(request,success=None,failure=None,traceid=False,symbol=None,side=None,pipe=None):
 	r = requests.post(request)
 	if r.status_code ==200:
-		if success!=None:
-			print(success)
+		# if success!=None:
+
+		# 	print(success)
 
 		if traceid==True:
 			get_order_id(find_between(r.text,"<Content>","</Content>"),symbol,side,pipe)  #need to grab the request id. obtain the order id. assign it to the symbol.the 
@@ -289,12 +290,18 @@ def ppro_request(request,success=None,failure=None,traceid=False,symbol=None,sid
 		return False
 
 def get_order_id(request_number,symbol,side,pipe):
-	req = "http://localhost:8080/GetOrderNumber?requestid="+str(request_number)
-	r = requests.post(req)
-	if r.status_code ==200:
-		#return id, symbol, and side. 
-		pipe.send(["new stoporder",[find_between(r.text,"<Content>","</Content>"),symbol,side]])
-
+	count=0
+	while True:
+		req = "http://localhost:8080/GetOrderNumber?requestid="+str(request_number)
+		r = requests.post(req)
+		if r.status_code ==200:
+			#return id, symbol, and side. 
+			print(symbol,"stop id aquired")
+			pipe.send(["new stoporder",[find_between(r.text,"<Content>","</Content>"),symbol,side]])
+			break
+		else:
+			count = count+1
+			print(symbol,"get id failed:",count)
 
 ####need to trace the order number to trace the stop id number. 
 def stoporder_to_market_buy(symbol,price,share,pipe=None):
