@@ -44,7 +44,7 @@ class viewer:
 		self.algo_manager.set_symbols_manager(self.data)
 
 		self.listening = ttk.LabelFrame(root,text="Analyzer") 
-		self.listening.place(x=600,rely=0.05,relheight=1,width=1100)
+		self.listening.place(x=640,rely=0.05,relheight=1,width=1100)
 
 		self.tabControl = ttk.Notebook(self.listening)
 		self.tab1 = tk.Canvas(self.tabControl)

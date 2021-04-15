@@ -33,7 +33,7 @@ class scanner(pannel):
 		self.extra_count = 101
 
 		self.tabControl = ttk.Notebook(root)
-		self.tabControl.place(x=0,rely=0.01,relheight=1,width=600)
+		self.tabControl.place(x=0,rely=0.01,relheight=1,width=640)
 
 		self.tab1 = tk.Canvas(self.tabControl)
 		self.tab2 = tk.Canvas(self.tabControl)
@@ -73,7 +73,7 @@ class scanner(pannel):
 		#self.NT.place(x=0,rely=0.05,relheight=1,width=500)
 
 		self.all = tk.Canvas(self.tab2)
-		self.all.place(x=0,rely=0.05,relheight=1,width=600)
+		self.all.place(x=0,rely=0.05,relheight=1,width=640)
 		# self.fastmover = tk.Canvas(self.NT)
 		# self.newhigh = tk.Canvas(self.NT)
 		# self.newlow = tk.Canvas(self.NT)
@@ -226,8 +226,22 @@ class scanner(pannel):
 
 		self.buttons =[]
 				#3,14,5,6,4,6,6,6,10,5
-		self.nasdaq_width = [4,14,5,6,4,6,6,6,12,5]
-		self.labels = ["Rank","Symbol","Market","Price","Since","SC%","SO%","L5R%","Status","Add"]
+		self.nasdaq_width = [4,14,5,6,4,4,6,6,6,12,5]
+		self.labels = ["Rank","Symbol","Market","Price","Since","Been","SC%","SO%","L5R%","Status","Add"]
+
+		self.labels_position = {}
+
+		self.labels_position["Rank"]=0
+		self.labels_position["Symbol"]=1
+		self.labels_position["Market"]=2
+		self.labels_position["Price"]=3
+		self.labels_position["Since"]=4
+		self.labels_position["Been"]=5
+		self.labels_position["SC%"]=6
+		self.labels_position["SO%"]=7
+		self.labels_position["L5R%"]=8
+		self.labels_position["Status"]=9
+		self.labels_position["Add"]=10
 
 		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
 
@@ -237,6 +251,7 @@ class scanner(pannel):
 		self.status_sort = False
 		self.price_sort = False
 		self.speed_sort = False
+		self.been_sort = False
 
 		self.rank_sort = False
 
@@ -268,11 +283,13 @@ class scanner(pannel):
 		self.buttons[3]["command"] = self.price_button
 
 		self.buttons[4]["command"] = self.since_button
-		self.buttons[5]["command"] = self.close_button
-		self.buttons[6]["command"] = self.open_button
-		self.buttons[7]["command"] = self.last5_button
 
-		self.buttons[8]["command"] = self.status_button
+		self.buttons[5]["command"] = self.been_button
+		self.buttons[6]["command"] = self.close_button
+		self.buttons[7]["command"] = self.open_button
+		self.buttons[8]["command"] = self.last5_button
+
+		self.buttons[9]["command"] = self.status_button
 
 
 	def change_sorting_order(self,order):
@@ -287,6 +304,14 @@ class scanner(pannel):
 			self.rank_sort = True
 
 		self.change_sorting_order("rank")
+
+	def been_button(self):
+		if self.been_sort==True:
+			self.been_sort = False
+		else:
+			self.been_sort = True
+
+		self.change_sorting_order("been")		
 
 	def since_button(self):
 		if self.since_sort==True:
@@ -368,6 +393,12 @@ class scanner(pannel):
 		self.change_sorting_order("open")
 
 
+	def sorting_been(self):
+		if self.been_sort==True:
+			self.df=self.df.sort_values(by=["been"],ascending=False)
+		else:
+			self.df=self.df.sort_values(by=["been"],ascending=True)		
+
 	def sorting_since(self):
 		if self.since_sort==True:
 			self.df=self.df.sort_values(by=["fats"],ascending=False)
@@ -439,6 +470,8 @@ class scanner(pannel):
 				self.sorting_last5()
 			elif self.sorting_order =="since":
 				self.sorting_since()
+			elif self.sorting_order =="been":
+				self.sorting_been()
 
 		#df.sort_values(by='col1', ascending=False)
 
@@ -515,14 +548,16 @@ class scanner(pannel):
 				roc30 = row['rank30']
 				status = row['status']
 				since = row['fa']
-
+				been = row['been']
 				market = symbol[-2:]
 				
-				info = [rank,index,market,price,since,status,symbol]
+				info = [rank,index,market,price,since,been,symbol]
 				self.nasdaq.append([])
 
+				# ["Rank","Symbol","Market","Price","Since","Been","SC%","SO%","L5R%","Status","Add"]
+
 				for j in range(len(self.nasdaq_width)):
-					if j ==0 or j==2 or j==4:
+					if j ==0 or j==2 or j==4 or j==5:
 						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=info[j],width=self.nasdaq_width[j]))
 						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 
@@ -539,7 +574,7 @@ class scanner(pannel):
 
 						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 					#close
-					elif j ==5:
+					elif j ==6:
 
 						try:
 							var = self.data.get_close_percentage(symbol)
@@ -553,7 +588,7 @@ class scanner(pannel):
 
 						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 
-					elif j ==6:
+					elif j ==7:
 
 						try:
 							var = self.data.get_open_percentage(symbol)
@@ -566,7 +601,7 @@ class scanner(pannel):
 							self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=self.nasdaq_width[j]))
 
 						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-					elif j ==7:
+					elif j ==8:
 
 						try:
 							var = self.data.get_last_5_range_percentage(symbol)
@@ -579,7 +614,7 @@ class scanner(pannel):
 							self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text="NA",width=self.nasdaq_width[j]))
 
 						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
-					elif j ==8:
+					elif j ==9:
 
 						try:
 							var = self.data.get_position_status(symbol)
@@ -614,7 +649,7 @@ class scanner(pannel):
 						else:
 							self.nasdaq[i][j]["text"]=index
 							self.nasdaq[i][j]["background"]="SystemButtonFace"
-					elif j==9:
+					elif j==10:
 
 						self.nasdaq[i].append(tk.Button(self.NT_scanner_frame ,text="Add",width=self.nasdaq_width[j],command= lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)))
 						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
@@ -648,12 +683,13 @@ class scanner(pannel):
 					status = row['status']
 					market = symbol[-2:]
 					since = row['fa']
-					info = [rank,index,market,price,since,status,symbol]
+					been = row['been']
+					info = [rank,index,market,price,since,been,status,symbol]
 
 				
 					for j in range(len(self.nasdaq_width)):
 
-						if j ==0 or j==2 or j==4:
+						if j ==0 or j==2 or j==4 or j==5:
 							self.nasdaq[i][j]["text"] = info[j]
 						elif j == 3:
 							try:
@@ -666,7 +702,7 @@ class scanner(pannel):
 							else:
 								self.nasdaq[i][j]["text"] = "NA"
 
-						elif j == 5:
+						elif j == 6:
 							try:
 								var = self.data.get_close_percentage(symbol)
 							except:
@@ -676,7 +712,7 @@ class scanner(pannel):
 								self.nasdaq[i][j]["textvariable"] = var
 							else:
 								self.nasdaq[i][j]["text"] = "NA"
-						elif j == 6:
+						elif j == 7:
 							try:
 								var = self.data.get_open_percentage(symbol)
 							except:
@@ -687,7 +723,7 @@ class scanner(pannel):
 							else:
 								self.nasdaq[i][j]["text"] = "NA"
 
-						elif j == 7:
+						elif j == 8:
 							try:
 								var = self.data.get_last_5_range_percentage(symbol)
 							except:
@@ -698,7 +734,7 @@ class scanner(pannel):
 							else:
 								self.nasdaq[i][j]["text"] = "NA"
 
-						elif j == 8:
+						elif j == 9:
 							try:
 								var = self.data.get_position_status(symbol)
 							except:
@@ -727,7 +763,7 @@ class scanner(pannel):
 							else:
 								self.nasdaq[i][j]["text"]=index
 								self.nasdaq[i][j]["background"]="SystemButtonFace"
-						elif j ==9:
+						elif j ==10:
 							self.nasdaq_trader_symbols.append(symbol)
 							self.nasdaq[i][j]["command"] = lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)
 			print("pannel updated")
