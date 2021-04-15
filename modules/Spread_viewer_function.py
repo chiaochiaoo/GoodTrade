@@ -83,13 +83,16 @@ def process_one(s):
 		#get the first value
 
 		#print the first time 370.
-		open_ = s.loc[s["datehour"]==(days[day] +" 09:30")]["open"].values[0]
+		try:
+			open_ = s.loc[s["datehour"]==(days[day] +" 09:30")]["open"].values[0]
 
 
-		s.loc[(s["day"]==days[day])&(s["timestamp"]>=570),"open_"] = open_
-		#tomorrow's, before 9:30.
-		if day < len(days)-1:
-			s.loc[(s["day"]==days[day+1])&(s["timestamp"]<570),"open_"] = open_
+			s.loc[(s["day"]==days[day])&(s["timestamp"]>=570),"open_"] = open_
+			#tomorrow's, before 9:30.
+			if day < len(days)-1:
+				s.loc[(s["day"]==days[day+1])&(s["timestamp"]<570),"open_"] = open_
+		except:
+			print(days[day],"data corruption")
 
 	percentage= []
 	for i in range(len(s)):
