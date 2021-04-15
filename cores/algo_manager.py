@@ -357,8 +357,8 @@ class algo_manager(pannel):
 			side = ""
 			if pos =="Long": side ="B"
 			elif pos =="Short": side ="S"
-			self.order_book[symbol+side] = id_
 
+			self.order_book[symbol+side] = id_
 			self.orders_symbol[id_] = symbol
 			#create the tkstring.
 
@@ -460,6 +460,8 @@ class algo_manager(pannel):
 			print("adding order failed")
 
 	def order_ui_creation(self,info):
+
+		#if they already exisit, just repace the old ones.
 		i = info[0][0]
 		id_ = info[0][1]
 		status = info[1]
@@ -726,7 +728,7 @@ class algo_manager(pannel):
 				if self.running_order[symbol] =="":
 					init = True
 
-			id_=self.order_book[symbol+side]
+			id_=self.order_book[code]
 			status = self.order_tkstring[id_]["algo_status"].get()
 
 			if init:   #send a chekcing procedure. check if the stoporder is done. 
@@ -853,23 +855,28 @@ class algo_manager(pannel):
 	def ppro_append_new_stoporder(self,pkg):
 
 		stopid,symbol,side = pkg[0],pkg[1],pkg[2]
-		id_=self.order_book[symbol+side]
 
-		with self.stoporder_book_lock:
-			self.stoporder_book.append(stopid)
+		
+		if symbol+side in self.order_book:
+			id_=self.order_book[symbol+side]
 
-		self.stoporder_to_id[stopid] = id_
-		self.id_to_stoporder[id_] = stopid
+			with self.stoporder_book_lock:
+				self.stoporder_book.append(stopid)
 
-		print(symbol,stopid)
-		if self.order_tkstring[id_]["algo_status"].get()==self.status["Deploying"]:
-			self.order_tkstring[id_]["algo_status"].set(self.status["Deployed"])
-			self.order_tklabels[id_]["algo_status"]["background"] = YELLOW
+			self.stoporder_to_id[stopid] = id_
+			self.id_to_stoporder[id_] = stopid
+
+			print(symbol,stopid)
+			if self.order_tkstring[id_]["algo_status"].get()==self.status["Deploying"]:
+				self.order_tkstring[id_]["algo_status"].set(self.status["Deployed"])
+				self.order_tklabels[id_]["algo_status"]["background"] = YELLOW
+			else:
+				print(symbol,"WHY NOT????", id_,self.order_tkstring[id_]["algo_status"].get())
+			self.stoporder[id_] = stopid
+
+			#change label into placed.
 		else:
-			print(symbol,"WHY NOT????", id_,self.order_tkstring[id_]["algo_status"].get())
-		self.stoporder[id_] = stopid
-
-		#change label into placed.
+			print("Cannot find new order,",symbol+side)
 
 
 
@@ -1068,6 +1075,9 @@ class algo_manager(pannel):
 			id_ = self.order_book[symbol+side]
 			self.mark_off_algo(id_,self.status["Rejected"])
 			print(symbol,"rejected:",info)
+
+		else:
+			print("cannot find id for",symbol+side)
 
 	#Utilities. 
 	def refresh_support_resistence(self,symbol,ask,bid):
