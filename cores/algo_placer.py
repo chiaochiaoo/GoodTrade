@@ -472,7 +472,7 @@ class algo_placer:
 		self.root.destroy()
 
 	#if the entry type is given. lock it. 
-	def __init__(self,commlink,orders):
+	def __init__(self,commlink,orders,deploy=False):
 
 		#self.algo_commlink,type_,symbol,description,entry,stop,position,None,risk
 
@@ -498,6 +498,8 @@ class algo_placer:
 		self.place= tk.Button(root ,text="Cancel",width=10,command=self.on_close)
 		self.place.place(x=310,y=250*block+10,height=40,width=80)
 
+		if deploy:
+			self.on_send()
 
 
 import tkinter as tk

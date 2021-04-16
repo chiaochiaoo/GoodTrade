@@ -161,6 +161,7 @@ class Symbol_data_manager:
 
 
 		self.algo_breakout_status = {}
+		self.algo_breakout_trade = {}
 		self.algo_breakout_up = {}
 		self.algo_breakout_down = {}
 		self.algo_breakout_timer = {}
@@ -432,9 +433,8 @@ class Symbol_data_manager:
 		# self.algo_breakout_up = {}
 		# self.algo_breakout_down = {}
 
-
 		self.algo_breakout_status[i] = StringVar()
-		self.algo_breakout_status[i].set("None")
+		self.algo_breakout_trade[i] = BooleanVar(value=False)
 
 		self.algo_breakout_timer[i] = StringVar()
 		self.algo_breakout_timer[i].set(0)

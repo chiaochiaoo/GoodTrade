@@ -73,11 +73,11 @@ class algo_process_manager_client:
 					if type_ == "Breakup":
 
 						#status, id. symbol.
-						self.data.algo_breakout_status[symbol].set(status)
+						#self.data.algo_breakout_status[symbol].set(status)
 						self.data.algo_breakout_up[symbol].set(id_)
 
 					elif type_ == "Breakdown":
-						self.data.algo_breakout_status[symbol].set(status)
+						#self.data.algo_breakout_status[symbol].set(status)
 						self.data.algo_breakout_down[symbol].set(id_)
 
 			elif message_type =="Confirmed":

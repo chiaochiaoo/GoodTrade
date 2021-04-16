@@ -216,6 +216,10 @@ class alert(pannel):
 				alert_vals = alerts[j][2]
 				m=format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
 				self.tickers_tracers[i].append((format[value_position],m))
+			elif j==9:
+				self.tickers_labels[i].append(tk.Checkbutton(self.frame,variable=format[j]))
+				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
+				format[j].set(self.auto_trade.get())
 
 			#trigger type
 			elif j==10:
@@ -255,7 +259,7 @@ class alert(pannel):
 
 		#algo_placer("AAPL.NQ","Breakout on Resistance on 134.45 for 60 secs",134.45,133.45,500)
 
-	def break_out_trade(self,info):
+	def break_out_trade(self,info,auto=False):
 
 		symbol,support,resistence,timer_trade,type_trade,default_risk = info[0],float(info[1].get()),float(info[2].get()),info[3].get(),info[4].get(),info[5].get()
 
@@ -284,28 +288,29 @@ class alert(pannel):
 		description_break_down = "Break Support on "+str(support)
 		info_down = ["Breakdown",symbol,description_break_down,support,resistence,"Short",None,risk,data_list]
 
+
 		#type_,symbol,description,entry_price,stop_price,position,capital,total_risk
 		if type_trade =='Break Up':
 
-			self.place_trade([info_up])
+			self.place_trade([info_up],auto)
 
 		elif  type_trade =='Break Dn':
 
-			self.place_trade([info_down])
+			self.place_trade([info_down],auto)
 
 		else:
-			self.place_trade([info_up,info_down])
+			self.place_trade([info_up,info_down],auto)
 			# p1 = threading.Thread(target=self.place_trade(info_up), daemon=True)
 			# p1.start()
 			# p2 = threading.Thread(target=self.place_trade(info_down), daemon=True)
 			# p2.start()
 		
 
-	def place_trade(self,infos):
+	def place_trade(self,infos,auto=False):
 		#print("placing:",info)
 		#type_,symbol,description,entry_price,stop_price,position,capital,total_risk
 
-		algo_placer(self.algo_commlink,infos)
+		algo_placer(self.algo_commlink,infos,auto)
 
 
 	def delete_symbol(self,symbol):
@@ -498,11 +503,11 @@ class alert(pannel):
 								if been>180 and been <300:
 									eval_label["background"]="yellow"
 
-								if been >180 and been <190:
-									if auto_trade[symbol].get()==1 and self.alerts[symbol][alert_type]==1:
-										self.data.ppro.long(symbol)
-									if auto_trade[symbol].get()==1 and self.alerts[symbol][alert_type]==2:
-										self.data.ppro.short(symbol)
+								# if been >180 and been <190:
+								# 	if auto_trade[symbol].get()==1 and self.alerts[symbol][alert_type]==1:
+								# 		self.data.ppro.long(symbol)
+								# 	if auto_trade[symbol].get()==1 and self.alerts[symbol][alert_type]==2:
+								# 		self.data.ppro.short(symbol)
 
 								if been>300 and been <600:
 									eval_label["background"]="#FF5B5B"
@@ -1044,8 +1049,8 @@ class breakout(alert):
 
 		super().__init__(frame,data,alert_panel,commlink)
 
-		self.labels = ["Ticker","Status","AR","Support","Resistance ","Range","ATR","Cur Price","Evaluation","Algo Status","Trigger Type","Trigger Timer","Configure Entry",]
-		self.width = [8,10,4,7,7,7,7,7,25,10,10,10,12]
+		self.labels = ["Ticker","Status","AR","Support","Resistance ","Range","ATR","Cur Price","Evaluation","Algo","Trigger Type","Trigger Timer","Configure Entry",]
+		self.width = [8,10,4,7,7,7,7,7,25,4,10,10,12]
 		self.labels_creator(self.frame)
 
 
@@ -1054,9 +1059,9 @@ class breakout(alert):
 		self.checker.configure(text='Auto range detection')
 		self.checker.toggle()
 
-		# self.checker2 = tk.Checkbutton(frame,variable=self.data.all_auto_trade)
-		# self.checker2.place(x=175, y=5, height=30, width=150, bordermode='ignore')
-		# self.checker2.configure(text='Auto Trade Breakout')
+		self.checker2 = tk.Checkbutton(frame,variable=self.data.all_auto_trade)
+		self.checker2.place(x=175, y=5, height=30, width=150, bordermode='ignore')
+		self.checker2.configure(text='Toggle all Breakout algo')
 
 		# self.default_capital = 
 		# self.default_risk =
@@ -1065,17 +1070,43 @@ class breakout(alert):
 
 		self.default_risk = tk.StringVar()
 
-		tk.Label(frame,text="Default risk per trade:",height=1,width=20).place(x=160,y=10)
+		tk.Label(frame,text="Default risk per trade:",height=1,width=20).place(x=340,y=10)
 
-		tk.Entry(frame,textvariable=self.default_risk,width=5).place(x=300,y=10)
+		tk.Entry(frame,textvariable=self.default_risk,width=5).place(x=480,y=10)
+
+
+		tk.Button(frame,text="Place all algos",command=self.placeall).place(x=550,y=10)
 
 		self.auto_range = self.data.all_auto
 		self.auto_trade =self.data.all_auto_trade
 
 		self.data.all_auto.trace('w', lambda *_,vals=self.data.auto_support_resistance,val=self.data.all_auto: self.set_auto(vals,val))
 
-		#self.data.all_auto_trade.trace('w', lambda *_,vals=self.data.auto_trade,val=self.data.all_auto_trade: self.set_auto(vals,val))
+		self.data.all_auto_trade.trace('w', lambda *_,vals=self.data.algo_breakout_trade,val=self.data.all_auto_trade: self.set_auto(vals,val))
 
+
+	def placeall(self):
+
+
+		
+		
+		print("Placing all")
+
+
+		for symbol in self.data.get_list():
+
+			if self.data.algo_breakout_trade[symbol].get()==True:
+
+				support = self.data.symbol_data_support[symbol]
+				resistance  = self.data.symbol_data_resistance[symbol]
+				timer_trade = self.data.algo_breakout_timer[symbol]
+				type_trade = self.data.algo_breakout_type[symbol]
+				default_risk = self.default_risk
+				info = [symbol,support,resistance,timer_trade,type_trade,default_risk]
+
+				self.break_out_trade(info,True)
+
+				print("Placing ",symbol)
 
 	def set_auto(self,vals,val):
 
@@ -1127,7 +1158,7 @@ class breakout(alert):
 		time = self.data.symbol_update_time[symbol]
 
 		algo_data = self.data.algo_breakout_type[symbol]
-		algo_status,trigger_timer,trigger_type = self.data.algo_breakout_status[symbol],self.data.algo_breakout_timer[symbol],self.data.algo_breakout_type[symbol]
+		algo_trade,trigger_timer,trigger_type = self.data.algo_breakout_trade[symbol],self.data.algo_breakout_timer[symbol],self.data.algo_breakout_type[symbol]
 
 		data_ready = self.data.data_ready[symbol]
 
@@ -1140,7 +1171,7 @@ class breakout(alert):
 
 		#cur, mean, std. symbol, time. 
 		alertvals= [symbol,time,cur_price,support,resistance ,alert_type]
-		labels = [symbol,status,checker,support,resistance ,range_,atr,cur_price,eva,algo_status,trigger_type,trigger_timer]
+		labels = [symbol,status,checker,support,resistance ,range_,atr,cur_price,eva,algo_trade,trigger_type,trigger_timer]
 
 		#any alert will need a threshold. deviation. std. or type.
 
