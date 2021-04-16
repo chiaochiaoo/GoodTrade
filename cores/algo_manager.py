@@ -1165,31 +1165,41 @@ class algo_manager(pannel):
 
 		global coecoefficient
 
+		good = False
 		if self.position[id_]=="Long":
 
 			ohv = self.data_list[id_]["OHavg"]
 			ohs = self.data_list[id_]["OHstd"]
 			#print(self.data_list[id_],type(ohv),ohs,type(price))
-			self.price_levels[id_][0] = price
-			self.price_levels[id_][1] = round(price+ohv*0.2*coefficient,2)
-			self.price_levels[id_][2] = round(price+ohv*0.5*coefficient,2)
-			self.price_levels[id_][3] =	round(price+ohv*0.75*coefficient,2)
-			# self.price_levels[id_][1] = round(price+min(ohv*0.5,ohv-ohs)*coefficient,2)
-			# self.price_levels[id_][2] = round(price+ohv*coefficient,2)
-			# self.price_levels[id_][3] =	round(price+min(ohv*1.2,ohv+ohs)*coefficient,2)
+
+			if ohv!=0:
+				self.price_levels[id_][0] = price
+				self.price_levels[id_][1] = round(price+ohv*0.2*coefficient,2)
+				self.price_levels[id_][2] = round(price+ohv*0.5*coefficient,2)
+				self.price_levels[id_][3] =	round(price+ohv*0.75*coefficient,2)
+				good = True
+			else:
+
+				self.order_tkstring[id_]["auto_manage"].set(False)
 		else:
 			olv = self.data_list[id_]["OLavg"]
 			ols = self.data_list[id_]["OLstd"]
-			self.price_levels[id_][0] = price
-			self.price_levels[id_][1] = round(price-olv*0.2*coefficient,2)
-			self.price_levels[id_][2] = round(price-olv*0.5*coefficient,2)
-			self.price_levels[id_][3] =	round(price-olv*0.75*coefficient,2)
+
+			if olv!=0:
+				self.price_levels[id_][0] = price
+				self.price_levels[id_][1] = round(price-olv*0.2*coefficient,2)
+				self.price_levels[id_][2] = round(price-olv*0.5*coefficient,2)
+				self.price_levels[id_][3] =	round(price-olv*0.75*coefficient,2)
+				good = True
+			else:
+				self.order_tkstring[id_]["auto_manage"].set(False)
 
 		#set the price levels. 
 		#print(id_,"updating price levels.",price,self.price_levels[id_][1],self.price_levels[id_][2],self.price_levels[id_][3])
-		self.order_tkstring[id_]["tgtpx1"].set(self.price_levels[id_][1])
-		self.order_tkstring[id_]["tgtpx2"].set(self.price_levels[id_][2])
-		self.order_tkstring[id_]["tgtpx3"].set(self.price_levels[id_][3])
+		if good:
+			self.order_tkstring[id_]["tgtpx1"].set(self.price_levels[id_][1])
+			self.order_tkstring[id_]["tgtpx2"].set(self.price_levels[id_][2])
+			self.order_tkstring[id_]["tgtpx3"].set(self.price_levels[id_][3])
 
 	def update_target_entry(self,id_):
 
