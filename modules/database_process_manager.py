@@ -56,7 +56,7 @@ class database_process_manager:
 		#deactivate it when it gets nothing to receive.
 
 		print("Database Online: Receiving Starts")
-		time.sleep(5)
+		time.sleep(10)
 		while True:
 			d = self.request.recv()
 
@@ -355,3 +355,4 @@ def fetch_data(symbol):
 # 03/30/2021,512.56,519.01,508.2,514.87,
 # 03/31/2021,520.48,538.82,519.3,533.93,
 # 04/01/2021,542.88,554.8,540.45,552.73,
+

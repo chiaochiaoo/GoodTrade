@@ -716,31 +716,51 @@ class algo_manager(pannel):
 		#check if this activates an hidden order.
 		#######filter out irrelavant orders.
 
-		init = False
 
 		#breaks when handling an already finished order.
+		check_order_book = True
 
-		if symbol in self.running_order or code in self.order_book: 
-			#establish id for the ones not seet up.
-			if symbol not in self.running_order:  #i dont understand this part anymore.
-				init = True
-			else:
-				if self.running_order[symbol] =="":
-					init = True
 
-			id_=self.order_book[code]
-			status = self.order_tkstring[id_]["algo_status"].get()
+		if symbol in self.running_order:
+			if self.running_order[symbol]!="":
+				print(self.running_order[symbol],"order update")
+				self.order_process(symbol,price,shares,side)
+				check_order_book = False
 
-			if init:   #send a chekcing procedure. check if the stoporder is done. 
+		if check_order_book:
+			if code in self.order_book:
+				id_=self.order_book[code]
+				status = self.order_tkstring[id_]["algo_status"].get()
+
 				if status=="Deployed" or status=="Deploying":
 					act = threading.Thread(target=self.order_activation,args=(id_,symbol,price,shares,side), daemon=True)
 					act.start()
+			else:
+				print("irrelavant orders from:",symbol)
+
+
+
+		# if symbol in self.running_order or code in self.order_book: 
+		# 	#establish id for the ones not seet up.
+		# 	if symbol not in self.running_order:  #i dont understand this part anymore.
+		# 		init = True
+		# 	else:
+		# 		if self.running_order[symbol] =="":
+		# 			init = True
+
+		# 	id_=self.order_book[code]
+		# 	status = self.order_tkstring[id_]["algo_status"].get()
+
+			# if init:   #send a chekcing procedure. check if the stoporder is done. 
+			# 	if status=="Deployed" or status=="Deploying":
+			# 		act = threading.Thread(target=self.order_activation,args=(id_,symbol,price,shares,side), daemon=True)
+			# 		act.start()
 					# id_ = self.order_book[code]
 					# self.running_order[symbol] = id_
 					# self.order_tkstring[id_]["algo_status"].set("Running")
 					# self.order_tklabels[id_]["algo_status"]["background"] = "#97FEA8" #set the label to be, green.	
-			else:
-				self.order_process(symbol,price,shares,side)
+		# 	else:
+		# 		self.order_process(symbol,price,shares,side)
 
 
 	def order_process(self,symbol,price,shares,side):
@@ -1005,7 +1025,7 @@ class algo_manager(pannel):
 
 						if price >= self.price_levels[id_][current_level]:
 
-							print("target reached,level:",current_level,"New stoploss:",self.price_levels[id_][current_level-1])
+							
 							#shake of 1/3 
 							share = min(int(int(self.target_share[id_])//3),self.current_share[id_])
 
@@ -1021,6 +1041,8 @@ class algo_manager(pannel):
 
 							self.price_current_level[id_]+=1 
 
+							print(symbol,": target reached,level:",current_level,"New stoploss:",self.price_levels[id_][current_level-1])
+
 				elif self.position[id_]=="Short":
 					price = ask
 					gain = round(self.average_price[id_]-price,4)
@@ -1033,7 +1055,7 @@ class algo_manager(pannel):
 						
 						if price <= self.price_levels[id_][current_level]:
 
-							print("target reached,level:",current_level)
+							
 							#shake of 1/3 
 							share = min(int(int(self.target_share[id_])//3),self.current_share[id_])
 							if current_level==3: share=int(self.current_share[id_])
@@ -1047,6 +1069,8 @@ class algo_manager(pannel):
 
 							self.price_current_level[id_]+=1 
 
+
+							print(symbol,": target reached,level:",current_level,"New stoploss:",self.price_levels[id_][current_level-1])
 
 
 				if self.current_share[id_] >0:
@@ -1367,8 +1391,8 @@ if __name__ == '__main__':
 
 	root = tk.Tk() 
 	root.title("GoodTrade Algo Manager") 
-	root.geometry("1600x800")
-	root.minsize(1600, 800)
+	root.geometry("1600x1000")
+	root.minsize(1600, 1000)
 	root.maxsize(1800, 1200)
 
 	view = algo_manager(root,port,goodtrade_pipe,ppro_pipe,ppro_pipe_end)

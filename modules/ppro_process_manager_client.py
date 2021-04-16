@@ -51,6 +51,7 @@ class ppro_process_manager:
 
 		#put the receive in corresponding box.
 
+		time.sleep(10)
 		temp = {}
 
 		while True:
