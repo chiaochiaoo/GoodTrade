@@ -95,6 +95,8 @@ class algo_manager(pannel):
 		self.stoporder_to_id ={}
 		self.id_to_stoporder = {}
 
+		self.used_stoporder = {}
+
 		self.pipe = gt_pipe
 		self.order_pipe = order_pipe
 
@@ -156,6 +158,9 @@ class algo_manager(pannel):
 
 		self.order_info = {}
 
+
+		self.current_ask = {}
+		self.current_bid = {}
 
 		self.flatten_lock = {}
 		
@@ -365,6 +370,8 @@ class algo_manager(pannel):
 			self.id_lock[id_] = threading.Lock()
 
 			self.flatten_lock[id_] = threading.Lock()
+
+			self.used_stoporder[id_] = False
 
 			self.order_tkstring[id_] = {}
 
@@ -769,7 +776,7 @@ class algo_manager(pannel):
 
 		if id_ != "":
 			current = self.current_share[id_]
-			print("symbol",symbol,"side:",side,"shares",shares,"price",price)
+			print("order",symbol,"side:",side,"shares",shares,"price",price)
 
 
 			if (self.position[id_]=="Long" and side =="B") or (self.position[id_]=="Short" and (side =="S" or side=="T")):
@@ -1105,8 +1112,12 @@ class algo_manager(pannel):
 
 	#Utilities. 
 	def refresh_support_resistence(self,symbol,ask,bid):
+
 		try:
 			if symbol in self.symbols_orders:
+
+				self.current_ask[symbol] = ask
+				self.current_bid[symbol] = bid
 				for id_ in self.symbols_orders[symbol]:
 					change = False
 					if self.order_tkstring[id_]["algo_status"].get() == "Pending" and self.order_tkstring[id_]["auto_range"].get()==True:
