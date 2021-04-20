@@ -321,7 +321,10 @@ class stop:
 
 			self.sync_lock = True
 
-			share = int(float_plus(totalrisk.get())//float_plus(perrisk.get()))
+			try:
+				share = int(float_plus(totalrisk.get())//float_plus(perrisk.get()))
+			except:
+				share=0
 
 			self.entry.set_share(str(share))
 
