@@ -3,6 +3,8 @@ import multiprocessing
 import time
 import re
 import pip
+import socket
+import pickle
 
 try:
     from finviz.screener import Screener
@@ -10,19 +12,13 @@ except ImportError:
     pip.main(['install', 'finviz'])
     from finviz.screener import Screener
 
-try:
-    from bs4 import BeautifulSoup
-except ImportError:
-    pip.main(['install', 'BeautifulSoup4'])
-    from bs4 import BeautifulSoup
 
-try:
-    from selenium import webdriver
-except ImportError:
-    pip.main(['install', 'selenium'])
-    from selenium import webdriver
-# A mini thread of the main thread. 
-# Sleep normally.
+HOST = '10.29.10.132'  # Standard loopback interface address (localhost)
+PORT = 65423        # Port to listen on (non-privileged ports are > 1023)
+
+# Now . I need to connect it. what do i do.
+# 1. connect to the database. 
+
 
 
 class scanner_process_manager:
@@ -31,13 +27,18 @@ class scanner_process_manager:
 		self.downloading = False
 		self.downloading2 = False
 		self.request = request_pipe
-		self.pannel = None
+		self.scanner = None
 
-		auto_refresh = threading.Thread(target=self.auto_refresh_nasdaq_trader, daemon=True)
-		auto_refresh.start()
+		#bond the port
+
+		#start receiving. nonstop. 
+		receive = threading.Thread(name="Reiceive info",target=self.receive_request, daemon=True)
+		receive.start()
+
+
 
 	def set_pannel(self,scanner_pannel):
-		self.pannel = scanner_pannel
+		self.scanner = scanner_pannel
 
 
 	def adding_comlete(self):
@@ -48,72 +49,51 @@ class scanner_process_manager:
 
 	def send_request(self,cond,market_,type_,cap):
 		if(self.downloading == True):
-			self.pannel.status_change("Downloading in progress")
+			self.scanner.status_change("Downloading in progress")
 			#print("Already downloading")
 		else:
 			self.downloading = True
-			self.pannel.status_change("Downloading in progress")
+			self.scanner.status_change("Downloading in progress")
 			self.request.send(["f",cond,market_,type_,cap])
 			#when success, put it False. ... Put on a thread to receive it.
 			#HERE,.... seperate a thread to run it.
-			receive = threading.Thread(name="Reiceive info",target=self.receive_request, daemon=True)
-			receive.start()
-
-
-	def auto_refresh_nasdaq_trader(self):
-
-		time.sleep(10)
-		while True:
-			self.refresh_nasdaq_trader()
-			time.sleep(60)
-
-
-	def refresh_nasdaq_trader(self):
-
-		if(self.downloading2 == True):
-			self.pannel.status_nasdaqchange("Updating in progress")
-
-		else:
-			self.downloading2 = True
-			self.request.send(["n"])
-
-			receive = threading.Thread(name="Reiceive info",target=self.receive_request, daemon=True)
-			receive.start()
-
-
-
 
 	def receive_request(self):
-		d = self.request.recv()
+
+		count = 0
+		while True:
+			d = self.request.recv()
+			count +=1
+			#print("manager info received",count,d[1])
+
+			if d[0]=="pkg":
+				try:
+					self.scanner.add_nasdaq_labels(d[1])
+				except Exception as e:
+					print("Error updating Nasdaq:",e)
+
+			elif d[0] =="termination":
+				break
+
+			else:
+				try:
+					self.scanner.add_labels(d)
+				except Exception as e:
+					print("Error updating finviz:",e)
 
 		#print(d)
 		#check if it is normal type?
-		if d[0]=="Nasdaq":
-			self.pannel.add_nasdaq_labels(d)
-		else:
-			self.pannel.add_labels(d)
+		# if d[0]=="Nasdaq":
+		# 	self.scanner.add_nasdaq_labels(d)
+		# else:
+		# 	self.scanner.add_labels(d)
 
 def multi_processing_scanner(pipe_receive):
 
 	sucess = False
 
-	while not sucess:
-
-		try:
-			PATH = "./network/chromedriver.exe"
-			driver = webdriver.Chrome(PATH)
-			driver.get('http://www.nasdaqtrader.com/')
-			# driver.find_element_by_id('tab4').click()
-			# time.sleep(1)
-			# driver.find_element_by_id('ahButton').click()
-			time.sleep(1)
-			sucess= True
-			print("Database online")
-		except:
-			#self.pannel.status_nasdaqchange("Problem accessing server")
-			sucess= False
-
-	#self.pannel.status_nasdaqchange("Ready")
+	receive = threading.Thread(name="NT",target=client_scanner, daemon=True)
+	receive.start()
 
 	while True:
 
@@ -130,58 +110,9 @@ def multi_processing_scanner(pipe_receive):
 			#send back.
 			pipe_receive.send(d)
 
-		elif order_type =="n":
-			driver.find_element_by_id('tab4').click()
-			time.sleep(1)
-			driver.find_element_by_id('ahButton').click()
-			time.sleep(1)
-			sucess = False
-
-			while not sucess:
-				try:
-					soup = BeautifulSoup(driver.page_source, 'html.parser')
-
-					t = soup.find(text=re.compile('Last updated*'))
-
-					data = []
-					table = soup.find('div', attrs={'id':'asGrid'})
-
-					try:
-
-						table = table.find('div')
-						table_body = table.findAll('tbody')[1]
-
-						for i in table_body.findAll('tr'):
-						    col =i.find_all('td')
-						    cols = [ele.text.strip() for ele in col]
-						    data.append(cols)
-					except:
-						data = []
-
-					data2 = []
-
-					try:
-						table = soup.find('div', attrs={'id':'ahGrid'})
-
-						table = table.find('div')
-						table_body = table.findAll('tbody')[1]
-
-						for i in table_body.findAll('tr'):
-						    col =i.find_all('td')
-						    cols = [ele.text.strip() for ele in col]
-						    data2.append(cols)
-					except:
-						data2 = []
-
-					pipe_receive.send(["Nasdaq",data,data2,str(t)[:-4]])
-					#self.pannel.status_nasdaqchange("Fetching complete")
-					sucess= True
-				except:
-					#self.pannel.status_nasdaqchange("Problem fetching data")
-					sucess = False
-
 		elif order_type =="terminate":
 			try:
+				pipe_receive.send(["termination"])
 				driver.quit()
 			except:
 				pass
@@ -248,12 +179,73 @@ def refreshstocks(cond,market_,type_,cap):
 
 	return list(stock_list)
 
-	# pannel.add_labels(stock_list)
+	# scanner.add_labels(stock_list)
 
-	# pannel.status.set("Download compelted")
-	# pannel.downloading = False
+	# scanner.status.set("Download compelted")
+	# scanner.downloading = False
 	# print("Scanner download complete")
 
+
+
+###client just indefinitely fetch the package. ###
+def client_scanner(pipe):
+
+	k=""
+	while True:
+
+		HOST = '10.29.10.132'  # The server's hostname or IP address
+		PORT = 65423       # The port used by the server
+
+	
+		print("Trying to connect to the Scanner server")
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		connected = False
+
+		while not connected:
+			try:
+				s.connect((HOST, PORT))
+				connected = True
+			except:
+				#pipe.send(["msg","Cannot connected. Try again in 2 seconds."])
+				print("Cannot connect Scanner server. Try again in 2 seconds.")
+				time.sleep(2)
+
+
+		connection = True
+		pipe.send(["msg","Connection Successful"])
+		print("Scanner server Connection Successful")
+		while connection:
+			# try:
+			# 	s.sendall(b'Alive check')
+			# except:
+			# 	connection = False
+			# 	break
+			data = []
+			print("Scanner client: taking data")
+			while True:
+				try:
+					part = s.recv(2048)
+				except:
+					connection = False
+					break
+				#if not part: break
+				data.append(part)
+				if len(part) < 2048:
+					#try to assemble it, if successful.jump. else, get more. 
+					try:
+						k = pickle.loads(b"".join(data))
+						#k = pd.read_pickle(b"".join(data))
+						break
+					except:
+						pass
+			#k is received. #
+			pipe.send(["pkg",k])
+		print("Server disconnected")
+		pipe.send(["msg","Server disconnected"])
+		# except Exception as e:
+		# 	pipe.send(["msg",e])
+		# 	print(e)
+		#restarted the whole thing 
 
 
 #main part.
