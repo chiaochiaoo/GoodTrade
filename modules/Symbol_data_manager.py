@@ -188,8 +188,9 @@ class Symbol_data_manager:
 		self.symbol_data_openhigh_std,self.symbol_data_openlow_std,self.symbol_data_range_std,
 		self.symbol_data_first5_std,self.symbol_data_first5_vol_std,self.symbol_data_normal5_std,
 		self.symbol_data_normal5_vol_std,
-		self.symbol_data_prev_close_val,self.symbol_data_prev_close_range,self.symbol_data_prev_close_std,self.symbol_data_ATR,
-		self.symbol_data_openhigh_dis,self.symbol_data_openlow_dis,self.symbol_data_range_dis,self.symbol_data_prev_close_dis]
+		self.symbol_data_prev_close_val,self.symbol_data_prev_close_range,self.symbol_data_prev_close_std,self.symbol_data_ATR]
+		#self.symbol_data_openhigh_dis,self.symbol_data_openlow_dis,self.symbol_data_range_dis,self.symbol_data_prev_close_dis
+		
 		self.data_ready = {}
 
 		#self.symbol_data_openhigh_dis,self,symbol_data_openlow_dis,self.symbol_data_range_dis

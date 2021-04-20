@@ -118,9 +118,9 @@ def timestamp_seconds(s):
 
 #print(timestamp_seconds("13:23:46"))
 
-a={}
-a["b"]=1
-a["a"]=2
+# a={}
+# a["b"]=1
+# a["a"]=2
 
-for v,k in a.items():
-	print(v,k)
+# for v,k in a.items():
+# 	print(v,k)
