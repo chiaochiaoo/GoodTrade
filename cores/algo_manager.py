@@ -77,6 +77,7 @@ def algo_manager_voxcom(pipe):
 				#s.sendall(pickle.dumps(["ids"]))
 
 				pipe.send(["pkg",k])
+				s.send(pickle.dumps(["Algo placed",k[2]]))
 			print("Server disconnected")
 			pipe.send(["msg","Server disconnected"])
 		except Exception as e:

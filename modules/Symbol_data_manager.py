@@ -166,6 +166,8 @@ class Symbol_data_manager:
 		self.algo_breakout_down = {}
 		self.algo_breakout_timer = {}
 		self.algo_breakout_type = {}
+
+		self.algo_breakout_placement={}
 		#####
 
 		self.symbol_position_status = {}
@@ -449,6 +451,9 @@ class Symbol_data_manager:
 		self.algo_breakout_up[i].set("")
 		self.algo_breakout_down[i] = StringVar()
 		self.algo_breakout_down[i].set("")
+
+		self.algo_breakout_placement[i] = StringVar()
+		self.algo_breakout_placement[i].set("")
 
 	def change_status(self,symbol,status):
 		self.symbol_status[symbol].set(status)

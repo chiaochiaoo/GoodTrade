@@ -30,10 +30,11 @@ def algo_manager_commlink(pipe):
 				#if something comes from pipe.
 				if pipe.poll(1):
 					data = pipe.recv()
+					print("New order:",data)
 					data=pickle.dumps(data)
 					try:
 						conn.sendall(data)
-						print("sending",data)
+						#print("sending",data)
 					except Exception as e:
 						print(e)
 						Connection=False
@@ -60,7 +61,8 @@ def algo_manager_commlink(pipe):
 									break
 								except:
 									pass
-						print(k)
+						#k is the confirmation from client. send it back to pipe.
+						pipe.send(k)
 
 			except Exception as e:
 				Connection= False

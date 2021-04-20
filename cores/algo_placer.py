@@ -461,7 +461,7 @@ class algo_placer:
 				info.insert(0,id_)
 
 				info.insert(0,"New order")
-				print(info)
+				#print(info)
 
 				if self.commlink!= None:
 					self.commlink.send(info)
