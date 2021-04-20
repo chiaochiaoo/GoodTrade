@@ -189,7 +189,7 @@ class algo_manager(pannel):
 		#960  57600 
 		time.sleep(2)
 		#now = datetime.now()
-		timestamp = 34190
+		timestamp = 34185
 
 		print("timer start")
 		while True:
