@@ -10,6 +10,8 @@ class pannel:
 		self.tickers_labels = {}
 		self.tickers_tracers = {}
 
+
+		self.reverse = True
 		self.tm = ttk.LabelFrame(frame) 
 		self.tm.place(x=0, y=40, relheight=0.85, relwidth=1)
 
@@ -62,12 +64,50 @@ class pannel:
 			print("destroyed labels")
 
 
+	def sort_cur_range(self,d=None):
+
+		#get all range,put in a dictionary.
+		if d!=None:
+			l = self.data.get_list()
+			rank= {}
+			for symbol in l:
+				rank[symbol] = d[symbol].get()
+
+			self.reverse = False if self.reverse else True
+			rank = sorted(rank.items(), reverse=self.reverse,key=lambda x: x[1])
+
+			new_ranking = {}
+			for i in range(len(rank)):
+				new_ranking[rank[i][0]]=i
+
+		else: #just sort alphabestcially 
+
+			l = self.data.get_list()
+
+			self.reverse = False if self.reverse else True
+			l = sorted(l,reverse=self.reverse)
+
+			new_ranking = {}
+			for i in range(len(l)):
+				new_ranking[l[i]]=i
+
+		self.redraw(new_ranking)
+			
+	def redraw(self,symbol_list):
+		#only change the grid position
+		print(symbol_list)
+		for key,value in symbol_list.items():
+			for j in range(len(self.labels)):
+				self.tickers_labels[key][j].grid(row=symbol_list[key]+2,column=j,padx=0)
+
 
 	def labels_creator(self,frame,cmd=None):
 
 		if cmd ==None:
 			for i in range(len(self.labels)): #Rows
 				self.b = tk.Button(frame, text=self.labels[i],width=self.width[i])#command=self.rank
+				if self.labels[i]=="Ticker":
+					self.b["command"]=lambda:self.sort_cur_range(None)
 				self.b.configure(activebackground="#f9f9f9")
 				self.b.configure(activeforeground="black")
 				self.b.configure(background="#d9d9d9")
@@ -84,6 +124,8 @@ class pannel:
 					self.b = tk.Button(frame, text=self.labels[i],width=self.width[i])#command=self.rank
 				else:
 					self.b = tk.Button(frame, text=self.labels[i],width=self.width[i],command=cmd[self.labels[i]])#command=self.rank
+				if self.labels[i]=="Ticker":
+					self.b["command"]=lambda:self.sort_cur_range(None)
 				self.b.configure(activebackground="#f9f9f9")
 				self.b.configure(activeforeground="black")
 				self.b.configure(background="#d9d9d9")

@@ -119,30 +119,7 @@ class alert(pannel):
 
 	#any alert will need a threshold. deviation. std. 
 
-	def sort_cur_range(self,d):
 
-		#get all range,put in a dictionary.
-
-		l = self.data.get_list()
-		rank= {}
-		for symbol in l:
-			rank[symbol] = d[symbol].get()
-
-		self.reverse = False if self.reverse else True
-		rank = sorted(rank.items(), reverse=self.reverse,key=lambda x: x[1])
-
-		new_ranking = {}
-		for i in range(len(rank)):
-			new_ranking[rank[i][0]]=i
-
-		self.redraw(new_ranking)
-
-	def redraw(self,symbol_list):
-		#only change the grid position
-		print(symbol_list)
-		for key,value in symbol_list.items():
-			for j in range(len(self.labels)):
-				self.tickers_labels[key][j].grid(row=symbol_list[key]+2,column=j,padx=0)
 
 	def add_symbol(self,symbol,format,alert_positions,alerts,data_ready):
 
@@ -672,30 +649,32 @@ class alert_map(pannel):
 		self.label_count +=1
 
 		self.rebind(self.canvas,self.frame)
-	def sort_cur_range(self,d):
 
-		#get all range,put in a dictionary.
+	# def sort_cur_range(self,d):
 
-		l = self.data.get_list()
-		rank= {}
-		for symbol in l:
-			rank[symbol] = d[symbol].get()
+	# 	#get all range,put in a dictionary.
 
-		self.reverse = False if self.reverse else True
-		rank = sorted(rank.items(), reverse=self.reverse,key=lambda x: x[1])
+	# 	l = self.data.get_list()
+	# 	rank= {}
+	# 	for symbol in l:
+	# 		rank[symbol] = d[symbol].get()
 
-		new_ranking = {}
-		for i in range(len(rank)):
-			new_ranking[rank[i][0]]=i
+	# 	self.reverse = False if self.reverse else True
+	# 	rank = sorted(rank.items(), reverse=self.reverse,key=lambda x: x[1])
 
-		self.redraw(new_ranking)
+	# 	new_ranking = {}
+	# 	for i in range(len(rank)):
+	# 		new_ranking[rank[i][0]]=i
 
-	def redraw(self,symbol_list):
-		#only change the grid position
-		print(symbol_list)
-		for key,value in symbol_list.items():
-			for j in range(len(self.labels)):
-				self.tickers_labels[key][j].grid(row=symbol_list[key]+2,column=j,padx=0)
+	# 	self.redraw(new_ranking)
+
+	# def redraw(self,symbol_list):
+	# 	#only change the grid position
+	# 	print(symbol_list)
+	# 	for key,value in symbol_list.items():
+	# 		for j in range(len(self.labels)):
+	# 			self.tickers_labels[key][j].grid(row=symbol_list[key]+2,column=j,padx=0)
+				
 	def delete_symbol(self,symbol):
 		for i in self.tickers_tracers[symbol]:
 			i[0].trace_vdelete("w",i[1])
@@ -725,7 +704,6 @@ class highlow(alert):
 		command["Evaluation"] = lambda :self.sort_cur_range(self.data.alert_hl_val)
 
 		self.labels_creator(self.frame,command)
-
 
 
 	def add_symbol(self,symbol):
