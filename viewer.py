@@ -385,7 +385,7 @@ if __name__ == '__main__':
 	authen_comm, authen_clientside_comm = multiprocessing.Pipe()
 	auth = multiprocessing.Process(target=authentication, args=(authen_comm,),daemon=True)
 	auth.daemon=True
-	auth.start()
+	#auth.start()
 
 
 	### algo comms 
