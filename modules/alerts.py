@@ -161,7 +161,7 @@ class alert(pannel):
 
 		self.symbol_ranking[symbol]= l
 
-		print(self.symbol_ranking)
+		#print(self.symbol_ranking)
 
 		for j in range(len(format)):
 
