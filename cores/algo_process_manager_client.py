@@ -55,35 +55,53 @@ class algo_process_manager_client:
 		temp = {}
 
 		while True:
-			info = self.gt_pipe.recv()
-			
-			#id, symbol, type, status, description, position, shares, risk$
-			message_type= info[0]
 
-			if message_type =="New order":
-				id_, symbol, type_, status, description, position ,order_type,order_price,shares, risk = info[1],info[2],info[3],info[4],info[5],info[6],info[7],info[8],info[9],info[10]
-				print("Algo manager :",id_, symbol, type_, status, description, position ,order_type,order_price,shares, risk )
+			if self.gt_pipe.poll(1):
+				info = self.gt_pipe.recv()
+				
+				#id, symbol, type, status, description, position, shares, risk$
+				message_type= info[0]
 
-				self.process_pipe.send(info)
+				if message_type =="New order":
+					id_, symbol, type_, status, description, position ,order_type,order_price,shares, risk = info[1],info[2],info[3],info[4],info[5],info[6],info[7],info[8],info[9],info[10]
+					#print("New order: :",id_, symbol, type_, status, description, position ,order_type,order_price,shares, risk )
 
-				if status == "Pending":
+					self.process_pipe.send(info)
 
-					#set it up. on GoodTrade. 
+				# elif message_type =="Confirmed":
+				# 	id_ = info[1]
+				# 	print("Algo manager:",id_,"confirmed")
+				# 	self.process_pipe.send(info)
 
-					if type_ == "Breakup":
+					# if status == "Pending":
 
-						#status, id. symbol.
-						#self.data.algo_breakout_status[symbol].set(status)
-						self.data.algo_breakout_up[symbol].set(id_)
+					# 	#set it up. on GoodTrade. 
 
-					elif type_ == "Breakdown":
-						#self.data.algo_breakout_status[symbol].set(status)
-						self.data.algo_breakout_down[symbol].set(id_)
+					# 	if type_ == "Breakup":
 
-			elif message_type =="Confirmed":
-				id_ = info[1]
-				print("Algo manager:",id_,"confirmed")
-				self.process_pipe.send(info)
+					# 		#status, id. symbol.
+					# 		#self.data.algo_breakout_status[symbol].set(status)
+					# 		self.data.algo_breakout_up[symbol].set(id_)
+
+					# 	elif type_ == "Breakdown":
+					# 		#self.data.algo_breakout_status[symbol].set(status)
+					# 		self.data.algo_breakout_down[symbol].set(id_)
+
+			if self.process_pipe.poll(1):
+
+				info = self.process_pipe.recv()
+
+				type_ = info[0]
+				symbol = info[1]
+
+				print(info)
+				if type_ =="Algo placed":
+
+					#button. 
+
+					self.data.algo_breakout_placement[symbol].set("Placed")
+
+
 
 			
 			
