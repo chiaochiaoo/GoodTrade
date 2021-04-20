@@ -275,7 +275,8 @@ def multi_processing_price(pipe_receive):
 			#send each dictionary. 
 			#pipe_receive.send(data)
 	except Exception as e:
-		pipe_receive.send(["message",e])
+		print("error:",e)
+		#pipe_receive.send(["message",e])
 
 def find_between(data, first, last):
 	try:
