@@ -30,6 +30,18 @@ global coecoefficient
 coefficient = 1
 
 
+#Thoughts:
+#Combine PPRO sutff with VOXCOM into one process.
+
+#Create subclass for the algo manager.
+
+#Entry strategy 
+
+#Manage strategy
+
+#How to get the machine to read chart?
+
+
 def algo_manager_voxcom(pipe):
 
 	#tries to establish commuc
