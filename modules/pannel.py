@@ -63,18 +63,36 @@ class pannel:
 
 
 
-	def labels_creator(self,frame):
-		for i in range(len(self.labels)): #Rows
-			self.b = tk.Button(frame, text=self.labels[i],width=self.width[i])#command=self.rank
-			self.b.configure(activebackground="#f9f9f9")
-			self.b.configure(activeforeground="black")
-			self.b.configure(background="#d9d9d9")
-			self.b.configure(disabledforeground="#a3a3a3")
-			self.b.configure(relief="ridge")
-			self.b.configure(foreground="#000000")
-			self.b.configure(highlightbackground="#d9d9d9")
-			self.b.configure(highlightcolor="black")
-			self.b.grid(row=1, column=i)
+	def labels_creator(self,frame,cmd=None):
+
+		if cmd ==None:
+			for i in range(len(self.labels)): #Rows
+				self.b = tk.Button(frame, text=self.labels[i],width=self.width[i])#command=self.rank
+				self.b.configure(activebackground="#f9f9f9")
+				self.b.configure(activeforeground="black")
+				self.b.configure(background="#d9d9d9")
+				self.b.configure(disabledforeground="#a3a3a3")
+				self.b.configure(relief="ridge")
+				self.b.configure(foreground="#000000")
+				self.b.configure(highlightbackground="#d9d9d9")
+				self.b.configure(highlightcolor="black")
+				self.b.grid(row=1, column=i)
+		else:
+			for i in range(len(self.labels)): #Rows
+
+				if self.labels[i] not in cmd:
+					self.b = tk.Button(frame, text=self.labels[i],width=self.width[i])#command=self.rank
+				else:
+					self.b = tk.Button(frame, text=self.labels[i],width=self.width[i],command=cmd[self.labels[i]])#command=self.rank
+				self.b.configure(activebackground="#f9f9f9")
+				self.b.configure(activeforeground="black")
+				self.b.configure(background="#d9d9d9")
+				self.b.configure(disabledforeground="#a3a3a3")
+				self.b.configure(relief="ridge")
+				self.b.configure(foreground="#000000")
+				self.b.configure(highlightbackground="#d9d9d9")
+				self.b.configure(highlightcolor="black")
+				self.b.grid(row=1, column=i)
 
 
 def timestamp(s):
@@ -99,3 +117,10 @@ def timestamp_seconds(s):
 		return 0
 
 #print(timestamp_seconds("13:23:46"))
+
+a={}
+a["b"]=1
+a["a"]=2
+
+for v,k in a.items():
+	print(v,k)

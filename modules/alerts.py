@@ -100,6 +100,8 @@ class alert(pannel):
 
 		super().__init__(frame)
 
+
+		self.reverse = True
 		self.alert_pannel=alert_pannel
 		self.data = data
 
@@ -110,9 +112,38 @@ class alert(pannel):
 
 		self.breakout_time = {}
 
+
+		self.symbol_ranking = {}
+
 		#init the labels. 
 
 	#any alert will need a threshold. deviation. std. 
+
+	def sort_cur_range(self,d):
+
+		#get all range,put in a dictionary.
+
+		l = self.data.get_list()
+		rank= {}
+		for symbol in l:
+			rank[symbol] = d[symbol].get()
+
+		self.reverse = False if self.reverse else True
+		rank = sorted(rank.items(), reverse=self.reverse,key=lambda x: x[1])
+
+		new_ranking = {}
+		for i in range(len(rank)):
+			new_ranking[rank[i][0]]=i
+
+		self.redraw(new_ranking)
+
+	def redraw(self,symbol_list):
+		#only change the grid position
+		print(symbol_list)
+		for key,value in symbol_list.items():
+			for j in range(len(self.labels)):
+				self.tickers_labels[key][j].grid(row=symbol_list[key]+2,column=j,padx=0)
+
 	def add_symbol(self,symbol,format,alert_positions,alerts,data_ready):
 
 		#init the alert value
@@ -127,6 +158,10 @@ class alert(pannel):
 		self.tickers_labels[symbol] = []
 		self.tickers_tracers[symbol] = []
 		i = symbol
+
+		self.symbol_ranking[symbol]= l
+
+		print(self.symbol_ranking)
 
 		for j in range(len(format)):
 
@@ -232,6 +267,14 @@ class alert(pannel):
 				self.tickers_labels[i].append(tk.Entry(self.frame ,textvariable=format[j],width=self.width[j]))
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 
+			elif j==len(format)-1:
+				support,resistence = format[3],format[4]
+				timer_trade = format[11]
+				type_trade = format[10]
+				info = [symbol,support,resistence,timer_trade,type_trade,default_risk]
+				self.tickers_labels[i].append(tk.Button(self.frame,textvariable=format[j],width=10,command = lambda info=info: self.break_out_trade(info)))
+				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
+
 			elif j>1:
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
@@ -244,14 +287,7 @@ class alert(pannel):
 
 		#symbol,status,checker,support,resistance ,range_,atr,cur_price,eva,algo_status,trigger_type,trigger_timer]
 
-		support,resistence = format[3],format[4]
-		timer_trade = format[11]
-		type_trade = format[10]
 
-		info = [symbol,support,resistence,timer_trade,type_trade,default_risk]
-		j+=1
-		self.tickers_labels[i].append(tk.Button(self.frame,width=10,command = lambda info=info: self.break_out_trade(info)))
-		self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 		#self.ticker_count +=1
 		self.label_count +=1
 
@@ -576,12 +612,23 @@ class alert(pannel):
 
 class alert_map(pannel):
 	def __init__(self,frame,data):
+
+		self.reverse= True
 		super().__init__(frame)
 
 		self.labels = ["Ticker","Status","Prev Close","High-Low","Open-High","Open-Low","Open Range","Open Vol","5m Range","5m Vol"]
 		self.width = [8,10,8,8,8,8,8,8,8,8]
-		self.labels_creator(self.frame)
 
+		command={}
+		command["Prev Close"] = lambda :self.sort_cur_range(self.data.alert_prev_val)
+		command["High-Low"] = lambda :self.sort_cur_range(self.data.alert_hl_val)
+		command["Open-High"] = lambda :self.sort_cur_range(self.data.alert_oh_val)
+		command["Open-Low"] = lambda :self.sort_cur_range(self.data.alert_ol_val)
+		command["Open Range"] = lambda :self.sort_cur_range(self.data.alert_openning_rg_val)
+		command["Open Vol"] = lambda :self.sort_cur_range(self.data.alert_openning_vol_val)
+		command["5m Range"] = lambda :self.sort_cur_range(self.data.alert_recent5_rg)
+		command["5m Vol"] = lambda :self.sort_cur_range(self.data.alert_recent5_vol)
+		self.labels_creator(self.frame,command)
 		self.alert_base = []
 
 		self.data = data
@@ -625,7 +672,30 @@ class alert_map(pannel):
 		self.label_count +=1
 
 		self.rebind(self.canvas,self.frame)
+	def sort_cur_range(self,d):
 
+		#get all range,put in a dictionary.
+
+		l = self.data.get_list()
+		rank= {}
+		for symbol in l:
+			rank[symbol] = d[symbol].get()
+
+		self.reverse = False if self.reverse else True
+		rank = sorted(rank.items(), reverse=self.reverse,key=lambda x: x[1])
+
+		new_ranking = {}
+		for i in range(len(rank)):
+			new_ranking[rank[i][0]]=i
+
+		self.redraw(new_ranking)
+
+	def redraw(self,symbol_list):
+		#only change the grid position
+		print(symbol_list)
+		for key,value in symbol_list.items():
+			for j in range(len(self.labels)):
+				self.tickers_labels[key][j].grid(row=symbol_list[key]+2,column=j,padx=0)
 	def delete_symbol(self,symbol):
 		for i in self.tickers_tracers[symbol]:
 			i[0].trace_vdelete("w",i[1])
@@ -639,6 +709,7 @@ class alert_map(pannel):
 
 
 
+
 class highlow(alert):
 
 	def __init__(self,frame,data:Symbol_data_manager,alert_panel:all_alerts):
@@ -647,7 +718,15 @@ class highlow(alert):
 
 		self.labels = ["Ticker","Status","Cur Range","Cur High","Cur Low","H. Avg","H. Std","H. Range","Evaluation"]
 		self.width = [8,10,7,7,7,7,7,9,15]
-		self.labels_creator(self.frame)
+
+		#a dictionary. labels: function
+		command={}
+		command["H. Avg"] = lambda :self.sort_cur_range(self.data.symbol_data_range_val)
+		command["Evaluation"] = lambda :self.sort_cur_range(self.data.alert_hl_val)
+
+		self.labels_creator(self.frame,command)
+
+
 
 	def add_symbol(self,symbol):
 
@@ -683,6 +762,9 @@ class highlow(alert):
 		#self,symbol,format,width,val_position,alert_position,alert_vals
 		super().add_symbol(symbol,labels,alert_positions,alerts,data_ready)
 
+	def print(self):
+		print("hello")
+
 	#find a way to bound the special checking value to. hmm. every update.
 
 class openhigh(alert):
@@ -693,7 +775,12 @@ class openhigh(alert):
 
 		self.labels = ["Ticker","Status","Cur Range","Cur Open","Cur High","H. Avg","H. Std","H. Range","Evaluation"]
 		self.width = [8,10,7,7,7,7,7,9,15]
-		self.labels_creator(self.frame)
+
+		command={}
+		command["H. Avg"] = lambda :self.sort_cur_range(self.data.symbol_data_openhigh_val)
+		command["Evaluation"] = lambda :self.sort_cur_range(self.data.alert_oh_val)
+
+		self.labels_creator(self.frame,command)
 
 	def add_symbol(self,symbol):
 
@@ -740,7 +827,12 @@ class openlow(alert):
 
 		self.labels = ["Ticker","Status","Cur Range","Cur Open","Cur Low","H. Avg","H. Std","H. Range","Evaluation"]
 		self.width = [8,10,7,7,7,7,7,9,15]
-		self.labels_creator(self.frame)
+
+		command={}
+		command["H. Avg"] = lambda :self.sort_cur_range(self.data.symbol_data_openlow_val)
+		command["Evaluation"] = lambda :self.sort_cur_range(self.data.alert_ol_val)
+
+		self.labels_creator(self.frame,command)
 
 	def add_symbol(self,symbol):
 
@@ -837,7 +929,12 @@ class prevclose(alert):
 
 		self.labels = ["Ticker","Status","Prev Close","Cur Range","H. Avg","H. Std","H. Range","Evaluation"]
 		self.width = [8,10,7,7,7,7,15,15]
-		self.labels_creator(self.frame)
+
+		command={}
+		command["H. Avg"] = lambda :self.sort_cur_range(self.data.symbol_data_prev_close_val)
+		command["Evaluation"] = lambda :self.sort_cur_range(self.data.alert_prev_val)
+
+		self.labels_creator(self.frame,command)
 
 	def add_symbol(self,symbol):
 
@@ -885,7 +982,12 @@ class firstfive(alert):
 
 		self.labels = ["Ticker","Status","Cur Range","H. Avg","H. Std","H. Range","Cur Vol","H.Vol Avg","H.Vol Std","H.Vol Range","Evaluation:Range","Evaluation:Volume"]
 		self.width = [8,10,7,7,7,7,7,7,7,12,14,15,15]
-		self.labels_creator(self.frame)
+
+		command={}
+		command["H. Avg"] = lambda :self.sort_cur_range(self.data.symbol_data_first5_val)
+		command["Evaluation:Range"] = lambda :self.sort_cur_range(self.data.alert_openning_rg_val)
+
+		self.labels_creator(self.frame,command)
 
 	def add_symbol(self,symbol):
 
@@ -1152,6 +1254,7 @@ class breakout(alert):
 		self.tickers_tracers[symbol].append((resistance,n))
 
 
+		algo_placement = self.data.algo_breakout_placement[symbol]
 
 		eva= self.data.symbol_data_breakout_eval[symbol]
 
@@ -1171,7 +1274,7 @@ class breakout(alert):
 
 		#cur, mean, std. symbol, time. 
 		alertvals= [symbol,time,cur_price,support,resistance ,alert_type]
-		labels = [symbol,status,checker,support,resistance ,range_,atr,cur_price,eva,algo_trade,trigger_type,trigger_timer]
+		labels = [symbol,status,checker,support,resistance ,range_,atr,cur_price,eva,algo_trade,trigger_type,trigger_timer,algo_placement]
 
 		#any alert will need a threshold. deviation. std. or type.
 
