@@ -26,6 +26,9 @@ global connection_error
 
 global yahoo_same_time
 yahoo_same_time = 0
+
+
+TEST = False
 ##################################################################
 ####  pipe in, symbol. if symbol not reg, reg. if reg, dereg  ####
 ####  main loop. for each reg, thread out and return.		  ####
@@ -270,7 +273,7 @@ def multi_processing_price(pipe_receive):
 					info = threading.Thread(target=getinfo,args=(i,pipe_receive,), daemon=True)
 					info.start()
 
-			#print("Registed list:",reg_list)
+			print("Registed list:",len(reg_list))
 			time.sleep(2.5)
 			#send each dictionary. 
 			#pipe_receive.send(data)
@@ -335,7 +338,10 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 		success = False
 		while not success:
 			try:
-				range_data=fetch_yahoo(symbol[:-3])
+				if TEST:
+					range_data=[price,price,price,price,0,0]
+				else:
+					range_data=fetch_yahoo(symbol[:-3])
 				success = True
 				print("yahoo success on ",symbol)
 			except:
