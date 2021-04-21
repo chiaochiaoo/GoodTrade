@@ -89,6 +89,9 @@ class scanner_process_manager:
 
 def multi_processing_scanner(pipe_receive):
 
+	# receive = threading.Thread(name="Reiceive info",target=client_scanner,args=(pipe_receive,),daemon=True)
+	# receive.start()
+
 	sucess = False
 
 	while True:

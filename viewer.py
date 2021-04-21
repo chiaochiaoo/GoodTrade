@@ -339,6 +339,26 @@ def authentication(pipe):
     #restarted the whole thing 
 
 
+#Utility 
+
+def utils(scanner_sending_pipe,db_sending_pipe,algo_manager_receive_comm):
+
+	scanner1 = threading.Thread(target=multi_processing_scanner,args=(scanner_sending_pipe,),daemon=True)
+	scanner1.start()
+
+	scanner2 = threading.Thread(target=client_scanner,args=(scanner_sending_pipe,),daemon=True)
+	scanner2.start()
+
+	db = threading.Thread(target=multi_processing_database,args=(db_sending_pipe,),daemon=True)
+	db.start()
+
+
+	algo_manager_commlink(algo_manager_receive_comm)
+
+	# algo_comm = threading.Thread(target=algo_manager_commlink,args=(algo_manager_receive_comm,),daemon=True)
+	# algo_comm.start()
+
+
 if __name__ == '__main__':
 
 	#try:
@@ -347,26 +367,30 @@ if __name__ == '__main__':
 
 
 	#### SCANNER SUB PROCESS####
-	request_scanner, receive_pipe = multiprocessing.Pipe()
+	scanner_request_scanner, scanner_sending_pipe = multiprocessing.Pipe()
 
-	process_scanner = multiprocessing.Process(target=multi_processing_scanner, args=(receive_pipe,),daemon=True)
+	process_scanner = multiprocessing.Process(target=multi_processing_scanner, args=(scanner_sending_pipe,),daemon=True)
 	process_scanner.daemon=True
-	process_scanner.start()
+	#process_scanner.start()
 
-	process_scanner_b = multiprocessing.Process(target=client_scanner, args=(receive_pipe,),daemon=True)
+
+	process_scanner_b = multiprocessing.Process(target=client_scanner, args=(scanner_sending_pipe,),daemon=True)
 	process_scanner_b.daemon=True
-	process_scanner_b.start()
+	#process_scanner_b.start()
 
-	s = scanner_process_manager(request_scanner)
+	s = scanner_process_manager(scanner_request_scanner)
 
 	#### DATABASE SUB PROCESS####
 
-	request_database, receive_database = multiprocessing.Pipe()
-	process_database = multiprocessing.Process(target=multi_processing_database, args=(receive_database,),daemon=True)
+	db_request_pipe, db_sending_pipe = multiprocessing.Pipe()
+	process_database = multiprocessing.Process(target=multi_processing_database, args=(db_sending_pipe,),daemon=True)
 	process_database.daemon=True
-	process_database.start()
+	#process_database.start()
 
-	d = database_process_manager(request_database)
+	d = database_process_manager(db_request_pipe)
+
+
+
 
 	### ppro update SUB PROCESS####
 
@@ -380,25 +404,33 @@ if __name__ == '__main__':
 	### scanner pannel needs the manager. 
 
 
-
-
 	authen_comm, authen_clientside_comm = multiprocessing.Pipe()
-	auth = multiprocessing.Process(target=authentication, args=(authen_comm,),daemon=True)
-	auth.daemon=True
+	# auth = multiprocessing.Process(name="Authentica",target=authentication, args=(authen_comm,),daemon=True)
+	# auth.daemon=True
 	#auth.start()
 
 
 	### algo comms 
 	algo_manager_comm, algo_manager_thread_comm = multiprocessing.Pipe()
-
 	algo_manager_receive_comm, algo_manager_process_comm = multiprocessing.Pipe()
 	
 	algo_comm_link = multiprocessing.Process(target=algo_manager_commlink, args=(algo_manager_receive_comm,),daemon=True)
 	algo_comm_link.daemon=True
-	algo_comm_link.start()
+	#algo_comm_link.start()
 
 	algo_manager = algo_process_manager_client(algo_manager_thread_comm,algo_manager_process_comm)
 	
+	#UTIL#
+
+	utility = multiprocessing.Process(target=utils, args=(scanner_sending_pipe,db_sending_pipe,algo_manager_receive_comm,),daemon=True)
+	utility.daemon=True
+
+	utility.start()
+
+
+
+
+
 	root = tk.Tk() 
 	root.title("GoodTrade") 
 	root.geometry("1800x900")
@@ -413,12 +445,11 @@ if __name__ == '__main__':
 	print("Main process terminated")
 
 
-
-	request_scanner.send(["terminate"])
+	scanner_request_scanner.send(["terminate"])
 	process_database.terminate()
 	process_ppro.terminate()
 
-	request_scanner.recv()
+	scanner_request_scanner.recv()
 
 
 	process_scanner.terminate()
