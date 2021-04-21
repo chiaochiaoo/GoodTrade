@@ -43,6 +43,7 @@ class database_process_manager:
 		self.init = True
 
 	def receive_start(self):
+		#time.sleep(10)
 		receive = threading.Thread(name="Thread: Database info receiver",target=self.receive_request, daemon=True)
 		receive.daemon = True
 		receive.start()
@@ -89,6 +90,7 @@ class database_process_manager:
 
 def multi_processing_database(pipe_receive):
 
+	time.sleep(10)
 	print("Database for Database online")
 	today = date.today().strftime("%m%d")
 

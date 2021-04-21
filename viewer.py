@@ -147,7 +147,7 @@ class ticker_manager(pannel):
 		self.permission_stats.place(x = 600, y =12)
 
 		self.ticker_stats = ttk.Label(frame, text="Current Registered Tickers: "+str(self.ticker_count))
-		#self.ticker_stats.place(x = 800, y =12)
+		self.ticker_stats.place(x = 800, y =12)
 
 		#############Registration Window ####################
 
@@ -343,6 +343,9 @@ def authentication(pipe):
 
 def utils(scanner_sending_pipe,db_sending_pipe,algo_manager_receive_comm):
 
+	time.sleep(5)
+	print("Utils start")
+
 	scanner1 = threading.Thread(target=multi_processing_scanner,args=(scanner_sending_pipe,),daemon=True)
 	scanner1.start()
 
@@ -391,7 +394,6 @@ if __name__ == '__main__':
 
 
 
-
 	### ppro update SUB PROCESS####
 
 	request_pipe, receive_pipe = multiprocessing.Pipe()
@@ -425,10 +427,7 @@ if __name__ == '__main__':
 	utility = multiprocessing.Process(target=utils, args=(scanner_sending_pipe,db_sending_pipe,algo_manager_receive_comm,),daemon=True)
 	utility.daemon=True
 
-	utility.start()
-
-
-
+	
 
 
 	root = tk.Tk() 
@@ -440,6 +439,7 @@ if __name__ == '__main__':
 	root.protocol("WM_DELETE_WINDOW", on_closing)
 
 	view = viewer(root,s,d,ppro,algo_manager_comm,authen_clientside_comm,algo_manager)
+	utility.start()
 	root.mainloop()
 
 	print("Main process terminated")
