@@ -20,7 +20,9 @@ except ImportError:
 
 try:
     pip.main(['install', 'matplotlib'])
-
+except:
+	pass
+	
 import os
 import time
 import threading
