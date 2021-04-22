@@ -1,7 +1,26 @@
 import tkinter as tk
 from tkinter import ttk
-import pandas as pd
-import numpy as np
+
+
+
+
+
+
+try:
+    import pandas as pd
+except ImportError:
+    pip.main(['install', 'pandas'])
+    import pandas as pd
+
+try:
+    import numpy as np
+except ImportError:
+    pip.main(['install', 'numpy'])
+    import numpy as np
+
+try:
+    pip.main(['install', 'matplotlib'])
+
 import os
 import time
 import threading
