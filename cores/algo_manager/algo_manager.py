@@ -152,9 +152,95 @@ class Manager:
 
 	def __init__(self):
 
+		self.symbols = []
+
+
+	#data part, UI part
+	def symbol_creation(self,symbol):
+
+		if symbol not in self.symbols:
+			self.register_to_ppro(symbol,True)
+		else:
+			print("symbols already exists")
+
+
+	def register(self,symbol):
+		if symbol not in self.symbols:
+			self.symbols.append(symbol)
+			req = threading.Thread(target=self.register_to_ppro, args=(symbol, True,),daemon=True)
+			req.start()
+			
+	def deregister(self,symbol):
+
+		if symbol in self.symbols:
+			self.symbols.remove(symbol)
+			self.register_to_ppro(symbol, False)
+
+	def register_to_ppro(self,symbol,status):
+
+		print("Registering",symbol,status)
+		if status == True:
+			postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&region=1&feedtype=L1&output=" + str(self.port)+"&status=on"
+		else:
+			postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&region=1&feedtype=L1&output=" + str(self.port)+"&status=off"
+
+		try:
+			r= requests.get(postbody)
+			if r.status_code==200:
+				return True
+			else:
+				return False
+		except:
+			print("register failed")
+			return False
+
+
+#everything ppro related. sending orders, receiving orders. 
+class PPRO:
+
+	def __init__(self):
 		pass
 
-class ui(pannel):
+	def order_pipe_listener(self):
+		while True:
+			d = self.order_pipe.recv()
+
+			if d[0] =="status":
+				try:
+					self.ppro_status.set("Ppro : "+str(d[1]))
+
+					if str(d[1])=="Connected":
+						self.ppro_status_["background"] = "#97FEA8"
+					else:
+						self.ppro_status_["background"] = "red"
+				except Exception as e:
+					print(e)
+
+			if d[0] =="msg":
+				print(d[1])
+
+			if d[0] =="order confirm":
+				#get symbol,price, shares.
+				# maybe filled. maybe partial filled.
+				self.ppro_order_confirmation(d[1])
+
+			if d[0] =="order update":
+
+				#update the quote, unrealized. 
+				self.ppro_order_update(d[1])
+
+			if d[0] =="order rejected":
+
+				self.ppro_order_rejection(d[1])
+
+			if d[0] =="new stoporder":
+
+				#print("stop order received:",d[1])
+				self.ppro_append_new_stoporder(d[1])
+			
+	#when there is a change of quantity of an order. 
+
+class UI(pannel):
 	def __init__(self,root):
 
 		self.root = root
@@ -288,7 +374,10 @@ class ui(pannel):
 # class manager:
 # 	def __init__(self):
 
+class Omnissiah():
 
+	def __init__(self):
+		pass
 
 if __name__ == '__main__':
 
