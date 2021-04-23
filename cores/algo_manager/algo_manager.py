@@ -14,7 +14,7 @@ from tkinter import ttk
 
 
 #DATA CLASS. SUPPORT/RESISTENCE. 
-class symbol:
+class Symbol:
 
 	def __init__(self,symbol):
 
@@ -65,7 +65,7 @@ class symbol:
 	def add_trigger(self,info,type_,trigger_price,timer):
 		self.triggers.append(trigger(self,info,type_,trigger_price,timer))
 
-class trigger:
+class Trigger:
 
 	def __init__(self,sym:symbol,info,type_,trigger_price,timer):
 
@@ -133,7 +133,7 @@ class trigger:
 		self.trigger_time = 0
 		self.trigger_duration = 0
 
-class trade:
+class Trade:
 	def __init__(self,symbol,position,shares,price=None,rationale=None):
 
 		self.activation = False
@@ -148,6 +148,11 @@ class trade:
 	def place_trade(self): #ask ppro to place orders.
 		pass
 
+class Manager:
+
+	def __init__(self):
+
+		pass
 
 class ui(pannel):
 	def __init__(self,root):
@@ -169,21 +174,22 @@ class ui(pannel):
 		#				"PxTgt 3":8,\
 		self.labels = {"Symbol":10,\
 						"Algo status":10,\
-						"Algo rationale":12,\
+						"MIND":12,\
 						"Strategy":10,\
 						"Config":12,\
 						"AR":4,\
 						"Sup":6,\
 						"Res":6,\
-						"Act/Est R":8,\
-						"AvgPx":8,\
-						"SzIn":6,\
-						"Position":6,\
 						"PosMan":8,\
 						"Configm":8,\
+						"Act/Est R":8,\
+						"Position":6,\
+						"AvgPx":8,\
+						"SzIn":6,\
 						"UPshr":8,\
 						"U":8,\
 						"R":8,\
+						"TR":8,\
 						"flatten":10,
 						"log":5}
 
