@@ -14,7 +14,7 @@ class Trigger:
 	#3. type
 	#5. Actions.
 	#4. next trigger / trigger layer
-	def __init__(self,symbol:Symbol,subject1,type_,subject2,timer:int,description,next_trigger:None):
+	def __init__(self,symbol:Symbol,subject1,type_,subject2,timer:int,description,next_trigger=None):
 
 		self.symbol = symbol
 		if self.error_checking(subject1,type_,subject2,timer):
@@ -24,9 +24,9 @@ class Trigger:
 
 		self.description = description
 
-		self.data = self.symbol.get_data()
-		self.subject1 = self.data[subject1]
-		self.subject2 = self.data[subject2]
+		self.d = self.symbol.get_data()
+		self.s1 = subject1
+		self.s2 = subject2#self.symbol.data[subject2]
 		self.type = type_
 		#stay above this time. 
 		self.trigger_timer = timer
@@ -58,21 +58,24 @@ class Trigger:
 	def check(self):
 
 		#if it is above the price, update the time. put into is trigger 
+		#print("Trigger:",self.d[self.subject1],self.d[self.subject2])
+		#print("Checking:",self.d[self.s1],self.d[self.s2])
 		if self.type ==">":
 
-			if self.symbol.get_bid()>=self.trigger_price:
+			if self.d[self.s1]>=self.d[self.s2]:
 				return self.check_trigger()
 			else:
 				self.reset()
 
 		elif self.type =="<":
 
-			if self.symbol.get_bid()<=self.trigger_price:
+			if self.d[self.s1]<=self.d[self.s2]:
 				self.check_trigger()
 			else:
-				return self.reset()
+				self.reset()
 
 		return False
+
 	def check_trigger(self):
 
 		if self.triggered == False: #first time trigger
@@ -83,6 +86,7 @@ class Trigger:
 		else: #second tie trigger. update trigger duation
 			self.trigger_duration = self.symbol.get_time() - self.trigger_time
 
+		#print(self.trigger_duration)
 		#check the trigger thingy. 
 		return self.is_trigger()
 
@@ -93,22 +97,26 @@ class Trigger:
 		else:
 			return False 
 
-
 	def trigger_event(self):  #once it's fired, it is gone.
-		print(self.description,"at time happened")
+		print("Trigger:",self.description,"on", self.symbol.get_name(),"at time", self.symbol.get_time())
 
 	def reset(self):
 		self.triggered = False
 		self.trigger_time = 0
 		self.trigger_duration = 0
 
-
 class SingleEntry(Trigger):
-
 	#Special type of trigger, overwrites action part. everything else is generic.
-	def __init__(self):
+	def __init__(self,symbol:Symbol,subject1,type_,subject2,timer:int,description,next_trigger=None):
+		super().__init__(symbol,subject1,type_,subject2,timer,description,next_trigger)
 
-		super.init()
+	#add the actual stuff here.
+	def trigger_event(self):
+
+		super().trigger_event()
+		#PPRO RELATED EVENT.
+		print("PPRO EVENT:",self.symbol.get_time())
+
 
 class TriggerSequence:
 
@@ -150,18 +158,66 @@ class TriggerSequence:
 #### Orders on a symbol create a basic trading plan. and modifying it chainging the plan.
 class TradingPlan:
 
-	def __init__(self,symbol:Symbol,tradingplan):
+	def __init__(self,symbol:Symbol,risk=None):
 
 		self.symbol = symbol
 
-		self.risk = tradingplan["risk"]
+		self.risk = risk
 		self.current_share = 0
 		self.target_share = 0
 
 		#using the parameters from the tradingplan, create the associated triggers, and trigger sequence. 
+		self.current_triggers=[]
 
+	def update(self):
+		remove = []
+		for i in self.current_triggers:
+			if i.check():
+				#print(1)
+				remove.append(i)
+		#execute the actions on remove.
+		#remove it from triggers.
+		for i in remove:
+			i.trigger_event()
+			self.current_triggers.remove(i)
 
+	def add_trigger(self,t:Trigger):
+		self.current_triggers.append(t)
 
+if __name__ == '__main__':
+
+	#TEST CASES for trigger.
+	aapl = Symbol("aapl")
+
+	TP = TradingPlan(aapl)
+	aapl.set_tradingplan(TP)
+	aapl.set_high(15)
+	buyTrigger = SingleEntry(aapl,ASK,">",HIGH,0,"BUY HIGH")
+
+	TP.add_trigger(buyTrigger)
+	
+	aapl.update_price(10,10,0)
+	aapl.update_price(11,11,1)
+	aapl.update_price(12,12,2)
+	aapl.update_price(13,13,3)
+	aapl.update_price(14,14,4)
+	aapl.update_price(15,15,5)
+	##### DECRESE#######
+	aapl.update_price(14,14,6)
+	aapl.update_price(13,13,7)
+	aapl.update_price(12,12,6)
+	aapl.update_price(11,11,7)
+	aapl.update_price(10,10,8)
+	###### INCREASE #############
+	aapl.update_price(11,11,9)
+	aapl.update_price(12,12,10)
+	aapl.update_price(13,13,11)
+	aapl.update_price(14,14,11)
+	aapl.update_price(15,15,12)
+	aapl.update_price(16,16,13)
+	aapl.update_price(17,17,14)
+	aapl.update_price(18,18,15)
+	aapl.update_price(19,19,16)
 ### EVENT CLASS. TRIGGER EVENT. ###
 # class Trade:
 # 	def __init__(self,symbol,position,shares,price=None,rationale=None):
