@@ -308,7 +308,7 @@ class algo_manager(pannel):
 		self.log_panel.place(x=10,y=250,relheight=0.8,width=180)
 
 		self.deployment_panel = ttk.LabelFrame(root,text="Algo deployment") 
-		self.deployment_panel.place(x=200,y=10,relheight=1,width=1400)
+		self.deployment_panel.place(x=200,y=10,relheight=0.8,width=1400)
 
 		self.dev_canvas = tk.Canvas(self.deployment_panel)
 		self.dev_canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
