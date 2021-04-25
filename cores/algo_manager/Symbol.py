@@ -82,8 +82,10 @@ class Symbol:
 
 	def set_high(self,v):
 		self.data[HIGH]=v
-	def set_low(self):
+		
+	def set_low(self,v):
 		self.data[LOW]=v
+
 	def get_data(self):
 		return self.data
 
