@@ -832,6 +832,7 @@ class algo_manager(pannel):
 					self.order_tkstring[id_]["algo_status"].set("Running")
 					self.order_tklabels[id_]["algo_status"]["background"] = "#97FEA8" #set the label to be, green.
 
+					self.update_target_price(id_,price)
 					self.order_process(symbol,price,shares,side)
 		#print(shares,"done")
 
@@ -1176,8 +1177,10 @@ class algo_manager(pannel):
 		except:
 			print("invalid price targets set for ",id_)
 
-	def update_target_price(self,id_): #call this whenever the break at price changes. 
-		price = self.break_at[id_]
+	def update_target_price(self,id_,price=None): #call this whenever the break at price changes. 
+
+		if price==None:
+			price = self.break_at[id_]
 
 		global coecoefficient
 
@@ -1216,6 +1219,9 @@ class algo_manager(pannel):
 			self.order_tkstring[id_]["tgtpx1"].set(self.price_levels[id_][1])
 			self.order_tkstring[id_]["tgtpx2"].set(self.price_levels[id_][2])
 			self.order_tkstring[id_]["tgtpx3"].set(self.price_levels[id_][3])
+
+
+		print("update: cur:",id_,price,self.price_levels[id_][1],self.price_levels[id_][2],self.price_levels[id_][3])
 
 	def update_target_entry(self,id_):
 
