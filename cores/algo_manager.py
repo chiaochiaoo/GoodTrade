@@ -366,9 +366,12 @@ class algo_manager(pannel):
 		#need stop level. 
 		id_,symbol,type_,status,des,pos,order_type,order_price,share,risk,stoplevel,data_list = d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10],d[11],d[12]
 
+		if pos =="Long": side ="B"
+		elif pos =="Short": side ="S"
+	
 		print(id_,"added to new order")
-
-		if id_ not in self.orders_registry:
+		
+		if id_ not in self.orders_registry and symbol+side not in self.order_book:
 
 			self.orders_registry.append(id_)
 
