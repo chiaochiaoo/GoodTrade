@@ -308,7 +308,7 @@ class algo_manager(pannel):
 		self.log_panel.place(x=10,y=250,relheight=0.8,width=180)
 
 		self.deployment_panel = ttk.LabelFrame(root,text="Algo deployment") 
-		self.deployment_panel.place(x=200,y=10,relheight=1,width=1400)
+		self.deployment_panel.place(x=200,y=10,relheight=0.8,width=1400)
 
 		self.dev_canvas = tk.Canvas(self.deployment_panel)
 		self.dev_canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
@@ -366,9 +366,12 @@ class algo_manager(pannel):
 		#need stop level. 
 		id_,symbol,type_,status,des,pos,order_type,order_price,share,risk,stoplevel,data_list = d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10],d[11],d[12]
 
+		if pos =="Long": side ="B"
+		elif pos =="Short": side ="S"
+	
 		print(id_,"added to new order")
-
-		if id_ not in self.orders_registry:
+		
+		if id_ not in self.orders_registry and symbol+side not in self.order_book:
 
 			self.orders_registry.append(id_)
 
