@@ -44,22 +44,26 @@ class ppro_process_manager:
 		self.receive_start()
 
 	def receive_start(self):
-		receive = threading.Thread(name="Thread: Database info receiver",target=self.receive_request, daemon=True)
+		receive = threading.Thread(name="Thread: PPRO info receiver",target=self.receive_request, daemon=True)
 		receive.start()
 
 	def receive_request(self):
 
 		#put the receive in corresponding box.
 
-		time.sleep(10)
 		temp = {}
+
+		while True:
+			if self.data.start ==True:
+				break
+			else:
+				time.sleep(2)
+		print("PPro subthread activated")
 
 		while True:
 			d = self.request.recv()
 
 			status = d[0]
-
-
 
 			if status == "message":
 				print(d[1])

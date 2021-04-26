@@ -194,6 +194,8 @@ class ticker_manager(pannel):
 		self.tickers = self.data.get_list()
 		self.rebind(self.canvas,self.frame)
 
+		self.data.start=True
+
 	def delete_symbol_reg_list(self,symbol):
 
 		if symbol in self.tickers:
