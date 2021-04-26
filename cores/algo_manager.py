@@ -252,7 +252,7 @@ class algo_manager(pannel):
 
 		self.width = list(self.labels.values())
 
-		self.setting = ttk.LabelFrame(root,text="Algo Manager") 
+		self.setting = ttk.LabelFrame(root,text="Algo Manager v1") 
 		self.setting.place(x=10,y=10,height=250,width=180)
 
 
@@ -1433,7 +1433,7 @@ if __name__ == '__main__':
 	algo_ppro_manager.start()
 
 	root = tk.Tk() 
-	root.title("GoodTrade Algo Manager") 
+	root.title("GoodTrade Algo Manager v1") 
 	root.geometry("1600x1000")
 	root.minsize(1600, 1000)
 	root.maxsize(1800, 1200)
