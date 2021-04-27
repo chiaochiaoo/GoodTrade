@@ -1163,8 +1163,8 @@ class algo_manager(pannel):
 							self.update_target_entry(id_)
 							#here I need to recaculate the estimate risk.
 							#self.adjusting_risk(id_)
-		except:
-			print("updating levels errors on",symbol)
+		except Exception as e:
+			print("updating levels errors on",symbol,e)
 
 	#whether it is done, rejected, or cancled. should go here
 
@@ -1230,6 +1230,8 @@ class algo_manager(pannel):
 		self.target_share[id_] = shares
 
 		self.order_tkstring[id_]["current_share"].set(str(self.current_share[id_])+"/"+str(self.target_share[id_]))
+
+		print(id_," updating shares: new risk per share: ",cur_risk,"new shares:",shares)
 
 	def mark_off_algo(self,id_,status):
 
