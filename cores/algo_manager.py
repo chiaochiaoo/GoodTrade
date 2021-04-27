@@ -1433,7 +1433,7 @@ if __name__ == '__main__':
 	algo_ppro_manager.start()
 
 	root = tk.Tk() 
-	root.title("GoodTrade Algo Manager v1") 
+	root.title("GoodTrade Algo Manager v1b") 
 	root.geometry("1600x1000")
 	root.minsize(1600, 1000)
 	root.maxsize(1800, 1200)
