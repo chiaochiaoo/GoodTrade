@@ -934,7 +934,7 @@ class algo_manager(pannel):
 		if current_status == self.status["Pending"]:
 
 			#refresh the datas.
-			self.update_target_entry(id_)
+			
 			self.lock_entrys(id_,True)
 
 			self.break_at[id_] = self.order_tkstring[id_]["break_at"].get()
@@ -942,6 +942,8 @@ class algo_manager(pannel):
 			self.price_levels[id_][1] = self.order_tkstring[id_]["tgtpx1"].get()
 			self.price_levels[id_][2] = self.order_tkstring[id_]["tgtpx2"].get()
 			self.price_levels[id_][3] = self.order_tkstring[id_]["tgtpx3"].get()
+
+			self.update_target_entry(id_)
 
 			self.order_tkstring[id_]["algo_status"].set(self.status["Deploying"])
 			self.order_tklabels[id_]["algo_status"]["background"] = LIGHTYELLOW
