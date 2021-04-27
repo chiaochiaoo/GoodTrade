@@ -1229,11 +1229,14 @@ class algo_manager(pannel):
 
 		cur_risk = round(abs(self.stoplevel[id_] - self.break_at[id_]),3)
 		shares = int(self.est_risk[id_]//cur_risk)
+
+		print(id_," updating shares: new risk per share: ",cur_risk," shares from",self.target_share[id_]," to",shares)
+
 		self.target_share[id_] = shares
 
 		self.order_tkstring[id_]["current_share"].set(str(self.current_share[id_])+"/"+str(self.target_share[id_]))
 
-		print(id_," updating shares: new risk per share: ",cur_risk,"new shares:",shares)
+		
 
 	def mark_off_algo(self,id_,status):
 
