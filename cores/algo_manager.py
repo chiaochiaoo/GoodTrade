@@ -1220,8 +1220,10 @@ class algo_manager(pannel):
 			self.order_tkstring[id_]["tgtpx2"].set(self.price_levels[id_][2])
 			self.order_tkstring[id_]["tgtpx3"].set(self.price_levels[id_][3])
 
-
-		print("update: cur:",id_,price,self.price_levels[id_][1],self.price_levels[id_][2],self.price_levels[id_][3])
+		try:
+			print("update: cur:",id_,price,self.price_levels[id_][1],self.price_levels[id_][2],self.price_levels[id_][3])
+		except Exception as e:
+			print(e)
 
 	def update_target_entry(self,id_):
 
