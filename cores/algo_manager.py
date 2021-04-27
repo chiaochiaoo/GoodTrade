@@ -934,7 +934,9 @@ class algo_manager(pannel):
 		if current_status == self.status["Pending"]:
 
 			#refresh the datas.
+			self.update_target_entry(id_)
 			self.lock_entrys(id_,True)
+
 			self.break_at[id_] = self.order_tkstring[id_]["break_at"].get()
 			self.stoplevel[id_] = self.order_tkstring[id_]["stoplevel"].get()
 			self.price_levels[id_][1] = self.order_tkstring[id_]["tgtpx1"].get()
