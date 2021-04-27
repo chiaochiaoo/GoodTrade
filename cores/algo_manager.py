@@ -1227,7 +1227,7 @@ class algo_manager(pannel):
 
 	def update_target_entry(self,id_):
 
-		cur_risk = abs(self.stoplevel[id_] - self.break_at[id_])
+		cur_risk = round(abs(self.stoplevel[id_] - self.break_at[id_]),3)
 		shares = int(self.est_risk[id_]//cur_risk)
 		self.target_share[id_] = shares
 
