@@ -1051,7 +1051,7 @@ class algo_manager(pannel):
 
 							
 							#shake of 1/3 
-							share = min(int(int(self.target_share[id_])//3),self.current_share[id_])
+							share = min(int(int(self.target_share[id_])//4),self.current_share[id_])
 
 							if current_level==3: share=int(self.current_share[id_])
 							#if share==0: share = self.current_share[id_]  #if 0. get rid of everything.
@@ -1081,7 +1081,7 @@ class algo_manager(pannel):
 
 							
 							#shake of 1/3 
-							share = min(int(int(self.target_share[id_])//3),self.current_share[id_])
+							share = min(int(int(self.target_share[id_])//4),self.current_share[id_])
 							if current_level==3: share=int(self.current_share[id_])
 
 							buy_market_order(symbol,share)
@@ -1195,7 +1195,7 @@ class algo_manager(pannel):
 				self.price_levels[id_][0] = price
 				self.price_levels[id_][1] = round(price+ohv*0.2*coefficient,2)
 				self.price_levels[id_][2] = round(price+ohv*0.5*coefficient,2)
-				self.price_levels[id_][3] =	round(price+ohv*0.75*coefficient,2)
+				self.price_levels[id_][3] =	round(price+ohv*0.8*coefficient,2)
 				good = True
 			else:
 
@@ -1208,7 +1208,7 @@ class algo_manager(pannel):
 				self.price_levels[id_][0] = price
 				self.price_levels[id_][1] = round(price-olv*0.2*coefficient,2)
 				self.price_levels[id_][2] = round(price-olv*0.5*coefficient,2)
-				self.price_levels[id_][3] =	round(price-olv*0.75*coefficient,2)
+				self.price_levels[id_][3] =	round(price-olv*0.8*coefficient,2)
 				good = True
 			else:
 				self.order_tkstring[id_]["auto_manage"].set(False)
