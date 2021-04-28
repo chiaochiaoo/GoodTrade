@@ -2,7 +2,7 @@ from Symbol import *
 from Triggers import *
 from Strategy import *
 
-
+# MAY THE 
 
 class TradingPlan:
 
@@ -27,7 +27,7 @@ class TradingPlan:
 
 	def set_EntryStrategy(self,entry_strategy:Strategy):
 		self.entry_strategy = entry_strategy
-		self.entry_strategy.set_symbol(self.symbol)
+		self.entry_strategy.set_symbol(self.symbol,self)
 
 	def start_EntryStrategy(self):
 		self.current_running_strategy = self.entry_strategy
@@ -35,11 +35,26 @@ class TradingPlan:
 	def entry_strategy_done(self):
 		self.current_running_strategy = self.manage_strategy
 
+	def management_strategy_done(self):
+
+		pass
+
+	def on_finish(self,plan):
+		
+		if plan==self.entry_strategy:
+			print("Trading Plan: Entry strategy complete. Management strategy begins.")
+			self.entry_strategy_done()
+		elif plan==self.manage_strategy:
+			self.management_strategy_done()
+		else:
+			print("Trading Plan: UNKONW CALL FROM Strategy")
+
 	def update(self): #let the strategy know it is updated. 
 
 		#just coordinate between the strategy.
 		if self.current_running_strategy!=None:
 			self.current_running_strategy.update()
+
 
 
 if __name__ == '__main__':

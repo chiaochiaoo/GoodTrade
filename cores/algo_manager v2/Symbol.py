@@ -10,10 +10,8 @@ class Symbol:
 
 		# self.bid = 0
 		# self.ask = 0
-
 		# self.support = 0
 		# self.resistence = 0
-
 		# self.open = 0
 		# self.high = 0
 		# self.low = 0
@@ -32,6 +30,9 @@ class Symbol:
 		self.data[OPEN] = 0
 		self.data[HIGH] =0
 		self.data[LOW] = 0
+
+		self.data[PREMARKETHIGH] = 0
+		self.data[PREMARKETLOW] = 0
 
 		# self.total_realized = 0
 		# self.number_trades = 0
@@ -79,6 +80,11 @@ class Symbol:
 		# 	i.trigger_event()
 		# 	self.triggers.remove(i)
 
+	def set_phigh(self,v):
+		self.data[PREMARKETHIGH]=v
+
+	def set_plow(self,v):
+		self.data[PREMARKETLOW]=v
 
 	def set_high(self,v):
 		self.data[HIGH]=v

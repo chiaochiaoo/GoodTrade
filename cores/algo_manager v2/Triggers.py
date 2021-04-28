@@ -1,7 +1,4 @@
-from Symbol import *
-from Tradingplan import *
-
-
+from constant import *
 
 class Trigger:
 
@@ -15,7 +12,7 @@ class Trigger:
 	#5. Actions.
 	#4. next trigger / trigger layer
 	#trigger don't know who it serves until it's activated. 
-	def __init__(self,subject1,type_,subject2,timer:int,description,trigger_limit=1):
+	def __init__(self,subject1,type_,subject2,trigger_timer:int,description,trigger_limit=1):
 
 		#self.symbol = symbol
 		#bigger, or less than. 
@@ -28,7 +25,7 @@ class Trigger:
 		self.s2 = subject2#self.symbol.data[subject2]
 		self.type = type_
 		#stay above this time. 
-		self.trigger_timer = timer
+		self.trigger_timer = trigger_timer
 
 		self.triggered = False
 		self.trigger_time = 0
@@ -39,7 +36,7 @@ class Trigger:
 
 		self.next_triggers = set()
 
-	def set_symbol(self,symbol:Symbol):
+	def set_symbol(self,symbol):
 		self.symbol = symbol
 		self.d = self.symbol.get_data()
 		if self.error_checking(subject1,type_,subject2,timer):
@@ -62,6 +59,9 @@ class Trigger:
 	def add_next_trigger(self,next_trigger):
 		self.next_triggers.add(next_trigger)
 
+	def get_next_triggers(self):
+		return self.next_triggers
+
 	def check(self,symbol=None):
 		if self.symbol==None:
 			if symbol!=None:
@@ -69,61 +69,58 @@ class Trigger:
 				self.d = symbol.get_data()
 
 		#if it is above the price, update the time. put into is trigger 
-		#print("Trigger:",self.d[self.subject1],self.d[self.subject2])
 		#print("Checking:",self.d[self.s1],self.d[self.s2])
 		if self.symbol!=None:
 
 			if self.type ==">":
 				if self.d[self.s1]>=self.d[self.s2]: # I will need to find out how to form composite number.
-					return self.check_trigger()
+					return self.update_trigger_duration()
 				else:
 					self.reset()
 
 			elif self.type =="<":
 
 				if self.d[self.s1]<=self.d[self.s2]:
-					self.check_trigger()
+					return self.update_trigger_duration()
 				else:
 					self.reset()
 
 		return False
 
-	def check_trigger(self):
+	def update_trigger_duration(self):
 
 		if self.triggered == False: #first time trigger
 
 			self.triggered = True
 			self.trigger_time = self.symbol.get_time() 
-		
+			self.trigger_duration = 0
+
 		else: #second tie trigger. update trigger duation
 			self.trigger_duration = self.symbol.get_time() - self.trigger_time
 
-		#print(self.trigger_duration)
-		#check the trigger thingy. 
 		return self.is_trigger()
 
 	def is_trigger(self):
 		
-		if self.triggered==True and self.trigger_duration >= self.trigger_timer:
-			print("Trigger:",self.description,"on", self.symbol.get_name(),"at time", self.symbol.get_time())
+		print("Trigger:","cur time:",self.symbol.get_time(), "duration:", self.trigger_duration, "timer:",self.trigger_timer,"already occurance:",self.trigger_count,"total repeat time:",self.trigger_limit)
+		if self.trigger_duration >= self.trigger_timer:
+
+			###EVENT HAPPENS HERE.####
+			self.trigger_event()
 			self.trigger_count+=1
 			if self.trigger_count == self.trigger_limit:
-				print("Trigger",self.description,"Finished,","next:",self.next_triggers)
+				print("??")
 				return True
 			else:
 				self.reset()	
 		else:
 			return False 
 
-	def trigger_event(self):  #once it's fired, it is gone.
-		print("Trigger:",self.description,"on", self.symbol.get_name(),"at time", self.symbol.get_time())
-
-		self.trigger_count+=1
-
-		if self.trigger_count == self.trigger_limit:
-			self.final_event()
-		else:
-			self.reset()	
+	def trigger_event(self):  #OVERRIDE
+		try:
+			print("Trigger:",self.description,"on", self.symbol.get_name(),"at time", self.symbol.get_time())
+		except:
+			print("Trigger:",self.description)
 		### REPLACE the current trategy with current states. (when repeate is met.)
 
 
@@ -135,214 +132,30 @@ class Trigger:
 		self.trigger_time = 0
 		self.trigger_duration = 0
 
+#self,subject1,type_,subject2,trigger_timer:int,description,trigger_limit=1
 class SingleEntry(Trigger):
 	#Special type of trigger, overwrites action part. everything else is generic.
-	def __init__(self,subject1,type_,subject2,timer:int,description,next_trigger=None):
-		super().__init__(subject1,type_,subject2,timer,description,next_trigger)
+	def __init__(self,subject1,type_,subject2,timer:int,description,pos):
+		super().__init__(subject1,type_,subject2,timer,description)
+
+		self.pos = pos
 
 	#add the actual stuff here.
 	def trigger_event(self):
 
-		super().trigger_event()
-		#PPRO RELATED EVENT.
-		print("PPRO EVENT:",self.symbol.get_time())
-
-
-# USE LESS. 
-#two things. 1. I need it be able to have multiple initial triggers. 2. Mark begin. 3. Mark finished.
-#OR - I have the plan for multiple Trigger Sequence? That's...hmm... dumb. 
-class TriggerSequence:
-
-	def __init__(Self,name):
-		self.name = name
-		self.main = None
-		self.last = None
-
-	def add_trigger(self,trigger:Trigger):
-
-		#the very first one.
-		if self.main ==None and self.last ==None:
-			self.main = Trigger
-
-		#the second one.
-		if self.main!=None and self.last==None:
-			self.last = Trigger
-			self.main.set_next_trigger(self.last)
-
-		elif self.main!=None and self.last!=None:
-			self.last.set_next_trigger(Trigger)
-			self.last = Trigger
-		else:
-			print("Tactic Sequence add trigger errors.")
-
-	def add_constant_trigger(self,trigger:Trigger):
-
-		if self.constant!=None:
-			print("Already exist a constant")
-		else:
-			self.constant = trigger 
-
-
-
-class Strategy: #ABSTRACT CLASS. the beginning of a sequence, containing one or more triggers.
-
-	def __init__(self):
-
-		self.activated = False
-		self.current_triggers = set()
-		self.symbol=None
-		self.tradingplan =None
-
-	def add_initial_triggers(self,trigger):
-		self.current_triggers.add(trigger)
-
-	def set_symbol(self,symbol:Symbol,tradingplan:TradingPlan):
-		self.symbol=symbol
-		self.tradingplan = tradingplan
-
-	def update(self):
-		if self.current_triggers!= None:
-			for i in self.current_triggers:
-				if self.symbol!=None:
-					check = False
-					if i.check(self.symbol):
-						print(i.description)
-						check = True
-
-					if check:
-						break
-		if check:
-			self.current_triggers = i.get_next_triggers() #replace the triggers. 
-			if len(self.current_triggers)==0: #if there is no trigger, call the finish even.t
-				self.on_finish()
-
-	def on_finish(self):
-		self.tradingplan.on_finish(self)				
-
-class TradingPlan:
-
-	def __init__(self,symbol:Symbol,risk=None):
-
-		self.symbol = symbol
-
-		self.risk = risk
-		self.current_share = 0
-		self.target_share = 0
-
-		#using the parameters from the tradingplan, create the associated triggers, and trigger sequence. 
-		# self.current_triggers=[]
-
-		self.trage_stage = "Pending"
-
-		self.current_running_strategy = None
-
-		self.entry_strategy_start = False
-
-		self.entry_strategy = None
-		self.manage_strategy = None
-
-	def set_EntryStrategy(self,entry_strategy:Strategy):
-		self.entry_strategy = entry_strategy
-		self.entry_strategy.set_symbol(self.symbol,self)
-
-	def set_ManageStrategy(self,manage_strategy:Strategy):
-		self.manage_strategy = manage_strategy
-		self.manage_strategy.set_symbol(self.symbol,self)
-
-	def start_EntryStrategy(self):
-		self.current_running_strategy = self.entry_strategy
-
-	def update(self): #let the strategy know it is updated. 
-
-		#just coordinate between the strategy.
-		if self.current_running_strategy!=None:
-			self.current_running_strategy.update()
-
-	def entry_strategy_done(self):
-		self.current_running_strategy = self.manage_strategy
 		
-	def on_finish(self,strategy:Strategy):
+		#PPRO RELATED EVENT.
+		# if self.pos=="Long":
+		# 	print("LONG")
+		# elif self.pos =="Short":
+		# 	print("SHORT")
 
-		if strategy == self.entry_strategy:
-			print("Trade matured, management begins")
-		elif strategy == self.manage_strategy:
-			print("Trade done")
-		else:
-			print("Unkown strategy")
+		try:
+			print("Trigger: SingleEntry PPRO EVENT: ",self.pos,"at",self.symbol.get_time())
+		except:
+			print("Trigger: SingleEntry PPRO EVENT: ",self.pos)
 
-class BreakUp(Strategy): #the parameters contains? dk. yet .
-	def __init__(self):
-		super().__init__()
+		super().trigger_event()
 
-		buyTrigger = SingleEntry(ASK,">",HIGH,0,"BUY BREAK OUT")
-		self.add_initial_triggers(buyTrigger)
-
-class AnyLevel(Strategy):
-	def __init__(self):
-		super().__init__()
-
-
-#### Trading plan is where all the triggers, conditions are.###
-#### Orders on a symbol create a basic trading plan. and modifying it chainging the plan.
-
-
-if __name__ == '__main__':
-
-	#TEST CASES for trigger.
-	
-	aapl = Symbol("aapl")
-	TP = TradingPlan(aapl)
-	aapl.set_tradingplan(TP)
-	aapl.set_high(12)
-	aapl.set_low(10)
-
-
-	b = BreakUp()
-	TP.set_EntryStrategy(b)
-	TP.start_EntryStrategy()
-
-	#TP.add_trigger(buyTrigger)
-	
-	aapl.update_price(10,10,0)
-	aapl.update_price(11,11,1)
-	aapl.update_price(12,12,2)
-	aapl.update_price(13,13,3)
-	aapl.update_price(14,14,4)
-	aapl.update_price(15,15,5)
-	##### DECRESE#######
-	aapl.update_price(14,14,6)
-	aapl.update_price(13,13,7)
-	aapl.update_price(12,12,6)
-	aapl.update_price(11,11,7)
-	aapl.update_price(10,10,8)
-	###### INCREASE #############
-	aapl.update_price(11,11,9)
-	aapl.update_price(12,12,10)
-	aapl.update_price(13,13,11)
-	aapl.update_price(14,14,11)
-	aapl.update_price(15,15,12)
-	aapl.update_price(16,16,13)
-	aapl.update_price(17,17,14)
-	aapl.update_price(18,18,15)
-	aapl.update_price(19,19,16)
-
-
-
-
-### EVENT CLASS. TRIGGER EVENT. ###
-# class Trade:
-# 	def __init__(self,symbol,position,shares,price=None,rationale=None):
-
-# 		self.matured = False
-# 		self.activation = False
-# 		self.symbol = symbol
-# 		self.position = position
-# 		self.shares = shares
-# 		self.price = None
-
-# 		self.stop_order = False
-# 		self.stop_order_id = None
-
-# 	def place_trade(self): #ask ppro to place orders.
-# 		pas
-
+# s = SingleEntry(ASK,">",PREMARKETHIGH,0,"BUY BREAK UP")
+# s.trigger_event()
