@@ -59,6 +59,7 @@ class ppro_process_manager:
 			else:
 				time.sleep(2)
 		print("PPro subthread activated")
+		time.sleep(5)
 
 		while True:
 			d = self.request.recv()

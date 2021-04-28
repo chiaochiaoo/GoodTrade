@@ -63,6 +63,7 @@ class database_process_manager:
 				time.sleep(2)
 
 		print("Database Online: Receiving Starts")
+		time.sleep(5)
 		while True:
 			d = self.request.recv()
 
