@@ -188,6 +188,11 @@ class ticker_manager(pannel):
 
 		ticks = self.data.get_list()
 
+		data = threading.Thread(target=self.adding_one_by_one(ticks), daemon=True)
+		data.start()
+
+	def adding_one_by_one(self,ticks):
+
 		for i in range(len(ticks)):
 			self.add_symbol_label(ticks[i])
 
@@ -451,7 +456,7 @@ if __name__ == '__main__':
 
 
 	root = tk.Tk() 
-	root.title("GoodTrade") 
+	root.title("GoodTrade v482") 
 	root.geometry("1800x900")
 	root.minsize(1500, 600)
 	root.maxsize(3000, 1500)
