@@ -191,21 +191,34 @@ class Strategy: #ABSTRACT CLASS. the beginning of a sequence, containing one or 
 		self.activated = False
 		self.current_triggers = set()
 		self.symbol=None
+		self.tradingplan =None
 
 	def add_initial_triggers(self,trigger):
 		self.current_triggers.add(trigger)
 
-	def set_symbol(self,symbol:Symbol):
+	def set_symbol(self,symbol:Symbol,tradingplan:TradingPlan):
 		self.symbol=symbol
+		self.tradingplan = tradingplan
 
 	def update(self):
 		if self.current_triggers!= None:
 			for i in self.current_triggers:
 				if self.symbol!=None:
+					check = False
 					if i.check(self.symbol):
 						print(i.description)
-					
-					#replace the triggers. 
+						check = True
+
+					if check:
+						break
+		if check:
+			self.current_triggers = i.get_next_triggers() #replace the triggers. 
+			if len(self.current_triggers)==0: #if there is no trigger, call the finish even.t
+				self.on_finish()
+
+	def on_finish(self):
+		self.tradingplan.on_finish(self)				
+
 class TradingPlan:
 
 	def __init__(self,symbol:Symbol,risk=None):
@@ -230,7 +243,11 @@ class TradingPlan:
 
 	def set_EntryStrategy(self,entry_strategy:Strategy):
 		self.entry_strategy = entry_strategy
-		self.entry_strategy.set_symbol(self.symbol)
+		self.entry_strategy.set_symbol(self.symbol,self)
+
+	def set_ManageStrategy(self,manage_strategy:Strategy):
+		self.manage_strategy = manage_strategy
+		self.manage_strategy.set_symbol(self.symbol,self)
 
 	def start_EntryStrategy(self):
 		self.current_running_strategy = self.entry_strategy
@@ -244,9 +261,14 @@ class TradingPlan:
 	def entry_strategy_done(self):
 		self.current_running_strategy = self.manage_strategy
 		
+	def on_finish(self,strategy:Strategy):
 
-	def add_trigger(self,t:Trigger):
-		self.current_triggers.append(t)
+		if strategy == self.entry_strategy:
+			print("Trade matured, management begins")
+		elif strategy == self.manage_strategy:
+			print("Trade done")
+		else:
+			print("Unkown strategy")
 
 class BreakUp(Strategy): #the parameters contains? dk. yet .
 	def __init__(self):
