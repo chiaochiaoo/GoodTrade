@@ -1,11 +1,25 @@
 from Symbol import *
 
+# "Omnissiah, Omnissiah.
+
+# From the Bleakness of the mind
+# Omnissiah save us
+# From the lies of the Antipath
+# Circuit preserve us
+# From the Rage of the Beast
+# Iron protect us
+# From the temptations of the Fleshlord
+# Silica cleanse us
+# From the Ravages of the Destroyer
+# Anima Shield us
+
+# Machine God Set Us Free
+# Omnissiah, Omnissiah."
 
 class Strategy: #ABSTRACT CLASS. the beginning of a sequence, containing one or more triggers.
 
 	def __init__(self):
 
-		self.activated = False
 		self.current_triggers = set()
 		self.symbol=None
 		self.tradingplan =None

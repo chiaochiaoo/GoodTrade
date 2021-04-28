@@ -9,15 +9,14 @@ class TradingPlan:
 	def __init__(self,symbol:Symbol,risk=None):
 
 		self.symbol = symbol
+		self.symbol_name = symbol.get_name()
 
 		self.risk = risk
+		self.position = None
 		self.current_share = 0
 		self.target_share = 0
 
-		#using the parameters from the tradingplan, create the associated triggers, and trigger sequence. 
-		# self.current_triggers=[]
-
-		self.trage_stage = "Pending"
+		self.trade_stage = "Pending"
 
 		self.current_running_strategy = None
 
@@ -33,19 +32,14 @@ class TradingPlan:
 	def start_EntryStrategy(self):
 		self.current_running_strategy = self.entry_strategy
 
+	def entry_strategy_done(self):
+		self.current_running_strategy = self.manage_strategy
+
 	def update(self): #let the strategy know it is updated. 
 
 		#just coordinate between the strategy.
 		if self.current_running_strategy!=None:
 			self.current_running_strategy.update()
-
-	def entry_strategy_done(self):
-		self.current_running_strategy = self.manage_strategy
-		
-
-	def add_trigger(self,t:Trigger):
-		self.current_triggers.append(t)
-
 
 
 if __name__ == '__main__':

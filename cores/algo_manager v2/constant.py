@@ -1,3 +1,6 @@
+#Spirits of the machine, accept my pleas, And walk amidst the gun, and fire it true.
+
+
 BID = "bid"
 ASK = "ask"
 RESISTENCE="resistence"
@@ -6,3 +9,5 @@ OPEN="open"
 HIGH="high"
 LOW="low" 
 TIMESTAMP="timestamp"
+PREMARKETHIGH="phigh"
+PREMARKETLOW="plow"
