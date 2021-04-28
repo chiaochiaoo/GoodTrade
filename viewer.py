@@ -44,7 +44,7 @@ from cores.algo_process_manager_client import *
 
 class viewer:
 
-	def __init__(self,root,scanner_process,database_process,ppro_process,algo_comm,authen_comm,algo_manager):
+	def __init__(self,root,scanner_process,database_process,ppro_process,algo_comm,authen_comm,algo_manager,util_go):
 
 		self.data = Symbol_data_manager()
 
@@ -114,7 +114,7 @@ class viewer:
 		#alerts  =[self.open_high_pannel]
 		alerts = [self.high_low_pannel,self.open_high_pannel,self.open_low_pannel,self.first_5,self.er,self.ev,self.br,self.pv,self.am]
 
-		self.tm = ticker_manager(self.tab1,self.data,alerts,authen_comm)
+		self.tm = ticker_manager(self.tab1,self.data,alerts,authen_comm,util_go)
 		
 		self.pair =  spread_trader(self.tab12,self.data)
 
@@ -125,12 +125,14 @@ class viewer:
 
 
 class ticker_manager(pannel):
-	def __init__(self,frame,data,alerts,authen_comm):
+	def __init__(self,frame,data,alerts,authen_comm,util_go):
 		super().__init__(frame)
 
 		self.authen = authen_comm
 
 		self.alerts = alerts
+
+		self.util_go = util_go
 
 		self.Entry1 = tk.Entry(frame)
 		self.Entry1.place(x=5, y=5, height=30, width=80, bordermode='ignore')
@@ -188,11 +190,20 @@ class ticker_manager(pannel):
 
 		ticks = self.data.get_list()
 
+		data = threading.Thread(target=self.adding_one_by_one(ticks), daemon=True)
+		data.start()
+
+	def adding_one_by_one(self,ticks):
+
 		for i in range(len(ticks)):
 			self.add_symbol_label(ticks[i])
 
 		self.tickers = self.data.get_list()
 		self.rebind(self.canvas,self.frame)
+
+		self.data.start=True
+
+		self.util_go.send("util activated")
 
 	def delete_symbol_reg_list(self,symbol):
 
@@ -359,25 +370,29 @@ def authentication(pipe):
 
 #Utility 
 
-def utils(scanner_sending_pipe,db_sending_pipe,algo_manager_receive_comm):
+def utils(scanner_sending_pipe,db_sending_pipe,algo_manager_receive_comm,ulti_receive):
 
-	time.sleep(5)
-	print("Utils start")
-
-	scanner1 = threading.Thread(target=multi_processing_scanner,args=(scanner_sending_pipe,),daemon=True)
-	scanner1.start()
-
-	scanner2 = threading.Thread(target=client_scanner,args=(scanner_sending_pipe,),daemon=True)
-	scanner2.start()
-
-	db = threading.Thread(target=multi_processing_database,args=(db_sending_pipe,),daemon=True)
-	db.start()
+	v = ulti_receive.recv()
+	print("util activated")
+	if v =="util activated":
 
 
-	algo_manager_commlink(algo_manager_receive_comm)
+		print("util start")
 
-	# algo_comm = threading.Thread(target=algo_manager_commlink,args=(algo_manager_receive_comm,),daemon=True)
-	# algo_comm.start()
+		scanner1 = threading.Thread(target=multi_processing_scanner,args=(scanner_sending_pipe,),daemon=True)
+		scanner1.start()
+
+		scanner2 = threading.Thread(target=client_scanner,args=(scanner_sending_pipe,),daemon=True)
+		scanner2.start()
+
+		db = threading.Thread(target=multi_processing_database,args=(db_sending_pipe,),daemon=True)
+		db.start()
+
+
+		algo_manager_commlink(algo_manager_receive_comm)
+
+		# algo_comm = threading.Thread(target=algo_manager_commlink,args=(algo_manager_receive_comm,),daemon=True)
+		# algo_comm.start()
 
 
 if __name__ == '__main__':
@@ -442,21 +457,24 @@ if __name__ == '__main__':
 	
 	#UTIL#
 
-	utility = multiprocessing.Process(target=utils, args=(scanner_sending_pipe,db_sending_pipe,algo_manager_receive_comm,),daemon=True)
+
+	util_go, util_receive = multiprocessing.Pipe()
+
+	utility = multiprocessing.Process(target=utils, args=(scanner_sending_pipe,db_sending_pipe,algo_manager_receive_comm,util_receive),daemon=True)
 	utility.daemon=True
 
 	
 
 
 	root = tk.Tk() 
-	root.title("GoodTrade") 
+	root.title("GoodTrade v483") 
 	root.geometry("1800x900")
 	root.minsize(1500, 600)
 	root.maxsize(3000, 1500)
 
 	root.protocol("WM_DELETE_WINDOW", on_closing)
 
-	view = viewer(root,s,d,ppro,algo_manager_comm,authen_clientside_comm,algo_manager)
+	view = viewer(root,s,d,ppro,algo_manager_comm,authen_clientside_comm,algo_manager,util_go)
 	utility.start()
 	root.mainloop()
 

@@ -60,6 +60,9 @@ class scanner_process_manager:
 	def receive_request(self):
 
 		count = 0
+
+		time.sleep(15)
+
 		while True:
 			d = self.request.recv()
 			count +=1

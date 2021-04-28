@@ -32,6 +32,7 @@ class database_process_manager:
 
 	def set_symbols_manager(self,s: Symbol_data_manager):
 
+		self.symbol_data_manager = s
 		self.data_status = s.data_ready
 		self.data = s.data_list
 		self.symbols = s.get_list()
@@ -55,9 +56,14 @@ class database_process_manager:
 
 		#need to add a while loop to count how many has received.
 		#deactivate it when it gets nothing to receive.
+		while True:
+			if self.symbol_data_manager.start ==True:
+				break
+			else:
+				time.sleep(2)
 
 		print("Database Online: Receiving Starts")
-		time.sleep(10)
+		time.sleep(5)
 		while True:
 			d = self.request.recv()
 

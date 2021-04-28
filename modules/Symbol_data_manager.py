@@ -220,7 +220,9 @@ class Symbol_data_manager:
 		self.symbol_percentage_last_5,
 		self.symbol_position_status]
 
+		self.start = False
 		self.init_data()
+
 
 
 	def toggle_all(self,vals,val):
@@ -231,6 +233,8 @@ class Symbol_data_manager:
 
 		for i in self.symbols:
 			self.init_symbol(i)
+
+		
 
 	def get_symbol_price(self,symbol):
 

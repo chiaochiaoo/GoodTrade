@@ -252,7 +252,7 @@ class algo_manager(pannel):
 
 		self.width = list(self.labels.values())
 
-		self.setting = ttk.LabelFrame(root,text="Algo Manager") 
+		self.setting = ttk.LabelFrame(root,text="Algo Manager v1") 
 		self.setting.place(x=10,y=10,height=250,width=180)
 
 
@@ -832,6 +832,7 @@ class algo_manager(pannel):
 					self.order_tkstring[id_]["algo_status"].set("Running")
 					self.order_tklabels[id_]["algo_status"]["background"] = "#97FEA8" #set the label to be, green.
 
+					self.update_target_price(id_,price)
 					self.order_process(symbol,price,shares,side)
 		#print(shares,"done")
 
@@ -933,12 +934,16 @@ class algo_manager(pannel):
 		if current_status == self.status["Pending"]:
 
 			#refresh the datas.
+			
 			self.lock_entrys(id_,True)
+
 			self.break_at[id_] = self.order_tkstring[id_]["break_at"].get()
 			self.stoplevel[id_] = self.order_tkstring[id_]["stoplevel"].get()
 			self.price_levels[id_][1] = self.order_tkstring[id_]["tgtpx1"].get()
 			self.price_levels[id_][2] = self.order_tkstring[id_]["tgtpx2"].get()
 			self.price_levels[id_][3] = self.order_tkstring[id_]["tgtpx3"].get()
+
+			self.update_target_entry(id_)
 
 			self.order_tkstring[id_]["algo_status"].set(self.status["Deploying"])
 			self.order_tklabels[id_]["algo_status"]["background"] = LIGHTYELLOW
@@ -1050,7 +1055,7 @@ class algo_manager(pannel):
 
 							
 							#shake of 1/3 
-							share = min(int(int(self.target_share[id_])//3),self.current_share[id_])
+							share = min(int(int(self.target_share[id_])//4),self.current_share[id_])
 
 							if current_level==3: share=int(self.current_share[id_])
 							#if share==0: share = self.current_share[id_]  #if 0. get rid of everything.
@@ -1080,7 +1085,7 @@ class algo_manager(pannel):
 
 							
 							#shake of 1/3 
-							share = min(int(int(self.target_share[id_])//3),self.current_share[id_])
+							share = min(int(int(self.target_share[id_])//4),self.current_share[id_])
 							if current_level==3: share=int(self.current_share[id_])
 
 							buy_market_order(symbol,share)
@@ -1162,8 +1167,8 @@ class algo_manager(pannel):
 							self.update_target_entry(id_)
 							#here I need to recaculate the estimate risk.
 							#self.adjusting_risk(id_)
-		except:
-			print("updating levels errors on",symbol)
+		except Exception as e:
+			print("updating levels errors on",symbol,e)
 
 	#whether it is done, rejected, or cancled. should go here
 
@@ -1176,8 +1181,10 @@ class algo_manager(pannel):
 		except:
 			print("invalid price targets set for ",id_)
 
-	def update_target_price(self,id_): #call this whenever the break at price changes. 
-		price = self.break_at[id_]
+	def update_target_price(self,id_,price=None): #call this whenever the break at price changes. 
+
+		if price==None:
+			price = self.break_at[id_]
 
 		global coecoefficient
 
@@ -1192,7 +1199,7 @@ class algo_manager(pannel):
 				self.price_levels[id_][0] = price
 				self.price_levels[id_][1] = round(price+ohv*0.2*coefficient,2)
 				self.price_levels[id_][2] = round(price+ohv*0.5*coefficient,2)
-				self.price_levels[id_][3] =	round(price+ohv*0.75*coefficient,2)
+				self.price_levels[id_][3] =	round(price+ohv*0.8*coefficient,2)
 				good = True
 			else:
 
@@ -1205,7 +1212,7 @@ class algo_manager(pannel):
 				self.price_levels[id_][0] = price
 				self.price_levels[id_][1] = round(price-olv*0.2*coefficient,2)
 				self.price_levels[id_][2] = round(price-olv*0.5*coefficient,2)
-				self.price_levels[id_][3] =	round(price-olv*0.75*coefficient,2)
+				self.price_levels[id_][3] =	round(price-olv*0.8*coefficient,2)
 				good = True
 			else:
 				self.order_tkstring[id_]["auto_manage"].set(False)
@@ -1217,13 +1224,23 @@ class algo_manager(pannel):
 			self.order_tkstring[id_]["tgtpx2"].set(self.price_levels[id_][2])
 			self.order_tkstring[id_]["tgtpx3"].set(self.price_levels[id_][3])
 
+		try:
+			print("update: cur:",id_,price,self.price_levels[id_][1],self.price_levels[id_][2],self.price_levels[id_][3])
+		except Exception as e:
+			print(e)
+
 	def update_target_entry(self,id_):
 
-		cur_risk = abs(self.stoplevel[id_] - self.break_at[id_])
+		cur_risk = round(abs(self.stoplevel[id_] - self.break_at[id_]),3)
 		shares = int(self.est_risk[id_]//cur_risk)
+
+		print(id_," updating shares: new risk per share: ",cur_risk," shares from",self.target_share[id_]," to",shares)
+
 		self.target_share[id_] = shares
 
 		self.order_tkstring[id_]["current_share"].set(str(self.current_share[id_])+"/"+str(self.target_share[id_]))
+
+		
 
 	def mark_off_algo(self,id_,status):
 
@@ -1427,7 +1444,7 @@ if __name__ == '__main__':
 	algo_ppro_manager.start()
 
 	root = tk.Tk() 
-	root.title("GoodTrade Algo Manager") 
+	root.title("GoodTrade Algo Manager v1b2") 
 	root.geometry("1600x1000")
 	root.minsize(1600, 1000)
 	root.maxsize(1800, 1200)
