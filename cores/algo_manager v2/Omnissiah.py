@@ -15,11 +15,12 @@ if __name__ == '__main__':
 	aapl = Symbol("aapl")
 	TP = TradingPlan(aapl)
 	aapl.set_tradingplan(TP)
-	aapl.set_phigh(12)
-	aapl.set_plow(10)
+	aapl.set_phigh(16)
+	aapl.set_plow(15)
 
 	b = BreakDown(0)
 	#b = BreakUp(0)
+	b = AnyLevel(3)
 	TP.set_EntryStrategy(b)
 	TP.start_EntryStrategy()
 

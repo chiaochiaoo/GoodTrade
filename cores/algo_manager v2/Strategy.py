@@ -74,6 +74,13 @@ class BreakDown(Strategy): #the parameters contains? dk. yet .
 		self.add_initial_triggers(shortTrigger)
 
 
-# class AnyLevel(Strategy):
-# 	def __init__(self):
-# 		super().__init__()
+class AnyLevel(Strategy):
+	def __init__(self,timer=0):
+		super().__init__("AnyLevel")
+		
+		#subject1,type_,subject2,trigger_timer,description,trigger_limit=1
+		buyTrigger = SingleEntry(ASK,">",PREMARKETHIGH,timer,"BUY BREAK UP","Long")
+		self.add_initial_triggers(buyTrigger)
+
+		shortTrigger = SingleEntry(BID,"<",PREMARKETLOW,timer,"SHORT BREAK DOWN","Short")
+		self.add_initial_triggers(shortTrigger)

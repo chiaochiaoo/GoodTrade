@@ -102,14 +102,14 @@ class Trigger:
 
 	def is_trigger(self):
 		
-		print("Trigger:","cur time:",self.symbol.get_time(), "duration:", self.trigger_duration, "timer:",self.trigger_timer,"already occurance:",self.trigger_count,"total repeat time:",self.trigger_limit)
+		#print("Trigger:","cur time:",self.symbol.get_time(), "duration:", self.trigger_duration, "timer:",self.trigger_timer,"already occurance:",self.trigger_count,"total repeat time:",self.trigger_limit)
 		if self.trigger_duration >= self.trigger_timer:
 
 			###EVENT HAPPENS HERE.####
 			self.trigger_event()
 			self.trigger_count+=1
 			if self.trigger_count == self.trigger_limit:
-				print("??")
+				#print("??")
 				return True
 			else:
 				self.reset()	

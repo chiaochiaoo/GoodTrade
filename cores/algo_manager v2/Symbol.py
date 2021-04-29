@@ -8,14 +8,6 @@ class Symbol:
 
 		self.symbol = symbol
 
-		# self.bid = 0
-		# self.ask = 0
-		# self.support = 0
-		# self.resistence = 0
-		# self.open = 0
-		# self.high = 0
-		# self.low = 0
-
 		self.init_open = False
 		self.init_high_low = False
 
@@ -68,17 +60,6 @@ class Symbol:
 		if self.tradingplan!=None:
 			self.tradingplan.update()
 
-		# remove = []
-		# for i in self.triggers:
-		# 	if i.check():
-		# 		#print(1)
-		# 		remove.append(i)
-
-		# #execute the actions on remove.
-		# #remove it from triggers.
-		# for i in remove:
-		# 	i.trigger_event()
-		# 	self.triggers.remove(i)
 
 	def set_phigh(self,v):
 		self.data[PREMARKETHIGH]=v
