@@ -1,4 +1,5 @@
 from constant import *
+import tkinter as tk
 #from Triggers import *
 
 class Symbol:
@@ -11,26 +12,25 @@ class Symbol:
 		self.init_open = False
 		self.init_high_low = False
 
+		self.numeric_labels = [TIMESTAMP,BID,ASK,RESISTENCE,SUPPORT,OPEN,HIGH,LOW,PREMARKETHIGH,PREMARKETLOW]
+
+
 		self.data = {}
-
-		self.data[TIMESTAMP]=0
-
-		self.data[BID]= 0
-		self.data[ASK]=	0
-		self.data[RESISTENCE] = 0
-		self.data[SUPPORT] = 0
-		self.data[OPEN] = 0
-		self.data[HIGH] =0
-		self.data[LOW] = 0
-
-		self.data[PREMARKETHIGH] = 0
-		self.data[PREMARKETLOW] = 0
-
-		# self.total_realized = 0
-		# self.number_trades = 0
+		self.tkvars = {}
 
 		self.tradingplan=None
+		self.init_data()
 
+	def init_data(self):
+
+		for i in self.numeric_labels:
+			self.data[i] = 0
+			#self.tkvars[i] = tk.DoubleVar()
+
+		self.data[AUTORANGE] = True
+		
+	def toggle_autorange(self,Bool):
+		self.data[AUTORANGE] = Bool
 
 	def get_name(self):
 		return self.symbol

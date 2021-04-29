@@ -26,6 +26,9 @@ class Strategy: #ABSTRACT CLASS. the beginning of a sequence, containing one or 
 		self.symbol=None
 		self.tradingplan =None
 
+	def get_name(self):
+		return self.strategy_name
+
 	def add_initial_triggers(self,trigger):
 		self.current_triggers.add(trigger)
 

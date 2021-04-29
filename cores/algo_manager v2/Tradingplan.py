@@ -1,7 +1,7 @@
 from Symbol import *
 from Triggers import *
 from Strategy import *
-
+from constant import*
 # MAY THE 
 
 class TradingPlan:
@@ -11,12 +11,6 @@ class TradingPlan:
 		self.symbol = symbol
 		self.symbol_name = symbol.get_name()
 
-		self.risk = risk
-		self.position = None
-		self.current_share = 0
-		self.target_share = 0
-
-		self.trade_stage = "Pending"
 
 		self.current_running_strategy = None
 
@@ -25,9 +19,52 @@ class TradingPlan:
 		self.entry_strategy = None
 		self.manage_strategy = None
 
+		self.entry_startegy_name = None
+		self.manage_startegy_name = None 
+
+		self.data = {}
+		self.tkvars = {}
+
+		self.numeric_labels = [ACTRISK,ESTRISK,CURRENT_SHARE,TARGET_SHARE,AVERAGE_PRICE,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER]
+		self.string_labels = [MIND,STATUS,POSITION,MANASTRAT,ENSTRAT,RISK_RATIO,SIZE_IN]
+
+		self.init_data(risk)
+
+	def init_data(self,risk):
+
+		for i in self.numeric_labels:
+			self.data[i] = 0
+			self.tkvars[i] = tk.DoubleVar(value=0)
+
+		for i in self.string_labels:
+			self.data[i] = ""
+			self.tkvars[i] = tk.StringVar(value=" ")
+
+		for i in self.symbol.numeric_labels:
+			self.data[i] = 0
+			self.tkvars[i] = tk.DoubleVar(value=0)
+
+		#Non String, Non Numeric Value
+
+		self.tkvars[AUTORANGE] = tk.BooleanVar(value=True)
+		
+		self.data[ESTRISK] = risk
+		self.tkvars[ESTRISK].set(risk)
+
 	def set_EntryStrategy(self,entry_strategy:Strategy):
 		self.entry_strategy = entry_strategy
 		self.entry_strategy.set_symbol(self.symbol,self)
+
+		self.data[ENSTRAT] = entry_strategy.get_name()
+		self.tkvars[ENSTRAT].set(entry_strategy.get_name())
+
+
+	def set_ManagementStrategy(self,manage_strategy:Strategy):
+		self.manage_strategy = manage_strategy
+		self.manage_strategy.set_symbol(self.symbol,self)		
+
+		self.data[MANASTRAT] = manage_strategy.get_name()
+		self.tkvars[MANASTRAT].set(manage_strategy.get_name())
 
 	def start_EntryStrategy(self):
 		self.current_running_strategy = self.entry_strategy
@@ -56,18 +93,22 @@ class TradingPlan:
 			self.current_running_strategy.update()
 
 
-
 if __name__ == '__main__':
 
 	#TEST CASES for trigger.
+	
 	aapl = Symbol("aapl")
-
 	TP = TradingPlan(aapl)
 	aapl.set_tradingplan(TP)
-	aapl.set_high(15)
-	buyTrigger = SingleEntry(aapl,ASK,">",HIGH,0,"BUY HIGH")
+	aapl.set_phigh(16)
+	aapl.set_plow(15)
 
-	TP.add_trigger(buyTrigger)
+	b = BreakDown(0)
+	#b = BreakUp(0)
+	b = AnyLevel(3)
+	TP.set_EntryStrategy(b)
+	TP.start_EntryStrategy()
+
 	
 	aapl.update_price(10,10,0)
 	aapl.update_price(11,11,1)
@@ -76,19 +117,17 @@ if __name__ == '__main__':
 	aapl.update_price(14,14,4)
 	aapl.update_price(15,15,5)
 	##### DECRESE#######
-	aapl.update_price(14,14,6)
+	aapl.update_price(5,5,6)
 	aapl.update_price(13,13,7)
-	aapl.update_price(12,12,6)
-	aapl.update_price(11,11,7)
+
 	aapl.update_price(10,10,8)
 	###### INCREASE #############
 	aapl.update_price(11,11,9)
 	aapl.update_price(12,12,10)
 	aapl.update_price(13,13,11)
-	aapl.update_price(14,14,11)
-	aapl.update_price(15,15,12)
-	aapl.update_price(16,16,13)
-	aapl.update_price(17,17,14)
-	aapl.update_price(18,18,15)
-	aapl.update_price(19,19,16)
-### EVENT CLASS. TRIGGER EVENT. ###
+	aapl.update_price(14,14,12)
+	aapl.update_price(15,15,13)
+	aapl.update_price(16,16,14)
+	aapl.update_price(17,17,15)
+	aapl.update_price(18,18,16)
+	aapl.update_price(19,19,17)

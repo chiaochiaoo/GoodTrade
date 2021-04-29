@@ -1,4 +1,5 @@
 from pannel import *
+from constant import *
 
 class UI(pannel):
 	def __init__(self,root):
@@ -6,13 +7,15 @@ class UI(pannel):
 		self.root = root
 
 		self.tk_strings=["algo_status","realized","shares","unrealized","unrealized_pshr","average_price"]
-		self.tk_labels=['Symbol', 'MIND', 'TradingPlan', 'EntryStrat', 'Timer', 'ManaStart', 'AR', 'Sup', 'Res', 'Act/Est R', 'Position', 'AvgPx', 'SzIn', 'UPshr', 'U', 'R', 'TR', 'flatten', 'log']
+		self.tk_labels=[SYMBOL,STATUS,MIND, 'TradingPlan', 'EntryStrat', 'Timer', 'ManaStart', 'AR', 'Sup', 'Res', 'Act/Est R', 'Position', 'AvgPx', 'SzIn', 'UPshr', 'U', 'R', 'TR', 'flatten', 'log']
 		
-		self.order_tklabels = {}
+		self.tklabels = {}
 		self.label_count = 1
 		self.init_pannel()
+
 	def init_pannel(self):
 		self.labels = {"Symbol":10,\
+						"Status":10,\
 						"MIND":20,\
 						"TradingPlan":12,\
 						"EntryStrat":12,\
@@ -32,7 +35,7 @@ class UI(pannel):
 						"flatten":10,
 						"log":5}
 
-		print(list(self.labels.keys()))
+		#print(list(self.labels.keys()))
 		self.width = list(self.labels.values())
 
 		self.setting = ttk.LabelFrame(self.root,text="Algo Manager") 
@@ -71,7 +74,6 @@ class UI(pannel):
 		self.timersx.grid(column=1,row=4,padx=10)
 
 
-
 		# self.algo_deploy = ttk.Button(self.setting, text="Deploy all algo")#,command=self.deploy_all_stoporders)
 		# self.algo_deploy.grid(column=1,row=6)
 
@@ -87,11 +89,11 @@ class UI(pannel):
 		self.total_u = tk.StringVar()
 		self.total_r = tk.StringVar()
 
-		self.log_panel = ttk.LabelFrame(root,text="Logs") 
+		self.log_panel = ttk.LabelFrame(self.root,text="Logs") 
 		self.log_panel.place(x=10,y=250,relheight=0.5,width=180)
 
-		self.deployment_panel = ttk.LabelFrame(root,text="Algo deployment") 
-		self.deployment_panel.place(x=200,y=10,relheight=0.85,width=1400)
+		self.deployment_panel = ttk.LabelFrame(self.root,text="Algo deployment") 
+		self.deployment_panel.place(x=200,y=10,relheight=0.85,width=1450)
 
 		self.dev_canvas = tk.Canvas(self.deployment_panel)
 		self.dev_canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
@@ -105,47 +107,120 @@ class UI(pannel):
 		self.deployment_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
 		self.dev_canvas.create_window(0, 0, window=self.deployment_frame, anchor=tk.NW)
 
-
-		self.create_example_trade()
+		#self.create_example_trade()
 
 		self.rebind(self.dev_canvas,self.deployment_frame)
 		self.recreate_labels()
 
+
+	def create_new_entry(self,tradingplan):
+
+
+		info = {
+		'Symbol':tradingplan.symbol_name, \
+		'Status':tradingplan.tkvars[STATUS],\
+		'MIND': tradingplan.tkvars[MIND],\
+		'TradingPlan':tradingplan.tkvars[ENSTRAT], \
+		'EntryStrat':"Singlle Entry", \
+		'Timer':tradingplan.tkvars[TIMER], \
+		'ManaStart':tradingplan.tkvars[MANASTRAT], \
+		'AR':tradingplan.tkvars[AUTORANGE], \
+		'Sup':tradingplan.tkvars[SUPPORT], \
+		'Res':tradingplan.tkvars[RESISTENCE], \
+		'Act/Est R':tradingplan.tkvars[RISK_RATIO], \
+		'Position':tradingplan.tkvars[POSITION], \
+		'AvgPx':tradingplan.tkvars[AVERAGE_PRICE], \
+		'SzIn':tradingplan.tkvars[SIZE_IN], \
+		'UPshr':tradingplan.tkvars[UNREAL_PSHR], \
+		'U':tradingplan.tkvars[UNREAL], \
+		'R':tradingplan.tkvars[REALIZED], \
+		'TR':tradingplan.tkvars[TOTAL_REALIZED], \
+		'flatten':"", \
+		'log':""}
+
+		l = self.label_count
+
+		info = list(info.values())
+		symbol = info[0]
+		self.tklabels[symbol] = {}
+		for j in range(len(info)):
+			#"symbol","algo_status","description","break_at","position","act_r/est_r","stoplevel","average_price","shares","pxtgt1","pxtgt1","pxtgt1","unrealized_pshr","unrealized","realized"
+			label_name = self.tk_labels[j]
+
+			if label_name == "Symbol":
+				self.tklabels[symbol][label_name] = tk.Button(self.deployment_frame ,text=info[j],width=self.width[j])
+
+			elif label_name =="Timer":
+				self.tklabels[symbol][label_name] = tk.Entry(self.deployment_frame,textvariable=info[j],width=self.width[j])
+
+			# elif label_name =="EntryStrat":
+			# 	self.tklabels[symbol][label_name] = tk.OptionMenu(self.deployment_frame, textvariable="",set())
+
+			# elif label_name =="ManaStart":
+			# 	self.tklabels[symbol][label_name] = tk.OptionMenu(self.deployment_frame, textvariable="",set())
+
+			elif label_name =="AR" or  label_name =="AM":
+				self.tklabels[symbol][label_name] = tk.Checkbutton(self.deployment_frame,variable=info[j])
+			elif label_name =="MIND":
+				self.tklabels[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
+			elif label_name == "Sup" or label_name == "Res" or label_name == "pxtgt1" or label_name == "pxtgt2" or label_name == "pxtgt3":
+				self.tklabels[symbol][label_name] =tk.Entry(self.deployment_frame ,textvariable=info[j],width=self.width[j])	
+			else:
+				if str(type(info[j]))=="<class 'tkinter.StringVar'>" or str(type(info[j]))=="<class 'tkinter.DoubleVar'>":
+					self.tklabels[symbol][label_name]=tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
+				else:
+					#print(self.tklabels[symbol])
+					self.tklabels[symbol][label_name]=tk.Button(self.deployment_frame ,text=info[j],width=self.width[j])
+			try:
+				self.label_default_configure(self.tklabels[symbol][label_name])
+			except:
+				pass
+
+			self.tklabels[symbol][label_name].grid(row= l+2, column=j,padx=0)
+
+		self.label_count +=1
+
 	def create_example_trade(self):
 
-		
-		info=['AAPL', 'MIND', 'Bullish', 'EntryStrat', 'Timer', 'ManaStart', 'AR', 'Sup', 'Res', 'Act/Est R', 'Long', 'AvgPx', 'SzIn', 'UPshr', 'U', 'R', 'TR', 'flatten', 'log']
-		id_ = 'AAPL'
-		self.order_tklabels[id_]={}
-		self.order_tklabels[id_][1]=1
+		info=['AAPL','STATUS', 'MIND', 'Bullish', 'EntryStrat', 'Timer', 'ManaStart', 'AR', 'Sup', 'Res', 'Act/Est R', 'Long', 'AvgPx', 'SzIn', 'UPshr', 'U', 'R', 'TR', 'flatten', 'log']
+		symbol = 'AAPL'
+		self.tklabels[symbol]={}
+		self.tklabels[symbol][1]=1
 		l = self.label_count
 		for j in range(len(info)):
 			#"symbol","algo_status","description","break_at","position","act_r/est_r","stoplevel","average_price","shares","pxtgt1","pxtgt1","pxtgt1","unrealized_pshr","unrealized","realized"
 			label_name = self.tk_labels[j]
 
 			if label_name == "Symbol":
-				self.order_tklabels[id_][label_name] =tk.Button(self.deployment_frame ,text=info[j],width=self.width[j],command = lambda s=id_: self.deploy_stop_order(id_))	
-			#elif label_name =="TradingPlan":
-				#self.order_tklabels[id_][label_name] =tk.Option(self.deployment_frame,variable=info[j])
+				self.tklabels[symbol][label_name] = tk.Button(self.deployment_frame ,text=info[j],width=self.width[j],command = lambda s=symbol: self.deploy_stop_order(symbol))
+
+			elif label_name =="Timer":
+				self.tklabels[symbol][label_name] = tk.Entry(self.deployment_frame,textvariable=info[j],width=self.width[j])
+
+			# elif label_name =="EntryStrat":
+			# 	self.tklabels[symbol][label_name] = tk.OptionMenu(self.deployment_frame, textvariable="",set())
+
+			# elif label_name =="ManaStart":
+			# 	self.tklabels[symbol][label_name] = tk.OptionMenu(self.deployment_frame, textvariable="",set())
 
 			elif label_name =="AR" or  label_name =="AM":
-				self.order_tklabels[id_][label_name] =tk.Checkbutton(self.deployment_frame,variable=info[j])
+				self.tklabels[symbol][label_name] = tk.Checkbutton(self.deployment_frame,variable=info[j])
 			elif label_name =="MIND":
-				self.order_tklabels[id_][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command = lambda s=id_: self.cancel_deployed(id_))
+				self.tklabels[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command = lambda s=symbol: self.cancel_deployed(symbol))
 			elif label_name == "Sup" or label_name == "Res" or label_name == "pxtgt1" or label_name == "pxtgt2" or label_name == "pxtgt3":
-				self.order_tklabels[id_][label_name] =tk.Entry(self.deployment_frame ,textvariable=info[j],width=self.width[j])	
+				self.tklabels[symbol][label_name] =tk.Entry(self.deployment_frame ,textvariable=info[j],width=self.width[j])	
 			else:
 				if str(type(info[j]))=="<class 'tkinter.StringVar'>":
-					self.order_tklabels[id_][label_name]=tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
+					self.tklabels[symbol][label_name]=tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
 				else:
-					print(self.order_tklabels[id_])
-					self.order_tklabels[id_][label_name]=tk.Button(self.deployment_frame ,text=info[j],width=self.width[j])
+					#print(self.tklabels[symbol])
+					self.tklabels[symbol][label_name]=tk.Button(self.deployment_frame ,text=info[j],width=self.width[j])
 
 			try:
-				self.label_default_configure(self.order_tklabels[id_][label_name])
+				self.label_default_configure(self.tklabels[symbol][label_name])
 			except:
 				pass
-			self.order_tklabels[id_][label_name].grid(row= l+2, column=j,padx=0)
+			self.tklabels[symbol][label_name].grid(row= l+2, column=j,padx=0)
 
 
 	def recreate_labels(self):
@@ -172,13 +247,13 @@ class UI(pannel):
 
 		#if they already exisit, just repace the old ones.
 		i = info[0][0]
-		id_ = info[0][1]
+		symbol = info[0][1]
 		status = info[1]
 		l = self.label_count
 
 		#self.tickers_labels[i]=[]
 		self.tickers_tracers[i] = []
-		self.order_tklabels[id_] = {}
+		self.tklabels[symbol] = {}
 
 		#add in tickers.
 		#print("LENGTH",len(info))
@@ -187,29 +262,29 @@ class UI(pannel):
 			label_name = self.tk_labels[j]
 
 			if label_name == "symbol":
-				self.order_tklabels[id_][label_name] =tk.Button(self.deployment_frame ,text=info[j][0],width=self.width[j],command = lambda s=id_: self.deploy_stop_order(id_))	
+				self.tklabels[symbol][label_name] =tk.Button(self.deployment_frame ,text=info[j][0],width=self.width[j],command = lambda s=symbol: self.deploy_stop_order(symbol))	
 			elif label_name =="AR" or  label_name =="AM":
-				self.order_tklabels[id_][label_name] =tk.Checkbutton(self.deployment_frame,variable=info[j])
+				self.tklabels[symbol][label_name] =tk.Checkbutton(self.deployment_frame,variable=info[j])
 			elif label_name =="algo_status":
-				self.order_tklabels[id_][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command = lambda s=id_: self.cancel_deployed(id_))
+				self.tklabels[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command = lambda s=symbol: self.cancel_deployed(symbol))
 			elif label_name == "break_at" or label_name == "stoplevel" or label_name == "pxtgt1" or label_name == "pxtgt2" or label_name == "pxtgt3":
-				self.order_tklabels[id_][label_name] =tk.Entry(self.deployment_frame ,textvariable=info[j],width=self.width[j])	
+				self.tklabels[symbol][label_name] =tk.Entry(self.deployment_frame ,textvariable=info[j],width=self.width[j])	
 			else:
 				if str(type(info[j]))=="<class 'tkinter.StringVar'>":
-					self.order_tklabels[id_][label_name]=tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
+					self.tklabels[symbol][label_name]=tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
 				else:
-					self.order_tklabels[id_][label_name]=tk.Button(self.deployment_frame ,text=info[j],width=self.width[j])
+					self.tklabels[symbol][label_name]=tk.Button(self.deployment_frame ,text=info[j],width=self.width[j])
 
 			try:
-				self.label_default_configure(self.order_tklabels[id_][label_name])
+				self.label_default_configure(self.tklabels[symbol][label_name])
 			except:
 				pass
-			self.order_tklabels[id_][label_name].grid(row= l+2, column=j,padx=0)
+			self.tklabels[symbol][label_name].grid(row= l+2, column=j,padx=0)
 
 			#else: #command = lambda s=symbol: self.delete_symbol_reg_list(s))
 
 		j+=1
-		flatten=tk.Button(self.deployment_frame ,text="flatten",width=self.width[j],command= lambda k=i:self.flatten_symbol(k,id_,status))
+		flatten=tk.Button(self.deployment_frame ,text="flatten",width=self.width[j],command= lambda k=i:self.flatten_symbol(k,symbol,status))
 		self.label_default_configure(flatten)
 		flatten.grid(row= l+2, column=j,padx=0)
 
@@ -218,12 +293,13 @@ class UI(pannel):
 		self.rebind(self.dev_canvas,self.deployment_frame)
 	
 
+if __name__ == '__main__':
 
-root = tk.Tk() 
-root.title("GoodTrade Algo Manager") 
-root.geometry("1500x500")
+	root = tk.Tk() 
+	root.title("GoodTrade Algo Manager v2") 
+	root.geometry("1500x500")
 
-UI(root)
-# root.minsize(1600, 1000)
-# root.maxsize(1800, 1200)
-root.mainloop()
+	UI(root)
+	# root.minsize(1600, 1000)
+	# root.maxsize(1800, 1200)
+	root.mainloop()
