@@ -4,7 +4,7 @@ import socket
 import threading
 
 
-def algo_ppro_manager(port,pipe):
+def Ppro_in(port,pipe):
 
 	UDP_IP = "localhost"
 	UDP_PORT = port
@@ -131,46 +131,46 @@ def decode_l1(stream_data,pipe):
 
 
 
-class Ppro_in:
+# class Ppro_in:
 
-	def __init__(self):
-		pass
+# 	def __init__(self):
+# 		pass
 
-	def order_pipe_listener(self):
-		while True:
-			d = self.order_pipe.recv()
+# 	def ppro_in(self):
+# 		while True:
+# 			d = self.order_pipe.recv()
 
-			if d[0] =="status":
-				try:
-					self.ppro_status.set("Ppro : "+str(d[1]))
+# 			if d[0] =="status":
+# 				try:
+# 					self.ppro_status.set("Ppro : "+str(d[1]))
 
-					if str(d[1])=="Connected":
-						self.ppro_status_["background"] = "#97FEA8"
-					else:
-						self.ppro_status_["background"] = "red"
-				except Exception as e:
-					print(e)
+# 					if str(d[1])=="Connected":
+# 						self.ppro_status_["background"] = "#97FEA8"
+# 					else:
+# 						self.ppro_status_["background"] = "red"
+# 				except Exception as e:
+# 					print(e)
 
-			if d[0] =="msg":
-				print(d[1])
+# 			if d[0] =="msg":
+# 				print(d[1])
 
-			if d[0] =="order confirm":
-				#get symbol,price, shares.
-				# maybe filled. maybe partial filled.
-				self.ppro_order_confirmation(d[1])
+# 			if d[0] =="order confirm":
+# 				#get symbol,price, shares.
+# 				# maybe filled. maybe partial filled.
+# 				self.ppro_order_confirmation(d[1])
 
-			if d[0] =="order update":
+# 			if d[0] =="order update":
 
-				#update the quote, unrealized. 
-				self.ppro_order_update(d[1])
+# 				#update the quote, unrealized. 
+# 				self.ppro_order_update(d[1])
 
-			if d[0] =="order rejected":
+# 			if d[0] =="order rejected":
 
-				self.ppro_order_rejection(d[1])
+# 				self.ppro_order_rejection(d[1])
 
-			if d[0] =="new stoporder":
+# 			if d[0] =="new stoporder":
 
-				#print("stop order received:",d[1])
-				self.ppro_append_new_stoporder(d[1])
+# 				#print("stop order received:",d[1])
+# 				self.ppro_append_new_stoporder(d[1])
 			
-	#when there is a change of quantity of an order. 
+# 	#when there is a change of quantity of an order. 

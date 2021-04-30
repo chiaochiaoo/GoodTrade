@@ -48,9 +48,8 @@ class UI(pannel):
 		self.ppro_status = tk.StringVar()
 		self.ppro_status.set("Ppro :")
 
-
-
 		self.algo_count_number = 0
+
 		# self.algo_count_string.set("Activated Algos:"+str(self.algo_count_number))
 
 		# self.algo_count_ = ttk.Label(self.setting, textvariable=self.algo_count_string)
