@@ -182,7 +182,7 @@ class ticker_manager(pannel):
 
 		self.init_reg_list()
 
-		data = threading.Thread(target=self.recv, daemon=True)
+		data = threading.Thread(target=self.recv, name="Authen thread",daemon=True)
 		data.start()
 
 		
@@ -190,20 +190,26 @@ class ticker_manager(pannel):
 
 		ticks = self.data.get_list()
 
-		data = threading.Thread(target=self.adding_one_by_one(ticks), daemon=True)
+		data = threading.Thread(target=self.adding_one_by_one(ticks), name="init reg list thread", daemon=True)
 		data.start()
 
 	def adding_one_by_one(self,ticks):
 
-		for i in range(len(ticks)):
-			self.add_symbol_label(ticks[i])
+		try:
 
-		self.tickers = self.data.get_list()
-		self.rebind(self.canvas,self.frame)
+			for i in range(len(ticks)):
+				self.add_symbol_label(ticks[i])
 
-		self.data.start=True
+			self.tickers = self.data.get_list()
+			self.rebind(self.canvas,self.frame)
 
-		self.util_go.send("util activated")
+			self.data.start=True
+
+			self.util_go.send("util activated")
+
+		except:
+
+			print("util activate failed")
 
 	def delete_symbol_reg_list(self,symbol):
 
@@ -303,12 +309,16 @@ class ticker_manager(pannel):
 			print("Error",e)
 
 	def recv(self):
-		k=self.authen.recv()
-		name=k[0]
-		per=k[1]
-		sta=k[2]
-		self.trader_stats["text"]= "User Authentication: "+name
-		self.permission_stats["text"]="Permission Status:"+per
+
+		try:
+			k=self.authen.recv()
+			name=k[0]
+			per=k[1]
+			sta=k[2]
+			self.trader_stats["text"]= "User Authentication: "+name
+			self.permission_stats["text"]="Permission Status:"+per
+		except:
+			print("Authen not good")
 #a seperate thread on its own. 
 
 def on_closing():

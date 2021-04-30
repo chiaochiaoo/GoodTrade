@@ -53,70 +53,72 @@ class ppro_process_manager:
 
 		temp = {}
 
-		while True:
-			if self.data.start ==True:
-				break
-			else:
-				time.sleep(2)
-		print("PPro subthread activated")
-		time.sleep(5)
-
-		while True:
-			d = self.request.recv()
-
-			status = d[0]
-
-			try:
-				if status == "message":
-					print(d[1])
-					if d[1] == "Connection established.":
-						if self.init:
-							self.ppro_status.set("Ppro Status: Connected")
-					elif d[1] == "Conection failed. try again in 3 sec.":
-						if self.init:
-							self.ppro_status.set("Ppro Status: Reconnecting..")
+		try:
+			
+			while True:
+				if self.data.start ==True:
+					break
 				else:
+					time.sleep(2)
+			print("PPro subthread activated")
+			time.sleep(5)
 
-					#print(d)
-					symbol = d[1]
-					#print("receive",symbol)
-					self.data_list[0][symbol].set(status)
+			while True:
+				d = self.request.recv()
 
-					#	pipe.send([status,symbol,price,time,timestamp,
-					#   d["high"],d["low"],\d["range"],d["last_5_range"],
-					#   d["vol"],d["open"],d["oh"],d["ol"],d["f5r"],d["f5v"]])
+				status = d[0]
 
-					if status == "Connected" or status =="Lagged":
+				
+					if status == "message":
+						print(d[1])
+						if d[1] == "Connection established.":
+							if self.init:
+								self.ppro_status.set("Ppro Status: Connected")
+						elif d[1] == "Conection failed. try again in 3 sec.":
+							if self.init:
+								self.ppro_status.set("Ppro Status: Reconnecting..")
+					else:
 
 						#print(d)
-						if len(d)-1 == len(self.data_list):
-							for i in range(1,len(self.data_list)):
-								#print(self.data_list[i][symbol].get())
-								self.data_list[i][symbol].set(d[i+1])
-								# if self.data_list[i][symbol].get() != d[i+1]:
-								#  	self.data_list[i][symbol].set(d[i+1])
+						symbol = d[1]
+						#print("receive",symbol)
+						self.data_list[0][symbol].set(status)
 
-							if self.auto_support_resistance[symbol].get() == 1:
-								timestamp = d[4]
-								high = d[7]
-								low = d[8]
-								#need to check if its the same as previous set. if not, that means it's manually changed. 
-								#if timestamp < 570:
+						#	pipe.send([status,symbol,price,time,timestamp,
+						#   d["high"],d["low"],\d["range"],d["last_5_range"],
+						#   d["vol"],d["open"],d["oh"],d["ol"],d["f5r"],d["f5v"]])
 
-								if symbol in temp:
-									cur = (self.resistance[symbol].get(),self.supoort[symbol].get())
-									if cur != temp[symbol]:
-										self.auto_support_resistance[symbol].set(0)
+						if status == "Connected" or status =="Lagged":
+
+							#print(d)
+							if len(d)-1 == len(self.data_list):
+								for i in range(1,len(self.data_list)):
+									#print(self.data_list[i][symbol].get())
+									self.data_list[i][symbol].set(d[i+1])
+									# if self.data_list[i][symbol].get() != d[i+1]:
+									#  	self.data_list[i][symbol].set(d[i+1])
+
+								if self.auto_support_resistance[symbol].get() == 1:
+									timestamp = d[4]
+									high = d[7]
+									low = d[8]
+									#need to check if its the same as previous set. if not, that means it's manually changed. 
+									#if timestamp < 570:
+
+									if symbol in temp:
+										cur = (self.resistance[symbol].get(),self.supoort[symbol].get())
+										if cur != temp[symbol]:
+											self.auto_support_resistance[symbol].set(0)
+										else:
+											temp[symbol] = (high,low)
+											self.resistance[symbol].set(high)
+											self.supoort[symbol].set(low)
 									else:
 										temp[symbol] = (high,low)
 										self.resistance[symbol].set(high)
 										self.supoort[symbol].set(low)
-								else:
-									temp[symbol] = (high,low)
-									self.resistance[symbol].set(high)
-									self.supoort[symbol].set(low)
-			except Exception as e:
-				print("ppro hiccup ",e)
+		except Exception as e:
+			print("ppro hiccup ",e)
 
 	def init_info(self):
 		for i in self.symbols:

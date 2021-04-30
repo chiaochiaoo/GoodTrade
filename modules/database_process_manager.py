@@ -64,32 +64,33 @@ class database_process_manager:
 
 		print("Database Online: Receiving Starts")
 		time.sleep(5)
-		while True:
-			d = self.request.recv()
+		try:
+			while True:
+				d = self.request.recv()
 
-			#print("receive")
-			#print(d)
+				#print("receive")
+				#print(d)
 
-			symbol = d[0]
+				symbol = d[0]
 
-			#nothing is returned.
+				#nothing is returned.
 
-			try:
-				if (len(d)==1):
-					self.black_list.append(symbol)
-				else:
-					if len(d)-1 == len(self.data):
-						for i in range(len(self.data)):
-							self.data[i][symbol].set(d[i+1])
-
-						self.reg_list.append(symbol)
-						self.data_status[symbol].set(True)
-						print(symbol," setting complete")
-
+				
+					if (len(d)==1):
+						self.black_list.append(symbol)
 					else:
-						print("Data length mismatch:",len(d)-1,len(self.data))
-			except Exception as e:
-				print("database hiccup",e)
+						if len(d)-1 == len(self.data):
+							for i in range(len(self.data)):
+								self.data[i][symbol].set(d[i+1])
+
+							self.reg_list.append(symbol)
+							self.data_status[symbol].set(True)
+							print(symbol," setting complete")
+
+						else:
+							print("Data length mismatch:",len(d)-1,len(self.data))
+		except Exception as e:
+			print("database hiccup",e)
 
 		### Upon receive, set the properties for each.
 		### What if i have many symbols at the same time?

@@ -32,7 +32,7 @@ class scanner_process_manager:
 		#bond the port
 
 		#start receiving. nonstop. 
-		receive = threading.Thread(name="Reiceive info",target=self.receive_request, daemon=True)
+		receive = threading.Thread(name="Reiceive info",target=self.receive_request,name="scanner subthread" daemon=True)
 		receive.start()
 
 	def set_pannel(self,scanner_pannel):
