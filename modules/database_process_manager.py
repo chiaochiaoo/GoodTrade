@@ -64,8 +64,10 @@ class database_process_manager:
 
 		print("Database Online: Receiving Starts")
 		time.sleep(5)
-		try:
-			while True:
+
+		while True:
+
+			try:
 				d = self.request.recv()
 
 				#print("receive")
@@ -89,8 +91,8 @@ class database_process_manager:
 
 					else:
 						print("Data length mismatch:",len(d)-1,len(self.data))
-		except Exception as e:
-			print("database hiccup",e)
+			except Exception as e:
+				print("database hiccup",e)
 
 		### Upon receive, set the properties for each.
 		### What if i have many symbols at the same time?
