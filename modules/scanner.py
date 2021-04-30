@@ -8,7 +8,6 @@ from modules.scanner_process_manager import *
 
 from tkinter import *
 
-TEST = False
 
 def status_change(var,label):
 	label["text"] = "Current Status: "+var.get()
@@ -814,51 +813,52 @@ class scanner(pannel):
 	def add_nasdaq_labels(self,df):
 
 		print("receive new data")
-		if TEST:
-			self.NT_update_time.set("Scanner disabled")
-			return True
 
-		self.nasdaq_trader_symbols = []
-		
-		timestamp = df[2]
-		df = df[1]
+		try:
+			self.nasdaq_trader_symbols = []
+			
+			timestamp = df[2]
+			df = df[1]
 
-		#df = df[df.market =='NQ'][:20].copy()
+			#df = df[df.market =='NQ'][:20].copy()
 
-		df.loc[df["market"]=='NQ',"market"] = self.market_sort[0]
-		df.loc[df["market"]=='NY',"market"] = self.market_sort[1]
-		df.loc[df["market"]=='AM',"market"] = self.market_sort[2]
+			df.loc[df["market"]=='NQ',"market"] = self.market_sort[0]
+			df.loc[df["market"]=='NY',"market"] = self.market_sort[1]
+			df.loc[df["market"]=='AM',"market"] = self.market_sort[2]
 
-		df["close"] = 0
-		df["open"] = 0
-		#registration 
+			df["close"] = 0
+			df["open"] = 0
+			#registration 
 
-		self.df = df
+			self.df = df
 
-		for index, row in df.iterrows():
-				if row['symbol'] not in self.symbols_registry:
-					self.data.partial_register(row['symbol'])
+			for index, row in df.iterrows():
+					if row['symbol'] not in self.symbols_registry:
+						self.data.partial_register(row['symbol'])
 
-		#update the SDM data to the PD
+			#update the SDM data to the PD
 
-		self.update_pd()
+			self.update_pd()
 
-		#update the infos from SDM
+			#update the infos from SDM
 
-		#call the sort.
-		#check if added.
-		#update. 
-		self.nasdaq_labels_sort()
+			#call the sort.
+			#check if added.
+			#update. 
+			self.nasdaq_labels_sort()
 
-		if self.nasdaq_trader_created == False:
-			time.sleep(5)
-			self.add_nasdaq_labels_init()
-		else:
-			self.add_nasdaq_labels_update()
+			if self.nasdaq_trader_created == False:
+				time.sleep(5)
+				self.add_nasdaq_labels_init()
+			else:
+				self.add_nasdaq_labels_update()
 
-		self.NT_update_time.set(timestamp)
+			self.NT_update_time.set(timestamp)
 
-		self.scanner_process_manager.updating_comlete()
+			self.scanner_process_manager.updating_comlete()
+
+		except Exception as e:
+			print("NT:",e)
 
 	def refresh(self):
 
