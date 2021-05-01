@@ -2,7 +2,7 @@ from Symbol import *
 from Triggers import *
 from Strategy import *
 from constant import*
-# MAY THE 
+# MAY THE MACHINE GOD BLESS THY AIM
 
 class TradingPlan:
 
