@@ -12,7 +12,10 @@ TIMESTAMP="timestamp"
 PREMARKETHIGH="phigh"
 PREMARKETLOW="plow"
 
+
+#options
 AUTORANGE = "AR"
+RELOAD = "reload"
 
 TIMER = "timer"
 ACTRISK="actrisk"

@@ -7,7 +7,7 @@ class UI(pannel):
 		self.root = root
 
 		self.tk_strings=["algo_status","realized","shares","unrealized","unrealized_pshr","average_price"]
-		self.tk_labels=[SYMBOL,STATUS,MIND, 'TradingPlan', 'EntryStrat', 'Timer', 'ManaStart', 'AR', 'Sup', 'Res', 'Act/Est R', 'Position', 'AvgPx', 'SzIn', 'UPshr', 'U', 'R', 'TR', 'flatten', 'log']
+		self.tk_labels=[SYMBOL,STATUS,MIND, 'TradingPlan', 'EntryStrat', 'Timer', 'ManaStart','Reload', 'AR', 'Sup', 'Res', 'Act/Est R', 'Position', 'AvgPx', 'SzIn', 'UPshr', 'U', 'R', 'TR', 'flatten', 'log']
 		
 		self.tklabels = {}
 		self.label_count = 1
@@ -21,6 +21,7 @@ class UI(pannel):
 						"EntryStrat":12,\
 						"Timer":5,\
 						"ManaStart":8,\
+						"Reload":6,\
 						"AR":4,\
 						"Sup":6,\
 						"Res":6,\
@@ -123,6 +124,7 @@ class UI(pannel):
 		'EntryStrat':"Singlle Entry", \
 		'Timer':tradingplan.tkvars[TIMER], \
 		'ManaStart':tradingplan.tkvars[MANASTRAT], \
+		"Reload":tradingplan.tkvars[RELOAD], \
 		'AR':tradingplan.tkvars[AUTORANGE], \
 		'Sup':tradingplan.tkvars[SUPPORT], \
 		'Res':tradingplan.tkvars[RESISTENCE], \
@@ -158,8 +160,8 @@ class UI(pannel):
 			# elif label_name =="ManaStart":
 			# 	self.tklabels[symbol][label_name] = tk.OptionMenu(self.deployment_frame, textvariable="",set())
 
-			elif label_name =="AR" or  label_name =="AM":
-				self.tklabels[symbol][label_name] = tk.Checkbutton(self.deployment_frame,variable=info[j])
+			elif label_name =="AR" or  label_name =="Reload":
+				self.tklabels[symbol][label_name] = tk.Checkbutton(self.deployment_frame,variable=info[j],width=2)
 			elif label_name =="MIND":
 				self.tklabels[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
 			elif label_name == "Sup" or label_name == "Res" or label_name == "pxtgt1" or label_name == "pxtgt2" or label_name == "pxtgt3":

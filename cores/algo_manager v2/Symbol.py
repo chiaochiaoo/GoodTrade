@@ -14,6 +14,7 @@ class Symbol:
 
 		self.numeric_labels = [TIMESTAMP,BID,ASK,RESISTENCE,SUPPORT,OPEN,HIGH,LOW,PREMARKETHIGH,PREMARKETLOW]
 
+		
 
 		self.data = {}
 		self.tkvars = {}
@@ -27,7 +28,7 @@ class Symbol:
 			self.data[i] = 0
 			#self.tkvars[i] = tk.DoubleVar()
 
-		self.data[AUTORANGE] = True
+		#self.data[AUTORANGE] = True
 		
 	def toggle_autorange(self,Bool):
 		self.data[AUTORANGE] = Bool

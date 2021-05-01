@@ -28,6 +28,8 @@ class TradingPlan:
 		self.numeric_labels = [ACTRISK,ESTRISK,CURRENT_SHARE,TARGET_SHARE,AVERAGE_PRICE,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER]
 		self.string_labels = [MIND,STATUS,POSITION,MANASTRAT,ENSTRAT,RISK_RATIO,SIZE_IN]
 
+		self.bool_labels= [AUTORANGE,RELOAD]
+
 		self.init_data(risk)
 
 	def init_data(self,risk):
@@ -43,6 +45,10 @@ class TradingPlan:
 		for i in self.symbol.numeric_labels:
 			self.data[i] = 0
 			self.tkvars[i] = tk.DoubleVar(value=0)
+
+		for i in self.bool_labels:
+			self.data[i] = True
+			self.tkvars[i] = tk.BooleanVar(value=True)
 
 		#Non String, Non Numeric Value
 
