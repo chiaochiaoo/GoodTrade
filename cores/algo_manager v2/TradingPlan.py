@@ -21,8 +21,12 @@ class TradingPlan:
 		self.data = {}
 		self.tkvars = {}
 
+		self.tklabels= {} ##returned by UI.
 
-		self.numeric_labels = [ACTRISK,ESTRISK,CURRENT_SHARE,TARGET_SHARE,AVERAGE_PRICE,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER]
+		self.hodings = []
+		self.current_price_level = 0
+
+		self.numeric_labels = [ACTRISK,ESTRISK,CURRENT_SHARE,TARGET_SHARE,AVERAGE_PRICE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3]
 		self.string_labels = [MIND,STATUS,POSITION,RISK_RATIO,SIZE_IN,ENTRYPLAN,ENTYPE,MANAGEMENTPLAN]
 
 		self.bool_labels= [AUTORANGE,RELOAD]
@@ -58,6 +62,10 @@ class TradingPlan:
 		self.tkvars[ENTYPE].set(entry_type)
 		self.tkvars[MANAGEMENTPLAN].set(manage_plan)
 
+
+		self.data[STATUS] = PENDING
+		self.tkvars[STATUS].set(PENDING)
+
 		# self.entry_plan_decoder(entry_plan,entry_type)
 		# self.manage_plan_decoder(manage_plan)
 
@@ -67,7 +75,7 @@ class TradingPlan:
 	def ppro_update_price(self,data):
 
 		pass
-		
+
 	def ppro_process_orders(self,price,shares,side):
 
 		
@@ -84,11 +92,166 @@ class TradingPlan:
 
 	def ppro_confirm_new_order(self,price,shares,side):
 
+
+		#set the state as running, then load up
+		self.mark_algo_status(RUNNING)
+		self.ppro_orders_loadup(price,shares,side)
+
+
 	def ppro_orders_loadup(self,price,shares,side):
+
+		current = self.data[CURRENT_SHARE]
+
+		self.data[CURRENT_SHARE] = self.data[CURRENT_SHARE] + shares
+
+		if current ==0:
+			self.data[AVERAGE_PRICE] = round(price,3)
+		else:
+			self.data[AVERAGE_PRICE]= round(((self.data[AVERAGE_PRICE]*current)+(price*shares))/self.data[CURRENT_SHARE],3)
+
+		for i in range(shares):
+			self.holdings.append(price)
+
+
 
 	def ppro_orders_loadoff(self,price,shares,side):
 
-	def ppro_order_rejection(self,data):
+		current = self.data[CURRENT_SHARE]
+
+		self.data[CURRENT_SHARE] = current-shares	
+		
+		gain = 0
+
+		if self.data[POSITION] == LONG:
+			for i in range(shares):
+				try:
+					gain += price-self.holdings.pop()
+				except:
+					print("Holding calculation error,holdings are empty.")
+		elif self.position[id_]=="Short":
+			for i in range(shares):
+				try:
+					gain += self.holdings.pop() - price	
+				except:
+					print("Holding calculation error,holdings are empty.")	
+
+		self.data[REALIZED]+=gain
+		self.data[REALIZED]= round(self.data[REALIZED],2)
+
+		self.adjusting_risk()
+
+		print(self.symbol_name," sold:",shares," current shares:",self.data[CURRENT_SHARE],"realized:",self.data[REALIZED])
+
+		#finish a trade if current share is 0.
+
+		if self.data[CURRENT_SHARE] <= 0:
+			self.data[UNREAL] = 0
+			self.data[UNREAL_PSHR] = 0
+
+			#mark it done.
+			self.mark_algo_status(DONE)
+
+
+	def ppro_order_rejection(self):
+
+		self.mark_off_algo(REJECTED)
+
+
+	#risk related ##
+
+	def adjusting_risk(self):
+
+		if self.data[POSITION] == LONG:
+			self.DATA[ACTRISK] = round(((self.data[AVERAGE_PRICE]-self.data[STOP_LEVEL])*self.data[CURRENT_SHARE]),2)
+		else:
+			self.DATA[ACTRISK] = round(((self.data[STOP_LEVEL]-self.data[AVERAGE_PRICE])*self.data[CURRENT_SHARE]),2)
+
+		diff = self.DATA[ACTRISK]-self.DATA[ESTRISK]
+		ratio = diff/self.DATA[ESTRISK]
+
+		##change color and change text.
+
+		self.tklabels[RISK_RATIO] = hexcolor_green_to_red(ratio)
+		self.tkvars[RISK_RATIO].set(str(self.DATA[ACTRISK])+"/"+str(self.DATA[ESTRISK]))
+
+		if self.data[CURRENT_SHARE] == 0:
+			self.tklabels[RISK_RATIO]["background"] = DEFAULT
+
+
+	## UI related ##
+	def update_displays(self):
+
+		self.tkvars[CURRENT_SHARE].set(str(self.data[CURRENT_SHARE])+"/"+str(self.data[TARGET_SHARE]))
+		self.tkvars[REALIZED].set(str(self.data[REALIZED]))
+		self.tkvars[UNREAL].set(str(self.data[UNREAL]))
+		self.tkvars[UNREAL_PSHR].set(str(self.data[UNREAL_PSHR]))
+		self.tkvars[AVERAGE_PRICE].set(self.data[AVERAGE_PRICE])
+
+		#check color.f9f9f9
+
+		self.tklabels[REALIZED]["background"]
+
+		self.tklabels[UNREAL]["background"]
+
+		if self.data[UNREAL_PSHR]>0:
+			self.tklabels[UNREAL_PSHR]["background"] = STRONGGREEN
+			self.tklabels[UNREAL]["background"] = STRONGGREEN
+		elif self.unrealized_pshr[id_]<0:
+			self.tklabels[UNREAL_PSHR]["background"] = STRONGRED
+			self.tklabels[UNREAL]["background"] = STRONGRED
+		else:
+			self.tklabels[UNREAL_PSHR]["background"] = DEFAULT
+			self.tklabels[UNREAL]["background"] =DEFAULT
+
+		if self.realized[id_]==0:
+			self.tklabels[REALIZED]["background"]["background"] = DEFAULT
+		elif self.realized[id_]>0:
+			self.tklabels[REALIZED]["background"]["background"] = STRONGGREEN
+		elif self.realized[id_]<0:
+			self.tklabels[REALIZED]["background"]["background"] = STRONGRED
+
+		current_level = self.current_price_level
+
+		self.tklabels[pxt1]
+		if  current_level==1:
+			self.tklabels[pxt1]["background"] = LIGHTYELLOW
+			self.tklabels[pxt2]["background"] = DEFAULT
+			self.tklabels[pxt3]["background"] = DEFAULT
+		elif  current_level==2:
+			self.tklabels[pxt1]["background"] = DEFAULT
+			self.tklabels[pxt2]["background"] = LIGHTYELLOW
+			self.tklabels[pxt3]["background"] = DEFAULT
+		elif  current_level==3:
+			self.tklabels[pxt1]["background"] = DEFAULT
+			self.tklabels[pxt2]["background"] = DEFAULT
+			self.tklabels[pxt3]["background"] = LIGHTYELLOW
+		else:
+			self.tklabels[pxt1]["background"] = DEFAULT
+			self.tklabels[pxt2]["background"] = DEFAULT
+			self.tklabels[pxt3]["background"] = DEFAULT	
+
+
+
+	def mark_algo_status(self,status):
+
+		self.data[STATUS] = status
+		self.tkvars[STATUS].set(status)
+
+		if status == REJECTED:
+			self.tklabels[STATUS]["background"] = "red"
+
+		elif status == DONE:
+
+			self.tklabels[STATUS]["background"] = DEFAULT
+			self.data[POSITION] = ""
+			self.tkvars[POSITION].set("")
+
+			#if reload is on, turn it back on.
+		# elif status == CANCELED:#canceled 
+
+		# 	if self.order_tkstring[id_]["algo_status"].get() == "Pending":
+		# 		self.order_tkstring[id_]["algo_status"].set(status)
+
 
 	## plan handler SECTION ###
 	def entry_plan_decoder(self,entry_plan,entry_type):

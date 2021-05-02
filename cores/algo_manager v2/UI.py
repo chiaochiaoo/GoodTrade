@@ -42,6 +42,9 @@ class UI(pannel):
 						"Stop":8,\
 						"AvgPx":8,\
 						"SzIn":6,\
+						"PxT1":4,\
+						"PxT2":4,\
+						"PxT3":4,\
 						"UPshr":8,\
 						"U":8,\
 						"R":8,\
@@ -106,7 +109,7 @@ class UI(pannel):
 		self.log_panel.place(x=10,y=250,relheight=0.5,width=180)
 
 		self.deployment_panel = ttk.LabelFrame(self.root,text="Algo deployment") 
-		self.deployment_panel.place(x=200,y=10,relheight=0.85,width=1600)
+		self.deployment_panel.place(x=200,y=10,relheight=0.85,width=1700)
 
 		self.dev_canvas = tk.Canvas(self.deployment_panel)
 		self.dev_canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
@@ -131,25 +134,28 @@ class UI(pannel):
 
 		infos = {
 		'Symbol':tradingplan.symbol_name, \
-		'Status':tradingplan.tkvars[STATUS],\
-		'MIND': tradingplan.tkvars[MIND],\
+		STATUS:tradingplan.tkvars[STATUS],\
+		MIND: tradingplan.tkvars[MIND],\
 		'EntryPlan':tradingplan.tkvars[ENTRYPLAN], \
 		'EntryType':tradingplan.tkvars[ENTYPE], \
 		'Timer':tradingplan.tkvars[TIMER], \
 		'ManaPlan':tradingplan.tkvars[MANAGEMENTPLAN], \
 		"Reload":tradingplan.tkvars[RELOAD], \
 		'AR':tradingplan.tkvars[AUTORANGE], \
-		'Sup':tradingplan.tkvars[SUPPORT], \
-		'Res':tradingplan.tkvars[RESISTENCE], \
-		'Act/Est R':tradingplan.tkvars[RISK_RATIO], \
+		SUPPORT:tradingplan.tkvars[SUPPORT], \
+		RESISTENCE:tradingplan.tkvars[RESISTENCE], \
+		RISK_RATIO:tradingplan.tkvars[RISK_RATIO], \
 		'Position':tradingplan.tkvars[POSITION], \
-		'Stop':tradingplan.tkvars[STOP],\
+		'Stop':tradingplan.tkvars[STOP_LEVEL],\
 		'AvgPx':tradingplan.tkvars[AVERAGE_PRICE], \
 		'SzIn':tradingplan.tkvars[SIZE_IN], \
-		'UPshr':tradingplan.tkvars[UNREAL_PSHR], \
-		'U':tradingplan.tkvars[UNREAL], \
-		'R':tradingplan.tkvars[REALIZED], \
-		'TR':tradingplan.tkvars[TOTAL_REALIZED], \
+		PXT1: tradingplan.tkvars[PXT1], \
+		PXT2:tradingplan.tkvars[PXT2], \
+		PXT3:tradingplan.tkvars[PXT3], \
+		UNREAL_PSHR:tradingplan.tkvars[UNREAL_PSHR], \
+		UNREAL:tradingplan.tkvars[UNREAL], \
+		REALIZED:tradingplan.tkvars[REALIZED], \
+		TOTAL_REALIZED:tradingplan.tkvars[TOTAL_REALIZED], \
 		'flatten':"", \
 		'log':""}
 
@@ -196,6 +202,8 @@ class UI(pannel):
 				self.label_default_configure(self.tklabels[symbol][label_name])
 			except:
 				pass
+
+			tradingplan.tklabels[label_name] = self.tklabels[symbol][label_name]
 
 			self.tklabels[symbol][label_name].grid(row= l+2, column=j,padx=0)
 
@@ -318,7 +326,7 @@ if __name__ == '__main__':
 
 	root = tk.Tk() 
 	root.title("GoodTrade Algo Manager v2") 
-	root.geometry("1650x700")
+	root.geometry("1920x700")
 
 	UI(root)
 	# root.minsize(1600, 1000)

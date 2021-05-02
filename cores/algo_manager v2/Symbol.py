@@ -41,6 +41,9 @@ class Symbol:
 
 	def update_price(self,bid,ask,ts):
 
+
+		#34200 openning.
+
 		# if self.data[HIGH]==0:
 		# 	self.data[HIGH] = ask
 		# if self.data[LOW] ==0:

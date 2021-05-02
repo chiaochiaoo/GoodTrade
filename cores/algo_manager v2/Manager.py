@@ -178,15 +178,27 @@ class Manager:
 
 			if d[0] =="order confirm":
 
-				self.ppro_order_confirmation(d[1])
+				symbol = data["symbol"]
+				price = data["price"]
+				shares = data["shares"]
+				side = data["side"]
+
+				if symbol in self.tradingplan:
+					self.tradingplan[symbol].ppro_confirm_new_order(price,shares,side)
 
 			if d[0] =="order update":
+				symbol = data["symbol"]
+				bid = data["bid"]
+				ask = data["ask"]
+				ts = data["timestamp"]
 
-				self.ppro_order_update(d[1])
+				if symbol in self.tradingplan:
+					self.tradingplan[symbol].ppro_update_price(price,bid,ask,ts)
 
 			if d[0] =="order rejected":
 
-				self.ppro_order_rejection(d[1])
+				if symbol in self.tradingplan:
+					self.tradingplan[symbol].ppro_order_rejection()
 
 			# if d[0] =="new stoporder":
 
@@ -220,7 +232,7 @@ if __name__ == '__main__':
 
 	root = tk.Tk() 
 	root.title("GoodTrade Algo Manager v2") 
-	root.geometry("1800x800")
+	root.geometry("1920x800")
 
 	Manager(root,goodtrade_pipe,ppro_in,ppro_out)
 
