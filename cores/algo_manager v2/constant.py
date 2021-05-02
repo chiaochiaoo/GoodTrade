@@ -49,6 +49,9 @@ MANAGEMENTPLAN = "ManagementPlan"
 TRADING_PLAN ="TradingPlan"
 
 
+#orders 
+LONG  = "B"
+SHORT = "S"
 
 
 #Entry Type

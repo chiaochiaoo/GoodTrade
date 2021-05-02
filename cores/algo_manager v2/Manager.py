@@ -15,30 +15,6 @@ import requests
 #May this class bless by the Deus Mechanicus.
 
 
-# def tradingplan_decoder(code):
-
-# 	if code == "Any Level":
-# 	if code == "Break Up Only":
-# 	if code == "Break Down Only":
-# 	if code == "Bullish":
-# 	if code == "Bearish":
-
-# def entrystrategy_decoder(entry_code):
-
-# 	if entry_code == "Any Level":
-# 	if entry_code == "Break Up Only":
-# 	if entry_code == "Break Down Only":
-# 	if entry_code == "Bullish":
-# 	if entry_code == "Bearish":
-
-# def managementstrategy_decoder(management_code):
-# 	#
-# 	if management_code == "None":
-# 	if management_code == "Three Px Targets":
-# 	if management_code == "Simple Stop":
-# 	if management_code == "Trailing Fib":
-
-
 def algo_manager_voxcom(pipe):
 
 	#tries to establish commuc
@@ -167,6 +143,21 @@ class Manager:
 					#except:
 					#	print("adding con porra")
 
+
+	def ppro_order_confirmation(self,data):
+
+		symbol = data["symbol"]
+		price = data["price"]
+		shares = data["shares"]
+		side = data["side"]
+
+		if symbol in self.tradingplan:
+			print("order",symbol,"side:",side,"shares",shares,"price",price)
+
+			self.tradingplan[symbol].ppro_process_orders(price,shares,side)
+		else:
+			print("irrelavant orders detected,",symbol,shares,side)
+
 	def ppro_in(self):
 		while True:
 			d = self.pipe_ppro_in.recv()
@@ -197,9 +188,9 @@ class Manager:
 
 				self.ppro_order_rejection(d[1])
 
-			if d[0] =="new stoporder":
+			# if d[0] =="new stoporder":
 
-				self.ppro_append_new_stoporder(d[1])
+			# 	self.ppro_append_new_stoporder(d[1])
 
 
 if __name__ == '__main__':
