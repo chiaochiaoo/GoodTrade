@@ -5,30 +5,30 @@ import tkinter as tk
 class Symbol:
 
 	#Symbol class tracks every data related to the symbol. Output it in a dictionary form.
-	def __init__(self,symbol):
+	def __init__(self,symbol,support=0,resistence=0):
 
 		self.symbol = symbol
 
 		self.init_open = False
 		self.init_high_low = False
 
-		self.numeric_labels = [TIMESTAMP,BID,ASK,RESISTENCE,SUPPORT,OPEN,HIGH,LOW,PREMARKETHIGH,PREMARKETLOW]
-
-		
+		self.numeric_labels = [TIMESTAMP,BID,ASK,RESISTENCE,SUPPORT,OPEN,HIGH,LOW,PREMARKETHIGH,PREMARKETLOW,STOP]
 
 		self.data = {}
 		self.tkvars = {}
 
 		self.tradingplan=None
-		self.init_data()
+		self.init_data(support,resistence)
 
-	def init_data(self):
+	def init_data(self,support,resistence):
 
 		for i in self.numeric_labels:
 			self.data[i] = 0
 			#self.tkvars[i] = tk.DoubleVar()
 
-		#self.data[AUTORANGE] = True
+		self.data[RESISTENCE] = resistence
+		self.data[SUPPORT] = support
+
 		
 	def toggle_autorange(self,Bool):
 		self.data[AUTORANGE] = Bool

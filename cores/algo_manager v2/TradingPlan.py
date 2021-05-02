@@ -6,34 +6,31 @@ from constant import*
 
 class TradingPlan:
 
-	def __init__(self,symbol:Symbol,risk=None):
+	def __init__(self,symbol:Symbol,entry_plan=None,entry_type=None,manage_plan=None,risk=None):
 
 		self.symbol = symbol
 		self.symbol_name = symbol.get_name()
-
 
 		self.current_running_strategy = None
 
 		self.entry_strategy_start = False
 
-		self.entry_strategy = None
-		self.manage_strategy = None
-
-		self.entry_startegy_name = None
-		self.manage_startegy_name = None 
+		self.entry_plan = None
+		self.entry_type = None
 
 		self.data = {}
 		self.tkvars = {}
 
 		self.numeric_labels = [ACTRISK,ESTRISK,CURRENT_SHARE,TARGET_SHARE,AVERAGE_PRICE,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER]
-		self.string_labels = [MIND,STATUS,POSITION,MANASTRAT,ENSTRAT,RISK_RATIO,SIZE_IN]
+		self.string_labels = [MIND,STATUS,POSITION,RISK_RATIO,SIZE_IN,ENTRYPLAN,ENTYPE,MANAGEMENTPLAN]
 
 		self.bool_labels= [AUTORANGE,RELOAD]
 
-		self.init_data(risk)
+		self.init_data(risk,entry_plan,entry_type,manage_plan)
 
-	def init_data(self,risk):
+	def init_data(self,risk,entry_plan,entry_type,manage_plan):
 
+		
 		for i in self.numeric_labels:
 			self.data[i] = 0
 			self.tkvars[i] = tk.DoubleVar(value=0)
@@ -43,8 +40,7 @@ class TradingPlan:
 			self.tkvars[i] = tk.StringVar(value=" ")
 
 		for i in self.symbol.numeric_labels:
-			self.data[i] = 0
-			self.tkvars[i] = tk.DoubleVar(value=0)
+			self.tkvars[i] = tk.DoubleVar(value=self.symbol.data[i])
 
 		for i in self.bool_labels:
 			self.data[i] = True
@@ -52,31 +48,69 @@ class TradingPlan:
 
 		#Non String, Non Numeric Value
 
-		self.tkvars[AUTORANGE] = tk.BooleanVar(value=True)
+		#Set some default values.
 		
 		self.data[ESTRISK] = risk
 		self.tkvars[ESTRISK].set(risk)
 
-	def set_EntryStrategy(self,entry_strategy:Strategy):
-		self.entry_strategy = entry_strategy
-		self.entry_strategy.set_symbol(self.symbol,self)
+		self.tkvars[ENTRYPLAN].set(entry_plan)
+		self.tkvars[ENTYPE].set(entry_type)
+		self.tkvars[MANAGEMENTPLAN].set(manage_plan)
 
-		self.data[ENSTRAT] = entry_strategy.get_name()
-		self.tkvars[ENSTRAT].set(entry_strategy.get_name())
+		# self.entry_plan_decoder(entry_plan,entry_type)
+		# self.manage_plan_decoder(manage_plan)
+
+	def entry_plan_decoder(self,entry_plan,entry_type):
+
+		if entry_type ==None or entry_type ==INSTANT:
+			instant = True 
+		if entry_type ==INCREMENTAL:
+			instant = False 
+
+		self.tkvars[ENTYPE].set(entry_type)
+
+		if entry_plan == BREAKANY:
+			self.set_EntryStrategy(BreakAny(0,instant))
+		elif entry_plan == BREAKUP:
+			self.set_EntryStrategy(BreakUp(0,instant))
+		elif entry_plan == BREAKDOWN:
+			self.set_EntryStrategy(BreakDown(0,instant))
+		elif entry_plan == BREAISH:
+			self.set_EntryStrategy(BreakAny(0,instant))
+		elif entry_plan == BULLISH:
+			self.set_EntryStrategy(BreakAny(0,instant))
+		else:
+			print("unkown plan")
+
+		self.tkvars[ENTRYPLAN].set(entry_plan)
 
 
-	def set_ManagementStrategy(self,manage_strategy:Strategy):
-		self.manage_strategy = manage_strategy
-		self.manage_strategy.set_symbol(self.symbol,self)		
+	def manage_plan_decoder(self,manage_plan):
 
-		self.data[MANASTRAT] = manage_strategy.get_name()
-		self.tkvars[MANASTRAT].set(manage_strategy.get_name())
+		if manage_plan ==None: self.tkvars[MANAGEMENTPLAN].set(NONE)
+
+
+
+	def set_EntryStrategy(self,entry_plan:Strategy):
+		self.entry_plan = entry_plan
+		self.entry_plan.set_symbol(self.symbol,self)
+
+		self.data[ENTRYPLAN] = entry_plan.get_name()
+		self.tkvars[ENTRYPLAN].set(entry_plan.get_name())
+
+
+	def set_ManagementStrategy(self,management_plan:Strategy):
+		self.management_plan = management_plan
+		self.management_plan.set_symbol(self.symbol,self)		
+
+		self.data[MANAGEMENTPLAN] = management_plan.get_name()
+		self.tkvars[MANAGEMENTPLAN].set(management_plan.get_name())
 
 	def start_EntryStrategy(self):
-		self.current_running_strategy = self.entry_strategy
+		self.current_running_strategy = self.entry_plan
 
 	def entry_strategy_done(self):
-		self.current_running_strategy = self.manage_strategy
+		self.current_running_strategy = self.management_plan
 
 	def management_strategy_done(self):
 
@@ -84,10 +118,10 @@ class TradingPlan:
 
 	def on_finish(self,plan):
 		
-		if plan==self.entry_strategy:
+		if plan==self.entry_plan:
 			print("Trading Plan: Entry strategy complete. Management strategy begins.")
 			self.entry_strategy_done()
-		elif plan==self.manage_strategy:
+		elif plan==self.management_plan:
 			self.management_strategy_done()
 		else:
 			print("Trading Plan: UNKONW CALL FROM Strategy")
@@ -111,7 +145,7 @@ if __name__ == '__main__':
 
 	b = BreakDown(0)
 	#b = BreakUp(0)
-	b = AnyLevel(3)
+	b = BreakAny(3)
 	TP.set_EntryStrategy(b)
 	TP.start_EntryStrategy()
 

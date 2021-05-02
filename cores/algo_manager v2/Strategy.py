@@ -1,6 +1,7 @@
 from constant import *
 from Symbol import *
 from Triggers import *
+import sys, inspect
 # "Omnissiah, Omnissiah.
 
 # From the Bleakness of the mind
@@ -25,12 +26,22 @@ class Strategy: #ABSTRACT CLASS. the beginning of a sequence, containing one or 
 		self.current_triggers = set()
 		self.symbol=None
 		self.tradingplan =None
+		self.timer = 0
+		self.all_triggers = []
 
 	def get_name(self):
 		return self.strategy_name
 
 	def add_initial_triggers(self,trigger):
 		self.current_triggers.add(trigger)
+
+		self.all_triggers.append(trigger)
+
+
+		#change all the timers 
+	def modify_all_timers(self):
+
+		pass
 
 	def set_symbol(self,symbol:Symbol,tradingplan):
 		self.symbol=symbol
@@ -63,23 +74,23 @@ class Strategy: #ABSTRACT CLASS. the beginning of a sequence, containing one or 
 
 
 class BreakUp(Strategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry. 
-	def __init__(self,timer=0):
-		super().__init__("Breakup")
+	def __init__(self,timer=0,repeat=False):
+		super().__init__("Break up")
 		#subject1,type_,subject2,trigger_timer,description,trigger_limit=1
 		buyTrigger = SingleEntry(ASK,">",PREMARKETHIGH,timer,"BUY BREAK UP","Long")
 		self.add_initial_triggers(buyTrigger)
 
 class BreakDown(Strategy): #the parameters contains? dk. yet .
-	def __init__(self,timer=0):
-		super().__init__("Breakdown")
+	def __init__(self,timer=0,repeat=False):
+		super().__init__("Break down")
 
 		shortTrigger = SingleEntry(BID,"<",PREMARKETLOW,timer,"SHORT BREAK DOWN","Short")
 		self.add_initial_triggers(shortTrigger)
 
 
-class AnyLevel(Strategy):
-	def __init__(self,timer=0):
-		super().__init__("AnyLevel")
+class BreakAny(Strategy):
+	def __init__(self,timer=0,repeat=False):
+		super().__init__("Break Any")
 		
 		#subject1,type_,subject2,trigger_timer,description,trigger_limit=1
 		buyTrigger = SingleEntry(ASK,">",PREMARKETHIGH,timer,"BUY BREAK UP","Long")
@@ -87,3 +98,12 @@ class AnyLevel(Strategy):
 
 		shortTrigger = SingleEntry(BID,"<",PREMARKETLOW,timer,"SHORT BREAK DOWN","Short")
 		self.add_initial_triggers(shortTrigger)
+
+
+
+# clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
+
+# print(clsmembers)
+
+# for i in clsmembers:
+# 	print(i)

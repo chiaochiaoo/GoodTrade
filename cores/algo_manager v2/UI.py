@@ -7,26 +7,39 @@ class UI(pannel):
 		self.root = root
 
 		self.tk_strings=["algo_status","realized","shares","unrealized","unrealized_pshr","average_price"]
-		self.tk_labels=[SYMBOL,STATUS,MIND, 'TradingPlan', 'EntryStrat', 'Timer', 'ManaStart','Reload', 'AR', 'Sup', 'Res', 'Act/Est R', 'Position', 'AvgPx', 'SzIn', 'UPshr', 'U', 'R', 'TR', 'flatten', 'log']
+		self.tk_labels=[SYMBOL,STATUS,MIND, 'EntryPlan', 'EntryType', 'Timer', 'Management','Reload', 'AR', 'Sup', 'Res', 'Act/Est R', 'Position', 'AvgPx', 'SzIn', 'UPshr', 'U', 'R', 'TR', 'flatten', 'log']
 		
 		self.tklabels = {}
 		self.label_count = 1
+
+
+		self.option_values()
+
 		self.init_pannel()
+
+	def option_values(self):
+
+		self.entry_type_options = {INSTANT,INCREMENTAL}
+
+		self.entry_plan_options = {BREAISH,BULLISH,BREAKUP,BREAKDOWN,BREAKANY}
+
+		self.management_plan_options = {NONE,THREE_TARGETS,TRAILING_FIB}
 
 	def init_pannel(self):
 		self.labels = {"Symbol":10,\
 						"Status":10,\
 						"MIND":20,\
-						"TradingPlan":12,\
-						"EntryStrat":12,\
+						"EntryPlan":11,\
+						"EntryType":12,\
 						"Timer":5,\
-						"ManaStart":8,\
+						"Management":14,\
 						"Reload":6,\
 						"AR":4,\
 						"Sup":6,\
 						"Res":6,\
 						"Act/Est R":8,\
 						"Position":6,\
+						"Stop":8,\
 						"AvgPx":8,\
 						"SzIn":6,\
 						"UPshr":8,\
@@ -93,7 +106,7 @@ class UI(pannel):
 		self.log_panel.place(x=10,y=250,relheight=0.5,width=180)
 
 		self.deployment_panel = ttk.LabelFrame(self.root,text="Algo deployment") 
-		self.deployment_panel.place(x=200,y=10,relheight=0.85,width=1450)
+		self.deployment_panel.place(x=200,y=10,relheight=0.85,width=1600)
 
 		self.dev_canvas = tk.Canvas(self.deployment_panel)
 		self.dev_canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
@@ -116,20 +129,21 @@ class UI(pannel):
 	def create_new_entry(self,tradingplan):
 
 
-		info = {
+		infos = {
 		'Symbol':tradingplan.symbol_name, \
 		'Status':tradingplan.tkvars[STATUS],\
 		'MIND': tradingplan.tkvars[MIND],\
-		'TradingPlan':tradingplan.tkvars[ENSTRAT], \
-		'EntryStrat':"Singlle Entry", \
+		'EntryPlan':tradingplan.tkvars[ENTRYPLAN], \
+		'EntryType':tradingplan.tkvars[ENTYPE], \
 		'Timer':tradingplan.tkvars[TIMER], \
-		'ManaStart':tradingplan.tkvars[MANASTRAT], \
+		'ManaPlan':tradingplan.tkvars[MANAGEMENTPLAN], \
 		"Reload":tradingplan.tkvars[RELOAD], \
 		'AR':tradingplan.tkvars[AUTORANGE], \
 		'Sup':tradingplan.tkvars[SUPPORT], \
 		'Res':tradingplan.tkvars[RESISTENCE], \
 		'Act/Est R':tradingplan.tkvars[RISK_RATIO], \
 		'Position':tradingplan.tkvars[POSITION], \
+		'Stop':tradingplan.tkvars[STOP],\
 		'AvgPx':tradingplan.tkvars[AVERAGE_PRICE], \
 		'SzIn':tradingplan.tkvars[SIZE_IN], \
 		'UPshr':tradingplan.tkvars[UNREAL_PSHR], \
@@ -141,12 +155,13 @@ class UI(pannel):
 
 		l = self.label_count
 
-		info = list(info.values())
+		info = list(infos.values())
+		labels = list(infos.keys())
 		symbol = info[0]
 		self.tklabels[symbol] = {}
 		for j in range(len(info)):
 			#"symbol","algo_status","description","break_at","position","act_r/est_r","stoplevel","average_price","shares","pxtgt1","pxtgt1","pxtgt1","unrealized_pshr","unrealized","realized"
-			label_name = self.tk_labels[j]
+			label_name = labels[j]
 
 			if label_name == "Symbol":
 				self.tklabels[symbol][label_name] = tk.Button(self.deployment_frame ,text=info[j],width=self.width[j])
@@ -154,16 +169,21 @@ class UI(pannel):
 			elif label_name =="Timer":
 				self.tklabels[symbol][label_name] = tk.Entry(self.deployment_frame,textvariable=info[j],width=self.width[j])
 
-			# elif label_name =="EntryStrat":
-			# 	self.tklabels[symbol][label_name] = tk.OptionMenu(self.deployment_frame, textvariable="",set())
+			elif label_name =="EntryPlan":
+				self.tklabels[symbol][label_name] = tk.OptionMenu(self.deployment_frame, info[j], *sorted(self.entry_plan_options))
 
-			# elif label_name =="ManaStart":
-			# 	self.tklabels[symbol][label_name] = tk.OptionMenu(self.deployment_frame, textvariable="",set())
+			elif label_name =="EntryType":
+				self.tklabels[symbol][label_name] = tk.OptionMenu(self.deployment_frame, info[j], *sorted(self.entry_type_options))
+
+			elif label_name =="ManaPlan":
+				self.tklabels[symbol][label_name] =tk.OptionMenu(self.deployment_frame, info[j], *sorted(self.management_plan_options))
 
 			elif label_name =="AR" or  label_name =="Reload":
 				self.tklabels[symbol][label_name] = tk.Checkbutton(self.deployment_frame,variable=info[j],width=2)
+
 			elif label_name =="MIND":
 				self.tklabels[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
+
 			elif label_name == "Sup" or label_name == "Res" or label_name == "pxtgt1" or label_name == "pxtgt2" or label_name == "pxtgt3":
 				self.tklabels[symbol][label_name] =tk.Entry(self.deployment_frame ,textvariable=info[j],width=self.width[j])	
 			else:
@@ -298,7 +318,7 @@ if __name__ == '__main__':
 
 	root = tk.Tk() 
 	root.title("GoodTrade Algo Manager v2") 
-	root.geometry("1500x500")
+	root.geometry("1650x700")
 
 	UI(root)
 	# root.minsize(1600, 1000)

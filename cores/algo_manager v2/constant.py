@@ -30,6 +30,7 @@ UNREAL = "UNREAL"
 UNREAL_PSHR = "UNREAL_PSHR" 
 REALIZED =  "REALIZED"
 TOTAL_REALIZED = "TOTAL_REALIZED" 
+STOP = "Stop"
 
 SYMBOL = "Symbol"
 MIND = "MIND"
@@ -39,5 +40,29 @@ STATUS = "Status"
 POSITION="Position"
 MANASTRAT = "ManaStart"
 ENSTRAT = "EntryStrat"
+ENTYPE = "Entrytype"
+
+
+ENTRYPLAN = "EntryPlan"
+MANAGEMENTPLAN = "ManagementPlan"
 
 TRADING_PLAN ="TradingPlan"
+
+
+
+
+#Entry Type
+INSTANT=      '  Instant'
+INCREMENTAL = 'Incrmntl'
+
+#Entry Plan
+BREAISH =   "  Breaish"
+BULLISH =   "  Bullish"
+BREAKUP =   " Break Up"
+BREAKDOWN = " Break Dn"
+BREAKANY =  "Break Any"
+
+#MANA Plan
+NONE =          "       NONE"
+THREE_TARGETS = "Three tgts "
+TRAILING_FIB =  "Trailng Fib" 

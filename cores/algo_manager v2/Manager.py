@@ -14,6 +14,31 @@ import requests
 
 #May this class bless by the Deus Mechanicus.
 
+
+# def tradingplan_decoder(code):
+
+# 	if code == "Any Level":
+# 	if code == "Break Up Only":
+# 	if code == "Break Down Only":
+# 	if code == "Bullish":
+# 	if code == "Bearish":
+
+# def entrystrategy_decoder(entry_code):
+
+# 	if entry_code == "Any Level":
+# 	if entry_code == "Break Up Only":
+# 	if entry_code == "Break Down Only":
+# 	if entry_code == "Bullish":
+# 	if entry_code == "Bearish":
+
+# def managementstrategy_decoder(management_code):
+# 	#
+# 	if management_code == "None":
+# 	if management_code == "Three Px Targets":
+# 	if management_code == "Simple Stop":
+# 	if management_code == "Trailing Fib":
+
+
 def algo_manager_voxcom(pipe):
 
 	#tries to establish commuc
@@ -86,7 +111,7 @@ class Manager:
 		#self.add_new_tradingplan("AAPL")
 		#self.add_new_tradingplan("SDS")
 
-		self.add_new_tradingplan(['Any level', 'TEST.AM', 10.0, 12.0, 5.0, {'ATR': 3.6, 'OHavg': 1.551, 'OHstd': 1.556, 'OLavg': 1.623, 'OLstd': 1.445}])
+		self.add_new_tradingplan(['Break Any', 'TEST.AM', 10.0, 12.0, 5.0, {'ATR': 3.6, 'OHavg': 1.551, 'OHstd': 1.556, 'OLavg': 1.623, 'OLstd': 1.445}])
 
 		good = threading.Thread(target=self.goodtrade_in, daemon=True)
 		good.start()
@@ -94,17 +119,20 @@ class Manager:
 	#data part, UI part
 	def add_new_tradingplan(self,data):
 
-		#['Any level', 'TEST.AM', 0.0, 0.0, 5.0, {'ATR': 3.6, 'OHavg': 1.551, 'OHstd': 1.556, 'OLavg': 1.623, 'OLstd': 1.445}]
+		#['Any level', 'TEST.AM', 1.0, 2.0, 5.0, {'ATR': 3.6, 'OHavg': 1.551, 'OHstd': 1.556, 'OLavg': 1.623, 'OLstd': 1.445}]
 
 		print(data)
 
-		plan = data[0]
+		entryplan = data[0]
 		symbol = data[1]
+		support = data[2]
+		resistence =  data[3]
+		risk = data[4]
 
 		if symbol not in self.symbols:
 
-			self.symbol_data[symbol]=Symbol(symbol)  #register in Symbol.
-			self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol])
+			self.symbol_data[symbol]=Symbol(symbol,support,resistence)  #register in Symbol.
+			self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,NONE,risk)
 
 			self.ui.create_new_entry(self.tradingplan[symbol])
 			
