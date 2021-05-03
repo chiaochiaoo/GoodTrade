@@ -58,7 +58,7 @@ class Symbol:
 
 		if self.data[ASK]>self.data[HIGH]:
 			self.data[HIGH] = self.data[ASK]
-		if self.data[BID]<self.data[LOW]:
+		if self.data[BID]<self.data[LOW] or self.data[LOW]==0:
 			self.data[LOW]= self.data[BID]
 
 		#print("sy",self.ask,self.high,self.output)
