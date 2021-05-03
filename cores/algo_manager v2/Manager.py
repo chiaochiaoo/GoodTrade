@@ -87,11 +87,14 @@ class Manager:
 		#self.add_new_tradingplan("AAPL")
 		#self.add_new_tradingplan("SDS")
 
-		self.add_new_tradingplan(['Break Any', 'TEST.AM', 10.0, 12.0, 5.0, {'ATR': 3.6, 'OHavg': 1.551, 'OHstd': 1.556, 'OLavg': 1.623, 'OLstd': 1.445}])
+		self.add_new_tradingplan(['Break Any', 'SPY.AM', 10.0, 12.0, 5.0, {'ATR': 3.6, 'OHavg': 1.551, 'OHstd': 1.556, 'OLavg': 1.623, 'OLstd': 1.445}])
 
 		good = threading.Thread(target=self.goodtrade_in, daemon=True)
 		good.start()
 		
+		ppro_in = threading.Thread(target=self.ppro_in, daemon=True)
+		ppro_in.start()
+
 	#data part, UI part
 	def add_new_tradingplan(self,data):
 
@@ -108,7 +111,7 @@ class Manager:
 		if symbol not in self.symbols:
 
 			self.symbol_data[symbol]=Symbol(symbol,support,resistence)  #register in Symbol.
-			self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,NONE,risk)
+			self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,NONE,risk,self.pipe_ppro_out)
 
 			self.ui.create_new_entry(self.tradingplan[symbol])
 			
@@ -125,7 +128,6 @@ class Manager:
 			d = self.pipe_goodtrade.recv()
 
 			if d[0] =="msg":
-				print(d[1])
 				try:
 					self.ui.main_app_status.set("Main: "+str(d[1]))
 					if str(d[1])=="Connected":
@@ -163,6 +165,7 @@ class Manager:
 			d = self.pipe_ppro_in.recv()
 
 			if d[0] =="status":
+				
 				try:
 					self.ui.ppro_status.set("Ppro : "+str(d[1]))
 
@@ -178,6 +181,7 @@ class Manager:
 
 			if d[0] =="order confirm":
 
+				data = d[1]
 				symbol = data["symbol"]
 				price = data["price"]
 				shares = data["shares"]
@@ -187,6 +191,7 @@ class Manager:
 					self.tradingplan[symbol].ppro_confirm_new_order(price,shares,side)
 
 			if d[0] =="order update":
+				data = d[1]
 				symbol = data["symbol"]
 				bid = data["bid"]
 				ask = data["ask"]
@@ -204,6 +209,12 @@ class Manager:
 
 			# 	self.ppro_append_new_stoporder(d[1])
 
+
+class Tester:
+
+	def __init__(self,ppro_in):
+
+		
 
 if __name__ == '__main__':
 
@@ -226,15 +237,15 @@ if __name__ == '__main__':
 
 	ppro_out, ppro_pipe_end2 = multiprocessing.Pipe()
 
-	ppro_in_manager = multiprocessing.Process(target=Ppro_out, args=(ppro_pipe_end2,),daemon=True)
-	ppro_in_manager.daemon=True
-	ppro_in_manager.start()
+	ppro_out_manager = multiprocessing.Process(target=Ppro_out, args=(ppro_pipe_end2,port,),daemon=True)
+	ppro_out_manager.daemon=True
+	ppro_out_manager.start()
 
 	root = tk.Tk() 
 	root.title("GoodTrade Algo Manager v2") 
 	root.geometry("1920x800")
 
-	Manager(root,goodtrade_pipe,ppro_in,ppro_out)
+	Manager(root,goodtrade_pipe,ppro_out,ppro_in)
 
 
 	# root.minsize(1600, 1000)

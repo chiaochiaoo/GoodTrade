@@ -69,6 +69,29 @@ def test_register():
 	except Exception as e:
 		return False
 
+
+
+	except:
+		print("register failed")
+		return False
+
+def timestamp_seconds(s):
+
+	p = s.split(":")
+	try:
+		x = int(p[0])*3600+int(p[1])*60+int(p[2])
+		return x
+	except Exception as e:
+		print("Timestamp conversion error:",e)
+		return 0
+def find_between(data, first, last):
+	try:
+		start = data.index(first) + len(first)
+		end = data.index(last, start)
+		return data[start:end]
+	except ValueError:
+		return data
+
 def register_order_listener(port):
 
 	postbody = "http://localhost:8080/SetOutput?region=1&feedtype=OSTAT&output="+ str(port)+"&status=on"
@@ -92,7 +115,7 @@ def decode_order(stream_data,pipe):
 			side = find_between(stream_data, "Side=", ",")
 			price = find_between(stream_data, "Price=", ",")
 			share = find_between(stream_data, "Shares=", ",")
-			ts=find_between(r.text, "MarketTime=\"", "\"")[:-4]
+			ts=find_between(stream_data, "MarketTime=\"", "\"")[:-4]
 			#add time
 			if side =="T": side ="S"
 
@@ -116,62 +139,19 @@ def decode_order(stream_data,pipe):
 
 			pipe.send(["order rejected",data])
 
+
 def decode_l1(stream_data,pipe):
 	symbol = find_between(stream_data, "Symbol=", ",")
 	bid=find_between(stream_data, "BidPrice=", ",")
 	ask=find_between(stream_data, "AskPrice=", ",")
-	ts=find_between(r.text, "MarketTime=\"", "\"")[:-4]
+	ts=find_between(stream_data, "MarketTime=", ",")[:-4]
+
 	data ={}
 	data["symbol"]= symbol
 	data["bid"]= float(bid)
 	data["ask"]= float(ask)
-	date["timestamp"]= timestamp_seconds(ts)
+	data["timestamp"]= timestamp_seconds(ts)
 	#add time
 	pipe.send(["order update",data])
 
 
-
-# print(9*3600+30*60)
-# class Ppro_in:
-
-# 	def __init__(self):
-# 		pass
-
-# 	def ppro_in(self):
-# 		while True:
-# 			d = self.order_pipe.recv()
-
-# 			if d[0] =="status":
-# 				try:
-# 					self.ppro_status.set("Ppro : "+str(d[1]))
-
-# 					if str(d[1])=="Connected":
-# 						self.ppro_status_["background"] = "#97FEA8"
-# 					else:
-# 						self.ppro_status_["background"] = "red"
-# 				except Exception as e:
-# 					print(e)
-
-# 			if d[0] =="msg":
-# 				print(d[1])
-
-# 			if d[0] =="order confirm":
-# 				#get symbol,price, shares.
-# 				# maybe filled. maybe partial filled.
-# 				self.ppro_order_confirmation(d[1])
-
-# 			if d[0] =="order update":
-
-# 				#update the quote, unrealized. 
-# 				self.ppro_order_update(d[1])
-
-# 			if d[0] =="order rejected":
-
-# 				self.ppro_order_rejection(d[1])
-
-# 			if d[0] =="new stoporder":
-
-# 				#print("stop order received:",d[1])
-# 				self.ppro_append_new_stoporder(d[1])
-			
-# 	#when there is a change of quantity of an order. 

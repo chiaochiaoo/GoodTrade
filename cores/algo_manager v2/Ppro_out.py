@@ -1,6 +1,7 @@
 from pannel import *
 from tkinter import ttk
 import requests
+import threading 
 #Thoughts:
 #Combine PPRO sutff with VOXCOM into one process.
 
@@ -17,98 +18,27 @@ import requests
 
 
 #everything ppro related. sending orders, receiving orders. ,flatten.
+def register(symbol,port):
+	req = threading.Thread(target=register_to_ppro, args=(symbol, True,port,),daemon=True)
+	req.start()
 
+def register_to_ppro(symbol,status,port):
 
-def Ppro_out(pipe): #a sperate process. GLOBALLY. 
-	while True:
-		try:
-			d = pipe.recv()
-			type_ = d[0]
+	print("Registering",symbol,status)
+	if status == True:
+		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&region=1&feedtype=L1&output=" + str(port)+"&status=on"
+	else:
+		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&region=1&feedtype=L1&output=" + str(port)+"&status=off"
 
-			if type_ == "Buy":
-
-				symbol = d[1]
-				share = d[2]
-				buy_market_order(symbol,share)
-
-			elif type_ =="Sell":
-
-				symbol = d[1]
-				share = d[2]
-				sell_market_order(symbol,share)
-
-			elif type_ == "Register":
-
-				symbol = d[1]
-				register(symbol)
-
-			elif type_ == "Fallen":
-
-				symbol = d[1]
-				flatten_symbol(symbol)
-
-
-		except Exception as e:
-			print(e)
-
-	# def register(self,symbol):
-	# 	req = threading.Thread(target=self.register_to_ppro, args=(symbol, True,),daemon=True)
-	# 	req.start()
-			
-	# def deregister(self,symbol):
-
-	# 	if symbol in self.symbols:
-	# 		self.symbols.remove(symbol)
-	# 		self.register_to_ppro(symbol, False)
-
-	# def register_to_ppro(self,symbol,status):
-
-	# 	print("Registering",symbol,status)
-	# 	if status == True:
-	# 		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&region=1&feedtype=L1&output=" + str(self.port)+"&status=on"
-	# 	else:
-	# 		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&region=1&feedtype=L1&output=" + str(self.port)+"&status=off"
-
-	# 	try:
-	# 		r= requests.get(postbody)
-	# 		if r.status_code==200:
-	# 			return True
-	# 		else:
-	# 			return False
-	# 	except:
-	# 		print("register failed")
-	# 		return False
-
-	# def flatten_symbol(self,symbol,id_=None,status_text=None):
-
-	# 	#check if this order is running.
-	# 	running = self.check_order_running(id_,symbol)
-
-	# 	#send once is good enough. 
-	# 	if running:
-	# 		flatten = threading.Thread(target=flatten_symbol,args=(symbol,), daemon=True)
-	# 		flatten.start()
-	# 		#self.current_share_data[id_]=0
-
-	# 	else:
-	# 		if id_!= None and status_text!= None:
-	# 			if id_ in self.orders_registry:
-	# 				self.orders_registry.remove(id_)
-
-	# 				#if current order is not running. 
-	# 				self.mark_off_algo(id_,self.status["Canceled"])
-	# 				# current_status = status_text.get()
-	# 				# if current_status=="Pending":
-	# 				# 	status_text.set("Canceled")
-	# 				# 	self.modify_algo_count(-1)
-	# 				# else:
-	# 				# 	status_text.set("Done.")
-
-
-
-
-
-
+	try:
+		r= requests.get(postbody)
+		if r.status_code==200:
+			return True
+		else:
+			return False
+	except:
+		print("register failed")
+		return False
 def flatten_symbol(symbol):
 
 	r = 'http://localhost:8080/Flatten?symbol='+str(symbol)
@@ -149,6 +79,13 @@ def buy_limit_order(symbol, price,share):
 	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,),daemon=True)
 	req.start()
 
+def find_between(data, first, last):
+	try:
+		start = data.index(first) + len(first)
+		end = data.index(last, start)
+		return data[start:end]
+	except ValueError:
+		return data
 
 def sell_limit_order(symbol, price,share):
 	price = round(float(price),2)
@@ -238,3 +175,96 @@ def cancel_stoporder(id_):
 
 	req = threading.Thread(target=ppro_request, args=(r,sucess,failure),daemon=True)
 	req.start()	
+
+def Ppro_out(pipe,port): #a sperate process. GLOBALLY. 
+	while True:
+		try:
+			d = pipe.recv()
+			type_ = d[0]
+
+			if type_ == "Buy":
+
+				symbol = d[1]
+				share = d[2]
+				rationale = d[3]
+
+				#buy_market_order(symbol,share)
+
+			elif type_ =="Sell":
+
+				symbol = d[1]
+				share = d[2]
+				rationale = d[3]
+				#sell_market_order(symbol,share)
+
+			elif type_ == "Register":
+
+				symbol = d[1]
+				register(symbol,port)
+
+			elif type_ == "Fallen":
+
+				symbol = d[1]
+				flatten_symbol(symbol)
+
+
+		except Exception as e:
+			print(e)
+
+	# def register(self,symbol):
+	# 	req = threading.Thread(target=self.register_to_ppro, args=(symbol, True,),daemon=True)
+	# 	req.start()
+			
+	# def deregister(self,symbol):
+
+	# 	if symbol in self.symbols:
+	# 		self.symbols.remove(symbol)
+	# 		self.register_to_ppro(symbol, False)
+
+	# def register_to_ppro(self,symbol,status):
+
+	# 	print("Registering",symbol,status)
+	# 	if status == True:
+	# 		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&region=1&feedtype=L1&output=" + str(self.port)+"&status=on"
+	# 	else:
+	# 		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&region=1&feedtype=L1&output=" + str(self.port)+"&status=off"
+
+	# 	try:
+	# 		r= requests.get(postbody)
+	# 		if r.status_code==200:
+	# 			return True
+	# 		else:
+	# 			return False
+	# 	except:
+	# 		print("register failed")
+	# 		return False
+
+	# def flatten_symbol(self,symbol,id_=None,status_text=None):
+
+	# 	#check if this order is running.
+	# 	running = self.check_order_running(id_,symbol)
+
+	# 	#send once is good enough. 
+	# 	if running:
+	# 		flatten = threading.Thread(target=flatten_symbol,args=(symbol,), daemon=True)
+	# 		flatten.start()
+	# 		#self.current_share_data[id_]=0
+
+	# 	else:
+	# 		if id_!= None and status_text!= None:
+	# 			if id_ in self.orders_registry:
+	# 				self.orders_registry.remove(id_)
+
+	# 				#if current order is not running. 
+	# 				self.mark_off_algo(id_,self.status["Canceled"])
+	# 				# current_status = status_text.get()
+	# 				# if current_status=="Pending":
+	# 				# 	status_text.set("Canceled")
+	# 				# 	self.modify_algo_count(-1)
+	# 				# else:
+	# 				# 	status_text.set("Done.")
+
+
+
+
+

@@ -51,6 +51,10 @@ MANAGEMENTPLAN = "ManagementPlan"
 TRADING_PLAN ="TradingPlan"
 
 
+#TRIGGER PARA
+SYMBOL_DATA = "symbol_data"
+TP_DATA = "TP_DATA" 
+
 #Algo STATUS
 DONE = "Done"
 PENDING = "Pending"

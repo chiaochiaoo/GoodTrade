@@ -2,13 +2,17 @@ from Symbol import *
 from Triggers import *
 from Strategy import *
 from constant import*
+
+import tkinter as tk
 # MAY THE MACHINE GOD BLESS THY AIM
 
 class TradingPlan:
 
-	def __init__(self,symbol:Symbol,entry_plan=None,entry_type=None,manage_plan=None,risk=None):
+	def __init__(self,symbol:Symbol,entry_plan=None,entry_type=None,manage_plan=None,risk=None,ppro_out=None):
 
 		self.symbol = symbol
+
+		self.symbol.set_tradingplan(self)
 		self.symbol_name = symbol.get_name()
 
 		self.current_running_strategy = None
@@ -16,6 +20,8 @@ class TradingPlan:
 
 		self.entry_plan = None
 		self.entry_type = None
+
+		self.ppro_out = ppro_out
 
 		self.expect_orders = False
 
@@ -80,7 +86,7 @@ class TradingPlan:
 	def ppro_update_price(self,bid,ask,ts):
 
 
-		self.symbol.update_price(bid,ask,ts,self.data[AUTORANGE].get())
+		self.symbol.update_price(bid,ask,ts,self.tkvars[AUTORANGE].get())
 		self.update_symbol_tkvar()
 
 		#check stop. 
@@ -301,6 +307,8 @@ class TradingPlan:
 
 		return self.data[ESTRISK]
 
+	def get_data(self):
+		return self.data
 
 	"""
 	Plan Handler
@@ -372,16 +380,15 @@ class TradingPlan:
 if __name__ == '__main__':
 
 	#TEST CASES for trigger.
-	
+	root = tk.Tk() 
 	aapl = Symbol("aapl")
 	TP = TradingPlan(aapl)
 	aapl.set_tradingplan(TP)
 	aapl.set_phigh(16)
 	aapl.set_plow(15)
 
-	b = BreakDown(0)
+	b = BreakUp(0,False,aapl,TP)
 	#b = BreakUp(0)
-	b = BreakAny(3)
 	TP.set_EntryStrategy(b)
 	TP.start_EntryStrategy()
 
@@ -407,3 +414,6 @@ if __name__ == '__main__':
 	aapl.update_price(17,17,15)
 	aapl.update_price(18,18,16)
 	aapl.update_price(19,19,17)
+
+
+	root.mainloop()

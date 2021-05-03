@@ -1,91 +1,105 @@
 from constant import *
 
-class Trigger:
+class AbstractTrigger:
 
-	#This is a generic trigger class.
-	#differen type of specicial trigger all inheirit the property of a trigger.
-	#Trigger solely operates on the data from symbol.
-	#needs:
-	#1. symbol's data
-	#2. who to compare with who
-	#3. type
-	#5. Actions.
-	#4. next trigger / trigger layer
-	#trigger don't know who it serves until it's activated. 
-	def __init__(self,subject1,type_,subject2,trigger_timer:int,description,trigger_limit=1):
+	"""
+	All trigger class basically have functons of.
+
+	1. check_conditions.
+	2. Triggers events.
+	3. Set next triggers
+	4. Return next triggers. 
+
+	"""
+	def __init__(self,description,trigger_timer:int,trigger_limit=1):
 
 		#self.symbol = symbol
 		#bigger, or less than. 
 		self.symbol = None
-		self.d = None
+		self.symbol_name = None
+		self.symbol_data = None
 		self.description = description
 
-		
-		self.s1 = subject1
-		self.s2 = subject2#self.symbol.data[subject2]
-		self.type = type_
-		#stay above this time. 
+		#How long it need sto trigger it.
 		self.trigger_timer = trigger_timer
 
 		self.triggered = False
 		self.trigger_time = 0
 		self.trigger_duration = 0
 
+		#How many times it can be triggered. 
 		self.trigger_count = 0
 		self.trigger_limit = trigger_limit
 
+		self.conditions = []
+
 		self.next_triggers = set()
 
-	def set_symbol(self,symbol,tradingplan):
-		self.symbol = symbol
-		self.d = self.symbol.get_data()
 
-		self.tradingplan = tradingplan 
-		if self.error_checking(subject1,type_,subject2,timer):
-			print("Trigger creation error on ",subject1,type_,subject2)
+	def add_conditions(subject1,d_type1,subject2,d_type2,type_):
+		self.conditions.append([subject1,d_type1,subject2,d_type2,type_])
 
-	def error_checking(self,subject1,type_,subject2,timer):
+	def decode_conditions(self):
 
-		checker = True
+		s1 =i[0]
+		t1= i[1]
+		s2= i[2]
+		t2= i[3]
+		type_ = i[4]
 
-		data = self.symbol.get_data()
-		if subject1 not in data or subject2 not in data:
-			checker = False
-		if type_!=">" or type_!="<":
-			checker = False
-		if timer<0:
-			checker = False
+		if s1 == SYMBOL_DATA:
+			s1_ = self.symbol_data
+		elif s1 == TP_DATA:
+			s1_ = self.tp_data
+		else:
+			print("Trigger decoding error on ",self.description)
 
-		return checker
+		if s2 == SYMBOL_DATA:
+			s2_ = self.symbol_data
+		elif s2 == TP_DATA:
+			s2_ = self.tp_data
+		else:
+			print("Trigger decoding error on ",self.description)
 
-	def add_next_trigger(self,next_trigger):
-		self.next_triggers.add(next_trigger)
+		return s1_,s2_,t1,t2,type_
 
-	def get_next_triggers(self):
-		return self.next_triggers
+	def check_conditions(self):
+		
+		eval = True
+		"""
+		1. Check if all conditions are met.
+		2. If so, take note of time. If time trigger is 0, immediatly trigger event. 
+		3. If time trigger is above 0. Check if it is already triggered. 
+		"""
 
-	def check(self,symbol=None):
-		if self.symbol==None:
-			if symbol!=None:
-				self.symbol = symbol
-				self.d = symbol.get_data()
+		try:
+			for i in self.conditions:
+				s1,s2,t1,t2,type_= self.decode_conditions(i)
 
-		#if it is above the price, update the time. put into is trigger 
-		#print("Checking:",self.d[self.s1],self.d[self.s2])
-		if self.symbol!=None:
+				if type_ ==">":
+					if not s1[t1] >= s2[t2]:
+						eval = False	
+				elif type_ =="<":
+					if not s1[t1] <= s2[t2]:
+						eval = False
 
-			if self.type ==">":
-				if self.d[self.s1]>=self.d[self.s2]: # I will need to find out how to form composite number.
-					return self.update_trigger_duration()
+			if eval ==True:
+
+				if self.trigger_timer == 0:
+					return self.is_trigger()
+
 				else:
-					self.reset()
+					if not self.triggered:
+						self.triggered = True
+						self.trigger_time = self.symbol.get_time() 
+						self.trigger_duration = 0
 
-			elif self.type =="<":
-
-				if self.d[self.s1]<=self.d[self.s2]:
-					return self.update_trigger_duration()
-				else:
-					self.reset()
+					else:
+						self.trigger_duration = self.symbol.get_time() - self.trigger_time
+						if self.trigger_duration >= self.self.trigger_timer:
+							return self.is_trigger()
+		except Exception as e:
+			print("Trigger error on ",self.description,e)
 
 		return False
 
@@ -103,28 +117,37 @@ class Trigger:
 		return self.is_trigger()
 
 	def is_trigger(self):
-		
-		#print("Trigger:","cur time:",self.symbol.get_time(), "duration:", self.trigger_duration, "timer:",self.trigger_timer,"already occurance:",self.trigger_count,"total repeat time:",self.trigger_limit)
-		if self.trigger_duration >= self.trigger_timer:
 
-			###EVENT HAPPENS HERE.####
-			self.trigger_event()
-			self.trigger_count+=1
-			if self.trigger_count == self.trigger_limit:
-				#print("??")
-				return True
-			else:
-				self.reset()	
+		self.trigger_event()
+		self.trigger_count+=1
+		if self.trigger_count == self.trigger_limit:
+			return True
 		else:
-			return False 
+			return False 	
 
 	def trigger_event(self):  #OVERRIDE
+
 		try:
 			print("Trigger:",self.description,"on", self.symbol.get_name(),"at time", self.symbol.get_time())
 		except:
 			print("Trigger:",self.description)
 		### REPLACE the current trategy with current states. (when repeate is met.)
 
+
+	def set_symbol(self,symbol,tradingplan,ppro_out):
+		self.symbol = symbol
+		self.symbol_name = symbol.get_name()
+		self.symbol_data = self.symbol.get_data()
+		self.ppro_out = ppro_out
+
+		self.tradingplan = tradingplan 
+		self.tp_data = self.tradingplan.get_data()
+
+	def add_next_trigger(self,next_trigger):
+		self.next_triggers.add(next_trigger)
+
+	def get_next_triggers(self):
+		return self.next_triggers
 
 	def print(self):
 		print("Trigger",self.description)
@@ -134,30 +157,45 @@ class Trigger:
 		self.trigger_time = 0
 		self.trigger_duration = 0
 
+
 #self,subject1,type_,subject2,trigger_timer:int,description,trigger_limit=1
-class SingleEntry(Trigger):
+
+class Purchase_trigger(AbstractTrigger):
 	#Special type of trigger, overwrites action part. everything else is generic.
-	def __init__(self,subject1,type_,subject2,timer:int,description,pos):
-		super().__init__(subject1,type_,subject2,timer,description)
+	def __init__(self,conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out):
+		super().__init__(description,trigger_timer,trigger_limit)
 
 		self.pos = pos
-
+		self.stop = stop
+		self.ppro_out =ppro_out
+		self.risk = risk 
+		self.conditions = conditions 
 	#add the actual stuff here.
 	def trigger_event(self):
 
-		
-		#PPRO RELATED EVENT.
-		# if self.pos=="Long":
-		# 	print("LONG")
-		# elif self.pos =="Short":
-		# 	print("SHORT")
+		share = self.shares_calculator()
 
-		try:
+		if self.pos == LONG:
+			self.ppro_out.send(["Buy",self.symbol_name,share,description])
 			print("Trigger: SingleEntry PPRO EVENT: ",self.pos,"at",self.symbol.get_time())
-		except:
-			print("Trigger: SingleEntry PPRO EVENT: ",self.pos)
+		elif self.pos ==SHORT:
+			self.ppro_out.send(["Sell",self.symbol_name,share,description])
+		else:
+			print("unidentified side.")
 
-		super().trigger_event()
+	def shares_calculator(self):
+
+
+		if self.pos ==LONG:
+			risk_per_share =  abs(self.symbol_data[self.stop]-self.symbol_data[ASK])
+		else:
+			risk_per_share =  abs(self.symbol_data[self.stop]-self.symbol_data[BID])
+
+		shares = self.risk//risk_per_share
+
+		return shares
+
+
 
 # s = SingleEntry(ASK,">",PREMARKETHIGH,0,"BUY BREAK UP")
 # s.trigger_event()
