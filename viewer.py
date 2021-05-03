@@ -14,11 +14,11 @@ except ImportError:
     pip.main(['install', 'numpy'])
     import numpy as np
 
-try:
-    pip.main(['install', 'matplotlib'])
-    pip.main(['install', 'requests'])
-except:
-	pass
+# try:
+#     pip.main(['install', 'matplotlib'])
+#     pip.main(['install', 'requests'])
+# except:
+# 	pass
 
 import os
 import time
