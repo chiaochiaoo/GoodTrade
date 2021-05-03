@@ -39,8 +39,15 @@ class Symbol:
 	def set_tradingplan(self,tradingplan):
 		self.tradingplan = tradingplan
 
-	def update_price(self,bid,ask,ts):
+	def update_price(self,bid,ask,ts,AR):
 
+		if AR==True and ts<34200:
+			if ask>self.data[RESISTENCE]:
+				self.data[RESISTENCE]=ask
+			if self.data[SUPPORT] == 0:
+				self.data[SUPPORT] = bid
+			if bid<self.data[SUPPORT]:
+				self.data[SUPPORT] = bid
 
 		#34200 openning.
 
@@ -49,10 +56,10 @@ class Symbol:
 		# if self.data[LOW] ==0:
 		# 	self.data[LOW] = bid 
 
-		# if self.data[ASK]>self.data[HIGH]:
-		# 	self.data[HIGH] = self.data[ASK]
-		# if self.data[BID]<self.data[LOW]:
-		# 	self.data[LOW]= self.data[BID]
+		if self.data[ASK]>self.data[HIGH]:
+			self.data[HIGH] = self.data[ASK]
+		if self.data[BID]<self.data[LOW]:
+			self.data[LOW]= self.data[BID]
 
 		#print("sy",self.ask,self.high,self.output)
 
@@ -60,9 +67,6 @@ class Symbol:
 		self.data[ASK] = ask
 		self.data[TIMESTAMP] = ts
 		#notify trading plan that price has changed. 
-
-		if self.tradingplan!=None:
-			self.tradingplan.update()
 
 
 	def set_phigh(self,v):
@@ -79,6 +83,12 @@ class Symbol:
 
 	def get_data(self):
 		return self.data
+
+	def get_support(self):
+		return self.data[SUPPORT]
+
+	def get_resistence(self):
+		return self.data[RESISTENCE]
 
 	def get_bid(self):
 		return self.data[BID]

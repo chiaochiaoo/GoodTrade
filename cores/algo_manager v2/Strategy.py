@@ -20,7 +20,7 @@ import sys, inspect
 
 class Strategy: #ABSTRACT CLASS. the beginning of a sequence, containing one or more triggers.
 
-	def __init__(self,name):
+	def __init__(self,name,symbol:Symbol,tradingplan):
 
 		self.strategy_name = name
 		self.current_triggers = set()
@@ -29,12 +29,15 @@ class Strategy: #ABSTRACT CLASS. the beginning of a sequence, containing one or 
 		self.timer = 0
 		self.all_triggers = []
 
+		self.risk = 0
+
+		self.set_symbol(symbol,tradingplan)
+
 	def get_name(self):
 		return self.strategy_name
 
 	def add_initial_triggers(self,trigger):
 		self.current_triggers.add(trigger)
-
 		self.all_triggers.append(trigger)
 
 
@@ -47,6 +50,8 @@ class Strategy: #ABSTRACT CLASS. the beginning of a sequence, containing one or 
 		self.symbol=symbol
 		self.tradingplan = tradingplan
 		self.strategy_name = self.symbol.get_name()+" "+self.strategy_name
+
+		self.risk = self.tradingplan.get_risk()
 
 	def update(self):
 		if self.current_triggers!= None:
@@ -62,6 +67,10 @@ class Strategy: #ABSTRACT CLASS. the beginning of a sequence, containing one or 
 						break
 			if check:
 				self.current_triggers = i.get_next_triggers() #replace the triggers. 
+
+				for i in self.current_triggers:
+					i.set_symbol(self.symbol,self.tradingplan)
+
 				if len(self.current_triggers)==0: #if there is no trigger, call the finish even.t
 					self.on_finish()
 

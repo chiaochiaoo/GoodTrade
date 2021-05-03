@@ -193,7 +193,7 @@ class Manager:
 				ts = data["timestamp"]
 
 				if symbol in self.tradingplan:
-					self.tradingplan[symbol].ppro_update_price(price,bid,ask,ts)
+					self.tradingplan[symbol].ppro_update_price(bid,ask,ts)
 
 			if d[0] =="order rejected":
 

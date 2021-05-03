@@ -12,11 +12,13 @@ class TradingPlan:
 		self.symbol_name = symbol.get_name()
 
 		self.current_running_strategy = None
-
 		self.entry_strategy_start = False
 
 		self.entry_plan = None
 		self.entry_type = None
+
+		self.expect_orders = False
+
 
 		self.data = {}
 		self.tkvars = {}
@@ -70,18 +72,44 @@ class TradingPlan:
 		# self.manage_plan_decoder(manage_plan)
 
 
-	## PPRO SECTION ###
+	"""
+	PPRO SECTIONd 
+	"""
 
-	def ppro_update_price(self,data):
 
-		pass
+	def ppro_update_price(self,bid,ask,ts):
+
+
+		self.symbol.update_price(bid,ask,ts,self.data[AUTORANGE].get())
+		self.update_symbol_tkvar()
+
+		#check stop. 
+		if self.data[POSITION]!="":
+			self.check_stop(bid,ask)
+
+		#check triggers
+		if self.current_running_strategy!=None:
+			self.current_running_strategy.update()
+		#check if stop is met. OH! Facil
+
+	def check_stop(bid,ask):
+
+		if self.data[POSITION] == LONG:
+			if bid<self.data[STOP_LEVEL]:
+				print("flatten")
+		elif self.data[POSITION] == SHORT:
+			if ask>self.data[STOP_LEVEL]:
+				print("flatten")
 
 	def ppro_process_orders(self,price,shares,side):
 
 		
 		if self.tkvars[POSITION].get()=="": # 1. No position.
 
-			self.ppro_confirm_new_order(price,shares,side)
+			if self.expect_orders==True:
+				self.ppro_confirm_new_order(price,shares,side)
+			else:
+				print("unexpected orders on",self.symbol_name)
 		
 		else:  # 2. Have position. 
 
@@ -90,10 +118,12 @@ class TradingPlan:
 			else: #opposite
 				self.ppro_orders_loadoff(price,shares,side)
 
+
+
 	def ppro_confirm_new_order(self,price,shares,side):
 
 
-		#set the state as running, then load up
+		"""set the state as running, then load up"""
 		self.mark_algo_status(RUNNING)
 		self.ppro_orders_loadup(price,shares,side)
 
@@ -157,7 +187,9 @@ class TradingPlan:
 		self.mark_off_algo(REJECTED)
 
 
+	"""
 	#risk related ##
+	"""
 
 	def adjusting_risk(self):
 
@@ -178,7 +210,15 @@ class TradingPlan:
 			self.tklabels[RISK_RATIO]["background"] = DEFAULT
 
 
-	## UI related ##
+	"""
+	UI related 
+	"""
+	
+
+	def update_symbol_tkvar(self):
+		self.tkvars[SUPPORT].set(self.symbol.get_support())
+		self.tkvars[RESISTENCE].set(self.symbol.get_resistence())
+
 	def update_displays(self):
 
 		self.tkvars[CURRENT_SHARE].set(str(self.data[CURRENT_SHARE])+"/"+str(self.data[TARGET_SHARE]))
@@ -252,8 +292,20 @@ class TradingPlan:
 		# 	if self.order_tkstring[id_]["algo_status"].get() == "Pending":
 		# 		self.order_tkstring[id_]["algo_status"].set(status)
 
+	"""
+	DATA MANAGEMENT 
+	"""
 
-	## plan handler SECTION ###
+	
+	def get_risk(self):
+
+		return self.data[ESTRISK]
+
+
+	"""
+	Plan Handler
+	"""
+
 	def entry_plan_decoder(self,entry_plan,entry_type):
 
 		if entry_type ==None or entry_type ==INSTANT:
@@ -315,12 +367,6 @@ class TradingPlan:
 			self.management_strategy_done()
 		else:
 			print("Trading Plan: UNKONW CALL FROM Strategy")
-
-	def update(self): #let the strategy know it is updated. 
-
-		#just coordinate between the strategy.
-		if self.current_running_strategy!=None:
-			self.current_running_strategy.update()
 
 
 if __name__ == '__main__':

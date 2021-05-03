@@ -36,9 +36,11 @@ class Trigger:
 
 		self.next_triggers = set()
 
-	def set_symbol(self,symbol):
+	def set_symbol(self,symbol,tradingplan):
 		self.symbol = symbol
 		self.d = self.symbol.get_data()
+
+		self.tradingplan = tradingplan 
 		if self.error_checking(subject1,type_,subject2,timer):
 			print("Trigger creation error on ",subject1,type_,subject2)
 
