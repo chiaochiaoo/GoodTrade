@@ -218,6 +218,9 @@ class Tester:
 	def __init__(self,receive_pipe,ppro_in):
 
 
+		self.sec = 0
+		self.bid=0
+		self.ask=0
 
 		self.root = tk.Toplevel(width=780,height=250)
 		self.gt = receive_pipe
@@ -226,16 +229,46 @@ class Tester:
 		self.init= tk.Button(self.root ,text="Register",width=10,bg="#5BFF80",command=self.start_test)
 		self.init.grid(column=1,row=1)
 
+		self.price = tk.DoubleVar(value=413)
+		self.entr=	tk.Entry(self.root ,textvariable=self.price,width=10)	
+		self.entr.grid(column=1,row=2)
 
+		self.up=	tk.Button(self.root ,text="up",command=self.price_up)	
+		self.up.grid(column=1,row=3)
+
+		self.down=	tk.Button(self.root ,text="down",command=self.price_down)	
+		self.down.grid(column=2,row=3)
+		self.up=	tk.Button(self.root ,text="up 10",command=self.price_upx)	
+		self.up.grid(column=1,row=4)
+
+		self.down=	tk.Button(self.root ,text="down 10",command=self.price_downx)	
+		self.down.grid(column=2,row=4)
 
 	def start_test(self):
-		self.gt.send(["pkg",['New order', ['Any level', 'SPY.AM', 413.0, 418.0, 5.0, {'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441}]]])
+		self.gt.send(["pkg",['New order', ['Any level', 'SPY.AM', 413.0, 414.0, 5.0, {'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441}]]])
 
 	def price_up(self):
-		pass
-
+		self.price.set(round(self.price.get()+0.1,2))
+		self.change()
 	def price_down(self):
-		pass
+		self.price.set(round(self.price.get()-0.1,2))
+		self.change()
+	def price_upx(self):
+		self.price.set(round(self.price.get()+1,2))
+		self.change()
+	def price_downx(self):
+		self.price.set(round(self.price.get()-1,2))
+		self.change()
+	def change(self):
+		self.sec+=1
+		data={}
+		data["symbol"]= "SPY.AM"
+		data["bid"]= round(float(self.price.get()-0.05),2)
+		data["ask"]= round(float(self.price.get()+0.05),2)
+
+		data["timestamp"]= self.sec
+		self.ppro.send(["order update",data])
+
 
 
 if __name__ == '__main__':
