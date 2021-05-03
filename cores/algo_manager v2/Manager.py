@@ -87,7 +87,7 @@ class Manager:
 		#self.add_new_tradingplan("AAPL")
 		#self.add_new_tradingplan("SDS")
 
-		self.add_new_tradingplan(['Break Any', 'SPY.AM', 10.0, 12.0, 5.0, {'ATR': 3.6, 'OHavg': 1.551, 'OHstd': 1.556, 'OLavg': 1.623, 'OLstd': 1.445}])
+		#self.add_new_tradingplan(['Break Any', 'SPY.AM', 10.0, 12.0, 5.0, {'ATR': 3.6, 'OHavg': 1.551, 'OHstd': 1.556, 'OLavg': 1.623, 'OLstd': 1.445}])
 
 		good = threading.Thread(target=self.goodtrade_in, daemon=True)
 		good.start()
@@ -95,12 +95,13 @@ class Manager:
 		ppro_in = threading.Thread(target=self.ppro_in, daemon=True)
 		ppro_in.start()
 
+		#if Testerx==True:
+			
+
 	#data part, UI part
 	def add_new_tradingplan(self,data):
 
 		#['Any level', 'TEST.AM', 1.0, 2.0, 5.0, {'ATR': 3.6, 'OHavg': 1.551, 'OHstd': 1.556, 'OLavg': 1.623, 'OLstd': 1.445}]
-
-		print(data)
 
 		entryplan = data[0]
 		symbol = data[1]
@@ -117,6 +118,8 @@ class Manager:
 			
 			#register in ppro
 			self.pipe_ppro_out.send(["Register",symbol])
+
+			self.symbols.append(symbol)
 			#append it to, UI.
 		else:
 			print("symbols already exists, modifying current parameter.")
@@ -212,9 +215,28 @@ class Manager:
 
 class Tester:
 
-	def __init__(self,ppro_in):
+	def __init__(self,receive_pipe,ppro_in):
 
-		
+
+
+		self.root = tk.Toplevel(width=780,height=250)
+		self.gt = receive_pipe
+		self.ppro = ppro_in
+
+		self.init= tk.Button(self.root ,text="Register",width=10,bg="#5BFF80",command=self.start_test)
+		self.init.grid(column=1,row=1)
+
+
+
+	def start_test(self):
+		self.gt.send(["pkg",['New order', ['Any level', 'SPY.AM', 413.0, 418.0, 5.0, {'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441}]]])
+
+	def price_up(self):
+		pass
+
+	def price_down(self):
+		pass
+
 
 if __name__ == '__main__':
 
@@ -246,7 +268,7 @@ if __name__ == '__main__':
 	root.geometry("1920x800")
 
 	Manager(root,goodtrade_pipe,ppro_out,ppro_in)
-
+	Tester(receive_pipe,ppro_pipe_end)
 
 	# root.minsize(1600, 1000)
 	# root.maxsize(1800, 1200)
