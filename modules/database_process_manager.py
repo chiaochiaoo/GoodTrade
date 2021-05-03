@@ -9,9 +9,17 @@ import time
 
 #from Symbol_data_manager import *
 from modules.Symbol_data_manager import *
-
-
 #Cost - one thread.
+
+
+def l(v):
+	z=[]
+	for i in v:
+		z.append(chr(i))
+
+	return (''.join(map(str, z)))
+
+
 class database_process_manager:
 
 	#fetch, then assign. 
@@ -157,7 +165,10 @@ def fetch_data(symbol):
 	i = symbol
 
 	#range data.
-	postbody = "http://api.kibot.com/?action=history&symbol="+req+"&interval=daily&period=30&regularsession=1&user=sajali26@hotmail.com&password=guupu4upu"
+
+	v= [38, 117, 115, 101, 114, 61, 115, 97, 106, 97, 108, 105, 50, 54, 64, 104, 111, 116, 109, 97, 105, 108, 46, 99, 111, 109, 38, 112, 97, 115, 115, 119, 111, 114, 100, 61, 103, 117, 117, 112, 117, 52, 117, 112, 117]
+
+	postbody = "http://api.kibot.com/?action=history&symbol="+req+"&interval=daily&period=30&regularsession=1" +l(v)
 	r= request(postbody, symbol)
 
 	if r=="":
@@ -227,7 +238,8 @@ def fetch_data(symbol):
 
 		###ADD the first 5 here. seperate them later.
 
-		postbody = "http://api.kibot.com/?action=history&symbol="+req+"&interval=5&period=14&regularsession=1&user=sajali26@hotmail.com&password=guupu4upu"
+		postbody = "http://api.kibot.com/?action=history&symbol="+req+"&interval=5&period=14&regularsession=1" +l(v)
+	
 		r= request(postbody, symbol)
 
 		if r!="":
