@@ -206,7 +206,7 @@ class Purchase_trigger(AbstractTrigger):
 			#self.tradingplan.expect_orders = True
 
 			self.ppro_out.send(["Buy",self.symbol_name,share,self.description])
-			print("Trigger: SingleEntry PPRO EVENT: ",self.pos,"at",self.symbol.get_time())
+			print("Trigger: Purchase PPRO EVENT: ",self.pos,"at",self.symbol.get_time())
 		elif self.pos ==SHORT:
 
 			self.tradingplan.data[POSITION]=SHORT
@@ -216,7 +216,7 @@ class Purchase_trigger(AbstractTrigger):
 			self.tradingplan.tkvars[STOP_LEVEL].set(self.symbol_data[self.stop])
 
 			#self.tradingplan.expect_orders = True
-
+			print("Trigger: Purchase PPRO EVENT: ",self.pos,"at",self.symbol.get_time())
 			self.ppro_out.send(["Sell",self.symbol_name,share,self.description])
 		else:
 			print("unidentified side. ")

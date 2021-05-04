@@ -188,14 +188,14 @@ def Ppro_out(pipe,port): #a sperate process. GLOBALLY.
 				share = d[2]
 				rationale = d[3]
 
-				#buy_market_order(symbol,share)
+				buy_market_order(symbol,share)
 
 			elif type_ =="Sell":
 
 				symbol = d[1]
 				share = d[2]
 				rationale = d[3]
-				#sell_market_order(symbol,share)
+				sell_market_order(symbol,share)
 
 			elif type_ == "Register":
 

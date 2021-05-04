@@ -82,7 +82,7 @@ def timestamp_seconds(s):
 		x = int(p[0])*3600+int(p[1])*60+int(p[2])
 		return x
 	except Exception as e:
-		print("Timestamp conversion error:",e)
+		print("Timestamp conversion error:",e,s)
 		return 0
 def find_between(data, first, last):
 	try:
@@ -115,7 +115,7 @@ def decode_order(stream_data,pipe):
 			side = find_between(stream_data, "Side=", ",")
 			price = find_between(stream_data, "Price=", ",")
 			share = find_between(stream_data, "Shares=", ",")
-			ts=find_between(stream_data, "MarketTime=\"", "\"")[:-4]
+			ts=find_between(stream_data, "MarketDateTime=", ",")[9:-4]
 			#add time
 			if side =="T" or side =="S": side ="Short"
 			if side =="B": side = "Long"
@@ -157,4 +157,5 @@ def decode_l1(stream_data,pipe):
 	#add time
 	pipe.send(["order update",data])
 
-
+# x= "LocalTime=15:56:54.742,Message=OrderStatus,MarketDateTime=20210504-15:56:55.000,Currency=1,Symbol=QQQ.NQ,Gateway=2030,Side=T,OrderNumber=QIAOSUN_02000326M1791F8100000,Price=329.540000,Shares=70,Position=4,OrderState=Filled,CurrencyChargeGway=1,ChargeGway=0.21000,CurrencyChargeAct=1,ChargeAct=0.0096600,CurrencyChargeSec=1,ChargeSec=0.47750,CurrencyChargeExec=0,ChargeExec=0,CurrencyChargeClr=1,ChargeClr=0.012950,OrderFlags=129,CurrencyCharge=1,Account=1TRUENV001TNVQIAOSUN_USD1,InfoCode=255,InfoText=LiqFlags:^Tag30:14^Tag31:329.5400000^Tag150:2^Tag9730:"
+# print(find_between(x, "MarketDateTime=", ",")[9:-4])

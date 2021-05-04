@@ -14,7 +14,7 @@ import requests
 
 #May this class bless by the Deus Mechanicus.
 
-TEST = True
+TEST = False
 
 def algo_manager_voxcom(pipe):
 
@@ -169,7 +169,7 @@ class Manager:
 		while True:
 			d = self.pipe_ppro_in.recv()
 
-			print("Ppro in:",d)
+			#print("Ppro in:",d)
 
 			if d[0] =="status":
 				

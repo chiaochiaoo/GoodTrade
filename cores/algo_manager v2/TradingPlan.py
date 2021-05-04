@@ -84,18 +84,37 @@ class TradingPlan:
 
 	""" PPRO SECTION """
 
+	def AR_toggle_check(self):
+		"""
+		This will happen whenever a trade is placed. 
+		"""
+		self.symbol.set_resistence(self.tkvars[RESISTENCE].get())
+		self.symbol.set_support(self.tkvars[RESISTENCE].get())
+		self.tklabels[AUTORANGE]["state"] = "disabled"
+
 	def ppro_update_price(self,bid,ask,ts):
 
-		self.symbol.update_price(bid,ask,ts,self.tkvars[AUTORANGE].get(),self.data[POSITION])
-		self.update_symbol_tkvar()
+		try:
+			if self.data[POSITION] =="" and self.tkvars[AUTORANGE].get()==False:
+				self.tklabels[SUPPORT]["state"] = "normal"
+				self.tklabels[RESISTENCE]["state"] = "normal"
+			else:
+				self.tklabels[SUPPORT]["state"] = "disabled"
+				self.tklabels[RESISTENCE]["state"] = "disabled"
+				
 
-		#check stop. 
-		if self.data[POSITION]!="":
-			self.check_pnl(bid,ask)
+			self.symbol.update_price(bid,ask,ts,self.tkvars[STATUS].get(),self.data[POSITION])
+			self.update_symbol_tkvar()
 
-		#check triggers
-		if self.current_running_strategy!=None:
-			self.current_running_strategy.update()
+			#check stop. 
+			if self.data[POSITION]!="":
+				self.check_pnl(bid,ask)
+
+			#check triggers
+			if self.current_running_strategy!=None:
+				self.current_running_strategy.update()
+		except Exception as e:
+			print("TP:",e)
 
 	def check_pnl(self,bid,ask):
 		"""
@@ -215,18 +234,20 @@ class TradingPlan:
 
 		self.data[POSITION] = ""
 		self.tkvars[POSITION].set("")
+		self.tklabels[AUTORANGE]["state"] = "normal"
 
 		self.current_running_strategy = None
 
 		#if reload is on, revert it back to entry stage. 
 		if self.tkvars[RELOAD].get() == True:
 			print("TP processing:",self.symbol_name,":"," Reload ativado. Trading triggers re-initialized. ")
-			self.start_tradingplan()
 			self.tkvars[RELOAD].set(False)
+			self.start_tradingplan()
+			
 
 	def ppro_order_rejection(self):
 
-		self.mark_off_algo(REJECTED)
+		self.mark_algo_status(REJECTED)
 
 
 	""" risk related ## """
@@ -253,6 +274,7 @@ class TradingPlan:
 	"""	UI related  """
 
 	def update_symbol_tkvar(self):
+		print("update")
 		self.tkvars[SUPPORT].set(self.symbol.get_support())
 		self.tkvars[RESISTENCE].set(self.symbol.get_resistence())
 
@@ -352,6 +374,7 @@ class TradingPlan:
 		self.entry_plan_decoder(entryplan, entry_type, entrytimer)
 		self.manage_plan_decoder(manage_plan)
 
+		self.AR_toggle_check()
 		self.start_tradingplan()
 	
 	def start_tradingplan(self):
