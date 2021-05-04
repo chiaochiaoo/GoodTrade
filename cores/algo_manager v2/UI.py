@@ -170,7 +170,7 @@ class UI(pannel):
 			label_name = labels[j]
 
 			if label_name == "Symbol":
-				self.tklabels[symbol][label_name] = tk.Button(self.deployment_frame ,text=info[j],width=self.width[j])
+				self.tklabels[symbol][label_name] = tk.Button(self.deployment_frame ,text=info[j],width=self.width[j],command=tradingplan.deploy)
 
 			elif label_name =="Timer":
 				self.tklabels[symbol][label_name] = tk.Entry(self.deployment_frame,textvariable=info[j],width=self.width[j])
@@ -208,6 +208,8 @@ class UI(pannel):
 			self.tklabels[symbol][label_name].grid(row= l+2, column=j,padx=0)
 
 		self.label_count +=1
+
+		tradingplan.update_displays()
 
 	def create_example_trade(self):
 

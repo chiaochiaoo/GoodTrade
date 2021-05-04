@@ -58,13 +58,14 @@ TP_DATA = "TP_DATA"
 #Algo STATUS
 DONE = "Done"
 PENDING = "Pending"
+DEPLOYED = "DEPLOYED"
 MATURING = "Maturing"
 RUNNING = "Running"
 REJECTED = "Rejected"
 CANCELED= "Canceled"
 #orders sies
-LONG  = "B"
-SHORT = "S"
+LONG  = "Long"
+SHORT = "Short"
 
 
 #Entry Type

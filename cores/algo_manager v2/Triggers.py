@@ -39,27 +39,36 @@ class AbstractTrigger:
 	def add_conditions(subject1,d_type1,subject2,d_type2,type_):
 		self.conditions.append([subject1,d_type1,subject2,d_type2,type_])
 
-	def decode_conditions(self):
+	def decode_conditions(self,i):
 
+		#print(i)
+		#['symbol_data', 'ask', '>', 'symbol_data', 'phigh']
 		s1 =i[0]
 		t1= i[1]
-		s2= i[2]
-		t2= i[3]
-		type_ = i[4]
+
+		type_ = i[2]
+
+
+		s2= i[3]
+		t2= i[4]
+		
+
+		s1_=None
+		s2_=None
 
 		if s1 == SYMBOL_DATA:
 			s1_ = self.symbol_data
 		elif s1 == TP_DATA:
 			s1_ = self.tp_data
 		else:
-			print("Trigger decoding error on ",self.description)
+			print("Trigger decoding error on ",s1,self.description)
 
 		if s2 == SYMBOL_DATA:
 			s2_ = self.symbol_data
 		elif s2 == TP_DATA:
 			s2_ = self.tp_data
 		else:
-			print("Trigger decoding error on ",self.description)
+			print("Trigger decoding error on ",s2,self.description)
 
 		return s1_,s2_,t1,t2,type_
 
@@ -72,7 +81,7 @@ class AbstractTrigger:
 		3. If time trigger is above 0. Check if it is already triggered. 
 		"""
 
-		try:
+		if 1:
 			for i in self.conditions:
 				s1,s2,t1,t2,type_= self.decode_conditions(i)
 
@@ -98,8 +107,8 @@ class AbstractTrigger:
 						self.trigger_duration = self.symbol.get_time() - self.trigger_time
 						if self.trigger_duration >= self.self.trigger_timer:
 							return self.is_trigger()
-		except Exception as e:
-			print("Trigger error on ",self.description,e)
+		# except Exception as e:
+		# 	print("Trigger error on ",self.description,e)
 
 		return False
 
@@ -170,18 +179,45 @@ class Purchase_trigger(AbstractTrigger):
 		self.ppro_out =ppro_out
 		self.risk = risk 
 		self.conditions = conditions 
+
+		checker = False
+		for i in conditions:
+			if len(i)!=5:
+				checker = True
+				break
+
+		if checker:
+			print("Trigger problem on purchase_trigger,conditions:",conditions)
 	#add the actual stuff here.
 	def trigger_event(self):
 
 		share = self.shares_calculator()
 
 		if self.pos == LONG:
-			self.ppro_out.send(["Buy",self.symbol_name,share,description])
+
+			#set pos to long ,and stop to a value.
+
+			self.tradingplan.data[POSITION]=LONG
+			self.tradingplan.tkvars[POSITION].set(LONG)
+
+			self.tradingplan.data[STOP_LEVEL]=self.symbol_data[self.stop]
+			self.tradingplan.tkvars[STOP_LEVEL].set(self.symbol_data[self.stop])
+
+			self.ppro_out.send(["Buy",self.symbol_name,share,self.description])
 			print("Trigger: SingleEntry PPRO EVENT: ",self.pos,"at",self.symbol.get_time())
 		elif self.pos ==SHORT:
-			self.ppro_out.send(["Sell",self.symbol_name,share,description])
+
+			self.tradingplan.data[POSITION]=SHORT
+			self.tradingplan.tkvars[POSITION].set(SHORT)
+
+			self.tradingplan.data[STOP_LEVEL]=self.symbol_data[self.stop]
+			self.tradingplan.tkvars[STOP_LEVEL].set(self.symbol_data[self.stop])
+
+			self.ppro_out.send(["Sell",self.symbol_name,share,self.description])
 		else:
 			print("unidentified side.")
+
+		self.tradingplan.update_displays()
 
 	def shares_calculator(self):
 
@@ -191,7 +227,9 @@ class Purchase_trigger(AbstractTrigger):
 		else:
 			risk_per_share =  abs(self.symbol_data[self.stop]-self.symbol_data[BID])
 
-		shares = self.risk//risk_per_share
+		shares = int(self.risk//risk_per_share)
+
+		self.tradingplan.data[TARGET_SHARE]=shares
 
 		return shares
 

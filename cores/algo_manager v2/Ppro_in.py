@@ -117,7 +117,8 @@ def decode_order(stream_data,pipe):
 			share = find_between(stream_data, "Shares=", ",")
 			ts=find_between(stream_data, "MarketTime=\"", "\"")[:-4]
 			#add time
-			if side =="T": side ="S"
+			if side =="T" or side =="S": side ="Short"
+			if side =="B": side = "Long"
 
 			data ={}
 			data["symbol"]= symbol
@@ -132,7 +133,9 @@ def decode_order(stream_data,pipe):
 			side = find_between(stream_data, "Side=", ",")
 			info = find_between(stream_data, "InfoText=", ",")
 			data ={}
-			if side =="T": side ="S"
+			if side =="T" or side =="S": side ="Short"
+			if side =="B": side = "Long"
+
 			data["symbol"]= symbol
 			data["side"]= side
 			data["info"]=info

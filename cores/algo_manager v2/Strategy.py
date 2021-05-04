@@ -39,7 +39,7 @@ class Strategy: #ABSTRACT CLASS. the beginning of a sequence, containing one or 
 
 	def add_initial_triggers(self,trigger):
 		self.current_triggers.add(trigger)
-		self.all_triggers.append(trigger)
+		trigger.set_symbol(self.symbol, self.tradingplan, self.ppro_out)
 
 
 		#change all the timers 
@@ -59,7 +59,7 @@ class Strategy: #ABSTRACT CLASS. the beginning of a sequence, containing one or 
 			for i in self.current_triggers:
 				if self.symbol!=None:
 					check = False
-					if i.check_conditions(self.symbol):
+					if i.check_conditions():
 						check = True
 					if check:
 						break
@@ -85,29 +85,30 @@ class BreakUp(Strategy): #the parameters contains? dk. yet .  #Can make single e
 		super().__init__("Break up",symbol,tradingplan)
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
-		buyTrigger = Purchase_trigger([SYMBOL_DATA,ASK,">",SYMBOL_DATA,PREMARKETHIGH],PREMARKETLOW,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
+		buyTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
 
 		self.add_initial_triggers(buyTrigger)
 
-# class BreakDown(Strategy): #the parameters contains? dk. yet .
-# 	def __init__(self,timer,repeat,symbol,tradingplan):
-# 		super().__init__("Break down",symbol,tradingplan)
+class BreakDown(Strategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry. 
+	def __init__(self,timer,repeat,symbol,tradingplan):
+		super().__init__("Break up",symbol,tradingplan)
+		#description,trigger_timer:int,trigger_limit=1
+		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
+		sellTrigger = Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
 
-# 		shortTrigger = Purchase_trigger(BID,"<",PREMARKETLOW,timer,"SHORT BREAK DOWN","Short")
-# 		self.add_initial_triggers(shortTrigger)
+		self.add_initial_triggers(buyTrigger)
 
+class BreakAny(Strategy):
+	def __init__(self,timer,repeat,symbol,tradingplan):
 
-# class BreakAny(Strategy):
-# 	def __init__(self,timer=0,repeat=False):
-# 		super().__init__("Break Any")
-		
-# 		#subject1,type_,subject2,trigger_timer,description,trigger_limit=1
-# 		buyTrigger = SingleEntry(ASK,">",PREMARKETHIGH,timer,"BUY BREAK UP","Long")
-# 		self.add_initial_triggers(buyTrigger)
+		super().__init__("Break Any",symbol,tradingplan)
+		#description,trigger_timer:int,trigger_limit=1
+		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
+		buyTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
+		sellTrigger = Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
 
-# 		shortTrigger = SingleEntry(BID,"<",PREMARKETLOW,timer,"SHORT BREAK DOWN","Short")
-# 		self.add_initial_triggers(shortTrigger)
-
+		self.add_initial_triggers(buyTrigger)
+		self.add_initial_triggers(sellTrigger)
 
 
 # clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)

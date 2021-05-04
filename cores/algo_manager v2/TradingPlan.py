@@ -20,6 +20,7 @@ class TradingPlan:
 
 		self.entry_plan = None
 		self.entry_type = None
+		self.management_plan = None
 
 		self.ppro_out = ppro_out
 
@@ -40,6 +41,7 @@ class TradingPlan:
 		self.bool_labels= [AUTORANGE,RELOAD]
 
 		self.init_data(risk,entry_plan,entry_type,manage_plan)
+
 
 	def init_data(self,risk,entry_plan,entry_type,manage_plan):
 
@@ -78,13 +80,12 @@ class TradingPlan:
 		# self.manage_plan_decoder(manage_plan)
 
 
-	"""
-	PPRO SECTIONd 
-	"""
+
+
+	""" PPRO SECTION """
 
 
 	def ppro_update_price(self,bid,ask,ts):
-
 
 		self.symbol.update_price(bid,ask,ts,self.tkvars[AUTORANGE].get())
 		self.update_symbol_tkvar()
@@ -98,8 +99,9 @@ class TradingPlan:
 			self.current_running_strategy.update()
 		#check if stop is met. OH! Facil
 
-	def check_stop(bid,ask):
+	def check_stop(self,bid,ask):
 
+		print("checking stop:",bid,ask,"stop:",self.data[STOP_LEVEL])
 		if self.data[POSITION] == LONG:
 			if bid<self.data[STOP_LEVEL]:
 				print("flatten")
@@ -109,7 +111,6 @@ class TradingPlan:
 
 	def ppro_process_orders(self,price,shares,side):
 
-		
 		if self.tkvars[POSITION].get()=="": # 1. No position.
 
 			if self.expect_orders==True:
@@ -193,9 +194,7 @@ class TradingPlan:
 		self.mark_off_algo(REJECTED)
 
 
-	"""
-	#risk related ##
-	"""
+	""" risk related ## """
 
 	def adjusting_risk(self):
 
@@ -216,9 +215,7 @@ class TradingPlan:
 			self.tklabels[RISK_RATIO]["background"] = DEFAULT
 
 
-	"""
-	UI related 
-	"""
+	"""	UI related  """
 	
 
 	def update_symbol_tkvar(self):
@@ -227,7 +224,7 @@ class TradingPlan:
 
 	def update_displays(self):
 
-		self.tkvars[CURRENT_SHARE].set(str(self.data[CURRENT_SHARE])+"/"+str(self.data[TARGET_SHARE]))
+		self.tkvars[SIZE_IN].set(str(self.data[CURRENT_SHARE])+"/"+str(self.data[TARGET_SHARE]))
 		self.tkvars[REALIZED].set(str(self.data[REALIZED]))
 		self.tkvars[UNREAL].set(str(self.data[UNREAL]))
 		self.tkvars[UNREAL_PSHR].set(str(self.data[UNREAL_PSHR]))
@@ -242,39 +239,38 @@ class TradingPlan:
 		if self.data[UNREAL_PSHR]>0:
 			self.tklabels[UNREAL_PSHR]["background"] = STRONGGREEN
 			self.tklabels[UNREAL]["background"] = STRONGGREEN
-		elif self.unrealized_pshr[id_]<0:
+		elif self.data[UNREAL_PSHR]<0:
 			self.tklabels[UNREAL_PSHR]["background"] = STRONGRED
 			self.tklabels[UNREAL]["background"] = STRONGRED
 		else:
 			self.tklabels[UNREAL_PSHR]["background"] = DEFAULT
 			self.tklabels[UNREAL]["background"] =DEFAULT
 
-		if self.realized[id_]==0:
-			self.tklabels[REALIZED]["background"]["background"] = DEFAULT
+		if self.data[REALIZED]==0:
+			self.tklabels[REALIZED]["background"] = DEFAULT
 		elif self.realized[id_]>0:
-			self.tklabels[REALIZED]["background"]["background"] = STRONGGREEN
+			self.tklabels[REALIZED]["background"] = STRONGGREEN
 		elif self.realized[id_]<0:
-			self.tklabels[REALIZED]["background"]["background"] = STRONGRED
+			self.tklabels[REALIZED]["background"] = STRONGRED
 
 		current_level = self.current_price_level
 
-		self.tklabels[pxt1]
 		if  current_level==1:
-			self.tklabels[pxt1]["background"] = LIGHTYELLOW
-			self.tklabels[pxt2]["background"] = DEFAULT
-			self.tklabels[pxt3]["background"] = DEFAULT
+			self.tklabels[PXT1]["background"] = LIGHTYELLOW
+			self.tklabels[PXT2]["background"] = DEFAULT
+			self.tklabels[PXT3]["background"] = DEFAULT
 		elif  current_level==2:
-			self.tklabels[pxt1]["background"] = DEFAULT
-			self.tklabels[pxt2]["background"] = LIGHTYELLOW
-			self.tklabels[pxt3]["background"] = DEFAULT
+			self.tklabels[PXT1]["background"] = DEFAULT
+			self.tklabels[PXT2]["background"] = LIGHTYELLOW
+			self.tklabels[PXT3]["background"] = DEFAULT
 		elif  current_level==3:
-			self.tklabels[pxt1]["background"] = DEFAULT
-			self.tklabels[pxt2]["background"] = DEFAULT
-			self.tklabels[pxt3]["background"] = LIGHTYELLOW
+			self.tklabels[PXT1]["background"] = DEFAULT
+			self.tklabels[PXT2]["background"] = DEFAULT
+			self.tklabels[PXT3]["background"] = LIGHTYELLOW
 		else:
-			self.tklabels[pxt1]["background"] = DEFAULT
-			self.tklabels[pxt2]["background"] = DEFAULT
-			self.tklabels[pxt3]["background"] = DEFAULT	
+			self.tklabels[PXT1]["background"] = DEFAULT
+			self.tklabels[PXT2]["background"] = DEFAULT
+			self.tklabels[PXT3]["background"] = DEFAULT	
 
 
 
@@ -298,45 +294,53 @@ class TradingPlan:
 		# 	if self.order_tkstring[id_]["algo_status"].get() == "Pending":
 		# 		self.order_tkstring[id_]["algo_status"].set(status)
 
-	"""
-	DATA MANAGEMENT 
-	"""
+	""" DATA MANAGEMENT  """
 
 	
 	def get_risk(self):
-
 		return self.data[ESTRISK]
 
 	def get_data(self):
 		return self.data
 
-	"""
-	Plan Handler
-	"""
+	""" Plan Handler """
 
-	def entry_plan_decoder(self,entry_plan,entry_type):
+	def deploy(self):
+
+		entryplan=self.tkvars[ENTRYPLAN].get()
+		entry_type=self.tkvars[ENTYPE].get()
+		entrytimer=self.tkvars[TIMER].get()
+		manage_plan =self.tkvars[MANAGEMENTPLAN].get()
+
+		self.entry_plan_decoder(entryplan, entry_type, entrytimer)
+		self.manage_plan_decoder(manage_plan)
+
+		self.tkvars[STATUS].set("Deployed")
+
+		self.start_EntryStrategy()
+
+	
+	def entry_plan_decoder(self,entry_plan,entry_type,entrytimer):
 
 		if entry_type ==None or entry_type ==INSTANT:
 			instant = True 
 		if entry_type ==INCREMENTAL:
 			instant = False 
 
-		self.tkvars[ENTYPE].set(entry_type)
 
 		if entry_plan == BREAKANY:
-			self.set_EntryStrategy(BreakAny(0,instant))
+			self.set_EntryStrategy(BreakAny(entrytimer,instant,self.symbol,self))
 		elif entry_plan == BREAKUP:
-			self.set_EntryStrategy(BreakUp(0,instant))
+			self.set_EntryStrategy(BreakUp(entrytimer,instant,self.symbol,self))
 		elif entry_plan == BREAKDOWN:
-			self.set_EntryStrategy(BreakDown(0,instant))
+			self.set_EntryStrategy(BreakDown(entrytimer,instant,self.symbol,self))
 		elif entry_plan == BREAISH:
-			self.set_EntryStrategy(BreakAny(0,instant))
+			self.set_EntryStrategy(BreakAny(entrytimer,instant,self.symbol,self))
 		elif entry_plan == BULLISH:
-			self.set_EntryStrategy(BreakAny(0,instant))
+			self.set_EntryStrategy(BreakAny(entrytimer,instant,self.symbol,self))
 		else:
 			print("unkown plan")
 
-		self.tkvars[ENTRYPLAN].set(entry_plan)
 
 	def manage_plan_decoder(self,manage_plan):
 
@@ -344,10 +348,10 @@ class TradingPlan:
 
 	def set_EntryStrategy(self,entry_plan:Strategy):
 		self.entry_plan = entry_plan
-		self.entry_plan.set_symbol(self.symbol,self)
+		#self.entry_plan.set_symbol(self.symbol,self)
 
 		self.data[ENTRYPLAN] = entry_plan.get_name()
-		self.tkvars[ENTRYPLAN].set(entry_plan.get_name())
+		#self.tkvars[ENTRYPLAN].set(entry_plan.get_name())
 
 	def set_ManagementStrategy(self,management_plan:Strategy):
 		self.management_plan = management_plan
