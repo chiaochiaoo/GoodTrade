@@ -39,9 +39,9 @@ class Symbol:
 	def set_tradingplan(self,tradingplan):
 		self.tradingplan = tradingplan
 
-	def update_price(self,bid,ask,ts,AR=True):
+	def update_price(self,bid,ask,ts,AR,pos):
 
-		if AR==True: #and ts<34200:
+		if AR==True and pos=="": #and ts<34200:
 			if ask>self.data[RESISTENCE]:
 				self.data[RESISTENCE]=ask
 			if self.data[SUPPORT] == 0:

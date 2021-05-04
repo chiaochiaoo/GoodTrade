@@ -209,6 +209,7 @@ class UI(pannel):
 
 		self.label_count +=1
 
+
 		tradingplan.update_displays()
 
 	def create_example_trade(self):

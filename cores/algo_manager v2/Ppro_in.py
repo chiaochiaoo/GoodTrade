@@ -125,7 +125,7 @@ def decode_order(stream_data,pipe):
 			data["side"]= side
 			data["price"]= float(price)
 			data["shares"]= int(share)
-			date["timestamp"]= timestamp_seconds(ts)
+			data["timestamp"]= timestamp_seconds(ts)
 			pipe.send(["order confirm",data])
 
 		if state =="Rejected":

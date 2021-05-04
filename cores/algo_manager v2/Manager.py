@@ -14,6 +14,7 @@ import requests
 
 #May this class bless by the Deus Mechanicus.
 
+TEST = True
 
 def algo_manager_voxcom(pipe):
 
@@ -34,8 +35,8 @@ def algo_manager_voxcom(pipe):
 					connected = True
 				except:
 					pipe.send(["msg","Disconnected"])
-					print("Cannot connected. Try again in 2 seconds.")
-					time.sleep(2)
+					#print("Cannot connected. Try again in 2 seconds.")
+					time.sleep(3)
 
 			connection = True
 			pipe.send(["msg","Connected"])
@@ -71,12 +72,14 @@ def algo_manager_voxcom(pipe):
 
 class Manager:
 
-	def __init__(self,root,goodtrade_pipe=None,ppro_out=None,ppro_in=None):
+	def __init__(self,root,goodtrade_pipe=None,ppro_out=None,ppro_in=None,TEST_MODE=False):
 
 
 		self.pipe_ppro_in = ppro_in
 		self.pipe_ppro_out = ppro_out
 		self.pipe_goodtrade = goodtrade_pipe
+
+		self.test_mode = TEST_MODE
 
 		self.symbols = []
 
@@ -99,7 +102,7 @@ class Manager:
 			
 
 	#data part, UI part
-	def add_new_tradingplan(self,data):
+	def add_new_tradingplan(self,data,TEST_MODE):
 
 		#['Any level', 'TEST.AM', 1.0, 2.0, 5.0, {'ATR': 3.6, 'OHavg': 1.551, 'OHstd': 1.556, 'OLavg': 1.623, 'OLstd': 1.445}]
 
@@ -112,7 +115,7 @@ class Manager:
 		if symbol not in self.symbols:
 
 			self.symbol_data[symbol]=Symbol(symbol,support,resistence)  #register in Symbol.
-			self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,NONE,risk,self.pipe_ppro_out)
+			self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,NONE,risk,self.pipe_ppro_out,TEST_MODE)
 
 			self.ui.create_new_entry(self.tradingplan[symbol])
 			
@@ -144,10 +147,9 @@ class Manager:
 
 				if d[1][0] == "New order":
 					#try:
-					self.add_new_tradingplan(d[1][1])
+					self.add_new_tradingplan(d[1][1],self.test_mode)
 					#except:
 					#	print("adding con porra")
-
 
 	def ppro_order_confirmation(self,data):
 
@@ -166,6 +168,8 @@ class Manager:
 	def ppro_in(self):
 		while True:
 			d = self.pipe_ppro_in.recv()
+
+			print("Ppro in:",d)
 
 			if d[0] =="status":
 				
@@ -191,7 +195,10 @@ class Manager:
 				side = data["side"]
 
 				if symbol in self.tradingplan:
-					self.tradingplan[symbol].ppro_confirm_new_order(price,shares,side)
+					self.tradingplan[symbol].ppro_process_orders(price,shares,side)
+
+				#if TEST:
+					#print(self.tradingplan[symbol].data)
 
 			if d[0] =="order update":
 				data = d[1]
@@ -215,7 +222,7 @@ class Manager:
 
 class Tester:
 
-	def __init__(self,receive_pipe,ppro_in):
+	def __init__(self,receive_pipe,ppro_in,ppro_out):
 
 
 		self.sec = 0
@@ -225,6 +232,11 @@ class Tester:
 		self.root = tk.Toplevel(width=780,height=250)
 		self.gt = receive_pipe
 		self.ppro = ppro_in
+
+		self.ppro_out = ppro_out
+
+		self.pos  = ""
+		self.share = 0
 
 		# self.init= tk.Button(self.root ,text="Register",width=10,bg="#5BFF80",command=self.start_test)
 		# self.init.grid(column=1,row=1) m
@@ -246,24 +258,116 @@ class Tester:
 
 		self.gt.send(["pkg",['New order', [BREAKANY, 'SPY.AM', 413.0, 414.0, 5.0, {'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441}]]])
 
+		time.sleep(1)
+		wish_granter = threading.Thread(target=self.wish, daemon=True)
+		wish_granter.start()
+
+	def wish(self): #a sperate process. GLOBALLY. 
+		while True:
+			try:
+				d = self.ppro_out.recv()
+				print(d)
+				type_ = d[0]
+
+				if type_ == "Buy":
+
+					symbol = d[1]
+					share = d[2]
+					rationale = d[3]
+
+					if self.share ==0:
+						self.pos = LONG
+
+					if self.pos ==LONG or self.pos=="":
+						self.share +=share
+					elif self.pos ==SHORT:
+						self.share -=share
+
+					data ={}
+					data["symbol"]= symbol
+					data["side"]= LONG
+					data["price"]= float(self.ask)
+					data["shares"]= int(share)
+					data["timestamp"]= self.sec
+					self.ppro.send(["order confirm",data])
+
+				elif type_ =="Sell":
+
+					symbol = d[1]
+					share = d[2]
+					rationale = d[3]
+
+					if self.share ==0:
+						self.pos = SHORT
+
+					if self.pos ==SHORT or self.pos=="":
+						self.share +=share
+					elif self.pos ==LONG:
+						self.share -=share
+
+					data ={}
+					data["symbol"]= symbol
+					data["side"]= SHORT
+					data["price"]= float(self.bid)
+					data["shares"]= int(share)
+					data["timestamp"]= self.sec
+					self.ppro.send(["order confirm",data])
+
+				elif type_ == "Register":
+
+					symbol = d[1]
+					register(symbol,port)
+
+				elif type_ == "Flatten":
+
+					symbol = d[1]
+					if self.pos ==LONG:
+						data ={}
+						data["symbol"]= symbol
+						data["side"]= SHORT
+						data["price"]= float(self.bid)
+						data["shares"]= int(self.share)
+						data["timestamp"]= self.sec
+						self.ppro.send(["order confirm",data])
+					else:
+						data ={}
+						data["symbol"]= symbol
+						data["side"]= LONG
+						data["price"]= float(self.bid)
+						data["shares"]= int(self.share)
+						data["timestamp"]= self.sec
+						self.ppro.send(["order confirm",data])
+					self.share = 0
+					self.pos =""
+			except Exception as e:
+				print(e)
+
 
 
 	def price_up(self):
 		self.price.set(round(self.price.get()+0.1,2))
 		self.change()
 	def price_down(self):
+
 		self.price.set(round(self.price.get()-0.1,2))
 		self.change()
+
 	def price_upx(self):
 		self.price.set(round(self.price.get()+1,2))
 		self.change()
+
 	def price_downx(self):
 		self.price.set(round(self.price.get()-1,2))
 		self.change()
+
 	def change(self):
 		self.sec+=1
 		data={}
 		data["symbol"]= "SPY.AM"
+
+		self.bid = round(float(self.price.get()-0.05),2)
+		self.ask = round(float(self.price.get()+0.05),2)
+
 		data["bid"]= round(float(self.price.get()-0.05),2)
 		data["ask"]= round(float(self.price.get()+0.05),2)
 
@@ -289,21 +393,25 @@ if __name__ == '__main__':
 
 	ppro_in_manager = multiprocessing.Process(target=Ppro_in, args=(port,ppro_pipe_end),daemon=True)
 	ppro_in_manager.daemon=True
-	ppro_in_manager.start()
+	
 
 	ppro_out, ppro_pipe_end2 = multiprocessing.Pipe()
 
 	ppro_out_manager = multiprocessing.Process(target=Ppro_out, args=(ppro_pipe_end2,port,),daemon=True)
 	ppro_out_manager.daemon=True
-	ppro_out_manager.start()
+	
 
 	root = tk.Tk() 
 	root.title("GoodTrade Algo Manager v2") 
 	root.geometry("1920x800")
 
-	Manager(root,goodtrade_pipe,ppro_out,ppro_in)
-	Tester(receive_pipe,ppro_pipe_end)
+	Manager(root,goodtrade_pipe,ppro_out,ppro_in,TEST)
 
+	if TEST:
+		Tester(receive_pipe,ppro_pipe_end,ppro_pipe_end2)
+	else:
+		ppro_out_manager.start()
+		ppro_in_manager.start()
 	# root.minsize(1600, 1000)
 	# root.maxsize(1800, 1200)
 	root.mainloop()

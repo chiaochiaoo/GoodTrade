@@ -2,18 +2,19 @@ from Symbol import *
 from Triggers import *
 from Strategy import *
 from constant import*
-
+from Util_functions import *
 import tkinter as tk
 # MAY THE MACHINE GOD BLESS THY AIM
 
 class TradingPlan:
 
-	def __init__(self,symbol:Symbol,entry_plan=None,entry_type=None,manage_plan=None,risk=None,ppro_out=None):
+	def __init__(self,symbol:Symbol,entry_plan=None,entry_type=None,manage_plan=None,risk=None,ppro_out=None,TEST_MODE=False):
 
 		self.symbol = symbol
 
 		self.symbol.set_tradingplan(self)
 		self.symbol_name = symbol.get_name()
+		self.test_mode = TEST_MODE
 
 		self.current_running_strategy = None
 		self.entry_strategy_start = False
@@ -32,7 +33,7 @@ class TradingPlan:
 
 		self.tklabels= {} ##returned by UI.
 
-		self.hodings = []
+		self.holdings = []
 		self.current_price_level = 0
 
 		self.numeric_labels = [ACTRISK,ESTRISK,CURRENT_SHARE,TARGET_SHARE,AVERAGE_PRICE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3]
@@ -63,8 +64,7 @@ class TradingPlan:
 
 		#Non String, Non Numeric Value
 
-		#Set some default values.
-		
+		#Set some default value
 		self.data[ESTRISK] = risk
 		self.tkvars[ESTRISK].set(risk)
 
@@ -84,56 +84,73 @@ class TradingPlan:
 
 	""" PPRO SECTION """
 
-
 	def ppro_update_price(self,bid,ask,ts):
 
-		self.symbol.update_price(bid,ask,ts,self.tkvars[AUTORANGE].get())
+		self.symbol.update_price(bid,ask,ts,self.tkvars[AUTORANGE].get(),self.data[POSITION])
 		self.update_symbol_tkvar()
 
 		#check stop. 
 		if self.data[POSITION]!="":
-			self.check_stop(bid,ask)
+			self.check_pnl(bid,ask)
 
 		#check triggers
 		if self.current_running_strategy!=None:
 			self.current_running_strategy.update()
-		#check if stop is met. OH! Facil
 
-	def check_stop(self,bid,ask):
+	def check_pnl(self,bid,ask):
+		"""
+		PNL, STOP TRIGGER.
+		"""
+		flatten = False
+		if self.data[POSITION]==LONG:
+			price = bid
+			gain = round((price-self.data[AVERAGE_PRICE]),4)
 
-		print("checking stop:",bid,ask,"stop:",self.data[STOP_LEVEL])
-		if self.data[POSITION] == LONG:
-			if bid<self.data[STOP_LEVEL]:
-				print("flatten")
-		elif self.data[POSITION] == SHORT:
-			if ask>self.data[STOP_LEVEL]:
-				print("flatten")
+			if price <= self.data[STOP_LEVEL]:
+				flatten=True
+
+		elif self.data[POSITION]==SHORT:
+			price = ask
+			gain = round(self.data[AVERAGE_PRICE]-price,4)
+			if price >=  self.data[STOP_LEVEL]:
+				flatten=True
+
+		if self.data[CURRENT_SHARE] >0:
+			self.data[UNREAL_PSHR] = gain
+			self.data[UNREAL]= round(gain*self.data[CURRENT_SHARE],4)
+
+		if flatten:
+			self.ppro_out.send(["Flatten",self.symbol_name])
+
+		self.update_displays()
 
 	def ppro_process_orders(self,price,shares,side):
-
-		if self.tkvars[POSITION].get()=="": # 1. No position.
+		
+		print("TP processing:",self.symbol_name,price,shares,side)
+		if self.data[POSITION]=="": # 1. No position.
 
 			if self.expect_orders==True:
 				self.ppro_confirm_new_order(price,shares,side)
 			else:
-				print("unexpected orders on",self.symbol_name)
+				print("TP processing: unexpected orders on",self.symbol_name)
 		
 		else:  # 2. Have position. 
 
-			if self.tkvars[POSITION].get()==side: #same side.
+			if self.data[POSITION]==side: #same side.
 				self.ppro_orders_loadup(price,shares,side)
 			else: #opposite
 				self.ppro_orders_loadoff(price,shares,side)
 
-
+		if self.test_mode:
+			print("TP processing:",self.data)
+		self.update_displays()
 
 	def ppro_confirm_new_order(self,price,shares,side):
 
-
 		"""set the state as running, then load up"""
 		self.mark_algo_status(RUNNING)
+		self.data[REALIZED] = 0
 		self.ppro_orders_loadup(price,shares,side)
-
 
 	def ppro_orders_loadup(self,price,shares,side):
 
@@ -149,7 +166,7 @@ class TradingPlan:
 		for i in range(shares):
 			self.holdings.append(price)
 
-
+		self.adjusting_risk()
 
 	def ppro_orders_loadoff(self,price,shares,side):
 
@@ -164,16 +181,18 @@ class TradingPlan:
 				try:
 					gain += price-self.holdings.pop()
 				except:
-					print("Holding calculation error,holdings are empty.")
-		elif self.position[id_]=="Short":
+					print("TP processing: Holding calculation error,holdings are empty.")
+		elif self.data[POSITION] == SHORT:
 			for i in range(shares):
 				try:
 					gain += self.holdings.pop() - price	
 				except:
-					print("Holding calculation error,holdings are empty.")	
+					print("TP processing: Holding calculation error,holdings are empty.")	
 
 		self.data[REALIZED]+=gain
 		self.data[REALIZED]= round(self.data[REALIZED],2)
+
+		
 
 		self.adjusting_risk()
 
@@ -182,12 +201,28 @@ class TradingPlan:
 		#finish a trade if current share is 0.
 
 		if self.data[CURRENT_SHARE] <= 0:
-			self.data[UNREAL] = 0
-			self.data[UNREAL_PSHR] = 0
+			self.clear_trade()
 
-			#mark it done.
-			self.mark_algo_status(DONE)
+	def clear_trade(self):
 
+		self.data[UNREAL] = 0
+		self.data[UNREAL_PSHR] = 0
+		
+		self.data[TOTAL_REALIZED] += self.data[REALIZED]
+		self.data[REALIZED] = 0
+		#mark it done.
+		self.mark_algo_status(DONE)
+
+		self.data[POSITION] = ""
+		self.tkvars[POSITION].set("")
+
+		self.current_running_strategy = None
+
+		#if reload is on, revert it back to entry stage. 
+		if self.tkvars[RELOAD].get() == True:
+			print("TP processing:",self.symbol_name,":"," Reload ativado. Trading triggers re-initialized. ")
+			self.start_tradingplan()
+			self.tkvars[RELOAD].set(False)
 
 	def ppro_order_rejection(self):
 
@@ -199,24 +234,23 @@ class TradingPlan:
 	def adjusting_risk(self):
 
 		if self.data[POSITION] == LONG:
-			self.DATA[ACTRISK] = round(((self.data[AVERAGE_PRICE]-self.data[STOP_LEVEL])*self.data[CURRENT_SHARE]),2)
+			self.data[ACTRISK] = round(((self.data[AVERAGE_PRICE]-self.data[STOP_LEVEL])*self.data[CURRENT_SHARE]),2)
 		else:
-			self.DATA[ACTRISK] = round(((self.data[STOP_LEVEL]-self.data[AVERAGE_PRICE])*self.data[CURRENT_SHARE]),2)
+			self.data[ACTRISK] = round(((self.data[STOP_LEVEL]-self.data[AVERAGE_PRICE])*self.data[CURRENT_SHARE]),2)
 
-		diff = self.DATA[ACTRISK]-self.DATA[ESTRISK]
-		ratio = diff/self.DATA[ESTRISK]
+		diff = self.data[ACTRISK]-self.data[ESTRISK]
+		ratio = diff/self.data[ESTRISK]
 
 		##change color and change text.
 
-		self.tklabels[RISK_RATIO] = hexcolor_green_to_red(ratio)
-		self.tkvars[RISK_RATIO].set(str(self.DATA[ACTRISK])+"/"+str(self.DATA[ESTRISK]))
+		self.tklabels[RISK_RATIO]["background"] = hexcolor_green_to_red(ratio)
+		self.tkvars[RISK_RATIO].set(str(self.data[ACTRISK])+"/"+str(self.data[ESTRISK]))
 
 		if self.data[CURRENT_SHARE] == 0:
 			self.tklabels[RISK_RATIO]["background"] = DEFAULT
 
 
 	"""	UI related  """
-	
 
 	def update_symbol_tkvar(self):
 		self.tkvars[SUPPORT].set(self.symbol.get_support())
@@ -226,6 +260,7 @@ class TradingPlan:
 
 		self.tkvars[SIZE_IN].set(str(self.data[CURRENT_SHARE])+"/"+str(self.data[TARGET_SHARE]))
 		self.tkvars[REALIZED].set(str(self.data[REALIZED]))
+		self.tkvars[TOTAL_REALIZED].set(str(self.data[TOTAL_REALIZED]))
 		self.tkvars[UNREAL].set(str(self.data[UNREAL]))
 		self.tkvars[UNREAL_PSHR].set(str(self.data[UNREAL_PSHR]))
 		self.tkvars[AVERAGE_PRICE].set(self.data[AVERAGE_PRICE])
@@ -248,10 +283,17 @@ class TradingPlan:
 
 		if self.data[REALIZED]==0:
 			self.tklabels[REALIZED]["background"] = DEFAULT
-		elif self.realized[id_]>0:
+		elif self.data[REALIZED]>0:
 			self.tklabels[REALIZED]["background"] = STRONGGREEN
-		elif self.realized[id_]<0:
+		elif self.data[REALIZED]<0:
 			self.tklabels[REALIZED]["background"] = STRONGRED
+
+		if self.data[TOTAL_REALIZED]==0:
+			self.tklabels[TOTAL_REALIZED]["background"] = DEFAULT
+		elif self.data[TOTAL_REALIZED]>0:
+			self.tklabels[TOTAL_REALIZED]["background"] = STRONGGREEN
+		elif self.data[TOTAL_REALIZED]<0:
+			self.tklabels[TOTAL_REALIZED]["background"] = STRONGRED
 
 		current_level = self.current_price_level
 
@@ -283,10 +325,7 @@ class TradingPlan:
 			self.tklabels[STATUS]["background"] = "red"
 
 		elif status == DONE:
-
 			self.tklabels[STATUS]["background"] = DEFAULT
-			self.data[POSITION] = ""
-			self.tkvars[POSITION].set("")
 
 			#if reload is on, turn it back on.
 		# elif status == CANCELED:#canceled 
@@ -295,7 +334,6 @@ class TradingPlan:
 		# 		self.order_tkstring[id_]["algo_status"].set(status)
 
 	""" DATA MANAGEMENT  """
-
 	
 	def get_risk(self):
 		return self.data[ESTRISK]
@@ -306,7 +344,6 @@ class TradingPlan:
 	""" Plan Handler """
 
 	def deploy(self):
-
 		entryplan=self.tkvars[ENTRYPLAN].get()
 		entry_type=self.tkvars[ENTYPE].get()
 		entrytimer=self.tkvars[TIMER].get()
@@ -315,11 +352,13 @@ class TradingPlan:
 		self.entry_plan_decoder(entryplan, entry_type, entrytimer)
 		self.manage_plan_decoder(manage_plan)
 
-		self.tkvars[STATUS].set("Deployed")
-
-		self.start_EntryStrategy()
-
+		self.start_tradingplan()
 	
+	def start_tradingplan(self):
+		self.tkvars[STATUS].set("Deployed")
+		self.current_running_strategy = self.entry_plan
+
+
 	def entry_plan_decoder(self,entry_plan,entry_type,entrytimer):
 
 		if entry_type ==None or entry_type ==INSTANT:
@@ -341,7 +380,6 @@ class TradingPlan:
 		else:
 			print("unkown plan")
 
-
 	def manage_plan_decoder(self,manage_plan):
 
 		if manage_plan ==None: self.tkvars[MANAGEMENTPLAN].set(NONE)
@@ -360,16 +398,6 @@ class TradingPlan:
 		self.data[MANAGEMENTPLAN] = management_plan.get_name()
 		self.tkvars[MANAGEMENTPLAN].set(management_plan.get_name())
 
-	def start_EntryStrategy(self):
-		self.current_running_strategy = self.entry_plan
-
-	def entry_strategy_done(self):
-		self.current_running_strategy = self.management_plan
-
-	def management_strategy_done(self):
-
-		pass
-
 	def on_finish(self,plan):
 		
 		if plan==self.entry_plan:
@@ -380,44 +408,51 @@ class TradingPlan:
 		else:
 			print("Trading Plan: UNKONW CALL FROM Strategy")
 
+	def entry_strategy_done(self):
+		self.current_running_strategy = self.management_plan
 
-if __name__ == '__main__':
+	def management_strategy_done(self):
 
-	#TEST CASES for trigger.
-	root = tk.Tk() 
-	aapl = Symbol("aapl")
-	TP = TradingPlan(aapl)
-	aapl.set_tradingplan(TP)
-	aapl.set_phigh(16)
-	aapl.set_plow(15)
+		pass
 
-	b = BreakUp(0,False,aapl,TP)
-	#b = BreakUp(0)
-	TP.set_EntryStrategy(b)
-	TP.start_EntryStrategy()
+
+# if __name__ == '__main__':
+
+# 	#TEST CASES for trigger.
+# 	root = tk.Tk() 
+# 	aapl = Symbol("aapl")
+# 	TP = TradingPlan(aapl)
+# 	aapl.set_tradingplan(TP)
+# 	aapl.set_phigh(16)
+# 	aapl.set_plow(15)
+
+# 	b = BreakUp(0,False,aapl,TP)
+# 	#b = BreakUp(0)
+# 	TP.set_EntryStrategy(b)
+# 	TP.start_EntryStrategy()
 
 	
-	aapl.update_price(10,10,0)
-	aapl.update_price(11,11,1)
-	aapl.update_price(12,12,2)
-	aapl.update_price(13,13,3)
-	aapl.update_price(14,14,4)
-	aapl.update_price(15,15,5)
-	##### DECRESE#######
-	aapl.update_price(5,5,6)
-	aapl.update_price(13,13,7)
+# 	aapl.update_price(10,10,0)
+# 	aapl.update_price(11,11,1)
+# 	aapl.update_price(12,12,2)
+# 	aapl.update_price(13,13,3)
+# 	aapl.update_price(14,14,4)
+# 	aapl.update_price(15,15,5)
+# 	##### DECRESE#######
+# 	aapl.update_price(5,5,6)
+# 	aapl.update_price(13,13,7)
 
-	aapl.update_price(10,10,8)
-	###### INCREASE #############
-	aapl.update_price(11,11,9)
-	aapl.update_price(12,12,10)
-	aapl.update_price(13,13,11)
-	aapl.update_price(14,14,12)
-	aapl.update_price(15,15,13)
-	aapl.update_price(16,16,14)
-	aapl.update_price(17,17,15)
-	aapl.update_price(18,18,16)
-	aapl.update_price(19,19,17)
+# 	aapl.update_price(10,10,8)
+# 	###### INCREASE #############
+# 	aapl.update_price(11,11,9)
+# 	aapl.update_price(12,12,10)
+# 	aapl.update_price(13,13,11)
+# 	aapl.update_price(14,14,12)
+# 	aapl.update_price(15,15,13)
+# 	aapl.update_price(16,16,14)
+# 	aapl.update_price(17,17,15)
+# 	aapl.update_price(18,18,16)
+# 	aapl.update_price(19,19,17)
 
 
-	root.mainloop()
+# 	root.mainloop()

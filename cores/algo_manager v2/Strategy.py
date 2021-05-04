@@ -24,6 +24,7 @@ class Strategy: #ABSTRACT CLASS. the beginning of a sequence, containing one or 
 
 		self.strategy_name = name
 		self.current_triggers = set()
+		self.initial_triggers = set()
 		self.symbol=None
 		self.tradingplan =None
 		self.ppro_out = None
@@ -39,6 +40,7 @@ class Strategy: #ABSTRACT CLASS. the beginning of a sequence, containing one or 
 
 	def add_initial_triggers(self,trigger):
 		self.current_triggers.add(trigger)
+		self.initial_triggers.add(trigger)
 		trigger.set_symbol(self.symbol, self.tradingplan, self.ppro_out)
 
 
@@ -54,8 +56,15 @@ class Strategy: #ABSTRACT CLASS. the beginning of a sequence, containing one or 
 		self.ppro_out = self.tradingplan.ppro_out
 		self.risk = self.tradingplan.get_risk()
 
+	def restart(self):
+
+		self.current_triggers = set()
+		for i in self.initial_triggers:
+			self.current_triggers.add(i)
+
 	def update(self):
-		if self.current_triggers!= None:
+		if len(self.current_triggers)>0:
+			check = False
 			for i in self.current_triggers:
 				if self.symbol!=None:
 					check = False
@@ -78,7 +87,7 @@ class Strategy: #ABSTRACT CLASS. the beginning of a sequence, containing one or 
 	def on_finish(self):
 		print(self.strategy_name+" completed")
 		self.tradingplan.on_finish(self)	
-
+		self.restart()
 
 class BreakUp(Strategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry. 
 	def __init__(self,timer,repeat,symbol,tradingplan):

@@ -203,6 +203,8 @@ class Purchase_trigger(AbstractTrigger):
 			self.tradingplan.data[STOP_LEVEL]=self.symbol_data[self.stop]
 			self.tradingplan.tkvars[STOP_LEVEL].set(self.symbol_data[self.stop])
 
+			#self.tradingplan.expect_orders = True
+
 			self.ppro_out.send(["Buy",self.symbol_name,share,self.description])
 			print("Trigger: SingleEntry PPRO EVENT: ",self.pos,"at",self.symbol.get_time())
 		elif self.pos ==SHORT:
@@ -212,6 +214,8 @@ class Purchase_trigger(AbstractTrigger):
 
 			self.tradingplan.data[STOP_LEVEL]=self.symbol_data[self.stop]
 			self.tradingplan.tkvars[STOP_LEVEL].set(self.symbol_data[self.stop])
+
+			#self.tradingplan.expect_orders = True
 
 			self.ppro_out.send(["Sell",self.symbol_name,share,self.description])
 		else:
