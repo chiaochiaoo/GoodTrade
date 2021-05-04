@@ -215,7 +215,7 @@ class Purchase_trigger(AbstractTrigger):
 
 			self.ppro_out.send(["Sell",self.symbol_name,share,self.description])
 		else:
-			print("unidentified side.")
+			print("unidentified side. ")
 
 		self.tradingplan.update_displays()
 
