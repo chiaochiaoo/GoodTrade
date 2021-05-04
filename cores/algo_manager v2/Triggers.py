@@ -134,7 +134,7 @@ class AbstractTrigger:
 		else:
 			return False 	
 
-	def trigger_event(self):  #OVERRIDE
+	def trigger_event(self):  #OVERRIDEn n 
 
 		try:
 			print("Trigger:",self.description,"on", self.symbol.get_name(),"at time", self.symbol.get_time())

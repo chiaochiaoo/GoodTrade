@@ -227,7 +227,7 @@ class Tester:
 		self.ppro = ppro_in
 
 		# self.init= tk.Button(self.root ,text="Register",width=10,bg="#5BFF80",command=self.start_test)
-		# self.init.grid(column=1,row=1)
+		# self.init.grid(column=1,row=1) m
 
 		self.price = tk.DoubleVar(value=413)
 		self.entr=	tk.Entry(self.root ,textvariable=self.price,width=10)	
@@ -246,7 +246,7 @@ class Tester:
 
 		self.gt.send(["pkg",['New order', [BREAKANY, 'SPY.AM', 413.0, 414.0, 5.0, {'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441}]]])
 
-	
+
 
 	def price_up(self):
 		self.price.set(round(self.price.get()+0.1,2))
