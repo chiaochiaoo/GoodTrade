@@ -39,7 +39,7 @@ class Symbol:
 	def set_tradingplan(self,tradingplan):
 		self.tradingplan = tradingplan
 
-	def update_price(self,bid,ask,ts,AR,status):
+	def update_price(self,bid,ask,ts,AR,pos):
 
 		if AR==True and pos==PENDING: #and ts<34200:
 			if ask>self.data[RESISTENCE]:
@@ -48,7 +48,6 @@ class Symbol:
 				self.data[SUPPORT] = bid
 			if bid<self.data[SUPPORT]:
 				self.data[SUPPORT] = bid
-
 			self.tradingplan.update_symbol_tkvar()
 
 		#34200 openning.

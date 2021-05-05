@@ -20,6 +20,7 @@ class AbstractTrigger:
 		self.symbol_data = None
 		self.description = description
 
+		self.mind = None
 		#How long it need sto trigger it.
 		self.trigger_timer = trigger_timer
 
@@ -95,6 +96,7 @@ class AbstractTrigger:
 			if eval ==True:
 
 				if self.trigger_timer == 0:
+
 					return self.is_trigger()
 
 				else:
@@ -105,7 +107,8 @@ class AbstractTrigger:
 
 					else:
 						self.trigger_duration = self.symbol.get_time() - self.trigger_time
-						if self.trigger_duration >= self.self.trigger_timer:
+						self.set_mind(str(int(self.trigger_timer - self.trigger_duration)) +" s to trigger")
+						if self.trigger_duration >= self.trigger_timer:
 							return self.is_trigger()
 		# except Exception as e:
 		# 	print("Trigger error on ",self.description,e)
@@ -127,15 +130,16 @@ class AbstractTrigger:
 
 	def is_trigger(self):
 
+		self.set_mind("Triggered!",GREEN)
 		self.trigger_event()
 		self.trigger_count+=1
 		if self.trigger_count == self.trigger_limit:
+			self.reset()
 			return True
 		else:
 			return False 	
 
 	def trigger_event(self):  #OVERRIDEn n 
-
 		try:
 			print("Trigger:",self.description,"on", self.symbol.get_name(),"at time", self.symbol.get_time())
 		except:
@@ -152,6 +156,26 @@ class AbstractTrigger:
 		self.tradingplan = tradingplan 
 		self.tp_data = self.tradingplan.get_data()
 
+		self.set_mind_object()
+
+	def set_mind(self,str,color=DEFAULT):
+
+		if self.mind==None:
+			self.set_mind_object()
+		if self.mind!=None:
+			self.mind.set(str)
+			self.mind_label["background"]=color
+
+	def clear_mind(self):
+		self.set_mind("",DEFAULT)
+
+	def set_mind_object(self):
+		try:
+			self.mind = self.tradingplan.tkvars[MIND]
+			self.mind_label = self.tradingplan.tklabels[MIND]
+		except:
+			pass
+
 	def add_next_trigger(self,next_trigger):
 		self.next_triggers.add(next_trigger)
 
@@ -165,6 +189,8 @@ class AbstractTrigger:
 		self.triggered = False
 		self.trigger_time = 0
 		self.trigger_duration = 0
+		self.trigger_count = 0
+		self.clear_mind()
 
 
 #self,subject1,type_,subject2,trigger_timer:int,description,trigger_limit=1
@@ -197,26 +223,26 @@ class Purchase_trigger(AbstractTrigger):
 
 			#set pos to long ,and stop to a value.
 
-			self.tradingplan.data[POSITION]=LONG
-			self.tradingplan.tkvars[POSITION].set(LONG)
+			# self.tradingplan.data[POSITION]=LONG
+			# self.tradingplan.tkvars[POSITION].set(LONG)
 
 			self.tradingplan.data[STOP_LEVEL]=self.symbol_data[self.stop]
 			self.tradingplan.tkvars[STOP_LEVEL].set(self.symbol_data[self.stop])
 
 			#self.tradingplan.expect_orders = True
+			print("Trigger: Purchase PPRO EVENT: ",self.symbol_name,self.pos,share,"at",self.symbol.get_time())
 
+			self.tradingplan.expect_orders = True
 			self.ppro_out.send(["Buy",self.symbol_name,share,self.description])
-			print("Trigger: Purchase PPRO EVENT: ",self.pos,"at",self.symbol.get_time())
 		elif self.pos ==SHORT:
 
-			self.tradingplan.data[POSITION]=SHORT
-			self.tradingplan.tkvars[POSITION].set(SHORT)
 
 			self.tradingplan.data[STOP_LEVEL]=self.symbol_data[self.stop]
 			self.tradingplan.tkvars[STOP_LEVEL].set(self.symbol_data[self.stop])
 
 			#self.tradingplan.expect_orders = True
-			print("Trigger: Purchase PPRO EVENT: ",self.pos,"at",self.symbol.get_time())
+			print("Trigger: Purchase PPRO EVENT: ",self.symbol_name,self.pos,share,"at",self.symbol.get_time())
+			self.tradingplan.expect_orders = True
 			self.ppro_out.send(["Sell",self.symbol_name,share,self.description])
 		else:
 			print("unidentified side. ")
@@ -231,7 +257,7 @@ class Purchase_trigger(AbstractTrigger):
 		else:
 			risk_per_share =  abs(self.symbol_data[self.stop]-self.symbol_data[BID])
 
-		shares = int(self.risk//risk_per_share)
+		shares = int(self.risk/risk_per_share)
 
 		self.tradingplan.data[TARGET_SHARE]=shares
 

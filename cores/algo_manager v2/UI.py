@@ -136,10 +136,10 @@ class UI(pannel):
 		'Symbol':tradingplan.symbol_name, \
 		STATUS:tradingplan.tkvars[STATUS],\
 		MIND: tradingplan.tkvars[MIND],\
-		'EntryPlan':tradingplan.tkvars[ENTRYPLAN], \
-		'EntryType':tradingplan.tkvars[ENTYPE], \
-		'Timer':tradingplan.tkvars[TIMER], \
-		'ManaPlan':tradingplan.tkvars[MANAGEMENTPLAN], \
+		ENTRYPLAN:tradingplan.tkvars[ENTRYPLAN], \
+		ENTYPE:tradingplan.tkvars[ENTYPE], \
+		TIMER:tradingplan.tkvars[TIMER], \
+		MANAGEMENTPLAN:tradingplan.tkvars[MANAGEMENTPLAN], \
 		"Reload":tradingplan.tkvars[RELOAD], \
 		'AR':tradingplan.tkvars[AUTORANGE], \
 		SUPPORT:tradingplan.tkvars[SUPPORT], \
@@ -171,17 +171,19 @@ class UI(pannel):
 
 			if label_name == "Symbol":
 				self.tklabels[symbol][label_name] = tk.Button(self.deployment_frame ,text=info[j],width=self.width[j],command=tradingplan.deploy)
+			elif label_name == STATUS:
+				self.tklabels[symbol][label_name] = tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command=tradingplan.cancle_deployment)
 
-			elif label_name =="Timer":
+			elif label_name ==TIMER:
 				self.tklabels[symbol][label_name] = tk.Entry(self.deployment_frame,textvariable=info[j],width=self.width[j])
 
-			elif label_name =="EntryPlan":
+			elif label_name ==ENTRYPLAN:
 				self.tklabels[symbol][label_name] = tk.OptionMenu(self.deployment_frame, info[j], *sorted(self.entry_plan_options))
 
-			elif label_name =="EntryType":
+			elif label_name ==ENTYPE:
 				self.tklabels[symbol][label_name] = tk.OptionMenu(self.deployment_frame, info[j], *sorted(self.entry_type_options))
 
-			elif label_name =="ManaPlan":
+			elif label_name ==MANAGEMENTPLAN:
 				self.tklabels[symbol][label_name] =tk.OptionMenu(self.deployment_frame, info[j], *sorted(self.management_plan_options))
 
 			elif label_name =="AR" or  label_name =="Reload":

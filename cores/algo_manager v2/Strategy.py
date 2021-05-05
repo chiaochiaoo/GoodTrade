@@ -63,6 +63,7 @@ class Strategy: #ABSTRACT CLASS. the beginning of a sequence, containing one or 
 			self.current_triggers.add(i)
 
 	def update(self):
+
 		if len(self.current_triggers)>0:
 			check = False
 			for i in self.current_triggers:
@@ -74,7 +75,7 @@ class Strategy: #ABSTRACT CLASS. the beginning of a sequence, containing one or 
 						break
 			if check:
 				self.current_triggers = i.get_next_triggers() #replace the triggers. 
-
+				print(self.current_triggers)
 				for i in self.current_triggers:
 					i.set_symbol(self.symbol,self.tradingplan,self.ppro_out)
 

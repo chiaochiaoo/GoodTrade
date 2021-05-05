@@ -80,8 +80,6 @@ class TradingPlan:
 		# self.manage_plan_decoder(manage_plan)
 
 
-
-
 	""" PPRO SECTION """
 
 	def AR_toggle_check(self):
@@ -94,17 +92,18 @@ class TradingPlan:
 
 	def ppro_update_price(self,bid,ask,ts):
 
-		try:
-			if self.data[POSITION] =="" and self.tkvars[AUTORANGE].get()==False:
-				self.tklabels[SUPPORT]["state"] = "normal"
-				self.tklabels[RESISTENCE]["state"] = "normal"
-			else:
-				self.tklabels[SUPPORT]["state"] = "disabled"
-				self.tklabels[RESISTENCE]["state"] = "disabled"
-				
-
-			self.symbol.update_price(bid,ask,ts,self.tkvars[STATUS].get(),self.data[POSITION])
-			self.update_symbol_tkvar()
+		if 1:
+			try:
+				if self.data[POSITION] =="" and self.tkvars[AUTORANGE].get()==False:
+					self.tklabels[SUPPORT]["state"] = "normal"
+					self.tklabels[RESISTENCE]["state"] = "normal"
+				else:
+					self.tklabels[SUPPORT]["state"] = "disabled"
+					self.tklabels[RESISTENCE]["state"] = "disabled"
+			except:
+				pass
+									#self,bid,ask,ts,AR,pos)
+			self.symbol.update_price(bid,ask,ts,self.tkvars[AUTORANGE].get(),self.tkvars[STATUS].get())
 
 			#check stop. 
 			if self.data[POSITION]!="":
@@ -113,8 +112,8 @@ class TradingPlan:
 			#check triggers
 			if self.current_running_strategy!=None:
 				self.current_running_strategy.update()
-		except Exception as e:
-			print("TP:",e)
+		# except Exception as e:
+		# 	print("TP issue:",e)
 
 	def check_pnl(self,bid,ask):
 		"""
@@ -168,6 +167,8 @@ class TradingPlan:
 
 		"""set the state as running, then load up"""
 		self.mark_algo_status(RUNNING)
+		self.data[POSITION]=side
+		self.tkvars[POSITION].set(side)
 		self.data[REALIZED] = 0
 		self.ppro_orders_loadup(price,shares,side)
 
@@ -211,8 +212,6 @@ class TradingPlan:
 		self.data[REALIZED]+=gain
 		self.data[REALIZED]= round(self.data[REALIZED],2)
 
-		
-
 		self.adjusting_risk()
 
 		print(self.symbol_name," sold:",shares," current shares:",self.data[CURRENT_SHARE],"realized:",self.data[REALIZED])
@@ -228,6 +227,7 @@ class TradingPlan:
 		self.data[UNREAL_PSHR] = 0
 		
 		self.data[TOTAL_REALIZED] += self.data[REALIZED]
+		self.data[TOTAL_REALIZED] = round(self.data[TOTAL_REALIZED],2)
 		self.data[REALIZED] = 0
 		#mark it done.
 		self.mark_algo_status(DONE)
@@ -272,9 +272,7 @@ class TradingPlan:
 
 
 	"""	UI related  """
-
 	def update_symbol_tkvar(self):
-		print("update")
 		self.tkvars[SUPPORT].set(self.symbol.get_support())
 		self.tkvars[RESISTENCE].set(self.symbol.get_resistence())
 
@@ -343,10 +341,22 @@ class TradingPlan:
 		self.data[STATUS] = status
 		self.tkvars[STATUS].set(status)
 
-		if status == REJECTED:
+
+		if status == DEPLOYED:
+			self.input_lock(True)
+			self.tklabels[STATUS]["background"] = LIGHTYELLOW
+
+		elif status == RUNNING:
+			self.tklabels[STATUS]["background"] = GREEN
+
+		elif status == REJECTED:
 			self.tklabels[STATUS]["background"] = "red"
 
 		elif status == DONE:
+			self.tklabels[STATUS]["background"] = DEEPGREEN
+
+		elif status == PENDING:
+			self.input_lock(False)
 			self.tklabels[STATUS]["background"] = DEFAULT
 
 			#if reload is on, turn it back on.
@@ -363,7 +373,26 @@ class TradingPlan:
 	def get_data(self):
 		return self.data
 
-	""" Plan Handler """
+	""" Deployment initialization """
+
+
+	def input_lock(self,lock):
+
+		state =""
+		if lock: state="disabled"
+		else: state = "normal"
+
+		self.tklabels[ENTRYPLAN]["state"] = state
+		self.tklabels[ENTYPE]["state"] = state
+		self.tklabels[TIMER]["state"] = state
+		self.tklabels[MANAGEMENTPLAN]["state"] = state
+
+	def cancle_deployment(self):
+		if self.data[POSITION] =="" and self.data[CURRENT_SHARE]==0:
+			self.mark_algo_status(PENDING)
+			self.stop_tradingplan()
+		else:
+			print("cannot cancel, holding positions.")
 
 	def deploy(self):
 		entryplan=self.tkvars[ENTRYPLAN].get()
@@ -374,14 +403,17 @@ class TradingPlan:
 		self.entry_plan_decoder(entryplan, entry_type, entrytimer)
 		self.manage_plan_decoder(manage_plan)
 
+		self.mark_algo_status(DEPLOYED)
 		self.AR_toggle_check()
 		self.start_tradingplan()
 	
 	def start_tradingplan(self):
-		self.tkvars[STATUS].set("Deployed")
 		self.current_running_strategy = self.entry_plan
 
+	def stop_tradingplan(self):
+		self.current_running_strategy = None
 
+	""" Plan Handler """	
 	def entry_plan_decoder(self,entry_plan,entry_type,entrytimer):
 
 		if entry_type ==None or entry_type ==INSTANT:
