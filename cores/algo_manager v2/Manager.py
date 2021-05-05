@@ -14,7 +14,7 @@ import requests
 
 #May this class bless by the Deus Mechanicus.
 
-TEST = False
+TEST = True
 
 def algo_manager_voxcom(pipe):
 

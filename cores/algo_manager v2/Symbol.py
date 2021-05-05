@@ -50,6 +50,7 @@ class Symbol:
 				self.data[SUPPORT] = bid
 			self.tradingplan.update_symbol_tkvar()
 
+		print(self.data)
 		#34200 openning.
 
 		# if self.data[HIGH]==0:

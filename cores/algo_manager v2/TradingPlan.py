@@ -87,7 +87,7 @@ class TradingPlan:
 		This will happen whenever a trade is placed. 
 		"""
 		self.symbol.set_resistence(self.tkvars[RESISTENCE].get())
-		self.symbol.set_support(self.tkvars[RESISTENCE].get())
+		self.symbol.set_support(self.tkvars[SUPPORT].get())
 		self.tklabels[AUTORANGE]["state"] = "disabled"
 
 	def ppro_update_price(self,bid,ask,ts):
@@ -417,10 +417,12 @@ class TradingPlan:
 	def entry_plan_decoder(self,entry_plan,entry_type,entrytimer):
 
 		if entry_type ==None or entry_type ==INSTANT:
-			instant = True 
+			instant = 1 
 		if entry_type ==INCREMENTAL:
-			instant = False 
+			instant = 3 
 
+		if instant >1:
+			entrytimer = 5
 
 		if entry_plan == BREAKANY:
 			self.set_EntryStrategy(BreakAny(entrytimer,instant,self.symbol,self))

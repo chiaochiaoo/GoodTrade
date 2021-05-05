@@ -11,7 +11,7 @@ class AbstractTrigger:
 	4. Return next triggers. 
 
 	"""
-	def __init__(self,description,trigger_timer:int,trigger_limit=1):
+	def __init__(self,description,trigger_timer:int,trigger_limit):
 
 		#self.symbol = symbol
 		#bigger, or less than. 
@@ -96,15 +96,13 @@ class AbstractTrigger:
 			if eval ==True:
 
 				if self.trigger_timer == 0:
-
 					return self.is_trigger()
-
 				else:
 					if not self.triggered:
 						self.triggered = True
 						self.trigger_time = self.symbol.get_time() 
 						self.trigger_duration = 0
-
+						self.set_mind(str(int(self.trigger_timer)) +" s to trigger")
 					else:
 						self.trigger_duration = self.symbol.get_time() - self.trigger_time
 						self.set_mind(str(int(self.trigger_timer - self.trigger_duration)) +" s to trigger")
@@ -133,8 +131,9 @@ class AbstractTrigger:
 		self.set_mind("Triggered!",GREEN)
 		self.trigger_event()
 		self.trigger_count+=1
+		self.reset()
 		if self.trigger_count == self.trigger_limit:
-			self.reset()
+			self.trigger_count = 0
 			return True
 		else:
 			return False 	
@@ -145,7 +144,6 @@ class AbstractTrigger:
 		except:
 			print("Trigger:",self.description)
 		### REPLACE the current trategy with current states. (when repeate is met.)
-
 
 	def set_symbol(self,symbol,tradingplan,ppro_out):
 		self.symbol = symbol
@@ -189,7 +187,7 @@ class AbstractTrigger:
 		self.triggered = False
 		self.trigger_time = 0
 		self.trigger_duration = 0
-		self.trigger_count = 0
+		
 		self.clear_mind()
 
 
@@ -219,6 +217,9 @@ class Purchase_trigger(AbstractTrigger):
 
 		share = self.shares_calculator()
 
+
+		print("Trigger: Purchase PPRO EVENT: ",self.symbol_name,self.pos,share,"at","stop:",self.stop,self.symbol_data[self.stop],self.symbol.get_time())
+
 		if self.pos == LONG:
 
 			#set pos to long ,and stop to a value.
@@ -230,20 +231,21 @@ class Purchase_trigger(AbstractTrigger):
 			self.tradingplan.tkvars[STOP_LEVEL].set(self.symbol_data[self.stop])
 
 			#self.tradingplan.expect_orders = True
-			print("Trigger: Purchase PPRO EVENT: ",self.symbol_name,self.pos,share,"at",self.symbol.get_time())
+			print("Trigger: Purchase: ",self.symbol_name,self.pos,share,"at",self.symbol.get_time())
 
 			self.tradingplan.expect_orders = True
-			self.ppro_out.send(["Buy",self.symbol_name,share,self.description])
+			if share>0:
+				self.ppro_out.send(["Buy",self.symbol_name,share,self.description])
 		elif self.pos ==SHORT:
-
 
 			self.tradingplan.data[STOP_LEVEL]=self.symbol_data[self.stop]
 			self.tradingplan.tkvars[STOP_LEVEL].set(self.symbol_data[self.stop])
 
 			#self.tradingplan.expect_orders = True
-			print("Trigger: Purchase PPRO EVENT: ",self.symbol_name,self.pos,share,"at",self.symbol.get_time())
+			
 			self.tradingplan.expect_orders = True
-			self.ppro_out.send(["Sell",self.symbol_name,share,self.description])
+			if share>0:
+				self.ppro_out.send(["Sell",self.symbol_name,share,self.description])
 		else:
 			print("unidentified side. ")
 
@@ -251,17 +253,21 @@ class Purchase_trigger(AbstractTrigger):
 
 	def shares_calculator(self):
 
+		#Now i need trigger limit into consideration.
 
 		if self.pos ==LONG:
 			risk_per_share =  abs(self.symbol_data[self.stop]-self.symbol_data[ASK])
 		else:
 			risk_per_share =  abs(self.symbol_data[self.stop]-self.symbol_data[BID])
 
+		if risk_per_share == 0:
+			risk_per_share = 0.1
+
 		shares = int(self.risk/risk_per_share)
 
 		self.tradingplan.data[TARGET_SHARE]=shares
 
-		return shares
+		return shares//self.trigger_limit
 
 
 
