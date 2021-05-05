@@ -46,14 +46,10 @@ class AbstractTrigger:
 		#['symbol_data', 'ask', '>', 'symbol_data', 'phigh']
 		s1 =i[0]
 		t1= i[1]
-
 		type_ = i[2]
-
-
 		s2= i[3]
 		t2= i[4]
 		
-
 		s1_=None
 		s2_=None
 

@@ -17,7 +17,7 @@ class Symbol:
 		self.init_open = False
 		self.init_high_low = False
 
-		self.numeric_labels = [TIMESTAMP,BID,ASK,RESISTENCE,SUPPORT,OPEN,HIGH,LOW,PREMARKETHIGH,PREMARKETLOW,STOP]
+		self.numeric_labels = [TIMESTAMP,BID,ASK,RESISTENCE,SUPPORT,OPEN,HIGH,LOW,PREMARKETHIGH,PREMARKETLOW,STOP,PXT1,PXT2,PXT3]
 
 		self.data = {}
 		self.tkvars = {}

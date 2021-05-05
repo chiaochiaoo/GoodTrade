@@ -44,11 +44,6 @@ class Strategy: #ABSTRACT CLASS. the beginning of a sequence, containing one or 
 		trigger.set_symbol(self.symbol, self.tradingplan, self.ppro_out)
 
 
-		#change all the timers 
-	def modify_all_timers(self):
-
-		pass
-
 	def set_symbol(self,symbol:Symbol,tradingplan):
 		self.symbol=symbol
 		self.tradingplan = tradingplan
@@ -119,6 +114,15 @@ class BreakAny(Strategy):
 
 		self.add_initial_triggers(buyTrigger)
 		self.add_initial_triggers(sellTrigger)
+
+
+class ThreePriceTargets(Strategy):
+
+	def __init__(self,timer,repeat,symbol,tradingplan):
+
+		super().__init__("Three price targets",symbol,tradingplan)
+		#description,trigger_timer:int,trigger_limit=1
+		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 
 
 # clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
