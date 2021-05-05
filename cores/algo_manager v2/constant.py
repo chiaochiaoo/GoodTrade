@@ -14,6 +14,13 @@ PREMARKETHIGH="phigh"
 PREMARKETLOW="plow"
 
 
+#STATS
+ATR ='ATR'
+OHAVG='OHavg'
+OHSTD = 'OHstd'
+OLAVG = 'OLavg'
+OLSTD ='OLstd'
+
 #TP PARAMETER
 AUTORANGE = "AR"
 RELOAD = "reload"
@@ -80,7 +87,7 @@ BREAKDOWN = " Break Dn"
 BREAKANY =  "Break Any"
 
 #MANA Plan
-NONE =          "       NONE"
+NONE =          "NONE"
 THREE_TARGETS = "Three tgts "
 TRAILING_FIB =  "Trailng Fib" 
 

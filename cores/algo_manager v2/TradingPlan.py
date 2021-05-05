@@ -67,6 +67,7 @@ class TradingPlan:
 		#Set some default value
 		self.data[ESTRISK] = risk
 		self.tkvars[ESTRISK].set(risk)
+		self.tkvars[RISK_RATIO].set(str(0)+"/"+str(self.data[ESTRISK]))
 
 		self.tkvars[ENTRYPLAN].set(entry_plan)
 		self.tkvars[ENTYPE].set(entry_type)
@@ -88,21 +89,22 @@ class TradingPlan:
 		"""
 		self.symbol.set_resistence(self.tkvars[RESISTENCE].get())
 		self.symbol.set_support(self.tkvars[SUPPORT].get())
-		self.tklabels[AUTORANGE]["state"] = "disabled"
+
+
+	def AR_toggle(self):
+		try:
+			if self.data[POSITION] =="" and self.tkvars[AUTORANGE].get()==False:
+				self.tklabels[SUPPORT]["state"] = "normal"
+				self.tklabels[RESISTENCE]["state"] = "normal"
+			else:
+				self.tklabels[SUPPORT]["state"] = "disabled"
+				self.tklabels[RESISTENCE]["state"] = "disabled"
+		except:
+			pass
 
 	def ppro_update_price(self,bid,ask,ts):
 
 		if 1:
-			try:
-				if self.data[POSITION] =="" and self.tkvars[AUTORANGE].get()==False:
-					self.tklabels[SUPPORT]["state"] = "normal"
-					self.tklabels[RESISTENCE]["state"] = "normal"
-				else:
-					self.tklabels[SUPPORT]["state"] = "disabled"
-					self.tklabels[RESISTENCE]["state"] = "disabled"
-			except:
-				pass
-									#self,bid,ask,ts,AR,pos)
 			self.symbol.update_price(bid,ask,ts,self.tkvars[AUTORANGE].get(),self.tkvars[STATUS].get())
 
 			#check stop. 
@@ -233,6 +235,7 @@ class TradingPlan:
 		self.mark_algo_status(DONE)
 
 		self.data[POSITION] = ""
+		self.data[TARGET_SHARE] = 0
 		self.tkvars[POSITION].set("")
 		self.tklabels[AUTORANGE]["state"] = "normal"
 
@@ -334,8 +337,6 @@ class TradingPlan:
 			self.tklabels[PXT2]["background"] = DEFAULT
 			self.tklabels[PXT3]["background"] = DEFAULT	
 
-
-
 	def mark_algo_status(self,status):
 
 		self.data[STATUS] = status
@@ -373,6 +374,7 @@ class TradingPlan:
 	def get_data(self):
 		return self.data
 
+
 	""" Deployment initialization """
 
 
@@ -386,6 +388,7 @@ class TradingPlan:
 		self.tklabels[ENTYPE]["state"] = state
 		self.tklabels[TIMER]["state"] = state
 		self.tklabels[MANAGEMENTPLAN]["state"] = state
+		self.tklabels[AUTORANGE]["state"] = state
 
 	def cancle_deployment(self):
 		if self.data[POSITION] =="" and self.data[CURRENT_SHARE]==0:
@@ -471,7 +474,6 @@ class TradingPlan:
 	def management_strategy_done(self):
 
 		pass
-
 
 # if __name__ == '__main__':
 

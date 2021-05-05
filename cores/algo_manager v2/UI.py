@@ -2,9 +2,12 @@ from pannel import *
 from constant import *
 
 class UI(pannel):
-	def __init__(self,root):
+	def __init__(self,root,manager=None):
 
 		self.root = root
+
+
+		self.manager = manager
 
 		self.tk_strings=["algo_status","realized","shares","unrealized","unrealized_pshr","average_price"]
 		self.tk_labels=[SYMBOL,STATUS,MIND, 'EntryPlan', 'EntryType', 'ETmr', 'Management','Reload', 'AR', 'Sup', 'Res', 'Act/Est R', 'Position', 'AvgPx', 'SzIn', 'UPshr', 'U', 'R', 'TR', 'flatten', 'log']
@@ -12,6 +15,7 @@ class UI(pannel):
 		self.tklabels = {}
 		self.label_count = 1
 
+		self.algo_counts = 0
 
 		self.option_values()
 
@@ -24,6 +28,91 @@ class UI(pannel):
 		self.entry_plan_options = {BREAISH,BULLISH,BREAKUP,BREAKDOWN,BREAKANY}
 
 		self.management_plan_options = {NONE,THREE_TARGETS,TRAILING_FIB}
+
+
+
+	def init_HQ_pannel(self):
+
+		self.main_app_status = tk.StringVar()
+		self.main_app_status.set("")
+
+		self.ppro_status = tk.StringVar()
+		self.ppro_status.set("")
+
+
+		self.algo_count_number = tk.DoubleVar(value=0)
+		self.algo_number = 0
+
+		self.algo_count_string = tk.StringVar(value="0")
+		self.algo_timer_string = tk.StringVar(value="0")
+		self.algo_count_string.set("Activated Algos:"+str(self.algo_count_number))
+
+		self.main = ttk.Label(self.comms, text="Main:")
+		self.main.grid(sticky="w",column=1,row=1,padx=10)
+		self.main_status = ttk.Label(self.comms, textvariable=self.main_app_status)
+		self.main_status.grid(sticky="w",column=2,row=1)
+
+		self.ppro = ttk.Label(self.comms, text="Ppro:")
+		self.ppro.grid(sticky="w",column=1,row=2,padx=10)
+		self.ppro_status_ = ttk.Label(self.comms, textvariable=self.ppro_status)
+		self.ppro_status_.grid(sticky="w",column=2,row=2)
+
+		self.al = ttk.Label(self.comms, text="Algo count::")
+		self.al.grid(sticky="w",column=1,row=3,padx=10)
+		self.algo_count_ = ttk.Label(self.comms,  textvariable=self.algo_count_number)
+		self.algo_count_.grid(sticky="w",column=2,row=3,padx=10)
+
+		self.timerc = ttk.Label(self.comms, text="Deploy in:")
+		self.timerc.grid(sticky="w",column=1,row=4,padx=10)
+		self.timersx = ttk.Label(self.comms,  textvariable=self.algo_timer_string)
+		self.timersx.grid(sticky="w",column=2,row=4,padx=10)
+
+	def init_config_pannel(self):
+
+		ttk.Label(self.config, text="All timer:").grid(sticky="w",column=1,row=5,padx=10)
+
+		ttk.Label(self.config, text="Aall EnPlan:").grid(sticky="w",column=1,row=6,padx=10)
+
+		ttk.Label(self.config, text="All EnType:").grid(sticky="w",column=1,row=7,padx=10)
+
+		ttk.Label(self.config, text="All Manaplan:",anchor="w").grid(sticky="w",column=1,row=8,padx=10)
+
+
+		self.all_timer = tk.DoubleVar(value=0)
+		tk.Entry(self.config,textvariable=self.all_timer,width=5).grid(sticky="w",column=2,row=5,padx=10)
+
+
+		self.all_enp = tk.StringVar(value=BREAKANY)
+		tk.OptionMenu(self.config, self.all_enp, *sorted(self.entry_plan_options)).grid(sticky="w",column=2,row=6,padx=10)
+
+		self.all_ent = tk.StringVar(value=INSTANT)
+		tk.OptionMenu(self.config, self.all_ent, *sorted(self.entry_type_options)).grid(sticky="w",column=2,row=7,padx=10)
+
+		self.all_mana = tk.StringVar(value=NONE)
+		tk.OptionMenu(self.config, self.all_mana, *sorted(self.management_plan_options)).grid(sticky="w",column=2,row=8,padx=10)
+
+
+		self.algo_deploy = ttk.Button(self.config, text="Apply to selected")#,command=self.manager.set_all_tp)
+		self.algo_deploy.grid(column=1,row=9)
+
+
+		self.algo_deploy = ttk.Button(self.config, text="Apply to all",command=self.manager.set_all_tp)#,command=self.deploy_all_stoporders)
+		self.algo_deploy.grid(column=2,row=9)
+
+	def init_command(self):
+
+		self.algo_deploy = ttk.Button(self.cmd, text="Deploy all algo")#,command=self.deploy_all_stoporders)
+		self.algo_deploy.grid(sticky="w",column=1,row=10)
+
+		self.algo_cancel = ttk.Button(self.cmd, text="Withdraw all algo")#,command=self.cancel_all_stoporders)
+		self.algo_cancel.grid(sticky="w",column=2,row=10)
+
+		self.algo_cancel = ttk.Button(self.cmd, text="Flatten all algo")
+		self.algo_cancel.grid(sticky="w",column=1,row=11)
+
+		self.algo_cancel = ttk.Button(self.cmd, text="Cancel all algo")
+		self.algo_cancel.grid(sticky="w",column=2,row=11)
+
 
 	def init_pannel(self):
 		self.labels = {"Symbol":10,\
@@ -55,61 +144,30 @@ class UI(pannel):
 		#print(list(self.labels.keys()))
 		self.width = list(self.labels.values())
 
-		self.setting = ttk.LabelFrame(self.root,text="Algo Manager") 
-		self.setting.place(x=10,y=10,height=250,width=180)
+		self.comms = ttk.LabelFrame(self.root,text="HQ") 
+		self.comms.place(x=10,y=10,height=150,width=210)
+
+		self.init_HQ_pannel()
+
+		self.config = ttk.LabelFrame(self.root,text="Config") 
+		self.config.place(x=10,y=140,height=160,width=210)
+
+		self.cmd = ttk.LabelFrame(self.root,text="Command") 
+		self.cmd.place(x=10,y=310,height=160,width=210)
 
 
-		self.main_app_status = tk.StringVar()
-		self.main_app_status.set("Main :")
+		self.init_config_pannel()
+		self.init_command()
+		# self.log_panel = ttk.LabelFrame(self.root,text="Events") 
+		# self.log_panel.place(x=10,y=300,relheight=0.5,width=210)
 
-		self.ppro_status = tk.StringVar()
-		self.ppro_status.set("Ppro :")
-
-		self.algo_count_number = 0
-
-		# self.algo_count_string.set("Activated Algos:"+str(self.algo_count_number))
-
-		# self.algo_count_ = ttk.Label(self.setting, textvariable=self.algo_count_string)
-		# self.algo_count_.grid(column=1,row=5,padx=10)
-
-		self.main_status = ttk.Label(self.setting, textvariable=self.main_app_status)
-		self.main_status.grid(column=1,row=1,padx=10)
-		#self.main_status.place(x = 20, y =12)
-
-		self.ppro_status_ = ttk.Label(self.setting, textvariable=self.ppro_status)
-		self.ppro_status_.grid(column=1,row=2,padx=10)
-		#self.ppro_status_.place(x = 20, y =32)
-
-		self.algo_count_string = tk.StringVar()
-
-		self.algo_timer_string = tk.StringVar()
-
-		self.timerc = ttk.Label(self.setting, text="Opening Algos deploy in:")
-		self.timerc.grid(column=1,row=3,padx=10)
-		self.timersx = ttk.Label(self.setting,  textvariable=self.algo_timer_string)
-		self.timersx.grid(column=1,row=4,padx=10)
-
-
-		# self.algo_deploy = ttk.Button(self.setting, text="Deploy all algo")#,command=self.deploy_all_stoporders)
-		# self.algo_deploy.grid(column=1,row=6)
-
-		# self.algo_cancel = ttk.Button(self.setting, text="Unmount all algo")#,command=self.cancel_all_stoporders)
-		# self.algo_cancel.grid(column=1,row=7)
-
-		# self.algo_cancel = ttk.Button(self.setting, text="Flatten all algo",command=self.cancel_all_stoporders)
-		# self.algo_cancel.grid(column=1,row=6)
-
-		# self.algo_cancel = ttk.Button(self.setting, text="Cancel all algo",command=self.cancel_all_stoporders)
-		# self.algo_cancel.grid(column=1,row=7)
+		self.deployment_panel = ttk.LabelFrame(self.root,text="Algo deployment") 
+		self.deployment_panel.place(x=210,y=10,relheight=0.85,width=1700)
 
 		self.total_u = tk.StringVar()
 		self.total_r = tk.StringVar()
 
-		self.log_panel = ttk.LabelFrame(self.root,text="Logs") 
-		self.log_panel.place(x=10,y=250,relheight=0.5,width=180)
 
-		self.deployment_panel = ttk.LabelFrame(self.root,text="Algo deployment") 
-		self.deployment_panel.place(x=200,y=10,relheight=0.85,width=1700)
 
 		self.dev_canvas = tk.Canvas(self.deployment_panel)
 		self.dev_canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
@@ -186,14 +244,16 @@ class UI(pannel):
 			elif label_name ==MANAGEMENTPLAN:
 				self.tklabels[symbol][label_name] =tk.OptionMenu(self.deployment_frame, info[j], *sorted(self.management_plan_options))
 
-			elif label_name =="AR" or  label_name =="Reload":
+			elif label_name =="AR" :
+				self.tklabels[symbol][label_name] = tk.Checkbutton(self.deployment_frame,variable=info[j],width=2,command=tradingplan.AR_toggle)
+			elif label_name =="Reload":
 				self.tklabels[symbol][label_name] = tk.Checkbutton(self.deployment_frame,variable=info[j],width=2)
 
 			elif label_name =="MIND":
 				self.tklabels[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
 
 			elif label_name == SUPPORT or label_name == RESISTENCE or label_name == "pxtgt1" or label_name == "pxtgt2" or label_name == "pxtgt3":
-				self.tklabels[symbol][label_name] =tk.Entry(self.deployment_frame ,textvariable=info[j],width=self.width[j])	
+				self.tklabels[symbol][label_name] =tk.Entry(self.deployment_frame ,textvariable=info[j],width=self.width[j],state="disabled")	
 			else:
 				if str(type(info[j]))=="<class 'tkinter.StringVar'>" or str(type(info[j]))=="<class 'tkinter.DoubleVar'>":
 					self.tklabels[symbol][label_name]=tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
@@ -211,6 +271,7 @@ class UI(pannel):
 
 		self.label_count +=1
 
+		self.algo_count_number.set(self.label_count-1)
 
 		tradingplan.update_displays()
 
@@ -331,7 +392,7 @@ if __name__ == '__main__':
 
 	root = tk.Tk() 
 	root.title("GoodTrade Algo Manager v2") 
-	root.geometry("1920x700")
+	root.geometry("1920x1000")
 
 	UI(root)
 	# root.minsize(1600, 1000)

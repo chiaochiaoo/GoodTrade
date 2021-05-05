@@ -108,6 +108,9 @@ class AbstractTrigger:
 						self.set_mind(str(int(self.trigger_timer - self.trigger_duration)) +" s to trigger")
 						if self.trigger_duration >= self.trigger_timer:
 							return self.is_trigger()
+
+			else:
+				self.reset()
 		# except Exception as e:
 		# 	print("Trigger error on ",self.description,e)
 
@@ -263,11 +266,13 @@ class Purchase_trigger(AbstractTrigger):
 		if risk_per_share == 0:
 			risk_per_share = 0.1
 
-		shares = int(self.risk/risk_per_share)
 
-		self.tradingplan.data[TARGET_SHARE]=shares
+		shares = int((self.risk)/risk_per_share)
 
-		return shares//self.trigger_limit
+		if self.tradingplan.data[TARGET_SHARE]==0:
+			self.tradingplan.data[TARGET_SHARE]=shares
+
+		return int(shares/self.trigger_limit)
 
 
 

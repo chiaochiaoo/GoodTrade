@@ -5,7 +5,12 @@ import tkinter as tk
 class Symbol:
 
 	#Symbol class tracks every data related to the symbol. Output it in a dictionary form.
-	def __init__(self,symbol,support=0,resistence=0):
+
+
+	"""
+	'ATR': 3.6, 'OHavg': 1.551, 'OHstd': 1.556, 'OLavg': 1.623, 'OLstd': 1.445
+	"""
+	def __init__(self,symbol,support,resistence,stats):
 
 		self.symbol = symbol
 
@@ -18,13 +23,16 @@ class Symbol:
 		self.tkvars = {}
 
 		self.tradingplan=None
-		self.init_data(support,resistence)
+		self.init_data(support,resistence,stats)
 
-	def init_data(self,support,resistence):
+	def init_data(self,support,resistence,stats):
 
 		for i in self.numeric_labels:
 			self.data[i] = 0
 			#self.tkvars[i] = tk.DoubleVar()
+
+		for key,value in stats.items():
+			self.data[key] = value
 
 		self.data[RESISTENCE] = resistence
 		self.data[SUPPORT] = support
@@ -50,7 +58,7 @@ class Symbol:
 				self.data[SUPPORT] = bid
 			self.tradingplan.update_symbol_tkvar()
 
-		print(self.data)
+		#print(self.data)
 		#34200 openning.
 
 		# if self.data[HIGH]==0:

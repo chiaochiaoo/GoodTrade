@@ -14,7 +14,7 @@ import requests
 
 #May this class bless by the Deus Mechanicus.
 
-TEST = True
+TEST = False
 
 def algo_manager_voxcom(pipe):
 
@@ -65,7 +65,7 @@ def algo_manager_voxcom(pipe):
 					print("placed:",k[1][1])
 					s.send(pickle.dumps(["Algo placed",k[1][1]]))
 			print("Main disconnected")
-			pipe.send(["msg","Main disconnected"])
+			pipe.send(["msg","disconnected"])
 		except Exception as e:
 			pipe.send(["msg",e])
 			print(e)
@@ -86,7 +86,7 @@ class Manager:
 		self.symbol_data = {}		
 		self.tradingplan = {}
 
-		self.ui = UI(root)
+		self.ui = UI(root,self)
 		#self.add_new_tradingplan("AAPL")
 		#self.add_new_tradingplan("SDS")
 
@@ -111,10 +111,11 @@ class Manager:
 		support = data[2]
 		resistence =  data[3]
 		risk = data[4]
+		stats = data[5]
 
 		if symbol not in self.symbols:
 
-			self.symbol_data[symbol]=Symbol(symbol,support,resistence)  #register in Symbol.
+			self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats)  #register in Symbol.
 			self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,NONE,risk,self.pipe_ppro_out,TEST_MODE)
 
 			self.ui.create_new_entry(self.tradingplan[symbol])
@@ -135,7 +136,7 @@ class Manager:
 
 			if d[0] =="msg":
 				try:
-					self.ui.main_app_status.set("Main: "+str(d[1]))
+					self.ui.main_app_status.set(str(d[1]))
 					if str(d[1])=="Connected":
 						self.ui.main_status["background"] = "#97FEA8"
 					else:
@@ -146,7 +147,7 @@ class Manager:
 				print("new package arrived",d)
 
 				if d[1][0] == "New order":
-					#try:
+					#try
 					self.add_new_tradingplan(d[1][1],self.test_mode)
 					#except:
 					#	print("adding con porra")
@@ -174,7 +175,7 @@ class Manager:
 			if d[0] =="status":
 				
 				try:
-					self.ui.ppro_status.set("Ppro : "+str(d[1]))
+					self.ui.ppro_status.set(str(d[1]))
 
 					if str(d[1])=="Connected":
 						self.ui.ppro_status_["background"] = "#97FEA8"
@@ -220,6 +221,25 @@ class Manager:
 			# 	self.ppro_append_new_stoporder(d[1])
 
 
+	def set_all_tp(self):
+
+		timer=self.ui.all_timer.get()
+		ep=self.ui.all_enp.get()
+		et=self.ui.all_ent.get()
+		managment=self.ui.all_mana.get() 
+
+		for d in self.tradingplan.values():
+			d.tkvars[ENTRYPLAN].set(ep)
+			d.tkvars[ENTYPE].set(et)
+			d.tkvars[MANAGEMENTPLAN].set(managment)
+			d.tkvars[TIMER].set(timer)
+
+
+
+	def set_selected_tp(self):
+		pass
+
+
 class Tester:
 
 	def __init__(self,receive_pipe,ppro_in,ppro_out):
@@ -256,7 +276,7 @@ class Tester:
 		self.down=	tk.Button(self.root ,text="down 10",command=self.price_downx)	
 		self.down.grid(column=2,row=4)
 
-		self.gt.send(["pkg",['New order', [BREAKANY, 'SPY.AM', 413.0, 414.0, 5.0, {'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441}]]])
+		self.gt.send(["pkg",['New order', [BREAKANY, 'SPY.AM', 413.0, 414.0, 50.0, {'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441}]]])
 
 		time.sleep(1)
 		wish_granter = threading.Thread(target=self.wish, daemon=True)
