@@ -14,7 +14,7 @@ import requests
 
 #May this class bless by the Deus Mechanicus.
 
-TEST = False
+TEST = True
 
 def algo_manager_voxcom(pipe):
 
@@ -234,7 +234,18 @@ class Manager:
 			d.tkvars[MANAGEMENTPLAN].set(managment)
 			d.tkvars[TIMER].set(timer)
 
+	def deploy_all(self):
+		for d in self.tradingplan.values():
+			d.deploy()
 
+	def withdraw_all(self):
+		for d in self.tradingplan.values():
+			d.cancle_deployment()
+
+	def flatten_all(self):
+		for d in self.tradingplan.values():
+			d.flatten_cmd()
+	
 
 	def set_selected_tp(self):
 		pass

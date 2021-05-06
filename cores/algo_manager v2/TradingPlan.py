@@ -279,6 +279,8 @@ class TradingPlan:
 		if self.data[CURRENT_SHARE] == 0:
 			self.tklabels[RISK_RATIO]["background"] = DEFAULT
 
+	def flatten_cmd(self):
+		self.ppro_out.send(["Flatten",self.symbol_name])
 
 	"""	UI related  """
 	def update_symbol_tkvar(self):

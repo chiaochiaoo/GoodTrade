@@ -94,6 +94,13 @@ TRAILING_FIB =  "Trailng Fib"
 
 
 
+##### ORDER TYPE ####
+
+BUY = "Buy"
+SELL = "Sell"
+FLATTEN = "Flatten"
+
+
 
 ##COLOR
 

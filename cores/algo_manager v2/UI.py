@@ -101,14 +101,14 @@ class UI(pannel):
 
 	def init_command(self):
 
-		self.algo_deploy = ttk.Button(self.cmd, text="Deploy all algo")#,command=self.deploy_all_stoporders)
+		self.algo_deploy = ttk.Button(self.cmd, text="Deploy all algo",command=self.manager.deploy_all)#,command=self.deploy_all_stoporders)
 		self.algo_deploy.grid(sticky="w",column=1,row=10)
 
-		self.algo_cancel = ttk.Button(self.cmd, text="Withdraw all algo")#,command=self.cancel_all_stoporders)
-		self.algo_cancel.grid(sticky="w",column=2,row=10)
+		self.algo_pend = ttk.Button(self.cmd, text="Withdraw all algo",command=self.manager.withdraw_all)#,command=self.cancel_all_stoporders)
+		self.algo_pend.grid(sticky="w",column=2,row=10)
 
-		self.algo_cancel = ttk.Button(self.cmd, text="Flatten all algo")
-		self.algo_cancel.grid(sticky="w",column=1,row=11)
+		self.flatten = ttk.Button(self.cmd, text="Flatten all algo")
+		self.flatten.grid(sticky="w",column=1,row=11)
 
 		self.algo_cancel = ttk.Button(self.cmd, text="Cancel all algo")
 		self.algo_cancel.grid(sticky="w",column=2,row=11)
@@ -251,6 +251,9 @@ class UI(pannel):
 
 			elif label_name =="MIND":
 				self.tklabels[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
+
+			elif label_name =="flatten":
+				self.tklabels[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command=tradingplan.flatten_cmd)
 
 			elif label_name == SUPPORT or label_name == RESISTENCE or label_name == "pxtgt1" or label_name == "pxtgt2" or label_name == "pxtgt3":
 				self.tklabels[symbol][label_name] =tk.Entry(self.deployment_frame ,textvariable=info[j],width=self.width[j],state="disabled")	

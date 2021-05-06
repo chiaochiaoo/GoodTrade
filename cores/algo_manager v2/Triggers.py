@@ -283,7 +283,7 @@ class Three_price_trigger(AbstractTrigger):
 		super().__init__(description,trigger_timer=0,trigger_limit=3)
 
 		self.ppro_out =ppro_out
-		self.conditions = None 
+		self.conditions = [] 
 		self.cur_level = 1
 
 
@@ -299,33 +299,36 @@ class Three_price_trigger(AbstractTrigger):
 		elif self.tradingplan.data[POSITION] == SHORT:
 			self.conditions = [[SYMBOL_DATA,BID,"<",TP_DATA,level]]
 
-		super().check_conditions()
+		if self.tradingplan.data[POSITION]!="" and self.tradingplan.data[CURRENT_SHARE]>0:
+			super().check_conditions()
 	#add the actual stuff here.
 	def trigger_event(self):
 
 
 		share = min(self.tradingplan.data[TARGET_SHARE]//3,self.tradingplan.data[CURRENT_SHARE])
-		if self.cur_level == 3: share = self.tradingplan.data[CURRENT_SHARE]
 
 		self.pos = self.tradingplan.data[POSITION]
 		#print("Trigger: Purchase PPRO EVENT: ",self.symbol_name,s,share,"at","stop:",self.stop,self.symbol_data[self.stop],self.symbol.get_time())
 
 		if self.pos == LONG:
-
-
-			if share>0:
-				self.ppro_out.send(["Sell",self.symbol_name,share,self.description])
+			if self.cur_level == 3:
+				self.ppro_out.send([FLATTEN,self.symbol_name])
+			else:
+				if share>0:
+					self.ppro_out.send([SELL,self.symbol_name,share,self.description])
 		elif self.pos ==SHORT:
+			if self.cur_level == 3:
+				self.ppro_out.send(["Flatten",self.symbol_name])
+			else:
+				if share>0:
+					self.ppro_out.send([BUY,self.symbol_name,share,self.description])
 
-
-			if share>0:
-				self.ppro_out.send(["Buy",self.symbol_name,share,self.description])
 		else:
 			print("unidentified side. ")
 
 		print(self.symbol_name," Hit price target", self.cur_level,"New target:","New Stop:")
-		
-		self.set_mind("Covered No.",,self.cur_level," lot.")
+
+		self.set_mind("Covered No."+str(self.cur_level)+" lot.",GREEN)
 		self.cur_level+=1
 		self.tradingplan.update_displays()
 

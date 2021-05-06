@@ -94,8 +94,7 @@ class Strategy:
 		self.tradingplan.on_finish(self)	
 		self.restart()
 
-	def adjust_target_price(self):
-		pass
+
 
 class BreakUp(Strategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry. 
 	def __init__(self,timer,repeat,symbol,tradingplan):
@@ -113,7 +112,7 @@ class BreakDown(Strategy): #the parameters contains? dk. yet .  #Can make single
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 		sellTrigger = Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
 
-		self.add_initial_triggers(buyTrigger)
+		self.add_initial_triggers(sellTrigger)
 
 class BreakAny(Strategy):
 	def __init__(self,timer,repeat,symbol,tradingplan):
@@ -150,7 +149,6 @@ class ThreePriceTargets(Strategy):
 
 		good = False
 
-		print(self.tradingplan.data[POSITION])
 		if self.tradingplan.data[POSITION]==LONG:
 			ohv = self.symbol.data[OHAVG]
 			ohs =  self.symbol.data[OHSTD]
@@ -158,8 +156,8 @@ class ThreePriceTargets(Strategy):
 			if ohv!=0:
 				#self.tradingplan[id_][0] = price
 				self.tradingplan.data[PXT1] = round(price+ohv*0.2*coefficient,2)
-				self.tradingplan.data[PXT2] = round(price+ohv*0.5*coefficient,2)
-				self.tradingplan.data[PXT3] =	round(price+ohv*0.8*coefficient,2)
+				self.tradingplan.data[PXT2] = round(self.tradingplan.data[PXT1]+0.02,2) #round(price+ohv*0.5*coefficient,2)
+				self.tradingplan.data[PXT3] = round(self.tradingplan.data[PXT2]+0.02,2) #round(price+ohv*0.8*coefficient,2)
 				good = True
 		elif self.tradingplan.data[POSITION]==SHORT:
 			olv = self.symbol.data[OLAVG]
@@ -167,8 +165,8 @@ class ThreePriceTargets(Strategy):
 			if olv!=0:
 				#self.price_levels[id_][0] = price
 				self.tradingplan.data[PXT1] = round(price-olv*0.2*coefficient,2)
-				self.tradingplan.data[PXT2] = round(price-olv*0.5*coefficient,2)
-				self.tradingplan.data[PXT3] = round(price-olv*0.8*coefficient,2)
+				self.tradingplan.data[PXT2] =round(self.tradingplan.data[PXT1]-0.02,2)  #round(price-olv*0.5*coefficient,2)
+				self.tradingplan.data[PXT3] = round(self.tradingplan.data[PXT2]-0.02,2) #round(price-olv*0.8*coefficient,2)
 				good = True
 				
 		#set the price levels. 

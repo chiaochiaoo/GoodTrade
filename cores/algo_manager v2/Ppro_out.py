@@ -2,6 +2,7 @@ from pannel import *
 from tkinter import ttk
 import requests
 import threading 
+from constant import *
 #Thoughts:
 #Combine PPRO sutff with VOXCOM into one process.
 
@@ -182,7 +183,8 @@ def Ppro_out(pipe,port): #a sperate process. GLOBALLY.
 			d = pipe.recv()
 			type_ = d[0]
 
-			if type_ == "Buy":
+			print("PPRO ORDER:",d)
+			if type_ == BUY:
 
 				symbol = d[1]
 				share = d[2]
@@ -190,7 +192,7 @@ def Ppro_out(pipe,port): #a sperate process. GLOBALLY.
 
 				buy_market_order(symbol,share)
 
-			elif type_ =="Sell":
+			elif type_ ==SELL:
 
 				symbol = d[1]
 				share = d[2]
@@ -202,11 +204,13 @@ def Ppro_out(pipe,port): #a sperate process. GLOBALLY.
 				symbol = d[1]
 				register(symbol,port)
 
-			elif type_ == "Fallen":
+			elif type_ == FLATTEN:
 
 				symbol = d[1]
 				flatten_symbol(symbol)
+			else:
 
+				print("Unrecognized ppro command received.")
 
 		except Exception as e:
 			print(e)
