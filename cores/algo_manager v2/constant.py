@@ -23,6 +23,7 @@ OLSTD ='OLstd'
 
 #TP PARAMETER
 AUTORANGE = "AR"
+AUTOMANAGE = "AM"
 RELOAD = "reload"
 
 TIMER = "timer"

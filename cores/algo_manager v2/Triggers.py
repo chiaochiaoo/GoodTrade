@@ -24,6 +24,7 @@ class AbstractTrigger:
 		#How long it need sto trigger it.
 		self.trigger_timer = trigger_timer
 
+		self.activation = True
 		self.triggered = False
 		self.trigger_time = 0
 		self.trigger_duration = 0
@@ -78,7 +79,7 @@ class AbstractTrigger:
 		3. If time trigger is above 0. Check if it is already triggered. 
 		"""
 
-		if 1:
+		if self.activation:
 			for i in self.conditions:
 				s1,s2,t1,t2,type_= self.decode_conditions(i)
 
@@ -133,6 +134,7 @@ class AbstractTrigger:
 		self.reset()
 		if self.trigger_count == self.trigger_limit:
 			self.trigger_count = 0
+			self.activation = False
 			return True
 		else:
 			return False 	
@@ -182,6 +184,9 @@ class AbstractTrigger:
 	def print(self):
 		print("Trigger",self.description)
 
+	def reactivate(self):
+		self.activation = True
+		
 	def reset(self):
 		self.triggered = False
 		self.trigger_time = 0

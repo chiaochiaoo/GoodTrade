@@ -131,9 +131,9 @@ class UI(pannel):
 						"Stop":8,\
 						"AvgPx":8,\
 						"SzIn":6,\
-						"PxT1":4,\
-						"PxT2":4,\
-						"PxT3":4,\
+						"PxT1":5,\
+						"PxT2":5,\
+						"PxT3":5,\
 						"UPshr":8,\
 						"U":8,\
 						"R":8,\

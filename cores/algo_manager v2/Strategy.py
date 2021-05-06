@@ -18,8 +18,17 @@ import sys, inspect
 # Machine God Set Us Free
 # Omnissiah, Omnissiah."
 
-class Strategy: #ABSTRACT CLASS. the beginning of a sequence, containing one or more triggers.
+class Strategy: 
 
+	"""
+	ABSTRACT CLASS. the beginning of a sequence, containing one or more triggers.
+
+	function:
+
+	update : for each trigger.
+		   -  Can be used for updating itself too (when overwrite.) 
+	initialize : 
+	"""
 	def __init__(self,name,symbol:Symbol,tradingplan):
 
 		self.strategy_name = name
@@ -118,12 +127,62 @@ class BreakAny(Strategy):
 
 class ThreePriceTargets(Strategy):
 
-	def __init__(self,timer,repeat,symbol,tradingplan):
+	def __init__(self,symbol,tradingplan):
 
 		super().__init__("Three price targets",symbol,tradingplan)
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 
+
+	def init_target_price(self): #call this whenever the break at price changes. 
+
+		
+		price = self.tradingplan.data[AVERAGE_PRICE]
+
+		coefficient = 1
+
+		good = False
+
+		print(self.tradingplan.data[POSITION])
+		if self.tradingplan.data[POSITION]==LONG:
+			print("1")
+			ohv = self.symbol.data[OHAVG]
+			ohs =  self.symbol.data[OHSTD]
+			#print(self.data_list[id_],type(ohv),ohs,type(price))
+			print("2")
+			if ohv!=0:
+				#self.tradingplan[id_][0] = price
+				self.tradingplan.data[PXT1] = round(price+ohv*0.2*coefficient,2)
+				self.tradingplan.data[PXT2] = round(price+ohv*0.5*coefficient,2)
+				self.tradingplan.data[PXT3] =	round(price+ohv*0.8*coefficient,2)
+				good = True
+
+		elif self.tradingplan.data[POSITION]==SHORT:
+			print("1")
+			olv = self.symbol.data[OLAVG]
+			ols = self.symbol.data[OLSTD]
+
+			if olv!=0:
+				print("2")
+
+				#self.price_levels[id_][0] = price
+				self.tradingplan.data[PXT1] = round(price-olv*0.2*coefficient,2)
+				self.tradingplan.data[PXT2] = round(price-olv*0.5*coefficient,2)
+				self.tradingplan.data[PXT3] = round(price-olv*0.8*coefficient,2)
+				good = True
+				
+		#set the price levels. 
+		#print(id_,"updating price levels.",price,self.price_levels[id_][1],self.price_levels[id_][2],self.price_levels[id_][3])
+		if good:
+			self.tradingplan.tkvars[AUTOMANAGE].set(True)
+			self.tradingplan.tkvars[PXT1].set(self.tradingplan.data[PXT1])
+			self.tradingplan.tkvars[PXT2].set(self.tradingplan.data[PXT2])
+			self.tradingplan.tkvars[PXT3].set(self.tradingplan.data[PXT3])
+		else:
+			self.tradingplan.tkvars[AUTOMANAGE].set(False)
+
+
+		print(self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
 
 # clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
 

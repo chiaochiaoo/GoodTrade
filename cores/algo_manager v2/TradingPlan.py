@@ -4,6 +4,8 @@ from Strategy import *
 from constant import*
 from Util_functions import *
 import tkinter as tk
+import time
+import threading
 # MAY THE MACHINE GOD BLESS THY AIM
 
 class TradingPlan:
@@ -28,6 +30,7 @@ class TradingPlan:
 		self.expect_orders = False
 
 
+
 		self.data = {}
 		self.tkvars = {}
 
@@ -35,11 +38,12 @@ class TradingPlan:
 
 		self.holdings = []
 		self.current_price_level = 0
+		self.price_levels = {}
 
 		self.numeric_labels = [ACTRISK,ESTRISK,CURRENT_SHARE,TARGET_SHARE,AVERAGE_PRICE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3]
 		self.string_labels = [MIND,STATUS,POSITION,RISK_RATIO,SIZE_IN,ENTRYPLAN,ENTYPE,MANAGEMENTPLAN]
 
-		self.bool_labels= [AUTORANGE,RELOAD]
+		self.bool_labels= [AUTORANGE,AUTOMANAGE,RELOAD]
 
 		self.init_data(risk,entry_plan,entry_type,manage_plan)
 
@@ -161,8 +165,8 @@ class TradingPlan:
 			else: #opposite
 				self.ppro_orders_loadoff(price,shares,side)
 
-		if self.test_mode:
-			print("TP processing:",self.data)
+		# if self.test_mode:
+		# 	print("TP processing:",self.data)
 		self.update_displays()
 
 	def ppro_confirm_new_order(self,price,shares,side):
@@ -187,6 +191,8 @@ class TradingPlan:
 
 		for i in range(shares):
 			self.holdings.append(price)
+
+		print(self.symbol_name," ",side,",",price," at ",shares,)
 
 		self.adjusting_risk()
 
@@ -398,17 +404,19 @@ class TradingPlan:
 			print("cannot cancel, holding positions.")
 
 	def deploy(self):
-		entryplan=self.tkvars[ENTRYPLAN].get()
-		entry_type=self.tkvars[ENTYPE].get()
-		entrytimer=self.tkvars[TIMER].get()
-		manage_plan =self.tkvars[MANAGEMENTPLAN].get()
 
-		self.entry_plan_decoder(entryplan, entry_type, entrytimer)
-		self.manage_plan_decoder(manage_plan)
+		if self.tkvars[STATUS].get() ==PENDING:
+			entryplan=self.tkvars[ENTRYPLAN].get()
+			entry_type=self.tkvars[ENTYPE].get()
+			entrytimer=self.tkvars[TIMER].get()
+			manage_plan =self.tkvars[MANAGEMENTPLAN].get()
 
-		self.mark_algo_status(DEPLOYED)
-		self.AR_toggle_check()
-		self.start_tradingplan()
+			self.entry_plan_decoder(entryplan, entry_type, entrytimer)
+			self.manage_plan_decoder(manage_plan)
+
+			self.mark_algo_status(DEPLOYED)
+			self.AR_toggle_check()
+			self.start_tradingplan()
 	
 	def start_tradingplan(self):
 		self.current_running_strategy = self.entry_plan
@@ -442,7 +450,9 @@ class TradingPlan:
 
 	def manage_plan_decoder(self,manage_plan):
 
-		if manage_plan ==None: self.tkvars[MANAGEMENTPLAN].set(NONE)
+		if manage_plan ==NONE: self.tkvars[MANAGEMENTPLAN].set(NONE)
+		if manage_plan == THREE_TARGETS:
+			self.set_ManagementStrategy(ThreePriceTargets(self.symbol,self))
 
 	def set_EntryStrategy(self,entry_plan:Strategy):
 		self.entry_plan = entry_plan
@@ -454,21 +464,27 @@ class TradingPlan:
 	def set_ManagementStrategy(self,management_plan:Strategy):
 		self.management_plan = management_plan
 		self.management_plan.set_symbol(self.symbol,self)		
-
 		self.data[MANAGEMENTPLAN] = management_plan.get_name()
-		self.tkvars[MANAGEMENTPLAN].set(management_plan.get_name())
+
 
 	def on_finish(self,plan):
 		
 		if plan==self.entry_plan:
-			print("Trading Plan: Entry strategy complete. Management strategy begins.")
-			self.entry_strategy_done()
+			print("TP: Entry strategy ",self.entry_plan.get_name()," completed, Management strategy begins.")
+			#self.entry_strategy_done()
+			done = threading.Thread(target=self.entry_strategy_done, daemon=True)
+			done.start()
 		elif plan==self.management_plan:
 			self.management_strategy_done()
+			print("TP: Management strategy completed on ",self.symbol_name)
 		else:
 			print("Trading Plan: UNKONW CALL FROM Strategy")
 
 	def entry_strategy_done(self):
+
+		while self.data[POSITION]=="":
+			time.sleep(3)
+		self.management_plan.init_target_price()
 		self.current_running_strategy = self.management_plan
 
 	def management_strategy_done(self):

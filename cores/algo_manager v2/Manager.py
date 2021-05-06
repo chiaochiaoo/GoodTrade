@@ -14,7 +14,7 @@ import requests
 
 #May this class bless by the Deus Mechanicus.
 
-TEST = False
+TEST = True
 
 def algo_manager_voxcom(pipe):
 
@@ -258,6 +258,9 @@ class Tester:
 		self.pos  = ""
 		self.share = 0
 
+
+		self.change_sum = 0
+
 		# self.init= tk.Button(self.root ,text="Register",width=10,bg="#5BFF80",command=self.start_test)
 		# self.init.grid(column=1,row=1) m
 
@@ -268,19 +271,25 @@ class Tester:
 		self.up=	tk.Button(self.root ,text="up",command=self.price_up)	
 		self.up.grid(column=1,row=3)
 
+		self.up=	tk.Button(self.root ,text="stay",command=self.price_stay)	
+		self.up.grid(column=1,row=4)
+
 		self.down=	tk.Button(self.root ,text="down",command=self.price_down)	
 		self.down.grid(column=2,row=3)
 		self.up=	tk.Button(self.root ,text="up 10",command=self.price_upx)	
-		self.up.grid(column=1,row=4)
+		self.up.grid(column=1,row=5)
 
 		self.down=	tk.Button(self.root ,text="down 10",command=self.price_downx)	
-		self.down.grid(column=2,row=4)
+		self.down.grid(column=2,row=5)
 
 		self.gt.send(["pkg",['New order', [BREAKANY, 'SPY.AM', 413.0, 414.0, 50.0, {'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441}]]])
 
 		time.sleep(1)
 		wish_granter = threading.Thread(target=self.wish, daemon=True)
 		wish_granter.start()
+
+		price_changer = threading.Thread(target=self.price_changer, daemon=True)
+		price_changer.start()
 
 	def wish(self): #a sperate process. GLOBALLY. 
 		while True:
@@ -363,14 +372,25 @@ class Tester:
 				print(e)
 
 
+	def price_changer(self):
+		while True:
+			self.price.set(round(self.price.get()+self.change_sum,2))
+			self.change()
+
+			time.sleep(1)
+
+	def price_stay(self):
+		self.change_sum = 0
 
 	def price_up(self):
-		self.price.set(round(self.price.get()+0.1,2))
-		self.change()
+		self.change_sum = 0.1
+		# self.price.set(round(self.price.get()+0.1,2))
+		# self.change()
 	def price_down(self):
+		self.change_sum = -0.1
 
-		self.price.set(round(self.price.get()-0.1,2))
-		self.change()
+		# self.price.set(round(self.price.get()-0.1,2))
+		# self.change()
 
 	def price_upx(self):
 		self.price.set(round(self.price.get()+1,2))
