@@ -30,7 +30,6 @@ class TradingPlan:
 		self.expect_orders = False
 
 
-
 		self.data = {}
 		self.tkvars = {}
 
@@ -192,6 +191,7 @@ class TradingPlan:
 		for i in range(shares):
 			self.holdings.append(price)
 
+		self.management_plan.adjust_target_price()
 		print(self.symbol_name," ",side,",",price," at ",shares,)
 
 		self.adjusting_risk()
@@ -414,11 +414,11 @@ class TradingPlan:
 			self.entry_plan_decoder(entryplan, entry_type, entrytimer)
 			self.manage_plan_decoder(manage_plan)
 
-			self.mark_algo_status(DEPLOYED)
 			self.AR_toggle_check()
 			self.start_tradingplan()
 	
 	def start_tradingplan(self):
+		self.mark_algo_status(DEPLOYED)
 		self.current_running_strategy = self.entry_plan
 
 	def stop_tradingplan(self):
@@ -482,9 +482,6 @@ class TradingPlan:
 
 	def entry_strategy_done(self):
 
-		while self.data[POSITION]=="":
-			time.sleep(3)
-		self.management_plan.init_target_price()
 		self.current_running_strategy = self.management_plan
 
 	def management_strategy_done(self):

@@ -14,7 +14,7 @@ import requests
 
 #May this class bless by the Deus Mechanicus.
 
-TEST = True
+TEST = False
 
 def algo_manager_voxcom(pipe):
 
@@ -62,7 +62,7 @@ def algo_manager_voxcom(pipe):
 				#s.sendall(pickle.dumps(["ids"]))
 				if k!=None:
 					pipe.send(["pkg",k])
-					print("placed:",k[1][1])
+					#print("placed:",k[1][1])
 					s.send(pickle.dumps(["Algo placed",k[1][1]]))
 			print("Main disconnected")
 			pipe.send(["msg","disconnected"])

@@ -277,5 +277,57 @@ class Purchase_trigger(AbstractTrigger):
 
 
 
+class Three_price_trigger(AbstractTrigger):
+	#Special type of trigger, overwrites action part. everything else is generic.
+	def __init__(self,description,ppro_out):
+		super().__init__(description,trigger_timer=0,trigger_limit=3)
+
+		self.ppro_out =ppro_out
+		self.conditions = None 
+		self.cur_level = 1
+
+
+	def check_conditions(self):
+
+		level = ""
+		if self.cur_level ==1: level= PXT1
+		if self.cur_level ==2: level= PXT2
+		if self.cur_level ==3: level= PXT3
+
+		if self.tradingplan.data[POSITION] == LONG:
+			self.conditions = [[SYMBOL_DATA,ASK,">",TP_DATA,level]]
+		elif self.tradingplan.data[POSITION] == SHORT:
+			self.conditions = [[SYMBOL_DATA,BID,"<",TP_DATA,level]]
+
+		super().check_conditions()
+	#add the actual stuff here.
+	def trigger_event(self):
+
+
+		share = min(self.tradingplan.data[TARGET_SHARE]//3,self.tradingplan.data[CURRENT_SHARE])
+		if self.cur_level == 3: share = self.tradingplan.data[CURRENT_SHARE]
+
+		self.pos = self.tradingplan.data[POSITION]
+		#print("Trigger: Purchase PPRO EVENT: ",self.symbol_name,s,share,"at","stop:",self.stop,self.symbol_data[self.stop],self.symbol.get_time())
+
+		if self.pos == LONG:
+
+
+			if share>0:
+				self.ppro_out.send(["Sell",self.symbol_name,share,self.description])
+		elif self.pos ==SHORT:
+
+
+			if share>0:
+				self.ppro_out.send(["Buy",self.symbol_name,share,self.description])
+		else:
+			print("unidentified side. ")
+
+		print(self.symbol_name," Hit price target", self.cur_level,"New target:","New Stop:")
+		
+		self.set_mind("Covered No.",,self.cur_level," lot.")
+		self.cur_level+=1
+		self.tradingplan.update_displays()
+
 # s = SingleEntry(ASK,">",PREMARKETHIGH,0,"BUY BREAK UP")
 # s.trigger_event()

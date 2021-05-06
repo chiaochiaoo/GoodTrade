@@ -94,6 +94,9 @@ class Strategy:
 		self.tradingplan.on_finish(self)	
 		self.restart()
 
+	def adjust_target_price(self):
+		pass
+
 class BreakUp(Strategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry. 
 	def __init__(self,timer,repeat,symbol,tradingplan):
 		super().__init__("Break up",symbol,tradingplan)
@@ -130,41 +133,38 @@ class ThreePriceTargets(Strategy):
 	def __init__(self,symbol,tradingplan):
 
 		super().__init__("Three price targets",symbol,tradingplan)
+
+		manaTrigger = Three_price_trigger("manage",self.ppro_out)
+
+		self.add_initial_triggers(manaTrigger)
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 
 
-	def init_target_price(self): #call this whenever the break at price changes. 
+	def adjust_target_price(self): #call this whenever the break at price changes. 
 
 		
 		price = self.tradingplan.data[AVERAGE_PRICE]
 
-		coefficient = 1
+		coefficient = 0.05
 
 		good = False
 
 		print(self.tradingplan.data[POSITION])
 		if self.tradingplan.data[POSITION]==LONG:
-			print("1")
 			ohv = self.symbol.data[OHAVG]
 			ohs =  self.symbol.data[OHSTD]
 			#print(self.data_list[id_],type(ohv),ohs,type(price))
-			print("2")
 			if ohv!=0:
 				#self.tradingplan[id_][0] = price
 				self.tradingplan.data[PXT1] = round(price+ohv*0.2*coefficient,2)
 				self.tradingplan.data[PXT2] = round(price+ohv*0.5*coefficient,2)
 				self.tradingplan.data[PXT3] =	round(price+ohv*0.8*coefficient,2)
 				good = True
-
 		elif self.tradingplan.data[POSITION]==SHORT:
-			print("1")
 			olv = self.symbol.data[OLAVG]
 			ols = self.symbol.data[OLSTD]
-
 			if olv!=0:
-				print("2")
-
 				#self.price_levels[id_][0] = price
 				self.tradingplan.data[PXT1] = round(price-olv*0.2*coefficient,2)
 				self.tradingplan.data[PXT2] = round(price-olv*0.5*coefficient,2)
@@ -182,7 +182,7 @@ class ThreePriceTargets(Strategy):
 			self.tradingplan.tkvars[AUTOMANAGE].set(False)
 
 
-		print(self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
+		#print(self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
 
 # clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
 
