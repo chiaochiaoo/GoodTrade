@@ -107,6 +107,8 @@ class AbstractTrigger:
 							return self.is_trigger()
 
 			else:
+				if self.triggered:
+					self.set_mind("Trigger breaks. reset.")
 				self.reset()
 		# except Exception as e:
 		# 	print("Trigger error on ",self.description,e)
@@ -131,7 +133,6 @@ class AbstractTrigger:
 		self.set_mind("Triggered!",GREEN)
 		self.trigger_event()
 		self.trigger_count+=1
-		self.reset()
 		if self.trigger_count == self.trigger_limit:
 			self.trigger_count = 0
 			self.activation = False
@@ -166,7 +167,7 @@ class AbstractTrigger:
 			self.mind_label["background"]=color
 
 	def clear_mind(self):
-		self.set_mind("",DEFAULT)
+		self.set_mind(" ",DEFAULT)
 
 	def set_mind_object(self):
 		try:
@@ -192,7 +193,7 @@ class AbstractTrigger:
 		self.trigger_time = 0
 		self.trigger_duration = 0
 		
-		self.clear_mind()
+		#self.clear_mind()
 
 
 #self,subject1,type_,subject2,trigger_timer:int,description,trigger_limit=1

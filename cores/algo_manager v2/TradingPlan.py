@@ -74,7 +74,7 @@ class TradingPlan:
 
 		self.tkvars[ENTRYPLAN].set(entry_plan)
 		self.tkvars[ENTYPE].set(entry_type)
-		self.tkvars[MANAGEMENTPLAN].set(manage_plan)
+		self.tkvars[MANAGEMENTPLAN].set(THREE_TARGETS)
 
 
 		self.data[STATUS] = PENDING
@@ -191,7 +191,7 @@ class TradingPlan:
 		for i in range(shares):
 			self.holdings.append(price)
 
-		self.management_plan.adjust_target_price()
+		self.management_plan.update_on_loadingup()
 		print(self.symbol_name," ",side,",",price," at ",shares,)
 
 		self.adjusting_risk()

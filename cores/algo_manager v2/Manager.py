@@ -6,6 +6,7 @@ from UI import *
 from Ppro_in import *
 from Ppro_out import *
 
+import sys
 import socket
 import pickle
 import time
@@ -35,18 +36,19 @@ def algo_manager_voxcom(pipe):
 					connected = True
 				except:
 					pipe.send(["msg","Disconnected"])
-					#print("Cannot connected. Try again in 2 seconds.")
+					print("Cannot connected. Try again in 3 seconds.")
 					time.sleep(3)
 
 			connection = True
 			pipe.send(["msg","Connected"])
+
 			while connection:
 
 				data = []
 				k = None
 				while True:
 					try:
-						part = s.recv(2048)
+						part = s.recv()
 					except:
 						connection = False
 						break
@@ -60,6 +62,7 @@ def algo_manager_voxcom(pipe):
 						except:
 							pass
 				#s.sendall(pickle.dumps(["ids"]))
+				print("pkg",k)
 				if k!=None:
 					pipe.send(["pkg",k])
 					#print("placed:",k[1][1])
@@ -458,11 +461,13 @@ if __name__ == '__main__':
 
 	Manager(root,goodtrade_pipe,ppro_out,ppro_in,TEST)
 
-	if TEST:
+	if len(sys.argv)>1:
 		Tester(receive_pipe,ppro_pipe_end,ppro_pipe_end2)
 	else:
 		ppro_out_manager.start()
-		ppro_in_manager.start()
+		ppro_in_manager.start()		
+
+
 	# root.minsize(1600, 1000)
 	# root.maxsize(1800, 1200)
 	root.mainloop()

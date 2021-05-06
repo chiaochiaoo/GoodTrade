@@ -55,6 +55,7 @@ class Strategy:
 
 	def set_symbol(self,symbol:Symbol,tradingplan):
 		self.symbol=symbol
+		self.symbol_name = symbol.get_name()
 		self.tradingplan = tradingplan
 		self.strategy_name = self.symbol.get_name()+" "+self.strategy_name
 		self.ppro_out = self.tradingplan.ppro_out
@@ -94,6 +95,11 @@ class Strategy:
 		self.tradingplan.on_finish(self)	
 		self.restart()
 
+	def update_on_pricechanging(self):
+		pass
+
+	def update_on_loadingup(self):
+		pass
 
 
 class BreakUp(Strategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry. 
@@ -140,12 +146,12 @@ class ThreePriceTargets(Strategy):
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 
 
-	def adjust_target_price(self): #call this whenever the break at price changes. 
+	def update_on_loadingup(self): #call this whenever the break at price changes. 
 
 		
 		price = self.tradingplan.data[AVERAGE_PRICE]
 
-		coefficient = 0.05
+		coefficient = 1
 
 		good = False
 
@@ -156,8 +162,8 @@ class ThreePriceTargets(Strategy):
 			if ohv!=0:
 				#self.tradingplan[id_][0] = price
 				self.tradingplan.data[PXT1] = round(price+ohv*0.2*coefficient,2)
-				self.tradingplan.data[PXT2] = round(self.tradingplan.data[PXT1]+0.02,2) #round(price+ohv*0.5*coefficient,2)
-				self.tradingplan.data[PXT3] = round(self.tradingplan.data[PXT2]+0.02,2) #round(price+ohv*0.8*coefficient,2)
+				self.tradingplan.data[PXT2] = round(price+ohv*0.5*coefficient,2) #round(self.tradingplan.data[PXT1]+0.02,2) 
+				self.tradingplan.data[PXT3] = round(price+ohv*0.8*coefficient,2) #round(self.tradingplan.data[PXT2]+0.02,2) #
 				good = True
 		elif self.tradingplan.data[POSITION]==SHORT:
 			olv = self.symbol.data[OLAVG]
@@ -165,8 +171,8 @@ class ThreePriceTargets(Strategy):
 			if olv!=0:
 				#self.price_levels[id_][0] = price
 				self.tradingplan.data[PXT1] = round(price-olv*0.2*coefficient,2)
-				self.tradingplan.data[PXT2] =round(self.tradingplan.data[PXT1]-0.02,2)  #round(price-olv*0.5*coefficient,2)
-				self.tradingplan.data[PXT3] = round(self.tradingplan.data[PXT2]-0.02,2) #round(price-olv*0.8*coefficient,2)
+				self.tradingplan.data[PXT2] = round(price-olv*0.5*coefficient,2) #round(self.tradingplan.data[PXT1]-0.02,2)  #
+				self.tradingplan.data[PXT3] = round(price-olv*0.8*coefficient,2) #round(self.tradingplan.data[PXT2]-0.02,2) #
 				good = True
 				
 		#set the price levels. 
@@ -176,6 +182,8 @@ class ThreePriceTargets(Strategy):
 			self.tradingplan.tkvars[PXT1].set(self.tradingplan.data[PXT1])
 			self.tradingplan.tkvars[PXT2].set(self.tradingplan.data[PXT2])
 			self.tradingplan.tkvars[PXT3].set(self.tradingplan.data[PXT3])
+
+			print(self.symbol_name,"price target adjusted:",self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
 		else:
 			self.tradingplan.tkvars[AUTOMANAGE].set(False)
 
