@@ -16,7 +16,6 @@ import requests
 #May this class bless by the Deus Mechanicus.
 
 TEST = True
-
 def algo_manager_voxcom(pipe):
 
 	#tries to establish commuc
@@ -36,19 +35,18 @@ def algo_manager_voxcom(pipe):
 					connected = True
 				except:
 					pipe.send(["msg","Disconnected"])
-					print("Cannot connected. Try again in 3 seconds.")
-					time.sleep(3)
+					print("Cannot connected. Try again in 2 seconds.")
+					time.sleep(2)
 
 			connection = True
 			pipe.send(["msg","Connected"])
-
 			while connection:
 
 				data = []
 				k = None
 				while True:
 					try:
-						part = s.recv()
+						part = s.recv(2048)
 					except:
 						connection = False
 						break
@@ -62,7 +60,62 @@ def algo_manager_voxcom(pipe):
 						except:
 							pass
 				#s.sendall(pickle.dumps(["ids"]))
-				print("pkg",k)
+				if k!=None:
+					pipe.send(["pkg",k])
+					print("placed:",k[1][1])
+					s.send(pickle.dumps(["Algo placed",k[1][1]]))
+			print("Main disconnected")
+			pipe.send(["msg","Main disconnected"])
+		except Exception as e:
+			pipe.send(["msg",e])
+			print(e)
+def algo_manager_voxcom2(pipe):
+
+	#tries to establish commuc
+	while True:
+
+		HOST = 'localhost'  # The server's hostname or IP address
+		PORT = 65499       # The port used by the server
+
+		try:
+			print("Trying to connect to the main application")
+			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			connected = False
+
+			while not connected:
+				try:
+					s.connect((HOST, PORT))
+					s.send(pickle.dumps(["Connection","Connected"]))
+					connected = True
+				except:
+					pipe.send(["msg","Disconnected"])
+					print("Cannot connected. Try again in 3 seconds.")
+					time.sleep(3)
+
+			connection = True
+
+			pipe.send(["msg","Connected"])
+
+			while connection:
+
+				data = []
+				k = None
+				while True:
+					try:
+						part = s.recv(2048)
+					except:
+						connection = False
+						break
+					#if not part: break
+					data.append(part)
+					if len(part) < 2048:
+						#try to assemble it, if successful.jump. else, get more. 
+						try:
+							k = pickle.loads(b"".join(data))
+							break
+						except Exception as e:
+							print(e)
+				#s.sendall(pickle.dumps(["ids"]))
 				if k!=None:
 					pipe.send(["pkg",k])
 					#print("placed:",k[1][1])
