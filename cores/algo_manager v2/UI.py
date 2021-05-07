@@ -275,7 +275,8 @@ class UI(pannel):
 		self.label_count +=1
 
 		self.algo_count_number.set(self.label_count-1)
-
+		self.rebind(self.dev_canvas,self.deployment_frame)
+		self.recreate_labels()
 		tradingplan.update_displays()
 
 	def create_example_trade(self):

@@ -57,7 +57,6 @@ class Strategy:
 		self.symbol=symbol
 		self.symbol_name = symbol.get_name()
 		self.tradingplan = tradingplan
-		self.strategy_name = self.symbol.get_name()+" "+self.strategy_name
 		self.ppro_out = self.tradingplan.ppro_out
 		self.risk = self.tradingplan.get_risk()
 
@@ -101,10 +100,13 @@ class Strategy:
 	def update_on_loadingup(self):
 		pass
 
+	def update_on_start(self):
+		pass
+
 
 class BreakUp(Strategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry. 
 	def __init__(self,timer,repeat,symbol,tradingplan):
-		super().__init__("Break up",symbol,tradingplan)
+		super().__init__("Entry : Break up",symbol,tradingplan)
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 		buyTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
@@ -113,7 +115,7 @@ class BreakUp(Strategy): #the parameters contains? dk. yet .  #Can make single e
 
 class BreakDown(Strategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry. 
 	def __init__(self,timer,repeat,symbol,tradingplan):
-		super().__init__("Break up",symbol,tradingplan)
+		super().__init__("Entry : Break up",symbol,tradingplan)
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 		sellTrigger = Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
@@ -123,7 +125,7 @@ class BreakDown(Strategy): #the parameters contains? dk. yet .  #Can make single
 class BreakAny(Strategy):
 	def __init__(self,timer,repeat,symbol,tradingplan):
 
-		super().__init__("Break Any",symbol,tradingplan)
+		super().__init__("Entry : Break Any",symbol,tradingplan)
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 		buyTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
@@ -137,7 +139,7 @@ class ThreePriceTargets(Strategy):
 
 	def __init__(self,symbol,tradingplan):
 
-		super().__init__("Three price targets",symbol,tradingplan)
+		super().__init__("Management: Three pxt targets",symbol,tradingplan)
 
 		manaTrigger = Three_price_trigger("manage",self.ppro_out)
 
@@ -190,6 +192,9 @@ class ThreePriceTargets(Strategy):
 
 		#print(self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
 
+
+	def update_on_start(self):
+		self.tradingplan.current_price_level = 1
 # clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
 
 # print(clsmembers)

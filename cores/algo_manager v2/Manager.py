@@ -121,7 +121,7 @@ def algo_manager_voxcom2(pipe):
 					#print("placed:",k[1][1])
 					s.send(pickle.dumps(["Algo placed",k[1][1]]))
 			print("Main disconnected")
-			pipe.send(["msg","disconnected"])
+			pipe.send(["msg","Disconnected"])
 		except Exception as e:
 			pipe.send(["msg",e])
 			print(e)

@@ -37,7 +37,6 @@ class AbstractTrigger:
 
 		self.next_triggers = set()
 
-
 	def add_conditions(subject1,d_type1,subject2,d_type2,type_):
 		self.conditions.append([subject1,d_type1,subject2,d_type2,type_])
 
@@ -68,6 +67,7 @@ class AbstractTrigger:
 		else:
 			print("Trigger decoding error on ",s2,self.description)
 
+		#print(s1_,s2_,t1,t2,type_)
 		return s1_,s2_,t1,t2,type_
 
 	def check_conditions(self):
@@ -78,9 +78,9 @@ class AbstractTrigger:
 		2. If so, take note of time. If time trigger is 0, immediatly trigger event. 
 		3. If time trigger is above 0. Check if it is already triggered. 
 		"""
-
 		if self.activation:
 			for i in self.conditions:
+				print(i)
 				s1,s2,t1,t2,type_= self.decode_conditions(i)
 
 				if type_ ==">":
@@ -129,15 +129,14 @@ class AbstractTrigger:
 		return self.is_trigger()
 
 	def is_trigger(self):
-
-		self.set_mind("Triggered!",GREEN)
-		self.trigger_event()
 		self.trigger_count+=1
+		self.trigger_event()
 		if self.trigger_count == self.trigger_limit:
 			self.trigger_count = 0
 			self.activation = False
 			return True
 		else:
+			self.reset()
 			return False 	
 
 	def trigger_event(self):  #OVERRIDEn n 
@@ -155,6 +154,8 @@ class AbstractTrigger:
 
 		self.tradingplan = tradingplan 
 		self.tp_data = self.tradingplan.get_data()
+
+		#print(self.symbol_name,self.description,self.trigger_timer,self.trigger_limit)
 
 		self.set_mind_object()
 
@@ -203,11 +204,15 @@ class Purchase_trigger(AbstractTrigger):
 	def __init__(self,conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out):
 		super().__init__(description,trigger_timer,trigger_limit)
 
+		print("purchase_trigger,",self.trigger_timer,self.trigger_limit)
 		self.pos = pos
 		self.stop = stop
 		self.ppro_out =ppro_out
 		self.risk = risk 
 		self.conditions = conditions 
+
+		self.entry_text =""
+		self.trigger_text = ""
 
 		checker = False
 		for i in conditions:
@@ -222,23 +227,23 @@ class Purchase_trigger(AbstractTrigger):
 
 		share = self.shares_calculator()
 
+		print(self.symbol_name,"Trigger: ",self.pos,share,"stop :",self.stop,self.symbol_data[self.stop],self.symbol.get_time())
 
-		print("Trigger: Purchase PPRO EVENT: ",self.symbol_name,self.pos,share,"at","stop:",self.stop,self.symbol_data[self.stop],self.symbol.get_time())
+		if self.pos!="":
+			self.tradingplan.expect_orders = True
+			if self.trigger_count!= self.trigger_limit:
+				self.set_mind("Entry: "+str(self.trigger_count)+"/"+str(self.trigger_limit),DEFAULT)
+			else:
+				self.set_mind("Entry: Complete",GREEN)
 
 		if self.pos == LONG:
-
-			#set pos to long ,and stop to a value.
-
-			# self.tradingplan.data[POSITION]=LONG
-			# self.tradingplan.tkvars[POSITION].set(LONG)
 
 			self.tradingplan.data[STOP_LEVEL]=self.symbol_data[self.stop]
 			self.tradingplan.tkvars[STOP_LEVEL].set(self.symbol_data[self.stop])
 
 			#self.tradingplan.expect_orders = True
-			print("Trigger: Purchase: ",self.symbol_name,self.pos,share,"at",self.symbol.get_time())
-
-			self.tradingplan.expect_orders = True
+			#print("Trigger: Purchase: ",self.symbol_name,self.pos,share,"at",self.symbol.get_time())
+		
 			if share>0:
 				self.ppro_out.send(["Buy",self.symbol_name,share,self.description])
 		elif self.pos ==SHORT:
@@ -246,13 +251,15 @@ class Purchase_trigger(AbstractTrigger):
 			self.tradingplan.data[STOP_LEVEL]=self.symbol_data[self.stop]
 			self.tradingplan.tkvars[STOP_LEVEL].set(self.symbol_data[self.stop])
 
-			#self.tradingplan.expect_orders = True
 			
 			self.tradingplan.expect_orders = True
+
 			if share>0:
 				self.ppro_out.send(["Sell",self.symbol_name,share,self.description])
 		else:
 			print("unidentified side. ")
+
+
 
 		self.tradingplan.update_displays()
 
@@ -285,15 +292,13 @@ class Three_price_trigger(AbstractTrigger):
 
 		self.ppro_out =ppro_out
 		self.conditions = [] 
-		self.cur_level = 1
-
 
 	def check_conditions(self):
 
 		level = ""
-		if self.cur_level ==1: level= PXT1
-		if self.cur_level ==2: level= PXT2
-		if self.cur_level ==3: level= PXT3
+		if self.tradingplan.current_price_level ==1: level= PXT1
+		if self.tradingplan.current_price_level ==2: level= PXT2
+		if self.tradingplan.current_price_level ==3: level= PXT3
 
 		if self.tradingplan.data[POSITION] == LONG:
 			self.conditions = [[SYMBOL_DATA,ASK,">",TP_DATA,level]]
@@ -312,13 +317,13 @@ class Three_price_trigger(AbstractTrigger):
 		#print("Trigger: Purchase PPRO EVENT: ",self.symbol_name,s,share,"at","stop:",self.stop,self.symbol_data[self.stop],self.symbol.get_time())
 
 		if self.pos == LONG:
-			if self.cur_level == 3:
+			if self.tradingplan.current_price_level == 3:
 				self.ppro_out.send([FLATTEN,self.symbol_name])
 			else:
 				if share>0:
 					self.ppro_out.send([SELL,self.symbol_name,share,self.description])
 		elif self.pos ==SHORT:
-			if self.cur_level == 3:
+			if self.tradingplan.current_price_level == 3:
 				self.ppro_out.send(["Flatten",self.symbol_name])
 			else:
 				if share>0:
@@ -327,10 +332,13 @@ class Three_price_trigger(AbstractTrigger):
 		else:
 			print("unidentified side. ")
 
-		print(self.symbol_name," Hit price target", self.cur_level,"New target:","New Stop:")
+		print(self.symbol_name," Hit price target", self.tradingplan.current_price_level,"New target:","New Stop:")
 
-		self.set_mind("Covered No."+str(self.cur_level)+" lot.",GREEN)
-		self.cur_level+=1
+		if self.tradingplan.current_price_level==3:
+			self.set_mind("Trade completed.")
+		else:
+			self.set_mind("Covered No."+str(self.tradingplan.current_price_level)+" lot.",GREEN)
+		self.tradingplan.current_price_level+=1
 		self.tradingplan.update_displays()
 
 # s = SingleEntry(ASK,">",PREMARKETHIGH,0,"BUY BREAK UP")

@@ -39,7 +39,7 @@ class TradingPlan:
 		self.current_price_level = 0
 		self.price_levels = {}
 
-		self.numeric_labels = [ACTRISK,ESTRISK,CURRENT_SHARE,TARGET_SHARE,AVERAGE_PRICE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3]
+		self.numeric_labels = [ACTRISK,ESTRISK,CURRENT_SHARE,TARGET_SHARE,AVERAGE_PRICE,LAST_AVERAGE_PRICE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3]
 		self.string_labels = [MIND,STATUS,POSITION,RISK_RATIO,SIZE_IN,ENTRYPLAN,ENTYPE,MANAGEMENTPLAN]
 
 		self.bool_labels= [AUTORANGE,AUTOMANAGE,RELOAD]
@@ -90,6 +90,7 @@ class TradingPlan:
 		"""
 		This will happen whenever a trade is placed. 
 		"""
+
 		self.symbol.set_resistence(self.tkvars[RESISTENCE].get())
 		self.symbol.set_support(self.tkvars[SUPPORT].get())
 
@@ -100,6 +101,7 @@ class TradingPlan:
 				self.tklabels[SUPPORT]["state"] = "normal"
 				self.tklabels[RESISTENCE]["state"] = "normal"
 			else:
+				self.AR_toggle_check()
 				self.tklabels[SUPPORT]["state"] = "disabled"
 				self.tklabels[RESISTENCE]["state"] = "disabled"
 		except:
@@ -191,10 +193,13 @@ class TradingPlan:
 		for i in range(shares):
 			self.holdings.append(price)
 
-		self.management_plan.update_on_loadingup()
-		print(self.symbol_name," ",side,",",price," at ",shares,)
+		if self.data[AVERAGE_PRICE]!=self.data[LAST_AVERAGE_PRICE]:
+			self.management_plan.update_on_loadingup()
+			self.adjusting_risk()
 
-		self.adjusting_risk()
+			print(self.symbol_name," ",side,",",self.data[AVERAGE_PRICE]," at ",self.data[CURRENT_SHARE],"act risk:",self.data[ACTRISK])
+
+		self.data[LAST_AVERAGE_PRICE] = self.data[AVERAGE_PRICE]
 
 	def ppro_orders_loadoff(self,price,shares,side):
 
@@ -408,16 +413,23 @@ class TradingPlan:
 	def deploy(self):
 
 		if self.tkvars[STATUS].get() ==PENDING:
-			entryplan=self.tkvars[ENTRYPLAN].get()
-			entry_type=self.tkvars[ENTYPE].get()
-			entrytimer=self.tkvars[TIMER].get()
-			manage_plan =self.tkvars[MANAGEMENTPLAN].get()
 
-			self.entry_plan_decoder(entryplan, entry_type, entrytimer)
-			self.manage_plan_decoder(manage_plan)
 
-			self.AR_toggle_check()
-			self.start_tradingplan()
+			try:
+				entryplan=self.tkvars[ENTRYPLAN].get()
+				entry_type=self.tkvars[ENTYPE].get()
+				entrytimer=int(self.tkvars[TIMER].get())
+				manage_plan =self.tkvars[MANAGEMENTPLAN].get()
+
+				self.entry_plan_decoder(entryplan, entry_type, entrytimer)
+				self.manage_plan_decoder(manage_plan)
+
+				print("Deploying:",self.symbol_name,self.entry_plan.get_name(),entry_type,entrytimer,self.management_plan.get_name())
+				self.AR_toggle_check()
+				self.start_tradingplan()
+			except Exception as e:
+
+				print("Deplying Error:",self.symbol_name,e)
 	
 	def start_tradingplan(self):
 		self.mark_algo_status(DEPLOYED)
@@ -435,7 +447,8 @@ class TradingPlan:
 			instant = 3 
 
 		if instant >1:
-			entrytimer = 5
+			if entrytimer<5:
+				entrytimer = 5
 
 		if entry_plan == BREAKANY:
 			self.set_EntryStrategy(BreakAny(entrytimer,instant,self.symbol,self))
@@ -472,19 +485,21 @@ class TradingPlan:
 	def on_finish(self,plan):
 		
 		if plan==self.entry_plan:
-			print("TP: Entry strategy ",self.entry_plan.get_name()," completed, Management strategy begins.")
+			print(self.symbol_name,self.entry_plan.get_name()," completed, Management strategy begins.")
 			#self.entry_strategy_done()
 			done = threading.Thread(target=self.entry_strategy_done, daemon=True)
 			done.start()
 		elif plan==self.management_plan:
 			self.management_strategy_done()
-			print("TP: Management strategy completed on ",self.symbol_name)
+			print(self.symbol_name,"management strategy completed on ")
 		else:
 			print("Trading Plan: UNKONW CALL FROM Strategy")
 
 	def entry_strategy_done(self):
 
+		self.management_plan.update_on_start()
 		self.current_running_strategy = self.management_plan
+
 
 	def management_strategy_done(self):
 
