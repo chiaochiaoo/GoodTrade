@@ -432,7 +432,7 @@ def process_and_send(lst,pipe):
 	if price > d["high"]:
 		d["high"] = price
 
-	if price < d["low"]:
+	if price < d["low"] or d["low"]==0:
 		d["low"] = price			
 
 	if timestamp <570:
