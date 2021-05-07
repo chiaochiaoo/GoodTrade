@@ -324,30 +324,30 @@ class Tester:
 
 		self.pos  = ""
 		self.share = 0
-
-
 		self.change_sum = 0
+
+		self.wait_time = 1
 
 		# self.init= tk.Button(self.root ,text="Register",width=10,bg="#5BFF80",command=self.start_test)
 		# self.init.grid(column=1,row=1) m
 
 		self.price = tk.DoubleVar(value=413)
-		self.entr=	tk.Entry(self.root ,textvariable=self.price,width=10)	
-		self.entr.grid(column=1,row=2)
 
-		self.up=	tk.Button(self.root ,text="up",command=self.price_up)	
-		self.up.grid(column=1,row=3)
+		tk.Entry(self.root ,textvariable=self.price,width=10).grid(column=1,row=2)	
 
-		self.up=	tk.Button(self.root ,text="stay",command=self.price_stay)	
-		self.up.grid(column=1,row=4)
+		tk.Button(self.root ,text="up",command=self.price_up).grid(column=1,row=4)	
+		tk.Button(self.root ,text="stay",command=self.price_stay).grid(column=2,row=4)	
+		tk.Button(self.root ,text="down",command=self.price_down).grid(column=3,row=4)	
 
-		self.down=	tk.Button(self.root ,text="down",command=self.price_down)	
-		self.down.grid(column=2,row=3)
-		self.up=	tk.Button(self.root ,text="up 10",command=self.price_upx)	
-		self.up.grid(column=1,row=5)
+		tk.Button(self.root ,text="TimeX1",command=self.time_facotr_1).grid(column=1,row=3)
+		tk.Button(self.root ,text="TimeX10",command=self.time_factor_10).grid(column=2,row=3)	
 
-		self.down=	tk.Button(self.root ,text="down 10",command=self.price_downx)	
-		self.down.grid(column=2,row=5)
+		tk.Button(self.root ,text="up 0.1",command=self.price_up_little).grid(column=1,row=5)
+		tk.Button(self.root ,text="down 0.1",command=self.price_down_little).grid(column=2,row=5)	
+
+		tk.Button(self.root ,text="up 1",command=self.price_upx).grid(column=1,row=6)	
+		tk.Button(self.root ,text="down 1",command=self.price_downx).grid(column=2,row=6)	
+
 
 		self.gt.send(["pkg",['New order', [BREAKANY, 'SPY.AM', 413.0, 414.0, 50.0, {'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441}]]])
 
@@ -443,21 +443,35 @@ class Tester:
 		while True:
 			self.price.set(round(self.price.get()+self.change_sum,2))
 			self.change()
-
-			time.sleep(1)
+			time.sleep(self.wait_time)
 
 	def price_stay(self):
 		self.change_sum = 0
 
+
+	def time_facotr_1(self):
+		self.wait_time=1
+
+	def time_factor_10(self):
+		self.wait_time=10
+
 	def price_up(self):
-		self.change_sum = 0.1
+		self.change_sum = 0.01
 		# self.price.set(round(self.price.get()+0.1,2))
 		# self.change()
 	def price_down(self):
-		self.change_sum = -0.1
+		self.change_sum = -0.01
 
 		# self.price.set(round(self.price.get()-0.1,2))
 		# self.change()
+
+	def price_up_little(self):
+		self.price.set(round(self.price.get()+0.1,2))
+		self.change()
+
+	def price_down_little(self):
+		self.price.set(round(self.price.get()-0.1,2))
+		self.change()
 
 	def price_upx(self):
 		self.price.set(round(self.price.get()+1,2))

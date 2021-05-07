@@ -90,10 +90,11 @@ class TradingPlan:
 		"""
 		This will happen whenever a trade is placed. 
 		"""
-
-		self.symbol.set_resistence(self.tkvars[RESISTENCE].get())
-		self.symbol.set_support(self.tkvars[SUPPORT].get())
-
+		try:
+			self.symbol.set_resistence(self.tkvars[RESISTENCE].get())
+			self.symbol.set_support(self.tkvars[SUPPORT].get())
+		except Exception as e:
+			print(self.symbol_name,"error on sup/res input.",e)
 
 	def AR_toggle(self):
 		try:

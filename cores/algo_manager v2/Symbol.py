@@ -22,6 +22,15 @@ class Symbol:
 		self.data = {}
 		self.tkvars = {}
 
+		#for false range detection
+		self.seen_high =0
+		self.seen_low =0
+		self.count = 0
+		self.last_ts = 0
+
+		self.mind = None
+		self.mind_label = None
+
 		self.tradingplan=None
 		self.init_data(support,resistence,stats)
 
@@ -44,42 +53,97 @@ class Symbol:
 	def get_name(self):
 		return self.symbol
 
+	def set_mind_object(self):
+		try:
+			self.mind = self.tradingplan.tkvars[MIND]
+			self.mind_label = self.tradingplan.tklabels[MIND]
+		except:
+			pass
+
 	def set_tradingplan(self,tradingplan):
 		self.tradingplan = tradingplan
 
+	def set_mind(self,str,color=DEFAULT):
+
+		if self.mind==None:
+			self.set_mind_object()
+		if self.mind!=None:
+			self.mind.set(str)
+			self.mind_label["background"]=color
+
+
+	def false_range_detection(self,bid,ask,ts):
+
+		#init
+		if ts !=self.last_ts and self.tradingplan.data[POSITION]=="":
+
+			if self.seen_low==0 and self.seen_high==0:
+				self.seen_low = bid
+				self.seen_high = ask
+				self.set_mind("FRD: InProgress",DEFAULT)
+
+			if ask>self.seen_high:
+				self.seen_high = ask
+			if bid<self.seen_low:
+				self.seen_low = bid 
+
+			if self.count >=30:
+				s = ((self.seen_low-self.data[SUPPORT])/self.data[SUPPORT])
+				r =  ((self.data[RESISTENCE]-self.seen_high)/self.seen_high)
+				if s>0.003:
+					self.set_mind("FRD: fishy support",YELLOW)
+				elif r>0.003:
+					self.set_mind("FRD: fishy resistence",YELLOW)
+				elif s>0.003 and r>0.003:
+					self.set_mind("FRD: fishy both levels",YELLOW)
+				else:
+					self.set_mind("FRD: GOOD",VERYLIGHTGREEN)
+
+			self.last_ts = ts
+			self.count +=1
+
+		#descrepancy. 			
+
+
+
+
 	def update_price(self,bid,ask,ts,AR,pos):
 
-		if AR==True and pos==PENDING: #and ts<34200:
-			if ask>self.data[RESISTENCE]:
-				self.data[RESISTENCE]=ask
-			if self.data[SUPPORT] == 0:
-				self.data[SUPPORT] = bid
-			if bid<self.data[SUPPORT]:
-				self.data[SUPPORT] = bid
-			self.tradingplan.update_symbol_tkvar()
+		try:
 
-		#print(self.data)
-		#34200 openning.
+			if AR==True and pos==PENDING and ts<34200:
+				if ask>self.data[RESISTENCE]:
+					self.data[RESISTENCE]=ask
+				if self.data[SUPPORT] == 0:
+					self.data[SUPPORT] = bid
+				if bid<self.data[SUPPORT]:
+					self.data[SUPPORT] = bid
+				self.tradingplan.update_symbol_tkvar()
 
-		# if self.data[HIGH]==0:
-		# 	self.data[HIGH] = ask
-		# if self.data[LOW] ==0:
-		# 	self.data[LOW] = bid 
+			#print(self.data)
+			#34200 openning.
 
-		if self.data[ASK]>self.data[HIGH]:
-			self.data[HIGH] = self.data[ASK]
-		if self.data[BID]<self.data[LOW] or self.data[LOW]==0:
-			self.data[LOW]= self.data[BID]
+			# if self.data[HIGH]==0:
+			# 	self.data[HIGH] = ask
+			# if self.data[LOW] ==0:
+			# 	self.data[LOW] = bid 
 
-		#print("sy",self.ask,self.high,self.output)
+			# if self.data[ASK]>self.data[HIGH]:
+			# 	self.data[HIGH] = self.data[ASK]
+			# if self.data[BID]<self.data[LOW] or self.data[LOW]==0:
+			# 	self.data[LOW]= self.data[BID]
 
-		self.data[BID] = bid
-		self.data[ASK] = ask
-		self.data[TIMESTAMP] = ts
+			#print("sy",self.ask,self.high,self.output)
 
-		
-		#notify trading plan that price has changed. 
+			self.data[BID] = bid
+			self.data[ASK] = ask
+			self.data[TIMESTAMP] = ts
 
+			self.false_range_detection(bid,ask,ts)
+			#notify trading plan that price has changed. 
+
+		except Exception as e:
+			print(self.get_name(),"Updating price error :",e)
 
 	def set_phigh(self,v):
 		self.data[PREMARKETHIGH]=v
