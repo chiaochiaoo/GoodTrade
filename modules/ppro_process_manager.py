@@ -570,8 +570,8 @@ def getinfo(symbol,pipe):
 
 				if(r.text =='<Response><Content>No data available symbol</Content></Response>'):
 					print("No symbol found")
-					black_list.append(symbol)
-					pipe.send(["Unfound",symbol])
+					# black_list.append(symbol)
+					# pipe.send(["Unfound",symbol])
 					lock[symbol] = False
 				else:
 
