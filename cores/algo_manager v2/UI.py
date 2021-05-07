@@ -107,10 +107,10 @@ class UI(pannel):
 		self.algo_pend = ttk.Button(self.cmd, text="Withdraw all algo",command=self.manager.withdraw_all)#,command=self.cancel_all_stoporders)
 		self.algo_pend.grid(sticky="w",column=2,row=10)
 
-		self.flatten = ttk.Button(self.cmd, text="Flatten all algo")
+		self.flatten = ttk.Button(self.cmd, text="Flatten all algo",command=self.manager.flatten_all)
 		self.flatten.grid(sticky="w",column=1,row=11)
 
-		self.algo_cancel = ttk.Button(self.cmd, text="Cancel all algo")
+		self.algo_cancel = ttk.Button(self.cmd, text="Cancel all algo",command=self.manager.cancel_all)
 		self.algo_cancel.grid(sticky="w",column=2,row=11)
 
 

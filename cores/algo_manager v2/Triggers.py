@@ -80,7 +80,6 @@ class AbstractTrigger:
 		"""
 		if self.activation:
 			for i in self.conditions:
-				print(i)
 				s1,s2,t1,t2,type_= self.decode_conditions(i)
 
 				if type_ ==">":

@@ -87,14 +87,14 @@ class Symbol:
 			if bid<self.seen_low:
 				self.seen_low = bid 
 
-			if self.count >=30:
+			if self.count >=1800:
 				s = ((self.seen_low-self.data[SUPPORT])/self.data[SUPPORT])
 				r =  ((self.data[RESISTENCE]-self.seen_high)/self.seen_high)
-				if s>0.003:
+				if s>0.004:
 					self.set_mind("FRD: fishy support",YELLOW)
-				elif r>0.003:
+				elif r>0.004:
 					self.set_mind("FRD: fishy resistence",YELLOW)
-				elif s>0.003 and r>0.003:
+				elif s>0.004 and r>0.004:
 					self.set_mind("FRD: fishy both levels",YELLOW)
 				else:
 					self.set_mind("FRD: GOOD",VERYLIGHTGREEN)

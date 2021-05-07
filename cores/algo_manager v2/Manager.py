@@ -12,7 +12,7 @@ import pickle
 import time
 import multiprocessing
 import requests
-
+from datetime import datetime
 #May this class bless by the Deus Mechanicus.
 
 TEST = True
@@ -154,6 +154,9 @@ class Manager:
 		ppro_in = threading.Thread(target=self.ppro_in, daemon=True)
 		ppro_in.start()
 
+		timer = threading.Thread(target=self.timer, daemon=True)
+		timer.start()
+
 		#if Testerx==True:
 			
 
@@ -183,6 +186,36 @@ class Manager:
 			#append it to, UI.
 		else:
 			print("symbols already exists, modifying current parameter.")
+
+	def timer(self):
+
+		#570  34200
+		#960  57600 
+		time.sleep(2)
+		#now = datetime.now()
+		timestamp = 34200
+
+		print("timer start")
+		while True:
+			now = datetime.now()
+			ts = now.hour*3600 + now.minute*60 + now.second
+			remain = timestamp - ts
+			print(timestamp,ts)
+			minute = remain//60
+			seconds = remain%60
+
+			if minute>0:
+				self.ui.algo_timer_string.set(str(minute)+" minutes and "+str(seconds)+" seconds")
+			else:
+				self.ui.algo_timer_string.set(str(seconds)+" seconds")
+			if remain<0:
+				print("Trigger")
+				break
+
+			time.sleep(1)
+
+		self.ui.algo_timer_string.set("Deployed")
+		self.deploy_all()
 
 	def goodtrade_in(self):
 		time.sleep(3)
@@ -276,7 +309,6 @@ class Manager:
 
 			# 	self.ppro_append_new_stoporder(d[1])
 
-
 	def set_all_tp(self):
 
 		timer=self.ui.all_timer.get()
@@ -301,7 +333,12 @@ class Manager:
 	def flatten_all(self):
 		for d in self.tradingplan.values():
 			d.flatten_cmd()
+
+	def cancel_all(self):
+		for d in self.tradingplan.values():
+			d.cancel_algo()
 	
+
 
 	def set_selected_tp(self):
 		pass

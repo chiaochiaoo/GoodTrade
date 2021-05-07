@@ -288,6 +288,8 @@ class TradingPlan:
 	def flatten_cmd(self):
 		self.ppro_out.send(["Flatten",self.symbol_name])
 
+		if self.tkvars[STATUS].get()==PENDING:
+			self.cancel_algo()
 	"""	UI related  """
 	def update_symbol_tkvar(self):
 		self.tkvars[SUPPORT].set(self.symbol.get_support())
@@ -403,6 +405,11 @@ class TradingPlan:
 		self.tklabels[TIMER]["state"] = state
 		self.tklabels[MANAGEMENTPLAN]["state"] = state
 		self.tklabels[AUTORANGE]["state"] = state
+
+
+	def cancel_algo(self):
+		if self.tkvars[STATUS].get()==PENDING:
+			self.mark_algo_status(CANCELED)
 
 	def cancle_deployment(self):
 		if self.data[POSITION] =="" and self.data[CURRENT_SHARE]==0:
