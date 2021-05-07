@@ -250,7 +250,7 @@ class TradingPlan:
 		self.data[TARGET_SHARE] = 0
 		self.tkvars[POSITION].set("")
 		self.tklabels[AUTORANGE]["state"] = "normal"
-
+		self.current_price_level = 0
 		self.current_running_strategy = None
 
 		#if reload is on, revert it back to entry stage. 

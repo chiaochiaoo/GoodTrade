@@ -40,6 +40,9 @@ class Strategy:
 		self.timer = 0
 		self.all_triggers = []
 
+		self.mind = None
+		self.mind_label = None
+		
 		self.risk = 0
 
 		self.set_symbol(symbol,tradingplan)
@@ -93,6 +96,24 @@ class Strategy:
 		print(self.strategy_name+" completed")
 		self.tradingplan.on_finish(self)	
 		self.restart()
+
+	def set_mind(self,str,color=DEFAULT):
+
+		if self.mind==None:
+			self.set_mind_object()
+		if self.mind!=None:
+			self.mind.set(str)
+			self.mind_label["background"]=color
+
+	def clear_mind(self):
+		self.set_mind(" ",DEFAULT)
+
+	def set_mind_object(self):
+		try:
+			self.mind = self.tradingplan.tkvars[MIND]
+			self.mind_label = self.tradingplan.tklabels[MIND]
+		except:
+			pass
 
 	def update_on_pricechanging(self):
 		pass
@@ -195,6 +216,7 @@ class ThreePriceTargets(Strategy):
 
 	def update_on_start(self):
 		self.tradingplan.current_price_level = 1
+		self.set_mind("")
 # clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
 
 # print(clsmembers)

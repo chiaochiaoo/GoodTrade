@@ -21,6 +21,7 @@ class AbstractTrigger:
 		self.description = description
 
 		self.mind = None
+		self.mind_label = None
 		#How long it need sto trigger it.
 		self.trigger_timer = trigger_timer
 

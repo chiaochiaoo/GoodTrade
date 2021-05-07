@@ -490,7 +490,7 @@ class Tester:
 		self.wait_time=1
 
 	def time_factor_10(self):
-		self.wait_time=10
+		self.wait_time=0.1
 
 	def price_up(self):
 		self.change_sum = 0.01

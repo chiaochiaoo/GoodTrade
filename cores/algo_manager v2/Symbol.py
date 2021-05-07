@@ -91,11 +91,11 @@ class Symbol:
 				s = ((self.seen_low-self.data[SUPPORT])/self.data[SUPPORT])
 				r =  ((self.data[RESISTENCE]-self.seen_high)/self.seen_high)
 				if s>0.004:
-					self.set_mind("FRD: fishy support",YELLOW)
+					self.set_mind("FRD: abnormal support",YELLOW)
 				elif r>0.004:
-					self.set_mind("FRD: fishy resistence",YELLOW)
+					self.set_mind("FRD: abnormal resistence",YELLOW)
 				elif s>0.004 and r>0.004:
-					self.set_mind("FRD: fishy both levels",YELLOW)
+					self.set_mind("FRD: abnormal both levels",YELLOW)
 				else:
 					self.set_mind("FRD: GOOD",VERYLIGHTGREEN)
 
