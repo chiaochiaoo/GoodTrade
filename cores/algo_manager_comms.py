@@ -3,11 +3,25 @@ import pickle
 
 import threading
 import multiprocessing
-import numpy as np
+
 import select
 import time
 
+import os
 #### HERE I NEED SELECT. ### Dua channel. ####
+
+
+def find_pid():
+	pid=(os.popen("netstat -ano|findstr 65499").read())[65:]
+	pid = int(pid)
+	return pid
+
+
+def kill(pid):
+	print(pid)
+	os.system("taskkill /f /pid "+str(pid))
+
+
 def algo_manager_commlink(pipe):
 
 	HOST = 'localhost'  # Standard loopback interface address (localhost)
@@ -17,7 +31,22 @@ def algo_manager_commlink(pipe):
 	while True:
 		print("Waitting for algo manager to connect")
 		s=  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		s.bind((HOST, PORT))
+
+		failed = 0
+		while True:
+			try:
+				s.bind((HOST, PORT))
+				break
+			except:
+				failed +=1
+				kill(find_pid())
+				if failed >=5:
+					break
+
+		if failed>=5:
+			print("algo failed to initialize")
+			break
+
 		s.listen()
 		
 		conn, addr = s.accept()
@@ -70,7 +99,17 @@ def algo_manager_commlink(pipe):
 	s.close()
 
 
+def find_between(data, first, last):
+	try:
+		start = data.index(first) + len(first)
+		end = data.index(last, start)
+		return data[start:end]
+	except ValueError:
+		return data
+
 if __name__ == '__main__':
+
+
 	server_side_comm, client_side_comm = multiprocessing.Pipe()
 
 	
