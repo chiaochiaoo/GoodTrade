@@ -133,8 +133,11 @@ def sharp_change(pair,period,change_value):
 
 def change_distribution(pair,period):
     lst = []
-    for i in (period,len(pair)-1):
-        lst.append(pair[i] - pair[i-period])
+    try:
+    	for i in (period,len(pair)-1):
+        	lst.append(pair[i] - pair[i-period])
+    except:
+    	pass
     return lst
 
 def change_min_max(pair):
