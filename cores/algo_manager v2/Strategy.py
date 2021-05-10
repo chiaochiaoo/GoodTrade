@@ -42,7 +42,7 @@ class Strategy:
 
 		self.mind = None
 		self.mind_label = None
-		
+
 		self.risk = 0
 
 		self.set_symbol(symbol,tradingplan)
@@ -162,12 +162,12 @@ class ThreePriceTargets(Strategy):
 
 		super().__init__("Management: Three pxt targets",symbol,tradingplan)
 
-		manaTrigger = Three_price_trigger("manage",self.ppro_out)
+		self.manaTrigger = Three_price_trigger("manage",self.ppro_out)
 
-		self.add_initial_triggers(manaTrigger)
+		self.add_initial_triggers(self.manaTrigger)
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
-
+		###upon activating, reset all parameters. 
 
 	def update_on_loadingup(self): #call this whenever the break at price changes. 
 
@@ -215,6 +215,7 @@ class ThreePriceTargets(Strategy):
 
 
 	def update_on_start(self):
+		self.manaTrigger.total_reset()
 		self.tradingplan.current_price_level = 1
 		self.set_mind("")
 # clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)

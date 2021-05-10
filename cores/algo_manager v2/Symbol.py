@@ -27,6 +27,7 @@ class Symbol:
 		self.seen_low =0
 		self.count = 0
 		self.last_ts = 0
+		self.init_ts = 0
 
 		self.mind = None
 		self.mind_label = None
@@ -75,7 +76,10 @@ class Symbol:
 	def false_range_detection(self,bid,ask,ts):
 
 		#init
-		if ts !=self.last_ts and self.tradingplan.data[POSITION]=="":
+		if self.init_ts==0:
+			self.init_ts = ts
+
+		if self.tradingplan.data[POSITION]=="":
 
 			if self.seen_low==0 and self.seen_high==0:
 				self.seen_low = bid
@@ -87,7 +91,7 @@ class Symbol:
 			if bid<self.seen_low:
 				self.seen_low = bid 
 
-			if self.count >=1800:
+			if ts - self.init_ts >=1800:
 				s = ((self.seen_low-self.data[SUPPORT])/self.data[SUPPORT])
 				r =  ((self.data[RESISTENCE]-self.seen_high)/self.seen_high)
 				if s>0.004:
@@ -100,7 +104,7 @@ class Symbol:
 					self.set_mind("FRD: GOOD",VERYLIGHTGREEN)
 
 			self.last_ts = ts
-			self.count +=1
+
 
 		#descrepancy. 			
 

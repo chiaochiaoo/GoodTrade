@@ -233,6 +233,7 @@ class TradingPlan:
 		#finish a trade if current share is 0.
 
 		if self.data[CURRENT_SHARE] <= 0:
+			self.tkvars[MIND].set("Trade completed.")
 			self.clear_trade()
 
 	def clear_trade(self):

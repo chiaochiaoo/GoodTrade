@@ -195,7 +195,9 @@ class AbstractTrigger:
 		self.trigger_duration = 0
 		
 		#self.clear_mind()
-
+	def total_reset(self):
+		self.reactivate()
+		self.reset()
 
 #self,subject1,type_,subject2,trigger_timer:int,description,trigger_limit=1
 
@@ -310,8 +312,7 @@ class Three_price_trigger(AbstractTrigger):
 	#add the actual stuff here.
 	def trigger_event(self):
 
-
-		share = min(self.tradingplan.data[TARGET_SHARE]//3,self.tradingplan.data[CURRENT_SHARE])
+		share = min(self.tradingplan.data[TARGET_SHARE]//4,self.tradingplan.data[CURRENT_SHARE])
 
 		self.pos = self.tradingplan.data[POSITION]
 		#print("Trigger: Purchase PPRO EVENT: ",self.symbol_name,s,share,"at","stop:",self.stop,self.symbol_data[self.stop],self.symbol.get_time())
@@ -328,16 +329,11 @@ class Three_price_trigger(AbstractTrigger):
 			else:
 				if share>0:
 					self.ppro_out.send([BUY,self.symbol_name,share,self.description])
-
 		else:
 			print("unidentified side. ")
 
 		print(self.symbol_name," Hit price target", self.tradingplan.current_price_level,"New target:","New Stop:")
-
-		if self.tradingplan.current_price_level==3:
-			self.set_mind("Trade completed.")
-		else:
-			self.set_mind("Covered No."+str(self.tradingplan.current_price_level)+" lot.",GREEN)
+		self.set_mind("Covered No."+str(self.tradingplan.current_price_level)+" lot.",GREEN)
 		self.tradingplan.current_price_level+=1
 		self.tradingplan.update_displays()
 
