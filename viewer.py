@@ -384,8 +384,8 @@ def utils(scanner_sending_pipe,db_sending_pipe,algo_manager_receive_comm,ulti_re
 
 	v = ulti_receive.recv()
 	print("util activated")
+	time.sleep(10)
 	if v =="util activated":
-
 
 		print("util start")
 
@@ -472,8 +472,6 @@ if __name__ == '__main__':
 
 	utility = multiprocessing.Process(target=utils, args=(scanner_sending_pipe,db_sending_pipe,algo_manager_receive_comm,util_receive),daemon=True)
 	utility.daemon=True
-
-	
 
 
 	root = tk.Tk() 
