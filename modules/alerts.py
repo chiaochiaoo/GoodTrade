@@ -235,8 +235,8 @@ class alert(pannel):
 
 			#trigger type
 			elif j==10:
-				self.trigger_types = {'Break Up','Break Dn','Any level'}
-				format[j].set('Any level') 
+				self.trigger_types = {'Break Up','Break Dn','Break Any'}
+				format[j].set('Break Any') 
 				self.tickers_labels[i].append(tk.OptionMenu(self.frame, format[j], *sorted(self.trigger_types)))
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 			#Trigger timer
@@ -277,11 +277,11 @@ class alert(pannel):
 		symbol,support,resistence,timer_trade,type_trade,default_risk = info[0],float(info[1].get()),float(info[2].get()),info[3].get(),info[4].get(),info[5].get()
 
 		print(symbol,support,resistence,timer_trade,type_trade,default_risk)
-		risk = None
+		risk = 0
 		try:
 			risk = float(default_risk)
 		except:
-			risk = None
+			risk = 0
 
 		atr,oha,ohs,ola,ols = self.data.symbol_data_ATR[symbol].get(),\
 		self.data.symbol_data_openhigh_val[symbol].get(),\
@@ -295,24 +295,15 @@ class alert(pannel):
 					 "OLavg":ola,
 					 "OLstd":ols}
 		#'Break Up','Break Down','Any'
-		description_break_up = "Break Resistance on "+str(resistence)
-		info_up = ["Breakup",symbol,description_break_up,resistence,support,"Long",None,risk,data_list]
 
-		description_break_down = "Break Support on "+str(support)
-		info_down = ["Breakdown",symbol,description_break_down,support,resistence,"Short",None,risk,data_list]
+
+		info = ["New order",[type_trade,symbol,support,resistence,risk,data_list]]
 
 
 		#type_,symbol,description,entry_price,stop_price,position,capital,total_risk
-		if type_trade =='Break Up':
 
-			self.place_trade([info_up],auto)
-
-		elif  type_trade =='Break Dn':
-
-			self.place_trade([info_down],auto)
-
-		else:
-			self.place_trade([info_up,info_down],auto)
+		if risk!=0 and support!=0 and resistence!=0:
+			self.algo_commlink.send(info)
 			# p1 = threading.Thread(target=self.place_trade(info_up), daemon=True)
 			# p1.start()
 			# p2 = threading.Thread(target=self.place_trade(info_down), daemon=True)
@@ -1164,6 +1155,7 @@ class breakout(alert):
 
 		self.data.all_auto_trade.trace('w', lambda *_,vals=self.data.algo_breakout_trade,val=self.data.all_auto_trade: self.set_auto(vals,val))
 
+		tk.Label(frame,textvariable=self.data.algo_manager_connected).place(x=750,y=10)
 
 	def placeall(self):
 
