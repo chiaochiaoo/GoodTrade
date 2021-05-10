@@ -63,8 +63,6 @@ class algo_process_manager_client:
 				message_type= info[0]
 
 				if message_type =="New order":
-					id_, symbol, type_, status, description, position ,order_type,order_price,shares, risk = info[1],info[2],info[3],info[4],info[5],info[6],info[7],info[8],info[9],info[10]
-					#print("New order: :",id_, symbol, type_, status, description, position ,order_type,order_price,shares, risk )
 
 					self.process_pipe.send(info)
 
@@ -92,16 +90,19 @@ class algo_process_manager_client:
 				info = self.process_pipe.recv()
 
 				type_ = info[0]
-				symbol = info[1]
+				
 
 				print(info)
 				if type_ =="Algo placed":
-
+					symbol = info[1]
 					#button. 
 
 					self.data.algo_breakout_placement[symbol].set("Placed")
 
+				if type_ =="Connected":
 
+					status = info[1]
+					self.data.algo_manager_connected.set(status)
 
 			
 			
