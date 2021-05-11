@@ -399,8 +399,6 @@ def utils(scanner_sending_pipe,db_sending_pipe,algo_manager_receive_comm,ulti_re
 		db.start()
 
 
-		algo_manager_commlink(algo_manager_receive_comm)
-
 		# algo_comm = threading.Thread(target=algo_manager_commlink,args=(algo_manager_receive_comm,),daemon=True)
 		# algo_comm.start()
 
@@ -466,6 +464,11 @@ if __name__ == '__main__':
 	algo_manager = algo_process_manager_client(algo_manager_thread_comm,algo_manager_process_comm)
 	
 	#UTIL#
+
+	algo_comm = threading.Thread(target=algo_manager_commlink, args=(algo_manager_receive_comm,),daemon=True)
+	algo_comm.daemon=True
+	algo_comm.start()
+	#algo_manager_commlink(algo_manager_receive_comm)
 
 
 	util_go, util_receive = multiprocessing.Pipe()

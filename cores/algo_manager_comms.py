@@ -11,15 +11,19 @@ import os
 #### HERE I NEED SELECT. ### Dua channel. ####
 
 
-def find_pid():
-	pid=(os.popen("netstat -ano|findstr 65499").read())[65:]
-	pid = int(pid)
-	return pid
 
+def kill():
 
-def kill(pid):
-	print(pid)
-	os.system("taskkill /f /pid "+str(pid))
+	fail = 0
+	while True:
+		try:
+			for i in os.popen("netstat -ano|findstr 65499").read().split("\n"):
+				pid=int(i[-8:])
+				os.system("taskkill /f /t /pid "+str(pid))
+		except:
+			fail+=1
+			if fail>=3:
+				break
 
 
 def algo_manager_commlink(pipe):
@@ -29,9 +33,9 @@ def algo_manager_commlink(pipe):
 
 
 	while True:
-		print("Waitting for algo manager to connect")
-		s=  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+		s=  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		# s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		failed = 0
 		while True:
 			try:
@@ -39,7 +43,7 @@ def algo_manager_commlink(pipe):
 				break
 			except:
 				failed +=1
-				kill(find_pid())
+				kill()
 				if failed >=5:
 					break
 
@@ -47,6 +51,7 @@ def algo_manager_commlink(pipe):
 			print("algo failed to initialize")
 			break
 
+		print("Waitting for algo manager to connect")
 		s.listen()
 		
 		conn, addr = s.accept()
@@ -109,7 +114,9 @@ def find_between(data, first, last):
 
 if __name__ == '__main__':
 
-
+	# for i in os.popen("netstat -ano|findstr 65499").read().split("\n"):
+	# 	print(i[-8:])
+		#print(int(i[61:])
 	server_side_comm, client_side_comm = multiprocessing.Pipe()
 
 	
