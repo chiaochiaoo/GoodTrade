@@ -157,7 +157,7 @@ def register(symbol):
 		r= requests.get(p)
 
 		reg_count+=1
-		print(symbol,"registerd ","total:",reg_count)
+		#print(symbol,"registerd ","total:",reg_count)
 
 		if symbol not in reg_list:
 			reg_list.append(symbol)
@@ -183,7 +183,7 @@ def deregister(symbol):
 	p="http://localhost:8080/Deregister?symbol="+symbol+"&feedtype=TOS"
 	r= requests.get(p)
 	reg_count-=1
-	print(symbol,"deregister","total:",reg_count)
+	#print(symbol,"deregister","total:",reg_count)
 	reg_list.remove(symbol)
 
 	# except Exception as e:
@@ -273,8 +273,8 @@ def multi_processing_price(pipe_receive):
 					info = threading.Thread(target=getinfo,args=(i,pipe_receive,), daemon=True)
 					info.start()
 
-			print("Registed list:",len(reg_list))
-			time.sleep(2.5)
+			#print("Registed list:",len(reg_list))
+			time.sleep(5)
 			#send each dictionary. 
 			#pipe_receive.send(data)
 	except Exception as e:
@@ -343,13 +343,13 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 				else:
 					range_data=fetch_yahoo(symbol[:-3])
 				success = True
-				print("yahoo success on ",symbol)
+				#print("yahoo success on ",symbol)
 			except:
 				yahoo_same_time-=1
 				retry_times -=1 
 				range_data=[price,price,price,price,0,0]
 				time.sleep(3)
-				print("yahoo not success on ",symbol,"re try")
+				#print("yahoo not success on ",symbol,"re try")
 				if retry_times ==0:success = True
 
 		#return high,low,m_high,m_low,f5,f5v
@@ -491,12 +491,12 @@ def process_and_send(lst,pipe):
 	register_again = False
 	#normal
 	if ms<570 or ms>960:
-		if latency >60:
+		if latency >120:
 			status = "Lagged"
 			register_again = False
 	#premarket
 	else:
-		if latency >120:
+		if latency >240:
 			status = "Lagged"
 			register_again = True
 
