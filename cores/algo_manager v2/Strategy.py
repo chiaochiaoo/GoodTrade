@@ -171,11 +171,8 @@ class ThreePriceTargets(Strategy):
 
 	def update_on_loadingup(self): #call this whenever the break at price changes. 
 
-		
 		price = self.tradingplan.data[AVERAGE_PRICE]
-
 		coefficient = 1
-
 		good = False
 
 		if self.tradingplan.data[POSITION]==LONG:
@@ -212,8 +209,6 @@ class ThreePriceTargets(Strategy):
 
 
 		#print(self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
-
-
 	def update_on_start(self):
 		self.manaTrigger.total_reset()
 		self.tradingplan.current_price_level = 1

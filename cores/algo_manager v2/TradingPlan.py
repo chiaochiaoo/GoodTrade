@@ -29,6 +29,7 @@ class TradingPlan:
 
 		self.expect_orders = False
 
+		self.flatten_order = False
 
 		self.data = {}
 		self.tkvars = {}
@@ -45,7 +46,6 @@ class TradingPlan:
 		self.bool_labels= [AUTORANGE,AUTOMANAGE,RELOAD,SELECTED]
 
 		self.init_data(risk,entry_plan,entry_type,manage_plan)
-
 
 	def init_data(self,risk,entry_plan,entry_type,manage_plan):
 
@@ -77,13 +77,11 @@ class TradingPlan:
 		self.tkvars[ENTYPE].set(entry_type)
 		self.tkvars[MANAGEMENTPLAN].set(THREE_TARGETS)
 
-
 		self.data[STATUS] = PENDING
 		self.tkvars[STATUS].set(PENDING)
 
 		# self.entry_plan_decoder(entry_plan,entry_type)
 		# self.manage_plan_decoder(manage_plan)
-
 
 	""" PPRO SECTION """
 
@@ -146,7 +144,8 @@ class TradingPlan:
 			self.data[UNREAL_PSHR] = gain
 			self.data[UNREAL]= round(gain*self.data[CURRENT_SHARE],4)
 
-		if flatten:
+		if flatten and self.flatten_order==False:
+			self.flatten_order=True
 			self.ppro_out.send(["Flatten",self.symbol_name])
 
 		self.update_displays()
@@ -179,6 +178,7 @@ class TradingPlan:
 		self.data[POSITION]=side
 		self.tkvars[POSITION].set(side)
 		self.data[REALIZED] = 0
+		self.flatten_order = False
 		self.ppro_orders_loadup(price,shares,side)
 
 	def ppro_orders_loadup(self,price,shares,side):
@@ -195,10 +195,11 @@ class TradingPlan:
 		for i in range(shares):
 			self.holdings.append(price)
 
+		self.adjusting_risk()
+		
 		if self.data[AVERAGE_PRICE]!=self.data[LAST_AVERAGE_PRICE]:
 			self.management_plan.update_on_loadingup()
-			self.adjusting_risk()
-
+			
 			print(self.symbol_name," ",side,",",self.data[AVERAGE_PRICE]," at ",self.data[CURRENT_SHARE],"act risk:",self.data[ACTRISK])
 
 		self.data[LAST_AVERAGE_PRICE] = self.data[AVERAGE_PRICE]
@@ -234,7 +235,7 @@ class TradingPlan:
 		#finish a trade if current share is 0.
 
 		if self.data[CURRENT_SHARE] <= 0:
-			self.tkvars[MIND].set("Trade completed.")
+			
 			self.clear_trade()
 
 	def clear_trade(self):
@@ -247,7 +248,7 @@ class TradingPlan:
 		self.data[REALIZED] = 0
 		#mark it done.
 		self.mark_algo_status(DONE)
-
+		self.set_mind("Trade completed.",VERYLIGHTGREEN)
 		self.data[POSITION] = ""
 		self.data[TARGET_SHARE] = 0
 		self.tkvars[POSITION].set("")
@@ -261,7 +262,6 @@ class TradingPlan:
 			self.tkvars[RELOAD].set(False)
 			self.start_tradingplan()
 			
-
 	def ppro_order_rejection(self):
 
 		self.mark_algo_status(REJECTED)
@@ -292,7 +292,7 @@ class TradingPlan:
 
 		if self.tkvars[STATUS].get()==PENDING:
 			self.cancel_algo()
-			
+
 	"""	UI related  """
 	def update_symbol_tkvar(self):
 		self.tkvars[SUPPORT].set(self.symbol.get_support())
@@ -385,6 +385,11 @@ class TradingPlan:
 		# 	if self.order_tkstring[id_]["algo_status"].get() == "Pending":
 		# 		self.order_tkstring[id_]["algo_status"].set(status)
 
+	def set_mind(self,str,color=DEFAULT):
+
+		self.tkvars[MIND].set(str)
+		self.tklabels[MIND]["background"]=color
+
 	""" DATA MANAGEMENT  """
 	
 	def get_risk(self):
@@ -393,9 +398,7 @@ class TradingPlan:
 	def get_data(self):
 		return self.data
 
-
 	""" Deployment initialization """
-
 
 	def input_lock(self,lock):
 
@@ -408,7 +411,6 @@ class TradingPlan:
 		self.tklabels[TIMER]["state"] = state
 		self.tklabels[MANAGEMENTPLAN]["state"] = state
 		self.tklabels[AUTORANGE]["state"] = state
-
 
 	def cancel_algo(self):
 		if self.tkvars[STATUS].get()==PENDING:
@@ -425,13 +427,13 @@ class TradingPlan:
 
 		if self.tkvars[STATUS].get() ==PENDING:
 
-
 			try:
 				entryplan=self.tkvars[ENTRYPLAN].get()
 				entry_type=self.tkvars[ENTYPE].get()
 				entrytimer=int(self.tkvars[TIMER].get())
 				manage_plan =self.tkvars[MANAGEMENTPLAN].get()
 
+				self.set_mind("",DEFAULT)
 				self.entry_plan_decoder(entryplan, entry_type, entrytimer)
 				self.manage_plan_decoder(manage_plan)
 
@@ -492,7 +494,6 @@ class TradingPlan:
 		self.management_plan.set_symbol(self.symbol,self)		
 		self.data[MANAGEMENTPLAN] = management_plan.get_name()
 
-
 	def on_finish(self,plan):
 		
 		if plan==self.entry_plan:
@@ -510,7 +511,6 @@ class TradingPlan:
 
 		self.management_plan.update_on_start()
 		self.current_running_strategy = self.management_plan
-
 
 	def management_strategy_done(self):
 

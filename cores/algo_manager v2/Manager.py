@@ -200,7 +200,7 @@ class Manager:
 			now = datetime.now()
 			ts = now.hour*3600 + now.minute*60 + now.second
 			remain = timestamp - ts
-			print(timestamp,ts)
+			#print(timestamp,ts)
 			minute = remain//60
 			seconds = remain%60
 
@@ -413,6 +413,7 @@ class Tester:
 				print(d)
 				type_ = d[0]
 
+				time.sleep(1)
 				if type_ == "Buy":
 
 					symbol = d[1]
@@ -457,10 +458,6 @@ class Tester:
 					data["timestamp"]= self.sec
 					self.ppro.send(["order confirm",data])
 
-				elif type_ == "Register":
-
-					symbol = d[1]
-					register(symbol,port)
 
 				elif type_ == "Flatten":
 

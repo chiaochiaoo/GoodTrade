@@ -129,6 +129,7 @@ class AbstractTrigger:
 		return self.is_trigger()
 
 	def is_trigger(self):
+
 		self.trigger_count+=1
 		self.trigger_event()
 		if self.trigger_count == self.trigger_limit:
@@ -262,7 +263,6 @@ class Purchase_trigger(AbstractTrigger):
 			print("unidentified side. ")
 
 
-
 		self.tradingplan.update_displays()
 
 	def shares_calculator(self):
@@ -285,8 +285,6 @@ class Purchase_trigger(AbstractTrigger):
 
 		return int(shares/self.trigger_limit)
 
-
-
 class Three_price_trigger(AbstractTrigger):
 	#Special type of trigger, overwrites action part. everything else is generic.
 	def __init__(self,description,ppro_out):
@@ -307,8 +305,9 @@ class Three_price_trigger(AbstractTrigger):
 		elif self.tradingplan.data[POSITION] == SHORT:
 			self.conditions = [[SYMBOL_DATA,BID,"<",TP_DATA,level]]
 
-		if self.tradingplan.data[POSITION]!="" and self.tradingplan.data[CURRENT_SHARE]>0:
-			super().check_conditions()
+		#if self.tradingplan.data[POSITION]!="" and self.tradingplan.data[CURRENT_SHARE]>0:
+		if self.tradingplan.data[POSITION]!="":
+			return(super().check_conditions())
 	#add the actual stuff here.
 	def trigger_event(self):
 
@@ -317,22 +316,36 @@ class Three_price_trigger(AbstractTrigger):
 		self.pos = self.tradingplan.data[POSITION]
 		#print("Trigger: Purchase PPRO EVENT: ",self.symbol_name,s,share,"at","stop:",self.stop,self.symbol_data[self.stop],self.symbol.get_time())
 
-		if self.pos == LONG:
-			if self.tradingplan.current_price_level == 3:
-				self.ppro_out.send([FLATTEN,self.symbol_name])
-			else:
-				if share>0:
-					self.ppro_out.send([SELL,self.symbol_name,share,self.description])
+		####################  SIDE.  ########################################
+		action = ""
+		if self.pos ==LONG:
+			action = SELL
 		elif self.pos ==SHORT:
+			action = BUY
+
+		if action !="":
+			if self.tradingplan.current_price_level == 1:
+				self.ppro_out.send([action,self.symbol_name,share,self.description])
+
+				#half way.
+				half_way = round((self.tradingplan.data[STOP_LEVEL] + self.tradingplan.data[AVERAGE_PRICE])/2,2)
+				self.tradingplan.data[STOP_LEVEL]=half_way
+				self.tradingplan.tkvars[STOP_LEVEL].set(half_way)
+
+			if self.tradingplan.current_price_level == 2:
+				self.ppro_out.send([action,self.symbol_name,share,self.description])
+				self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[AVERAGE_PRICE]
+				self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[AVERAGE_PRICE])
+				#move the stop to break even.
+
 			if self.tradingplan.current_price_level == 3:
-				self.ppro_out.send(["Flatten",self.symbol_name])
-			else:
-				if share>0:
-					self.ppro_out.send([BUY,self.symbol_name,share,self.description])
+				self.ppro_out.send([action,self.symbol_name,self.tradingplan.data[CURRENT_SHARE],"manage "])
+
+				#move the stop to first price level. 
 		else:
 			print("unidentified side. ")
 
-		print(self.symbol_name," Hit price target", self.tradingplan.current_price_level,"New target:","New Stop:")
+		print(self.symbol_name," Hit price target", self.tradingplan.current_price_level,"New Stop:",self.tradingplan.data[STOP_LEVEL])
 		self.set_mind("Covered No."+str(self.tradingplan.current_price_level)+" lot.",GREEN)
 		self.tradingplan.current_price_level+=1
 		self.tradingplan.update_displays()
