@@ -50,6 +50,7 @@ class scanner(pannel):
 
 		self.update_in_progress = False
 
+		self.nasdaq_is_working_on_it = False
 		self.add_amount = tk.StringVar(self.tab2)
 		self.add_choices = {'Top 5','Top 10','Top 20','Top 50','All'}
 		self.add_amount.set('Top 5') 
@@ -815,49 +816,54 @@ class scanner(pannel):
 		print("receive new data")
 
 		try:
-			self.nasdaq_trader_symbols = []
-			
-			timestamp = df[2]
-			df = df[1]
+			if self.nasdaq_is_working_on_it==False:
 
-			#df = df[df.market =='NQ'][:20].copy()
+				self.nasdaq_is_working_on_it = True
+				self.nasdaq_trader_symbols = []
+				
+				timestamp = df[2]
+				df = df[1]
 
-			df.loc[df["market"]=='NQ',"market"] = self.market_sort[0]
-			df.loc[df["market"]=='NY',"market"] = self.market_sort[1]
-			df.loc[df["market"]=='AM',"market"] = self.market_sort[2]
+				#df = df[df.market =='NQ'][:20].copy()
 
-			df["close"] = 0
-			df["open"] = 0
-			#registration 
+				df.loc[df["market"]=='NQ',"market"] = self.market_sort[0]
+				df.loc[df["market"]=='NY',"market"] = self.market_sort[1]
+				df.loc[df["market"]=='AM',"market"] = self.market_sort[2]
 
-			self.df = df
+				df["close"] = 0
+				df["open"] = 0
+				#registration 
 
-			for index, row in df.iterrows():
-					if row['symbol'] not in self.symbols_registry:
-						self.data.partial_register(row['symbol'])
+				self.df = df
 
-			#update the SDM data to the PD
+				for index, row in df.iterrows():
+						if row['symbol'] not in self.symbols_registry:
+							self.data.partial_register(row['symbol'])
 
-			self.update_pd()
+				#update the SDM data to the PD
 
-			#update the infos from SDM
+				self.update_pd()
 
-			#call the sort.
-			#check if added.
-			#update. 
-			self.nasdaq_labels_sort()
+				#update the infos from SDM
 
-			if self.nasdaq_trader_created == False:
-				time.sleep(5)
-				self.add_nasdaq_labels_init()
-			else:
-				self.add_nasdaq_labels_update()
+				#call the sort.
+				#check if added.
+				#update. 
+				self.nasdaq_labels_sort()
 
-			self.NT_update_time.set(timestamp)
+				if self.nasdaq_trader_created == False:
+					time.sleep(5)
+					self.add_nasdaq_labels_init()
+				else:
+					self.add_nasdaq_labels_update()
 
-			self.scanner_process_manager.updating_comlete()
+				self.NT_update_time.set(timestamp)
 
+				self.scanner_process_manager.updating_comlete()
+
+				self.nasdaq_is_working_on_it = False
 		except Exception as e:
+			self.nasdaq_is_working_on_it = False
 			print("NT:",e)
 
 	def refresh(self):
