@@ -187,7 +187,7 @@ class TradingPlan:
 
 		self.data[CURRENT_SHARE] = self.data[CURRENT_SHARE] + shares
 
-		if current ==0:
+		if current ==0 or self.data[CURRENT_SHARE]==0:
 			self.data[AVERAGE_PRICE] = round(price,3)
 		else:
 			self.data[AVERAGE_PRICE]= round(((self.data[AVERAGE_PRICE]*current)+(price*shares))/self.data[CURRENT_SHARE],3)
@@ -196,7 +196,7 @@ class TradingPlan:
 			self.holdings.append(price)
 
 		self.adjusting_risk()
-		
+
 		if self.data[AVERAGE_PRICE]!=self.data[LAST_AVERAGE_PRICE]:
 			self.management_plan.update_on_loadingup()
 			
@@ -503,7 +503,7 @@ class TradingPlan:
 			done.start()
 		elif plan==self.management_plan:
 			self.management_strategy_done()
-			print(self.symbol_name,"management strategy completed on ")
+			print(self.symbol_name,"management strategy completed ")
 		else:
 			print("Trading Plan: UNKONW CALL FROM Strategy")
 
