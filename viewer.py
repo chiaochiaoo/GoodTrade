@@ -395,10 +395,10 @@ def utils(scanner_sending_pipe,db_sending_pipe,algo_manager_receive_comm,ulti_re
 		scanner2 = threading.Thread(target=client_scanner,args=(scanner_sending_pipe,),daemon=True)
 		scanner2.start()
 
-		db = threading.Thread(target=multi_processing_database,args=(db_sending_pipe,),daemon=True)
-		db.start()
+		# db = threading.Thread(target=multi_processing_database,args=(db_sending_pipe,),daemon=True)
+		# db.start()
 
-
+		multi_processing_database(db_sending_pipe)
 		# algo_comm = threading.Thread(target=algo_manager_commlink,args=(algo_manager_receive_comm,),daemon=True)
 		# algo_comm.start()
 
@@ -467,7 +467,7 @@ if __name__ == '__main__':
 
 	algo_comm = threading.Thread(target=algo_manager_commlink, args=(algo_manager_receive_comm,),daemon=True)
 	algo_comm.daemon=True
-	algo_comm.start()
+
 	#algo_manager_commlink(algo_manager_receive_comm)
 
 
@@ -487,6 +487,7 @@ if __name__ == '__main__':
 
 	view = viewer(root,s,d,ppro,algo_manager_comm,authen_clientside_comm,algo_manager,util_go)
 	utility.start()
+	algo_comm.start()
 	root.mainloop()
 
 	print("Main process terminated")
