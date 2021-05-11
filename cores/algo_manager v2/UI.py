@@ -75,10 +75,8 @@ class UI(pannel):
 
 		ttk.Label(self.config, text="All Manaplan:",anchor="w").grid(sticky="w",column=1,row=8,padx=10)
 
-
 		self.all_timer = tk.DoubleVar(value=0)
 		tk.Entry(self.config,textvariable=self.all_timer,width=5).grid(sticky="w",column=2,row=5,padx=10)
-
 
 		self.all_enp = tk.StringVar(value=BREAKANY)
 		tk.OptionMenu(self.config, self.all_enp, *sorted(self.entry_plan_options)).grid(sticky="w",column=2,row=6,padx=10)
@@ -89,10 +87,8 @@ class UI(pannel):
 		self.all_mana = tk.StringVar(value=THREE_TARGETS)
 		tk.OptionMenu(self.config, self.all_mana, *sorted(self.management_plan_options)).grid(sticky="w",column=2,row=8,padx=10)
 
-
 		self.algo_deploy = ttk.Button(self.config, text="Apply to selected",command=self.manager.set_selected_tp)#,command=self.manager.set_all_tp)
 		self.algo_deploy.grid(column=1,row=9)
-
 
 		self.algo_deploy = ttk.Button(self.config, text="Apply to all",command=self.manager.set_all_tp)#,command=self.deploy_all_stoporders)
 		self.algo_deploy.grid(column=2,row=9)

@@ -276,12 +276,13 @@ class TradingPlan:
 		else:
 			self.data[ACTRISK] = round(((self.data[STOP_LEVEL]-self.data[AVERAGE_PRICE])*self.data[CURRENT_SHARE]),2)
 
-		diff = self.data[ACTRISK]-self.data[ESTRISK]
-		ratio = diff/self.data[ESTRISK]
-
+		#diff = self.data[ACTRISK]-self.data[ESTRISK]
+		ratio = (self.data[ACTRISK]/self.data[ESTRISK])-0.3#self.data[ESTRISK]/diff
+		if ratio>1.2 : ratio = 1.2
+		if ratio<0 : ratio = 0
 		##change color and change text.
 
-		self.tklabels[RISK_RATIO]["background"] = hexcolor_green_to_red(ratio)
+		self.tklabels[RISK_RATIO]["background"] = hexcolor_red(ratio)
 		self.tkvars[RISK_RATIO].set(str(self.data[ACTRISK])+"/"+str(self.data[ESTRISK]))
 
 		if self.data[CURRENT_SHARE] == 0:
