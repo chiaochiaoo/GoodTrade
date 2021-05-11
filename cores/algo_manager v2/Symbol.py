@@ -79,7 +79,7 @@ class Symbol:
 		if self.init_ts==0:
 			self.init_ts = ts
 
-		if self.tradingplan.data[POSITION]=="":
+		if self.tradingplan.tkvars[STATUS].get()==PENDING:
 
 			if self.seen_low==0 and self.seen_high==0:
 				self.seen_low = bid

@@ -29,8 +29,6 @@ class UI(pannel):
 
 		self.management_plan_options = {NONE,THREE_TARGETS,TRAILING_FIB}
 
-
-
 	def init_HQ_pannel(self):
 
 		self.main_app_status = tk.StringVar()
@@ -92,7 +90,7 @@ class UI(pannel):
 		tk.OptionMenu(self.config, self.all_mana, *sorted(self.management_plan_options)).grid(sticky="w",column=2,row=8,padx=10)
 
 
-		self.algo_deploy = ttk.Button(self.config, text="Apply to selected")#,command=self.manager.set_all_tp)
+		self.algo_deploy = ttk.Button(self.config, text="Apply to selected",command=self.manager.set_selected_tp)#,command=self.manager.set_all_tp)
 		self.algo_deploy.grid(column=1,row=9)
 
 
@@ -115,7 +113,8 @@ class UI(pannel):
 
 
 	def init_pannel(self):
-		self.labels = {"Symbol":10,\
+		self.labels = {"":4,\
+						"Symbol":10,\
 						"Status":10,\
 						"MIND":20,\
 						"EntryPlan":11,\
@@ -167,8 +166,6 @@ class UI(pannel):
 		self.total_u = tk.StringVar()
 		self.total_r = tk.StringVar()
 
-
-
 		self.dev_canvas = tk.Canvas(self.deployment_panel)
 		self.dev_canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
 
@@ -191,6 +188,7 @@ class UI(pannel):
 
 
 		infos = {
+		SELECTED:tradingplan.tkvars[SELECTED],\
 		'Symbol':tradingplan.symbol_name, \
 		STATUS:tradingplan.tkvars[STATUS],\
 		MIND: tradingplan.tkvars[MIND],\
@@ -221,7 +219,7 @@ class UI(pannel):
 
 		info = list(infos.values())
 		labels = list(infos.keys())
-		symbol = info[0]
+		symbol = info[1]
 		self.tklabels[symbol] = {}
 		for j in range(len(info)):
 			#"symbol","algo_status","description","break_at","position","act_r/est_r","stoplevel","average_price","shares","pxtgt1","pxtgt1","pxtgt1","unrealized_pshr","unrealized","realized"
@@ -246,7 +244,7 @@ class UI(pannel):
 
 			elif label_name =="AR" :
 				self.tklabels[symbol][label_name] = tk.Checkbutton(self.deployment_frame,variable=info[j],width=2,command=tradingplan.AR_toggle)
-			elif label_name =="Reload":
+			elif label_name =="Reload" or label_name==SELECTED:
 				self.tklabels[symbol][label_name] = tk.Checkbutton(self.deployment_frame,variable=info[j],width=2)
 
 			elif label_name =="MIND":

@@ -42,7 +42,7 @@ class TradingPlan:
 		self.numeric_labels = [ACTRISK,ESTRISK,CURRENT_SHARE,TARGET_SHARE,AVERAGE_PRICE,LAST_AVERAGE_PRICE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3]
 		self.string_labels = [MIND,STATUS,POSITION,RISK_RATIO,SIZE_IN,ENTRYPLAN,ENTYPE,MANAGEMENTPLAN]
 
-		self.bool_labels= [AUTORANGE,AUTOMANAGE,RELOAD]
+		self.bool_labels= [AUTORANGE,AUTOMANAGE,RELOAD,SELECTED]
 
 		self.init_data(risk,entry_plan,entry_type,manage_plan)
 
@@ -65,6 +65,7 @@ class TradingPlan:
 			self.data[i] = True
 			self.tkvars[i] = tk.BooleanVar(value=True)
 
+		self.tkvars[SELECTED].set(False)
 		#Non String, Non Numeric Value
 
 		#Set some default value
@@ -291,6 +292,7 @@ class TradingPlan:
 
 		if self.tkvars[STATUS].get()==PENDING:
 			self.cancel_algo()
+			
 	"""	UI related  """
 	def update_symbol_tkvar(self):
 		self.tkvars[SUPPORT].set(self.symbol.get_support())

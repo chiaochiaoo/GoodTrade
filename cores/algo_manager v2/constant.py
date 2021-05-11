@@ -25,6 +25,7 @@ OLSTD ='OLstd'
 AUTORANGE = "AR"
 AUTOMANAGE = "AM"
 RELOAD = "reload"
+SELECTED = "selected"
 
 TIMER = "timer"
 ACTRISK="actrisk"

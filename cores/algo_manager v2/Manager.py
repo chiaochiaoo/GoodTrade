@@ -322,6 +322,19 @@ class Manager:
 			d.tkvars[MANAGEMENTPLAN].set(managment)
 			d.tkvars[TIMER].set(timer)
 
+	def set_selected_tp(self):
+
+		timer=self.ui.all_timer.get()
+		ep=self.ui.all_enp.get()
+		et=self.ui.all_ent.get()
+		managment=self.ui.all_mana.get() 
+
+		for d in self.tradingplan.values():
+			if d.tkvars[SELECTED].get()==True:
+				d.tkvars[ENTRYPLAN].set(ep)
+				d.tkvars[ENTYPE].set(et)
+				d.tkvars[MANAGEMENTPLAN].set(managment)
+				d.tkvars[TIMER].set(timer)
 	def deploy_all(self):
 		for d in self.tradingplan.values():
 			d.deploy()
@@ -340,8 +353,6 @@ class Manager:
 	
 
 
-	def set_selected_tp(self):
-		pass
 
 
 class Tester:
