@@ -42,7 +42,6 @@ def hex_to_string(int):
 #1-5 is good 
 def hexcolor_red(level):
 	code = int(510*(level))
-	print(code,"_")
 	if code >255:
 		first_part = code-255
 		return "#FF"+hex_to_string(255-first_part)+"00"
@@ -50,13 +49,13 @@ def hexcolor_red(level):
 		return "#FF"+"FF"+hex_to_string(255-code)
 
 #COLOR CODING TEST
-if __name__ == '__main__':
+# if __name__ == '__main__':
 
-	import tkinter as tk
-	root = tk.Tk() 
+# 	import tkinter as tk
+# 	root = tk.Tk() 
 
-	for i in range(0,13):
+# 	for i in range(0,13):
 
-		tk.Label(text="",background=hexcolor_red(i/10),width=10).grid(column=i,row=1)
+# 		tk.Label(text="",background=hexcolor_red(i/10),width=10).grid(column=i,row=1)
 
-	root.mainloop()
+# 	root.mainloop()

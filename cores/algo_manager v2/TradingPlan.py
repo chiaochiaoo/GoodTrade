@@ -499,9 +499,9 @@ class TradingPlan:
 		
 		if plan==self.entry_plan:
 			print(self.symbol_name,self.entry_plan.get_name()," completed, Management strategy begins.")
-			#self.entry_strategy_done()
-			done = threading.Thread(target=self.entry_strategy_done, daemon=True)
-			done.start()
+			self.entry_strategy_done()
+			# done = threading.Thread(target=self.entry_strategy_done, daemon=True)
+			# done.start()
 		elif plan==self.management_plan:
 			self.management_strategy_done()
 			print(self.symbol_name,"management strategy completed ")
