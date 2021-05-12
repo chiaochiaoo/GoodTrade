@@ -189,6 +189,7 @@ class AbstractTrigger:
 
 	def reactivate(self):
 		self.activation = True
+		self.trigger_count = 0
 		
 	def reset(self):
 		self.triggered = False

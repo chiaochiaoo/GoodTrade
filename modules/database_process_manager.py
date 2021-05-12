@@ -121,18 +121,36 @@ def multi_processing_database(pipe_receive):
 
 		file = "data/"+symbol+"_"+today+".txt"
 
+		success = False
 		if os.path.isfile(file):
 			with open(file) as json_file:
 				data = json.load(json_file)
+				success = True
 			#time.sleep(0.1)
 		else:
-			data = fetch_data(symbol)
-			with open(file, 'w') as outfile:
-				json.dump(data, outfile)
+			fail = 0
+			time.sleep(1.5)
+			while True:
+				try:
+					data = fetch_data(symbol)
+					success = True
+					break
+				except Exception as e:
+					fail +=1
+					print("fetching failure..retrying.",e)
+					time.sleep(1)
+					if fail >=10:
+						break
+
+			if success:
+				with open(file, 'w') as outfile:
+					json.dump(data, outfile)
 
 		#data append the yahooooo data.
-
-		pipe_receive.send(data)
+		if success:
+			pipe_receive.send(data)
+		else:
+			print(symbol,"fetched failed.")
 
 
 def request(req,symbol):
