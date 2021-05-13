@@ -27,7 +27,10 @@ class TradingPlan:
 
 		self.ppro_out = ppro_out
 
-		self.expect_orders = False
+		self.expect_orders = ""
+
+		# self.expect_long = False
+		# self.expect_short = False
 
 		self.flatten_order = False
 
@@ -126,6 +129,8 @@ class TradingPlan:
 		"""
 		PNL, STOP TRIGGER.
 		"""
+
+		print("PNL CHECK ON",self.symbol_name,self.data[POSITION])
 		flatten = False
 		if self.data[POSITION]==LONG:
 			price = bid
@@ -154,8 +159,8 @@ class TradingPlan:
 		
 		print("TP processing:",self.symbol_name,price,shares,side)
 		if self.data[POSITION]=="": # 1. No position.
-
-			if self.expect_orders==True:
+			print(self.expect_orders,side)
+			if self.expect_orders==side:
 				self.ppro_confirm_new_order(price,shares,side)
 			else:
 				print("TP processing: unexpected orders on",self.symbol_name)
@@ -174,6 +179,8 @@ class TradingPlan:
 	def ppro_confirm_new_order(self,price,shares,side):
 
 		"""set the state as running, then load up"""
+
+		print(self.symbol_name,"New order confirmed:",price,shares,side)
 		self.mark_algo_status(RUNNING)
 		self.data[POSITION]=side
 		self.tkvars[POSITION].set(side)
@@ -242,15 +249,21 @@ class TradingPlan:
 
 		self.data[UNREAL] = 0
 		self.data[UNREAL_PSHR] = 0
-		
 		self.data[TOTAL_REALIZED] += self.data[REALIZED]
 		self.data[TOTAL_REALIZED] = round(self.data[TOTAL_REALIZED],2)
 		self.data[REALIZED] = 0
+
+		self.data[TARGET_SHARE] = 0
 		#mark it done.
+
+		#prevent manual conflit.
+		self.expect_orders = ""
+		##################
+
 		self.mark_algo_status(DONE)
 		self.set_mind("Trade completed.",VERYLIGHTGREEN)
 		self.data[POSITION] = ""
-		self.data[TARGET_SHARE] = 0
+
 		self.tkvars[POSITION].set("")
 		self.tklabels[AUTORANGE]["state"] = "normal"
 		self.current_price_level = 0

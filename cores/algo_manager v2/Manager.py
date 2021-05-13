@@ -353,8 +353,6 @@ class Manager:
 	
 
 
-
-
 class Tester:
 
 	def __init__(self,receive_pipe,ppro_in,ppro_out):
@@ -396,7 +394,8 @@ class Tester:
 		tk.Button(self.root ,text="up 1",command=self.price_upx).grid(column=1,row=6)	
 		tk.Button(self.root ,text="down 1",command=self.price_downx).grid(column=2,row=6)	
 
-
+		tk.Button(self.root ,text="add 1 share",command=self.add1).grid(column=1,row=7)	
+		tk.Button(self.root ,text="sub 1 share",command=self.sub1).grid(column=2,row=7)	
 		self.gt.send(["pkg",['New order', [BREAKANY, 'SPY.AM', 413.0, 414.0, 50.0, {'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441}]]])
 
 		time.sleep(1)
@@ -483,6 +482,23 @@ class Tester:
 			except Exception as e:
 				print(e)
 
+	def add1(self):
+		data = {}
+		data["symbol"]= "SPY.AM"
+		data["side"]= LONG
+		data["price"]= float(self.ask)
+		data["shares"]= int(1)
+		data["timestamp"]= self.sec
+		self.ppro.send(["order confirm",data])
+
+	def sub1(self):
+		data = {}
+		data["symbol"]= "SPY.AM"
+		data["side"]= SHORT
+		data["price"]= float(self.ask)
+		data["shares"]= int(1)
+		data["timestamp"]= self.sec
+		self.ppro.send(["order confirm",data])
 
 	def price_changer(self):
 		while True:
@@ -492,7 +508,6 @@ class Tester:
 
 	def price_stay(self):
 		self.change_sum = 0
-
 
 	def time_facotr_1(self):
 		self.wait_time=1

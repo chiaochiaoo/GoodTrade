@@ -190,7 +190,7 @@ class AbstractTrigger:
 	def reactivate(self):
 		self.activation = True
 		self.trigger_count = 0
-		
+
 	def reset(self):
 		self.triggered = False
 		self.trigger_time = 0
@@ -234,7 +234,7 @@ class Purchase_trigger(AbstractTrigger):
 		print(self.symbol_name,"Trigger: ",self.pos,share,"stop :",self.stop,self.symbol_data[self.stop],self.symbol.get_time())
 
 		if self.pos!="":
-			self.tradingplan.expect_orders = True
+			self.tradingplan.expect_orders = self.pos
 			if self.trigger_count!= self.trigger_limit:
 				self.set_mind("Entry: "+str(self.trigger_count)+"/"+str(self.trigger_limit),DEFAULT)
 			else:
@@ -250,13 +250,12 @@ class Purchase_trigger(AbstractTrigger):
 		
 			if share>0:
 				self.ppro_out.send(["Buy",self.symbol_name,share,self.description])
+				
 		elif self.pos ==SHORT:
 
 			self.tradingplan.data[STOP_LEVEL]=self.symbol_data[self.stop]
 			self.tradingplan.tkvars[STOP_LEVEL].set(self.symbol_data[self.stop])
 
-			
-			self.tradingplan.expect_orders = True
 
 			if share>0:
 				self.ppro_out.send(["Sell",self.symbol_name,share,self.description])

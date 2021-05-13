@@ -9,7 +9,7 @@ import requests
 
 class Symbol_data_manager:	
 
-	#if file does not exist, create an empty file. 
+	"""if file does not exist, create an empty file. """
 	def __init__(self):
 
 		if not path.exists("list.txt"):
