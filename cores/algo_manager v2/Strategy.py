@@ -2,6 +2,8 @@ from constant import *
 from Symbol import *
 from Triggers import *
 import sys, inspect
+from Util_functions import *
+
 # "Omnissiah, Omnissiah.
 
 # From the Bleakness of the mind
@@ -82,7 +84,7 @@ class Strategy:
 						break
 			if check:
 				self.current_triggers = i.get_next_triggers() #replace the triggers. 
-				#print(self.current_triggers)
+				#log_print(self.current_triggers)
 				for i in self.current_triggers:
 					i.set_symbol(self.symbol,self.tradingplan,self.ppro_out)
 
@@ -90,10 +92,10 @@ class Strategy:
 					self.on_finish()
 
 		else:
-			print("Strategy: nothing to trigger.")
+			log_print("Strategy: nothing to trigger.")
 
 	def on_finish(self):
-		print(self.strategy_name+" completed")
+		log_print(self.strategy_name+" completed")
 		self.tradingplan.on_finish(self)	
 		self.restart()
 
@@ -178,7 +180,7 @@ class ThreePriceTargets(Strategy):
 		if self.tradingplan.data[POSITION]==LONG:
 			ohv = self.symbol.data[OHAVG]
 			ohs =  self.symbol.data[OHSTD]
-			#print(self.data_list[id_],type(ohv),ohs,type(price))
+			#log_print(self.data_list[id_],type(ohv),ohs,type(price))
 			if ohv!=0:
 				#self.tradingplan[id_][0] = price
 				self.tradingplan.data[PXT1] = round(price+ohv*0.2*coefficient,2)
@@ -196,26 +198,26 @@ class ThreePriceTargets(Strategy):
 				good = True
 				
 		#set the price levels. 
-		#print(id_,"updating price levels.",price,self.price_levels[id_][1],self.price_levels[id_][2],self.price_levels[id_][3])
+		#log_print(id_,"updating price levels.",price,self.price_levels[id_][1],self.price_levels[id_][2],self.price_levels[id_][3])
 		if good:
 			self.tradingplan.tkvars[AUTOMANAGE].set(True)
 			self.tradingplan.tkvars[PXT1].set(self.tradingplan.data[PXT1])
 			self.tradingplan.tkvars[PXT2].set(self.tradingplan.data[PXT2])
 			self.tradingplan.tkvars[PXT3].set(self.tradingplan.data[PXT3])
 
-			print(self.symbol_name,"price target adjusted:",self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
+			log_print(self.symbol_name,"price target adjusted:",self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
 		else:
 			self.tradingplan.tkvars[AUTOMANAGE].set(False)
 
 
-		#print(self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
+		#log_print(self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
 	def update_on_start(self):
 		self.manaTrigger.total_reset()
 		self.tradingplan.current_price_level = 1
 		self.set_mind("")
 # clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
 
-# print(clsmembers)
+# log_print(clsmembers)
 
 # for i in clsmembers:
-# 	print(i)
+# 	log_print(i)

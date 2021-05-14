@@ -1,7 +1,7 @@
 from constant import *
 import tkinter as tk
 #from Triggers import *
-
+from Util_functions import *
 class Symbol:
 
 	#Symbol class tracks every data related to the symbol. Output it in a dictionary form.
@@ -147,7 +147,7 @@ class Symbol:
 			#notify trading plan that price has changed. 
 
 		except Exception as e:
-			print(self.get_name(),"Updating price error :",e)
+			log_print(self.get_name(),"Updating price error :",e)
 
 	def set_phigh(self,v):
 		self.data[PREMARKETHIGH]=v

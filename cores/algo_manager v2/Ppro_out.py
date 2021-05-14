@@ -3,6 +3,7 @@ from tkinter import ttk
 import requests
 import threading 
 from constant import *
+from Util_functions import *
 #Thoughts:
 #Combine PPRO sutff with VOXCOM into one process.
 
@@ -25,7 +26,7 @@ def register(symbol,port):
 
 def register_to_ppro(symbol,status,port):
 
-	#print("Registering",symbol,status)
+	#log_print("Registering",symbol,status)
 	if status == True:
 		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&region=1&feedtype=L1&output=" + str(port)+"&status=on"
 	else:
@@ -38,7 +39,7 @@ def register_to_ppro(symbol,status,port):
 		else:
 			return False
 	except:
-		print("register failed")
+		log_print("register failed")
 		return False
 def flatten_symbol(symbol):
 
@@ -105,12 +106,12 @@ def ppro_request(request,success=None,failure=None,traceid=False,symbol=None,sid
 		r = requests.post(request)
 		if r.status_code ==200:
 			# if success!=None:
-			# 	print(success)
+			# 	log_print(success)
 			if traceid==True:
 				get_order_id(find_between(r.text,"<Content>","</Content>"),symbol,side,pipe)  #need to grab the request id. obtain the order id. assign it to the symbol.the 
 			return True
 		else:
-			print(failure)
+			log_print(failure)
 			#return False
 			failure +=1
 
@@ -126,12 +127,12 @@ def get_order_id(request_number,symbol,side,pipe):
 		r = requests.post(req)
 		if r.status_code ==200:
 			#return id, symbol, and side. 
-			print(symbol,side,"stop id aquired")
+			log_print(symbol,side,"stop id aquired")
 			pipe.send(["new stoporder",[find_between(r.text,"<Content>","</Content>"),symbol,side]])
 			break
 		else:
 			count = count+1
-			print(symbol,side,"get id failed:",count)
+			log_print(symbol,side,"get id failed:",count)
 
 ####need to trace the order number to trace the stop id number. 
 def stoporder_to_market_buy(symbol,price,share,pipe=None):
@@ -139,7 +140,7 @@ def stoporder_to_market_buy(symbol,price,share,pipe=None):
 	price = round(float(price),2)
 	#r = 'localhost:8080/SendSwiftStop?symbol=&ordername=ARCA Buy ARCX Market DAY&shares=&referenceprice=ask&swiftstopprice='
 	r='http://localhost:8080/SendSwiftStop?symbol='+symbol+'&ordername=ARCA%20Buy%20ARCX%20Market%20DAY&shares='+str(share)+'&referenceprice=ask&swiftstopprice='+str(price)
-	#print(r)
+	#log_print(r)
 	sucess='stoporder buy market order success on '+symbol
 	failure="Error stoporder buy market"+symbol
    
@@ -183,7 +184,7 @@ def Ppro_out(pipe,port): #a sperate process. GLOBALLY.
 			d = pipe.recv()
 			type_ = d[0]
 
-			print("PPRO ORDER:",d)
+			log_print("PPRO ORDER:",d)
 			if type_ == BUY:
 
 				symbol = d[1]
@@ -210,10 +211,10 @@ def Ppro_out(pipe,port): #a sperate process. GLOBALLY.
 				flatten_symbol(symbol)
 			else:
 
-				print("Unrecognized ppro command received.")
+				log_print("Unrecognized ppro command received.")
 
 		except Exception as e:
-			print(e)
+			log_print(e)
 
 	# def register(self,symbol):
 	# 	req = threading.Thread(target=self.register_to_ppro, args=(symbol, True,),daemon=True)
@@ -227,7 +228,7 @@ def Ppro_out(pipe,port): #a sperate process. GLOBALLY.
 
 	# def register_to_ppro(self,symbol,status):
 
-	# 	print("Registering",symbol,status)
+	# 	log_print("Registering",symbol,status)
 	# 	if status == True:
 	# 		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&region=1&feedtype=L1&output=" + str(self.port)+"&status=on"
 	# 	else:
@@ -240,7 +241,7 @@ def Ppro_out(pipe,port): #a sperate process. GLOBALLY.
 	# 		else:
 	# 			return False
 	# 	except:
-	# 		print("register failed")
+	# 		log_print("register failed")
 	# 		return False
 
 	# def flatten_symbol(self,symbol,id_=None,status_text=None):

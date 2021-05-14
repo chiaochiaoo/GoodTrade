@@ -110,7 +110,7 @@ class UI(pannel):
 
 	def init_pannel(self):
 		self.labels = {"":4,\
-						"Symbol":10,\
+						"Symbol":8,\
 						"Status":10,\
 						"MIND":20,\
 						"EntryPlan":11,\
@@ -133,7 +133,7 @@ class UI(pannel):
 						"U":8,\
 						"R":8,\
 						"TR":8,\
-						"flatten":10,
+						"flatten":8,
 						"log":5}
 
 		#print(list(self.labels.keys()))
@@ -157,7 +157,7 @@ class UI(pannel):
 		# self.log_panel.place(x=10,y=300,relheight=0.5,width=210)
 
 		self.deployment_panel = ttk.LabelFrame(self.root,text="Algo deployment") 
-		self.deployment_panel.place(x=210,y=10,relheight=0.85,width=1700)
+		self.deployment_panel.place(x=210,y=10,relheight=0.85,width=1650)
 
 		self.total_u = tk.StringVar()
 		self.total_r = tk.StringVar()

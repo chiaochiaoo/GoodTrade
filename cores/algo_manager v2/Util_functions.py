@@ -1,3 +1,25 @@
+from datetime import datetime
+
+def log_print(*args):
+	"""My custom log_print() function."""
+	# Adding new arguments to the log_print function signature 
+	# is probably a bad idea.
+	# Instead consider testing if custom argument keywords
+	# are present in kwargs
+
+	#send this via a pipe to another processor 
+
+	try:
+		f = open("../../algo_logs/"+datetime.now().strftime("%m-%d")+".txt", "a+")
+		time_ = datetime.now().strftime("\n%H:%M:%S : ")
+		listToStr = ' '.join([str(elem) for elem in args])
+		f.write(time_+listToStr)
+		f.close()
+		print(*args)
+	except Exception as e:
+		print(*args,e,"failed to write")
+
+
 def hexcolor_green_to_red(level):
 
 	if level>0:

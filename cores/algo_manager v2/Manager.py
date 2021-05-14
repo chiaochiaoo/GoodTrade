@@ -1,11 +1,3 @@
-from __future__ import print_function
-
-try:
-	import __builtin__
-except ImportError:
-	# Python 3
-	import builtins as __builtin__
-
 from pannel import *
 from tkinter import ttk
 from Symbol import *
@@ -14,6 +6,8 @@ from UI import *
 from Ppro_in import *
 from Ppro_out import *
 from constant import *
+
+from Util_functions import *
 import sys
 import socket
 import pickle
@@ -29,26 +23,6 @@ except:
 	f = open("../../algo_logs/"+datetime.now().strftime("%m-%d")+".txt", "w")
 f.close()
 
-def print(*args, **kwargs):
-	"""My custom print() function."""
-	# Adding new arguments to the print function signature 
-	# is probably a bad idea.
-	# Instead consider testing if custom argument keywords
-	# are present in kwargs
-	try:
-		f = open("../../algo_logs/"+datetime.now().strftime("%m-%d")+".txt", "a+")
-	except:
-		f = open("../../algo_logs/"+datetime.now().strftime("%m-%d")+".txt", "x")
-	try:
-		time_ = datetime.now().strftime("\n%H:%M:%S : ")
-		listToStr = ' '.join([str(elem) for elem in args])
-		f.write(time_+listToStr)
-
-		f.close()
-
-		return __builtin__.print(*args, **kwargs)
-	except:
-		pass
 
 TEST = True
 def algo_manager_voxcom(pipe):
@@ -60,7 +34,7 @@ def algo_manager_voxcom(pipe):
 		PORT = 65499       # The port used by the server
 
 		try:
-			print("Trying to connect to the main application")
+			log_print("Trying to connect to the main application")
 			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			connected = False
 
@@ -70,7 +44,7 @@ def algo_manager_voxcom(pipe):
 					connected = True
 				except:
 					pipe.send(["msg","Disconnected"])
-					print("Cannot connected. Try again in 2 seconds.")
+					log_print("Cannot connected. Try again in 2 seconds.")
 					time.sleep(2)
 
 			connection = True
@@ -97,13 +71,13 @@ def algo_manager_voxcom(pipe):
 				#s.sendall(pickle.dumps(["ids"]))
 				if k!=None:
 					pipe.send(["pkg",k])
-					print("placed:",k[1][1])
+					log_print("placed:",k[1][1])
 					s.send(pickle.dumps(["Algo placed",k[1][1]]))
-			print("Main disconnected")
+			log_print("Main disconnected")
 			pipe.send(["msg","Main disconnected"])
 		except Exception as e:
 			pipe.send(["msg",e])
-			print(e)
+			log_print(e)
 def algo_manager_voxcom2(pipe):
 
 	#tries to establish commuc
@@ -113,7 +87,7 @@ def algo_manager_voxcom2(pipe):
 		PORT = 65499       # The port used by the server
 
 		try:
-			print("Trying to connect to the main application")
+			log_print("Trying to connect to the main application")
 			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			connected = False
 
@@ -124,7 +98,7 @@ def algo_manager_voxcom2(pipe):
 					connected = True
 				except:
 					pipe.send(["msg","Disconnected"])
-					print("Cannot connected. Try again in 3 seconds.")
+					log_print("Cannot connected. Try again in 3 seconds.")
 					time.sleep(3)
 
 			connection = True
@@ -149,18 +123,17 @@ def algo_manager_voxcom2(pipe):
 							k = pickle.loads(b"".join(data))
 							break
 						except Exception as e:
-							print(e)
+							log_print(e)
 				#s.sendall(pickle.dumps(["ids"]))
 				if k!=None:
 					pipe.send(["pkg",k])
-					#print("placed:",k[1][1])
+					#log_print("placed:",k[1][1])
 					s.send(pickle.dumps(["Algo placed",k[1][1]]))
-			print("Main disconnected")
+			log_print("Main disconnected")
 			pipe.send(["msg","Disconnected"])
 		except Exception as e:
 			pipe.send(["msg",e])
-			print(e)
-
+			log_print(e)
 
 def logging(pipe):
 
@@ -168,7 +141,7 @@ def logging(pipe):
 	while True:
 		string = pipe.recv()
 		time_ = datetime.now().strftime("%H:%M:%S")
-		print(string)
+		log_print(string)
 		f.write(time_+" :"+string)
 	f.close()
 
@@ -231,7 +204,7 @@ class Manager:
 			self.symbols.append(symbol)
 			#append it to, UI.
 		else:
-			print("symbols already exists, modifying current parameter.")
+			log_print("symbols already exists, modifying current parameter.")
 
 	def timer(self):
 
@@ -241,12 +214,12 @@ class Manager:
 		#now = datetime.now()
 		timestamp = 34200
 
-		print("timer start")
+		log_print("timer start")
 		while True:
 			now = datetime.now()
 			ts = now.hour*3600 + now.minute*60 + now.second
 			remain = timestamp - ts
-			#print(timestamp,ts)
+			#log_print(timestamp,ts)
 			minute = remain//60
 			seconds = remain%60
 
@@ -255,7 +228,7 @@ class Manager:
 			else:
 				self.ui.algo_timer_string.set(str(seconds)+" seconds")
 			if remain<0:
-				print("Trigger")
+				log_print("Trigger")
 				break
 
 			time.sleep(1)
@@ -277,15 +250,15 @@ class Manager:
 					else:
 						self.ui.main_status["background"] = "red"
 				except Exception as e:
-					print(e)
+					log_print(e)
 			if d[0] =="pkg":
-				print("new package arrived",d)
+				log_print("new package arrived",d)
 
 				if d[1][0] == "New order":
 					#try
 					self.add_new_tradingplan(d[1][1],self.test_mode)
 					#except:
-					#	print("adding con porra")
+					#	log_print("adding con porra")
 
 	def ppro_order_confirmation(self,data):
 
@@ -295,17 +268,17 @@ class Manager:
 		side = data["side"]
 
 		if symbol in self.tradingplan:
-			print("order",symbol,"side:",side,"shares",shares,"price",price)
+			log_print("order",symbol,"side:",side,"shares",shares,"price",price)
 
 			self.tradingplan[symbol].ppro_process_orders(price,shares,side)
 		else:
-			print("irrelavant orders detected,",symbol,shares,side)
+			log_print("irrelavant orders detected,",symbol,shares,side)
 
 	def ppro_in(self):
 		while True:
 			d = self.pipe_ppro_in.recv()
 
-			#print("Ppro in:",d)
+			#log_print("Ppro in:",d)
 
 			if d[0] =="status":
 				
@@ -317,10 +290,10 @@ class Manager:
 					else:
 						self.ui.ppro_status_["background"] = "red"
 				except Exception as e:
-					print(e)
+					log_print(e)
 
 			if d[0] =="msg":
-				print(d[1])
+				log_print(d[1])
 
 			if d[0] =="order confirm":
 
@@ -334,7 +307,7 @@ class Manager:
 					self.tradingplan[symbol].ppro_process_orders(price,shares,side)
 
 				#if TEST:
-					#print(self.tradingplan[symbol].data)
+					#log_print(self.tradingplan[symbol].data)
 
 			if d[0] =="order update":
 				data = d[1]
@@ -397,8 +370,6 @@ class Manager:
 		for d in self.tradingplan.values():
 			d.cancel_algo()
 	
-
-
 class Tester:
 
 	def __init__(self,receive_pipe,ppro_in,ppro_out):
@@ -455,7 +426,7 @@ class Tester:
 		while True:
 			try:
 				d = self.ppro_out.recv()
-				print(d)
+				log_print(d)
 				type_ = d[0]
 
 				time.sleep(1)
@@ -526,7 +497,7 @@ class Tester:
 					self.share = 0
 					self.pos =""
 			except Exception as e:
-				print(e)
+				log_print(e)
 
 	def add1(self):
 		data = {}
@@ -600,7 +571,6 @@ class Tester:
 
 		data["timestamp"]= self.sec
 		self.ppro.send(["order update",data])
-
 
 
 if __name__ == '__main__':

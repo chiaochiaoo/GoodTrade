@@ -3,6 +3,7 @@ import requests
 import socket
 import threading
 from constant import *
+from Util_functions import *
 
 def Ppro_in(port,pipe):
 
@@ -15,7 +16,7 @@ def Ppro_in(port,pipe):
 	ppro_conn = threading.Thread(target=ppro_connection_service,args=(pipe,port), daemon=True)
 	ppro_conn.start()
 
-	print("Socket Created:",sock)
+	log_print("Socket Created:",sock)
 	
 	work=False
 	pipe.send(["msg","algo_ppro working"])
@@ -41,15 +42,15 @@ def ppro_connection_service(pipe,port):
 		if test_register():
 			pipe.send(["status","Connected"])
 			if state == False:
-				print("Ppro connected. Registering OSTAT")
+				log_print("Ppro connected. Registering OSTAT")
 				i = 3
 				while i >0:
 					if register_order_listener(port):
-						print("OSTAT registered")
+						log_print("OSTAT registered")
 						state = True
 						break
 					else:
-						print("OSTAT registeration failed")
+						log_print("OSTAT registeration failed")
 					i-=1 
 		else:
 			pipe.send(["status","Disconnected"])
@@ -59,8 +60,8 @@ def test_register():
 	try:
 		p="http://localhost:8080/Register?symbol=QQQ.NQ&feedtype=L1"
 		r= requests.get(p)
-		#print(r.status_code)
-		#print(r)
+		#log_print(r.status_code)
+		#log_print(r)
 		if r.status_code==200:
 			return True
 		else:
@@ -72,7 +73,7 @@ def test_register():
 
 
 	except:
-		print("register failed")
+		log_print("register failed")
 		return False
 
 def timestamp_seconds(s):
@@ -82,7 +83,7 @@ def timestamp_seconds(s):
 		x = int(p[0])*3600+int(p[1])*60+int(p[2])
 		return x
 	except Exception as e:
-		print("Timestamp conversion error:",e,s)
+		log_print("Timestamp conversion error:",e,s)
 		return 0
 def find_between(data, first, last):
 	try:
@@ -103,12 +104,12 @@ def register_order_listener(port):
 		else:
 			return False
 	except:
-		print("register failed")
+		log_print("register failed")
 		return False
 
 def decode_order(stream_data,pipe):
 	if "OrderState" in stream_data:
-		#print(stream_data)
+		#log_print(stream_data)
 		state = find_between(stream_data, "OrderState=", ",")
 		if state =="Filled" or state =="Partially Filled":
 			symbol = find_between(stream_data, "Symbol=", ",")
@@ -158,4 +159,4 @@ def decode_l1(stream_data,pipe):
 	pipe.send(["order update",data])
 
 # x= "LocalTime=15:56:54.742,Message=OrderStatus,MarketDateTime=20210504-15:56:55.000,Currency=1,Symbol=QQQ.NQ,Gateway=2030,Side=T,OrderNumber=QIAOSUN_02000326M1791F8100000,Price=329.540000,Shares=70,Position=4,OrderState=Filled,CurrencyChargeGway=1,ChargeGway=0.21000,CurrencyChargeAct=1,ChargeAct=0.0096600,CurrencyChargeSec=1,ChargeSec=0.47750,CurrencyChargeExec=0,ChargeExec=0,CurrencyChargeClr=1,ChargeClr=0.012950,OrderFlags=129,CurrencyCharge=1,Account=1TRUENV001TNVQIAOSUN_USD1,InfoCode=255,InfoText=LiqFlags:^Tag30:14^Tag31:329.5400000^Tag150:2^Tag9730:"
-# print(find_between(x, "MarketDateTime=", ",")[9:-4])
+# log_print(find_between(x, "MarketDateTime=", ",")[9:-4])

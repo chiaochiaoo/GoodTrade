@@ -96,7 +96,7 @@ class TradingPlan:
 			self.symbol.set_resistence(self.tkvars[RESISTENCE].get())
 			self.symbol.set_support(self.tkvars[SUPPORT].get())
 		except Exception as e:
-			print(self.symbol_name,"error on sup/res input.",e)
+			log_print(self.symbol_name,"error on sup/res input.",e)
 
 	def AR_toggle(self):
 		try:
@@ -123,14 +123,14 @@ class TradingPlan:
 			if self.current_running_strategy!=None:
 				self.current_running_strategy.update()
 		# except Exception as e:
-		# 	print("TP issue:",e)
+		# 	log_print("TP issue:",e)
 
 	def check_pnl(self,bid,ask):
 		"""
 		PNL, STOP TRIGGER.
 		"""
 
-		#print("PNL CHECK ON",self.symbol_name,self.data[POSITION])
+		#log_print("PNL CHECK ON",self.symbol_name,self.data[POSITION])
 		flatten = False
 		if self.data[POSITION]==LONG:
 			price = bid
@@ -157,12 +157,12 @@ class TradingPlan:
 
 	def ppro_process_orders(self,price,shares,side):
 		
-		print("TP processing:",self.symbol_name,price,shares,side)
+		log_print("TP processing:",self.symbol_name,price,shares,side)
 		if self.data[POSITION]=="": # 1. No position.
 			if self.expect_orders==side:
 				self.ppro_confirm_new_order(price,shares,side)
 			else:
-				print("TP processing: unexpected orders on",self.symbol_name)
+				log_print("TP processing: unexpected orders on",self.symbol_name)
 		
 		else:  # 2. Have position. 
 
@@ -172,14 +172,14 @@ class TradingPlan:
 				self.ppro_orders_loadoff(price,shares,side)
 
 		# if self.test_mode:
-		# 	print("TP processing:",self.data)
+		# 	log_print("TP processing:",self.data)
 		self.update_displays()
 
 	def ppro_confirm_new_order(self,price,shares,side):
 
 		"""set the state as running, then load up"""
 
-		print(self.symbol_name,"New order confirmed:",price,shares,side)
+		log_print(self.symbol_name,"New order confirmed:",price,shares,side)
 		self.mark_algo_status(RUNNING)
 		self.data[POSITION]=side
 		self.tkvars[POSITION].set(side)
@@ -206,7 +206,7 @@ class TradingPlan:
 		if self.data[AVERAGE_PRICE]!=self.data[LAST_AVERAGE_PRICE]:
 			self.management_plan.update_on_loadingup()
 			
-			print(self.symbol_name," ",side,",",self.data[AVERAGE_PRICE]," at ",self.data[CURRENT_SHARE],"act risk:",self.data[ACTRISK])
+			log_print(self.symbol_name," ",side,",",self.data[AVERAGE_PRICE]," at ",self.data[CURRENT_SHARE],"act risk:",self.data[ACTRISK])
 
 		self.data[LAST_AVERAGE_PRICE] = self.data[AVERAGE_PRICE]
 
@@ -223,20 +223,20 @@ class TradingPlan:
 				try:
 					gain += price-self.holdings.pop()
 				except:
-					print("TP processing: Holding calculation error,holdings are empty.")
+					log_print("TP processing: Holding calculation error,holdings are empty.")
 		elif self.data[POSITION] == SHORT:
 			for i in range(shares):
 				try:
 					gain += self.holdings.pop() - price	
 				except:
-					print("TP processing: Holding calculation error,holdings are empty.")	
+					log_print("TP processing: Holding calculation error,holdings are empty.")	
 
 		self.data[REALIZED]+=gain
 		self.data[REALIZED]= round(self.data[REALIZED],2)
 
 		self.adjusting_risk()
 
-		print(self.symbol_name," sold:",shares," current shares:",self.data[CURRENT_SHARE],"realized:",self.data[REALIZED])
+		log_print(self.symbol_name," sold:",shares," current shares:",self.data[CURRENT_SHARE],"realized:",self.data[REALIZED])
 
 		#finish a trade if current share is 0.
 
@@ -270,7 +270,7 @@ class TradingPlan:
 
 		#if reload is on, revert it back to entry stage. 
 		if self.tkvars[RELOAD].get() == True:
-			print("TP processing:",self.symbol_name,":"," Reload ativado. Trading triggers re-initialized. ")
+			log_print("TP processing:",self.symbol_name,":"," Reload ativado. Trading triggers re-initialized. ")
 			self.tkvars[RELOAD].set(False)
 			self.start_tradingplan()
 			
@@ -434,7 +434,7 @@ class TradingPlan:
 			self.mark_algo_status(PENDING)
 			self.stop_tradingplan()
 		else:
-			print("cannot cancel, holding positions.")
+			log_print("cannot cancel, holding positions.")
 
 	def deploy(self):
 
@@ -450,12 +450,12 @@ class TradingPlan:
 				self.entry_plan_decoder(entryplan, entry_type, entrytimer)
 				self.manage_plan_decoder(manage_plan)
 
-				print("Deploying:",self.symbol_name,self.entry_plan.get_name(),entry_type,entrytimer,self.management_plan.get_name())
+				log_print("Deploying:",self.symbol_name,self.entry_plan.get_name(),entry_type,entrytimer,self.management_plan.get_name())
 				self.AR_toggle_check()
 				self.start_tradingplan()
 			except Exception as e:
 
-				print("Deplying Error:",self.symbol_name,e)
+				log_print("Deplying Error:",self.symbol_name,e)
 	
 	def start_tradingplan(self):
 		self.mark_algo_status(DEPLOYED)
@@ -487,7 +487,7 @@ class TradingPlan:
 		elif entry_plan == BULLISH:
 			self.set_EntryStrategy(BreakAny(entrytimer,instant,self.symbol,self))
 		else:
-			print("unkown plan")
+			log_print("unkown plan")
 
 	def manage_plan_decoder(self,manage_plan):
 
@@ -510,15 +510,15 @@ class TradingPlan:
 	def on_finish(self,plan):
 		
 		if plan==self.entry_plan:
-			print(self.symbol_name,self.entry_plan.get_name()," completed, Management strategy begins.")
+			log_print(self.symbol_name,self.entry_plan.get_name()," completed, Management strategy begins.")
 			self.entry_strategy_done()
 			# done = threading.Thread(target=self.entry_strategy_done, daemon=True)
 			# done.start()
 		elif plan==self.management_plan:
 			self.management_strategy_done()
-			print(self.symbol_name,"management strategy completed ")
+			log_print(self.symbol_name,"management strategy completed ")
 		else:
-			print("Trading Plan: UNKONW CALL FROM Strategy")
+			log_print("Trading Plan: UNKONW CALL FROM Strategy")
 
 	def entry_strategy_done(self):
 
