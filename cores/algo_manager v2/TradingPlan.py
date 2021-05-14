@@ -159,7 +159,6 @@ class TradingPlan:
 		
 		print("TP processing:",self.symbol_name,price,shares,side)
 		if self.data[POSITION]=="": # 1. No position.
-			print(self.expect_orders,side)
 			if self.expect_orders==side:
 				self.ppro_confirm_new_order(price,shares,side)
 			else:
