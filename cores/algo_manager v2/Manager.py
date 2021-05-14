@@ -1,3 +1,11 @@
+from __future__ import print_function
+
+try:
+	import __builtin__
+except ImportError:
+	# Python 3
+	import builtins as __builtin__
+
 from pannel import *
 from tkinter import ttk
 from Symbol import *
@@ -5,7 +13,7 @@ from TradingPlan import *
 from UI import *
 from Ppro_in import *
 from Ppro_out import *
-
+from constant import *
 import sys
 import socket
 import pickle
@@ -14,6 +22,33 @@ import multiprocessing
 import requests
 from datetime import datetime
 #May this class bless by the Deus Mechanicus.
+
+try:
+	f = open("../../algo_logs/"+datetime.now().strftime("%m-%d")+".txt", "x")
+except:
+	f = open("../../algo_logs/"+datetime.now().strftime("%m-%d")+".txt", "w")
+f.close()
+
+def print(*args, **kwargs):
+	"""My custom print() function."""
+	# Adding new arguments to the print function signature 
+	# is probably a bad idea.
+	# Instead consider testing if custom argument keywords
+	# are present in kwargs
+	try:
+		f = open("../../algo_logs/"+datetime.now().strftime("%m-%d")+".txt", "a+")
+	except:
+		f = open("../../algo_logs/"+datetime.now().strftime("%m-%d")+".txt", "x")
+	try:
+		time_ = datetime.now().strftime("\n%H:%M:%S : ")
+		listToStr = ' '.join([str(elem) for elem in args])
+		f.write(time_+listToStr)
+
+		f.close()
+
+		return __builtin__.print(*args, **kwargs)
+	except:
+		pass
 
 TEST = True
 def algo_manager_voxcom(pipe):
@@ -125,6 +160,17 @@ def algo_manager_voxcom2(pipe):
 		except Exception as e:
 			pipe.send(["msg",e])
 			print(e)
+
+
+def logging(pipe):
+
+	f = open(datetime.now().strftime("%d/%m")+".txt", "w")
+	while True:
+		string = pipe.recv()
+		time_ = datetime.now().strftime("%H:%M:%S")
+		print(string)
+		f.write(time_+" :"+string)
+	f.close()
 
 class Manager:
 
