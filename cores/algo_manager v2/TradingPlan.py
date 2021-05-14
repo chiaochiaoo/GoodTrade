@@ -130,7 +130,7 @@ class TradingPlan:
 		PNL, STOP TRIGGER.
 		"""
 
-		print("PNL CHECK ON",self.symbol_name,self.data[POSITION])
+		#print("PNL CHECK ON",self.symbol_name,self.data[POSITION])
 		flatten = False
 		if self.data[POSITION]==LONG:
 			price = bid
