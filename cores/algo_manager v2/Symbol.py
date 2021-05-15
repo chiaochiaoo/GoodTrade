@@ -115,36 +115,41 @@ class Symbol:
 
 		try:
 
-			if AR==True and pos==PENDING and ts<34200:
-				if ask>self.data[RESISTENCE]:
-					self.data[RESISTENCE]=ask
-				if self.data[SUPPORT] == 0:
-					self.data[SUPPORT] = bid
-				if bid<self.data[SUPPORT]:
-					self.data[SUPPORT] = bid
-				self.tradingplan.update_symbol_tkvar()
+			if self.data[BID]!= bid and self.data[ASK]!=ask:
+				
 
-			#print(self.data)
-			#34200 openning.
+				if AR==True and pos==PENDING and ts<34200:
+					if ask>self.data[RESISTENCE]:
+						self.data[RESISTENCE]=ask
+					if self.data[SUPPORT] == 0:
+						self.data[SUPPORT] = bid
+					if bid<self.data[SUPPORT]:
+						self.data[SUPPORT] = bid
+					self.tradingplan.update_symbol_tkvar()
 
-			# if self.data[HIGH]==0:
-			# 	self.data[HIGH] = ask
-			# if self.data[LOW] ==0:
-			# 	self.data[LOW] = bid 
+				#print(self.data)
+				#34200 openning.
 
-			# if self.data[ASK]>self.data[HIGH]:
-			# 	self.data[HIGH] = self.data[ASK]
-			# if self.data[BID]<self.data[LOW] or self.data[LOW]==0:
-			# 	self.data[LOW]= self.data[BID]
+				if self.data[HIGH]==0:
+					self.data[HIGH] = ask
+				if self.data[LOW] ==0:
+					self.data[LOW] = bid 
 
-			#print("sy",self.ask,self.high,self.output)
+				if self.data[ASK]>self.data[HIGH]:
+					self.data[HIGH] = self.data[ASK]
+				if self.data[BID]<self.data[LOW]:
+					self.data[LOW]= self.data[BID]
 
-			self.data[BID] = bid
-			self.data[ASK] = ask
-			self.data[TIMESTAMP] = ts
+				#print("sy",self.ask,self.high,self.output)
 
-			self.false_range_detection(bid,ask,ts)
-			#notify trading plan that price has changed. 
+				self.data[BID] = bid
+				self.data[ASK] = ask
+				self.data[TIMESTAMP] = ts
+
+				self.false_range_detection(bid,ask,ts)
+
+				print(self.data)
+				#notify trading plan that price has changed. 
 
 		except Exception as e:
 			log_print(self.get_name(),"Updating price error :",e)

@@ -127,6 +127,7 @@ class Strategy:
 		pass
 
 
+"""ENTRY PLAN"""
 class BreakUp(Strategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry. 
 	def __init__(self,timer,repeat,symbol,tradingplan):
 		super().__init__("Entry : Break up",symbol,tradingplan)
@@ -157,7 +158,37 @@ class BreakAny(Strategy):
 		self.add_initial_triggers(buyTrigger)
 		self.add_initial_triggers(sellTrigger)
 
+class Bullish(Strategy):
+	def __init__(self,timer,repeat,symbol,tradingplan):
 
+		super().__init__("Entry :Bullish",symbol,tradingplan)
+		#description,trigger_timer:int,trigger_limit=1
+		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
+		buyTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
+
+
+		#self,description,trigger_timer:int,trigger_limit
+		transitional_trigger = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],0,1,"Waiting for long reversal")
+		buyreversalTrigger = Purchase_trigger([[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],LOW,self.risk,"buy reversal",timer,repeat,LONG,self.ppro_out)
+		
+		transitional_trigger.add_next_trigger(buyreversalTrigger)
+
+		self.add_initial_triggers(buyTrigger)
+		self.add_initial_triggers(transitional_trigger)
+
+class DipBuyer(Strategy):
+	def __init__(self,timer,repeat,symbol,tradingplan):
+
+		super().__init__("Entry :Bullish",symbol,tradingplan)
+		#description,trigger_timer:int,trigger_limit=1
+		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
+		buyTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
+		sellTrigger = Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
+
+		self.add_initial_triggers(buyTrigger)
+		self.add_initial_triggers(sellTrigger)
+
+""" MANAGEMENT PLAN"""
 class ThreePriceTargets(Strategy):
 
 	def __init__(self,symbol,tradingplan):

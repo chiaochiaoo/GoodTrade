@@ -485,7 +485,7 @@ class TradingPlan:
 		elif entry_plan == BREAISH:
 			self.set_EntryStrategy(BreakAny(entrytimer,instant,self.symbol,self))
 		elif entry_plan == BULLISH:
-			self.set_EntryStrategy(BreakAny(entrytimer,instant,self.symbol,self))
+			self.set_EntryStrategy(Bullish(entrytimer,instant,self.symbol,self))
 		else:
 			log_print("unkown plan")
 

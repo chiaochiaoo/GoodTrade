@@ -413,7 +413,7 @@ class Tester:
 
 		tk.Button(self.root ,text="add 1 share",command=self.add1).grid(column=1,row=7)	
 		tk.Button(self.root ,text="sub 1 share",command=self.sub1).grid(column=2,row=7)	
-		self.gt.send(["pkg",['New order', [BREAKANY, 'SPY.AM', 413.0, 414.0, 50.0, {'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441}]]])
+		self.gt.send(["pkg",['New order', [BREAKANY, 'SPY.AM', 412.5, 413.5, 50.0, {'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441}]]])
 
 		time.sleep(1)
 		wish_granter = threading.Thread(target=self.wish, daemon=True)
@@ -563,11 +563,11 @@ class Tester:
 		data={}
 		data["symbol"]= "SPY.AM"
 
-		self.bid = round(float(self.price.get()-0.05),2)
-		self.ask = round(float(self.price.get()+0.05),2)
+		self.bid = round(float(self.price.get()-0.01),2)
+		self.ask = round(float(self.price.get()+0.01),2)
 
-		data["bid"]= round(float(self.price.get()-0.05),2)
-		data["ask"]= round(float(self.price.get()+0.05),2)
+		data["bid"]= round(float(self.price.get()-0.01),2)
+		data["ask"]= round(float(self.price.get()+0.01),2)
 
 		data["timestamp"]= self.sec
 		self.ppro.send(["order update",data])
@@ -584,7 +584,7 @@ if __name__ == '__main__':
 
 	algo_voxcom = multiprocessing.Process(target=algo_manager_voxcom, args=(receive_pipe,),daemon=True)
 	algo_voxcom.daemon=True
-	algo_voxcom.start()
+	
 
 	ppro_in, ppro_pipe_end = multiprocessing.Pipe()
 
@@ -607,6 +607,7 @@ if __name__ == '__main__':
 	if len(sys.argv)>1:
 		Tester(receive_pipe,ppro_pipe_end,ppro_pipe_end2)
 	else:
+		algo_voxcom.start()
 		ppro_out_manager.start()
 		ppro_in_manager.start()		
 

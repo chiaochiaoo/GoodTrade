@@ -12,7 +12,7 @@ class AbstractTrigger:
 	4. Return next triggers. 
 
 	"""
-	def __init__(self,description,trigger_timer:int,trigger_limit):
+	def __init__(self,description,conditions,trigger_timer:int,trigger_limit,mind_string=None):
 
 		#self.symbol = symbol
 		#bigger, or less than. 
@@ -35,7 +35,13 @@ class AbstractTrigger:
 		self.trigger_count = 0
 		self.trigger_limit = trigger_limit
 
-		self.conditions = []
+
+		self.mind_string = mind_string
+
+		if conditions!=None:
+			self.conditions = conditions 
+		else:
+			self.conditions = []
 
 		self.next_triggers = set()
 
@@ -85,10 +91,10 @@ class AbstractTrigger:
 				s1,s2,t1,t2,type_= self.decode_conditions(i)
 
 				if type_ ==">":
-					if not s1[t1] >= s2[t2]:
+					if not s1[t1] > s2[t2]:
 						eval = False	
 				elif type_ =="<":
-					if not s1[t1] <= s2[t2]:
+					if not s1[t1] < s2[t2]:
 						eval = False
 
 			if eval ==True:
@@ -142,6 +148,9 @@ class AbstractTrigger:
 			return False 	
 
 	def trigger_event(self):  #OVERRIDEn n 
+
+		if self.mind_string!=None:
+			self.set_mind(self.mind_string) 
 		try:
 			log_print("Trigger:",self.description,"on", self.symbol.get_name(),"at time", self.symbol.get_time())
 		except:
@@ -207,14 +216,14 @@ class AbstractTrigger:
 class Purchase_trigger(AbstractTrigger):
 	#Special type of trigger, overwrites action part. everything else is generic.
 	def __init__(self,conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out):
-		super().__init__(description,trigger_timer,trigger_limit)
+		super().__init__(description,conditions,trigger_timer,trigger_limit)
 
 		#log_print("purchase_trigger,",self.trigger_timer,self.trigger_limit)
 		self.pos = pos
 		self.stop = stop
 		self.ppro_out =ppro_out
 		self.risk = risk 
-		self.conditions = conditions 
+		#self.conditions = conditions 
 
 		self.entry_text =""
 		self.trigger_text = ""
@@ -289,7 +298,7 @@ class Purchase_trigger(AbstractTrigger):
 class Three_price_trigger(AbstractTrigger):
 	#Special type of trigger, overwrites action part. everything else is generic.
 	def __init__(self,description,ppro_out):
-		super().__init__(description,trigger_timer=0,trigger_limit=3)
+		super().__init__(description,None,trigger_timer=0,trigger_limit=3)
 
 		self.ppro_out =ppro_out
 		self.conditions = [] 
