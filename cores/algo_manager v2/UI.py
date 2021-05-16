@@ -25,9 +25,9 @@ class UI(pannel):
 
 		self.entry_type_options = {INSTANT,INCREMENTAL}
 
-		self.entry_plan_options = {BREAISH,BULLISH,BREAKUP,BREAKDOWN,BREAKANY}
+		self.entry_plan_options = {BREAISH,BULLISH,BREAKUP,BREAKDOWN,BREAKANY,RIPSELL,DIPBUY}
 
-		self.management_plan_options = {NONE,THREE_TARGETS,TRAILING_FIB}
+		self.management_plan_options = {THREE_TARGETS,TRAILING_FIB}
 
 	def init_HQ_pannel(self):
 

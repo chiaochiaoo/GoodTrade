@@ -88,6 +88,8 @@ BULLISH =   "  Bullish"
 BREAKUP =   " Break Up"
 BREAKDOWN = " Break Dn"
 BREAKANY =  "Break Any"
+DIPBUY = "Dipbuy"
+RIPSELL = "Ripsell"
 
 #MANA Plan
 NONE =          "NONE"

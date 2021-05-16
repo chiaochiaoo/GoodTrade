@@ -28,7 +28,6 @@ class TradingPlan:
 		self.ppro_out = ppro_out
 
 		self.expect_orders = ""
-
 		# self.expect_long = False
 		# self.expect_short = False
 
@@ -112,7 +111,7 @@ class TradingPlan:
 
 	def ppro_update_price(self,bid,ask,ts):
 
-		if 1:
+		if bid!=self.symbol.get_bid() or ask!=self.symbol.get_ask():
 			self.symbol.update_price(bid,ask,ts,self.tkvars[AUTORANGE].get(),self.tkvars[STATUS].get())
 
 			#check stop. 
@@ -122,6 +121,7 @@ class TradingPlan:
 			#check triggers
 			if self.current_running_strategy!=None:
 				self.current_running_strategy.update()
+
 		# except Exception as e:
 		# 	log_print("TP issue:",e)
 
@@ -483,9 +483,13 @@ class TradingPlan:
 		elif entry_plan == BREAKDOWN:
 			self.set_EntryStrategy(BreakDown(entrytimer,instant,self.symbol,self))
 		elif entry_plan == BREAISH:
-			self.set_EntryStrategy(BreakAny(entrytimer,instant,self.symbol,self))
+			self.set_EntryStrategy(Bearish(entrytimer,instant,self.symbol,self))
 		elif entry_plan == BULLISH:
 			self.set_EntryStrategy(Bullish(entrytimer,instant,self.symbol,self))
+		elif entry_plan == RIPSELL:
+			self.set_EntryStrategy(Ripsell(entrytimer,instant,self.symbol,self))
+		elif entry_plan == DIPBUY:
+			self.set_EntryStrategy(Dipbuy(entrytimer,instant,self.symbol,self))
 		else:
 			log_print("unkown plan")
 

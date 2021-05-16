@@ -114,7 +114,6 @@ class Symbol:
 	def update_price(self,bid,ask,ts,AR,pos):
 
 		try:
-
 			if self.data[BID]!= bid and self.data[ASK]!=ask:
 				
 
