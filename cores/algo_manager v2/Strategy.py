@@ -187,7 +187,7 @@ class Bearish(Strategy):
 		sellTrigger = Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
 
 		#self,description,trigger_timer:int,trigger_limit
-		transitional_trigger = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,RESISTENCE]],0,1,"Waiting for long reversal")
+		transitional_trigger = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,RESISTENCE]],0,1,"Waiting for short reversal")
 		
 		sellreversalTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],HIGH,self.risk,"short reversal",timer,repeat,SHORT,self.ppro_out)
 		
