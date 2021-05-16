@@ -235,7 +235,7 @@ class alert(pannel):
 
 			#trigger type
 			elif j==10:
-				self.trigger_types = {' Break Up',' Break Dn','Break Any',"  Breaish","  Bullish"}
+				self.trigger_types = {' Break Up',' Break Dn','Break Any',"  Breaish","  Bullish","Dipbuy","Ripsell"}
 				format[j].set('Break Any') 
 				self.tickers_labels[i].append(tk.OptionMenu(self.frame, format[j], *sorted(self.trigger_types)))
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
