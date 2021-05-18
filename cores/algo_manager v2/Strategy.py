@@ -166,16 +166,18 @@ class Bullish(Strategy):
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 		buyTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
+		self.add_initial_triggers(buyTrigger)
 
-
-		#self,description,trigger_timer:int,trigger_limit
-		transitional_trigger = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],0,1,"Waiting for long reversal")
+		transitional_trigger = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],0,1,"Waiting for long ")
+		transitional_trigger2 = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],25,1,"Waiting for long ")
 		buyreversalTrigger = Purchase_trigger([[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],LOW,self.risk,"buy reversal",timer,repeat,LONG,self.ppro_out)
 		
-		transitional_trigger.add_next_trigger(buyreversalTrigger)
 
-		self.add_initial_triggers(buyTrigger)
+		transitional_trigger.add_next_trigger(transitional_trigger2)
+		transitional_trigger2.add_next_trigger(buyreversalTrigger)
+
 		self.add_initial_triggers(transitional_trigger)
+
 
 class Bearish(Strategy):
 	def __init__(self,timer,repeat,symbol,tradingplan):
@@ -186,16 +188,19 @@ class Bearish(Strategy):
 		#buyTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
 
 		sellTrigger = Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
-
-		#self,description,trigger_timer:int,trigger_limit
-		transitional_trigger = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,RESISTENCE]],0,1,"Waiting for short reversal")
-		
-		sellreversalTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],HIGH,self.risk,"short reversal",timer,repeat,SHORT,self.ppro_out)
-		
-		transitional_trigger.add_next_trigger(sellreversalTrigger)
-
 		self.add_initial_triggers(sellTrigger)
+
+
+		transitional_trigger = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,RESISTENCE]],0,1,"Waiting for short")
+		transitional_trigger2 = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],25,1,"Waiting for short")
+		sellreversalTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],HIGH,self.risk,"short reversal",30,repeat,SHORT,self.ppro_out)
+
+		transitional_trigger.add_next_trigger(transitional_trigger2)
+		transitional_trigger2.add_next_trigger(sellreversalTrigger)
+
+
 		self.add_initial_triggers(transitional_trigger)
+
 
 
 class Ripsell(Strategy):
@@ -207,10 +212,13 @@ class Ripsell(Strategy):
 
 		#self,description,trigger_timer:int,trigger_limit
 		transitional_trigger = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,RESISTENCE]],0,1,"Waiting for short")
+		transitional_trigger2 = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],25,1,"Waiting for short")
+		sellreversalTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],HIGH,self.risk,"short reversal",30,repeat,SHORT,self.ppro_out)
 		
-		sellreversalTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],HIGH,self.risk,"short reversal",timer,repeat,SHORT,self.ppro_out)
-		
-		transitional_trigger.add_next_trigger(sellreversalTrigger)
+
+		transitional_trigger.add_next_trigger(transitional_trigger2)
+		transitional_trigger2.add_next_trigger(sellreversalTrigger)
+
 
 		self.add_initial_triggers(transitional_trigger)
 
@@ -222,12 +230,47 @@ class Dipbuy(Strategy):
 		super().__init__("Entry :DipBuy",symbol,tradingplan)
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
+
 		transitional_trigger = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],0,1,"Waiting for long ")
+		transitional_trigger2 = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],25,1,"Waiting for long ")
 		buyreversalTrigger = Purchase_trigger([[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],LOW,self.risk,"buy reversal",timer,repeat,LONG,self.ppro_out)
 		
-		transitional_trigger.add_next_trigger(buyreversalTrigger)
+
+		transitional_trigger.add_next_trigger(transitional_trigger2)
+		transitional_trigger2.add_next_trigger(buyreversalTrigger)
 
 		self.add_initial_triggers(transitional_trigger)
+
+
+class Fadeany(Strategy):
+	def __init__(self,timer,repeat,symbol,tradingplan):
+
+		super().__init__("Entry :Fadeany",symbol,tradingplan)
+		#description,trigger_timer:int,trigger_limit=1
+		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
+
+		transitional_trigger = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],0,1,"Waiting for long ")
+		transitional_trigger2 = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],25,1,"Waiting for long ")
+		buyreversalTrigger = Purchase_trigger([[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],LOW,self.risk,"buy reversal",timer,repeat,LONG,self.ppro_out)
+		
+
+		transitional_trigger.add_next_trigger(transitional_trigger2)
+		transitional_trigger2.add_next_trigger(buyreversalTrigger)
+
+		self.add_initial_triggers(transitional_trigger)
+
+		transitional_trigger = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,RESISTENCE]],0,1,"Waiting for short")
+		transitional_trigger2 = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],25,1,"Waiting for short")
+		sellreversalTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],HIGH,self.risk,"short reversal",30,repeat,SHORT,self.ppro_out)
+		
+
+		transitional_trigger.add_next_trigger(transitional_trigger2)
+		transitional_trigger2.add_next_trigger(sellreversalTrigger)
+
+
+		self.add_initial_triggers(transitional_trigger)
+
+
 
 """ MANAGEMENT PLAN"""
 class ThreePriceTargets(Strategy):
@@ -355,8 +398,8 @@ class SmartTrail(Strategy):
 			#log_print(self.data_list[id_],type(ohv),ohs,type(price))
 			if ohv!=0:
 				#self.tradingplan[id_][0] = price
-				self.tradingplan.data[PXT1] = round(price+ohv*0.2*coefficient,2)
-				self.tradingplan.data[PXT2] = round(price+ohv*0.4*coefficient,2) #round(self.tradingplan.data[PXT1]+0.02,2) 
+				self.tradingplan.data[PXT1] = round(price+ohv*0.15*coefficient,2)
+				self.tradingplan.data[PXT2] = round(price+ohv*0.3*coefficient,2) #round(self.tradingplan.data[PXT1]+0.02,2) 
 				self.tradingplan.data[PXT3] = round(price+ohv*10*coefficient,2) #round(self.tradingplan.data[PXT2]+0.02,2) #
 				good = True
 		elif self.tradingplan.data[POSITION]==SHORT:
@@ -364,8 +407,8 @@ class SmartTrail(Strategy):
 			ols = self.symbol.data[OLSTD]
 			if olv!=0:
 				#self.price_levels[id_][0] = price
-				self.tradingplan.data[PXT1] = round(price-olv*0.2*coefficient,2)
-				self.tradingplan.data[PXT2] = round(price-olv*0.4*coefficient,2) #round(self.tradingplan.data[PXT1]-0.02,2)  #
+				self.tradingplan.data[PXT1] = round(price-olv*0.15*coefficient,2)
+				self.tradingplan.data[PXT2] = round(price-olv*0.3*coefficient,2) #round(self.tradingplan.data[PXT1]-0.02,2)  #
 				self.tradingplan.data[PXT3] = round(price-olv*10*coefficient,2) #round(self.tradingplan.data[PXT2]-0.02,2) #
 				good = True
 				

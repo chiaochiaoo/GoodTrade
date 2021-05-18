@@ -83,13 +83,14 @@ INSTANT=      '  Instant'
 INCREMENTAL = 'Incrmntl'
 
 #Entry Plan
-BREAISH =   "  Breaish"
+BREAISH =   "  Bearish"
 BULLISH =   "  Bullish"
 BREAKUP =   " Break Up"
 BREAKDOWN = " Break Dn"
 BREAKANY =  "Break Any"
 DIPBUY = "Dipbuy"
 RIPSELL = "Ripsell"
+FADEANY = "Fade Any"
 
 #MANA Plan
 NONE =          "NONE"
