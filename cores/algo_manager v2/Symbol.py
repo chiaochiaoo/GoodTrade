@@ -147,7 +147,7 @@ class Symbol:
 
 				self.false_range_detection(bid,ask,ts)
 
-				print(self.data)
+				#print(self.data)
 				#notify trading plan that price has changed. 
 
 		except Exception as e:

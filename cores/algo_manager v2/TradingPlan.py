@@ -3,7 +3,7 @@ from Triggers import *
 from Strategy import *
 from constant import*
 from Util_functions import *
-import tkinter as tk
+import tkinter as tkvars
 import time
 import threading
 # MAY THE MACHINE GOD BLESS THY AIM
@@ -270,7 +270,7 @@ class TradingPlan:
 
 		#if reload is on, revert it back to entry stage. 
 		if self.tkvars[RELOAD].get() == True:
-			log_print("TP processing:",self.symbol_name,":"," Reload ativado. Trading triggers re-initialized. ")
+			log_print("TP processing:",self.symbol_name,":"," Reload activated. Trading triggers re-initialized. ")
 			self.tkvars[RELOAD].set(False)
 			self.start_tradingplan()
 			

@@ -1,5 +1,8 @@
 list.txt
 __pycache__/
+algo_logs/
+modules/graphing
+modules/GraphingComponent
 version.txt
 manual/breakout.PNG
 manual/OPENING.PNG
