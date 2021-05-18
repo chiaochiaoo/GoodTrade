@@ -228,6 +228,8 @@ class Purchase_trigger(AbstractTrigger):
 		self.entry_text =""
 		self.trigger_text = ""
 
+		self.stop_price = 0
+
 		checker = False
 		for i in conditions:
 			if len(i)!=5:
@@ -252,8 +254,8 @@ class Purchase_trigger(AbstractTrigger):
 
 		if self.pos == LONG:
 
-			self.tradingplan.data[STOP_LEVEL]=self.symbol_data[self.stop]
-			self.tradingplan.tkvars[STOP_LEVEL].set(self.symbol_data[self.stop])
+			self.tradingplan.data[STOP_LEVEL]=self.stop_price#self.symbol_data[self.stop]
+			self.tradingplan.tkvars[STOP_LEVEL].set(self.stop_price)
 
 			#self.tradingplan.expect_orders = True
 			#log_print("Trigger: Purchase: ",self.symbol_name,self.pos,share,"at",self.symbol.get_time())
@@ -263,8 +265,8 @@ class Purchase_trigger(AbstractTrigger):
 				
 		elif self.pos ==SHORT:
 
-			self.tradingplan.data[STOP_LEVEL]=self.symbol_data[self.stop]
-			self.tradingplan.tkvars[STOP_LEVEL].set(self.symbol_data[self.stop])
+			self.tradingplan.data[STOP_LEVEL]=self.stop_price#self.symbol_data[self.stop]
+			self.tradingplan.tkvars[STOP_LEVEL].set(self.stop_price)
 
 
 			if share>0:
@@ -279,14 +281,41 @@ class Purchase_trigger(AbstractTrigger):
 
 		#Now i need trigger limit into consideration.
 
-		if self.pos ==LONG:
-			risk_per_share =  abs(self.symbol_data[self.stop]-self.symbol_data[ASK])
-		else:
-			risk_per_share =  abs(self.symbol_data[self.stop]-self.symbol_data[BID])
+		# if self.pos ==LONG:
+		# 	risk_per_share =  abs(self.symbol_data[self.stop]-self.symbol_data[ASK])
+		# else:
+		# 	risk_per_share =  abs(self.symbol_data[self.stop]-self.symbol_data[BID])
 
-		if risk_per_share == 0:
+		# if risk_per_share == 0:
+		# 	risk_per_share = 0.1
+
+
+		if self.pos ==LONG:
+			risk_per_share = abs(self.symbol_data[ASK]-self.symbol_data[self.stop])
+
+			self.stop_price = self.symbol_data[self.stop]
+
+			if risk_per_share < self.symbol_data[ASK]*0.0006:
+				log_print(self.symbol_name,": stop too close:",round(risk_per_share,2)," adjusted to",str(round(self.symbol_data[ASK]*0.0006,2)))
+				risk_per_share = self.symbol_data[ASK]*0.0006
+				self.stop_price = round(self.symbol_data[BID] - risk_per_share,2)
+
+		elif self.pos ==SHORT:
+			risk_per_share = abs(self.symbol_data[self.stop]-self.symbol_data[BID])
+			self.stop_price = self.symbol_data[self.stop]
+			if risk_per_share < self.symbol_data[ASK]*0.0006:
+				log_print(self.symbol_name,": stop too close:",round(risk_per_share,2)," adjusted to",str(round(self.symbol_data[ASK]*0.0006,2)))
+				risk_per_share = self.symbol_data[ASK]*0.0006
+				self.stop_price = round(self.symbol_data[ASK] + risk_per_share,2)
+
+		if self.symbol_data[ASK]>100 and risk_per_share <0.12:
+			risk_per_share = 0.12
+
+		if self.symbol_data[ASK]<100 and self.symbol_data[ASK]>5 and risk_per_share <0.1:
 			risk_per_share = 0.1
 
+		if self.symbol_data[ASK]<5 and risk_per_share <0.02:
+			risk_per_share = 0.02
 
 		shares = int((self.risk)/risk_per_share)
 

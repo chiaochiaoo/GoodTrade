@@ -394,7 +394,7 @@ class Tester:
 		# self.init= tk.Button(self.root ,text="Register",width=10,bg="#5BFF80",command=self.start_test)
 		# self.init.grid(column=1,row=1) m
 
-		self.price = tk.DoubleVar(value=413)
+		self.price = tk.DoubleVar(value=412.55)
 
 		tk.Entry(self.root ,textvariable=self.price,width=10).grid(column=1,row=2)	
 
@@ -413,7 +413,7 @@ class Tester:
 
 		tk.Button(self.root ,text="add 1 share",command=self.add1).grid(column=1,row=7)	
 		tk.Button(self.root ,text="sub 1 share",command=self.sub1).grid(column=2,row=7)	
-		self.gt.send(["pkg",['New order', [BREAKANY, 'SPY.AM', 412.5, 413.5, 50.0, {'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441}]]])
+		self.gt.send(["pkg",['New order', [BREAKANY, 'SPY.AM', 412.5, 412.6, 50.0, {'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441}]]])
 
 		time.sleep(1)
 		wish_granter = threading.Thread(target=self.wish, daemon=True)
