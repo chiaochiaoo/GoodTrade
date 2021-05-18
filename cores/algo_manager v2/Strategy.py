@@ -117,6 +117,7 @@ class Strategy:
 		except:
 			pass
 
+	"""redundant, already contained in update"""
 	def update_on_pricechanging(self):
 		pass
 
@@ -276,10 +277,109 @@ class ThreePriceTargets(Strategy):
 			self.tradingplan.tkvars[PXT2].set(self.tradingplan.data[PXT2])
 			self.tradingplan.tkvars[PXT3].set(self.tradingplan.data[PXT3])
 
-			log_print(self.symbol_name,"price target adjusted:",self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
+			log_print(self.symbol_name,"Management price target adjusted:",self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
 		else:
 			self.tradingplan.tkvars[AUTOMANAGE].set(False)
 
+
+		#log_print(self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
+	def update_on_start(self):
+		self.manaTrigger.total_reset()
+		self.tradingplan.current_price_level = 1
+		self.set_mind("")
+
+
+
+
+class SmartTrail(Strategy):
+
+	def __init__(self,symbol,tradingplan):
+
+		super().__init__("Management: Smart Trail",symbol,tradingplan)
+
+		#####
+		self.current_high = 0
+		self.current_low = 0
+		self.distance = 0
+
+		self.manaTrigger = SmartTrailing_trigger("SmartTrail Trigger",self)
+
+		self.add_initial_triggers(self.manaTrigger)
+		#description,trigger_timer:int,trigger_limit=1
+		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
+		###upon activating, reset all parameters. 
+
+	def update(self):
+
+		super().update()
+
+		if self.tradingplan.current_price_level == 3 and self.distance!=0:
+
+			#print("I AM HERE!")
+
+			change = False
+			### update STOP level ###
+
+			if self.tradingplan.data[POSITION]==LONG:
+
+				new_stop = round(self.symbol.get_bid() - self.distance,2)
+				if new_stop > self.tradingplan.data[STOP_LEVEL]:
+					self.tradingplan.data[STOP_LEVEL]=new_stop
+					self.tradingplan.tkvars[STOP_LEVEL].set(new_stop)
+					change = True
+
+			elif self.tradingplan.data[POSITION]==SHORT:
+
+				new_stop = round(self.symbol.get_ask() + self.distance,2)
+				if new_stop < self.tradingplan.data[STOP_LEVEL]:
+					self.tradingplan.data[STOP_LEVEL]=new_stop
+					self.tradingplan.tkvars[STOP_LEVEL].set(new_stop)
+					change = True
+
+			### calculate new lock-in profit ###
+			if change:
+				lock_in = round(abs(self.tradingplan.data[STOP_LEVEL] -self.tradingplan.data[AVERAGE_PRICE])*self.tradingplan.data[CURRENT_SHARE],2)
+				self.tradingplan.adjusting_risk()
+				self.set_mind("$ lock-in: "+str(lock_in),GREEN)
+
+
+	def update_on_loadingup(self): #call this whenever the break at price changes. 
+
+		price = self.tradingplan.data[AVERAGE_PRICE]
+		coefficient = 1
+		good = False
+
+		if self.tradingplan.data[POSITION]==LONG:
+			ohv = self.symbol.data[OHAVG]
+			ohs =  self.symbol.data[OHSTD]
+			#log_print(self.data_list[id_],type(ohv),ohs,type(price))
+			if ohv!=0:
+				#self.tradingplan[id_][0] = price
+				self.tradingplan.data[PXT1] = round(price+ohv*0.2*coefficient,2)
+				self.tradingplan.data[PXT2] = round(price+ohv*0.4*coefficient,2) #round(self.tradingplan.data[PXT1]+0.02,2) 
+				self.tradingplan.data[PXT3] = round(price+ohv*10*coefficient,2) #round(self.tradingplan.data[PXT2]+0.02,2) #
+				good = True
+		elif self.tradingplan.data[POSITION]==SHORT:
+			olv = self.symbol.data[OLAVG]
+			ols = self.symbol.data[OLSTD]
+			if olv!=0:
+				#self.price_levels[id_][0] = price
+				self.tradingplan.data[PXT1] = round(price-olv*0.2*coefficient,2)
+				self.tradingplan.data[PXT2] = round(price-olv*0.4*coefficient,2) #round(self.tradingplan.data[PXT1]-0.02,2)  #
+				self.tradingplan.data[PXT3] = round(price-olv*10*coefficient,2) #round(self.tradingplan.data[PXT2]-0.02,2) #
+				good = True
+				
+		#set the price levels. 
+		#log_print(id_,"updating price levels.",price,self.price_levels[id_][1],self.price_levels[id_][2],self.price_levels[id_][3])
+		if good:
+			self.tradingplan.tkvars[AUTOMANAGE].set(True)
+			self.tradingplan.tkvars[PXT1].set(self.tradingplan.data[PXT1])
+			self.tradingplan.tkvars[PXT2].set(self.tradingplan.data[PXT2])
+			self.tradingplan.tkvars[PXT3].set(self.tradingplan.data[PXT3])
+
+			log_print(self.symbol_name,"Smart trailing price target adjusted:",self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
+		else:
+			self.tradingplan.tkvars[AUTOMANAGE].set(False)
 
 		#log_print(self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
 	def update_on_start(self):

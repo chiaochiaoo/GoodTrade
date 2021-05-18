@@ -94,7 +94,7 @@ RIPSELL = "Ripsell"
 #MANA Plan
 NONE =          "NONE"
 THREE_TARGETS = "Three tgts "
-TRAILING_FIB =  "Trailng Fib" 
+SMARTTRAIL =  "SmartTrail" 
 
 
 

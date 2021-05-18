@@ -498,6 +498,8 @@ class TradingPlan:
 		if manage_plan ==NONE: self.tkvars[MANAGEMENTPLAN].set(NONE)
 		if manage_plan == THREE_TARGETS:
 			self.set_ManagementStrategy(ThreePriceTargets(self.symbol,self))
+		if manage_plan == SMARTTRAIL:
+			self.set_ManagementStrategy(SmartTrail(self.symbol,self))
 
 	def set_EntryStrategy(self,entry_plan:Strategy):
 		self.entry_plan = entry_plan

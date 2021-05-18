@@ -27,7 +27,7 @@ class UI(pannel):
 
 		self.entry_plan_options = {BREAISH,BULLISH,BREAKUP,BREAKDOWN,BREAKANY,RIPSELL,DIPBUY}
 
-		self.management_plan_options = {THREE_TARGETS,TRAILING_FIB}
+		self.management_plan_options = {THREE_TARGETS,SMARTTRAIL}
 
 	def init_HQ_pannel(self):
 
