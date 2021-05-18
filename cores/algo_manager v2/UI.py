@@ -25,7 +25,7 @@ class UI(pannel):
 
 		self.entry_type_options = {INSTANT,INCREMENTAL}
 
-		self.entry_plan_options = {BREAISH,BULLISH,BREAKUP,BREAKDOWN,BREAKANY,RIPSELL,DIPBUY}
+		self.entry_plan_options = {BREAISH,BULLISH,BREAKUP,BREAKDOWN,BREAKANY,RIPSELL,DIPBUY,FADEANY}
 
 		self.management_plan_options = {THREE_TARGETS,SMARTTRAIL}
 

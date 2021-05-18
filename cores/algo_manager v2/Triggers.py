@@ -444,8 +444,8 @@ class SmartTrailing_trigger(AbstractTrigger):
 				self.tradingplan.tkvars[STOP_LEVEL].set(half_way)
 
 				self.tradingplan.adjusting_risk()
-				log_print(self.symbol_name,"Reduce to .25 risk.")
-				self.set_mind("25% risk",GREEN)
+				log_print(self.symbol_name,"Reduce to 0.50 risk.")
+				self.set_mind("50% risk",GREEN)
 
 
 			if self.tradingplan.current_price_level == 2:
