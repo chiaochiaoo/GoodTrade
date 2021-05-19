@@ -11,11 +11,11 @@ def log_print(*args):
 
 	try:
 		f = open("../../algo_logs/"+datetime.now().strftime("%m-%d")+".txt", "a+")
-		time_ = datetime.now().strftime("\n%H:%M:%S : ")
+		time_ = datetime.now().strftime("%H:%M:%S : ")
 		listToStr = ' '.join([str(elem) for elem in args])
-		f.write(time_+listToStr)
+		f.write("\n"+time_+listToStr)
 		f.close()
-		print(*args)
+		print(time_,*args)
 	except Exception as e:
 		print(*args,e,"failed to write")
 
