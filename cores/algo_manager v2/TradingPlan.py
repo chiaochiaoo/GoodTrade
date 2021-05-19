@@ -450,7 +450,7 @@ class TradingPlan:
 				self.entry_plan_decoder(entryplan, entry_type, entrytimer)
 				self.manage_plan_decoder(manage_plan)
 
-				log_print("Deploying:",self.symbol_name,self.entry_plan.get_name(),entry_type,entrytimer,self.management_plan.get_name())
+				log_print("Deploying:",self.symbol_name,self.entry_plan.get_name(),self.symbol.get_support(),self.symbol.get_resistence(),entry_type,entrytimer,self.management_plan.get_name())
 				self.AR_toggle_check()
 				self.start_tradingplan()
 			except Exception as e:

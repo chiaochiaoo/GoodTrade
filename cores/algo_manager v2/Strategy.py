@@ -399,7 +399,7 @@ class SmartTrail(Strategy):
 			if ohv!=0:
 				#self.tradingplan[id_][0] = price
 				self.tradingplan.data[PXT1] = round(price+ohv*0.15*coefficient,2)
-				self.tradingplan.data[PXT2] = round(price+ohv*0.3*coefficient,2) #round(self.tradingplan.data[PXT1]+0.02,2) 
+				self.tradingplan.data[PXT2] = round(price+ohv*0.4*coefficient,2) #round(self.tradingplan.data[PXT1]+0.02,2) 
 				self.tradingplan.data[PXT3] = round(price+ohv*10*coefficient,2) #round(self.tradingplan.data[PXT2]+0.02,2) #
 				good = True
 		elif self.tradingplan.data[POSITION]==SHORT:
@@ -408,7 +408,7 @@ class SmartTrail(Strategy):
 			if olv!=0:
 				#self.price_levels[id_][0] = price
 				self.tradingplan.data[PXT1] = round(price-olv*0.15*coefficient,2)
-				self.tradingplan.data[PXT2] = round(price-olv*0.3*coefficient,2) #round(self.tradingplan.data[PXT1]-0.02,2)  #
+				self.tradingplan.data[PXT2] = round(price-olv*0.4*coefficient,2) #round(self.tradingplan.data[PXT1]-0.02,2)  #
 				self.tradingplan.data[PXT3] = round(price-olv*10*coefficient,2) #round(self.tradingplan.data[PXT2]-0.02,2) #
 				good = True
 				
