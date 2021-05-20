@@ -42,10 +42,10 @@ class TradingPlan:
 		self.current_price_level = 0
 		self.price_levels = {}
 
-		self.numeric_labels = [ACTRISK,ESTRISK,CURRENT_SHARE,TARGET_SHARE,AVERAGE_PRICE,LAST_AVERAGE_PRICE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3]
+		self.numeric_labels = [ACTRISK,ESTRISK,CURRENT_SHARE,TARGET_SHARE,AVERAGE_PRICE,LAST_AVERAGE_PRICE,RISK_PER_SHARE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3]
 		self.string_labels = [MIND,STATUS,POSITION,RISK_RATIO,SIZE_IN,ENTRYPLAN,ENTYPE,MANAGEMENTPLAN]
 
-		self.bool_labels= [AUTORANGE,AUTOMANAGE,RELOAD,SELECTED]
+		self.bool_labels= [AUTORANGE,AUTOMANAGE,RELOAD,SELECTED,ANCART_OVERRIDE]
 
 		self.init_data(risk,entry_plan,entry_type,manage_plan)
 
@@ -66,6 +66,8 @@ class TradingPlan:
 		for i in self.bool_labels:
 			self.data[i] = True
 			self.tkvars[i] = tk.BooleanVar(value=True)
+
+		self.data[ANCART_OVERRIDE]=False
 
 		self.tkvars[SELECTED].set(False)
 		#Non String, Non Numeric Value
@@ -157,7 +159,7 @@ class TradingPlan:
 
 	def ppro_process_orders(self,price,shares,side):
 		
-		log_print("TP processing:",self.symbol_name,price,shares,side)
+		#log_print("TP processing:",self.symbol_name,price,shares,side)
 		if self.data[POSITION]=="": # 1. No position.
 			if self.expect_orders==side:
 				self.ppro_confirm_new_order(price,shares,side)
@@ -450,7 +452,7 @@ class TradingPlan:
 				self.entry_plan_decoder(entryplan, entry_type, entrytimer)
 				self.manage_plan_decoder(manage_plan)
 
-				log_print("Deploying:",self.symbol_name,self.entry_plan.get_name(),self.symbol.get_support(),self.symbol.get_resistence(),entry_type,entrytimer,self.management_plan.get_name())
+				log_print("Deploying:",self.symbol_name,self.entry_plan.get_name(),self.symbol.get_support(),self.symbol.get_resistence(),entry_type,entrytimer,self.management_plan.get_name(),"risk:",self.data[ESTRISK])
 				self.AR_toggle_check()
 				self.start_tradingplan()
 			except Exception as e:
@@ -503,6 +505,9 @@ class TradingPlan:
 		if manage_plan == SMARTTRAIL:
 			self.set_ManagementStrategy(SmartTrail(self.symbol,self))
 
+		if manage_plan == ANCARTMETHOD:
+			self.set_ManagementStrategy(AncartMethod(self.symbol,self))
+
 	def set_EntryStrategy(self,entry_plan:Strategy):
 		self.entry_plan = entry_plan
 		#self.entry_plan.set_symbol(self.symbol,self)
@@ -524,7 +529,7 @@ class TradingPlan:
 			# done.start()
 		elif plan==self.management_plan:
 			self.management_strategy_done()
-			log_print(self.symbol_name,"management strategy completed ")
+			log_print(self.symbol_name,"management strategy completed.")
 		else:
 			log_print("Trading Plan: UNKONW CALL FROM Strategy")
 

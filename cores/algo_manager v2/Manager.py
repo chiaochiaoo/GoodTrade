@@ -426,7 +426,7 @@ class Tester:
 		while True:
 			try:
 				d = self.ppro_out.recv()
-				log_print(d)
+				log_print("PPRO order:",d)
 				type_ = d[0]
 
 				time.sleep(1)

@@ -141,7 +141,10 @@ def decode_order(stream_data,pipe):
 			data["symbol"]= symbol
 			data["side"]= side
 			data["info"]=info
-
+			try:
+				log_print(symbol,side,info)
+			except:
+				pass
 			pipe.send(["order rejected",data])
 
 

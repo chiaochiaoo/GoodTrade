@@ -26,6 +26,7 @@ AUTORANGE = "AR"
 AUTOMANAGE = "AM"
 RELOAD = "reload"
 SELECTED = "selected"
+ANCART_OVERRIDE = "ancartoverride"
 
 TIMER = "timer"
 ACTRISK="actrisk"
@@ -35,6 +36,7 @@ SIZE_IN = "size_in"
 
 CURRENT_SHARE = "CURRENT_SHARE"
 TARGET_SHARE = "TARGET_SHARE"
+RISK_PER_SHARE = "RISK_PER_SHARE"
 AVERAGE_PRICE = "AVERAGE_PRICE"
 LAST_AVERAGE_PRICE = "Last_average_price"
 UNREAL = "UNREAL"
@@ -96,7 +98,7 @@ FADEANY = "Fade Any"
 NONE =          "NONE"
 THREE_TARGETS = "Three tgts "
 SMARTTRAIL =  "SmartTrail" 
-
+ANCARTMETHOD =  "ANCART M"
 
 
 ##### ORDER TYPE ####

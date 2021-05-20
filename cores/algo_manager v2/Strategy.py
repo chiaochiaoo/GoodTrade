@@ -333,6 +333,77 @@ class ThreePriceTargets(Strategy):
 
 
 
+class AncartMethod(Strategy):
+
+
+	def __init__(self,symbol,tradingplan):
+
+		super().__init__("Management: ANCART METHODOLOGY",symbol,tradingplan)
+
+		self.manaTrigger = ANCART_trigger("ANCART method manage",self.ppro_out)
+
+		self.add_initial_triggers(self.manaTrigger)
+		#description,trigger_timer:int,trigger_limit=1
+		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
+		###upon activating, reset all parameters. 
+
+		### CALCULATE THE STOP HERE.? NO .
+
+		try:
+			self.tradingplan.data[TARGET_SHARE] = int(self.tradingplan.tkvars[TARGET_SHARE].get())
+			self.tradingplan.data[RISK_PER_SHARE] = float(self.tradingplan.tkvars[RISK_PER_SHARE].get())
+			self.tradingplan.data[ESTRISK] = round(self.tradingplan.data[TARGET_SHARE]*self.tradingplan.data[RISK_PER_SHARE],2)
+		except:
+			print("ANCART RISK INITIALIZATION ERROR, WRONG INPUT.")
+			self.tradingplan.tkvars[AUTOMANAGE].set(False)
+
+		tradingplan.data[ANCART_OVERRIDE] = True
+
+		tradingplan.adjusting_risk()
+		tradingplan.update_displays()
+		tradingplan.tklabels[RISK_RATIO].grid()
+		tradingplan.tklabels['SzIn'].grid()
+
+	def update_on_loadingup(self): #call this whenever the break at price changes. 
+
+		price = self.tradingplan.data[AVERAGE_PRICE]
+		coefficient = 1
+		good = False
+
+		if self.tradingplan.data[POSITION]==LONG:
+
+			#self.tradingplan[id_][0] = price
+			self.tradingplan.data[PXT1] = round(self.tradingplan.data[AVERAGE_PRICE] +self.tradingplan.data[RISK_PER_SHARE],2)
+			self.tradingplan.data[PXT2] = round(self.tradingplan.data[AVERAGE_PRICE] +self.tradingplan.data[RISK_PER_SHARE]*2,2)
+			self.tradingplan.data[PXT3] = round(self.tradingplan.data[AVERAGE_PRICE] +self.tradingplan.data[RISK_PER_SHARE]*3,2)
+
+		elif self.tradingplan.data[POSITION]==SHORT:
+
+			#self.price_levels[id_][0] = price
+			self.tradingplan.data[PXT1] = round(self.tradingplan.data[AVERAGE_PRICE] -self.tradingplan.data[RISK_PER_SHARE],2)
+			self.tradingplan.data[PXT2] = round(self.tradingplan.data[AVERAGE_PRICE] -self.tradingplan.data[RISK_PER_SHARE]*2,2)
+			self.tradingplan.data[PXT3] = round(self.tradingplan.data[AVERAGE_PRICE] -self.tradingplan.data[RISK_PER_SHARE]*3,2)
+			
+		#set the price levels. 
+		#log_print(id_,"updating price levels.",price,self.price_levels[id_][1],self.price_levels[id_][2],self.price_levels[id_][3])
+		
+		self.tradingplan.tkvars[AUTOMANAGE].set(True)
+		self.tradingplan.tkvars[PXT1].set(self.tradingplan.data[PXT1])
+		self.tradingplan.tkvars[PXT2].set(self.tradingplan.data[PXT2])
+		self.tradingplan.tkvars[PXT3].set(self.tradingplan.data[PXT3])
+
+		
+		log_print(self.symbol_name,"Management price target adjusted:",self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
+
+
+		#log_print(self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
+	def update_on_start(self):
+		self.manaTrigger.total_reset()
+		self.tradingplan.current_price_level = 1
+		self.set_mind("")
+
+	def update_on_finish(self):
+		pass
 
 class SmartTrail(Strategy):
 

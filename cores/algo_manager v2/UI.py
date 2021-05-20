@@ -27,7 +27,7 @@ class UI(pannel):
 
 		self.entry_plan_options = {BREAISH,BULLISH,BREAKUP,BREAKDOWN,BREAKANY,RIPSELL,DIPBUY,FADEANY}
 
-		self.management_plan_options = {THREE_TARGETS,SMARTTRAIL}
+		self.management_plan_options = {THREE_TARGETS,SMARTTRAIL,ANCARTMETHOD}
 
 	def init_HQ_pannel(self):
 
@@ -108,6 +108,8 @@ class UI(pannel):
 		self.algo_cancel.grid(sticky="w",column=2,row=11)
 
 
+
+
 	def init_pannel(self):
 		self.labels = {"":4,\
 						"Symbol":8,\
@@ -122,10 +124,10 @@ class UI(pannel):
 						"Sup":6,\
 						"Res":6,\
 						"Act/Est R":8,\
+						"SzIn":6,\
 						"Position":6,\
 						"Stop":8,\
 						"AvgPx":8,\
-						"SzIn":6,\
 						"PxT1":5,\
 						"PxT2":5,\
 						"PxT3":5,\
@@ -197,10 +199,10 @@ class UI(pannel):
 		SUPPORT:tradingplan.tkvars[SUPPORT], \
 		RESISTENCE:tradingplan.tkvars[RESISTENCE], \
 		RISK_RATIO:tradingplan.tkvars[RISK_RATIO], \
+		'SzIn':tradingplan.tkvars[SIZE_IN], \
 		'Position':tradingplan.tkvars[POSITION], \
 		'Stop':tradingplan.tkvars[STOP_LEVEL],\
 		'AvgPx':tradingplan.tkvars[AVERAGE_PRICE], \
-		'SzIn':tradingplan.tkvars[SIZE_IN], \
 		PXT1: tradingplan.tkvars[PXT1], \
 		PXT2:tradingplan.tkvars[PXT2], \
 		PXT3:tradingplan.tkvars[PXT3], \
@@ -236,6 +238,9 @@ class UI(pannel):
 				self.tklabels[symbol][label_name] = tk.OptionMenu(self.deployment_frame, info[j], *sorted(self.entry_type_options))
 
 			elif label_name ==MANAGEMENTPLAN:
+
+				info[j].trace('w',  lambda *_, symbol=symbol,plan=info[j],tgt_share=tradingplan.tkvars[TARGET_SHARE],rsk_share=tradingplan.tkvars[RISK_PER_SHARE]: self.management_plan_checking(symbol,plan,tgt_share,rsk_share))
+		
 				self.tklabels[symbol][label_name] =tk.OptionMenu(self.deployment_frame, info[j], *sorted(self.management_plan_options))
 
 			elif label_name =="AR" :
@@ -245,6 +250,20 @@ class UI(pannel):
 
 			elif label_name =="MIND":
 				self.tklabels[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
+
+			elif label_name ==RISK_RATIO:
+				self.tklabels[symbol][RISK_PER_SHARE]=tk.Entry(self.deployment_frame ,textvariable=tradingplan.tkvars[RISK_PER_SHARE],width=self.width[j])
+				tradingplan.tklabels[RISK_PER_SHARE] = self.tklabels[symbol][RISK_PER_SHARE]
+				tradingplan.tklabels[RISK_PER_SHARE].grid(row= l+2, column=j,padx=0)
+
+				self.tklabels[symbol][label_name]=tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
+
+			elif label_name =='SzIn':
+				self.tklabels[symbol][TARGET_SHARE]=tk.Entry(self.deployment_frame ,textvariable=tradingplan.tkvars[TARGET_SHARE],width=self.width[j])
+				tradingplan.tklabels[TARGET_SHARE] = self.tklabels[symbol][TARGET_SHARE]
+				tradingplan.tklabels[TARGET_SHARE].grid(row= l+2, column=j,padx=0)
+
+				self.tklabels[symbol][label_name]=tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
 
 			elif label_name =="flatten":
 				self.tklabels[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command=tradingplan.flatten_cmd)
@@ -268,10 +287,25 @@ class UI(pannel):
 
 		self.label_count +=1
 
+
+
 		self.algo_count_number.set(self.label_count-1)
 		self.rebind(self.dev_canvas,self.deployment_frame)
 		self.recreate_labels()
 		tradingplan.update_displays()
+
+	def management_plan_checking(self,symbol,plan,target_share,risk_per_share):
+
+		if plan.get()==ANCARTMETHOD:
+			self.tklabels[symbol][RISK_RATIO].grid_remove()
+			self.tklabels[symbol]['SzIn'].grid_remove()
+			target_share.set(100)
+			risk_per_share.set(0.5)
+		else:
+			self.tklabels[symbol][RISK_RATIO].grid()
+			self.tklabels[symbol]['SzIn'].grid()
+			target_share.set(0)
+
 
 	def create_example_trade(self):
 
