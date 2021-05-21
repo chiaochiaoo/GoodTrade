@@ -117,13 +117,15 @@ class Strategy:
 		except:
 			pass
 
-	"""redundant, already contained in update"""
-	def update_on_pricechanging(self):
+	""" for entry plan only """
+	def reload_triggers(self):
 		pass
 
+	""" for management plan only """
 	def update_on_loadingup(self):
 		pass
 
+	""" for management plan only """
 	def update_on_start(self):
 		pass
 
@@ -331,6 +333,63 @@ class ThreePriceTargets(Strategy):
 		self.tradingplan.current_price_level = 1
 		self.set_mind("")
 
+class OneToTWORiskReward(Strategy):
+
+	def __init__(self,symbol,tradingplan):
+
+		super().__init__("Management: 1-to-2 risk-reward ",symbol,tradingplan)
+
+		self.manaTrigger = TwoToOneTrigger("manage",self.ppro_out)
+
+		self.add_initial_triggers(self.manaTrigger)
+		#description,trigger_timer:int,trigger_limit=1
+		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
+		###upon activating, reset all parameters. 
+
+	def update_on_loadingup(self): #call this whenever the break at price changes. 
+
+		price = self.tradingplan.data[AVERAGE_PRICE]
+		stop = self.tradingplan.data[STOP_LEVEL]
+
+		gap = abs(price-stop)
+		coefficient = 1
+		good = False
+
+		if self.tradingplan.data[POSITION]==LONG:
+
+			#log_print(self.data_list[id_],type(ohv),ohs,type(price))
+	
+			#self.tradingplan[id_][0] = price
+			self.tradingplan.data[PXT1] = round(price+gap,2)
+			self.tradingplan.data[PXT2] = round(price+gap*2,2) #round(self.tradingplan.data[PXT1]+0.02,2) 
+			self.tradingplan.data[PXT3] = round(price+gap*3,2) #round(self.tradingplan.data[PXT2]+0.02,2) #
+
+		elif self.tradingplan.data[POSITION]==SHORT:
+
+	
+			#self.price_levels[id_][0] = price
+			self.tradingplan.data[PXT1] = round(price-gap,2)
+			self.tradingplan.data[PXT2] = round(price-gap*2,2) #round(self.tradingplan.data[PXT1]-0.02,2)  #
+			self.tradingplan.data[PXT3] = round(price-gap*3,2) #round(self.tradingplan.data[PXT2]-0.02,2) #
+
+			
+		#set the price levels. 
+		#log_print(id_,"updating price levels.",price,self.price_levels[id_][1],self.price_levels[id_][2],self.price_levels[id_][3])
+	
+		self.tradingplan.tkvars[AUTOMANAGE].set(True)
+		self.tradingplan.tkvars[PXT1].set(self.tradingplan.data[PXT1])
+		self.tradingplan.tkvars[PXT2].set(self.tradingplan.data[PXT2])
+		self.tradingplan.tkvars[PXT3].set(self.tradingplan.data[PXT3])
+
+		log_print(self.symbol_name,"Management price target adjusted:",self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
+
+
+
+		#log_print(self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
+	def update_on_start(self):
+		self.manaTrigger.total_reset()
+		self.tradingplan.current_price_level = 1
+		self.set_mind("")
 
 
 class AncartMethod(Strategy):
