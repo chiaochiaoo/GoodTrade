@@ -98,8 +98,8 @@ FADEANY = "Fade Any"
 NONE =          "NONE"
 THREE_TARGETS = "Three tgts "
 SMARTTRAIL =  "SmartTrail" 
-ANCARTMETHOD =  "ANCART M"
-
+ANCARTMETHOD =  "AC METHOD"
+ONETOTWORISKREWARD = "1:2 RiskReward"
 
 ##### ORDER TYPE ####
 
