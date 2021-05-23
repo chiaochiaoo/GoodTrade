@@ -121,14 +121,8 @@ class Strategy:
 	def reload_triggers(self):
 		pass
 
-	""" for management plan only """
-	def update_on_loadingup(self):
-		pass
 
-	""" for management plan only """
-	def update_on_start(self):
-		pass
-
+""" PLANS : seperate management plan and entry plan"""
 
 """ENTRY PLAN"""
 class BreakUp(Strategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry. 
@@ -275,7 +269,28 @@ class Fadeany(Strategy):
 
 
 """ MANAGEMENT PLAN"""
-class ThreePriceTargets(Strategy):
+
+class ManagementStrategy(Strategy):
+
+	def __init__(self,name,symbol:Symbol,tradingplan):
+		super().__init__("Management: Three pxt targets",symbol,tradingplan)
+		
+	""" for management plan only """
+	def update_on_loadingup(self):
+		pass
+
+	""" for management plan only """
+	def update_on_start(self):
+		self.manaTrigger.total_reset()
+		self.tradingplan.current_price_level = 1
+		self.set_mind("")
+
+
+	""" for management plan only """
+	def update_on_initializing_trade(self):
+		pass
+
+class ThreePriceTargets(ManagementStrategy):
 
 	def __init__(self,symbol,tradingplan):
 
@@ -333,7 +348,7 @@ class ThreePriceTargets(Strategy):
 		self.tradingplan.current_price_level = 1
 		self.set_mind("")
 
-class OneToTWORiskReward(Strategy):
+class OneToTWORiskReward(ManagementStrategy):
 
 	def __init__(self,symbol,tradingplan):
 
@@ -386,13 +401,9 @@ class OneToTWORiskReward(Strategy):
 
 
 		#log_print(self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
-	def update_on_start(self):
-		self.manaTrigger.total_reset()
-		self.tradingplan.current_price_level = 1
-		self.set_mind("")
 
 
-class AncartMethod(Strategy):
+class AncartMethod(ManagementStrategy):
 
 
 	def __init__(self,symbol,tradingplan):
@@ -407,21 +418,6 @@ class AncartMethod(Strategy):
 		###upon activating, reset all parameters. 
 
 		### CALCULATE THE STOP HERE.? NO .
-
-		try:
-			self.tradingplan.data[TARGET_SHARE] = int(self.tradingplan.tkvars[TARGET_SHARE].get())
-			self.tradingplan.data[RISK_PER_SHARE] = float(self.tradingplan.tkvars[RISK_PER_SHARE].get())
-			self.tradingplan.data[ESTRISK] = round(self.tradingplan.data[TARGET_SHARE]*self.tradingplan.data[RISK_PER_SHARE],2)
-		except:
-			print("ANCART RISK INITIALIZATION ERROR, WRONG INPUT.")
-			self.tradingplan.tkvars[AUTOMANAGE].set(False)
-
-		tradingplan.data[ANCART_OVERRIDE] = True
-
-		tradingplan.adjusting_risk()
-		tradingplan.update_displays()
-		tradingplan.tklabels[RISK_RATIO].grid()
-		tradingplan.tklabels['SzIn'].grid()
 
 	def update_on_loadingup(self): #call this whenever the break at price changes. 
 
@@ -456,15 +452,25 @@ class AncartMethod(Strategy):
 
 
 		#log_print(self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
-	def update_on_start(self):
-		self.manaTrigger.total_reset()
-		self.tradingplan.current_price_level = 1
-		self.set_mind("")
 
-	def update_on_finish(self):
-		pass
 
-class SmartTrail(Strategy):
+	def update_on_initializing_trade(self):
+		try:
+			self.tradingplan.data[TARGET_SHARE] = int(self.tradingplan.tkvars[INPUT_TARGET_SHARE].get())
+			self.tradingplan.data[RISK_PER_SHARE] = float(self.tradingplan.tkvars[RISK_PER_SHARE].get())
+			self.tradingplan.data[ESTRISK] = round(self.tradingplan.data[TARGET_SHARE]*self.tradingplan.data[RISK_PER_SHARE],2)
+		except:
+			print("ANCART RISK INITIALIZATION ERROR, WRONG INPUT.")
+			self.tradingplan.tkvars[AUTOMANAGE].set(False)
+
+		#self.tradingplan.data[ANCART_OVERRIDE] = True
+		self.tradingplan.adjusting_risk()
+		self.tradingplan.update_displays()
+		self.tradingplan.tklabels[RISK_RATIO].grid()
+		self.tradingplan.tklabels['SzIn'].grid()
+
+
+class SmartTrail(ManagementStrategy):
 
 	def __init__(self,symbol,tradingplan):
 
@@ -555,10 +561,7 @@ class SmartTrail(Strategy):
 			self.tradingplan.tkvars[AUTOMANAGE].set(False)
 
 		#log_print(self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
-	def update_on_start(self):
-		self.manaTrigger.total_reset()
-		self.tradingplan.current_price_level = 1
-		self.set_mind("")
+
 # clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
 
 # log_print(clsmembers)

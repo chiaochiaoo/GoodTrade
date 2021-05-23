@@ -89,7 +89,6 @@ class AbstractTrigger:
 		if self.activation:
 			for i in self.conditions:
 				s1,s2,t1,t2,type_= self.decode_conditions(i)
-
 				if type_ ==">":
 					if not s1[t1] > s2[t2]:
 						eval = False	
@@ -251,7 +250,7 @@ class Purchase_trigger(AbstractTrigger):
 		IF NOT, PROCEED AS USUAL. 
 		"""
 
-		if self.tradingplan.data[ANCART_OVERRIDE]==True:
+		if self.tradingplan.tkvars[MANAGEMENTPLAN].get() == ANCARTMETHOD:
 
 			share = int(self.tradingplan.data[TARGET_SHARE]/self.trigger_limit)
 
@@ -261,14 +260,12 @@ class Purchase_trigger(AbstractTrigger):
 					self.set_mind("Entry: "+str(self.trigger_count)+"/"+str(self.trigger_limit),DEFAULT)
 				else:
 					self.set_mind("Entry: Complete",GREEN)
-
 			if self.pos == LONG:
 
 				self.tradingplan.data[STOP_LEVEL]= round(self.symbol_data[BID]-self.tradingplan.data[RISK_PER_SHARE],2)
 				self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[STOP_LEVEL])
 				if share>0:
 					self.ppro_out.send(["Buy",self.symbol_name,share,self.description])
-					
 			elif self.pos ==SHORT:
 
 				self.tradingplan.data[STOP_LEVEL]= round(self.symbol_data[ASK]+self.tradingplan.data[RISK_PER_SHARE],2)

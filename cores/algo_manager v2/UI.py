@@ -239,7 +239,7 @@ class UI(pannel):
 
 			elif label_name ==MANAGEMENTPLAN:
 
-				info[j].trace('w',  lambda *_, symbol=symbol,plan=info[j],tgt_share=tradingplan.tkvars[TARGET_SHARE],rsk_share=tradingplan.tkvars[RISK_PER_SHARE]: self.management_plan_checking(symbol,plan,tgt_share,rsk_share))
+				info[j].trace('w',  lambda *_, symbol=symbol,plan=info[j],tgt_share=tradingplan.tkvars[INPUT_TARGET_SHARE],rsk_share=tradingplan.tkvars[RISK_PER_SHARE]: self.management_plan_checking(symbol,plan,tgt_share,rsk_share))
 		
 				self.tklabels[symbol][label_name] =tk.OptionMenu(self.deployment_frame, info[j], *sorted(self.management_plan_options))
 
@@ -259,7 +259,7 @@ class UI(pannel):
 				self.tklabels[symbol][label_name]=tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
 
 			elif label_name =='SzIn':
-				self.tklabels[symbol][TARGET_SHARE]=tk.Entry(self.deployment_frame ,textvariable=tradingplan.tkvars[TARGET_SHARE],width=self.width[j])
+				self.tklabels[symbol][TARGET_SHARE]=tk.Entry(self.deployment_frame ,textvariable=tradingplan.tkvars[INPUT_TARGET_SHARE],width=self.width[j])
 				tradingplan.tklabels[TARGET_SHARE] = self.tklabels[symbol][TARGET_SHARE]
 				tradingplan.tklabels[TARGET_SHARE].grid(row= l+2, column=j,padx=0)
 
