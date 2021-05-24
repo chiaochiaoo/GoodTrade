@@ -78,6 +78,25 @@ class AbstractTrigger:
 		#log_print(s1_,s2_,t1,t2,type_)
 		return s1_,s2_,t1,t2,type_
 
+	""" return True if a trade is succesful.(in the entry range). else False"""
+	def pre_deploying_check(self):
+
+		eval = True
+
+		for i in self.conditions:
+			s1,s2,t1,t2,type_= self.decode_conditions(i)
+			if type_ ==">":
+				if not s1[t1] > s2[t2]:
+					eval = False	
+			elif type_ =="<":
+				if not s1[t1] < s2[t2]:
+					eval = False
+			#print(s1[t1],type_,s2[t2],eval)
+		return eval
+
+	def deactivate(self):
+		self.activation = False
+
 	def check_conditions(self):
 		
 		eval = True
@@ -192,6 +211,11 @@ class AbstractTrigger:
 
 	def get_next_triggers(self):
 		return self.next_triggers
+
+	def get_trigger_state(self):
+		""" if true: still useful 
+		    if false: already used """
+		return self.activation
 
 	def log_print(self):
 		log_print("Trigger",self.description)

@@ -206,7 +206,7 @@ class TradingPlan:
 		self.adjusting_risk()
 
 		if self.data[AVERAGE_PRICE]!=self.data[LAST_AVERAGE_PRICE]:
-			self.management_plan.update_on_loadingup()
+			self.management_plan.on_loading_up()
 			
 			log_print(self.symbol_name," ",side,",",self.data[AVERAGE_PRICE]," at ",self.data[CURRENT_SHARE],"act risk:",self.data[ACTRISK])
 
@@ -462,8 +462,8 @@ class TradingPlan:
 	def start_tradingplan(self):
 		self.mark_algo_status(DEPLOYED)
 
-		self.management_plan.update_on_initializing_trade()
-
+		self.entry_plan.on_deploying()
+		self.management_plan.on_deploying()
 		self.current_running_strategy = self.entry_plan
 
 
@@ -543,7 +543,7 @@ class TradingPlan:
 
 	def entry_strategy_done(self):
 
-		self.management_plan.update_on_start()
+		self.management_plan.on_start()
 		self.current_running_strategy = self.management_plan
 
 	def management_strategy_done(self):

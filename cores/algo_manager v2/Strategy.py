@@ -1,9 +1,10 @@
 from constant import *
 from Symbol import *
 from Triggers import *
-import sys, inspect
+
 from Util_functions import *
 
+#import sys, inspect
 # "Omnissiah, Omnissiah.
 
 # From the Bleakness of the mind
@@ -49,15 +50,6 @@ class Strategy:
 
 		self.set_symbol(symbol,tradingplan)
 
-	def get_name(self):
-		return self.strategy_name
-
-	def add_initial_triggers(self,trigger):
-		self.current_triggers.add(trigger)
-		self.initial_triggers.add(trigger)
-		trigger.set_symbol(self.symbol, self.tradingplan, self.ppro_out)
-
-
 	def set_symbol(self,symbol:Symbol,tradingplan):
 		self.symbol=symbol
 		self.symbol_name = symbol.get_name()
@@ -65,11 +57,12 @@ class Strategy:
 		self.ppro_out = self.tradingplan.ppro_out
 		self.risk = self.tradingplan.get_risk()
 
-	def restart(self):
+	def get_name(self):
+		return self.strategy_name
 
-		self.current_triggers = set()
-		for i in self.initial_triggers:
-			self.current_triggers.add(i)
+	def add_initial_triggers(self,trigger):
+		self.initial_triggers.add(trigger)
+		trigger.set_symbol(self.symbol, self.tradingplan, self.ppro_out)
 
 	def update(self):
 
@@ -95,9 +88,13 @@ class Strategy:
 			log_print("Strategy: nothing to trigger.")
 
 	def on_finish(self):
-		log_print(self.strategy_name+" completed")
 		self.tradingplan.on_finish(self)	
 		self.restart()
+
+	def restart(self):
+		self.current_triggers = set()
+		for i in self.initial_triggers:
+			self.current_triggers.add(i)
 
 	def set_mind(self,str,color=DEFAULT):
 
@@ -117,65 +114,164 @@ class Strategy:
 		except:
 			pass
 
+
+	def print_current_triggers(self):
+
+		st = self.symbol_name +" Triggers sets: "+self.strategy_name
+		for i in self.current_triggers:
+			if i.get_trigger_state()==True:
+				st += " " +i.description
+		log_print(st)
+
 	""" for entry plan only """
+
+
+class EntryStrategy(Strategy):
+
+	def __init__(self,name,symbol:Symbol,tradingplan):
+		super().__init__(name,symbol,tradingplan)
+
+		self.deployed = False
+
+	def on_loading_up(self):
+		pass
+
+	def on_start(self):
+		self.manaTrigger.total_reset()
+		self.tradingplan.current_price_level = 1
+		self.set_mind("")
+
+
+	""" REQUIRED: Fill in the conditions for each type of triggers. 
+	   Will determine what triggers to use should the system decides to reload. """
+
 	def reload_triggers(self):
 		pass
 
+	""" don't total reset here. """
+	def on_deploying(self):
+
+		self.current_triggers = set()
+
+		for i in self.initial_triggers:
+			self.current_triggers.add(i)
+
+		if self.deployed:
+			self.on_redeploying()
+
+		self.print_current_triggers()
+		self.deployed = True
+
+
+	def on_redeploying(self):
+		pass
+
+	def on_finish(self):
+
+		super().on_finish()
+		#self.reload_triggers()
+
+		"""depending on the conditions, refresh the used triggers."""
 
 """ PLANS : seperate management plan and entry plan"""
 
 """ENTRY PLAN"""
-class BreakUp(Strategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry. 
+class BreakUp(EntryStrategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry. 
 	def __init__(self,timer,repeat,symbol,tradingplan):
 		super().__init__("Entry : Break up",symbol,tradingplan)
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
-		buyTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
+		self.buyTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
 
-		self.add_initial_triggers(buyTrigger)
+		self.add_initial_triggers(self.buyTrigger)
 
-class BreakDown(Strategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry. 
+	def on_redeploying(self):
+
+		if not self.buyTrigger.pre_deploying_check():
+			self.buyTrigger.total_reset()
+
+
+
+class BreakDown(EntryStrategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry. 
 	def __init__(self,timer,repeat,symbol,tradingplan):
 		super().__init__("Entry : Break up",symbol,tradingplan)
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
-		sellTrigger = Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
+		self.sellTrigger = Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
 
-		self.add_initial_triggers(sellTrigger)
+		self.add_initial_triggers(self.sellTrigger)
 
-class BreakAny(Strategy):
+
+	def on_redeploying(self):
+
+		if not self.sellTrigger.pre_deploying_check():
+			self.sellTrigger.total_reset()
+
+
+class BreakAny(EntryStrategy):
 	def __init__(self,timer,repeat,symbol,tradingplan):
 
 		super().__init__("Entry : Break Any",symbol,tradingplan)
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
-		buyTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
-		sellTrigger = Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
+		self.buyTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
+		self.sellTrigger = Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
 
-		self.add_initial_triggers(buyTrigger)
-		self.add_initial_triggers(sellTrigger)
+		self.add_initial_triggers(self.buyTrigger)
+		self.add_initial_triggers(self.sellTrigger)
 
-class Bullish(Strategy):
+	def on_redeploying(self):
+
+		""" if one is used and does not vilate the entry condition (failed trade) reset it."""
+		if self.sellTrigger.get_trigger_state()==False and not self.sellTrigger.pre_deploying_check():
+			self.sellTrigger.total_reset()
+
+		if self.buyTrigger.get_trigger_state()==False and not self.buyTrigger.pre_deploying_check():
+			self.buyTrigger.total_reset()
+
+class Bullish(EntryStrategy):
 	def __init__(self,timer,repeat,symbol,tradingplan):
 
 		super().__init__("Entry :Bullish",symbol,tradingplan)
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
-		buyTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
-		self.add_initial_triggers(buyTrigger)
+		self.buyTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
+		self.add_initial_triggers(self.buyTrigger)
 
-		transitional_trigger = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],0,1,"Waiting for recross")
-		transitional_trigger2 = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],25,1,"Waiting for recross")
-		buyreversalTrigger = Purchase_trigger([[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],LOW,self.risk,"long reversal",timer,repeat,LONG,self.ppro_out)
+		self.transitional_trigger = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],0,1,"Waiting for recross")
+		self.transitional_trigger2 = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],25,1,"Waiting for recross")
+		self.buyreversalTrigger = Purchase_trigger([[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],LOW,self.risk,"long reversal",timer,repeat,LONG,self.ppro_out)
 		
 
-		transitional_trigger.add_next_trigger(transitional_trigger2)
-		transitional_trigger2.add_next_trigger(buyreversalTrigger)
+		self.transitional_trigger.add_next_trigger(self.transitional_trigger2)
+		self.transitional_trigger2.add_next_trigger(self.buyreversalTrigger)
 
-		self.add_initial_triggers(transitional_trigger)
+		self.add_initial_triggers(self.transitional_trigger)
 
 
-class Bearish(Strategy):
+	def on_redeploying(self):
+
+		""" whicheer gets used gets re-deploy """
+
+		if self.buyTrigger.get_trigger_state()==False and not self.buyTrigger.pre_deploying_check():
+			self.buyTrigger.total_reset()
+
+
+		if self.buyreversalTrigger.get_trigger_state()==False: ### if its rip sell used 
+
+			if not self.buyreversalTrigger.pre_deploying_check():  ## if it's a not successful run. 
+				self.transitional_trigger.total_reset()
+				self.transitional_trigger2.total_reset()
+				self.buyreversalTrigger.total_reset()
+			else:
+				if not self.buyTrigger.pre_deploying_check():
+					self.buyTrigger.total_reset()
+				else:
+					self.buyTrigger.deactivate()  #it's a successful run. deactive the other one. 
+
+
+
+class Bearish(EntryStrategy):
 	def __init__(self,timer,repeat,symbol,tradingplan):
 
 		super().__init__("Entry :Bearish",symbol,tradingplan)
@@ -183,23 +279,45 @@ class Bearish(Strategy):
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 		#buyTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
 
-		sellTrigger = Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
-		self.add_initial_triggers(sellTrigger)
+		self.sellTrigger = Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
+		self.add_initial_triggers(self.sellTrigger)
 
 
-		transitional_trigger = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,RESISTENCE]],0,1,"Waiting for recross")
-		transitional_trigger2 = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],25,1,"Waiting for recross")
-		sellreversalTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],HIGH,self.risk,"short reversal",30,repeat,SHORT,self.ppro_out)
+		self.transitional_trigger = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,RESISTENCE]],0,1,"Waiting for recross")
+		self.transitional_trigger2 = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],25,1,"Waiting for recross")
+		self.sellreversalTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],HIGH,self.risk,"short reversal",timer,repeat,SHORT,self.ppro_out)
 
-		transitional_trigger.add_next_trigger(transitional_trigger2)
-		transitional_trigger2.add_next_trigger(sellreversalTrigger)
-
-
-		self.add_initial_triggers(transitional_trigger)
+		self.transitional_trigger.add_next_trigger(self.transitional_trigger2)
+		self.transitional_trigger2.add_next_trigger(self.sellreversalTrigger)
 
 
+		self.add_initial_triggers(self.transitional_trigger)
 
-class Ripsell(Strategy):
+	def on_redeploying(self):
+
+		""" whicheer gets used gets re-deploy """
+
+		if self.sellTrigger.get_trigger_state()==False and not self.sellTrigger.pre_deploying_check():
+			self.sellTrigger.total_reset()
+
+
+		if self.sellreversalTrigger.get_trigger_state()==False: ### if its rip sell used 
+
+			if not self.sellreversalTrigger.pre_deploying_check():  ## if it's a not successful run. 
+				self.transitional_trigger.total_reset()
+				self.transitional_trigger2.total_reset()
+				self.sellreversalTrigger.total_reset()
+			else:
+				if not self.sellTrigger.pre_deploying_check():
+					self.sellTrigger.total_reset()
+				else:
+					self.sellTrigger.deactivate()  #it's a successful run. deactive the other one. 
+
+
+
+
+
+class Ripsell(EntryStrategy):
 	def __init__(self,timer,repeat,symbol,tradingplan):
 
 		super().__init__("Entry :Ripsell",symbol,tradingplan)
@@ -207,64 +325,91 @@ class Ripsell(Strategy):
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 
 		#self,description,trigger_timer:int,trigger_limit
-		transitional_trigger = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,RESISTENCE]],0,1,"Waiting for recross")
-		transitional_trigger2 = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],25,1,"Waiting for recross")
-		sellreversalTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],HIGH,self.risk,"short reversal",30,repeat,SHORT,self.ppro_out)
-		
+		self.transitional_trigger = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,RESISTENCE]],0,1,"Waiting for recross")
+		self.transitional_trigger2 = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],25,1,"Waiting for recross")
+		self.sellreversalTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],HIGH,self.risk,"short reversal",30,repeat,SHORT,self.ppro_out)
 
-		transitional_trigger.add_next_trigger(transitional_trigger2)
-		transitional_trigger2.add_next_trigger(sellreversalTrigger)
+		self.transitional_trigger.add_next_trigger(self.transitional_trigger2)
+		self.transitional_trigger2.add_next_trigger(self.sellreversalTrigger)
+
+		self.add_initial_triggers(self.transitional_trigger)
+
+	def on_redeploying(self):
+
+		""" if the current price did not stay above the break price. reset the second half triggers. """
+		if not self.sellreversalTrigger.pre_deploying_check():
+			self.transitional_trigger.total_reset()
+			self.transitional_trigger2.total_reset()
+			self.sellreversalTrigger.total_reset()
 
 
-		self.add_initial_triggers(transitional_trigger)
-
-
-
-class Dipbuy(Strategy):
+class Dipbuy(EntryStrategy):
 	def __init__(self,timer,repeat,symbol,tradingplan):
 
 		super().__init__("Entry :DipBuy",symbol,tradingplan)
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 
-		transitional_trigger = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],0,1,"Waiting for recross ")
-		transitional_trigger2 = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],25,1,"Waiting for recross ")
-		buyreversalTrigger = Purchase_trigger([[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],LOW,self.risk,"long reversal",timer,repeat,LONG,self.ppro_out)
+		self.transitional_trigger = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],0,1,"Waiting for recross ")
+		self.transitional_trigger2 = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],25,1,"Waiting for recross ")
+		self.buyreversalTrigger = Purchase_trigger([[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],LOW,self.risk,"long reversal",timer,repeat,LONG,self.ppro_out)
 		
 
-		transitional_trigger.add_next_trigger(transitional_trigger2)
-		transitional_trigger2.add_next_trigger(buyreversalTrigger)
+		self.transitional_trigger.add_next_trigger(self.transitional_trigger2)
+		self.transitional_trigger2.add_next_trigger(self.buyreversalTrigger)
 
-		self.add_initial_triggers(transitional_trigger)
+		self.add_initial_triggers(self.transitional_trigger)
+
+	def on_redeploying(self):
+
+		""" if the current price did not stay above the break price. reset the second half triggers. """
+		if not self.buyreversalTrigger.pre_deploying_check():
+			self.transitional_trigger.total_reset()
+			self.transitional_trigger2.total_reset()
+			self.buyreversalTrigger.total_reset()
 
 
-class Fadeany(Strategy):
+class Fadeany(EntryStrategy):
 	def __init__(self,timer,repeat,symbol,tradingplan):
 
 		super().__init__("Entry :Fadeany",symbol,tradingplan)
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 
-		transitional_trigger = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],0,1,"Waiting for recross ")
-		transitional_trigger2 = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],25,1,"Waiting for recross ")
-		buyreversalTrigger = Purchase_trigger([[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],LOW,self.risk,"long reversal",timer,repeat,LONG,self.ppro_out)
+		self.transitional_trigger_buy = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],0,1,"Waiting for recross ")
+		self.transitional_trigger_buy_2 = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],25,1,"Waiting for recross ")
+		self.buyreversalTrigger = Purchase_trigger([[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],LOW,self.risk,"long reversal",timer,repeat,LONG,self.ppro_out)
 		
+		self.transitional_trigger_buy.add_next_trigger(self.transitional_trigger_buy_2)
+		self.transitional_trigger_buy_2.add_next_trigger(self.buyreversalTrigger)
+		self.add_initial_triggers(self.transitional_trigger_buy)
 
-		transitional_trigger.add_next_trigger(transitional_trigger2)
-		transitional_trigger2.add_next_trigger(buyreversalTrigger)
 
-		self.add_initial_triggers(transitional_trigger)
 
-		transitional_trigger = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,RESISTENCE]],0,1,"Waiting for recross")
-		transitional_trigger2 = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],25,1,"Waiting for recross")
-		sellreversalTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],HIGH,self.risk,"short reversal",30,repeat,SHORT,self.ppro_out)
+		self.transitional_trigger_sell = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,RESISTENCE]],0,1,"Waiting for recross")
+		self.transitional_trigger_sell_2 = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],25,1,"Waiting for recross")
+		self.sellreversalTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],HIGH,self.risk,"short reversal",timer,repeat,SHORT,self.ppro_out)
 		
+		self.transitional_trigger_sell.add_next_trigger(self.transitional_trigger_sell_2)
+		self.transitional_trigger_sell_2.add_next_trigger(self.sellreversalTrigger)
+		self.add_initial_triggers(self.transitional_trigger_sell)
 
-		transitional_trigger.add_next_trigger(transitional_trigger2)
-		transitional_trigger2.add_next_trigger(sellreversalTrigger)
+
+	def on_redeploying(self):
+
+		""" whicheer gets used gets re-deploy """
+		if  self.buyreversalTrigger.get_trigger_state()==False and not self.buyreversalTrigger.pre_deploying_check():
+			self.transitional_trigger_buy.total_reset()
+			self.transitional_trigger_buy_2.total_reset()
+			self.buyreversalTrigger.total_reset()
+
+		if  self.sellreversalTrigger.get_trigger_state()==False and not self.sellreversalTrigger.pre_deploying_check():
+			self.transitional_trigger_sell.total_reset()
+			self.transitional_trigger_sell_2.total_reset()
+			self.buyreversalTrigger.total_reset()
 
 
-		self.add_initial_triggers(transitional_trigger)
+
 
 
 
@@ -273,22 +418,24 @@ class Fadeany(Strategy):
 class ManagementStrategy(Strategy):
 
 	def __init__(self,name,symbol:Symbol,tradingplan):
-		super().__init__("Management: Three pxt targets",symbol,tradingplan)
+		super().__init__(name,symbol,tradingplan)
 		
 	""" for management plan only """
-	def update_on_loadingup(self):
+	def on_loading_up(self):
 		pass
 
 	""" for management plan only """
-	def update_on_start(self):
+	def on_start(self):
 		self.manaTrigger.total_reset()
 		self.tradingplan.current_price_level = 1
 		self.set_mind("")
 
 
 	""" for management plan only """
-	def update_on_initializing_trade(self):
-		pass
+	def on_deploying(self):
+		self.current_triggers = set()
+		for i in self.initial_triggers:
+			self.current_triggers.add(i)
 
 class ThreePriceTargets(ManagementStrategy):
 
@@ -303,7 +450,7 @@ class ThreePriceTargets(ManagementStrategy):
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 		###upon activating, reset all parameters. 
 
-	def update_on_loadingup(self): #call this whenever the break at price changes. 
+	def on_loading_up(self): #call this whenever the break at price changes. 
 
 		price = self.tradingplan.data[AVERAGE_PRICE]
 		coefficient = 1
@@ -343,7 +490,7 @@ class ThreePriceTargets(ManagementStrategy):
 
 
 		#log_print(self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
-	def update_on_start(self):
+	def on_start(self):
 		self.manaTrigger.total_reset()
 		self.tradingplan.current_price_level = 1
 		self.set_mind("")
@@ -361,7 +508,7 @@ class OneToTWORiskReward(ManagementStrategy):
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 		###upon activating, reset all parameters. 
 
-	def update_on_loadingup(self): #call this whenever the break at price changes. 
+	def on_loading_up(self): #call this whenever the break at price changes. 
 
 		price = self.tradingplan.data[AVERAGE_PRICE]
 		stop = self.tradingplan.data[STOP_LEVEL]
@@ -419,7 +566,7 @@ class AncartMethod(ManagementStrategy):
 
 		### CALCULATE THE STOP HERE.? NO .
 
-	def update_on_loadingup(self): #call this whenever the break at price changes. 
+	def on_loading_up(self): #call this whenever the break at price changes. 
 
 		price = self.tradingplan.data[AVERAGE_PRICE]
 		coefficient = 1
@@ -453,8 +600,10 @@ class AncartMethod(ManagementStrategy):
 
 		#log_print(self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
 
+	def on_deploying(self):
 
-	def update_on_initializing_trade(self):
+		super().on_deploying()
+
 		try:
 			self.tradingplan.data[TARGET_SHARE] = int(self.tradingplan.tkvars[INPUT_TARGET_SHARE].get())
 			self.tradingplan.data[RISK_PER_SHARE] = float(self.tradingplan.tkvars[RISK_PER_SHARE].get())
@@ -521,8 +670,7 @@ class SmartTrail(ManagementStrategy):
 				self.tradingplan.adjusting_risk()
 				self.set_mind("$ lock-in: "+str(lock_in),GREEN)
 
-
-	def update_on_loadingup(self): #call this whenever the break at price changes. 
+	def on_loading_up(self): #call this whenever the break at price changes. 
 
 		price = self.tradingplan.data[AVERAGE_PRICE]
 		coefficient = 1
