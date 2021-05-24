@@ -200,6 +200,26 @@ def Ppro_out(pipe,port): #a sperate process. GLOBALLY.
 				rationale = d[3]
 				sell_market_order(symbol,share)
 
+			elif type_ == LIMITBUY:
+				
+				symbol = d[1]
+				price = round(d[2],2)
+				share = d[3]
+				rationale = d[4]
+
+				buy_limit_order(symbol,price,share)
+
+			elif type_ == LIMITSELL:
+
+				symbol = d[1]
+				price = round(d[2],2)
+				share = d[3]
+				rationale = d[4]
+
+				sell_limit_order(symbol,price,share)
+
+
+
 			elif type_ == "Register":
 
 				symbol = d[1]

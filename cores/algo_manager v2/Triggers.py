@@ -449,7 +449,7 @@ class Three_price_trigger(AbstractTrigger):
 		self.tradingplan.current_price_level+=1
 		self.tradingplan.update_displays()
 
-class TwoToOneTrigger(AbstractTrigger):
+class TwoToOneTriggerOLD(AbstractTrigger):
 	#Special type of trigger, overwrites action part. everything else is generic.
 	def __init__(self,description,ppro_out):
 		super().__init__(description,None,trigger_timer=0,trigger_limit=3)
@@ -514,6 +514,77 @@ class TwoToOneTrigger(AbstractTrigger):
 		self.set_mind("Covered No."+str(self.tradingplan.current_price_level)+" lot.",GREEN)
 		self.tradingplan.current_price_level+=1
 		self.tradingplan.update_displays()
+
+
+
+""" The new trigger only adjust the stops. 
+"""
+class TwoToOneTrigger(AbstractTrigger):
+	#Special type of trigger, overwrites action part. everything else is generic.
+	def __init__(self,description,ppro_out):
+		super().__init__(description,None,trigger_timer=0,trigger_limit=3)
+
+		self.ppro_out =ppro_out
+		self.conditions = [] 
+
+	def check_conditions(self):
+
+		level = ""
+		if self.tradingplan.current_price_level ==1: level= PXT1
+		if self.tradingplan.current_price_level ==2: level= PXT2
+		if self.tradingplan.current_price_level ==3: level= PXT3
+
+		if self.tradingplan.data[POSITION] == LONG:
+			self.conditions = [[SYMBOL_DATA,ASK,">",TP_DATA,level]]
+		elif self.tradingplan.data[POSITION] == SHORT:
+			self.conditions = [[SYMBOL_DATA,BID,"<",TP_DATA,level]]
+
+		#if self.tradingplan.data[POSITION]!="" and self.tradingplan.data[CURRENT_SHARE]>0:
+		if self.tradingplan.data[POSITION]!="":
+			return(super().check_conditions())
+	#add the actual stuff here.
+	def trigger_event(self):
+
+		share = min(self.tradingplan.data[TARGET_SHARE]//4,self.tradingplan.data[CURRENT_SHARE])
+
+		self.pos = self.tradingplan.data[POSITION]
+		#log_print("Trigger: Purchase PPRO EVENT: ",self.symbol_name,s,share,"at","stop:",self.stop,self.symbol_data[self.stop],self.symbol.get_time())
+
+		####################  SIDE.  ########################################
+		action = ""
+		if self.pos ==LONG:
+			action = SELL
+		elif self.pos ==SHORT:
+			action = BUY
+
+		if action !="":
+			if self.tradingplan.current_price_level == 1:
+				#self.ppro_out.send([action,self.symbol_name,share,self.description])
+
+				#half way.
+				self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[AVERAGE_PRICE]
+				self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[AVERAGE_PRICE])
+
+			if self.tradingplan.current_price_level == 2:
+				#self.ppro_out.send([action,self.symbol_name,share,self.description])
+
+				self.tradingplan.data[STOP_LEVEL]= self.tradingplan.data[PXT1]
+				self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[PXT1])
+
+				#move the stop to break even.
+
+			#if self.tradingplan.current_price_level == 3:
+				#self.ppro_out.send([action,self.symbol_name,self.tradingplan.data[CURRENT_SHARE],"manage "])
+
+				#move the stop to first price level. 
+		else:
+			log_print("unidentified side. ")
+
+		log_print(self.symbol_name," Hit price target", self.tradingplan.current_price_level,"New Stop:",self.tradingplan.data[STOP_LEVEL])
+		self.set_mind("Covered No."+str(self.tradingplan.current_price_level)+" lot.",GREEN)
+		self.tradingplan.current_price_level+=1
+		self.tradingplan.update_displays()
+
 
 
 class ANCART_trigger(AbstractTrigger):

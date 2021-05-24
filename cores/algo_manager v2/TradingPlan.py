@@ -1,11 +1,13 @@
 from Symbol import *
 from Triggers import *
 from Strategy import *
+from Strategy_Management import *
 from constant import*
 from Util_functions import *
 import tkinter as tkvars
 import time
 import threading
+
 # MAY THE MACHINE GOD BLESS THY AIM
 
 class TradingPlan:
@@ -531,7 +533,7 @@ class TradingPlan:
 	def on_finish(self,plan):
 		
 		if plan==self.entry_plan:
-			log_print(self.symbol_name,self.entry_plan.get_name()," completed, Management strategy begins.")
+			log_print(self.symbol_name,self.entry_plan.get_name()," completed.")
 			self.entry_strategy_done()
 			# done = threading.Thread(target=self.entry_strategy_done, daemon=True)
 			# done.start()

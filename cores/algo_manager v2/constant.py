@@ -108,6 +108,9 @@ BUY = "Buy"
 SELL = "Sell"
 FLATTEN = "Flatten"
 
+LIMITBUY = "Litmit Buy" 
+LIMITSELL = "Limit Sell"
+
 
 
 ##COLOR
