@@ -432,7 +432,7 @@ class Tester:
 				log_print("PPRO order:",d)
 				type_ = d[0]
 
-				#time.sleep(1)
+				time.sleep(1)
 				if type_ == "Buy":
 
 					symbol = d[1]
@@ -589,7 +589,7 @@ class Tester:
 		self.limit_buy_sell()
 
 	def limit_buy_sell(self):
-		
+
 		used = []
 		for key,item in self.buy_book.items():
 			if self.bid <= key:

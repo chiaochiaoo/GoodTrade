@@ -563,20 +563,22 @@ class TwoToOneTrigger(AbstractTrigger):
 			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[AVERAGE_PRICE])
 
 		if self.tradingplan.current_price_level == 1:
-
 			self.strategy.deploy_second_batch_torpedoes() #Auf die Plätze, fertig, los!
+			
 		if self.tradingplan.current_price_level == 2:
-
 			self.tradingplan.data[STOP_LEVEL]= self.tradingplan.data[PXT2]
 			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[PXT2])
 			self.strategy.deploy_third_batch_torpedoes()
 
 		if self.tradingplan.current_price_level == 3:
-
 			pass
 
+		if self.tradingplan.current_price_level == 0:
+			self.set_mind("Break even",GREEN)
+		else:
+			self.set_mind("Covered No."+str(self.tradingplan.current_price_level)+" lot.",GREEN)
+
 		log_print(self.symbol_name," Hit price target", self.tradingplan.current_price_level,"New Stop:",self.tradingplan.data[STOP_LEVEL])
-		self.set_mind("Covered No."+str(self.tradingplan.current_price_level)+" lot.",GREEN)
 		self.tradingplan.current_price_level+=1
 		self.tradingplan.update_displays()
 
@@ -644,6 +646,8 @@ class ANCART_trigger(AbstractTrigger):
 			log_print("unidentified side. ")
 
 		log_print(self.symbol_name," Hit price target", self.tradingplan.current_price_level,"New Stop:",self.tradingplan.data[STOP_LEVEL])
+
+		i
 		self.set_mind("Covered No."+str(self.tradingplan.current_price_level)+" lot.",GREEN)
 		self.tradingplan.current_price_level+=1
 		self.tradingplan.update_displays()

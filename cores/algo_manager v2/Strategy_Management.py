@@ -28,6 +28,7 @@ class ManagementStrategy(Strategy):
 	def __init__(self,name,symbol:Symbol,tradingplan):
 		super().__init__(name,symbol,tradingplan)
 
+		self.management_start = False
 		self.initialized = False
 		self.shares_loaded = False
 	""" for management plan only """
@@ -151,21 +152,21 @@ class OneToTWORiskReward(ManagementStrategy):
 		self.tradingplan.data[PXT1] = round(self.price+coefficient*self.gap*0.3,2) #break even price
 		self.tradingplan.data[PXT2] = round(self.price+coefficient*self.gap*1,2)  #transitional
 		self.tradingplan.data[PXT3] = round(self.price+coefficient*self.gap*2,2)  #transitional
-		self.tradingplan.data[PXT4] = round(self.price+coefficient*self.gap*3.2,2)  
+		self.tradingplan.data[PXT4] = round(self.price+coefficient*self.gap*3.2,2)
 
-		#set the price levels. 
+		#set the price levels.
 		#log_print(id_,"updating price levels.",price,self.price_levels[id_][1],self.price_levels[id_][2],self.price_levels[id_][3])
-	
+
 		self.tradingplan.tkvars[AUTOMANAGE].set(True)
 		self.tradingplan.tkvars[PXT1].set(self.tradingplan.data[PXT1])
 		self.tradingplan.tkvars[PXT2].set(self.tradingplan.data[PXT3])
 		self.tradingplan.tkvars[PXT3].set(self.tradingplan.data[PXT4])
 
-		log_print(self.symbol_name,"Management price target adjusted:",self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
+		log_print(self.symbol_name,"Management price target adjusted:",self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3],self.tradingplan.data[PXT4])
 
 		self.shares_loaded = True
 
-		if self.initialized == False:
+		if self.initialized == False and self.management_start==True:
 			self.on_start()
 
 	def on_start(self):
@@ -180,6 +181,8 @@ class OneToTWORiskReward(ManagementStrategy):
 			self.orders_organizer(first_lot,second_lot,third_lot)
 			self.deploy_first_batch_torpedoes()
 			self.initialized == True
+		else:
+			self.management_start=True
 
 	def shares_calculator(self,shares):
 
@@ -205,7 +208,7 @@ class OneToTWORiskReward(ManagementStrategy):
 		action = ""
 		if self.tradingplan.data[POSITION] == LONG:
 			action = LIMITSELL
-			
+
 		elif self.tradingplan.data[POSITION] == SHORT:
 			action = LIMITBUY
 			coefficient = -1
