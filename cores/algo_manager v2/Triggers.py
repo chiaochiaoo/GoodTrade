@@ -521,18 +521,26 @@ class TwoToOneTriggerOLD(AbstractTrigger):
 """
 class TwoToOneTrigger(AbstractTrigger):
 	#Special type of trigger, overwrites action part. everything else is generic.
-	def __init__(self,description,ppro_out):
-		super().__init__(description,None,trigger_timer=0,trigger_limit=3)
+	def __init__(self,description,strategy):
+		super().__init__(description,None,trigger_timer=0,trigger_limit=4)
 
-		self.ppro_out =ppro_out
+		self.strategy =strategy
 		self.conditions = [] 
+
+		self.second_oders = {}
+		self.third_orders = {}
+
+	def set_orders(self,second,third):
+		self.second_oders = second
+		self.third_orders = third
 
 	def check_conditions(self):
 
 		level = ""
-		if self.tradingplan.current_price_level ==1: level= PXT1
-		if self.tradingplan.current_price_level ==2: level= PXT2
-		if self.tradingplan.current_price_level ==3: level= PXT3
+		if self.tradingplan.current_price_level ==0: level= PXT1
+		if self.tradingplan.current_price_level ==1: level= PXT2
+		if self.tradingplan.current_price_level ==2: level= PXT3
+		if self.tradingplan.current_price_level ==3: level= PXT4
 
 		if self.tradingplan.data[POSITION] == LONG:
 			self.conditions = [[SYMBOL_DATA,ASK,">",TP_DATA,level]]
@@ -540,45 +548,32 @@ class TwoToOneTrigger(AbstractTrigger):
 			self.conditions = [[SYMBOL_DATA,BID,"<",TP_DATA,level]]
 
 		#if self.tradingplan.data[POSITION]!="" and self.tradingplan.data[CURRENT_SHARE]>0:
+
 		if self.tradingplan.data[POSITION]!="":
 			return(super().check_conditions())
-	#add the actual stuff here.
+
+		#add the actual stuff here.
+
 	def trigger_event(self):
 
-		share = min(self.tradingplan.data[TARGET_SHARE]//4,self.tradingplan.data[CURRENT_SHARE])
+		if self.tradingplan.current_price_level == 0:
+			
+			#BREAK EVEN
+			self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[AVERAGE_PRICE]
+			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[AVERAGE_PRICE])
 
-		self.pos = self.tradingplan.data[POSITION]
-		#log_print("Trigger: Purchase PPRO EVENT: ",self.symbol_name,s,share,"at","stop:",self.stop,self.symbol_data[self.stop],self.symbol.get_time())
+		if self.tradingplan.current_price_level == 1:
 
-		####################  SIDE.  ########################################
-		action = ""
-		if self.pos ==LONG:
-			action = SELL
-		elif self.pos ==SHORT:
-			action = BUY
+			self.strategy.deploy_second_batch_torpedoes() #Auf die Plätze, fertig, los!
+		if self.tradingplan.current_price_level == 2:
 
-		if action !="":
-			if self.tradingplan.current_price_level == 1:
-				#self.ppro_out.send([action,self.symbol_name,share,self.description])
+			self.tradingplan.data[STOP_LEVEL]= self.tradingplan.data[PXT2]
+			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[PXT2])
+			self.strategy.deploy_third_batch_torpedoes()
 
-				#half way.
-				self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[AVERAGE_PRICE]
-				self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[AVERAGE_PRICE])
+		if self.tradingplan.current_price_level == 3:
 
-			if self.tradingplan.current_price_level == 2:
-				#self.ppro_out.send([action,self.symbol_name,share,self.description])
-
-				self.tradingplan.data[STOP_LEVEL]= self.tradingplan.data[PXT1]
-				self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[PXT1])
-
-				#move the stop to break even.
-
-			#if self.tradingplan.current_price_level == 3:
-				#self.ppro_out.send([action,self.symbol_name,self.tradingplan.data[CURRENT_SHARE],"manage "])
-
-				#move the stop to first price level. 
-		else:
-			log_print("unidentified side. ")
+			pass
 
 		log_print(self.symbol_name," Hit price target", self.tradingplan.current_price_level,"New Stop:",self.tradingplan.data[STOP_LEVEL])
 		self.set_mind("Covered No."+str(self.tradingplan.current_price_level)+" lot.",GREEN)

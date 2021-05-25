@@ -52,7 +52,9 @@ MIND = "MIND"
 PXT1 = "tpx1"
 PXT2 = "tpx2"
 PXT3 = "tpx3"
-
+PXT4 = "tpx4"
+PXT5 = "tpx5"
+PXTF = "tpxF"
 
 STATUS = "Status"
 POSITION="Position"
@@ -124,3 +126,16 @@ LIGHTGREEN = "#97FEA8"
 STRONGGREEN = "#3DFC68"
 STRONGRED = "#FC433D"
 DEEPGREEN = "#059a12"
+
+
+
+
+
+
+
+#first,second,third = shares_calculator(8)
+
+
+
+#shares_puncher(first, second, third)
+

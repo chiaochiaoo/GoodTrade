@@ -84,7 +84,7 @@ class UI(pannel):
 		self.all_ent = tk.StringVar(value=INSTANT)
 		tk.OptionMenu(self.config, self.all_ent, *sorted(self.entry_type_options)).grid(sticky="w",column=2,row=7,padx=10)
 
-		self.all_mana = tk.StringVar(value=THREE_TARGETS)
+		self.all_mana = tk.StringVar(value=ONETOTWORISKREWARD)
 		tk.OptionMenu(self.config, self.all_mana, *sorted(self.management_plan_options)).grid(sticky="w",column=2,row=8,padx=10)
 
 		self.algo_deploy = ttk.Button(self.config, text="Apply to selected",command=self.manager.set_selected_tp)#,command=self.manager.set_all_tp)

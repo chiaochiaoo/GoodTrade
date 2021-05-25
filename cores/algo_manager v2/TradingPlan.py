@@ -81,7 +81,7 @@ class TradingPlan:
 
 		self.tkvars[ENTRYPLAN].set(entry_plan)
 		self.tkvars[ENTYPE].set(entry_type)
-		self.tkvars[MANAGEMENTPLAN].set(THREE_TARGETS)
+		self.tkvars[MANAGEMENTPLAN].set(ONETOTWORISKREWARD)
 
 		self.data[STATUS] = PENDING
 		self.tkvars[STATUS].set(PENDING)

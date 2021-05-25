@@ -391,6 +391,9 @@ class Tester:
 
 		self.wait_time = 1
 
+		self.buy_book = {}
+		self.sell_book = {}
+
 		# self.init= tk.Button(self.root ,text="Register",width=10,bg="#5BFF80",command=self.start_test)
 		# self.init.grid(column=1,row=1) m
 
@@ -475,6 +478,18 @@ class Tester:
 					self.ppro.send(["order confirm",data])
 
 
+				elif type_ == LIMITBUY:
+					symbol = d[1]
+					price = d[2]
+					share = d[3]
+
+					self.buy_book[price] = share
+				elif type_ == LIMITSELL:
+					symbol = d[1]
+					price = d[2]
+					share = d[3]
+
+					self.sell_book[price] = share
 				elif type_ == "Flatten":
 
 					symbol = d[1]
@@ -571,7 +586,39 @@ class Tester:
 
 		data["timestamp"]= self.sec
 		self.ppro.send(["order update",data])
+		self.limit_buy_sell()
 
+	def limit_buy_sell(self):
+		
+		used = []
+		for key,item in self.buy_book.items():
+			if self.bid <= key:
+				data={}
+				data["symbol"]= "SPY.AM"
+				data["side"]= LONG
+				data["price"]= float(self.ask)
+				data["shares"]= self.buy_book[key]
+				data["timestamp"]= self.sec
+				self.ppro.send(["order confirm",data])
+				used.append(key)
+
+		for i in used:
+			del self.buy_book[i]
+
+		used = []
+		for key,item in self.sell_book.items():
+			if self.ask >= key:
+				data={}
+				data["symbol"]= "SPY.AM"
+				data["side"]= SHORT
+				data["price"]= float(self.bid)
+				data["shares"]= self.sell_book[key]
+				data["timestamp"]= self.sec
+				self.ppro.send(["order confirm",data])
+				used.append(key)
+
+		for i in used:
+			del self.sell_book[i]
 
 if __name__ == '__main__':
 
