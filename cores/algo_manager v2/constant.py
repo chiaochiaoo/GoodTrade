@@ -136,7 +136,6 @@ STRONGRED = "#FC433D"
 DEEPGREEN = "#059a12"
 
 
-
 			
 	# def deploy_orders(self,orders):
 

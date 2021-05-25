@@ -3,6 +3,8 @@ from Symbol import *
 from Triggers import *
 from Util_functions import *
 
+import time
+
 from Strategy import *
 #import sys, inspect
 # "Omnissiah, Omnissiah.
@@ -196,6 +198,7 @@ class OneToTWORiskReward(ManagementStrategy):
 			return first_lot,first_lot,third_lot
 
 	def deploy_n_batch_torpedoes(self,n):
+
 		self.deploy_orders(self.total_orders[n-1])
 
 
@@ -211,11 +214,14 @@ class OneToTWORiskReward(ManagementStrategy):
 			coefficient = -1
 
 		#add some delay in here, random seconds. 
+		wait = [0.5,1.1,1.3,1.4,1.6]
+		c = 0
 		for key in sorted(orders.keys()):
 			if orders[key]>0:
 				price = round(self.price+coefficient*self.gap*key,2)
 				share = orders[key]
-				self.ppro_out.send([action,self.symbol_name,price,share,"Exit price "])
+				self.ppro_out.send([action,self.symbol_name,price,share,wait[c],"Exit price "])
+				c+=1 
 
 	def orders_organizer(self,first,second,third):
 

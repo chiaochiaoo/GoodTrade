@@ -4,6 +4,7 @@ import requests
 import threading 
 from constant import *
 from Util_functions import *
+import time
 #Thoughts:
 #Combine PPRO sutff with VOXCOM into one process.
 
@@ -57,6 +58,7 @@ def buy_market_order(symbol,share):
 	sucess='buy market order success on'+symbol
 	failure="Error buy order on"+symbol
    
+
 	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,),daemon=True)
 	req.start()
 
@@ -71,15 +73,7 @@ def sell_market_order(symbol,share):
 	req.start()
 
 
-def buy_limit_order(symbol, price,share):
 
-	price = round(float(price),2)
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Buy ARCX Limit DAY&shares='+str(share)
-	sucess='buy limit order success on'+symbol
-	failure="Error buy limit order on"+symbol
-   
-	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,),daemon=True)
-	req.start()
 
 def find_between(data, first, last):
 	try:
@@ -89,18 +83,31 @@ def find_between(data, first, last):
 	except ValueError:
 		return data
 
-def sell_limit_order(symbol, price,share):
+def buy_limit_order(symbol, price,share,wait=0):
+
+	price = round(float(price),2)
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Buy ARCX Limit DAY&shares='+str(share)
+	sucess='buy limit order success on'+symbol
+	failure="Error buy limit order on"+symbol
+   
+	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,wait,),daemon=True)
+	req.start()
+
+def sell_limit_order(symbol, price,share,wait=0):
 	price = round(float(price),2)
 
 	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Sell->Short ARCX Limit DAY&shares='+str(share)
 	sucess='sell limit order success on'+symbol
 	failure="Error sell limit order on"+symbol
    
-	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,),daemon=True)
+	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,wait,),daemon=True)
 	req.start()
 
-def ppro_request(request,success=None,failure=None,traceid=False,symbol=None,side=None,pipe=None):
+def ppro_request(request,success=None,failure=None,wait=0,traceid=False,symbol=None,side=None,pipe=None):
 	failure = 0
+
+	if wait!=0:
+		time.sleep(wait)
 
 	while True:
 		r = requests.post(request)
@@ -205,18 +212,19 @@ def Ppro_out(pipe,port): #a sperate process. GLOBALLY.
 				symbol = d[1]
 				price = round(d[2],2)
 				share = d[3]
-				rationale = d[4]
-
-				buy_limit_order(symbol,price,share)
+				wait = d[4]
+				rationale = d[5]
+				buy_limit_order(symbol,price,share,wait)
 
 			elif type_ == LIMITSELL:
 
 				symbol = d[1]
 				price = round(d[2],2)
 				share = d[3]
-				rationale = d[4]
+				wait = d[4]
+				rationale = d[5]
 
-				sell_limit_order(symbol,price,share)
+				sell_limit_order(symbol,price,share,wait)
 
 
 
