@@ -432,7 +432,7 @@ class Tester:
 				log_print("PPRO order:",d)
 				type_ = d[0]
 
-				time.sleep(1)
+				#time.sleep(1)
 				if type_ == "Buy":
 
 					symbol = d[1]
@@ -600,7 +600,8 @@ class Tester:
 				data["shares"]= self.buy_book[key]
 				data["timestamp"]= self.sec
 				self.ppro.send(["order confirm",data])
-				self.share-=self.buy_book[key]
+				self.share -= data["shares"]
+
 				used.append(key)
 
 		for i in used:
@@ -616,7 +617,7 @@ class Tester:
 				data["shares"]= self.sell_book[key]
 				data["timestamp"]= self.sec
 				self.ppro.send(["order confirm",data])
-				self.share-=self.buy_book[key]
+				self.share-= data["shares"]
 				used.append(key)
 
 		for i in used:
