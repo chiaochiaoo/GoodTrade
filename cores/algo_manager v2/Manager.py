@@ -600,6 +600,7 @@ class Tester:
 				data["shares"]= self.buy_book[key]
 				data["timestamp"]= self.sec
 				self.ppro.send(["order confirm",data])
+				self.share-=self.buy_book[key]
 				used.append(key)
 
 		for i in used:
@@ -615,6 +616,7 @@ class Tester:
 				data["shares"]= self.sell_book[key]
 				data["timestamp"]= self.sec
 				self.ppro.send(["order confirm",data])
+				self.share-=self.buy_book[key]
 				used.append(key)
 
 		for i in used:
