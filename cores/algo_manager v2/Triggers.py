@@ -522,7 +522,7 @@ class TwoToOneTriggerOLD(AbstractTrigger):
 class TwoToOneTrigger(AbstractTrigger):
 	#Special type of trigger, overwrites action part. everything else is generic.
 	def __init__(self,description,strategy):
-		super().__init__(description,None,trigger_timer=0,trigger_limit=4)
+		super().__init__(description,None,trigger_timer=0,trigger_limit=7)
 
 		self.strategy =strategy
 		self.conditions = [] 
@@ -537,10 +537,14 @@ class TwoToOneTrigger(AbstractTrigger):
 	def check_conditions(self):
 
 		level = ""
-		if self.tradingplan.current_price_level ==0: level= PXT1
-		if self.tradingplan.current_price_level ==1: level= PXT2
-		if self.tradingplan.current_price_level ==2: level= PXT3
-		if self.tradingplan.current_price_level ==3: level= PXT4
+
+		if self.strategy.orders_level ==1: level= TRIGGER_PRICE_1
+		elif self.strategy.orders_level ==2: level= TRIGGER_PRICE_2
+		elif self.strategy.orders_level ==3: level= TRIGGER_PRICE_3
+		elif self.strategy.orders_level ==4: level= TRIGGER_PRICE_4
+		elif self.strategy.orders_level ==5: level= TRIGGER_PRICE_5
+		elif self.strategy.orders_level ==6: level= TRIGGER_PRICE_6
+		elif self.strategy.orders_level ==7: level= TRIGGER_PRICE_7
 
 		if self.tradingplan.data[POSITION] == LONG:
 			self.conditions = [[SYMBOL_DATA,ASK,">",TP_DATA,level]]
@@ -556,30 +560,42 @@ class TwoToOneTrigger(AbstractTrigger):
 
 	def trigger_event(self):
 
-		if self.tradingplan.current_price_level == 0:
+		if self.strategy.orders_level == 1:
 			
 			#BREAK EVEN
 			self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[AVERAGE_PRICE]
 			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[AVERAGE_PRICE])
-
-		if self.tradingplan.current_price_level == 1:
-			self.strategy.deploy_second_batch_torpedoes() #Auf die Plätze, fertig, los!
-			
-		if self.tradingplan.current_price_level == 2:
-			self.tradingplan.data[STOP_LEVEL]= self.tradingplan.data[PXT2]
-			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[PXT2])
-			self.strategy.deploy_third_batch_torpedoes()
-
-		if self.tradingplan.current_price_level == 3:
-			pass
-
-		if self.tradingplan.current_price_level == 0:
 			self.set_mind("Break even",GREEN)
-		else:
-			self.set_mind("Covered No."+str(self.tradingplan.current_price_level)+" lot.",GREEN)
 
-		log_print(self.symbol_name," Hit price target", self.tradingplan.current_price_level,"New Stop:",self.tradingplan.data[STOP_LEVEL])
-		self.tradingplan.current_price_level+=1
+		if self.strategy.orders_level == 2:
+			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
+			self.tradingplan.current_price_level = 2
+			self.set_mind("Covered No."+str(1)+" lot.",GREEN)
+
+		if self.strategy.orders_level == 3:
+			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
+			self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[TRIGGER_PRICE_1]
+			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[TRIGGER_PRICE_1])
+			
+		if self.strategy.orders_level == 4:
+			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
+			self.tradingplan.current_price_level = 3
+			self.set_mind("Covered No."+str(2)+" lot.",GREEN)
+			self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[TRIGGER_PRICE_2]
+			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[TRIGGER_PRICE_2])
+
+		if self.strategy.orders_level == 5:
+			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
+			self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[TRIGGER_PRICE_3]
+			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[TRIGGER_PRICE_3])
+
+		if self.strategy.orders_level == 6:
+			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
+			self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[TRIGGER_PRICE_4]
+			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[TRIGGER_PRICE_4])
+
+		# log_print(self.symbol_name," Hit price target", self.tradingplan.current_price_level,"New Stop:",self.tradingplan.data[STOP_LEVEL])
+		self.strategy.orders_level +=1
 		self.tradingplan.update_displays()
 
 

@@ -56,6 +56,14 @@ PXT4 = "tpx4"
 PXT5 = "tpx5"
 PXTF = "tpxF"
 
+TRIGGER_PRICE_1 = "Trigger_price_1"
+TRIGGER_PRICE_2 = "Trigger_price_2"
+TRIGGER_PRICE_3 = "Trigger_price_3"
+TRIGGER_PRICE_4 = "Trigger_price_4"
+TRIGGER_PRICE_5 = "Trigger_price_5"
+TRIGGER_PRICE_6 = "Trigger_price_6"
+TRIGGER_PRICE_7 = "Trigger_price_7"
+
 STATUS = "Status"
 POSITION="Position"
 MANASTRAT = "ManaStart"
@@ -129,13 +137,22 @@ DEEPGREEN = "#059a12"
 
 
 
+			
+	# def deploy_orders(self,orders):
 
+	# 	coefficient = 1
+	# 	action = ""
+	# 	if self.tradingplan.data[POSITION] == LONG:
+	# 		action = LIMITSELL
 
+	# 	elif self.tradingplan.data[POSITION] == SHORT:
+	# 		action = LIMITBUY
+	# 		coefficient = -1
 
+	# 	for key in sorted(orders.keys()):
+	# 		if orders[key]>0:
+	# 			price = round(self.price+coefficient*self.gap*key,2)
+	# 			share = orders[key]
+	# 			self.ppro_out.send([action,self.symbol_name,price,share,"Exit price "])
 
-#first,second,third = shares_calculator(8)
-
-
-
-#shares_puncher(first, second, third)
 

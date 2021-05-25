@@ -120,10 +120,8 @@ class OneToTWORiskReward(ManagementStrategy):
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 		###upon activating, reset all parameters. 
-
-		self.first_orders = None
-		self.second_orders = None
-		self.third_orders = None
+		self.total_orders = None
+		self.orders_level = 1
 
 		self.price = self.tradingplan.data[AVERAGE_PRICE]
 		self.stop = self.tradingplan.data[STOP_LEVEL]
@@ -148,21 +146,23 @@ class OneToTWORiskReward(ManagementStrategy):
 		px4 = 3.2 #over and out.
 
 		"""
-
-		self.tradingplan.data[PXT1] = round(self.price+coefficient*self.gap*0.3,2) #break even price
-		self.tradingplan.data[PXT2] = round(self.price+coefficient*self.gap*1,2)  #transitional
-		self.tradingplan.data[PXT3] = round(self.price+coefficient*self.gap*2,2)  #transitional
-		self.tradingplan.data[PXT4] = round(self.price+coefficient*self.gap*3.2,2)
+		self.tradingplan.data[TRIGGER_PRICE_1] = round(self.price+coefficient*self.gap*0.3,2) #break even price
+		self.tradingplan.data[TRIGGER_PRICE_2] = round(self.price+coefficient*self.gap*0.7,2)  #second
+		self.tradingplan.data[TRIGGER_PRICE_3] = round(self.price+coefficient*self.gap*1.2,2)  #third
+		self.tradingplan.data[TRIGGER_PRICE_4] = round(self.price+coefficient*self.gap*1.7,2)  #fourth
+		self.tradingplan.data[TRIGGER_PRICE_5] = round(self.price+coefficient*self.gap*2.2,2)  #fifth
+		self.tradingplan.data[TRIGGER_PRICE_6] = round(self.price+coefficient*self.gap*2.7,2)  #sixth
+		self.tradingplan.data[TRIGGER_PRICE_7] = round(self.price+coefficient*self.gap*3.2,2)  #FINAL
 
 		#set the price levels.
 		#log_print(id_,"updating price levels.",price,self.price_levels[id_][1],self.price_levels[id_][2],self.price_levels[id_][3])
 
 		self.tradingplan.tkvars[AUTOMANAGE].set(True)
-		self.tradingplan.tkvars[PXT1].set(self.tradingplan.data[PXT1])
-		self.tradingplan.tkvars[PXT2].set(self.tradingplan.data[PXT3])
-		self.tradingplan.tkvars[PXT3].set(self.tradingplan.data[PXT4])
+		self.tradingplan.tkvars[PXT1].set(self.tradingplan.data[TRIGGER_PRICE_1])
+		self.tradingplan.tkvars[PXT2].set(self.tradingplan.data[TRIGGER_PRICE_5])
+		self.tradingplan.tkvars[PXT3].set(self.tradingplan.data[TRIGGER_PRICE_7])
 
-		log_print(self.symbol_name,"Management price target adjusted:",self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3],self.tradingplan.data[PXT4])
+		log_print(self.symbol_name,"Management price target adjusted:",self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
 
 		self.shares_loaded = True
 
@@ -176,10 +176,11 @@ class OneToTWORiskReward(ManagementStrategy):
 			super().on_start()
 
 			""" send out the limit orders """
-			self.tradingplan.current_price_level = 0
+			self.tradingplan.current_price_level = 1
+			self.orders_level = 1
 			first_lot,second_lot,third_lot = self.shares_calculator(self.tradingplan.data[TARGET_SHARE])
 			self.orders_organizer(first_lot,second_lot,third_lot)
-			self.deploy_first_batch_torpedoes()
+			self.deploy_n_batch_torpedoes(1)
 			self.initialized == True
 		else:
 			self.management_start=True
@@ -194,13 +195,9 @@ class OneToTWORiskReward(ManagementStrategy):
 
 			return first_lot,first_lot,third_lot
 
-	def deploy_first_batch_torpedoes(self):
-		self.deploy_orders(self.first_orders)
+	def deploy_n_batch_torpedoes(self,n):
+		self.deploy_orders(self.total_orders[n-1])
 
-	def deploy_second_batch_torpedoes(self):
-		self.deploy_orders(self.second_orders)
-	def deploy_third_batch_torpedoes(self):
-		self.deploy_orders(self.third_orders)
 
 	def deploy_orders(self,orders):
 
@@ -221,27 +218,42 @@ class OneToTWORiskReward(ManagementStrategy):
 
 	def orders_organizer(self,first,second,third):
 
-		first_lot  =  [0.7,0.8,0.6,0.9,0.5,1.0,0.4,1.1,0.3,1.2]
-		second_lot =  [1.7,1.8,1.6,1.9,1.5,2.0,1.4,2.1,1.3,2.2]
-		third_lot  =  [2.7,2.8,2.6,2.9,2.5,3.0,2.4,3.1,2.3,3.2]
+		### Arange this way to distribute it around the key areas. 
+		first_lot  =  [0.5,1.0,0.4,0.9,0.6,1.1,0.7,1.2,0.3,0.8]
+		second_lot =  [1.5,2.0,1.4,1.9,1.6,2.1,1.7,2.2,1.3,1.8]
+		third_lot  =  [2.5,3.0,2.4,2.9,2.6,3.1,2.7,3.2,2.3,2.8]
 
 		all_lots = [first_lot,second_lot,third_lot]
 		shares = [first,second,third]
 
-		new_shares = [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0]]
+		new_shares = [[0,0,0,0,0,0,0,0,0,0] for i in range(3)]
 
 		for i in range(len(new_shares)):
 			for j in range(shares[i]):
 				new_shares[i][j%10] +=1
 
-		all_orders = [{},{},{}]
-		for i in range(len(all_lots)):
+		share_distribution = {}
+		for i in range(len(new_shares)):
 			for j in range(len(new_shares[i])):
-				all_orders[i][all_lots[i][j]] = new_shares[i][j]
+				share_distribution[all_lots[i][j]] = new_shares[i][j]
 
-		self.first_orders = all_orders[0]
-		self.second_orders = all_orders[1]
-		self.third_orders = all_orders[2]
+		# Now we have all orders. let's slice them up.
+
+		total_list = []
+		total_list.extend(first_lot)
+		total_list.extend(second_lot)
+		total_list.extend(third_lot)
+		list.sort(total_list)
+		orders = [total_list[5*i:5*i+5] for i in range(6)]
+		#now chop the total_list into 6 sections. then grab the shares from all_orders
+
+		total_orders = []
+		for i in range(len(orders)):
+			total_orders.append({})
+			for j in range(len(orders[i])):
+				total_orders[i][orders[i][j]] = share_distribution[orders[i][j]]
+			
+		self.total_orders = total_orders
 
 class AncartMethod(ManagementStrategy):
 
