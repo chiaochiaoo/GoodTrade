@@ -210,6 +210,7 @@ class OneToTWORiskReward(ManagementStrategy):
 			action = LIMITBUY
 			coefficient = -1
 
+		#add some delay in here, random seconds. 
 		for key in sorted(orders.keys()):
 			if orders[key]>0:
 				price = round(self.price+coefficient*self.gap*key,2)
