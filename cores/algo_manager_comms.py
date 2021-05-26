@@ -29,7 +29,7 @@ def kill():
 def algo_manager_commlink(pipe):
 
 	HOST = 'localhost'  # Standard loopback interface address (localhost)
-	PORT = 65491        # Port to listen on (non-privileged ports are > 1023)
+	PORT = 66491        # Port to listen on (non-privileged ports are > 1023)
 
 
 	while True:
