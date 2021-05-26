@@ -110,9 +110,8 @@ NONE =          "NONE"
 THREE_TARGETS = "Three tgts "
 SMARTTRAIL =  "SmartTrail" 
 ANCARTMETHOD =  "AC METHOD"
-ONETOTWORISKREWARD = "1:2 Exprmntl"
+ONETOTWORISKREWARD = "1:2 RiskReward"
 
-ONETOTWORISKREWARDOLD = "1:2 RiskReward"
 ##### ORDER TYPE ####
 
 BUY = "Buy"
