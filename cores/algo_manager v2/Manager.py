@@ -31,7 +31,7 @@ def algo_manager_voxcom(pipe):
 	while True:
 
 		HOST = 'localhost'  # The server's hostname or IP address
-		PORT = 65499       # The port used by the server
+		PORT = 65491       # The port used by the server
 
 		try:
 			log_print("Trying to connect to the main application")
