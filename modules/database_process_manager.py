@@ -95,7 +95,7 @@ class database_process_manager:
 
 						self.reg_list.append(symbol)
 						self.data_status[symbol].set(True)
-						print(symbol," setting complete")
+						#print(symbol," setting complete")
 
 					else:
 						print("Data length mismatch:",len(d)-1,len(self.data))
@@ -232,7 +232,7 @@ def fetch_data(symbol):
 			prev_close = float(lst[C])
 
 
-		print(symbol,"Fetch range data complete:",len(range_),"days")
+		#print(symbol,"Fetch range data complete:",len(range_),"days")
 
 
 		#set the var.
@@ -286,7 +286,7 @@ def fetch_data(symbol):
 					d.append(v)
 
 
-			print(symbol,"Fetch 5-min  data complete:",len(a),"days")
+			#print(symbol,"Fetch 5-min  data complete:",len(a),"days")
 
 
 			#set the var.

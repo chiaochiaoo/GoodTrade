@@ -761,6 +761,8 @@ class openhigh(alert):
 		hist_std = self.data.symbol_data_openhigh_std[symbol]
 		hist_range= self.data.symbol_data_openhigh_range[symbol]
 
+		open_now  = self.data.symbol_price_opennow[symbol]
+
 		eva= self.data.symbol_data_openhigh_eval[symbol]
 		time = self.data.symbol_update_time[symbol]
 
@@ -773,7 +775,7 @@ class openhigh(alert):
 		alert_type = "Intraday Open-High"
 
 		#cur, mean, std. symbol, time. 
-		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type,alert_val]
+		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type,alert_val,open_now]
 		labels = [symbol,status,cur_range,cur_open,cur_high,hist_avg,hist_std,hist_range,eva]
 
 
@@ -787,6 +789,86 @@ class openhigh(alert):
 		super().add_symbol(symbol,labels,alert_positions,alerts,data_ready)
 
 	#find a way to bound the special checking value to. hmm. every update.
+	def alert(self,eval_string,eval_label,alerts_vals,ready,status):
+
+		#check how many std it is. `
+
+		#attention, only do the calculation when the database is set. 
+
+		try:
+
+			if ready.get() == True and status.get() =="Connected":
+
+				symbol= alerts_vals[0]
+				time= alerts_vals[1].get()
+				alert_type = alerts_vals[5]
+
+				minute= time[:5]
+				second = time[:8]
+				ts = timestamp(time)
+				seconds = timestamp_seconds(second)
+
+
+				cur_price= abs(round(alerts_vals[2].get(),3))
+
+				now =  round(alerts_vals[7].get(),3)
+
+				mean= round(alerts_vals[3].get(),3)
+				std=  round(alerts_vals[4].get(),3)
+
+				#on certain alert_type, the math can be different. 
+
+
+				if std != 0:
+					cur = round((cur_price-mean)/std,1)
+					if now>0:
+						now_ = round((now-mean)/std,1)
+					else:
+						now_ = 0 
+					eval_string.set("Cur:"+str(now_)+" Max:"+str(cur))
+				else:
+					cur = 0
+					eval_string.set("Unable to process std 0")
+
+				#color.
+				#cur = abs(cur)
+				alert_val = alerts_vals[6]
+				alert_val.set(now_)
+
+				if now_ <0.5:
+					eval_label["background"]="white"
+
+				elif now_>0.5 and now_<1:
+
+					alert_str = "Moderate "+alert_type
+					eval_label["background"]="#97FEA8"
+
+					if ts>570 and self.alerts[symbol][alert_type] < 0.5:
+						self.alerts[symbol][alert_type] = 0.5
+						self.alert_pannel.add_alerts([symbol,time,alert_str])
+						self.set_latest_alert(symbol, alert_str, time)
+
+				elif now_>1 and now_<2 and self.alerts[symbol][alert_type] < 1:
+					self.alerts[symbol][alert_type] = 1
+					alert_str = "High "+alert_type
+					eval_label["background"]="yellow"
+					if ts>570:
+						#only set when there is higher severity. 
+						self.alert_pannel.add_alerts([symbol,time,alert_str])
+						self.set_latest_alert(symbol, alert_str, time)
+				elif now_>2 and self.alerts[symbol][alert_type] < 2:
+
+					self.alerts[symbol][alert_type] = 2
+					### Send the alert to alert pannel.
+					alert_str = "Very high "+alert_type
+					eval_label["background"]="red"
+					if ts>570:
+						self.alert_pannel.add_alerts([symbol,time,alert_str])
+						self.set_latest_alert(symbol, alert_str, time)
+
+		except Exception as e:
+			print("Alert Error:",e)
+
 
 class openlow(alert):
 
@@ -812,6 +894,7 @@ class openlow(alert):
 		hist_avg= self.data.symbol_data_openlow_val[symbol]
 		hist_std = self.data.symbol_data_openlow_std[symbol]
 		hist_range= self.data.symbol_data_openlow_range[symbol]
+		open_now  = self.data.symbol_price_opennow[symbol]
 
 		eva= self.data.symbol_data_openlow_eval[symbol]
 		time = self.data.symbol_update_time[symbol]
@@ -825,7 +908,7 @@ class openlow(alert):
 		alert_type = "Intraday Open-Low"
 
 		#cur, mean, std. symbol, time. 
-		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type,alert_val]
+		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type,alert_val,open_now]
 		labels = [symbol,status,cur_range,cur_open,cur_low,hist_avg,hist_std,hist_range,eva]
 
 
@@ -839,7 +922,85 @@ class openlow(alert):
 
 		#self,symbol,format,width,val_position,alert_position,alert_vals
 		super().add_symbol(symbol,labels,alert_positions,alerts,data_ready)
+	def alert(self,eval_string,eval_label,alerts_vals,ready,status):
 
+		#check how many std it is. `
+
+		#attention, only do the calculation when the database is set. 
+
+		try:
+
+			if ready.get() == True and status.get() =="Connected":
+
+				symbol= alerts_vals[0]
+				time= alerts_vals[1].get()
+				alert_type = alerts_vals[5]
+
+				minute= time[:5]
+				second = time[:8]
+				ts = timestamp(time)
+				seconds = timestamp_seconds(second)
+
+
+				cur_price= abs(round(alerts_vals[2].get(),3))
+
+				now =  round(alerts_vals[7].get(),3)
+
+				mean= round(alerts_vals[3].get(),3)
+				std=  round(alerts_vals[4].get(),3)
+
+				#on certain alert_type, the math can be different. 
+
+
+				if std != 0:
+					cur = round((cur_price-mean)/std,1)
+					if now<0:
+						now_ = round((abs(now)-mean)/std,1)
+					else:
+						now_ = 0 
+					eval_string.set("Cur:"+str(now_)+" Max:"+str(cur))
+				else:
+					cur = 0
+					eval_string.set("Unable to process std 0")
+
+				#color.
+				#cur = abs(cur)
+				alert_val = alerts_vals[6]
+				alert_val.set(now_)
+
+				if now_ <0.5:
+					eval_label["background"]="white"
+
+				elif now_>0.5 and now_<1:
+
+					alert_str = "Moderate "+alert_type
+					eval_label["background"]="#97FEA8"
+
+					if ts>570 and self.alerts[symbol][alert_type] < 0.5:
+						self.alerts[symbol][alert_type] = 0.5
+						self.alert_pannel.add_alerts([symbol,time,alert_str])
+						self.set_latest_alert(symbol, alert_str, time)
+
+				elif now_>1 and now_<2 and self.alerts[symbol][alert_type] < 1:
+					self.alerts[symbol][alert_type] = 1
+					alert_str = "High "+alert_type
+					eval_label["background"]="yellow"
+					if ts>570:
+						#only set when there is higher severity. 
+						self.alert_pannel.add_alerts([symbol,time,alert_str])
+						self.set_latest_alert(symbol, alert_str, time)
+				elif now_>2 and self.alerts[symbol][alert_type] < 2:
+
+					self.alerts[symbol][alert_type] = 2
+					### Send the alert to alert pannel.
+					alert_str = "Very high "+alert_type
+					eval_label["background"]="red"
+					if ts>570:
+						self.alert_pannel.add_alerts([symbol,time,alert_str])
+						self.set_latest_alert(symbol, alert_str, time)
+
+		except Exception as e:
+			print("Alert Error:",e)
 	#find a way to bound the special checking value to. hmm. every update.
 
 #########################

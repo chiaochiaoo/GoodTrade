@@ -48,6 +48,7 @@ class Symbol_data_manager:
 		self.symbol_price_range = {}
 		self.symbol_price_openhigh = {}
 		self.symbol_price_openlow = {}
+		self.symbol_open_current_range = {}
 
 		self.symbol_price_premarket_high = {}
 		self.symbol_price_premarket_low = {}
@@ -212,6 +213,7 @@ class Symbol_data_manager:
 		self.symbol_price_open,
 		self.symbol_price_openhigh,
 		self.symbol_price_openlow,
+		self.symbol_price_opennow,
 		self.first_5_min_range,
 		self.first_5_min_volume,
 		self.symbol_price_prevclose,
@@ -300,7 +302,9 @@ class Symbol_data_manager:
 		self.symbol_price_low[i] = DoubleVar()
 		self.symbol_price_openhigh[i] = DoubleVar()
 		self.symbol_price_openlow[i] = DoubleVar()
+
 		self.symbol_price_opennow[i] = DoubleVar()
+
 		self.symbol_price_prevclose_to_now[i] = DoubleVar()
 
 		self.symbol_price_premarket_high[i] = DoubleVar()

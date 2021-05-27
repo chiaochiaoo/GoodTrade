@@ -381,7 +381,7 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 	d["prev_close_gap"] = 0
 	d["prev_close_percentage"] = 0
 
-
+	d["open_current_range"] = 0
 	d["open_percentage"] = 0
 
 	d["volume"] = 0
@@ -451,10 +451,11 @@ def process_and_send(lst,pipe):
 		d["oh"] = round(d["high"] - open_,3)
 		d["ol"] = round(open_ - d["low"],3)
 		if open_!=0:
+			d["open_current_range"] = round((price-open_),2)
 			d["open_percentage"] =  round(((price-open_)*100/open_),2)
 		else:
 			d["open_percentage"] = 0
-
+			d["open_current_range"] = 0
 
 
 	d["prev_close_gap"] = round(price-prev_close,3)
@@ -544,7 +545,7 @@ def process_and_send(lst,pipe):
 	d["last_5_range_percentage"] = round(d["last_5_range"]*100/(price+0.00000001),2)
 
 	pipe.send([status,symbol,price,time,timestamp,d["high"],d["low"],d["phigh"],d["plow"],\
-		d["range"],d["last_5_range"],d["vol"],d["open"],d["oh"],d["ol"],
+		d["range"],d["last_5_range"],d["vol"],d["open"],d["oh"],d["ol"],d["open_current_range"],
 		d["f5r"],d["f5v"],d["prev_close"],d["prev_close_gap"],d["prev_close_percentage"],d["open_percentage"],d["last_5_range_percentage"],d["status"]])
 
 	#print("sent",symbol)
