@@ -63,6 +63,8 @@ TRIGGER_PRICE_4 = "Trigger_price_4"
 TRIGGER_PRICE_5 = "Trigger_price_5"
 TRIGGER_PRICE_6 = "Trigger_price_6"
 TRIGGER_PRICE_7 = "Trigger_price_7"
+TRIGGER_PRICE_8 = "Trigger_price_8"
+TRIGGER_PRICE_9 = "Trigger_price_9"
 
 STATUS = "Status"
 POSITION="Position"

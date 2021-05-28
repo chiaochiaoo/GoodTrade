@@ -522,7 +522,7 @@ class TwoToOneTriggerOLD(AbstractTrigger):
 class TwoToOneTrigger(AbstractTrigger):
 	#Special type of trigger, overwrites action part. everything else is generic.
 	def __init__(self,description,strategy):
-		super().__init__(description,None,trigger_timer=0,trigger_limit=7)
+		super().__init__(description,None,trigger_timer=0,trigger_limit=9)
 
 		self.strategy =strategy
 		self.conditions = [] 
@@ -545,6 +545,8 @@ class TwoToOneTrigger(AbstractTrigger):
 		elif self.strategy.orders_level ==5: level= TRIGGER_PRICE_5
 		elif self.strategy.orders_level ==6: level= TRIGGER_PRICE_6
 		elif self.strategy.orders_level ==7: level= TRIGGER_PRICE_7
+		elif self.strategy.orders_level ==8: level= TRIGGER_PRICE_8
+		elif self.strategy.orders_level ==9: level= TRIGGER_PRICE_9
 
 		if self.tradingplan.data[POSITION] == LONG:
 			self.conditions = [[SYMBOL_DATA,ASK,">",TP_DATA,level]]
@@ -563,39 +565,55 @@ class TwoToOneTrigger(AbstractTrigger):
 		if self.strategy.orders_level == 1:
 			
 			#BREAK EVEN
-			self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[AVERAGE_PRICE]
+			self.tradingplan.data[STOP_LEVEL]=round((self.tradingplan.data[STOP_LEVEL]*3+self.tradingplan.data[AVERAGE_PRICE])/4,2)
+			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[STOP_LEVEL])
+			self.set_mind("75% risk",GREEN)
+		if self.strategy.orders_level == 2:
+			
+			#BREAK EVEN
+			self.tradingplan.data[STOP_LEVEL]=round((self.tradingplan.data[STOP_LEVEL]*2+self.tradingplan.data[AVERAGE_PRICE])/3,2)
+			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[STOP_LEVEL])
+			self.set_mind("Half risk",GREEN)
+
+		if self.strategy.orders_level == 3:
+			
+			#BREAK EVEN
+			self.tradingplan.data[STOP_LEVEL]=round(self.tradingplan.data[AVERAGE_PRICE],2)
 			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[AVERAGE_PRICE])
 			self.set_mind("Break even",GREEN)
 
-		if self.strategy.orders_level == 2:
+		if self.strategy.orders_level == 4:
+			self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[AVERAGE_PRICE]
+			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[AVERAGE_PRICE])
 			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
 			self.tradingplan.current_price_level = 2
 			self.set_mind("Covered No."+str(1)+" lot.",GREEN)
-
-		if self.strategy.orders_level == 3:
-			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
-			self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[TRIGGER_PRICE_1]
-			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[TRIGGER_PRICE_1])
-			
-		if self.strategy.orders_level == 4:
-			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
-			self.tradingplan.current_price_level = 3
-			self.set_mind("Covered No."+str(2)+" lot.",GREEN)
-			self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[TRIGGER_PRICE_2]
-			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[TRIGGER_PRICE_2])
 
 		if self.strategy.orders_level == 5:
 			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
 			self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[TRIGGER_PRICE_3]
 			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[TRIGGER_PRICE_3])
-
+			
 		if self.strategy.orders_level == 6:
 			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
+			self.tradingplan.current_price_level = 3
+			self.set_mind("Covered No."+str(2)+" lot.",GREEN)
 			self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[TRIGGER_PRICE_4]
 			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[TRIGGER_PRICE_4])
 
+		if self.strategy.orders_level == 7:
+			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
+			self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[TRIGGER_PRICE_5]
+			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[TRIGGER_PRICE_5])
+
+		if self.strategy.orders_level == 8:
+			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
+			self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[TRIGGER_PRICE_6]
+			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[TRIGGER_PRICE_6])
+
 		# log_print(self.symbol_name," Hit price target", self.tradingplan.current_price_level,"New Stop:",self.tradingplan.data[STOP_LEVEL])
 		self.strategy.orders_level +=1
+		self.tradingplan.adjusting_risk()
 		self.tradingplan.update_displays()
 
 

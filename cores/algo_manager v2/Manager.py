@@ -374,8 +374,10 @@ class Tester:
 
 	def __init__(self,receive_pipe,ppro_in,ppro_out):
 
+		now = datetime.now()
 
-		self.sec = 0
+		self.sec =  now.hour*3600 + now.minute*60 + now.second
+		print(self.sec)
 		self.bid=0
 		self.ask=0
 

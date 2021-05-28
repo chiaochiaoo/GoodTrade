@@ -145,21 +145,23 @@ class OneToTWORiskReward(ManagementStrategy):
 		px4 = 3.2 #over and out.
 
 		"""
-		self.tradingplan.data[TRIGGER_PRICE_1] = round(self.price+coefficient*self.gap*0.3,2) #break even price
-		self.tradingplan.data[TRIGGER_PRICE_2] = round(self.price+coefficient*self.gap*0.7,2)  #second
-		self.tradingplan.data[TRIGGER_PRICE_3] = round(self.price+coefficient*self.gap*1.2,2)  #third
-		self.tradingplan.data[TRIGGER_PRICE_4] = round(self.price+coefficient*self.gap*1.7,2)  #fourth
-		self.tradingplan.data[TRIGGER_PRICE_5] = round(self.price+coefficient*self.gap*2.2,2)  #fifth
-		self.tradingplan.data[TRIGGER_PRICE_6] = round(self.price+coefficient*self.gap*2.7,2)  #sixth
-		self.tradingplan.data[TRIGGER_PRICE_7] = round(self.price+coefficient*self.gap*3.2,2)  #FINAL
+		self.tradingplan.data[TRIGGER_PRICE_1] = round(self.price+coefficient*self.gap*0.2,2)  #75%
+		self.tradingplan.data[TRIGGER_PRICE_2] = round(self.price+coefficient*self.gap*0.3,2)  #half
+		self.tradingplan.data[TRIGGER_PRICE_3] = round(self.price+coefficient*self.gap*0.5,2)  #br even
+		self.tradingplan.data[TRIGGER_PRICE_4] = round(self.price+coefficient*self.gap*0.7,2)  #second
+		self.tradingplan.data[TRIGGER_PRICE_5] = round(self.price+coefficient*self.gap*1.2,2)  #third
+		self.tradingplan.data[TRIGGER_PRICE_6] = round(self.price+coefficient*self.gap*1.7,2)  #fourth
+		self.tradingplan.data[TRIGGER_PRICE_7] = round(self.price+coefficient*self.gap*2.2,2)  #fifth
+		self.tradingplan.data[TRIGGER_PRICE_8] = round(self.price+coefficient*self.gap*2.7,2)  #sixth
+		self.tradingplan.data[TRIGGER_PRICE_9] = round(self.price+coefficient*self.gap*3.2,2)  #FINAL
 
 		#set the price levels.
 		#log_print(id_,"updating price levels.",price,self.price_levels[id_][1],self.price_levels[id_][2],self.price_levels[id_][3])
 
 		self.tradingplan.tkvars[AUTOMANAGE].set(True)
 		self.tradingplan.tkvars[PXT1].set(self.tradingplan.data[TRIGGER_PRICE_1])
-		self.tradingplan.tkvars[PXT2].set(self.tradingplan.data[TRIGGER_PRICE_5])
-		self.tradingplan.tkvars[PXT3].set(self.tradingplan.data[TRIGGER_PRICE_7])
+		self.tradingplan.tkvars[PXT2].set(self.tradingplan.data[TRIGGER_PRICE_7])
+		self.tradingplan.tkvars[PXT3].set(self.tradingplan.data[TRIGGER_PRICE_9])
 
 		log_print(self.symbol_name,"Management price target adjusted:",self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
 
@@ -179,7 +181,7 @@ class OneToTWORiskReward(ManagementStrategy):
 			self.orders_level = 1
 			first_lot,second_lot,third_lot = self.shares_calculator(self.tradingplan.data[TARGET_SHARE])
 			self.orders_organizer(first_lot,second_lot,third_lot)
-			self.deploy_n_batch_torpedoes(1)
+			self.deploy_n_batch_torpedoes(3)
 			self.initialized == True
 		else:
 			self.management_start=True
@@ -196,7 +198,7 @@ class OneToTWORiskReward(ManagementStrategy):
 
 	def deploy_n_batch_torpedoes(self,n):
 
-		self.deploy_orders(self.total_orders[n-1])
+		self.deploy_orders(self.total_orders[n-3])
 
 
 	def deploy_orders(self,orders):

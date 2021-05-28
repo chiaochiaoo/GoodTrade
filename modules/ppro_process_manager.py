@@ -332,7 +332,7 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 		d["low"] = ppro_low
 		d["f5r"] = 0
 		d["f5v"] = 0
-
+		d["already_opened"] = False
 	else:
 		retry_times = 30
 		success = False
@@ -359,6 +359,7 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 		d["low"] = range_data[3]
 		d["f5r"] = range_data[4]
 		d["f5v"] = range_data[5]
+		d["already_opened"] = True
 
 	#print(symbol,d["phigh"],d["plow"],d["high"],d["low"])
 
@@ -448,6 +449,11 @@ def process_and_send(lst,pipe):
 		d["ol"] = 0
 		d["open_percentage"] = 0
 	else:
+		if d["already_opened"] == False:  #one time check.
+			d["high"] = price
+			d["low"] = price
+			d["already_opened"] = True
+
 		d["oh"] = round(d["high"] - open_,3)
 		d["ol"] = round(open_ - d["low"],3)
 		if open_!=0:
