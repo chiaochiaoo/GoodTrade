@@ -517,17 +517,17 @@ def process_and_send(lst,pipe):
 
 	d["status"] = ""
 
-	if d["pos_range"]>=0.99:
+	if d["pos_range"]>=0.98:
 		d["status"]="New High"
 		status_given = True
 
-	if d["pos_range"]<=0.01:
+	if d["pos_range"]<=0.02:
 		d["status"]="New Low"
 
-	if d["pos_range"]<0.99 and d["pos_range"]>=0.96:
+	if d["pos_range"]<0.98 and d["pos_range"]>=0.90:
 		d["status"]="Near High"
 
-	if d["pos_range"]>0.01 and d["pos_range"]<=0.04:
+	if d["pos_range"]>0.02 and d["pos_range"]<=0.1:
 		d["status"]="Near Low"
 
 	#################################################
@@ -538,10 +538,10 @@ def process_and_send(lst,pipe):
 		change_high = d["highs"][-1] - d["highs"][-5]
 		change_low = d["lows"][-1] - d["lows"][-5]
 
-		if d["pos_range"]<=0.1 and d["pos_range"]>0.01 and change_high>0 and change_low>0:
+		if d["pos_range"]<=0.1 and d["pos_range"]>0.03 and change_high>0 and change_low>0:
 			d["status"]="Low Reversing"
 
-		if d["pos_range"]>=0.9 and d["pos_range"]<=0.99 and change_high<0 and change_low<0:
+		if d["pos_range"]>=0.9 and d["pos_range"]<=0.97 and change_high<0 and change_low<0:
 			d["status"]="High Reversing"
 
 	if prev_close!=0:
