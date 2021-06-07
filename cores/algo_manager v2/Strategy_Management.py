@@ -191,10 +191,13 @@ class OneToTWORiskReward(ManagementStrategy):
 		if shares<3:
 			return 0,shares,0
 		else:
-			first_lot = int(shares/3)
-			third_lot = shares - 2*first_lot
-
-			return first_lot,first_lot,third_lot
+			# first_lot = int(shares/3)
+			# third_lot = shares - 2*first_lot
+			third_lot = int(shares/2)
+			first_lot = int((shares - third_lot)/3)
+			second_lot = shares - first_lot - third_lot
+			#print(first_lot,second_lot,third_lot)
+			return first_lot,second_lot,third_lot
 
 	def deploy_n_batch_torpedoes(self,n):
 
