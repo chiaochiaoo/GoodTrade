@@ -54,7 +54,7 @@ def flatten_symbol(symbol):
 def buy_market_order(symbol,share):
 
 	
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Buy ARCX Market DAY&shares='+str(share)
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=0.01&ordername=ARCA Buy ARCX Market DAY&shares='+str(share)
 	sucess='buy market order success on'+symbol
 	failure="Error buy order on"+symbol
    
@@ -65,7 +65,7 @@ def buy_market_order(symbol,share):
 
 def sell_market_order(symbol,share):
 
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(share)
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=0.01&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(share)
 	sucess='sell market order success on'+symbol
 	failure="Error sell order on"+symbol
    
@@ -111,6 +111,7 @@ def ppro_request(request,success=None,failure=None,wait=0,traceid=False,symbol=N
 
 	while True:
 		r = requests.post(request)
+		print(r.text)
 		if r.status_code ==200:
 			# if success!=None:
 			# 	log_print(success)
@@ -227,7 +228,6 @@ def Ppro_out(pipe,port): #a sperate process. GLOBALLY.
 				sell_limit_order(symbol,price,share,wait)
 
 
-
 			elif type_ == "Register":
 
 				symbol = d[1]
@@ -243,6 +243,17 @@ def Ppro_out(pipe,port): #a sperate process. GLOBALLY.
 
 		except Exception as e:
 			log_print(e)
+
+
+# if __name__ == '__main__':  #TEST BLOCK
+
+
+
+# 	buy_limit_order("AAL.NQ",24.22,1)
+
+# 	while True:
+# 		a=1
+	#sell_market_order("AAL.NQ",1)
 
 	# def register(self,symbol):
 	# 	req = threading.Thread(target=self.register_to_ppro, args=(symbol, True,),daemon=True)
