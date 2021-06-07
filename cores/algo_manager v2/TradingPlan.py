@@ -44,7 +44,7 @@ class TradingPlan:
 		self.current_price_level = 0
 		self.price_levels = {}
 
-		self.numeric_labels = [ACTRISK,ESTRISK,CURRENT_SHARE,TARGET_SHARE,INPUT_TARGET_SHARE,AVERAGE_PRICE,LAST_AVERAGE_PRICE,RISK_PER_SHARE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3]
+		self.numeric_labels = [ACTRISK,ESTRISK,CURRENT_SHARE,TARGET_SHARE,INPUT_TARGET_SHARE,AVERAGE_PRICE,LAST_AVERAGE_PRICE,RISK_PER_SHARE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3,FLATTENTIMER,BREAKPRICE]
 		self.string_labels = [MIND,STATUS,POSITION,RISK_RATIO,SIZE_IN,ENTRYPLAN,ENTYPE,MANAGEMENTPLAN]
 
 		self.bool_labels= [AUTORANGE,AUTOMANAGE,RELOAD,SELECTED,ANCART_OVERRIDE]
@@ -120,7 +120,7 @@ class TradingPlan:
 
 			#check stop. 
 			if self.data[POSITION]!="":
-				self.check_pnl(bid,ask)
+				self.check_pnl(bid,ask,ts)
 
 			#check triggers
 			if self.current_running_strategy!=None:
@@ -129,14 +129,16 @@ class TradingPlan:
 		# except Exception as e:
 		# 	log_print("TP issue:",e)
 
-	def check_pnl(self,bid,ask):
+	def check_pnl(self,bid,ask,ts):
 		"""
 		PNL, STOP TRIGGER.
 		"""
 
 		#log_print("PNL CHECK ON",self.symbol_name,self.data[POSITION])
 		flatten = False
+		gain = 0
 		if self.data[POSITION]==LONG:
+
 			price = bid
 			gain = round((price-self.data[AVERAGE_PRICE]),4)
 
@@ -153,8 +155,26 @@ class TradingPlan:
 			self.data[UNREAL_PSHR] = gain
 			self.data[UNREAL]= round(gain*self.data[CURRENT_SHARE],4)
 
+
+		##IMPlement PNL timer here
+
+		if self.data[FLATTENTIMER]==0:
+
+
+			if gain<0: #first time set. 
+				self.data[FLATTENTIMER] = ts
+		else:
+			if gain<0:
+				if ts-self.data[FLATTENTIMER]>90:
+					flatten=True
+
+				print(ts-self.data[FLATTENTIMER])
+			else:
+				self.data[FLATTENTIMER]=0
+				print("reset flatten timer to 0")
 		if flatten and self.flatten_order==False:
 			self.flatten_order=True
+			self.data[FLATTENTIMER]=0
 			self.ppro_out.send(["Flatten",self.symbol_name])
 
 		self.update_displays()
@@ -188,6 +208,7 @@ class TradingPlan:
 		self.data[POSITION]=side
 		self.tkvars[POSITION].set(side)
 		self.data[REALIZED] = 0
+		self.data[FLATTENTIMER]=0
 		self.flatten_order = False
 		self.ppro_orders_loadup(price,shares,side)
 

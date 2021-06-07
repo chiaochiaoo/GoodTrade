@@ -28,6 +28,8 @@ RELOAD = "reload"
 SELECTED = "selected"
 ANCART_OVERRIDE = "ancartoverride"
 
+FLATTENTIMER = "flattentimer"
+
 TIMER = "timer"
 ACTRISK="actrisk"
 ESTRISK="estrisk"
@@ -48,6 +50,9 @@ STOP = "Stop"
 STOP_LEVEL = "Stop_level"
 SYMBOL = "Symbol"
 MIND = "MIND"
+
+
+BREAKPRICE = "Breakprice"
 
 PXT1 = "tpx1"
 PXT2 = "tpx2"
