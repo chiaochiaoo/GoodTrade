@@ -111,7 +111,7 @@ def ppro_request(request,success=None,failure=None,wait=0,traceid=False,symbol=N
 
 	while True:
 		r = requests.post(request)
-		print(r.text)
+		#print(r.text)
 		if r.status_code ==200:
 			# if success!=None:
 			# 	log_print(success)
