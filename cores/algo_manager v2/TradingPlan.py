@@ -137,10 +137,15 @@ class TradingPlan:
 		#log_print("PNL CHECK ON",self.symbol_name,self.data[POSITION])
 		flatten = False
 		gain = 0
+		stillbreak = True
+
 		if self.data[POSITION]==LONG:
 
 			price = bid
 			gain = round((price-self.data[AVERAGE_PRICE]),4)
+
+			if price < self.data[BREAKPRICE]:
+				stillbreak = False
 
 			if price <= self.data[STOP_LEVEL]:
 				flatten=True
@@ -148,6 +153,10 @@ class TradingPlan:
 		elif self.data[POSITION]==SHORT:
 			price = ask
 			gain = round(self.data[AVERAGE_PRICE]-price,4)
+
+			if price > self.data[BREAKPRICE]:
+				stillbreak = False
+
 			if price >=  self.data[STOP_LEVEL]:
 				flatten=True
 
@@ -159,19 +168,17 @@ class TradingPlan:
 		##IMPlement PNL timer here
 
 		if self.data[FLATTENTIMER]==0:
-
-
-			if gain<0: #first time set. 
+			if not stillbreak: #first time set. 
 				self.data[FLATTENTIMER] = ts
 		else:
-			if gain<0:
-				if ts-self.data[FLATTENTIMER]>90:
+			if not stillbreak:
+				if ts-self.data[FLATTENTIMER]>60:
 					flatten=True
 
-				print(ts-self.data[FLATTENTIMER])
+				#print(ts-self.data[FLATTENTIMER])
 			else:
 				self.data[FLATTENTIMER]=0
-				print("reset flatten timer to 0")
+				#print("reset flatten timer to 0")
 		if flatten and self.flatten_order==False:
 			self.flatten_order=True
 			self.data[FLATTENTIMER]=0

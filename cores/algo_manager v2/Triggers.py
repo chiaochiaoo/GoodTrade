@@ -243,6 +243,9 @@ class Purchase_trigger(AbstractTrigger):
 
 		#log_print("purchase_trigger,",self.trigger_timer,self.trigger_limit)
 		self.pos = pos
+
+		self.entry = conditions[0][4]
+
 		self.stop = stop
 		self.ppro_out =ppro_out
 		self.risk = risk 
@@ -251,6 +254,7 @@ class Purchase_trigger(AbstractTrigger):
 		self.entry_text =""
 		self.trigger_text = ""
 
+		self.entry_price = 0
 		self.stop_price = 0
 
 		checker = False
@@ -303,6 +307,8 @@ class Purchase_trigger(AbstractTrigger):
 		else:
 			share = self.shares_calculator()
 
+			self.entry_price = self.symbol_data[self.entry]
+			
 			log_print(self.symbol_name,"Trigger: ",self.pos,share,"stop :",self.stop,self.symbol_data[self.stop],self.symbol.get_time())
 
 			if self.pos!="":
@@ -317,6 +323,9 @@ class Purchase_trigger(AbstractTrigger):
 				self.tradingplan.data[STOP_LEVEL]=self.stop_price#self.symbol_data[self.stop]
 				self.tradingplan.tkvars[STOP_LEVEL].set(self.stop_price)
 
+				self.tradingplan.data[BREAKPRICE]=self.entry_price#self.symbol_data[self.stop]
+				#self.tradingplan.tkvars[BREAKPRICE].set(self.entry_price)
+
 				#self.tradingplan.expect_orders = True
 				#log_print("Trigger: Purchase: ",self.symbol_name,self.pos,share,"at",self.symbol.get_time())
 			
@@ -328,6 +337,8 @@ class Purchase_trigger(AbstractTrigger):
 				self.tradingplan.data[STOP_LEVEL]=self.stop_price#self.symbol_data[self.stop]
 				self.tradingplan.tkvars[STOP_LEVEL].set(self.stop_price)
 
+				self.tradingplan.data[BREAKPRICE]=self.entry_price#self.symbol_data[self.stop]
+				#self.tradingplan.tkvars[BREAKPRICE].set(self.entry_price)
 
 				if share>0:
 					self.ppro_out.send(["Sell",self.symbol_name,share,self.description])
