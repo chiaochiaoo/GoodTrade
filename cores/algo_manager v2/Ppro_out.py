@@ -29,9 +29,9 @@ def register_to_ppro(symbol,status,port):
 
 	#log_print("Registering",symbol,status)
 	if status == True:
-		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&region=1&feedtype=L1&output=" + str(port)+"&status=on"
+		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&feedtype=L1&output=" + str(port)+"&status=on"
 	else:
-		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&region=1&feedtype=L1&output=" + str(port)+"&status=off"
+		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&feedtype=L1&output=" + str(port)+"&status=off"
 
 	try:
 		r= requests.get(postbody)
