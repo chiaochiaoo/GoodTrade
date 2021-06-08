@@ -41,10 +41,11 @@ class util_client:
 			if count %5 ==0:
 				if count !=0:
 					self.util_request.send(l)
-				l=["Database Request"]
+				l=["Database Request init"]
 			l.append(i)
 			count+=1
 		if len(l)>1:
+			l[0]="Database Request finish"
 			self.util_request.send(l)
 			
 		
@@ -121,6 +122,7 @@ def util_comms(ulti_response): #connects to server for db, nt, and finviz.
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		connected = False
 
+		reg_list = ["Database Request"]
 		while not connected:
 			try:
 				s.connect((HOST, PORT))
@@ -170,8 +172,19 @@ def util_comms(ulti_response): #connects to server for db, nt, and finviz.
 					if ulti_response.poll(2):
 						d = ulti_response.recv()
 						if d is not None:
-							print("sending request:",d)
-							s.sendall(pickle.dumps(d))
+							print(d)
+							if d[0] == "Database Request init":
+								reg_list.extend(d[1:])
+								#print(reg_list)
+							elif d[0] == "Database Request finish":
+								#print(reg_list)
+								reg_list.extend(d[1:])
+								print("sending request:",reg_list)
+								s.sendall(pickle.dumps(reg_list))
+								reg_list = ["Database Request"]
+							else:
+								print("sending request:",d)
+								s.sendall(pickle.dumps(d))
 				except Exception as e:
 					print(e)
 
