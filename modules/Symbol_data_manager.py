@@ -237,8 +237,6 @@ class Symbol_data_manager:
 		for i in self.symbols:
 			self.init_symbol(i)
 
-		
-
 	def get_symbol_price(self,symbol):
 
 		if symbol in self.symbol_init:
@@ -478,7 +476,7 @@ class Symbol_data_manager:
 		if symbol not in self.symbol_init:
 			self.init_symbol(symbol)
 			self.ppro.register(symbol)
-			print("partial registering:",symbol)
+			#print("partial registering:",symbol)
 
 	def if_registered(self,symbol):
 
@@ -500,7 +498,7 @@ class Symbol_data_manager:
 			self.database.send_request(symbol)
 			self.ppro.register(symbol)
 
-			print("full registering:",symbol)
+			#print("full registering:",symbol)
 			#print(self.symbol_position_status)
 		else:
 			print("Trying register:",symbol," already registered")

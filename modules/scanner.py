@@ -4,7 +4,7 @@ import threading
 import pandas as pd
 
 from modules.pannel import *
-from modules.scanner_process_manager import *
+#from modules.scanner_process_manager import *
 
 from tkinter import *
 
@@ -14,7 +14,7 @@ def status_change(var,label):
 
 class scanner(pannel):
 
-	def __init__(self,root,tickers_manager,scanner_process:scanner_process_manager,data):
+	def __init__(self,root,tickers_manager,scanner_process,data,scanner_request):
 
 		super()
 
@@ -28,6 +28,8 @@ class scanner(pannel):
 		self.nasdaq_trader_list = {}
 		self.nasdaq_trader_symbols_ranking = []
 		self.nasdaq_trader_ranking = []
+
+		self.scanner_request = scanner_process
 
 		self.extra_count = 101
 
@@ -859,7 +861,7 @@ class scanner(pannel):
 
 				self.NT_update_time.set(timestamp)
 
-				self.scanner_process_manager.updating_comlete()
+				#self.scanner_process_manager.updating_comlete()
 
 				self.nasdaq_is_working_on_it = False
 		except Exception as e:

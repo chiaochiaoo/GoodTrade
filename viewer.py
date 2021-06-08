@@ -26,7 +26,7 @@ import threading
 import sys
 from tkinter import messagebox
 
-
+from modules.Util_client import *
 from modules.alerts import *
 from modules.pannel import *	
 from modules.Symbol_data_manager import *
@@ -35,8 +35,7 @@ from modules.Symbol_data_manager import *
 from modules.spreadtrader import *
 
 from modules.scanner import *
-from modules.scanner_process_manager import *
-from modules.database_process_manager import *
+
 from modules.ppro_process_manager import *
 
 from cores.algo_manager_comms import *
@@ -44,11 +43,11 @@ from cores.algo_process_manager_client import *
 
 class viewer:
 
-	def __init__(self,root,scanner_process,database_process,ppro_process,algo_comm,authen_comm,algo_manager,util_go):
+	def __init__(self,root,util_process,ppro_process,algo_comm,authen_comm,algo_manager,util_request):
 
 		self.data = Symbol_data_manager()
 
-		self.db = database_process
+		self.db = util_process
 		self.db.set_symbols_manager(self.data)
 
 		self.ppro = ppro_process
@@ -114,25 +113,23 @@ class viewer:
 		#alerts  =[self.open_high_pannel]
 		alerts = [self.high_low_pannel,self.open_high_pannel,self.open_low_pannel,self.first_5,self.er,self.ev,self.br,self.pv,self.am]
 
-		self.tm = ticker_manager(self.tab1,self.data,alerts,authen_comm,util_go)
+		self.tm = ticker_manager(self.tab1,self.data,alerts,authen_comm)
 		
 		self.pair =  spread_trader(self.tab12,self.data)
 
-		self.scanner_pannel = scanner(root,self.tm,scanner_process,self.data)
+		self.scanner_pannel = scanner(root,self.tm,util_process,self.data,util_request)
 
-		scanner_process.set_pannel(self.scanner_pannel)
+		util_process.set_pannel(self.scanner_pannel)
 
 
 
 class ticker_manager(pannel):
-	def __init__(self,frame,data,alerts,authen_comm,util_go):
+	def __init__(self,frame,data,alerts,authen_comm):
 		super().__init__(frame)
 
 		self.authen = authen_comm
 
 		self.alerts = alerts
-
-		self.util_go = util_go
 
 		self.Entry1 = tk.Entry(frame)
 		self.Entry1.place(x=5, y=5, height=30, width=80, bordermode='ignore')
@@ -182,8 +179,8 @@ class ticker_manager(pannel):
 
 		self.init_reg_list()
 
-		data = threading.Thread(target=self.recv, name="Authen thread",daemon=True)
-		data.start()
+		#data = threading.Thread(target=self.recv, name="Authen thread",daemon=True)
+		#data.start()
 
 		
 	def init_reg_list(self):
@@ -204,8 +201,6 @@ class ticker_manager(pannel):
 			self.rebind(self.canvas,self.frame)
 
 			self.data.start=True
-
-			self.util_go.send("util activated")
 
 		except:
 
@@ -380,29 +375,15 @@ def authentication(pipe):
 
 #Utility 
 
-def utils(scanner_sending_pipe,db_sending_pipe,algo_manager_receive_comm,ulti_receive):
-
-	v = ulti_receive.recv()
-	print("util activated")
-	time.sleep(10)
-	if v =="util activated":
-
-		print("util start")
-
-		scanner1 = threading.Thread(target=multi_processing_scanner,args=(scanner_sending_pipe,),daemon=True)
-		scanner1.start()
-
-		scanner2 = threading.Thread(target=client_scanner,args=(scanner_sending_pipe,),daemon=True)
-		scanner2.start()
+def utils(algo_manager_receive_comm,util_response):
 
 		# db = threading.Thread(target=multi_processing_database,args=(db_sending_pipe,),daemon=True)
 		# db.start()
 
-		multi_processing_database(db_sending_pipe)
-		# algo_comm = threading.Thread(target=algo_manager_commlink,args=(algo_manager_receive_comm,),daemon=True)
-		# algo_comm.start()
+		algo_comm = threading.Thread(target=algo_manager_commlink,args=(algo_manager_receive_comm,),daemon=True)
+		algo_comm.start()
 
-
+		util_comms(util_response)
 if __name__ == '__main__':
 
 	#try:
@@ -410,33 +391,7 @@ if __name__ == '__main__':
 	multiprocessing.freeze_support()
 
 
-	#### SCANNER SUB PROCESS####
-	scanner_request_scanner, scanner_sending_pipe = multiprocessing.Pipe()
-
-	process_scanner = multiprocessing.Process(target=multi_processing_scanner, args=(scanner_sending_pipe,),daemon=True)
-	process_scanner.daemon=True
-	#process_scanner.start()
-
-
-	process_scanner_b = multiprocessing.Process(target=client_scanner, args=(scanner_sending_pipe,),daemon=True)
-	process_scanner_b.daemon=True
-	#process_scanner_b.start()
-
-	s = scanner_process_manager(scanner_request_scanner)
-
-	#### DATABASE SUB PROCESS####
-
-	db_request_pipe, db_sending_pipe = multiprocessing.Pipe()
-	process_database = multiprocessing.Process(target=multi_processing_database, args=(db_sending_pipe,),daemon=True)
-	process_database.daemon=True
-	#process_database.start()
-
-	d = database_process_manager(db_request_pipe)
-
-
-
-	### ppro update SUB PROCESS####
-
+	# PPRO SECTION ##
 	request_pipe, receive_pipe = multiprocessing.Pipe()
 	process_ppro = multiprocessing.Process(target=multi_processing_price, args=(receive_pipe,),daemon=True)
 	process_ppro.daemon=True
@@ -446,35 +401,41 @@ if __name__ == '__main__':
 
 	### scanner pannel needs the manager. 
 
-
-	authen_comm, authen_clientside_comm = multiprocessing.Pipe()
+	
 	# auth = multiprocessing.Process(name="Authentica",target=authentication, args=(authen_comm,),daemon=True)
 	# auth.daemon=True
 	#auth.start()
-
 
 	### algo comms 
 	algo_manager_comm, algo_manager_thread_comm = multiprocessing.Pipe()
 	algo_manager_receive_comm, algo_manager_process_comm = multiprocessing.Pipe()
 	
-	algo_comm_link = multiprocessing.Process(target=algo_manager_commlink, args=(algo_manager_receive_comm,),daemon=True)
-	algo_comm_link.daemon=True
+	# algo_comm_link = multiprocessing.Process(target=algo_manager_commlink, args=(algo_manager_receive_comm,),daemon=True)
+	# algo_comm_link.daemon=True
 	#algo_comm_link.start()
 
 	algo_manager = algo_process_manager_client(algo_manager_thread_comm,algo_manager_process_comm)
 	
 	#UTIL#
 
-	algo_comm = threading.Thread(target=algo_manager_commlink, args=(algo_manager_receive_comm,),daemon=True)
-	algo_comm.daemon=True
+	# algo_comm = threading.Thread(target=algo_manager_commlink, args=(algo_manager_receive_comm,),daemon=True)
+	# algo_comm.daemon=True
 
 	#algo_manager_commlink(algo_manager_receive_comm)
 
+	#GARBAGE SECTION
+	authen_comm, authen_clientside_comm = multiprocessing.Pipe()
 
-	util_go, util_receive = multiprocessing.Pipe()
+	#################
 
-	utility = multiprocessing.Process(target=utils, args=(scanner_sending_pipe,db_sending_pipe,algo_manager_receive_comm,util_receive),daemon=True)
+
+	util_request, util_response = multiprocessing.Pipe()
+
+	utility = multiprocessing.Process(target=utils, args=(algo_manager_receive_comm,util_response),daemon=True)
 	utility.daemon=True
+
+	# utility = multiprocessing.Process(target=utils, args=(scanner_sending_pipe,db_sending_pipe,algo_manager_receive_comm,util_receive),daemon=True)
+	# utility.daemon=True
 
 
 	root = tk.Tk() 
@@ -485,35 +446,22 @@ if __name__ == '__main__':
 
 	root.protocol("WM_DELETE_WINDOW", on_closing)
 
-	view = viewer(root,s,d,ppro,algo_manager_comm,authen_clientside_comm,algo_manager,util_go)
+	util_process = util_client(util_request)
+	
+	view = viewer(root,util_process,ppro,algo_manager_comm,authen_clientside_comm,algo_manager,util_request)
 	utility.start()
-	algo_comm.start()
+
 	root.mainloop()
 
 	print("Main process terminated")
 
-
-	scanner_request_scanner.send(["terminate"])
-	process_database.terminate()
+	#scanner_request_scanner.send(["terminate"])
+	utility.terminate()
 	process_ppro.terminate()
+	#scanner_request_scanner.recv()
 
-	scanner_request_scanner.recv()
-
-
-	process_scanner.terminate()
-	process_scanner.join()
-
-	process_scanner_b.terminate()
-	process_scanner.join()
-	
-	process_database.join()
+	utility.join()
 	process_ppro.join()
-
-	algo_comm_link.terminate()
-	algo_comm_link.join()
-
-	auth.terminate()
-	auth.join()
 
 	print("All subprocesses terminated")
 	

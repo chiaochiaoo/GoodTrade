@@ -17,7 +17,7 @@ def kill():
 	fail = 0
 	while True:
 		try:
-			for i in os.popen("netstat -ano|findstr 65499").read().split("\n"):
+			for i in os.popen("netstat -ano|findstr 65491").read().split("\n"):
 				pid=int(i[-8:])
 				os.system("taskkill /f /t /pid "+str(pid))
 		except:
@@ -41,14 +41,14 @@ def algo_manager_commlink(pipe):
 			try:
 				s.bind((HOST, PORT))
 				break
-			except:
+			except Exception as e:
 				failed +=1
 				kill()
 				if failed >=5:
+					print("algo failed to initialize",e)
 					break
 
 		if failed>=5:
-			print("algo failed to initialize")
 			break
 
 		print("Waitting for algo manager to connect")

@@ -5,6 +5,7 @@ import re
 import pip
 import socket
 import pickle
+import select
 
 try:
     from finviz.screener import Screener
@@ -266,3 +267,65 @@ def client_scanner(pipe):
 # 	while True:
 # 		a = 1
 # 		
+
+
+# k=""
+# while True:
+
+# 	HOST = '10.29.10.132'  # The server's hostname or IP address
+# 	PORT = 65424       # The port used by the server
+
+
+# 	print("Trying to connect to the Scanner server")
+# 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# 	connected = False
+
+# 	while not connected:
+# 		try:
+# 			s.connect((HOST, PORT))
+# 			connected = True
+# 		except:
+# 			#pipe.send(["msg","Cannot connected. Try again in 2 seconds."])
+# 			print("Cannot connect Scanner server. Try again in 2 seconds.")
+# 			time.sleep(2)
+
+# 	connection = True
+# 	s.setblocking(0)
+# 	print("Scanner server Connection Successful")
+
+# 	while connection:
+# 		# try:
+# 		# 	s.sendall(b'Alive check')
+# 		# except:
+# 		# 	connection = False
+# 		# 	break
+# 		data = []
+# 		print("Scanner client: taking data")
+# 		while True:
+
+# 				ready = select.select([s], [], [], 1)
+					
+# 				if ready[0]:
+# 					try:
+# 						part = s.recv(2048)
+# 					except:
+# 						connection = False
+# 						break
+# 					#if not part: break
+# 					data.append(part)
+# 					if len(part) < 2048:
+# 						#try to assemble it, if successful.jump. else, get more. 
+# 						try:
+# 							k = pickle.loads(b"".join(data))
+# 							print(k)
+
+# 							#k = pd.read_pickle(b"".join(data))
+# 							break
+# 						except:
+# 							pass
+# 				#k is received. #
+# 						print(k)
+
+# 				s.sendall(pickle.dumps(["Database quote","aapl.nq","qqq.nq"]))
+# 				#print("dump some shit")
+# 	print("Server disconnected")
