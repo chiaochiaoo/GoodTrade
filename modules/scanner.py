@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk 
 import threading
 import pandas as pd
-
+import time
 from modules.pannel import *
 #from modules.scanner_process_manager import *
 
