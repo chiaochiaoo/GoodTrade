@@ -173,7 +173,7 @@ def util_comms(ulti_response): #connects to server for db, nt, and finviz.
 							print("sending request:",d)
 							s.sendall(pickle.dumps(d))
 					else:
-						print("taking nothing")
+						#print("taking nothing")
 				except Exception as e:
 					print(e)
 
