@@ -1350,10 +1350,11 @@ class breakout(alert):
 
 	def color(self,vals,val):
 
-		if val.get()[-4:]=="False":
+		if val.get()[-4:]=="alse":
 			vals["background"] = "red"
 		elif val.get()[-4:]=="True":
 			vals["background"] = "#97FEA8"
+			
 	def set_auto(self,vals,val):
 
 		v = val.get()

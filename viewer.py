@@ -414,8 +414,7 @@ if __name__ == '__main__':
 	# algo_comm_link.daemon=True
 	#algo_comm_link.start()
 
-	algo_manager = algo_process_manager_client(algo_manager_thread_comm,algo_manager_process_comm)
-	
+
 	#UTIL#
 
 	# algo_comm = threading.Thread(target=algo_manager_commlink, args=(algo_manager_receive_comm,),daemon=True)
@@ -431,8 +430,7 @@ if __name__ == '__main__':
 
 	util_request, util_response = multiprocessing.Pipe()
 
-	utility = multiprocessing.Process(target=utils, args=(algo_manager_receive_comm,util_response),daemon=True)
-	utility.daemon=True
+
 
 	# utility = multiprocessing.Process(target=utils, args=(scanner_sending_pipe,db_sending_pipe,algo_manager_receive_comm,util_receive),daemon=True)
 	# utility.daemon=True
@@ -443,6 +441,13 @@ if __name__ == '__main__':
 	root.geometry("1800x900")
 	root.minsize(1500, 600)
 	root.maxsize(3000, 1500)
+
+
+	algo_manager = algo_process_manager_client(algo_manager_thread_comm,algo_manager_process_comm,root)
+	
+	utility = multiprocessing.Process(target=utils, args=(algo_manager_receive_comm,util_response),daemon=True)
+	utility.daemon=True
+
 
 	root.protocol("WM_DELETE_WINDOW", on_closing)
 

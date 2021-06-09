@@ -14,6 +14,7 @@ import pickle
 import time
 import multiprocessing
 import requests
+import select
 from datetime import datetime
 #May this class bless by the Deus Mechanicus.
 
@@ -42,6 +43,8 @@ def algo_manager_voxcom(pipe):
 				try:
 					s.connect((HOST, PORT))
 					connected = True
+					#
+					s.setblocking(0)
 				except:
 					pipe.send(["msg","Disconnected"])
 					log_print("Cannot connected. Try again in 2 seconds.")
@@ -49,35 +52,64 @@ def algo_manager_voxcom(pipe):
 
 			connection = True
 			pipe.send(["msg","Connected"])
+			k = None
+
 			while connection:
 
-				data = []
-				k = None
-				while True:
-					try:
-						part = s.recv(2048)
-					except:
-						connection = False
-						break
-					#if not part: break
-					data.append(part)
-					if len(part) < 2048:
-						#try to assemble it, if successful.jump. else, get more. 
+				#from the socket
+				ready = select.select([s], [], [], 1)
+				
+				if ready[0]:
+					data = []
+					while True:
 						try:
-							k = pickle.loads(b"".join(data))
-							break
+							part = s.recv(2048)
 						except:
-							pass
-				#s.sendall(pickle.dumps(["ids"]))
-				if k!=None:
-					pipe.send(["pkg",k])
-					log_print("placed:",k[1][1])
-					s.send(pickle.dumps(["Algo placed",k[1][1]]))
+							connection = False
+							break
+						#if not part: break
+						data.append(part)
+						if len(part) < 2048:
+							#try to assemble it, if successful.jump. else, get more. 
+							try:
+								k = pickle.loads(b"".join(data))
+								break
+							except:
+								pass
+					#k is the confirmation from client. send it back to pipe.
+					if k!=None:
+						pipe.send(["pkg",k])
+						log_print("placed:",k[1][1])
+						s.send(pickle.dumps(["Algo placed",k[1][1]]))
+
+				if pipe.poll(1):
+					data = pipe.recv()
+					if data == "Termination":
+						s.send(pickle.dumps(["Termination"]))
+						print("Terminate!")
+
+				# 	part = s.recv(2048)
+				# except:
+				# 	connection = False
+				# 	break
+				# #if not part: break
+				# data.append(part)
+				# if len(part) < 2048:
+				# 	#try to assemble it, if successful.jump. else, get more. 
+				# 	try:
+				# 		k = pickle.loads(b"".join(data))
+				# 		break
+				# 	except:
+				# 		pass
+
+
 			log_print("Main disconnected")
 			pipe.send(["msg","Main disconnected"])
 		except Exception as e:
 			pipe.send(["msg",e])
 			log_print(e)
+
+
 def algo_manager_voxcom2(pipe):
 
 	#tries to establish commuc
@@ -149,7 +181,7 @@ class Manager:
 
 	def __init__(self,root,goodtrade_pipe=None,ppro_out=None,ppro_in=None,TEST_MODE=False):
 
-
+		self.termination = False
 		self.pipe_ppro_in = ppro_in
 		self.pipe_ppro_out = ppro_out
 		self.pipe_goodtrade = goodtrade_pipe
@@ -246,8 +278,10 @@ class Manager:
 				try:
 					self.ui.main_app_status.set(str(d[1]))
 					if str(d[1])=="Connected":
+						self.termination = True
 						self.ui.main_status["background"] = "#97FEA8"
 					else:
+						self.termination = False
 						self.ui.main_status["background"] = "red"
 				except Exception as e:
 					log_print(e)
@@ -354,6 +388,14 @@ class Manager:
 				d.tkvars[ENTYPE].set(et)
 				d.tkvars[MANAGEMENTPLAN].set(managment)
 				d.tkvars[TIMER].set(timer)
+
+	def terminateGT(self):
+
+		if self.termination:
+			self.pipe_goodtrade.send("Termination")
+			self.termination = False
+		else:
+			print("Already terminated or not connected")
 	def deploy_all(self):
 		for d in self.tradingplan.values():
 			d.deploy()
@@ -624,6 +666,7 @@ class Tester:
 
 		for i in used:
 			del self.sell_book[i]
+
 
 if __name__ == '__main__':
 

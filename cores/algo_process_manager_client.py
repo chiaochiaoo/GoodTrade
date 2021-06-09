@@ -7,7 +7,7 @@ class algo_process_manager_client:
 	#A big manager. Who has access to all the corresponding grids in the labels.
  	#update each symbols per, 39 seconds? 
 	#run every ten seconds. 
-	def __init__(self,GT_pipe,process_pipe):
+	def __init__(self,GT_pipe,process_pipe,root):
 		#need to track. 1 min range/ volume. 5 min range/volume.
 		#self.depositLabel['text'] = 'change the value'
 		#fetch this
@@ -16,7 +16,7 @@ class algo_process_manager_client:
 		self.reg_list = []
 		self.black_list = []
 		self.lock = {}
-
+		self.root = root
 		self.init = False
 
 		#repeat this every 5 seconds.
@@ -54,59 +54,53 @@ class algo_process_manager_client:
 
 		temp = {}
 
-		while True:
+		try:
 
-			if self.gt_pipe.poll(1):
-				info = self.gt_pipe.recv()
-				
-				#id, symbol, type, status, description, position, shares, risk$
-				message_type= info[0]
+			while True:
 
-				if message_type =="New order":
+				if self.gt_pipe.poll(1):
+					info = self.gt_pipe.recv()
+					
+					#id, symbol, type, status, description, position, shares, risk$
+					message_type= info[0]
 
-					self.process_pipe.send(info)
+					if message_type =="New order":
 
-				# elif message_type =="Confirmed":
-				# 	id_ = info[1]
-				# 	print("Algo manager:",id_,"confirmed")
-				# 	self.process_pipe.send(info)
+						self.process_pipe.send(info)
 
-					# if status == "Pending":
 
-					# 	#set it up. on GoodTrade. 
 
-					# 	if type_ == "Breakup":
+				if self.process_pipe.poll(1):
 
-					# 		#status, id. symbol.
-					# 		#self.data.algo_breakout_status[symbol].set(status)
-					# 		self.data.algo_breakout_up[symbol].set(id_)
+					info = self.process_pipe.recv()
 
-					# 	elif type_ == "Breakdown":
-					# 		#self.data.algo_breakout_status[symbol].set(status)
-					# 		self.data.algo_breakout_down[symbol].set(id_)
+					type_ = info[0]
+					
+					print(info)
+					if type_ =="Algo placed":
+						symbol = info[1]
+						#button. 
 
-			if self.process_pipe.poll(1):
+						self.data.algo_breakout_placement[symbol].set("Placed")
 
-				info = self.process_pipe.recv()
+					if type_ =="algo manager":
+		
+						status = info[1]
+						if status == "Connected":
+							self.data.algo_manager_connected.set("AM:True")
+						else:
+							self.data.algo_manager_connected.set("AM:False")
+					if type_ =="socket":
+						status = info[1]
+						if status == "Connected":
+							self.data.algo_socket.set("Socket:True")
+						else:
+							self.data.algo_socket.set("Socket:False")
 
-				type_ = info[0]
-				
-
-				print(info)
-				if type_ =="Algo placed":
-					symbol = info[1]
-					#button. 
-
-					self.data.algo_breakout_placement[symbol].set("Placed")
-
-				if type_ =="Connected":
-	
-					#status = info[1]
-					self.data.algo_manager_connected.set("AM:True")
-				if type_ =="algo socket established":
-					self.data.algo_socket.set("Socket:True")
-			
-			
+					if type_ == "Termination":
+						self.root.destroy()
+		except Exception as e:
+			print(e)
 
 
 
