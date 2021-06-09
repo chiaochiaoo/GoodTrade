@@ -39,7 +39,8 @@ class Symbol_data_manager:
 		self.all_auto_trade = IntVar()
 		self.all_auto = IntVar()
 
-		self.algo_manager_connected = StringVar()
+		self.algo_socket = StringVar(value="Socket:False")
+		self.algo_manager_connected = StringVar(value="AM:False")
 		#basics
 		self.symbol_price = {}
 		self.symbol_price_high = {}

@@ -51,10 +51,14 @@ def algo_manager_commlink(pipe):
 		if failed>=5:
 			break
 
+		pipe.send(["algo socket established"])
 		print("Waitting for algo manager to connect")
 		s.listen()
 		
 		conn, addr = s.accept()
+
+		pipe.send(["Connected"])
+
 		print("Algo manager connected.")
 		s.setblocking(0)
 		Connection = True
@@ -96,6 +100,9 @@ def algo_manager_commlink(pipe):
 								except:
 									pass
 						#k is the confirmation from client. send it back to pipe.
+
+						if k[0] == "Termination":
+							os._exit(1) 
 						pipe.send(k)
 
 			except Exception as e:

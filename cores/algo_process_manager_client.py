@@ -100,10 +100,11 @@ class algo_process_manager_client:
 					self.data.algo_breakout_placement[symbol].set("Placed")
 
 				if type_ =="Connected":
-
-					status = info[1]
-					self.data.algo_manager_connected.set(status)
-
+	
+					#status = info[1]
+					self.data.algo_manager_connected.set("AM:True")
+				if type_ =="algo socket established":
+					self.data.algo_socket.set("Socket:True")
 			
 			
 

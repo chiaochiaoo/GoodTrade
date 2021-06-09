@@ -1312,11 +1312,18 @@ class breakout(alert):
 		self.auto_range = self.data.all_auto
 		self.auto_trade =self.data.all_auto_trade
 
-		self.data.all_auto.trace('w', lambda *_,vals=self.data.auto_support_resistance,val=self.data.all_auto: self.set_auto(vals,val))
+		self.socket = Label(frame,textvariable=self.data.algo_socket,background="red",height=1,width=12)
+		self.connection =Label(frame,textvariable=self.data.algo_manager_connected,background="red",height=1,width=14)
 
+		self.socket.place(x=650,y=10)
+		self.connection.place(x=750,y=10)
+
+		self.data.all_auto.trace('w', lambda *_,vals=self.data.auto_support_resistance,val=self.data.all_auto: self.set_auto(vals,val))
 		self.data.all_auto_trade.trace('w', lambda *_,vals=self.data.algo_breakout_trade,val=self.data.all_auto_trade: self.set_auto(vals,val))
 
-		tk.Label(frame,textvariable=self.data.algo_manager_connected).place(x=750,y=10)
+		self.data.algo_socket.trace('w', lambda *_,vals=self.socket,val=self.data.algo_socket: self.color(vals,val))
+		self.data.algo_manager_connected.trace('w', lambda *_,vals=self.connection,val=self.data.algo_manager_connected: self.color(vals,val))
+
 
 	def placeall(self):
 
@@ -1341,6 +1348,12 @@ class breakout(alert):
 
 				print("Placing ",symbol)
 
+	def color(self,vals,val):
+
+		if val.get()[-4:]=="False":
+			vals["background"] = "red"
+		elif val.get()[-4:]=="True":
+			vals["background"] = "#97FEA8"
 	def set_auto(self,vals,val):
 
 		v = val.get()

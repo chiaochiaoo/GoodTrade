@@ -379,7 +379,7 @@ def utils(algo_manager_receive_comm,util_response):
 
 		# db = threading.Thread(target=multi_processing_database,args=(db_sending_pipe,),daemon=True)
 		# db.start()
-
+		time.sleep(5)
 		algo_comm = threading.Thread(target=algo_manager_commlink,args=(algo_manager_receive_comm,),daemon=True)
 		algo_comm.start()
 
@@ -439,7 +439,7 @@ if __name__ == '__main__':
 
 
 	root = tk.Tk() 
-	root.title("GoodTrade v486") 
+	root.title("GoodTrade v489") 
 	root.geometry("1800x900")
 	root.minsize(1500, 600)
 	root.maxsize(3000, 1500)
