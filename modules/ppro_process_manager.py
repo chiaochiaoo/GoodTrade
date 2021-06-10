@@ -170,7 +170,7 @@ def register(symbol):
 		#append it to the list.
 	except Exception as e:
 		#means cannot connect.
-		print("Register,",e)
+		print("Register error,",e)
 
 		#it could be database not linked 
 
@@ -189,8 +189,13 @@ def deregister(symbol):
 	# except Exception as e:
 	# 	print("Dereg",symbol,e)
 
-def multi_processing_price(pipe_receive):
+def thread_waiting_mechanism():
+	print(threading.active_count())
+	while threading.active_count()>75:
+		print("wait")
+		time.sleep(1)
 
+def multi_processing_price(pipe_receive):
 
 
 	global black_list
@@ -221,6 +226,7 @@ def multi_processing_price(pipe_receive):
 					pipe_receive.send(["message","Connection established."])
 
 					for i in reg_list:
+						thread_waiting_mechanism()
 						reg = threading.Thread(target=register,args=(i,), daemon=True)
 						reg.start()
 
@@ -248,10 +254,12 @@ def multi_processing_price(pipe_receive):
 			#bulk cmds. reg these symbols. 
 			for i in reg:
 				if i not in black_list:
+					thread_waiting_mechanism()
 					reg = threading.Thread(target=register,args=(i,), daemon=True)
 					reg.start()
 
 			for i in dereg:
+				thread_waiting_mechanism()
 				dereg = threading.Thread(target=deregister,args=(i,), daemon=True)
 				dereg.start()
 
@@ -270,11 +278,18 @@ def multi_processing_price(pipe_receive):
 				#if prev thread didn't die, kill it and start a new one. 
 				#print("sending",i)
 				if i not in black_list:
+					thread_waiting_mechanism()
 					info = threading.Thread(target=getinfo,args=(i,pipe_receive,), daemon=True)
 					info.start()
 
-			#print("Registed list:",len(reg_list))
-			time.sleep(5)
+			if k%5 == 0:
+				print("Registed list:",len(reg_list),"T:",threading.active_count())
+			k+=1
+			#time.sleep(10)
+
+			
+
+
 			#send each dictionary. 
 			#pipe_receive.send(data)
 	except Exception as e:
@@ -580,6 +595,9 @@ def getinfo(symbol,pipe):
 					# black_list.append(symbol)
 					# pipe.send(["Unfound",symbol])
 					lock[symbol] = False
+
+				elif 'symbol should be registered first' in r.text:
+					register(symbol)
 				else:
 
 					time=find_between(r.text, "MarketTime=\"", "\"")[:-4]
