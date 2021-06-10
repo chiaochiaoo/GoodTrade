@@ -28,7 +28,7 @@ global yahoo_same_time
 yahoo_same_time = 0
 
 
-TEST = True
+TEST = False
 ##################################################################
 ####  pipe in, symbol. if symbol not reg, reg. if reg, dereg  ####
 ####  main loop. for each reg, thread out and return.		  ####
