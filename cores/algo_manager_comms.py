@@ -64,24 +64,41 @@ def algo_manager_commlink(pipe):
 		s.setblocking(0)
 		Connection = True
 
+		order_list = []
 		while Connection:
 			try:
 				#if something comes from pipe.
-				if pipe.poll(1):
+				if pipe.poll(0):
 					data = pipe.recv()
-					print("New order:",data)
-					data=pickle.dumps(data)
-					try:
-						conn.sendall(data)
-						#print("sending",data)
-					except Exception as e:
-						print(e)
-						Connection=False
-						break
-					
+					print(data)
+
+					if data[0] == "Orders Request add":
+						order_list.extend(data[1:])
+					elif data[0] == "Orders Request finish":
+
+						if len(data)>1:
+							order_list.extend(data[1:])
+
+						print(order_list)
+						data=pickle.dumps(order_list)
+						try:
+							conn.sendall(data)
+							order_list = []
+						except Exception as e:
+							print(e)
+							Connection=False
+							break
+					elif data[0] == "New order":
+						data=pickle.dumps(data)
+						try:
+							conn.sendall(data)
+						except Exception as e:
+							print(e)
+							Connection=False
+							break
 				#if client sends something 
 				if Connection:
-					ready = select.select([conn], [], [], 1)
+					ready = select.select([conn], [], [], 0)
 					
 					if ready[0]:
 						data = []
@@ -107,6 +124,7 @@ def algo_manager_commlink(pipe):
 							break
 						pipe.send(k)
 
+				#print("running")
 			except Exception as e:
 				Connection= False
 		

@@ -47,62 +47,59 @@ class algo_process_manager_client:
 	def receive_start(self):
 		receive = threading.Thread(name="Thread: Algo manager receiver",target=self.receive_request, daemon=True)
 		receive.start()
+		receive = threading.Thread(name="Thread: Algo manager receiver2",target=self.receive_request2, daemon=True)
+		receive.start()
+
 
 	def receive_request(self):
 
 		#put the receive in corresponding box.
+		while True:
+			try:
+				info = self.gt_pipe.recv()
+				
+				#id, symbol, type, status, description, position, shares, risk$
+				message_type= info[0]
 
-		temp = {}
+				if message_type =="New order":
 
-		try:
+					self.process_pipe.send(info)
 
-			while True:
+			except Exception as e:
+				print(e)
 
-				if self.gt_pipe.poll(1):
-					info = self.gt_pipe.recv()
-					
-					#id, symbol, type, status, description, position, shares, risk$
-					message_type= info[0]
+	def receive_request2(self):
 
-					if message_type =="New order":
+		#put the receive in corresponding box.
 
-						self.process_pipe.send(info)
+		while True:
+			try:
 
+				info = self.process_pipe.recv()
+				type_ = info[0]
+			
+				if type_ =="Algo placed":
+					symbol = info[1]
+					#button. 
+					self.data.algo_breakout_placement[symbol].set("Placed")
+				if type_ =="algo manager":
+	
+					status = info[1]
+					if status == "Connected":
+						self.data.algo_manager_connected.set("AM:True")
+					else:
+						self.data.algo_manager_connected.set("AM:False")
+				if type_ =="socket":
+					status = info[1]
+					if status == "Connected":
+						self.data.algo_socket.set("Socket:True")
+					else:
+						self.data.algo_socket.set("Socket:False")
 
-
-				if self.process_pipe.poll(1):
-
-					info = self.process_pipe.recv()
-
-					type_ = info[0]
-					
-					print(info)
-					if type_ =="Algo placed":
-						symbol = info[1]
-						#button. 
-
-						self.data.algo_breakout_placement[symbol].set("Placed")
-
-					if type_ =="algo manager":
-		
-						status = info[1]
-						if status == "Connected":
-							self.data.algo_manager_connected.set("AM:True")
-						else:
-							self.data.algo_manager_connected.set("AM:False")
-					if type_ =="socket":
-						status = info[1]
-						if status == "Connected":
-							self.data.algo_socket.set("Socket:True")
-						else:
-							self.data.algo_socket.set("Socket:False")
-
-					if type_ == "Termination":
-						self.root.destroy()
-		except Exception as e:
-			print(e)
-
-
+				if type_ == "Termination":
+					self.root.destroy()
+			except Exception as e:
+				print(e)
 
 		#grab all info. 
 

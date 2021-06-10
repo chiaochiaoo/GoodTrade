@@ -82,7 +82,7 @@ def algo_manager_voxcom(pipe):
 						log_print("placed:",k[1][1])
 						s.send(pickle.dumps(["Algo placed",k[1][1]]))
 
-				if pipe.poll(1):
+				if pipe.poll(0):
 					data = pipe.recv()
 					if data == "Termination":
 						s.send(pickle.dumps(["Termination"]))
