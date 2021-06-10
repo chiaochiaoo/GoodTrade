@@ -64,13 +64,13 @@ def algo_manager_commlink(pipe):
 		s.setblocking(0)
 		Connection = True
 
-		order_list = []
+		order_list = ["New order"]
 		while Connection:
 			try:
 				#if something comes from pipe.
 				if pipe.poll(0):
 					data = pipe.recv()
-					print(data)
+					#print(data)
 
 					if data[0] == "Orders Request add":
 						order_list.extend(data[1:])
@@ -79,11 +79,12 @@ def algo_manager_commlink(pipe):
 						if len(data)>1:
 							order_list.extend(data[1:])
 
-						print(order_list)
+						#print(order_list)
 						data=pickle.dumps(order_list)
 						try:
+							print(order_list)
 							conn.sendall(data)
-							order_list = []
+							order_list = ["New order"]
 						except Exception as e:
 							print(e)
 							Connection=False

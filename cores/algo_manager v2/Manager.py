@@ -78,9 +78,14 @@ def algo_manager_voxcom(pipe):
 								pass
 					#k is the confirmation from client. send it back to pipe.
 					if k!=None:
-						pipe.send(["pkg",k])
-						log_print("placed:",k[1][1])
-						s.send(pickle.dumps(["Algo placed",k[1][1]]))
+						placed = []
+						#print(k)
+						pipe.send(["pkg",k[1:]])
+						for i in k[1:]:
+							log_print("placed:",i[1])
+							placed.append(i[1])
+						#log_print("placed:",k[1][1])
+						s.send(pickle.dumps(["Algo placed",placed]))
 
 				if pipe.poll(0):
 					data = pipe.recv()
@@ -288,15 +293,8 @@ class Manager:
 			if d[0] =="pkg":
 				log_print("new package arrived",d)
 
-				if d[1][0] == "New order":
-					#try
-					# reg = threading.Thread(target=self.add_new_tradingplan,args=(d[1][1],self.test_mode,), daemon=True)
-					# reg.start()
-
-					# add = threading.Thread(target=self.wish, daemon=True)
-					# add.start()
-
-					self.add_new_tradingplan(d[1][1],self.test_mode)
+				for i in d[1]:
+					self.add_new_tradingplan(i,self.test_mode)
 					#except:
 					#	log_print("adding con porra")
 

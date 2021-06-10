@@ -61,9 +61,9 @@ class algo_process_manager_client:
 				#id, symbol, type, status, description, position, shares, risk$
 				message_type= info[0]
 
-				if message_type =="New order":
+				#if message_type =="New order":
 
-					self.process_pipe.send(info)
+				self.process_pipe.send(info)
 
 			except Exception as e:
 				print(e)
@@ -79,9 +79,10 @@ class algo_process_manager_client:
 				type_ = info[0]
 			
 				if type_ =="Algo placed":
-					symbol = info[1]
+					symbols = info[1]
 					#button. 
-					self.data.algo_breakout_placement[symbol].set("Placed")
+					for symbol in symbols:
+						self.data.algo_breakout_placement[symbol].set("Placed")
 				if type_ =="algo manager":
 	
 					status = info[1]

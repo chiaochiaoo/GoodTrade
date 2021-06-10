@@ -283,17 +283,18 @@ class alert(pannel):
 		except:
 			risk = 0
 
-		atr,oha,ohs,ola,ols = self.data.symbol_data_ATR[symbol].get(),\
-		self.data.symbol_data_openhigh_val[symbol].get(),\
-		self.data.symbol_data_openhigh_std[symbol].get(),\
-		self.data.symbol_data_openlow_val[symbol].get(),\
-		self.data.symbol_data_openlow_std[symbol].get()
+		data_list = {}
+		# atr,oha,ohs,ola,ols = self.data.symbol_data_ATR[symbol].get(),\
+		# self.data.symbol_data_openhigh_val[symbol].get(),\
+		# self.data.symbol_data_openhigh_std[symbol].get(),\
+		# self.data.symbol_data_openlow_val[symbol].get(),\
+		# self.data.symbol_data_openlow_std[symbol].get()
 
-		data_list = {"ATR":atr,
-					 "OHavg":oha,
-					 "OHstd":ohs,
-					 "OLavg":ola,
-					 "OLstd":ols}
+		# data_list = {"ATR":atr,
+		# 			 "OHavg":oha,
+		# 			 "OHstd":ohs,
+		# 			 "OLavg":ola,
+		# 			 "OLstd":ols}
 		#'Break Up','Break Down','Any'
 
 
@@ -304,19 +305,25 @@ class alert(pannel):
 
 		if risk!=0 and support!=0 and resistence!=0:
 			self.algo_commlink.send(info)
-			# p1 = threading.Thread(target=self.place_trade(info_up), daemon=True)
-			# p1.start()
-			# p2 = threading.Thread(target=self.place_trade(info_down), daemon=True)
-			# p2.start()
-		
 
-	def place_trade(self,infos,auto=False):
-		#print("placing:",info)
-		#type_,symbol,description,entry_price,stop_price,position,capital,total_risk
+	def break_out_trades(self,infos):
 
-		algo_placer(self.algo_commlink,infos,auto)
+		#print(infos)
 
+		l=["Orders Request add"]
+		count = 0
+		for i in infos:
+			if count %2 ==0:
+				if count !=0:
+					self.algo_commlink.send(l)
+					#print(l)
+				l=["Orders Request add"]
+			l.append(i)
+			count+=1
 
+		l[0]="Orders Request finish"
+		self.algo_commlink.send(l)
+		#self.algo_commlink.send("sdsdsdsdsdsds")
 	def delete_symbol(self,symbol):
 		for i in self.tickers_tracers[symbol]:
 			i[0].trace_vdelete("w",i[1])
@@ -1328,11 +1335,9 @@ class breakout(alert):
 	def placeall(self):
 
 
-		
-		
 		print("Placing all")
 
-
+		total = []
 		for symbol in self.data.get_list():
 
 			if self.data.algo_breakout_trade[symbol].get()==True:
@@ -1344,9 +1349,16 @@ class breakout(alert):
 				default_risk = self.default_risk
 				info = [symbol,support,resistance,timer_trade,type_trade,default_risk]
 
-				self.break_out_trade(info,True)
+				#self.break_out_trade(info,True)
 
-				print("Placing ",symbol)
+				#print("Placing ",symbol)
+				symbol,support,resistence,timer_trade,type_trade,default_risk = info[0],float(info[1].get()),float(info[2].get()),info[3].get(),info[4].get(),info[5].get()
+				data_list={}
+				if default_risk!=0 and support!=0 and resistence!=0:
+					total.append([type_trade,symbol,support,resistence,default_risk,data_list])
+	
+		self.break_out_trades(total)
+		#print(l)
 
 	def color(self,vals,val):
 
