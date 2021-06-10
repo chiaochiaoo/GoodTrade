@@ -637,8 +637,8 @@ def getinfo(symbol,pipe):
 				pipe.send(["Ppro Error",symbol])
 				lock[symbol] = False
 
-		else:
-			print(symbol,"blocked call")
+		# else:
+		# 	print(symbol,"blocked call")
 
 
 

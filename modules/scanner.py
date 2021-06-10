@@ -839,8 +839,8 @@ class scanner(pannel):
 				self.df = df
 
 				for index, row in df.iterrows():
-						if row['symbol'] not in self.symbols_registry:
-							self.data.partial_register(row['symbol'])
+					if row['symbol'] not in self.symbols_registry:
+						self.data.partial_register(row['symbol'])
 
 				#update the SDM data to the PD
 
@@ -851,12 +851,13 @@ class scanner(pannel):
 				#call the sort.
 				#check if added.
 				#update. 
-				self.nasdaq_labels_sort()
+				
 
 				if self.nasdaq_trader_created == False:
-					time.sleep(5)
+					#time.sleep(5)
 					self.add_nasdaq_labels_init()
 				else:
+					self.nasdaq_labels_sort()
 					self.add_nasdaq_labels_update()
 
 				self.NT_update_time.set(timestamp)
@@ -866,6 +867,7 @@ class scanner(pannel):
 				self.nasdaq_is_working_on_it = False
 		except Exception as e:
 			self.nasdaq_is_working_on_it = False
+			self.nasdaq_trader_created == False
 			print("NT:",e)
 
 	def refresh(self):
