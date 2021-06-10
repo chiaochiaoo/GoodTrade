@@ -86,9 +86,9 @@ class scanner(pannel):
 
 		####################################### Finviz ################################################
 
-		# self.tickers_manager = tickers_manager
+		self.tickers_manager = tickers_manager
 
-		# self.scanner_process_manager = scanner_process
+		self.scanner_process_manager = scanner_process
 
 		# self.setting = ttk.LabelFrame(self.tab1,text="Scanner Settings") 
 		# self.setting.place(relx=0.01, rely=0.01, relheight=1, width=480)
