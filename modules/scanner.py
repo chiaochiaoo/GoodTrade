@@ -841,7 +841,7 @@ class scanner(pannel):
 				for index, row in df.iterrows():
 					if row['symbol'] not in self.symbols_registry:
 						self.data.partial_register(row['symbol'])
-
+				time.sleep(1)
 				#update the SDM data to the PD
 
 				self.update_pd()
