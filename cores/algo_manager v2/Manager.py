@@ -57,7 +57,7 @@ def algo_manager_voxcom(pipe):
 			while connection:
 
 				#from the socket
-				ready = select.select([s], [], [], 1)
+				ready = select.select([s], [], [], 0)
 				
 				if ready[0]:
 					data = []
@@ -273,7 +273,7 @@ class Manager:
 		count = 0
 		while True:
 			d = self.pipe_goodtrade.recv()
-
+			#print(d)
 			if d[0] =="msg":
 				try:
 					self.ui.main_app_status.set(str(d[1]))
@@ -290,6 +290,12 @@ class Manager:
 
 				if d[1][0] == "New order":
 					#try
+					# reg = threading.Thread(target=self.add_new_tradingplan,args=(d[1][1],self.test_mode,), daemon=True)
+					# reg.start()
+
+					# add = threading.Thread(target=self.wish, daemon=True)
+					# add.start()
+
 					self.add_new_tradingplan(d[1][1],self.test_mode)
 					#except:
 					#	log_print("adding con porra")
