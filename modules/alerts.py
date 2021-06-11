@@ -1359,6 +1359,7 @@ class breakout(alert):
 				self.data.symbol_data_openlow_val[symbol].get(),\
 				self.data.symbol_data_openlow_std[symbol].get()
 
+				default_risk = float(default_risk)
 				data_list = {"ATR":atr,
 							 "OHavg":oha,
 							 "OHstd":ohs,
