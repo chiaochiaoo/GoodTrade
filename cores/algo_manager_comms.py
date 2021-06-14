@@ -39,7 +39,7 @@ def algo_manager_commlink(pipe):
 	p = {}
 	p[datetime.now().strftime("%m%d")] = 0
 	#flush the file with 00000
-	with open("commlink.json","w") as f:
+	with open("cores/commlink.json","w") as f:
 		json.dump(p,f)
 
 	while True:
