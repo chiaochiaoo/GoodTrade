@@ -7,11 +7,11 @@ class algo_process_manager_client:
 	#A big manager. Who has access to all the corresponding grids in the labels.
  	#update each symbols per, 39 seconds? 
 	#run every ten seconds. 
-	def __init__(self,GT_pipe,process_pipe,root):
+	def __init__(self,process_pipe,root):
 		#need to track. 1 min range/ volume. 5 min range/volume.
 		#self.depositLabel['text'] = 'change the value'
 		#fetch this
-		self.gt_pipe = GT_pipe
+		#self.gt_pipe = GT_pipe
 		self.process_pipe = process_pipe
 		self.reg_list = []
 		self.black_list = []
@@ -45,30 +45,30 @@ class algo_process_manager_client:
 		# self.receive_start()
 
 	def receive_start(self):
+		#receive = threading.Thread(name="Thread: Algo manager receiver",target=self.receive_request, daemon=True)
+		#receive.start()
 		receive = threading.Thread(name="Thread: Algo manager receiver",target=self.receive_request, daemon=True)
 		receive.start()
-		receive = threading.Thread(name="Thread: Algo manager receiver2",target=self.receive_request2, daemon=True)
-		receive.start()
 
+
+	# def receive_request(self):
+
+	# 	#put the receive in corresponding box.
+	# 	while True:
+	# 		try:
+	# 			info = self.gt_pipe.recv()
+				
+	# 			#id, symbol, type, status, description, position, shares, risk$
+	# 			message_type= info[0]
+
+	# 			#if message_type =="New order":
+
+	# 			self.process_pipe.send(info)
+
+	# 		except Exception as e:
+	# 			print(e)
 
 	def receive_request(self):
-
-		#put the receive in corresponding box.
-		while True:
-			try:
-				info = self.gt_pipe.recv()
-				
-				#id, symbol, type, status, description, position, shares, risk$
-				message_type= info[0]
-
-				#if message_type =="New order":
-
-				self.process_pipe.send(info)
-
-			except Exception as e:
-				print(e)
-
-	def receive_request2(self):
 
 		#put the receive in corresponding box.
 

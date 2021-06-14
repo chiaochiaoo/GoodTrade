@@ -407,7 +407,7 @@ if __name__ == '__main__':
 	#auth.start()
 
 	### algo comms 
-	algo_manager_comm, algo_manager_thread_comm = multiprocessing.Pipe()
+	#algo_manager_comm, algo_manager_thread_comm = multiprocessing.Pipe()
 	algo_manager_receive_comm, algo_manager_process_comm = multiprocessing.Pipe()
 	
 	# algo_comm_link = multiprocessing.Process(target=algo_manager_commlink, args=(algo_manager_receive_comm,),daemon=True)
@@ -443,7 +443,7 @@ if __name__ == '__main__':
 	root.maxsize(3000, 1500)
 
 
-	algo_manager = algo_process_manager_client(algo_manager_thread_comm,algo_manager_process_comm,root)
+	algo_manager = algo_process_manager_client(algo_manager_process_comm,root)
 	
 	utility = multiprocessing.Process(target=utils, args=(algo_manager_receive_comm,util_response),daemon=True)
 	utility.daemon=True
@@ -453,7 +453,7 @@ if __name__ == '__main__':
 
 	util_process = util_client(util_request)
 	
-	view = viewer(root,util_process,ppro,algo_manager_comm,authen_clientside_comm,algo_manager,util_request)
+	view = viewer(root,util_process,ppro,algo_manager_process_comm,authen_clientside_comm,algo_manager,util_request)
 	utility.start()
 
 	root.mainloop()

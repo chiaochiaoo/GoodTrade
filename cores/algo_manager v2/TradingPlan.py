@@ -185,7 +185,7 @@ class TradingPlan:
 				self.data[FLATTENTIMER] = ts
 		else:
 			if not stillbreak:
-				print(self.symbol_name,"timer:",ts-self.data[FLATTENTIMER])
+				#print(self.symbol_name,"timer:",ts-self.data[FLATTENTIMER])
 				if ts-self.data[FLATTENTIMER]>self.data[RISKTIMER]:
 					flatten=True
 

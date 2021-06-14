@@ -18,7 +18,7 @@ import select
 from datetime import datetime
 import json
 #May this class bless by the Deus Mechanicus.
-
+import psutil
 try:
 	f = open("../../algo_logs/"+datetime.now().strftime("%m-%d")+".txt", "x")
 except:

@@ -65,6 +65,12 @@ class ppro_process_manager:
 		while True:
 
 			try:
+
+				# print("Threads:",threading.active_count())
+				# for thread in threading.enumerate(): 
+				# 	print(thread.name)
+
+
 				d = self.request.recv()
 
 				status = d[0]
