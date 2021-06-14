@@ -91,7 +91,7 @@ class Symbol:
 			if bid<self.seen_low:
 				self.seen_low = bid 
 
-			if ts - self.init_ts >=1800:
+			if ts - self.init_ts >=900:
 				s = ((self.seen_low-self.data[SUPPORT])/self.data[SUPPORT])
 				r =  ((self.data[RESISTENCE]-self.seen_high)/self.seen_high)
 				if s>0.004:

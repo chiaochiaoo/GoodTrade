@@ -103,7 +103,7 @@ class TradingPlan:
 			self.tklabels[RESISTENCE]["background"] = "red"
 			return False
 		try:
-			self.symbol.set_resistence(self.tkvars[SUPPORT].get())
+			self.symbol.set_support(self.tkvars[SUPPORT].get())
 			self.tklabels[SUPPORT]["background"] = "white"
 		except Exception as e:
 			log_print(self.symbol_name,"error on sup/res input.",e)
@@ -185,7 +185,7 @@ class TradingPlan:
 				self.data[FLATTENTIMER] = ts
 		else:
 			if not stillbreak:
-				print(ts-self.data[FLATTENTIMER])
+				print(self.symbol_name,"timer:",ts-self.data[FLATTENTIMER])
 				if ts-self.data[FLATTENTIMER]>self.data[RISKTIMER]:
 					flatten=True
 
@@ -492,7 +492,7 @@ class TradingPlan:
 				entrytimer=int(self.tkvars[TIMER].get())
 				manage_plan =self.tkvars[MANAGEMENTPLAN].get()
 
-				self.data[RISKTIMER] = self.tkvars[RISKTIMER].get()
+				self.data[RISKTIMER] = int(self.tkvars[RISKTIMER].get())
 
 
 				self.set_mind("",DEFAULT)
