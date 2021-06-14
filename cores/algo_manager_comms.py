@@ -38,8 +38,11 @@ def algo_manager_commlink(pipe):
 
 	p = {}
 	p[datetime.now().strftime("%m%d")] = 0
+
+
+	file_location = "cores/commlink.json"
 	#flush the file with 00000
-	with open("cores/commlink.json","w") as f:
+	with open(file_location,"w") as f:
 		json.dump(p,f)
 
 	while True:
@@ -64,7 +67,7 @@ def algo_manager_commlink(pipe):
 		if success:  #save the file
 			p[datetime.now().strftime("%m%d")] = PORT
 			print("Socket creation successful:",PORT)
-			with open("commlink.json","w") as f:
+			with open(file_location,"w") as f:
 				json.dump(p,f)
 
 		if not success:
