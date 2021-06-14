@@ -571,57 +571,82 @@ class TwoToOneTrigger(AbstractTrigger):
 
 		#add the actual stuff here.
 
+	def bring_up_stop(self,new_stop):
+
+		coefficient = 1
+		if self.tradingplan.data[POSITION] ==SHORT:
+			coefficient = -1
+
+		#print(new_stop,self.tradingplan.data[STOP_LEVEL])
+		if new_stop*coefficient >self.tradingplan.data[STOP_LEVEL]*coefficient:
+			self.tradingplan.data[STOP_LEVEL]=new_stop
+			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[STOP_LEVEL])
+
+		#print("new stop:",self.tradingplan.data[STOP_LEVEL])
+
 	def trigger_event(self):
+
+
 
 		if self.strategy.orders_level == 1:
 			
-			#BREAK EVEN
-			self.tradingplan.data[STOP_LEVEL]=round((self.tradingplan.data[STOP_LEVEL]*3+self.tradingplan.data[AVERAGE_PRICE])/4,2)
-			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[STOP_LEVEL])
+			#75
+			new_stop = round((self.tradingplan.data[STOP_LEVEL]*3+self.tradingplan.data[AVERAGE_PRICE])/4,2)
+			self.bring_up_stop(new_stop)
+
 			self.set_mind("75% risk",GREEN)
+
 		if self.strategy.orders_level == 2:
 			
 			#BREAK EVEN
-			self.tradingplan.data[STOP_LEVEL]=round((self.tradingplan.data[STOP_LEVEL]*2+self.tradingplan.data[AVERAGE_PRICE])/3,2)
-			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[STOP_LEVEL])
+
+			new_stop =round((self.tradingplan.data[STOP_LEVEL]*2+self.tradingplan.data[AVERAGE_PRICE])/3,2)
+			self.bring_up_stop(new_stop)
+
 			self.set_mind("Half risk",GREEN)
 
 		if self.strategy.orders_level == 3:
 			
 			#BREAK EVEN
-			self.tradingplan.data[STOP_LEVEL]=round(self.tradingplan.data[AVERAGE_PRICE],2)
-			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[AVERAGE_PRICE])
+
+			new_stop =round(self.tradingplan.data[AVERAGE_PRICE],2)
+			self.bring_up_stop(new_stop)
+
 			self.set_mind("Break even",GREEN)
 
 		if self.strategy.orders_level == 4:
-			self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[AVERAGE_PRICE]
-			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[AVERAGE_PRICE])
+
+			new_stop =round(self.tradingplan.data[AVERAGE_PRICE],2)
+			self.bring_up_stop(new_stop)
+
 			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
 			self.tradingplan.current_price_level = 2
 			self.set_mind("Covered No."+str(1)+" lot.",GREEN)
 
 		if self.strategy.orders_level == 5:
 			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
-			self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[TRIGGER_PRICE_3]
-			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[TRIGGER_PRICE_3])
+
+			new_stop =round(self.tradingplan.data[TRIGGER_PRICE_3],2)
+			self.bring_up_stop(new_stop)
 			
 		if self.strategy.orders_level == 6:
 			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
 			self.tradingplan.current_price_level = 3
 			self.set_mind("Covered No."+str(2)+" lot.",GREEN)
-			self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[TRIGGER_PRICE_4]
-			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[TRIGGER_PRICE_4])
+
+			new_stop =round(self.tradingplan.data[TRIGGER_PRICE_4],2)
+			self.bring_up_stop(new_stop)
 
 		if self.strategy.orders_level == 7:
 			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
-			self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[TRIGGER_PRICE_5]
-			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[TRIGGER_PRICE_5])
+
+			new_stop =round(self.tradingplan.data[TRIGGER_PRICE_5],2)
+			self.bring_up_stop(new_stop)
 
 		if self.strategy.orders_level == 8:
 			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
-			self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[TRIGGER_PRICE_6]
-			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[TRIGGER_PRICE_6])
-
+			new_stop =round(self.tradingplan.data[TRIGGER_PRICE_6],2)
+			self.bring_up_stop(new_stop)
 		# log_print(self.symbol_name," Hit price target", self.tradingplan.current_price_level,"New Stop:",self.tradingplan.data[STOP_LEVEL])
 		self.strategy.orders_level +=1
 		self.tradingplan.adjusting_risk()
