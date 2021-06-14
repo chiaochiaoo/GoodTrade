@@ -401,13 +401,14 @@ class Manager:
 				d.tkvars[MANAGEMENTPLAN].set(managment)
 				d.tkvars[TIMER].set(timer)
 
-	def terminateGT(self):
+	# def terminateGT(self):
 
-		if self.termination:
-			self.pipe_goodtrade.send("Termination")
-			self.termination = False
-		else:
-			print("Already terminated or not connected")
+	# 	if self.termination:
+	# 		self.pipe_goodtrade.send("Termination")
+	# 		self.termination = False
+	# 	else:
+	# 		print("Already terminated or not connected")
+			
 	def deploy_all(self):
 		for d in self.tradingplan.values():
 			d.deploy()

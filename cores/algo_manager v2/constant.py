@@ -79,7 +79,7 @@ ENTYPE = "Entrytype"
 ENTRYPLAN = "EntryPlan"
 MANAGEMENTPLAN = "ManagementPlan"
 TRADING_PLAN ="TradingPlan"
-
+RISKTIMER = "Risktimer"
 
 #TRIGGER PARA
 SYMBOL_DATA = "symbol_data"

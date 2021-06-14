@@ -44,7 +44,7 @@ class TradingPlan:
 		self.current_price_level = 0
 		self.price_levels = {}
 
-		self.numeric_labels = [ACTRISK,ESTRISK,CURRENT_SHARE,TARGET_SHARE,INPUT_TARGET_SHARE,AVERAGE_PRICE,LAST_AVERAGE_PRICE,RISK_PER_SHARE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3,FLATTENTIMER,BREAKPRICE]
+		self.numeric_labels = [ACTRISK,ESTRISK,CURRENT_SHARE,TARGET_SHARE,INPUT_TARGET_SHARE,AVERAGE_PRICE,LAST_AVERAGE_PRICE,RISK_PER_SHARE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3,FLATTENTIMER,BREAKPRICE,RISKTIMER]
 		self.string_labels = [MIND,STATUS,POSITION,RISK_RATIO,SIZE_IN,ENTRYPLAN,ENTYPE,MANAGEMENTPLAN]
 
 		self.bool_labels= [AUTORANGE,AUTOMANAGE,RELOAD,SELECTED,ANCART_OVERRIDE]
@@ -97,19 +97,32 @@ class TradingPlan:
 		"""
 		try:
 			self.symbol.set_resistence(self.tkvars[RESISTENCE].get())
-			self.symbol.set_support(self.tkvars[SUPPORT].get())
+			self.tklabels[RESISTENCE]["background"] = "white"
 		except Exception as e:
 			log_print(self.symbol_name,"error on sup/res input.",e)
+			self.tklabels[RESISTENCE]["background"] = "red"
+			return False
+		try:
+			self.symbol.set_resistence(self.tkvars[SUPPORT].get())
+			self.tklabels[SUPPORT]["background"] = "white"
+		except Exception as e:
+			log_print(self.symbol_name,"error on sup/res input.",e)
+			self.tklabels[SUPPORT]["background"] = "red"
+			return False
+
+		return True
 
 	def AR_toggle(self):
 		try:
-			if self.data[POSITION] =="" and self.tkvars[AUTORANGE].get()==False:
+			if self.data[POSITION] =="" and self.tkvars[AUTORANGE].get()==False:   #Turn off safety, now adjust the values. 
 				self.tklabels[SUPPORT]["state"] = "normal"
 				self.tklabels[RESISTENCE]["state"] = "normal"
-			else:
-				self.AR_toggle_check()
-				self.tklabels[SUPPORT]["state"] = "disabled"
-				self.tklabels[RESISTENCE]["state"] = "disabled"
+			else:  ###Turn the safety back on. 
+				if self.AR_toggle_check() == True:
+					self.tklabels[SUPPORT]["state"] = "disabled"
+					self.tklabels[RESISTENCE]["state"] = "disabled"
+				else:
+					self.tkvars[AUTORANGE].set(False)
 		except:
 			pass
 
@@ -172,7 +185,8 @@ class TradingPlan:
 				self.data[FLATTENTIMER] = ts
 		else:
 			if not stillbreak:
-				if ts-self.data[FLATTENTIMER]>60:
+				print(ts-self.data[FLATTENTIMER])
+				if ts-self.data[FLATTENTIMER]>self.data[RISKTIMER]:
 					flatten=True
 
 				#print(ts-self.data[FLATTENTIMER])
@@ -478,13 +492,17 @@ class TradingPlan:
 				entrytimer=int(self.tkvars[TIMER].get())
 				manage_plan =self.tkvars[MANAGEMENTPLAN].get()
 
+				self.data[RISKTIMER] = self.tkvars[RISKTIMER].get()
+
+
 				self.set_mind("",DEFAULT)
 				self.entry_plan_decoder(entryplan, entry_type, entrytimer)
 				self.manage_plan_decoder(manage_plan)
 
-				log_print("Deploying:",self.symbol_name,self.entry_plan.get_name(),self.symbol.get_support(),self.symbol.get_resistence(),entry_type,entrytimer,self.management_plan.get_name(),"risk:",self.data[ESTRISK])
-				self.AR_toggle_check()
-				self.start_tradingplan()
+				if self.AR_toggle_check():
+					log_print("Deploying:",self.symbol_name,self.entry_plan.get_name(),self.symbol.get_support(),self.symbol.get_resistence(),entry_type,entrytimer,self.management_plan.get_name(),"risk:",self.data[ESTRISK],"risk timer:",self.data[RISKTIMER])
+				
+					self.start_tradingplan()
 			except Exception as e:
 
 				log_print("Deplying Error:",self.symbol_name,e)

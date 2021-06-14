@@ -17,6 +17,8 @@ class UI(pannel):
 
 		self.algo_counts = 0
 
+		self.risk_timer = tk.DoubleVar(value=120)
+
 		self.option_values()
 
 		self.init_pannel()
@@ -65,8 +67,11 @@ class UI(pannel):
 		self.timersx = ttk.Label(self.comms,  textvariable=self.algo_timer_string)
 		self.timersx.grid(sticky="w",column=2,row=4,padx=10)
 
-		self.deconstruct = ttk.Button(self.comms, text="Terminate GT",command=self.manager.terminateGT)#,command=self.deploy_all_stoporders)
-		self.deconstruct.grid(sticky="w",column=1,row=5)
+
+		ttk.Label(self.comms, text="Risk timer:").grid(sticky="w",column=1,row=5,padx=10)
+		tk.Entry(self.comms,textvariable=self.risk_timer,width=5).grid(sticky="w",column=2,row=5,padx=10)
+		# self.deconstruct = ttk.Button(self.comms, text="Terminate GT",command=self.manager.terminateGT)#,command=self.deploy_all_stoporders)
+		# self.deconstruct.grid(sticky="w",column=1,row=5)
 
 	def init_config_pannel(self):
 
@@ -215,6 +220,11 @@ class UI(pannel):
 		TOTAL_REALIZED:tradingplan.tkvars[TOTAL_REALIZED], \
 		'flatten':"", \
 		'log':""}
+
+
+		#link the global variable 
+		tradingplan.tkvars[RISKTIMER] = self.risk_timer 
+
 
 		l = self.label_count
 
