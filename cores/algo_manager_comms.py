@@ -8,6 +8,8 @@ import select
 import time
 
 import os
+from datetime import datetime
+import json
 #### HERE I NEED SELECT. ### Dua channel. ####
 
 
@@ -29,26 +31,43 @@ def kill():
 def algo_manager_commlink(pipe):
 
 	HOST = 'localhost'  # Standard loopback interface address (localhost)
-	PORT = 65491        # Port to listen on (non-privileged ports are > 1023)
 
+	PORT_START = 65491
+	PORT_END = 65991
+	#PORT = 65491        # Port to listen on (non-privileged ports are > 1023)
+
+	p = {}
+	p[datetime.now().strftime("%m%d")] = 0
+	#flush the file with 00000
+	with open("commlink.json","w") as f:
+		json.dump(p,f)
 
 	while True:
 
+		PORT = PORT_START	
 		s=  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		# s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		failed = 0
+		success = False
 		while True:
 			try:
 				s.bind((HOST, PORT))
+				success = True
 				break
 			except Exception as e:
-				failed +=1
-				kill()
-				if failed >=5:
+				PORT +=1
+				#kill()
+				if PORT >PORT_END:
 					print("algo failed to initialize",e)
 					break
 
-		if failed>=5:
+		if success:  #save the file
+			p[datetime.now().strftime("%m%d")] = PORT
+			print("Socket creation successful:",PORT)
+			with open("commlink.json","w") as f:
+				json.dump(p,f)
+
+		if not success:
 			break
 
 		pipe.send(["socket","Connected"])
@@ -127,8 +146,7 @@ def algo_manager_commlink(pipe):
 
 				#print("running")
 			except Exception as e:
-				Connection= False
-		
+				Connection= False	
 	s.close()
 
 
@@ -144,7 +162,9 @@ if __name__ == '__main__':
 
 	# for i in os.popen("netstat -ano|findstr 65499").read().split("\n"):
 	# 	print(i[-8:])
-		#print(int(i[61:])
+	# 	print(int(i[61:])
+
+	
 	server_side_comm, client_side_comm = multiprocessing.Pipe()
 
 	

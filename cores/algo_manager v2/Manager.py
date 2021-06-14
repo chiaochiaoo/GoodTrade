@@ -16,6 +16,7 @@ import multiprocessing
 import requests
 import select
 from datetime import datetime
+import json
 #May this class bless by the Deus Mechanicus.
 
 try:
@@ -32,7 +33,7 @@ def algo_manager_voxcom(pipe):
 	while True:
 
 		HOST = 'localhost'  # The server's hostname or IP address
-		PORT = 65491       # The port used by the server
+		#PORT = 65491       # The port used by the server
 
 		try:
 			log_print("Trying to connect to the main application")
@@ -41,13 +42,20 @@ def algo_manager_voxcom(pipe):
 
 			while not connected:
 				try:
-					s.connect((HOST, PORT))
-					connected = True
-					#
+					with open('../commlink.json') as json_file:
+						port_file = json.load(json_file)
+
+					if datetime.now().strftime("%m%d") not in port_file:
+						time.sleep(1)
+					else:
+						PORT = port_file[datetime.now().strftime("%m%d")]
+						s.connect((HOST, PORT))
+						connected = True
+
 					s.setblocking(0)
-				except:
+				except Exception as e:
 					pipe.send(["msg","Disconnected"])
-					log_print("Cannot connected. Try again in 2 seconds.")
+					log_print("Cannot connected. Try again in 2 seconds.",e)
 					time.sleep(2)
 
 			connection = True
