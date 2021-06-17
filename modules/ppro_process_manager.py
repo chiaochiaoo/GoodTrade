@@ -191,7 +191,7 @@ def deregister(symbol):
 
 def thread_waiting_mechanism():
 	#print(threading.active_count())
-	while threading.active_count()>75:
+	while threading.active_count()>50:
 		#print("wait")
 		time.sleep(1)
 
@@ -282,8 +282,8 @@ def multi_processing_price(pipe_receive):
 					info = threading.Thread(target=getinfo,args=(i,pipe_receive,), daemon=True)
 					info.start()
 
-			if k%5 == 0:
-				print("Registed list:",len(reg_list),"T:",threading.active_count())
+			# if k%5 == 0:
+			# 	print("Registed list:",len(reg_list),"T:",threading.active_count())
 			k+=1
 			time.sleep(1)
 
