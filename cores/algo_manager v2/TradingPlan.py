@@ -347,10 +347,11 @@ class TradingPlan:
 			self.tklabels[RISK_RATIO]["background"] = DEFAULT
 
 	def flatten_cmd(self):
-		self.ppro_out.send(["Flatten",self.symbol_name])
-
+		
 		if self.tkvars[STATUS].get()==PENDING:
 			self.cancel_algo()
+		else:
+			self.ppro_out.send(["Flatten",self.symbol_name])
 
 	"""	UI related  """
 	def update_symbol_tkvar(self):
