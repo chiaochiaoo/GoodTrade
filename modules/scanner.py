@@ -3,6 +3,8 @@ from tkinter import ttk
 import threading
 import pandas as pd
 import time
+
+#from pannel import *
 from modules.pannel import *
 #from modules.scanner_process_manager import *
 
@@ -40,9 +42,13 @@ class scanner(pannel):
 		self.tab2 = tk.Canvas(self.tabControl)
 
 		self.tabControl.add(self.tab2, text ='Nasdaq Trader') 
-		self.tabControl.add(self.tab1, text ='VB Scanner') 
+		self.tabControl.add(self.tab1, text ='TNV Scanner') 
 		
 		
+		############## SACNNER ##############
+
+		self.TNVscanner = TNVscanner(self.tab1)
+
 		############################### Nasdaq Trader ############################################
 
 		# self.NT_refresh = ttk.Button(self.tab2,
@@ -184,6 +190,9 @@ class scanner(pannel):
 
 		# df = pd.read_csv("test.csv",index_col=0)
 		# self.add_nasdaq_labels(["d",df,"csc"])
+
+	def update_TNVscanner(self,df):
+		self.TNVscanner.update_entry(df)
 
 	def add_symbols(self):
 
@@ -797,21 +806,23 @@ class scanner(pannel):
 		self.update_in_progress = False
 
 
-	def add_nasdaq_labels(self,df):
+	def add_nasdaq_labels(self,data):
 
 		print("receive new data")
 
-		try:
+		if 1:
 			if self.nasdaq_is_working_on_it==False:
 
 				self.nasdaq_is_working_on_it = True
 				self.nasdaq_trader_symbols = []
 				
-				timestamp = df[2]
-				df = df[1]
+			
+				df = data[0]
+				timestamp = data[1]
+				
 
 				#df = df[df.market =='NQ'][:20].copy()
-
+				df.to_csv("test.csv")
 				df.loc[df["market"]=='NQ',"market"] = self.market_sort[0]
 				df.loc[df["market"]=='NY',"market"] = self.market_sort[1]
 				df.loc[df["market"]=='AM',"market"] = self.market_sort[2]
@@ -849,10 +860,10 @@ class scanner(pannel):
 				#self.scanner_process_manager.updating_comlete()
 
 				self.nasdaq_is_working_on_it = False
-		except Exception as e:
-			self.nasdaq_is_working_on_it = False
-			self.nasdaq_trader_created == False
-			print("NT:",e)
+		# except Exception as e:
+		# 	self.nasdaq_is_working_on_it = False
+		# 	self.nasdaq_trader_created == False
+		# 	print("NT:",e)
 
 	def refresh(self):
 
@@ -916,7 +927,160 @@ class scanner(pannel):
 
 
 
-#df=pd.read_csv("test.csv",index_col=0)
+class TNVscanner():
+
+	def __init__(self,root):
+
+		self.l = 1
+		self.root = root
+
+		self.buttons = []
+		self.entries = []
+
+		#self.NT_update_time = tk.StringVar(value='Last updated')
+		#self.NT_update_time.set('Last updated') 
+		
+		self.NT_stat = ttk.Label(self.root, text="Last update: ")
+		self.NT_stat.place(x=10, y=10, height=25, width=200)
+	
+
+		self.breakout_frame = ttk.LabelFrame(self.root,text="Volatility Breakout") 
+		self.breakout_frame.place(x=0, rely=0.05, relheight=0.268, relwidth=0.95)
+
+		self.reversal_frame = ttk.LabelFrame(self.root,text="Reversal") 
+		self.reversal_frame.place(x=0, rely=0.32, relheight=0.268, relwidth=0.95)
+
+		self.momentum_frame = ttk.LabelFrame(self.root,text="Momentum") 
+		self.momentum_frame.place(x=0, rely=0.59, relheight=0.268, relwidth=0.95)
+
+		# self.NT_scanner_canvas = tk.Canvas(self.all)
+		# self.NT_scanner_canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
+		# self.scroll = tk.Scrollbar(self.all)
+		# self.scroll.config(orient=tk.VERTICAL, command=self.NT_scanner_canvas.yview)
+		# self.scroll.pack(side=tk.RIGHT,fill="y")
+		# self.NT_scanner_canvas.configure(yscrollcommand=self.scroll.set)
+		# self.NT_scanner_frame = tk.Frame(self.NT_scanner_canvas)
+		# self.NT_scanner_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
+		# self.NT_scanner_canvas.create_window(0, 0, window=self.NT_scanner_frame, anchor=tk.NW)
+
+		self.recreate_labels(self.breakout_frame)
+		#self.update_entry()
+
+	def recreate_labels(self,frame):
+
+
+		self.nasdaq_width = [9,6,5,5,5,5,6,6,6,6,6,6,8,6]
+		self.labels = ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
+
+		self.labels_position = {}
+
+		self.labels_position["Rank"]=0
+		self.labels_position["Symbol"]=1
+		self.labels_position["Market"]=2
+		self.labels_position["Price"]=3
+		self.labels_position["Since"]=4
+		self.labels_position["Been"]=5
+		self.labels_position["SC%"]=6
+		self.labels_position["SO%"]=7
+		self.labels_position["L5R%"]=8
+		self.labels_position["Status"]=9
+		self.labels_position["Add"]=10
+
+		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
+
+		self.status_code = {}
+		self.status_num = 0
+
+		for i in range(len(self.labels)): #Rows
+			self.b = tk.Button(self.breakout_frame, text=self.labels[i],width=self.nasdaq_width[i])#,command=self.rank
+			self.b.configure(activebackground="#f9f9f9")
+			self.b.configure(activeforeground="black")
+			self.b.configure(background="#d9d9d9")
+			self.b.configure(disabledforeground="#a3a3a3")
+			self.b.configure(relief="ridge")
+			self.b.configure(foreground="#000000")
+			self.b.configure(highlightbackground="#d9d9d9")
+			self.b.configure(highlightcolor="black")
+			self.b.grid(row=self.l, column=i)
+			self.buttons.append(self.b)
+
+		self.l+=1
+		self.create_entry()
+		
+
+	def create_entry(self):
+
+		for k in range(0,8):
+
+			self.entries.append([])
+
+			for i in range(len(self.labels)): #Rows
+				self.b = tk.Label(self.breakout_frame, text=" ",width=self.nasdaq_width[i])#,command=self.rank
+				self.b.configure(activebackground="#f9f9f9")
+				self.b.configure(activeforeground="black")
+				self.b.configure(background="#d9d9d9")
+				self.b.configure(disabledforeground="#a3a3a3")
+				self.b.configure(relief="ridge")
+				self.b.configure(foreground="#000000")
+				self.b.configure(highlightbackground="#d9d9d9")
+				self.b.configure(highlightcolor="black")
+				self.b.grid(row=self.l, column=i)
+				self.entries[k].append(self.b)
+			self.l+=1
+
+
+	def update_entry(self,data):
+
+		#at most 8.
+		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
+
+		df = data[0]
+		timestamp = data[1]
+
+		self.NT_stat["text"] = "Last update: "+timestamp
+
+		df.to_csv("tttt.csv")
+		entry = 0
+
+		for index, row in df.iterrows():
+			#print(row)
+			rank = index
+			vol = row['Avg VolumeSTR']
+			relv = row['rel vol']
+			roc5 = row['5ROCP']
+			roc10 = row['10ROCP']
+			roc15 = row['15ROCP']
+			score = row['score']
+			sc = row['SC']
+			so = row['SO']
+
+			if 1: #score>0:
+
+				lst = [rank,vol,relv,roc5,roc10,roc15,score,sc,so]
+
+				for i in range(len(lst)):
+					self.entries[entry][i]["text"] = lst[i]
+				entry+=1
+				if entry ==8:
+					break
+
+
+
+
+if __name__ == '__main__':
+
+	root = tk.Tk() 
+	root.title("GoodTrade v489") 
+	root.geometry("640x840")
+
+	vbs(root)
+
+	root.mainloop()
+
+
+			
+	# 		info = [rank,avgv,relv,roc5,roc10,roc15,score,sc,so]
+	# 		self.nasdaq.append([])
 
 # # # # df=df.sort_values(by="rank",ascending=False)
 

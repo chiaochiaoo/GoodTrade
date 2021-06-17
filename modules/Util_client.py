@@ -73,6 +73,7 @@ class util_client:
 
 			if len(d)>0:
 
+				print(d[0])
 				if d[0]=="Database Request":
 					#print("send send send",d)
 					self.util_request.send(d)
@@ -80,9 +81,17 @@ class util_client:
 
 					self.util_request.send(d)
 
-				elif d[0]=="Scanner Update":
+				elif d[0]=="NasdaqTrader update":
+					self.pannel.add_nasdaq_labels(d[1])
 					try:
 						self.pannel.add_nasdaq_labels(d[1])
+					except Exception as e:
+						print("Error updating Nasdaq:",e)
+
+				elif d[0]=="Scanner update":
+					self.pannel.update_TNVscanner(d[1])
+					try:
+						self.pannel.update_TNVscanner(d[1])
 					except Exception as e:
 						print("Error updating Nasdaq:",e)
 
@@ -102,6 +111,8 @@ class util_client:
 					except Exception as e:
 						print("Error updating finviz:",e)
 
+				else:
+					print("unkown server package:",d)
 		#print(d)
 		#check if it is normal type?
 		# if d[0]=="Nasdaq":
