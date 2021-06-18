@@ -6,7 +6,9 @@ import pip
 import socket
 import pickle
 import select
-
+from datetime import date
+import os.path
+import json
 #from Symbol_data_manager import *
 from modules.Symbol_data_manager import *
 
@@ -25,6 +27,8 @@ class util_client:
 		self.util_request = util_request
 		self.pannel = None
 
+		self.today  = date.today().strftime("%m%d")
+
 		receive = threading.Thread(name="Util subthread",target=self.receive_request,daemon=True)
 		receive.start()
 
@@ -42,13 +46,13 @@ class util_client:
 				if count !=0:
 					self.util_request.send(l)
 				l=["Database Request init"]
-			l.append(i)
+			if not self.check_if_file_exist(i):
+				l.append(i)
 			count+=1
 		if len(l)>1:
 			l[0]="Database Request finish"
 			self.util_request.send(l)
 			
-		
 		# self.data = s.data_list
 		# self.symbols = s.get_list()[:]
 		# print(self.symbols)
@@ -56,12 +60,41 @@ class util_client:
 		# print("send::",self.symbols)
 		# self.util_request.send(l)
 
+	def check_if_file_exist(self,symbol):
+
+		file = "data/"+symbol+"_"+self.today+".txt"
+
+		if os.path.isfile(file):
+			print(symbol,"already exisit, loading local copy instd.")
+			with open(file) as json_file:
+				d = json.load(json_file)
+
+			for i in range(len(self.data)):
+				self.data[i][symbol].set(d[i+1])
+
+			self.data_status[symbol].set(True)
+
+			return True
+		return False
+
 	def set_pannel(self,scanner_pannel):
 		self.pannel = scanner_pannel
 
 	def send_request(self,symbol):
-		print("db reg ",symbol)
-		self.util_request.send(["Database Request",symbol])
+
+		file = "data/"+symbol+"_"+self.today+".txt"
+
+		if os.path.isfile(file):
+			print(symbol,"already exisit, loading local copy instd.")
+			with open(file) as json_file:
+				d = json.load(json_file)
+
+			for i in range(len(self.data)):
+				self.data[i][symbol].set(d[i+1])
+
+			self.data_status[symbol].set(True)
+		else:
+			self.util_request.send(["Database Request",symbol])
 
 	def receive_request(self):
 
@@ -98,12 +131,19 @@ class util_client:
 				elif d[0] =="Database Response":
 
 					dic = d[1]
+					#print(dic)
 					for symbol,d in dic.items():
 						if len(d)-1 == len(self.data):
 							for i in range(len(self.data)):
 								self.data[i][symbol].set(d[i+1])
 
 							self.data_status[symbol].set(True)
+
+							file = "data/"+symbol+"_"+self.today+".txt"
+							with open(file, 'w') as outfile:
+									json.dump(d, outfile)
+
+							#save the file here.
 
 				elif d[0] =="Finviz Response":
 					try:

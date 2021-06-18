@@ -96,13 +96,13 @@ class all_alerts(pannel):
 
 class alert(pannel):
 
-	def __init__(self,frame,data:Symbol_data_manager,alert_pannel:all_alerts,commlink=None):
+	def __init__(self,frame,data:Symbol_data_manager,commlink=None):
 
 		super().__init__(frame)
 
 
 		self.reverse = True
-		self.alert_pannel=alert_pannel
+		#self.alert_pannel=alert_pannel
 		self.data = data
 
 		self.alerts = {}
@@ -162,8 +162,8 @@ class alert(pannel):
 				value_position = alerts[j][0]
 				alert_position = alerts[j][1]
 				alert_vals = alerts[j][2]
-				m=format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
-				self.tickers_tracers[i].append((format[value_position],m))
+				#m=format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
+				#self.tickers_tracers[i].append((format[value_position],m))
 			elif j>1:
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
@@ -226,8 +226,8 @@ class alert(pannel):
 				value_position = alerts[j][0]
 				alert_position = alerts[j][1]
 				alert_vals = alerts[j][2]
-				m=format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
-				self.tickers_tracers[i].append((format[value_position],m))
+				# m=format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
+				# self.tickers_tracers[i].append((format[value_position],m))
 			elif j==9:
 				self.tickers_labels[i].append(tk.Checkbutton(self.frame,variable=format[j]))
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
@@ -398,7 +398,7 @@ class alert(pannel):
 
 							eval_string.set(alert_str)
 
-							self.alert_pannel.add_alerts([symbol,time,alert_str])
+							#self.alert_pannel.add_alerts([symbol,time,alert_str])
 							self.set_latest_alert(symbol, alert_str, time)
 
 
@@ -431,7 +431,7 @@ class alert(pannel):
 
 							eval_string.set(alert_str)
 
-							self.alert_pannel.add_alerts([symbol,time,alert_str])
+							#self.alert_pannel.add_alerts([symbol,time,alert_str])
 							self.set_latest_alert(symbol, alert_str, time)
 
 							#send out confirm.
@@ -556,7 +556,7 @@ class alert(pannel):
 
 						if ts>570 and self.alerts[symbol][alert_type] < 0.5:
 							self.alerts[symbol][alert_type] = 0.5
-							self.alert_pannel.add_alerts([symbol,time,alert_str])
+							#self.alert_pannel.add_alerts([symbol,time,alert_str])
 							self.set_latest_alert(symbol, alert_str, time)
 
 					elif cur>1 and cur<2 and self.alerts[symbol][alert_type] < 1:
@@ -565,7 +565,7 @@ class alert(pannel):
 						eval_label["background"]="yellow"
 						if ts>570:
 							#only set when there is higher severity. 
-							self.alert_pannel.add_alerts([symbol,time,alert_str])
+							#self.alert_pannel.add_alerts([symbol,time,alert_str])
 							self.set_latest_alert(symbol, alert_str, time)
 					elif cur>2 and self.alerts[symbol][alert_type] < 2:
 
@@ -574,7 +574,7 @@ class alert(pannel):
 						alert_str = "Very high "+alert_type
 						eval_label["background"]="red"
 						if ts>570:
-							self.alert_pannel.add_alerts([symbol,time,alert_str])
+							#self.alert_pannel.add_alerts([symbol,time,alert_str])
 							self.set_latest_alert(symbol, alert_str, time)
 
 		except Exception as e:
@@ -689,9 +689,9 @@ class alert_map(pannel):
 
 class highlow(alert):
 
-	def __init__(self,frame,data:Symbol_data_manager,alert_panel:all_alerts):
+	def __init__(self,frame,data:Symbol_data_manager):
 
-		super().__init__(frame,data,alert_panel)
+		super().__init__(frame,data)
 
 		self.labels = ["Ticker","Status","Cur Range","Cur High","Cur Low","H. Avg","H. Std","H. Range","Evaluation"]
 		self.width = [8,10,7,7,7,7,7,9,15]
@@ -745,9 +745,9 @@ class highlow(alert):
 
 class openhigh(alert):
 
-	def __init__(self,frame,data:Symbol_data_manager,alert_panel:all_alerts):
+	def __init__(self,frame,data:Symbol_data_manager):
 
-		super().__init__(frame,data,alert_panel)
+		super().__init__(frame,data)
 
 		self.labels = ["Ticker","Status","Cur Range","Cur Open","Cur High","H. Avg","H. Std","H. Range","Evaluation"]
 		self.width = [8,10,7,7,7,7,7,9,15]
@@ -852,7 +852,7 @@ class openhigh(alert):
 
 					if ts>570 and self.alerts[symbol][alert_type] < 0.5:
 						self.alerts[symbol][alert_type] = 0.5
-						self.alert_pannel.add_alerts([symbol,time,alert_str])
+						#self.alert_pannel.add_alerts([symbol,time,alert_str])
 						self.set_latest_alert(symbol, alert_str, time)
 
 				elif now_>1 and now_<2 and self.alerts[symbol][alert_type] < 1:
@@ -861,7 +861,7 @@ class openhigh(alert):
 					eval_label["background"]="yellow"
 					if ts>570:
 						#only set when there is higher severity. 
-						self.alert_pannel.add_alerts([symbol,time,alert_str])
+						#self.alert_pannel.add_alerts([symbol,time,alert_str])
 						self.set_latest_alert(symbol, alert_str, time)
 				elif now_>2 and self.alerts[symbol][alert_type] < 2:
 
@@ -870,7 +870,7 @@ class openhigh(alert):
 					alert_str = "Very high "+alert_type
 					eval_label["background"]="red"
 					if ts>570:
-						self.alert_pannel.add_alerts([symbol,time,alert_str])
+						#self.alert_pannel.add_alerts([symbol,time,alert_str])
 						self.set_latest_alert(symbol, alert_str, time)
 
 		except Exception as e:
@@ -879,9 +879,9 @@ class openhigh(alert):
 
 class openlow(alert):
 
-	def __init__(self,frame,data:Symbol_data_manager,alert_panel:all_alerts):
+	def __init__(self,frame,data:Symbol_data_manager):
 
-		super().__init__(frame,data,alert_panel)
+		super().__init__(frame,data)
 
 		self.labels = ["Ticker","Status","Cur Range","Cur Open","Cur Low","H. Avg","H. Std","H. Range","Evaluation"]
 		self.width = [8,10,7,7,7,7,7,9,15]
@@ -985,7 +985,7 @@ class openlow(alert):
 
 					if ts>570 and self.alerts[symbol][alert_type] < 0.5:
 						self.alerts[symbol][alert_type] = 0.5
-						self.alert_pannel.add_alerts([symbol,time,alert_str])
+						#self.alert_pannel.add_alerts([symbol,time,alert_str])
 						self.set_latest_alert(symbol, alert_str, time)
 
 				elif now_>1 and now_<2 and self.alerts[symbol][alert_type] < 1:
@@ -994,7 +994,7 @@ class openlow(alert):
 					eval_label["background"]="yellow"
 					if ts>570:
 						#only set when there is higher severity. 
-						self.alert_pannel.add_alerts([symbol,time,alert_str])
+						#self.alert_pannel.add_alerts([symbol,time,alert_str])
 						self.set_latest_alert(symbol, alert_str, time)
 				elif now_>2 and self.alerts[symbol][alert_type] < 2:
 
@@ -1003,7 +1003,7 @@ class openlow(alert):
 					alert_str = "Very high "+alert_type
 					eval_label["background"]="red"
 					if ts>570:
-						self.alert_pannel.add_alerts([symbol,time,alert_str])
+						#self.alert_pannel.add_alerts([symbol,time,alert_str])
 						self.set_latest_alert(symbol, alert_str, time)
 
 		except Exception as e:
@@ -1013,9 +1013,9 @@ class openlow(alert):
 #########################
 class open_now(alert):
 
-	def __init__(self,frame,data:Symbol_data_manager,alert_panel:all_alerts):
+	def __init__(self,frame,data:Symbol_data_manager):
 
-		super().__init__(frame,data,alert_panel)
+		super().__init__(frame,data,)
 
 		self.labels = ["Ticker","Status","Cur Open","Cur Price","Cur Range","H. Avg","H. Std","H. Range","Evaluation"]
 		self.width = [8,10,7,7,7,7,7,9,15]
@@ -1060,9 +1060,9 @@ class open_now(alert):
 
 class prevclose(alert):
 
-	def __init__(self,frame,data:Symbol_data_manager,alert_panel:all_alerts):
+	def __init__(self,frame,data:Symbol_data_manager):
 
-		super().__init__(frame,data,alert_panel)
+		super().__init__(frame,data)
 
 		self.labels = ["Ticker","Status","Prev Close","Cur Range","H. Avg","H. Std","H. Range","Evaluation"]
 		self.width = [8,10,7,7,7,7,15,15]
@@ -1113,9 +1113,9 @@ class prevclose(alert):
 
 class firstfive(alert):
 
-	def __init__(self,frame,data:Symbol_data_manager,alert_panel:all_alerts):
+	def __init__(self,frame,data:Symbol_data_manager):
 
-		super().__init__(frame,data,alert_panel)
+		super().__init__(frame,data)
 
 		self.labels = ["Ticker","Status","Cur Range","H. Avg","H. Std","H. Range","Cur Vol","H.Vol Avg","H.Vol Std","H.Vol Range","Evaluation:Range","Evaluation:Volume"]
 		self.width = [8,10,7,7,7,7,7,7,7,12,14,15,15]
@@ -1184,9 +1184,9 @@ class firstfive(alert):
 
 class extremrange(alert):
 
-	def __init__(self,frame,data:Symbol_data_manager,alert_panel:all_alerts):
+	def __init__(self,frame,data:Symbol_data_manager):
 
-		super().__init__(frame,data,alert_panel)
+		super().__init__(frame,data)
 
 		self.labels = ["Ticker","Status","Cur Range","H. Avg","H. Std","H. Range","Evaluation"]
 		self.width = [8,10,7,7,7,15,15]
@@ -1232,9 +1232,9 @@ class extremrange(alert):
 
 class extremevolume(alert):
 
-	def __init__(self,frame,data:Symbol_data_manager,alert_panel:all_alerts):
+	def __init__(self,frame,data:Symbol_data_manager):
 
-		super().__init__(frame,data,alert_panel)
+		super().__init__(frame,data)
 
 		self.labels = ["Ticker","Status","Cur Vol(k)","H. Avg(k)","H. Std(k)","H. Range","Evaluation"]
 		self.width = [8,10,15,7,7,15,15]
@@ -1284,9 +1284,9 @@ class extremevolume(alert):
 
 class breakout(alert):
 
-	def __init__(self,frame,data:Symbol_data_manager,alert_panel:all_alerts,commlink=None):
+	def __init__(self,frame,data:Symbol_data_manager,commlink=None):
 
-		super().__init__(frame,data,alert_panel,commlink)
+		super().__init__(frame,data,commlink)
 
 		self.labels = ["Ticker","Status","AR","Support","Resistance ","Range","ATR","Cur Price","Evaluation","Algo","Trigger Type","Trigger Timer","Configure Entry",]
 		self.width = [8,10,4,7,7,7,7,7,25,4,10,10,12]

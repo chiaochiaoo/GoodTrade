@@ -79,7 +79,7 @@ class viewer:
 		self.tab12 = tk.Canvas(self.tabControl)
 
 		self.tabControl.add(self.tab1, text ='Tickers Manager') 
-		self.tabControl.add(self.tab8, text ='All alerts') 
+
 		self.tabControl.add(self.tab11, text ='Alerts map') 
 		self.tabControl.add(self.tab10, text ='Prev Close') 
 		self.tabControl.add(self.tab5, text ='High-Low')
@@ -94,21 +94,22 @@ class viewer:
 
 		self.tabControl.pack(expand = 1, fill ="both") 
 
+		#self.tabControl.add(self.tab8, text ='All alerts') 
 		#self.ticker_management_init(self.tab1)
-		self.all_alerts = all_alerts(self.tab8)
+		#self.all_alerts = all_alerts(self.tab8)
 
-		self.open_high_pannel = openhigh(self.tab6,self.data,self.all_alerts)
+		self.open_high_pannel = openhigh(self.tab6,self.data)
 
-		self.high_low_pannel = highlow(self.tab5,self.data,self.all_alerts)
-		self.open_low_pannel = openlow(self.tab7,self.data,self.all_alerts)
+		self.high_low_pannel = highlow(self.tab5,self.data)
+		self.open_low_pannel = openlow(self.tab7,self.data)
 
-		self.first_5 = firstfive(self.tab4,self.data,self.all_alerts)
-		self.er = extremrange(self.tab2,self.data,self.all_alerts)
-		self.ev = extremevolume(self.tab3,self.data,self.all_alerts)
+		self.first_5 = firstfive(self.tab4,self.data)
+		self.er = extremrange(self.tab2,self.data)
+		self.ev = extremevolume(self.tab3,self.data)
 
-		self.pv = prevclose(self.tab10,self.data,self.all_alerts)
+		self.pv = prevclose(self.tab10,self.data,)
 
-		self.br = breakout(self.tab9,self.data,self.all_alerts,algo_comm)#algo_comm #,algo_comm
+		self.br = breakout(self.tab9,self.data,algo_comm)#algo_comm #,algo_comm
 		self.am = alert_map(self.tab11,self.data)
 		#alerts  =[self.open_high_pannel]
 		alerts = [self.high_low_pannel,self.open_high_pannel,self.open_low_pannel,self.first_5,self.er,self.ev,self.br,self.pv,self.am]
@@ -437,7 +438,7 @@ if __name__ == '__main__':
 
 
 	root = tk.Tk() 
-	root.title("GoodTrade v490") 
+	root.title("GoodTrade v491") 
 	root.geometry("1800x900")
 	root.minsize(1500, 600)
 	root.maxsize(3000, 1500)

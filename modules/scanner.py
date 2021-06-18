@@ -27,9 +27,9 @@ class scanner(pannel):
 		self.symbols_registry = []
 
 		self.nasdaq_trader_symbols = []
-		self.nasdaq_trader_list = {}
-		self.nasdaq_trader_symbols_ranking = []
-		self.nasdaq_trader_ranking = []
+		#self.nasdaq_trader_list = {}
+		self.nasdaq_trader_symbols_ranking = {}
+		#self.nasdaq_trader_ranking = []
 
 		self.scanner_request = scanner_process
 
@@ -47,7 +47,7 @@ class scanner(pannel):
 		
 		############## SACNNER ##############
 
-		self.TNVscanner = TNVscanner(self.tab1)
+		self.TNVscanner = TNVscanner(self.tab1,self)
 
 		############################### Nasdaq Trader ############################################
 
@@ -649,6 +649,7 @@ class scanner(pannel):
 						self.nasdaq[i].append(tk.Button(self.NT_scanner_frame ,text="Add",width=self.nasdaq_width[j],command= lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)))
 						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 						self.nasdaq_trader_symbols.append(symbol)
+						self.nasdaq_trader_symbols_ranking[symbol] = rank
 
 		self.nasdaq_trader_created = True
 		self.rebind(self.NT_scanner_canvas,self.NT_scanner_frame)
@@ -759,6 +760,7 @@ class scanner(pannel):
 								self.nasdaq[i][j]["text"]=index
 								self.nasdaq[i][j]["background"]="SystemButtonFace"
 						elif j ==10:
+							self.nasdaq_trader_symbols_ranking[symbol] = rank
 							self.nasdaq_trader_symbols.append(symbol)
 							self.nasdaq[i][j]["command"] = lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)
 			print("pannel updated")
@@ -929,11 +931,12 @@ class scanner(pannel):
 
 class TNVscanner():
 
-	def __init__(self,root):
+	def __init__(self,root,NT):
 
 		self.l = 1
 		self.root = root
 
+		self.NT = NT
 		self.buttons = []
 		self.entries = []
 
@@ -945,10 +948,10 @@ class TNVscanner():
 	
 
 		self.breakout_frame = ttk.LabelFrame(self.root,text="Volatility Breakout") 
-		self.breakout_frame.place(x=0, rely=0.05, relheight=0.268, relwidth=0.95)
+		self.breakout_frame.place(x=0, rely=0.05, relheight=0.3, relwidth=0.95)
 
 		self.reversal_frame = ttk.LabelFrame(self.root,text="Reversal") 
-		self.reversal_frame.place(x=0, rely=0.32, relheight=0.268, relwidth=0.95)
+		self.reversal_frame.place(x=0, rely=0.36, relheight=0.268, relwidth=0.95)
 
 		self.momentum_frame = ttk.LabelFrame(self.root,text="Momentum") 
 		self.momentum_frame.place(x=0, rely=0.59, relheight=0.268, relwidth=0.95)
@@ -1010,7 +1013,7 @@ class TNVscanner():
 
 	def create_entry(self):
 
-		for k in range(0,8):
+		for k in range(0,10):
 
 			self.entries.append([])
 
@@ -1039,7 +1042,7 @@ class TNVscanner():
 
 		self.NT_stat["text"] = "Last update: "+timestamp
 
-		df.to_csv("tttt.csv")
+		#df.to_csv("tttt.csv")
 		entry = 0
 
 		for index, row in df.iterrows():
@@ -1054,17 +1057,25 @@ class TNVscanner():
 			sc = row['SC']
 			so = row['SO']
 
-			if 1: #score>0:
+			if rank in self.NT.nasdaq_trader_symbols_ranking:
+				listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
+			else:
+				listed = "No"
+			#print(self.NT.nasdaq_trader_symbols)
+			if 1: #score>0:	
 
-				lst = [rank,vol,relv,roc5,roc10,roc15,score,sc,so]
+				lst = [rank,vol,relv,roc5,roc10,roc15,score,sc,so,listed]
 
 				for i in range(len(lst)):
 					self.entries[entry][i]["text"] = lst[i]
 				entry+=1
-				if entry ==8:
+				if entry ==10:
 					break
 
-
+		while entry<10:
+			for i in range(len(lst)):
+				self.entries[entry][i]["text"] = ""
+			entry+=1
 
 
 if __name__ == '__main__':
@@ -1073,7 +1084,7 @@ if __name__ == '__main__':
 	root.title("GoodTrade v489") 
 	root.geometry("640x840")
 
-	vbs(root)
+	TNVscanner(root)
 
 	root.mainloop()
 
