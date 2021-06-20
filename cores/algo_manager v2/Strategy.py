@@ -181,7 +181,7 @@ class BreakUp(EntryStrategy): #the parameters contains? dk. yet .  #Can make sin
 		super().__init__("Entry : Break up",symbol,tradingplan)
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
-		self.buyTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
+		self.buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
 
 		self.add_initial_triggers(self.buyTrigger)
 
@@ -197,7 +197,7 @@ class BreakDown(EntryStrategy): #the parameters contains? dk. yet .  #Can make s
 		super().__init__("Entry : Break up",symbol,tradingplan)
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
-		self.sellTrigger = Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
+		self.sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
 
 		self.add_initial_triggers(self.sellTrigger)
 
@@ -214,8 +214,8 @@ class BreakAny(EntryStrategy):
 		super().__init__("Entry : Break Any",symbol,tradingplan)
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
-		self.buyTrigger = Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
-		self.sellTrigger = Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
+		self.buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
+		self.sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
 
 		self.add_initial_triggers(self.buyTrigger)
 		self.add_initial_triggers(self.sellTrigger)
@@ -228,6 +228,34 @@ class BreakAny(EntryStrategy):
 
 		if self.buyTrigger.get_trigger_state()==False and not self.buyTrigger.pre_deploying_check():
 			self.buyTrigger.total_reset()
+
+
+class BreakFirst(EntryStrategy):
+	def __init__(self,timer,repeat,symbol,tradingplan):
+
+		super().__init__("Entry : BreakFirst",symbol,tradingplan)
+		#description,trigger_timer:int,trigger_limit=1
+		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
+		self.buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
+		self.sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
+
+		self.add_initial_triggers(self.buyTrigger)
+		self.add_initial_triggers(self.sellTrigger)
+
+	def on_redeploying(self):
+
+		""" if one is used and does not vilate the entry condition (failed trade) reset it."""
+		if self.sellTrigger.get_trigger_state()==False and not self.sellTrigger.pre_deploying_check():
+			self.sellTrigger.total_reset()
+
+			self.buyTrigger.deactivate()
+			#disable the buy trigger.
+
+		if self.buyTrigger.get_trigger_state()==False and not self.buyTrigger.pre_deploying_check():
+			self.buyTrigger.total_reset()
+
+			self.sellTrigger.deactivate()
+			#disable the sell trigger. 
 
 class Bullish(EntryStrategy):
 	def __init__(self,timer,repeat,symbol,tradingplan):

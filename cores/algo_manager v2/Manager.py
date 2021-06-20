@@ -431,7 +431,7 @@ class Tester:
 
 		now = datetime.now()
 
-		self.sec =  now.hour*3600 + now.minute*60 + now.second
+		self.sec =  34180
 		print(self.sec)
 		self.bid=0
 		self.ask=0
@@ -707,7 +707,7 @@ if __name__ == '__main__':
 	
 
 	root = tk.Tk() 
-	root.title("GoodTrade Algo Manager v2 b5") 
+	root.title("GoodTrade Algo Manager v2 b6") 
 	root.geometry("1920x800")
 
 	Manager(root,goodtrade_pipe,ppro_out,ppro_in,TEST)

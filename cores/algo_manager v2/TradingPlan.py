@@ -548,6 +548,8 @@ class TradingPlan:
 			self.set_EntryStrategy(Dipbuy(entrytimer,instant,self.symbol,self))
 		elif entry_plan == FADEANY:
 			self.set_EntryStrategy(Fadeany(entrytimer,instant,self.symbol,self))
+		elif entry_plan == BREAKFIRST:
+			self.set_EntryStrategy(BreakFirst(entrytimer,instant,self.symbol,self))
 		else:
 			log_print("unkown plan")
 

@@ -111,7 +111,7 @@ BREAKANY =  "Break Any"
 DIPBUY = "Dipbuy"
 RIPSELL = "Ripsell"
 FADEANY = "Fade Any"
-
+BREAKFIRST = "Break First"
 #MANA Plan
 NONE =          "NONE"
 THREE_TARGETS = "Three tgts "

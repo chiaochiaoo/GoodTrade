@@ -28,7 +28,7 @@ class UI(pannel):
 
 		self.entry_type_options = {INSTANT,INCREMENTAL}
 
-		self.entry_plan_options = {BREAISH,BULLISH,BREAKUP,BREAKDOWN,BREAKANY,RIPSELL,DIPBUY,FADEANY}
+		self.entry_plan_options = {BREAISH,BULLISH,BREAKUP,BREAKDOWN,BREAKFIRST,BREAKANY,RIPSELL,DIPBUY,FADEANY}
 
 		self.management_plan_options = {ONETOTWORISKREWARD,ONETOTWORISKREWARDOLD}#THREE_TARGETS,SMARTTRAIL,ANCARTMETHOD,
 
@@ -78,7 +78,7 @@ class UI(pannel):
 
 		ttk.Label(self.config, text="All timer:").grid(sticky="w",column=1,row=5,padx=10)
 
-		ttk.Label(self.config, text="Aall EnPlan:").grid(sticky="w",column=1,row=6,padx=10)
+		ttk.Label(self.config, text="All EnPlan:").grid(sticky="w",column=1,row=6,padx=10)
 
 		ttk.Label(self.config, text="All EnType:").grid(sticky="w",column=1,row=7,padx=10)
 
@@ -87,10 +87,10 @@ class UI(pannel):
 		self.all_timer = tk.DoubleVar(value=0)
 		tk.Entry(self.config,textvariable=self.all_timer,width=5).grid(sticky="w",column=2,row=5,padx=10)
 
-		self.all_enp = tk.StringVar(value=BREAKANY)
+		self.all_enp = tk.StringVar(value=BREAKFIRST)
 		tk.OptionMenu(self.config, self.all_enp, *sorted(self.entry_plan_options)).grid(sticky="w",column=2,row=6,padx=10)
 
-		self.all_ent = tk.StringVar(value=INSTANT)
+		self.all_ent = tk.StringVar(value=INCREMENTAL)
 		tk.OptionMenu(self.config, self.all_ent, *sorted(self.entry_type_options)).grid(sticky="w",column=2,row=7,padx=10)
 
 		self.all_mana = tk.StringVar(value=ONETOTWORISKREWARD)

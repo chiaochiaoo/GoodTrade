@@ -117,6 +117,8 @@ class Symbol:
 			if self.data[BID]!= bid and self.data[ASK]!=ask:
 				
 
+				#print(ts,self.data[BID],self.data[ASK],self.data[RESISTENCE],self.data[SUPPORT],self.data[HIGH],self.data[LOW])
+
 				if AR==True and pos==PENDING and ts<34200:
 					if ask>self.data[RESISTENCE]:
 						self.data[RESISTENCE]=ask
@@ -129,15 +131,16 @@ class Symbol:
 				#print(self.data)
 				#34200 openning.
 
-				if self.data[HIGH]==0:
-					self.data[HIGH] = ask
-				if self.data[LOW] ==0:
-					self.data[LOW] = bid 
+				if ts>=34200:
+					if self.data[HIGH]==0:
+						self.data[HIGH] = ask
+					if self.data[LOW] ==0:
+						self.data[LOW] = bid 
 
-				if self.data[ASK]>self.data[HIGH]:
-					self.data[HIGH] = self.data[ASK]
-				if self.data[BID]<self.data[LOW]:
-					self.data[LOW]= self.data[BID]
+					if self.data[ASK]>self.data[HIGH]:
+						self.data[HIGH] = self.data[ASK]
+					if self.data[BID]<self.data[LOW]:
+						self.data[LOW]= self.data[BID]
 
 				#print("sy",self.ask,self.high,self.output)
 
