@@ -1045,38 +1045,41 @@ class TNVscanner():
 		#df.to_csv("tttt.csv")
 		entry = 0
 
-		for index, row in df.iterrows():
-			#print(row)
-			rank = index
-			vol = row['Avg VolumeSTR']
-			relv = row['rel vol']
-			roc5 = row['5ROCP']
-			roc10 = row['10ROCP']
-			roc15 = row['15ROCP']
-			score = row['score']
-			sc = row['SC']
-			so = row['SO']
+		try:
+			for index, row in df.iterrows():
+				#print(row)
+				rank = index
+				vol = row['Avg VolumeSTR']
+				relv = row['rel vol']
+				roc5 = row['5ROCP']
+				roc10 = row['10ROCP']
+				roc15 = row['15ROCP']
+				score = row['score']
+				sc = row['SC']
+				so = row['SO']
 
-			if rank in self.NT.nasdaq_trader_symbols_ranking:
-				listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
-			else:
-				listed = "No"
-			#print(self.NT.nasdaq_trader_symbols)
-			if 1: #score>0:	
+				if rank in self.NT.nasdaq_trader_symbols_ranking:
+					listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
+				else:
+					listed = "No"
+				#print(self.NT.nasdaq_trader_symbols)
+				if 1: #score>0:	
 
-				lst = [rank,vol,relv,roc5,roc10,roc15,score,sc,so,listed]
+					lst = [rank,vol,relv,roc5,roc10,roc15,score,sc,so,listed]
 
-				for i in range(len(lst)):
-					self.entries[entry][i]["text"] = lst[i]
+					for i in range(len(lst)):
+						self.entries[entry][i]["text"] = lst[i]
+					entry+=1
+					if entry ==10:
+						break
+
+			while entry<10:
+				#print("ok")
+				for i in range(10):
+					self.entries[entry][i]["text"] = ""
 				entry+=1
-				if entry ==10:
-					break
-
-		while entry<10:
-			for i in range(len(lst)):
-				self.entries[entry][i]["text"] = ""
-			entry+=1
-
+		except:
+			pass
 
 if __name__ == '__main__':
 
