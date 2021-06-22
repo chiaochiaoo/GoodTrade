@@ -973,7 +973,7 @@ class TNVscanner():
 
 
 		self.nasdaq_width = [9,6,5,5,5,5,6,6,6,6,6,6,8,6]
-		self.labels = ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
+		self.labels = ["Symbol","Vol","Rel.V","SCORE","5M","SC%","SO%","Listed","Since","Last","Ignore","Add"]
 
 		self.labels_position = {}
 
@@ -1042,7 +1042,7 @@ class TNVscanner():
 
 		self.NT_stat["text"] = "Last update: "+timestamp
 
-		#df.to_csv("tttt.csv")
+		df.to_csv("tttt.csv")
 		entry = 0
 
 		try:
@@ -1058,6 +1058,10 @@ class TNVscanner():
 				sc = row['SC']
 				so = row['SO']
 
+				since = row['since']
+				last = row['last']
+
+				############ add since, and been to the thing #############
 				if rank in self.NT.nasdaq_trader_symbols_ranking:
 					listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
 				else:
@@ -1065,7 +1069,7 @@ class TNVscanner():
 				#print(self.NT.nasdaq_trader_symbols)
 				if 1: #score>0:	
 
-					lst = [rank,vol,relv,roc5,roc10,roc15,score,sc,so,listed]
+					lst = [rank,vol,relv,roc5,score,sc,so,listed,since,last]
 
 					for i in range(len(lst)):
 						self.entries[entry][i]["text"] = lst[i]
@@ -1078,8 +1082,8 @@ class TNVscanner():
 				for i in range(10):
 					self.entries[entry][i]["text"] = ""
 				entry+=1
-		except:
-			pass
+		except Exception as e:
+			print("TNV scanner construction:",e)
 
 if __name__ == '__main__':
 
