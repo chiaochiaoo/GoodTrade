@@ -1069,7 +1069,7 @@ class TNVscanner():
 				#print(self.NT.nasdaq_trader_symbols)
 				if 1: #score>0:	
 
-					lst = [rank,vol,relv,roc5,score,sc,so,listed,since,last]
+					lst = [rank,vol,relv,score,roc5,sc,so,listed,since,last]
 
 					for i in range(len(lst)):
 						self.entries[entry][i]["text"] = lst[i]
