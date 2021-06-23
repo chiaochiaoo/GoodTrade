@@ -87,7 +87,9 @@ class scanner(pannel):
 
 		self.df = None
 
+		self.create_nasdaq_trader_pannel()
 		self.recreate_labels(self.NT_scanner_frame)
+
 
 
 		####################################### Finviz ################################################
@@ -286,7 +288,6 @@ class scanner(pannel):
 
 		self.buttons[9]["command"] = self.status_button
 
-
 	def change_sorting_order(self,order):
 		self.sorting_order = order
 		self.nasdaq_labels_sort()
@@ -379,14 +380,12 @@ class scanner(pannel):
 			self.last_5 = True
 		self.change_sorting_order("last5")
 
-
 	def open_button(self):
 		if self.open_sort==True:
 			self.open_sort = False
 		else:
 			self.open_sort = True
 		self.change_sorting_order("open")
-
 
 	def sorting_been(self):
 		if self.been_sort==True:
@@ -418,7 +417,6 @@ class scanner(pannel):
 		else:
 			self.df=self.df.sort_values(by=["price"],ascending=True)
 
-
 	def sorting_speed(self):
 		self.df = self.df.sort_values(by=["rank5","status"],ascending=False)
 
@@ -430,7 +428,6 @@ class scanner(pannel):
 			self.df = self.df.sort_values(by=["close"],ascending=False)
 		else:
 			self.df = self.df.sort_values(by=["close"],ascending=True)
-
 
 	def sorting_open(self):
 		if self.open_sort==True:
@@ -491,11 +488,6 @@ class scanner(pannel):
 			market = '.AM'
 		return market
 
-	#This is the button function.
-	#Take all the information needed and send it to the new process.
-
-	#Steps1. Asychonous Version.
-	#Steps2. Synchonous Version. - Just need to let it load, and then call it and sne,.d
 
 	def delete_old_lables(self):
 		if len(self.info)>0:
@@ -525,6 +517,40 @@ class scanner(pannel):
 
 		return sy
 
+
+	def create_nasdaq_trader_pannel(self):
+
+		self.labels = ["Rank","Symbol","Market","Price","Since","Been","SC%","SO%","L5R%","Status","Add"]
+		self.nasdaq_width = [4,14,5,6,4,4,6,6,6,12,5]
+		for k in range(0,100):
+
+			self.nasdaq.append([])
+
+			for i in range(len(self.labels)): #Rows
+
+				if i==len(self.labels)-1:
+					self.b = tk.Button(self.NT_scanner_frame, text=" ",width=self.nasdaq_width[i])#,command=self.rank
+				else:
+					self.b = tk.Label(self.NT_scanner_frame, text=" ",width=self.nasdaq_width[i])#,command=self.rank
+				# self.b.configure(activebackground="#f9f9f9")
+				# self.b.configure(activeforeground="black")
+				# self.b.configure(background="#d9d9d9")
+				# self.b.configure(disabledforeground="#a3a3a3")
+				# self.b.configure(relief="ridge")
+				# self.b.configure(foreground="#000000")
+				# self.b.configure(highlightbackground="#d9d9d9")
+				# self.b.configure(highlightcolor="black")
+				self.b.grid(row=k+1, column=i)
+				self.nasdaq[k].append(self.b)
+
+
+			#add the button here
+			#self.l+=1
+
+		self.nasdaq_trader_created = True
+
+		self.rebind(self.NT_scanner_canvas,self.NT_scanner_frame)
+		
 	def add_nasdaq_labels_init(self):
 
 		df = self.df
