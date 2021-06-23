@@ -7,6 +7,32 @@ import time
 import requests
 
 
+
+symbol_status = "symbol_status"
+symbol_price = "symbol_price"
+symbol_update_time = "symbol_update_time"
+minute_timestamp_val = "minute_timestamp_val"
+symbol_price_high = "symbol_price_high"
+symbol_price_low = "symbol_price_low"
+symbol_price_premarket_high = "symbol_price_premarket_high"
+symbol_price_premarket_low = "symbol_price_premarket_low"
+symbol_price_range = "symbol_price_range"
+last_5_min_range = "last_5_min_range"
+last_5_min_volume = "last_5_min_volume"
+symbol_price_open = "symbol_price_open"
+symbol_price_openhigh = "symbol_price_openhigh"
+symbol_price_openlow = "symbol_price_openlow"
+symbol_price_opennow = "symbol_price_opennow"
+first_5_min_range = "first_5_min_range"
+first_5_min_volume = "first_5_min_volume"
+symbol_price_prevclose = "symbol_price_prevclose"
+symbol_price_prevclose_to_now = "symbol_price_prevclose_to_now"
+symbol_percentage_since_close = "symbol_percentage_since_close"
+symbol_percentage_since_open = "symbol_percentage_since_open"
+symbol_percentage_last_5 = "symbol_percentage_last_5"
+symbol_position_status = "symbol_position_status"
+
+
 class Symbol_data_manager:	
 
 	"""if file does not exist, create an empty file. """
@@ -202,27 +228,75 @@ class Symbol_data_manager:
 
 		#['Connected', 'QQQ.NQ', 310.64, '14:06:46', 846, 321.5, 310.47, 321.5, 310.47, 11.03, 0.0, 0.0, 317.27, 4.23, 6.8, 0, 0, 318.4, -7.76, 'New Low']
 
-		self.update_list = [self.symbol_status,self.symbol_price,self.symbol_update_time,
-		self.minute_timestamp_val,
-		self.symbol_price_high,
-		self.symbol_price_low ,
-		self.symbol_price_premarket_high,
-		self.symbol_price_premarket_low,
-		self.symbol_price_range,
-		self.last_5_min_range,
-		self.last_5_min_volume,
-		self.symbol_price_open,
-		self.symbol_price_openhigh,
-		self.symbol_price_openlow,
-		self.symbol_price_opennow,
-		self.first_5_min_range,
-		self.first_5_min_volume,
-		self.symbol_price_prevclose,
-		self.symbol_price_prevclose_to_now,
-		self.symbol_percentage_since_close,
-		self.symbol_percentage_since_open,
-		self.symbol_percentage_last_5,
-		self.symbol_position_status]
+		update_list = [symbol_status,symbol_price,symbol_update_time,
+		minute_timestamp_val,
+		symbol_price_high,
+		symbol_price_low ,
+		symbol_price_premarket_high,
+		symbol_price_premarket_low,
+		symbol_price_range,
+		last_5_min_range,
+		last_5_min_volume,
+		symbol_price_open,
+		symbol_price_openhigh,
+		symbol_price_openlow,
+		symbol_price_opennow,
+		first_5_min_range,
+		first_5_min_volume,
+		symbol_price_prevclose,
+		symbol_price_prevclose_to_now,
+		symbol_percentage_since_close,
+		symbol_percentage_since_open,
+		symbol_percentage_last_5,
+		symbol_position_status]
+
+		self.update_list = {}
+
+		self.update_list[symbol_status] = self.symbol_status
+		self.update_list[symbol_price] = self.symbol_price
+		self.update_list[symbol_update_time] = self.symbol_update_time
+		self.update_list[minute_timestamp_val] = self.minute_timestamp_val
+		self.update_list[symbol_price_high] = self.symbol_price_high
+		self.update_list[symbol_price_low] = self.symbol_price_low
+		self.update_list[symbol_price_premarket_high] = self.symbol_price_premarket_high
+		self.update_list[symbol_price_premarket_low] = self.symbol_price_premarket_low
+		self.update_list[symbol_price_range] = self.symbol_price_range
+		self.update_list[last_5_min_range] = self.last_5_min_range
+		self.update_list[last_5_min_volume] = self.last_5_min_volume
+		self.update_list[symbol_price_open] = self.symbol_price_open
+		self.update_list[symbol_price_openhigh] = self.symbol_price_openhigh
+		self.update_list[symbol_price_openlow] = self.symbol_price_openlow
+		self.update_list[symbol_price_opennow] = self.symbol_price_opennow
+		self.update_list[first_5_min_range] = self.first_5_min_range
+		self.update_list[first_5_min_volume] = self.first_5_min_volume
+		self.update_list[symbol_price_prevclose] = self.symbol_price_prevclose
+		self.update_list[symbol_price_prevclose_to_now] = self.symbol_price_prevclose_to_now
+		self.update_list[symbol_percentage_since_close] = self.symbol_percentage_since_close
+		self.update_list[symbol_percentage_since_open] = self.symbol_percentage_since_open
+		self.update_list[symbol_percentage_last_5] = self.symbol_percentage_last_5
+		self.update_list[symbol_position_status] = self.symbol_position_status
+		
+		# self.update_list = [self.symbol_status,self.symbol_price,self.symbol_update_time,
+		# self.minute_timestamp_val,
+		# self.symbol_price_high,
+		# self.symbol_price_low ,
+		# self.symbol_price_premarket_high,
+		# self.symbol_price_premarket_low,
+		# self.symbol_price_range,
+		# self.last_5_min_range,
+		# self.last_5_min_volume,
+		# self.symbol_price_open,
+		# self.symbol_price_openhigh,
+		# self.symbol_price_openlow,
+		# self.symbol_price_opennow,
+		# self.first_5_min_range,
+		# self.first_5_min_volume,
+		# self.symbol_price_prevclose,
+		# self.symbol_price_prevclose_to_now,
+		# self.symbol_percentage_since_close,
+		# self.symbol_percentage_since_open,
+		# self.symbol_percentage_last_5,
+		# self.symbol_position_status]
 
 		self.start = False
 		self.init_data()
