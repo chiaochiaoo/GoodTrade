@@ -4,6 +4,7 @@ import threading
 import time
 import json
 from datetime import datetime
+from datetime import date
 
 from modules.Symbol_data_manager import *
 from modules.ppro_process_manager_client import *
@@ -18,9 +19,11 @@ lock = {}
 global black_list
 global reg_list
 global data
+global data_historical
 black_list = []
 reg_list = []
 data = {}
+data_historical = {}
 
 global connection_error
 
@@ -191,7 +194,7 @@ def deregister(symbol):
 
 def thread_waiting_mechanism():
 	#print(threading.active_count())
-	while threading.active_count()>50:
+	while threading.active_count()>75:
 		#print("wait")
 		time.sleep(1)
 
@@ -380,6 +383,7 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 
 	d["price"]=price
 	d["timestamp"] =0
+	d["send_timestamp"] = 0
 	d["time"] = ""
 
 	d["timestamps"] = []
@@ -409,6 +413,28 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 	d["status"] = ""
 
 	d["pos_range"] = 0.5
+
+	#keys = list(d.keys())
+	d["last_send"] = {}
+	# for i in keys:
+	# 	d["last_send"][i] = d[i]
+
+
+def historical_eval(symbol):
+
+	global data_historical
+
+	#try to see if the file exist.
+	if symbol not in data_historical:
+		date.today().strftime("%m%d")
+
+		file = "data/"+symbol+"_"+self.today+".txt"
+
+		if os.path.isfile(file):
+			with open(file) as json_file:
+				d = json.load(json_file)
+
+			self.data_status[symbol].set(True)
 
 
 def process_and_send(lst,pipe):
@@ -565,9 +591,66 @@ def process_and_send(lst,pipe):
 		d["prev_close_percentage"] = 0
 	d["last_5_range_percentage"] = round(d["last_5_range"]*100/(price+0.00000001),2)
 
-	pipe.send([status,symbol,price,time,timestamp,d["high"],d["low"],d["phigh"],d["plow"],\
-		d["range"],d["last_5_range"],d["vol"],d["open"],d["oh"],d["ol"],d["open_current_range"],
-		d["f5r"],d["f5v"],d["prev_close"],d["prev_close_gap"],d["prev_close_percentage"],d["open_percentage"],d["last_5_range_percentage"],d["status"]])
+
+	update_list={}
+
+	send_list={}
+	if d["send_timestamp"]== timestamp: #this minute it has just updated.
+
+		update_list[symbol_price] = price
+		update_list[symbol_update_time] = time
+		update_list[minute_timestamp_val] = timestamp
+
+		pipe.send([status,symbol,update_list])
+	else:
+		d["send_timestamp"] = timestamp
+		update_list[symbol_price] = price
+		update_list[symbol_update_time] = time
+		update_list[minute_timestamp_val] = timestamp
+		update_list[symbol_price_high] = d["high"]
+		update_list[symbol_price_low] = d["low"]
+		update_list[symbol_price_premarket_high] = d["phigh"]
+		update_list[symbol_price_premarket_low] = d["plow"]
+		update_list[symbol_price_range] = d["range"]
+		update_list[last_5_min_range] = d["last_5_range"]
+		update_list[last_5_min_volume] = d["vol"]
+		update_list[symbol_price_open] = d["open"]
+		update_list[symbol_price_openhigh] = d["oh"]
+		update_list[symbol_price_openlow] = d["ol"]
+		update_list[symbol_price_opennow] = d["open_current_range"]
+		update_list[first_5_min_range] = d["f5r"]
+		update_list[first_5_min_volume] = d["f5v"]
+		update_list[symbol_price_prevclose] = d["prev_close"]
+		update_list[symbol_price_prevclose_to_now] = d["prev_close_gap"]
+		update_list[symbol_percentage_since_close] = d["prev_close_percentage"]
+		update_list[symbol_percentage_since_open] = d["open_percentage"]
+		update_list[symbol_percentage_last_5] = d["last_5_range_percentage"]
+		update_list[symbol_position_status] = d["status"]
+
+	#check the list. del if repeate.
+	for key,item in update_list.items():
+
+		if key not in d["last_send"]:
+			d["last_send"][key] = item
+			send_list[key] = item
+		else:
+			if update_list[key] != d["last_send"][key]:
+				d["last_send"][key] = item
+				send_list[key] = item
+
+	pipe.send([status,symbol,send_list])
+	
+
+
+
+	# pipe.send([status,symbol,price,time,timestamp,d["high"],d["low"],d["phigh"],d["plow"],\
+	# 	d["range"],d["last_5_range"],d["vol"],d["open"],d["oh"],d["ol"],d["open_current_range"],
+	# 	d["f5r"],d["f5v"],d["prev_close"],d["prev_close_gap"],d["prev_close_percentage"],d["open_percentage"],d["last_5_range_percentage"],d["status"]])
+
+
+	# pipe.send([status,symbol,price,time,timestamp,d["high"],d["low"],d["phigh"],d["plow"],\
+	# 	d["range"],d["last_5_range"],d["vol"],d["open"],d["oh"],d["ol"],d["open_current_range"],
+	# 	d["f5r"],d["f5v"],d["prev_close"],d["prev_close_gap"],d["prev_close_percentage"],d["open_percentage"],d["last_5_range_percentage"],d["status"]])
 
 	#print("sent",symbol)
 
