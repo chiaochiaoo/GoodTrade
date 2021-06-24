@@ -47,7 +47,7 @@ class TradingPlan:
 		self.numeric_labels = [ACTRISK,ESTRISK,CURRENT_SHARE,TARGET_SHARE,INPUT_TARGET_SHARE,AVERAGE_PRICE,LAST_AVERAGE_PRICE,RISK_PER_SHARE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3,FLATTENTIMER,BREAKPRICE,RISKTIMER]
 		self.string_labels = [MIND,STATUS,POSITION,RISK_RATIO,SIZE_IN,ENTRYPLAN,ENTYPE,MANAGEMENTPLAN]
 
-		self.bool_labels= [AUTORANGE,AUTOMANAGE,RELOAD,SELECTED,ANCART_OVERRIDE]
+		self.bool_labels= [AUTORANGE,AUTOMANAGE,RELOAD,SELECTED,ANCART_OVERRIDE,USING_STOP]
 
 		self.init_data(risk,entry_plan,entry_type,manage_plan)
 
@@ -193,7 +193,7 @@ class TradingPlan:
 			else:
 				self.data[FLATTENTIMER]=0
 				#print("reset flatten timer to 0")
-		if flatten and self.flatten_order==False:
+		if flatten and self.flatten_order==False and self.data[USING_STOP]:
 			self.flatten_order=True
 			self.data[FLATTENTIMER]=0
 			self.ppro_out.send(["Flatten",self.symbol_name])

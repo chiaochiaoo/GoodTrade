@@ -27,7 +27,7 @@ AUTOMANAGE = "AM"
 RELOAD = "reload"
 SELECTED = "selected"
 ANCART_OVERRIDE = "ancartoverride"
-
+USING_STOP = "Using_STOP"
 FLATTENTIMER = "flattentimer"
 
 TIMER = "timer"
@@ -99,7 +99,7 @@ SHORT = "Short"
 
 
 #Entry Type
-INSTANT=      '  Instant'
+INSTANT=      'Instant'
 INCREMENTAL = 'Incrmntl'
 
 #Entry Plan

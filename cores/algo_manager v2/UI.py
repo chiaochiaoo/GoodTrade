@@ -18,7 +18,7 @@ class UI(pannel):
 
 		self.algo_counts = 0
 
-		self.risk_timer = tk.DoubleVar(value=120)
+		self.risk_timer = tk.DoubleVar(value=1200)
 
 		self.option_values()
 

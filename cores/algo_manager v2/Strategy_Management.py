@@ -177,6 +177,10 @@ class OneToTWORiskReward(ManagementStrategy):
 			super().on_start()
 
 			""" send out the limit orders """
+
+			if self.tradingplan.data[USING_STOP]==False:
+				self.set_mind("STOP BYPASSING: ON")
+
 			self.tradingplan.current_price_level = 1
 			self.orders_level = 1
 			first_lot,second_lot,third_lot = self.shares_calculator(self.tradingplan.data[TARGET_SHARE])
