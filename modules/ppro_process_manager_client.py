@@ -105,7 +105,10 @@ class ppro_process_manager:
 						#print(d)
 						#if len(d)-1 == len(self.data_list):
 
-
+						if 'symbol_price_premarket_high' in data:
+							self.resistance[symbol].set(data['symbol_price_premarket_high'])
+						if  'symbol_price_premarket_low' in data:
+							self.supoort[symbol].set(data['symbol_price_premarket_low'])
 
 							# for i in range(1,len(self.data_list)):
 							# 	#print(self.data_list[i][symbol].get())
@@ -114,9 +117,13 @@ class ppro_process_manager:
 								#  	self.data_list[i][symbol].set(d[i+1])
 
 							# if self.auto_support_resistance[symbol].get() == 1:
-							# 	timestamp = d[4]
-							# 	high = d[7]
-							# 	low = d[8]
+							# 	#timestamp = d[4]
+							# 	if 'symbol_price_premarket_high' in data:
+							# 		high = data['symbol_price_premarket_high']
+
+							# 	if  'symbol_price_premarket_low' in data:
+							# 		low = data['symbol_price_premarket_low']
+
 							# 	#need to check if its the same as previous set. if not, that means it's manually changed. 
 							# 	#if timestamp < 570:
 
@@ -126,6 +133,7 @@ class ppro_process_manager:
 							# 			self.auto_support_resistance[symbol].set(0)
 							# 		else:
 							# 			temp[symbol] = (high,low)
+
 							# 			self.resistance[symbol].set(high)
 							# 			self.supoort[symbol].set(low)
 							# 	else:

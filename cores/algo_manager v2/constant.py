@@ -105,13 +105,13 @@ INCREMENTAL = 'Incrmntl'
 #Entry Plan
 BREAISH =   "  Bearish"
 BULLISH =   "  Bullish"
-BREAKUP =   " Break Up"
-BREAKDOWN = " Break Dn"
-BREAKANY =  "Break Any"
+BREAKUP =   " BreakUp"
+BREAKDOWN = " BreakDn"
+BREAKANY =  "BreakAny"
 DIPBUY = "Dipbuy"
 RIPSELL = "Ripsell"
-FADEANY = "Fade Any"
-BREAKFIRST = "Break First"
+FADEANY = "FadeAny"
+BREAKFIRST = "BreakFirst"
 #MANA Plan
 NONE =          "NONE"
 THREE_TARGETS = "Three tgts "
