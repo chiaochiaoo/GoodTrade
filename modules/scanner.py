@@ -522,7 +522,7 @@ class scanner(pannel):
 
 		self.labels = ["Rank","Symbol","Market","Price","Since","Been","SC%","SO%","L5R%","Status","Add"]
 		self.nasdaq_width = [4,14,5,6,4,4,6,6,6,12,5]
-		for k in range(0,100):
+		for k in range(0,102):
 
 			self.nasdaq.append([])
 
@@ -686,7 +686,7 @@ class scanner(pannel):
 
 		df = self.df
 
-		i = -1
+		i = 0
 
 		self.update_pd()
 

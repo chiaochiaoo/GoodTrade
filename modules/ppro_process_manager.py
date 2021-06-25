@@ -558,18 +558,26 @@ def process_and_send(lst,pipe):
 
 	d["status"] = ""
 
-	if d["pos_range"]>=0.98:
+
+
+	if d["pos_range"]>=0.99:
 		d["status"]="New High"
 		status_given = True
 
-	if d["pos_range"]<=0.02:
+	if d["pos_range"]<=0.01:
 		d["status"]="New Low"
 
-	if d["pos_range"]<0.98 and d["pos_range"]>=0.90:
+	if d["pos_range"]<0.99 and d["pos_range"]>=0.90:
 		d["status"]="Near High"
 
-	if d["pos_range"]>0.02 and d["pos_range"]<=0.1:
+	if d["pos_range"]>0.01 and d["pos_range"]<=0.1:
 		d["status"]="Near Low"
+
+	if d["pos_range"]>0.1 and d["pos_range"]<0.25:
+		d["status"]="Trading Low"
+
+	if d["pos_range"]<0.9 and d["pos_range"]>0.75:
+		d["status"]="Trading High"
 
 	#################################################
 	#if d["pos_range"]<0.96 and d["pos_range"]>0.4:
@@ -600,8 +608,11 @@ def process_and_send(lst,pipe):
 		update_list[symbol_price] = price
 		update_list[symbol_update_time] = time
 		update_list[minute_timestamp_val] = timestamp
-
-		pipe.send([status,symbol,update_list])
+		update_list[symbol_percentage_last_5] = d["last_5_range_percentage"]
+		update_list[symbol_position_status] = d["status"]
+		update_list[symbol_price_high] = d["high"]
+		update_list[symbol_price_low] = d["low"]
+		
 	else:
 		d["send_timestamp"] = timestamp
 		update_list[symbol_price] = price
