@@ -8,6 +8,7 @@ import time
 from modules.pannel import *
 #from modules.scanner_process_manager import *
 
+from modules.TNV_Scanner import *
 from tkinter import *
 
 
@@ -43,11 +44,11 @@ class scanner(pannel):
 
 		self.tabControl.add(self.tab2, text ='Nasdaq Trader') 
 		self.tabControl.add(self.tab1, text ='TNV Scanner') 
-		
-		
+
+
 		############## SACNNER ##############
 
-		self.TNVscanner = TNVscanner(self.tab1,self)
+		self.TNVscanner = TNV_Scanner(self.tab1,self)
 
 		############################### Nasdaq Trader ############################################
 
@@ -955,7 +956,7 @@ class scanner(pannel):
 
 
 
-class TNVscanner():
+class TNV_Scanner():
 
 	def __init__(self,root,NT):
 
@@ -972,15 +973,28 @@ class TNVscanner():
 		self.NT_stat = ttk.Label(self.root, text="Last update: ")
 		self.NT_stat.place(x=10, y=10, height=25, width=200)
 	
+		self.TNV_TAB = ttk.Notebook(self.root)
+		self.TNV_TAB.place(x=0,rely=0.05,relheight=1,width=640)
 
-		self.breakout_frame = ttk.LabelFrame(self.root,text="Volatility Breakout") 
-		self.breakout_frame.place(x=0, rely=0.05, relheight=0.3, relwidth=0.95)
+		self.vb_frame = tk.Canvas(self.TNV_TAB)
+		self.or_frame = tk.Canvas(self.TNV_TAB)
+		self.ob_frame = tk.Canvas(self.TNV_TAB)
+		self.pb_frame = tk.Canvas(self.TNV_TAB)
 
-		self.reversal_frame = ttk.LabelFrame(self.root,text="Reversal") 
-		self.reversal_frame.place(x=0, rely=0.36, relheight=0.268, relwidth=0.95)
 
-		self.momentum_frame = ttk.LabelFrame(self.root,text="Momentum") 
-		self.momentum_frame.place(x=0, rely=0.59, relheight=0.268, relwidth=0.95)
+		self.TNV_TAB.add(self.vb_frame, text ='Volitality Break') 
+		self.TNV_TAB.add(self.or_frame, text ='Open Reversal')	
+		self.TNV_TAB.add(self.ob_frame, text ='Opening Break')
+		self.TNV_TAB.add(self.pb_frame, text ='Premarket Pick') 
+
+		# self.breakout_frame = ttk.LabelFrame(self.root,text="Volatility Breakout") 
+		# self.breakout_frame.place(x=0, rely=0.05, relheight=1, relwidth=0.95)
+
+		# self.reversal_frame = ttk.LabelFrame(self.root,text="Reversal") 
+		# self.reversal_frame.place(x=0, rely=0.36, relheight=0.268, relwidth=0.95)
+
+		# self.momentum_frame = ttk.LabelFrame(self.root,text="Momentum") 
+		# self.momentum_frame.place(x=0, rely=0.59, relheight=0.268, relwidth=0.95)
 
 		# self.NT_scanner_canvas = tk.Canvas(self.all)
 		# self.NT_scanner_canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
@@ -992,7 +1006,7 @@ class TNVscanner():
 		# self.NT_scanner_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
 		# self.NT_scanner_canvas.create_window(0, 0, window=self.NT_scanner_frame, anchor=tk.NW)
 
-		self.recreate_labels(self.breakout_frame)
+		self.recreate_labels(self.vb_frame)
 		#self.update_entry()
 
 	def recreate_labels(self,frame):
@@ -1021,7 +1035,7 @@ class TNVscanner():
 		self.status_num = 0
 
 		for i in range(len(self.labels)): #Rows
-			self.b = tk.Button(self.breakout_frame, text=self.labels[i],width=self.nasdaq_width[i])#,command=self.rank
+			self.b = tk.Button(self.vb_frame, text=self.labels[i],width=self.nasdaq_width[i])#,command=self.rank
 			self.b.configure(activebackground="#f9f9f9")
 			self.b.configure(activeforeground="black")
 			self.b.configure(background="#d9d9d9")
@@ -1039,20 +1053,20 @@ class TNVscanner():
 
 	def create_entry(self):
 
-		for k in range(0,10):
+		for k in range(0,50):
 
 			self.entries.append([])
 
 			for i in range(len(self.labels)): #Rows
-				self.b = tk.Label(self.breakout_frame, text=" ",width=self.nasdaq_width[i])#,command=self.rank
-				self.b.configure(activebackground="#f9f9f9")
-				self.b.configure(activeforeground="black")
-				self.b.configure(background="#d9d9d9")
-				self.b.configure(disabledforeground="#a3a3a3")
-				self.b.configure(relief="ridge")
-				self.b.configure(foreground="#000000")
-				self.b.configure(highlightbackground="#d9d9d9")
-				self.b.configure(highlightcolor="black")
+				self.b = tk.Label(self.vb_frame, text=" ",width=self.nasdaq_width[i])#,command=self.rank
+				# self.b.configure(activebackground="#f9f9f9")
+				# self.b.configure(activeforeground="black")
+				# self.b.configure(background="#d9d9d9")
+				# self.b.configure(disabledforeground="#a3a3a3")
+				# self.b.configure(relief="ridge")
+				# self.b.configure(foreground="#000000")
+				# self.b.configure(highlightbackground="#d9d9d9")
+				# self.b.configure(highlightcolor="black")
 				self.b.grid(row=self.l, column=i)
 				self.entries[k].append(self.b)
 			self.l+=1
@@ -1100,10 +1114,10 @@ class TNVscanner():
 					for i in range(len(lst)):
 						self.entries[entry][i]["text"] = lst[i]
 					entry+=1
-					if entry ==10:
+					if entry ==50:
 						break
 
-			while entry<10:
+			while entry<50:
 				#print("ok")
 				for i in range(10):
 					self.entries[entry][i]["text"] = ""
@@ -1117,7 +1131,7 @@ if __name__ == '__main__':
 	root.title("GoodTrade v489") 
 	root.geometry("640x840")
 
-	TNVscanner(root)
+	TNVscanner(root,None)
 
 	root.mainloop()
 
