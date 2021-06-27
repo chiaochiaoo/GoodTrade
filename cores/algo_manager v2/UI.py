@@ -12,7 +12,7 @@ class UI(pannel):
 
 		self.tk_strings=["algo_status","realized","shares","unrealized","unrealized_pshr","average_price"]
 		self.tk_labels=[SYMBOL,STATUS,MIND, 'EntryPlan', 'EntryType', 'ETmr', 'Management','Reload', 'AR', 'Sup', 'Res', 'Act/Est R', 'Position', 'AvgPx', 'SzIn', 'UPshr', 'U', 'R', 'TR', 'flatten', 'log']
-		
+
 		self.tklabels = {}
 		self.label_count = 1
 
@@ -102,22 +102,50 @@ class UI(pannel):
 		self.algo_deploy = ttk.Button(self.config, text="Apply to all",command=self.manager.set_all_tp)#,command=self.deploy_all_stoporders)
 		self.algo_deploy.grid(column=2,row=9)
 
+
+
+
 	def init_command(self):
 
+
 		self.algo_deploy = ttk.Button(self.cmd, text="Deploy all algo",command=self.manager.deploy_all)#,command=self.deploy_all_stoporders)
-		self.algo_deploy.grid(sticky="w",column=1,row=10)
+		self.algo_deploy.grid(sticky="w",column=1,row=1)
 
 		self.algo_pend = ttk.Button(self.cmd, text="Withdraw all algo",command=self.manager.withdraw_all)#,command=self.cancel_all_stoporders)
-		self.algo_pend.grid(sticky="w",column=2,row=10)
+		self.algo_pend.grid(sticky="w",column=2,row=1)
 
 		self.flatten = ttk.Button(self.cmd, text="Flatten all algo",command=self.manager.flatten_all)
-		self.flatten.grid(sticky="w",column=1,row=11)
+		self.flatten.grid(sticky="w",column=1,row=2)
 
 		self.algo_cancel = ttk.Button(self.cmd, text="Cancel all algo",command=self.manager.cancel_all)
-		self.algo_cancel.grid(sticky="w",column=2,row=11)
+		self.algo_cancel.grid(sticky="w",column=2,row=2)
 
 
+		row=3
+		ttk.Label(self.cmd, text=" ").grid(sticky="w",column=1,row=row)
+		row+=1
+		ttk.Label(self.cmd, text="All Active Longs:").grid(sticky="w",column=1,row=row)
 
+		row+=1
+		ttk.Button(self.cmd, text="Add 10%").grid(sticky="w",column=1,row=row)
+		ttk.Button(self.cmd, text="Add 25%").grid(sticky="w",column=2,row=row)
+
+		row+=1
+		ttk.Button(self.cmd, text="Minus 10%").grid(sticky="w",column=1,row=row)
+		ttk.Button(self.cmd, text="Minus 25%").grid(sticky="w",column=2,row=row)
+
+		row+=1
+		ttk.Label(self.cmd, text=" ").grid(sticky="w",column=1,row=row)
+		row+=1
+		ttk.Label(self.cmd, text="All Active Shorts:").grid(sticky="w",column=1,row=row)
+
+		row+=1
+		ttk.Button(self.cmd, text="Add 10%").grid(sticky="w",column=1,row=row)
+		ttk.Button(self.cmd, text="Add 25%").grid(sticky="w",column=2,row=row)
+
+		row+=1
+		ttk.Button(self.cmd, text="Minus 10%").grid(sticky="w",column=1,row=row)
+		ttk.Button(self.cmd, text="Minus 25%").grid(sticky="w",column=2,row=row)
 
 	def init_pannel(self):
 		self.labels = {"":4,\
@@ -159,7 +187,7 @@ class UI(pannel):
 		self.config.place(x=10,y=140,height=160,width=210)
 
 		self.cmd = ttk.LabelFrame(self.root,text="Command") 
-		self.cmd.place(x=10,y=310,height=160,width=210)
+		self.cmd.place(x=10,y=310,height=400,width=210)
 
 
 		self.init_config_pannel()
