@@ -147,6 +147,12 @@ class UI(pannel):
 		ttk.Button(self.cmd, text="Minus 10%").grid(sticky="w",column=1,row=row)
 		ttk.Button(self.cmd, text="Minus 25%").grid(sticky="w",column=2,row=row)
 
+
+		#iterate all the trading plans.
+		#if position ="LONG"
+		#if shares>= 25.
+		#calculate the shares to be taken off. 
+
 	def init_pannel(self):
 		self.labels = {"":4,\
 						"Symbol":8,\
