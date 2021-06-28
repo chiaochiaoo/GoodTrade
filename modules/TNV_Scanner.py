@@ -4,8 +4,8 @@ import threading
 import pandas as pd
 import time
 
-
-from modules.pannel import *
+#from pannel import *
+#from modules.pannel import *
 
 from tkinter import *
 
@@ -14,19 +14,18 @@ class TNV_Scanner():
 
 	def __init__(self,root,NT):
 
-		self.l = 1
+		
 		self.root = root
 
 		self.NT = NT
-		self.buttons = []
-		self.entries = []
+
 
 		#self.NT_update_time = tk.StringVar(value='Last updated')
-		#self.NT_update_time.set('Last updated') 
-		
+		#self.NT_update_time.set('Last updated')
+
 		self.NT_stat = ttk.Label(self.root, text="Last update: ")
 		self.NT_stat.place(x=10, y=10, height=25, width=200)
-	
+
 		self.TNV_TAB = ttk.Notebook(self.root)
 		self.TNV_TAB.place(x=0,rely=0.05,relheight=1,width=640)
 
@@ -36,18 +35,18 @@ class TNV_Scanner():
 		self.pb_frame = tk.Canvas(self.TNV_TAB)
 
 
-		self.TNV_TAB.add(self.vb_frame, text ='Volitality Break') 
-		self.TNV_TAB.add(self.or_frame, text ='Open Reversal')	
-		self.TNV_TAB.add(self.ob_frame, text ='Opening Break')
-		self.TNV_TAB.add(self.pb_frame, text ='Premarket Pick') 
+		self.TNV_TAB.add(self.vb_frame, text ='Volatility Break')
+		self.TNV_TAB.add(self.or_frame, text ='Open Reversal')
+		self.TNV_TAB.add(self.ob_frame, text ='Open Break')
+		self.TNV_TAB.add(self.pb_frame, text ='Premarket Pick')
 
-		# self.breakout_frame = ttk.LabelFrame(self.root,text="Volatility Breakout") 
+		# self.breakout_frame = ttk.LabelFrame(self.root,text="Volatility Breakout")
 		# self.breakout_frame.place(x=0, rely=0.05, relheight=1, relwidth=0.95)
 
-		# self.reversal_frame = ttk.LabelFrame(self.root,text="Reversal") 
+		# self.reversal_frame = ttk.LabelFrame(self.root,text="Reversal")
 		# self.reversal_frame.place(x=0, rely=0.36, relheight=0.268, relwidth=0.95)
 
-		# self.momentum_frame = ttk.LabelFrame(self.root,text="Momentum") 
+		# self.momentum_frame = ttk.LabelFrame(self.root,text="Momentum")
 		# self.momentum_frame.place(x=0, rely=0.59, relheight=0.268, relwidth=0.95)
 
 		# self.NT_scanner_canvas = tk.Canvas(self.all)
@@ -60,17 +59,29 @@ class TNV_Scanner():
 		# self.NT_scanner_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
 		# self.NT_scanner_canvas.create_window(0, 0, window=self.NT_scanner_frame, anchor=tk.NW)
 
-		self.recreate_labels(self.vb_frame)
+		self.volatility_scanner = Volatility_break(self.vb_frame)
+		self.open_reversal = Open_Reversal(self.or_frame)
+		self.open_break = Volatility_break(self.ob_frame)
 		#self.update_entry()
+
+	def update_entry(self,data):
+		self.volatility_scanner.update_entry(data)
+
+
+class Volatility_break():
+	def __init__(self,root):
+
+		self.buttons = []
+		self.entries = []
+		self.l = 1
+		self.labels_width = [9,6,5,5,5,5,6,6,6,6,6,6,8,6]
+		self.labels = ["Symbol","Vol","Rel.V","SCORE","5M","SC%","SO%","Listed","Since","Last","Ignore","Add"]
+		self.root = root
+		self.recreate_labels(self.root)
 
 	def recreate_labels(self,frame):
 
-
-		self.nasdaq_width = [9,6,5,5,5,5,6,6,6,6,6,6,8,6]
-		self.labels = ["Symbol","Vol","Rel.V","SCORE","5M","SC%","SO%","Listed","Since","Last","Ignore","Add"]
-
 		self.labels_position = {}
-
 		self.labels_position["Rank"]=0
 		self.labels_position["Symbol"]=1
 		self.labels_position["Market"]=2
@@ -89,7 +100,7 @@ class TNV_Scanner():
 		self.status_num = 0
 
 		for i in range(len(self.labels)): #Rows
-			self.b = tk.Button(self.vb_frame, text=self.labels[i],width=self.nasdaq_width[i])#,command=self.rank
+			self.b = tk.Button(self.root, text=self.labels[i],width=self.labels_width[i])#,command=self.rank
 			self.b.configure(activebackground="#f9f9f9")
 			self.b.configure(activeforeground="black")
 			self.b.configure(background="#d9d9d9")
@@ -103,7 +114,6 @@ class TNV_Scanner():
 
 		self.l+=1
 		self.create_entry()
-		
 
 	def create_entry(self):
 
@@ -112,18 +122,237 @@ class TNV_Scanner():
 			self.entries.append([])
 
 			for i in range(len(self.labels)): #Rows
-				self.b = tk.Label(self.vb_frame, text=" ",width=self.nasdaq_width[i])#,command=self.rank
-				# self.b.configure(activebackground="#f9f9f9")
-				# self.b.configure(activeforeground="black")
-				# self.b.configure(background="#d9d9d9")
-				# self.b.configure(disabledforeground="#a3a3a3")
-				# self.b.configure(relief="ridge")
-				# self.b.configure(foreground="#000000")
-				# self.b.configure(highlightbackground="#d9d9d9")
-				# self.b.configure(highlightcolor="black")
+				self.b = tk.Label(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
 				self.b.grid(row=self.l, column=i)
 				self.entries[k].append(self.b)
 			self.l+=1
+
+
+
+	def update_entry(self,data):
+
+		#at most 8.
+		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
+
+		df = data[0]
+		timestamp = data[1]
+
+		self.NT_stat["text"] = "Last update: "+timestamp
+
+		df.to_csv("tttt.csv")
+		entry = 0
+
+		try:
+			for index, row in df.iterrows():
+				#print(row)
+				rank = index
+				vol = row['Avg VolumeSTR']
+				relv = row['rel vol']
+				roc5 = row['5ROCP']
+				roc10 = row['10ROCP']
+				roc15 = row['15ROCP']
+				score = row['score']
+				sc = row['SC']
+				so = row['SO']
+
+				since = row['since']
+				last = row['last']
+
+				############ add since, and been to the thing #############
+				if rank in self.NT.nasdaq_trader_symbols_ranking:
+					listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
+				else:
+					listed = "No"
+				#print(self.NT.nasdaq_trader_symbols)
+				if 1: #score>0:	
+
+					lst = [rank,vol,relv,score,roc5,sc,so,listed,since,last]
+
+					for i in range(len(lst)):
+						self.entries[entry][i]["text"] = lst[i]
+					entry+=1
+					if entry ==50:
+						break
+
+			while entry<50:
+				#print("ok")
+				for i in range(10):
+					self.entries[entry][i]["text"] = ""
+				entry+=1
+		except Exception as e:
+			print("TNV scanner construction:",e)
+
+class Open_Reversal():
+	def __init__(self,root):
+		self.buttons = []
+		self.entries = []
+		self.l = 1
+		self.labels_width = [9,6,5,7,5,5,6,6,6,6,6,6,8,6]
+		self.labels = ["Symbol","Vol","Rel.V","Re.SCORE","5M","SC%","Listed","Since","Last","Ignore","Add"]
+		self.root = root
+		self.recreate_labels(self.root)
+
+	def recreate_labels(self,frame):
+
+		self.labels_position = {}
+		self.labels_position["Rank"]=0
+		self.labels_position["Symbol"]=1
+		self.labels_position["Market"]=2
+		self.labels_position["Price"]=3
+		self.labels_position["Since"]=4
+		self.labels_position["Been"]=5
+		self.labels_position["SC%"]=6
+		self.labels_position["SO%"]=7
+		self.labels_position["L5R%"]=8
+		self.labels_position["Status"]=9
+		self.labels_position["Add"]=10
+
+		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
+
+		self.status_code = {}
+		self.status_num = 0
+
+		for i in range(len(self.labels)): #Rows
+			self.b = tk.Button(self.root, text=self.labels[i],width=self.labels_width[i])#,command=self.rank
+			self.b.configure(activebackground="#f9f9f9")
+			self.b.configure(activeforeground="black")
+			self.b.configure(background="#d9d9d9")
+			self.b.configure(disabledforeground="#a3a3a3")
+			self.b.configure(relief="ridge")
+			self.b.configure(foreground="#000000")
+			self.b.configure(highlightbackground="#d9d9d9")
+			self.b.configure(highlightcolor="black")
+			self.b.grid(row=self.l, column=i)
+			self.buttons.append(self.b)
+
+		self.l+=1
+		self.create_entry()
+
+	def create_entry(self):
+
+		for k in range(0,50):
+
+			self.entries.append([])
+
+			for i in range(len(self.labels)): #Rows
+				self.b = tk.Label(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
+				self.b.grid(row=self.l, column=i)
+				self.entries[k].append(self.b)
+			self.l+=1
+
+
+
+	def update_entry(self,data):
+
+		#at most 8.
+		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
+
+		df = data[0]
+		timestamp = data[1]
+
+		self.NT_stat["text"] = "Last update: "+timestamp
+
+		df.to_csv("tttt.csv")
+		entry = 0
+
+		try:
+			for index, row in df.iterrows():
+				#print(row)
+				rank = index
+				vol = row['Avg VolumeSTR']
+				relv = row['rel vol']
+				roc5 = row['5ROCP']
+				roc10 = row['10ROCP']
+				roc15 = row['15ROCP']
+				score = row['score']
+				sc = row['SC']
+				so = row['SO']
+
+				since = row['since']
+				last = row['last']
+
+				############ add since, and been to the thing #############
+				if rank in self.NT.nasdaq_trader_symbols_ranking:
+					listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
+				else:
+					listed = "No"
+				#print(self.NT.nasdaq_trader_symbols)
+				if 1: #score>0:	
+
+					lst = [rank,vol,relv,score,roc5,sc,so,listed,since,last]
+
+					for i in range(len(lst)):
+						self.entries[entry][i]["text"] = lst[i]
+					entry+=1
+					if entry ==50:
+						break
+
+			while entry<50:
+				#print("ok")
+				for i in range(10):
+					self.entries[entry][i]["text"] = ""
+				entry+=1
+		except Exception as e:
+			print("TNV scanner construction:",e)
+
+class Open_Break():
+	def __init__(self,root):
+		self.buttons = []
+		self.entries = []
+		self.l = 1
+		self.labels_width = [9,6,5,7,5,5,6,6,6,6,8,6]
+		self.labels = ["Symbol","Vol","Rel.V","Br.SCORE","5M","SO%","SC%","Listed","Since","Last","Ignore","Add"]
+		self.root = root
+		self.recreate_labels(self.root)
+
+	def recreate_labels(self,frame):
+
+		self.labels_position = {}
+		self.labels_position["Rank"]=0
+		self.labels_position["Symbol"]=1
+		self.labels_position["Market"]=2
+		self.labels_position["Price"]=3
+		self.labels_position["Since"]=4
+		self.labels_position["Been"]=5
+		self.labels_position["SC%"]=6
+		self.labels_position["SO%"]=7
+		self.labels_position["L5R%"]=8
+		self.labels_position["Status"]=9
+		self.labels_position["Add"]=10
+
+		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
+
+		self.status_code = {}
+		self.status_num = 0
+
+		for i in range(len(self.labels)): #Rows
+			self.b = tk.Button(self.root, text=self.labels[i],width=self.labels_width[i])#,command=self.rank
+			self.b.configure(activebackground="#f9f9f9")
+			self.b.configure(activeforeground="black")
+			self.b.configure(background="#d9d9d9")
+			self.b.configure(disabledforeground="#a3a3a3")
+			self.b.configure(relief="ridge")
+			self.b.configure(foreground="#000000")
+			self.b.configure(highlightbackground="#d9d9d9")
+			self.b.configure(highlightcolor="black")
+			self.b.grid(row=self.l, column=i)
+			self.buttons.append(self.b)
+
+		self.l+=1
+		self.create_entry()
+
+	def create_entry(self):
+
+		for k in range(0,50):
+
+			self.entries.append([])
+
+			for i in range(len(self.labels)): #Rows
+				self.b = tk.Label(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
+				self.b.grid(row=self.l, column=i)
+				self.entries[k].append(self.b)
+			self.l+=1
+
 
 
 	def update_entry(self,data):
@@ -185,9 +414,10 @@ if __name__ == '__main__':
 	root.title("GoodTrade v489") 
 	root.geometry("640x840")
 
-	TNVscanner(root,None)
+	TNV_Scanner(root,None)
 
 	root.mainloop()
+
 
 
 			
