@@ -194,7 +194,7 @@ def deregister(symbol):
 
 def thread_waiting_mechanism():
 	#print(threading.active_count())
-	while threading.active_count()>75:
+	while threading.active_count()>30:
 		#print("wait")
 		time.sleep(1)
 
@@ -649,7 +649,9 @@ def process_and_send(lst,pipe):
 				d["last_send"][key] = item
 				send_list[key] = item
 
-	pipe.send([status,symbol,send_list])
+
+	if len(send_list)>1:
+		pipe.send([status,symbol,send_list])
 	
 
 

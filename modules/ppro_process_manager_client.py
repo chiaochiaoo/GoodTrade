@@ -100,6 +100,7 @@ class ppro_process_manager:
 
 					if status == "Connected" or status =="Lagged":
 						#print(data)
+
 						for key,item in data.items():
 							self.data_list[key][symbol].set(item)
 						#print(d)
