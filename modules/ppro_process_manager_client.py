@@ -62,6 +62,8 @@ class ppro_process_manager:
 		print("PPro subthread activated")
 		time.sleep(5)
 
+
+		#cap how much updates it creates.
 		while True:
 
 			try:
