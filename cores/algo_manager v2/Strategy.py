@@ -60,6 +60,11 @@ class Strategy:
 	def get_name(self):
 		return self.strategy_name
 
+	def set_initial_trigger(self,trigger):
+		self.initial_triggers = set()
+		self.initial_triggers.add(trigger)
+		trigger.set_symbol(self.symbol, self.tradingplan, self.ppro_out)
+
 	def add_initial_triggers(self,trigger):
 		self.initial_triggers.add(trigger)
 		trigger.set_symbol(self.symbol, self.tradingplan, self.ppro_out)
@@ -236,6 +241,8 @@ class BreakFirst(EntryStrategy):
 		super().__init__("Entry : BreakFirst",symbol,tradingplan)
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
+		self.timer = timer
+		self.repeat = repeat
 		self.buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
 		self.sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
 
@@ -244,18 +251,38 @@ class BreakFirst(EntryStrategy):
 
 	def on_redeploying(self):
 
-		""" if one is used and does not vilate the entry condition (failed trade) reset it."""
-		if self.sellTrigger.get_trigger_state()==False and not self.sellTrigger.pre_deploying_check():
-			self.sellTrigger.total_reset()
 
-			self.buyTrigger.deactivate()
-			#disable the buy trigger.
-
-		if self.buyTrigger.get_trigger_state()==False and not self.buyTrigger.pre_deploying_check():
-			self.buyTrigger.total_reset()
-
+		if self.buyTrigger.get_trigger_state()==False:
+			print(1)
 			self.sellTrigger.deactivate()
-			#disable the sell trigger. 
+
+			if not self.buyTrigger.pre_deploying_check():
+				self.buyTrigger.total_reset()
+			else:
+				print("XXX")
+				self.transitional_trigger = AbstractTrigger("transition to below pH.",[[SYMBOL_DATA,BID,"<",SYMBOL_DATA,RESISTENCE]],0,1,"REACTIVATE")
+				self.buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",self.timer,self.repeat,LONG,self.ppro_out)
+				self.transitional_trigger.add_next_trigger(self.buyTrigger)
+				
+				self.set_initial_trigger(self.transitional_trigger)
+				self.restart()
+		elif self.sellTrigger.get_trigger_state()==False:
+			self.buyTrigger.deactivate()
+
+			if not self.sellTrigger.pre_deploying_check():
+				self.sellTrigger.total_reset()
+			else:
+				self.transitional_trigger = AbstractTrigger("transition to below pH.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],0,1,"REACTIVATE")
+				self.sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],SUPPORT,self.risk,"break down",self.timer,self.repeat,SHORT,self.ppro_out)
+				self.transitional_trigger.add_next_trigger(self.sellTrigger)
+
+				self.set_initial_trigger(self.transitional_trigger)
+				self.restart()
+
+
+
+
+
 
 class Bullish(EntryStrategy):
 	def __init__(self,timer,repeat,symbol,tradingplan):
