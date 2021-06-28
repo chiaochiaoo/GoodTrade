@@ -28,7 +28,7 @@ def kill():
 				break
 
 
-def algo_manager_commlink(pipe):
+def algo_manager_commlink(pipe,util_pipe):
 
 	HOST = 'localhost'  # Standard loopback interface address (localhost)
 
@@ -73,14 +73,14 @@ def algo_manager_commlink(pipe):
 		if not success:
 			break
 
-		pipe.send(["socket","Connected"])
-		pipe.send(["algo manager","Disconnected"])
+		util_pipe.send(["socket","Connected"])
+		util_pipe.send(["algo manager","Disconnected"])
 		print("Waitting for algo manager to connect")
 		s.listen()
 		
 		conn, addr = s.accept()
 
-		pipe.send(["algo manager","Connected"])
+		util_pipe.send(["algo manager","Connected"])
 
 		print("Algo manager connected.")
 		s.setblocking(0)
@@ -120,35 +120,44 @@ def algo_manager_commlink(pipe):
 							Connection=False
 							break
 				#if client sends something 
+				#print(2)
 				if Connection:
-					ready = select.select([conn], [], [], 0)
 					
-					if ready[0]:
-						data = []
-						while True:
-							try:
-								part = conn.recv(2048)
-							except:
-								connection = False
-								break
-							#if not part: break
-							data.append(part)
-							if len(part) < 2048:
-								#try to assemble it, if successful.jump. else, get more. 
+					try:
+						ready = select.select([conn], [], [], 0)
+						
+						if ready[0]:
+							data = []
+							while True:
 								try:
-									k = pickle.loads(b"".join(data))
-									break
+									part = conn.recv(2048)
 								except:
-									pass
-						#k is the confirmation from client. send it back to pipe.
+									connection = False
+									break
+								#if not part: break
+								data.append(part)
+								if len(part) < 2048:
+									#try to assemble it, if successful.jump. else, get more. 
+									try:
+										k = pickle.loads(b"".join(data))
+										break
+									except:
+										pass
+							#k is the confirmation from client. send it back to pipe.
 
-						if k[0] == "Termination":
-							pipe.send(["Termination"])
-							break
-						pipe.send(k)
 
+							print("algo_manager_comms:",pickle.loads(b"".join(data)))
+							if k[0] == "Termination":
+								util_pipe.send(["Termination"])
+								break
+							util_pipe.send(pickle.loads(b"".join(data)))
+					except Exception as e:
+						print(e)
+						Connection= False
 				#print("running")
+				#print(3)
 			except Exception as e:
+				print(e)
 				Connection= False	
 	s.close()
 

@@ -20,7 +20,7 @@ class algo_process_manager_client:
 		self.init = False
 
 		#repeat this every 5 seconds.
-		self.receive_start()
+		#self.receive_start()
 
 	def set_symbols_manager(self,s:Symbol_data_manager):
 
@@ -29,44 +29,12 @@ class algo_process_manager_client:
 
 		self.data_list = s.update_list
 
-		# self.symbols = s.get_list()
-		# self.ppro_status = s.ppro_status
-
-		# #########
-		# self.supoort = s.symbol_data_support
-		# self.resistance = s.symbol_data_resistance
-		# self.auto_support_resistance = s.auto_support_resistance
-
-		# for i in self.symbols:
-		# 	self.register(i)
-
-		# self.init_info()
-		# self.init = True
-		# self.receive_start()
-
 	def receive_start(self):
-		#receive = threading.Thread(name="Thread: Algo manager receiver",target=self.receive_request, daemon=True)
-		#receive.start()
+
+		#integrate this within UTIL.
 		receive = threading.Thread(name="Thread: Algo manager receiver",target=self.receive_request, daemon=True)
 		receive.start()
 
-
-	# def receive_request(self):
-
-	# 	#put the receive in corresponding box.
-	# 	while True:
-	# 		try:
-	# 			info = self.gt_pipe.recv()
-				
-	# 			#id, symbol, type, status, description, position, shares, risk$
-	# 			message_type= info[0]
-
-	# 			#if message_type =="New order":
-
-	# 			self.process_pipe.send(info)
-
-	# 		except Exception as e:
-	# 			print(e)
 
 	def receive_request(self):
 
@@ -97,8 +65,6 @@ class algo_process_manager_client:
 					else:
 						self.data.algo_socket.set("Socket:False")
 
-				if type_ == "Termination":
-					self.root.destroy()
 			except Exception as e:
 				print(e)
 

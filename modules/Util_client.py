@@ -52,13 +52,6 @@ class util_client:
 		if len(l)>1:
 			l[0]="Database Request finish"
 			self.util_request.send(l)
-			
-		# self.data = s.data_list
-		# self.symbols = s.get_list()[:]
-		# print(self.symbols)
-		# l = self.symbols.insert(0,"Database Request")
-		# print("send::",self.symbols)
-		# self.util_request.send(l)
 
 	def check_if_file_exist(self,symbol):
 
@@ -107,9 +100,13 @@ class util_client:
 			if len(d)>0:
 
 				print(d[0])
+
+
+				######### SCANNER PART ############
 				if d[0]=="Database Request":
 					#print("send send send",d)
 					self.util_request.send(d)
+
 				elif d[0]=="Finviz Request":
 
 					self.util_request.send(d)
@@ -151,14 +148,30 @@ class util_client:
 					except Exception as e:
 						print("Error updating finviz:",e)
 
+
+				########## ALGO PART ###############
+				elif d[0] =="Algo placed":
+					symbols = d[1]
+					#button. 
+					for symbol in symbols:
+						self.symbol_data_manager.algo_breakout_placement[symbol].set("Placed")
+				elif d[0] =="algo manager":
+	
+					status = d[1]
+					if status == "Connected":
+						self.symbol_data_manager.algo_manager_connected.set("AM:True")
+					else:
+						self.symbol_data_manager.algo_manager_connected.set("AM:False")
+				elif d[0] =="socket":
+					status = d[1]
+					if status == "Connected":
+						self.symbol_data_manager.algo_socket.set("Socket:True")
+					else:
+						self.symbol_data_manager.algo_socket.set("Socket:False")
+
 				else:
 					print("unkown server package:",d)
-		#print(d)
-		#check if it is normal type?
-		# if d[0]=="Nasdaq":
-		# 	self.pannel.add_nasdaq_labels(d)
-		# else:
-		# 	self.pannel.add_labels(d)
+
 
 def util_comms(ulti_response): #connects to server for db, nt, and finviz. 
 

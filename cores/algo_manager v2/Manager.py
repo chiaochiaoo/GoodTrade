@@ -30,6 +30,8 @@ TEST = True
 def algo_manager_voxcom(pipe):
 
 	#tries to establish commuc
+
+
 	while True:
 
 		HOST = 'localhost'  # The server's hostname or IP address
@@ -87,19 +89,20 @@ def algo_manager_voxcom(pipe):
 					#k is the confirmation from client. send it back to pipe.
 					if k!=None:
 						placed = []
-						#print(k)
+
 						pipe.send(["pkg",k[1:]])
 						for i in k[1:]:
 							log_print("placed:",i[1])
 							placed.append(i[1])
 						#log_print("placed:",k[1][1])
+						
 						s.send(pickle.dumps(["Algo placed",placed]))
 
-				if pipe.poll(0):
-					data = pipe.recv()
-					if data == "Termination":
-						s.send(pickle.dumps(["Termination"]))
-						print("Terminate!")
+				# if pipe.poll(0):
+				# 	data = pipe.recv()
+				# 	if data == "Termination":
+				# 		s.send(pickle.dumps(["Termination"]))
+				# 		print("Terminate!")
 
 				# 	part = s.recv(2048)
 				# except:
@@ -716,7 +719,7 @@ if __name__ == '__main__':
 
 	ppro_in_manager = multiprocessing.Process(target=Ppro_in, args=(port,ppro_pipe_end),daemon=True)
 	ppro_in_manager.daemon=True
-	
+
 
 	ppro_out, ppro_pipe_end2 = multiprocessing.Pipe()
 
@@ -741,3 +744,17 @@ if __name__ == '__main__':
 	# root.minsize(1600, 1000)
 	# root.maxsize(1800, 1200)
 	root.mainloop()
+
+
+	algo_voxcom.terminate()
+	ppro_in_manager.terminate()
+	ppro_out_manager.terminate()
+
+
+	algo_voxcom.join()
+	ppro_in_manager.join()
+	ppro_out_manager.join()
+	print("All subprocesses terminated")
+	
+	os._exit(1) 
+	print("exit")

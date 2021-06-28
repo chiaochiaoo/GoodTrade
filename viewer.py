@@ -43,7 +43,7 @@ from cores.algo_process_manager_client import *
 
 class viewer:
 
-	def __init__(self,root,util_process,ppro_process,algo_comm,authen_comm,algo_manager,util_request):
+	def __init__(self,root,util_process,ppro_process,algo_comm,authen_comm,util_request):
 
 		self.data = Symbol_data_manager()
 
@@ -56,9 +56,8 @@ class viewer:
 		self.data.set_database_manager(self.db)
 		self.data.set_ppro_manager(self.ppro)
 
-
-		self.algo_manager = algo_manager
-		self.algo_manager.set_symbols_manager(self.data)
+		# self.algo_manager = algo_manager
+		# self.algo_manager.set_symbols_manager(self.data)
 
 		self.listening = ttk.LabelFrame(root,text="Analyzer") 
 		self.listening.place(x=640,rely=0.05,relheight=1,width=1100)
@@ -381,7 +380,7 @@ def utils(algo_manager_receive_comm,util_response):
 		# db = threading.Thread(target=multi_processing_database,args=(db_sending_pipe,),daemon=True)
 		# db.start()
 		time.sleep(5)
-		algo_comm = threading.Thread(target=algo_manager_commlink,args=(algo_manager_receive_comm,),daemon=True)
+		algo_comm = threading.Thread(target=algo_manager_commlink,args=(algo_manager_receive_comm,util_response,),daemon=True)
 		algo_comm.start()
 
 		util_comms(util_response)
@@ -444,7 +443,7 @@ if __name__ == '__main__':
 	root.maxsize(3000, 1500)
 
 
-	algo_manager = algo_process_manager_client(algo_manager_process_comm,root)
+	#algo_manager = algo_process_manager_client(algo_manager_process_comm,root)
 	
 	utility = multiprocessing.Process(target=utils, args=(algo_manager_receive_comm,util_response),daemon=True)
 	utility.daemon=True
@@ -454,7 +453,7 @@ if __name__ == '__main__':
 
 	util_process = util_client(util_request)
 	
-	view = viewer(root,util_process,ppro,algo_manager_process_comm,authen_clientside_comm,algo_manager,util_request)
+	view = viewer(root,util_process,ppro,algo_manager_process_comm,authen_clientside_comm,util_request)
 	utility.start()
 
 	root.mainloop()
