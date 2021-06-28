@@ -206,6 +206,9 @@ class Manager:
 		self.symbol_data = {}		
 		self.tradingplan = {}
 
+
+		self.manage_lock = 0
+
 		self.ui = UI(root,self)
 		#self.add_new_tradingplan("AAPL")
 		#self.add_new_tradingplan("SDS")
@@ -423,9 +426,18 @@ class Manager:
 
 	def trades_aggregation(self,side,action,percent):
 
-		for d in self.tradingplan.values():
-			d.manage_trades(side,action,percent)
+		now = datetime.now()
+		ts = now.hour*3600 + now.minute*60 + now.second
 
+		diff =  ts -self.manage_lock
+		if diff>5:
+
+			log_print("All",side," ",action," ",percent*100,"%")
+			for d in self.tradingplan.values():
+				d.manage_trades(side,action,percent)
+
+			self.manage_lock = ts
+		log_print("Trades aggregation under cooldown:",diff)
 
 	def cancel_all(self):
 		for d in self.tradingplan.values():

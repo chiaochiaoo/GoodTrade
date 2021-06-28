@@ -349,7 +349,7 @@ class TradingPlan:
 
 				description = "Trades aggregation"
 				if pproaction!="":
-					self.ppro_out.send([pproaction,self.symbol_name,share,description])
+					self.ppro_out.send([pproaction,self.symbol_name,shares,description])
 
 	""" risk related ## """
 

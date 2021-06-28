@@ -5,6 +5,18 @@ from modules.Symbol_data_manager import *
 from cores.algo_placer import *
 import threading
 
+
+BREAISH =   "  Bearish"
+BULLISH =   "  Bullish"
+BREAKUP =   " BreakUp"
+BREAKDOWN = " BreakDn"
+BREAKANY =  "BreakAny"
+DIPBUY = "Dipbuy"
+RIPSELL = "Ripsell"
+FADEANY = "FadeAny"
+BREAKFIRST = "BreakFirst"
+
+
 def hex_to_string(int):
 	a = hex(int)[-2:]
 	a = a.replace("x","0")
@@ -235,8 +247,8 @@ class alert(pannel):
 
 			#trigger type
 			elif j==10:
-				self.trigger_types = {' Break Up',' Break Dn','Break Any',"  Bearish","  Bullish","Dipbuy","Ripsell"}
-				format[j].set('Break Any') 
+				self.trigger_types = {BREAISH,BULLISH,BREAKUP,BREAKDOWN,BREAKANY,DIPBUY,RIPSELL,BREAKFIRST,}
+				format[j].set(BREAKFIRST) 
 				self.tickers_labels[i].append(tk.OptionMenu(self.frame, format[j], *sorted(self.trigger_types)))
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 			#Trigger timer
