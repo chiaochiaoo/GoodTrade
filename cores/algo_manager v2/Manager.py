@@ -421,6 +421,12 @@ class Manager:
 		for d in self.tradingplan.values():
 			d.flatten_cmd()
 
+	def trades_aggregation(self,side,action,percent):
+
+		for d in self.tradingplan.values():
+			d.manage_trades(side,action,percent)
+
+
 	def cancel_all(self):
 		for d in self.tradingplan.values():
 			d.cancel_algo()

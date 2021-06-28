@@ -59,22 +59,26 @@ class TNV_Scanner():
 		# self.NT_scanner_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
 		# self.NT_scanner_canvas.create_window(0, 0, window=self.NT_scanner_frame, anchor=tk.NW)
 
-		self.volatility_scanner = Volatility_break(self.vb_frame)
-		self.open_reversal = Open_Reversal(self.or_frame)
-		self.open_break = Volatility_break(self.ob_frame)
+		self.volatility_scanner = Volatility_break(self.vb_frame,NT)
+		self.open_reversal = Open_Reversal(self.or_frame,NT)
+		self.open_break = Volatility_break(self.ob_frame,NT)
 		#self.update_entry()
 
 	def update_entry(self,data):
+		timestamp = data[1]
+
+		self.NT_stat["text"] = "Last update: "+timestamp
 		self.volatility_scanner.update_entry(data)
 
 
 class Volatility_break():
-	def __init__(self,root):
+	def __init__(self,root,NT):
 
 		self.buttons = []
 		self.entries = []
 		self.l = 1
 		self.labels_width = [9,6,5,5,5,5,6,6,6,6,6,6,8,6]
+		self.NT = NT
 		self.labels = ["Symbol","Vol","Rel.V","SCORE","5M","SC%","SO%","Listed","Since","Last","Ignore","Add"]
 		self.root = root
 		self.recreate_labels(self.root)
@@ -135,9 +139,7 @@ class Volatility_break():
 		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
 
 		df = data[0]
-		timestamp = data[1]
 
-		self.NT_stat["text"] = "Last update: "+timestamp
 
 		df.to_csv("tttt.csv")
 		entry = 0
@@ -183,10 +185,11 @@ class Volatility_break():
 			print("TNV scanner construction:",e)
 
 class Open_Reversal():
-	def __init__(self,root):
+	def __init__(self,root,NT):
 		self.buttons = []
 		self.entries = []
 		self.l = 1
+		self.NT = NT
 		self.labels_width = [9,6,5,7,5,5,6,6,6,6,6,6,8,6]
 		self.labels = ["Symbol","Vol","Rel.V","Re.SCORE","5M","SC%","Listed","Since","Last","Ignore","Add"]
 		self.root = root
@@ -296,10 +299,11 @@ class Open_Reversal():
 			print("TNV scanner construction:",e)
 
 class Open_Break():
-	def __init__(self,root):
+	def __init__(self,root,NT):
 		self.buttons = []
 		self.entries = []
 		self.l = 1
+		self.NT = NT
 		self.labels_width = [9,6,5,7,5,5,6,6,6,6,8,6]
 		self.labels = ["Symbol","Vol","Rel.V","Br.SCORE","5M","SO%","SC%","Listed","Since","Last","Ignore","Add"]
 		self.root = root

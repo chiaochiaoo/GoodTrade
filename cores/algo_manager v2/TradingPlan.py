@@ -325,6 +325,32 @@ class TradingPlan:
 		self.mark_algo_status(REJECTED)
 
 
+	""" Trade management """
+
+	def manage_trades(self,side,action,percentage):
+
+		if self.data[POSITION] == side:
+			if self.data[CURRENT_SHARE]>0:
+				shares = int(self.data[CURRENT_SHARE]*percentage)
+				pproaction = ""
+				if shares ==0:
+					shares = 1
+
+				if action ==ADD:
+					if self.data[POSITION] == LONG:
+						pproaction = BUY
+					elif self.data[POSITION] == SHORT:
+						pproaction = SELL
+				elif action ==MINUS:
+					if self.data[POSITION] == LONG:
+						pproaction = SELL
+					elif self.data[POSITION] == SHORT:
+						pproaction = BUY
+
+				description = "Trades aggregation"
+				if pproaction!="":
+					self.ppro_out.send([pproaction,self.symbol_name,share,description])
+
 	""" risk related ## """
 
 	def adjusting_risk(self):
@@ -514,8 +540,6 @@ class TradingPlan:
 		self.entry_plan.on_deploying()
 		self.management_plan.on_deploying()
 		self.current_running_strategy = self.entry_plan
-
-
 
 	def stop_tradingplan(self):
 		self.current_running_strategy = None

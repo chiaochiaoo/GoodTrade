@@ -130,6 +130,9 @@ LIMITBUY = "Litmit Buy"
 LIMITSELL = "Limit Sell"
 
 
+ADD ="add"
+MINUS="minus"
+
 
 ##COLOR
 
