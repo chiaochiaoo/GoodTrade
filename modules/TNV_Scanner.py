@@ -41,9 +41,9 @@ class TNV_Scanner():
 		self.ob_frame = tk.Canvas(self.TNV_TAB)
 		self.pb_frame = tk.Canvas(self.TNV_TAB)
 
-
-		self.TNV_TAB.add(self.vb_frame, text ='Volatility Break')
 		self.TNV_TAB.add(self.or_frame, text ='Open Reversal')
+		self.TNV_TAB.add(self.vb_frame, text ='Volatility Break')
+		
 		self.TNV_TAB.add(self.ob_frame, text ='Open Break')
 		self.TNV_TAB.add(self.pb_frame, text ='Premarket Pick')
 
