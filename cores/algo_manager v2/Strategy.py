@@ -259,7 +259,7 @@ class BreakFirst(EntryStrategy):
 			if not self.buyTrigger.pre_deploying_check():
 				self.buyTrigger.total_reset()
 			else:
-				print("XXX")
+
 				self.transitional_trigger = AbstractTrigger("transition to below pH.",[[SYMBOL_DATA,BID,"<",SYMBOL_DATA,RESISTENCE]],0,1,"REACTIVATE")
 				self.buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",self.timer,self.repeat,LONG,self.ppro_out)
 				self.transitional_trigger.add_next_trigger(self.buyTrigger)
@@ -273,7 +273,7 @@ class BreakFirst(EntryStrategy):
 				self.sellTrigger.total_reset()
 			else:
 				self.transitional_trigger = AbstractTrigger("transition to below pH.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],0,1,"REACTIVATE")
-				self.sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],SUPPORT,self.risk,"break down",self.timer,self.repeat,SHORT,self.ppro_out)
+				self.sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",self.timer,self.repeat,SHORT,self.ppro_out)
 				self.transitional_trigger.add_next_trigger(self.sellTrigger)
 
 				self.set_initial_trigger(self.transitional_trigger)
