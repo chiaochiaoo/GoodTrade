@@ -10,6 +10,13 @@ import time
 from tkinter import *
 
 
+def ts_to_min(ts):
+	ts = int(ts)
+	m = ts//60
+	s = ts%60
+
+	return str(m)+":"+str(s)
+
 class TNV_Scanner():
 
 	def __init__(self,root,NT):
@@ -66,9 +73,12 @@ class TNV_Scanner():
 
 	def update_entry(self,data):
 		timestamp = data[1]
-
 		self.NT_stat["text"] = "Last update: "+timestamp
-		self.volatility_scanner.update_entry(data)
+		for key,item in data[0].items():
+			if key == "Volitality_Break":
+				self.volatility_scanner.update_entry(item)
+			elif key == "Open_Reseral":
+				self.open_reversal.update_entry(item)
 
 
 class Volatility_break():
@@ -131,14 +141,12 @@ class Volatility_break():
 				self.entries[k].append(self.b)
 			self.l+=1
 
-
-
 	def update_entry(self,data):
 
 		#at most 8.
 		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
 
-		df = data[0]
+		df = data
 
 
 		df.to_csv("tttt.csv")
@@ -190,25 +198,15 @@ class Open_Reversal():
 		self.entries = []
 		self.l = 1
 		self.NT = NT
-		self.labels_width = [9,6,5,7,5,5,6,6,6,6,6,6,8,6]
-		self.labels = ["Symbol","Vol","Rel.V","Re.SCORE","5M","SC%","Listed","Since","Last","Ignore","Add"]
+		self.labels_width = [9,6,5,7,7,5,6,6,6,6,6,6,8,6]
+		self.labels = ["Symbol","Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Ignore","Add"]
 		self.root = root
 		self.recreate_labels(self.root)
 
-	def recreate_labels(self,frame):
 
-		self.labels_position = {}
-		self.labels_position["Rank"]=0
-		self.labels_position["Symbol"]=1
-		self.labels_position["Market"]=2
-		self.labels_position["Price"]=3
-		self.labels_position["Since"]=4
-		self.labels_position["Been"]=5
-		self.labels_position["SC%"]=6
-		self.labels_position["SO%"]=7
-		self.labels_position["L5R%"]=8
-		self.labels_position["Status"]=9
-		self.labels_position["Add"]=10
+		#self.update_entry([pd.read_csv("test2.csv",index_col=0)])
+
+	def recreate_labels(self,frame):
 
 		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
 
@@ -244,16 +242,15 @@ class Open_Reversal():
 			self.l+=1
 
 
-
 	def update_entry(self,data):
 
 		#at most 8.
 		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
 
-		df = data[0]
-		timestamp = data[1]
+		df = data
+		#timestamp = data[1]
 
-		self.NT_stat["text"] = "Last update: "+timestamp
+		#self.NT_stat["text"] = "Last update: "+timestamp
 
 		df.to_csv("tttt.csv")
 		entry = 0
@@ -261,28 +258,31 @@ class Open_Reversal():
 		try:
 			for index, row in df.iterrows():
 				#print(row)
+
+				#["Symbol","Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Ignore","Add"]
 				rank = index
 				vol = row['Avg VolumeSTR']
 				relv = row['rel vol']
-				roc5 = row['5ROCP']
-				roc10 = row['10ROCP']
-				roc15 = row['15ROCP']
-				score = row['score']
+				side = row['reversalside']
+				rscore = row['reversal_score']
 				sc = row['SC']
-				so = row['SO']
 
-				since = row['since']
-				last = row['last']
+				since = ts_to_min(row['reversal_timer'])
+
 
 				############ add since, and been to the thing #############
-				if rank in self.NT.nasdaq_trader_symbols_ranking:
-					listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
+
+				if self.NT != None:
+					if rank in self.NT.nasdaq_trader_symbols_ranking:
+						listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
+					else:
+						listed = "No"
 				else:
 					listed = "No"
 				#print(self.NT.nasdaq_trader_symbols)
 				if 1: #score>0:	
 
-					lst = [rank,vol,relv,score,roc5,sc,so,listed,since,last]
+					lst = [rank,vol,relv,side,rscore,sc,listed,since]
 
 					for i in range(len(lst)):
 						self.entries[entry][i]["text"] = lst[i]
