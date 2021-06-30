@@ -245,7 +245,7 @@ class Manager:
 		if symbol not in self.symbols:
 
 			self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats)  #register in Symbol.
-			self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,NONE,risk,self.pipe_ppro_out,TEST_MODE)
+			self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INCREMENTAL,NONE,risk,self.pipe_ppro_out,TEST_MODE)
 
 			self.ui.create_new_entry(self.tradingplan[symbol])
 			

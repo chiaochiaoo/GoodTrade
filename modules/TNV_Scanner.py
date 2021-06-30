@@ -89,7 +89,7 @@ class Volatility_break():
 		self.l = 1
 		self.labels_width = [9,6,5,5,5,5,6,6,6,6,6,6,8,6]
 		self.NT = NT
-		self.labels = ["Symbol","Vol","Rel.V","SCORE","5M","SC%","SO%","Listed","Since","Last","Ignore","Add"]
+		self.labels = ["Symbol","A.Vol","Rel.V","SCORE","5M","SC%","SO%","Listed","Since","Last","Ignore","Add"]
 		self.root = root
 		self.recreate_labels(self.root)
 
@@ -199,7 +199,7 @@ class Open_Reversal():
 		self.l = 1
 		self.NT = NT
 		self.labels_width = [9,6,5,7,7,5,6,6,6,6,6,6,8,6]
-		self.labels = ["Symbol","Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Ignore","Add"]
+		self.labels = ["Symbol","A.Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Ignore","Add"]
 		self.root = root
 		self.recreate_labels(self.root)
 
@@ -305,7 +305,7 @@ class Open_Break():
 		self.l = 1
 		self.NT = NT
 		self.labels_width = [9,6,5,7,5,5,6,6,6,6,8,6]
-		self.labels = ["Symbol","Vol","Rel.V","Br.SCORE","5M","SO%","SC%","Listed","Since","Last","Ignore","Add"]
+		self.labels = ["Symbol","A.Vol","Rel.V","Br.SCORE","5M","SO%","SC%","Listed","Since","Last","Ignore","Add"]
 		self.root = root
 		self.recreate_labels(self.root)
 
