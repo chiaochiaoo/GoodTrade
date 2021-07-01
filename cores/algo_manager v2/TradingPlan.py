@@ -593,7 +593,9 @@ class TradingPlan:
 
 		if manage_plan == ONETOTWORISKREWARDOLD:
 			self.set_ManagementStrategy(OneToTWORiskReward_OLD(self.symbol,self))
-
+		if manage_plan == FIBO:
+			self.set_ManagementStrategy(FibonacciOnly(self.symbol,self))
+			
 	def set_EntryStrategy(self,entry_plan:Strategy):
 		self.entry_plan = entry_plan
 		#self.entry_plan.set_symbol(self.symbol,self)

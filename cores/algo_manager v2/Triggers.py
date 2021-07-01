@@ -721,6 +721,7 @@ class FibonacciManager(AbstractTrigger):
 		elif self.tradingplan.data[POSITION] == SHORT:
 			self.conditions = [[SYMBOL_DATA,BID,"<",TP_DATA,FIBCURRENT_MAX]]
 
+		#print(self.conditions)
 		#if self.tradingplan.data[POSITION]!="" and self.tradingplan.data[CURRENT_SHARE]>0:
 		if self.tradingplan.data[POSITION]!="":
 			return(super().check_conditions())
@@ -734,7 +735,7 @@ class FibonacciManager(AbstractTrigger):
 		#1. reset level.
 		#self.tradingplan.data[CURRENT_FIB_LEVEL] == 1:
 		self.strategy.fib_level = 1
-
+		self.strategy.FibActivated = True
 
 		#2.  Recalculate the Fibo levels. (Break price - current max.)
 		gap = abs(self.tradingplan.data[FIBCURRENT_MAX]-self.tradingplan.data[BREAKPRICE])
@@ -745,50 +746,66 @@ class FibonacciManager(AbstractTrigger):
 			self.tradingplan.data[FIBLEVEL2] = round(self.tradingplan.data[FIBCURRENT_MAX] - (0.382*gap),2)
 			self.tradingplan.data[FIBLEVEL3] = round(self.tradingplan.data[FIBCURRENT_MAX] - (0.5*gap),2)
 			self.tradingplan.data[FIBLEVEL4] = round(self.tradingplan.data[FIBCURRENT_MAX] - (0.618*gap),2)
+			self.tradingplan.data[STOP_LEVEL] = round(self.tradingplan.data[FIBCURRENT_MAX] - (0.618*gap),2)
 
 		elif self.tradingplan.data[POSITION] == SHORT:
+
 			self.tradingplan.data[FIBLEVEL1] = round(self.tradingplan.data[FIBCURRENT_MAX] + (0.214*gap),2)
 			self.tradingplan.data[FIBLEVEL2] = round(self.tradingplan.data[FIBCURRENT_MAX] + (0.382*gap),2)
 			self.tradingplan.data[FIBLEVEL3] = round(self.tradingplan.data[FIBCURRENT_MAX] + (0.5*gap),2)
 			self.tradingplan.data[FIBLEVEL4] = round(self.tradingplan.data[FIBCURRENT_MAX] + (0.618*gap),2)
-
+			self.tradingplan.data[STOP_LEVEL] = round(self.tradingplan.data[FIBCURRENT_MAX] + (0.618*gap),2)
 		#3. Bring up the new FIB max. 
+
+		self.tradingplan.data[PXT1] =self.tradingplan.data[FIBLEVEL1] 
+		self.tradingplan.data[PXT2] =self.tradingplan.data[FIBLEVEL2] 
+		self.tradingplan.data[PXT3] =self.tradingplan.data[FIBLEVEL3] 
+
+		self.tradingplan.tkvars[PXT1].set(self.tradingplan.data[PXT1])
+		self.tradingplan.tkvars[PXT2].set(self.tradingplan.data[PXT2])
+		self.tradingplan.tkvars[PXT3].set(self.tradingplan.data[PXT3])
+		self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[STOP_LEVEL])
+
+		
 		if self.tradingplan.data[POSITION] == LONG:
-			self.tradingplan.data[FIBCURRENT_MAX] += round(0.1*self.strategy.risk_per_share,2)
+			self.tradingplan.data[FIBCURRENT_MAX] += 0.1*self.strategy.risk_per_share
 			
 		elif self.tradingplan.data[POSITION] == SHORT:
-			self.tradingplan.data[FIBCURRENT_MAX] -= round(0.1*self.strategy.risk_per_share,2)
+			self.tradingplan.data[FIBCURRENT_MAX] -= 0.1*self.strategy.risk_per_share
 
-		log_print("Fib new high calculated:",self.tradingplan.data[FIBCURRENT_MAX],"levels:",self.tradingplan.data[FIBLEVEL1],self.tradingplan.data[FIBLEVEL2],self.tradingplan.data[FIBLEVEL3],self.tradingplan.data[FIBLEVEL4])
+		self.tradingplan.adjusting_risk()
+		self.tradingplan.update_displays()
+		log_print(self.symbol_name,"Fibo recalibrate:",round(self.tradingplan.data[FIBCURRENT_MAX],2),"levels:",self.tradingplan.data[FIBLEVEL1],self.tradingplan.data[FIBLEVEL2],self.tradingplan.data[FIBLEVEL3],self.tradingplan.data[FIBLEVEL4])
 
 class FibonacciTrigger(AbstractTrigger):
 	#Special type of trigger, overwrites action part. everything else is generic.
 	def __init__(self,description,strategy):
-		super().__init__(description,None,trigger_timer=0,trigger_limit=999)
+		super().__init__(description,None,trigger_timer=5,trigger_limit=999)
 
 		self.strategy =strategy
 		self.conditions = [] 
 
 	def check_conditions(self):
 
-		level = ""
+		if self.strategy.FibActivated:
+			level = ""
 
-		if self.strategy.fib_level ==1: level= FIBLEVEL1
-		elif self.strategy.fib_level ==2: level= FIBLEVEL2
-		elif self.strategy.fib_level ==3: level= FIBLEVEL3
-		elif self.strategy.fib_level ==4: level= FIBLEVEL4
+			if self.strategy.fib_level ==1: level= FIBLEVEL1
+			elif self.strategy.fib_level ==2: level= FIBLEVEL2
+			elif self.strategy.fib_level ==3: level= FIBLEVEL3
+			elif self.strategy.fib_level ==4: level= FIBLEVEL4
 
-		if self.tradingplan.data[POSITION] == LONG:
-			self.conditions = [[SYMBOL_DATA,ASK,">",TP_DATA,level]]
-		elif self.tradingplan.data[POSITION] == SHORT:
-			self.conditions = [[SYMBOL_DATA,BID,"<",TP_DATA,level]]
+			if self.tradingplan.data[POSITION] == LONG:
+				self.conditions = [[SYMBOL_DATA,ASK,"<",TP_DATA,level]]
+			elif self.tradingplan.data[POSITION] == SHORT:
+				self.conditions = [[SYMBOL_DATA,BID,">",TP_DATA,level]]
 
-		#if self.tradingplan.data[POSITION]!="" and self.tradingplan.data[CURRENT_SHARE]>0:
+			#if self.tradingplan.data[POSITION]!="" and self.tradingplan.data[CURRENT_SHARE]>0:
+			#print(self.conditions)
+			if self.tradingplan.data[POSITION]!="":
+				return(super().check_conditions())
 
-		if self.tradingplan.data[POSITION]!="":
-			return(super().check_conditions())
-
-		#add the actual stuff here.
+			#add the actual stuff here.
 
 	def bring_up_stop(self,new_stop):
 
@@ -806,17 +823,19 @@ class FibonacciTrigger(AbstractTrigger):
 	def trigger_event(self):
 
 		if self.strategy.fib_level == 1:
-			self.tradingplan.manage_trades(self.tradingplan.data[POSITION],MINUS,0.1)
-
+			self.tradingplan.manage_trades(self.tradingplan.data[POSITION],MINUS,0.15)
+			log_print(self.symbol_name,"retracement level:1","Taking off 10%.")
+			self.set_mind("retracement level:1")
 		if self.strategy.fib_level == 2:
-
 			self.tradingplan.manage_trades(self.tradingplan.data[POSITION],MINUS,0.25)
-
+			log_print(self.symbol_name,"retracement level:2","Taking off 25%.")
+			self.set_mind("retracement level:2")
 		if self.strategy.fib_level == 3:
 			self.tradingplan.manage_trades(self.tradingplan.data[POSITION],MINUS,0.4)
-
-		#if self.strategy.fib_level == 4: #fLATTEN
-
+			log_print(self.symbol_name,"retracement level:3","Taking off 40%.")
+			self.set_mind("retracement level:3")
+		if self.strategy.fib_level == 4: #fLATTEN
+			log_print(self.symbol_name,"Critial level reached, flattening")
 
 
 		if self.tradingplan.data[USING_STOP]==False:
