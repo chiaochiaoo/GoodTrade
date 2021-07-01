@@ -360,7 +360,6 @@ class Purchase_trigger(AbstractTrigger):
 		return int(shares/self.trigger_limit)
 
 
-
 class NoStop_trigger(AbstractTrigger):
 
 	#Special type of trigger, overwrites action part. everything else is generic.
@@ -637,71 +636,6 @@ class Break_any_Purchase_trigger(AbstractTrigger):
 		return int(shares/self.trigger_limit)
 
 
-class Three_price_trigger(AbstractTrigger):
-	#Special type of trigger, overwrites action part. everything else is generic.
-	def __init__(self,description,ppro_out):
-		super().__init__(description,None,trigger_timer=0,trigger_limit=3)
-
-		self.ppro_out =ppro_out
-		self.conditions = [] 
-
-	def check_conditions(self):
-
-		level = ""
-		if self.tradingplan.current_price_level ==1: level= PXT1
-		if self.tradingplan.current_price_level ==2: level= PXT2
-		if self.tradingplan.current_price_level ==3: level= PXT3
-
-		if self.tradingplan.data[POSITION] == LONG:
-			self.conditions = [[SYMBOL_DATA,ASK,">",TP_DATA,level]]
-		elif self.tradingplan.data[POSITION] == SHORT:
-			self.conditions = [[SYMBOL_DATA,BID,"<",TP_DATA,level]]
-
-		#if self.tradingplan.data[POSITION]!="" and self.tradingplan.data[CURRENT_SHARE]>0:
-		if self.tradingplan.data[POSITION]!="":
-			return(super().check_conditions())
-	#add the actual stuff here.
-	def trigger_event(self):
-
-		share = min(self.tradingplan.data[TARGET_SHARE]//4,self.tradingplan.data[CURRENT_SHARE])
-
-		self.pos = self.tradingplan.data[POSITION]
-		#log_print("Trigger: Purchase PPRO EVENT: ",self.symbol_name,s,share,"at","stop:",self.stop,self.symbol_data[self.stop],self.symbol.get_time())
-
-		####################  SIDE.  ########################################
-		action = ""
-		if self.pos ==LONG:
-			action = SELL
-		elif self.pos ==SHORT:
-			action = BUY
-
-		if action !="":
-			if self.tradingplan.current_price_level == 1:
-				self.ppro_out.send([action,self.symbol_name,share,self.description])
-
-				#half way.
-				half_way = round((self.tradingplan.data[STOP_LEVEL] + self.tradingplan.data[AVERAGE_PRICE])/2,2)
-				self.tradingplan.data[STOP_LEVEL]=half_way
-				self.tradingplan.tkvars[STOP_LEVEL].set(half_way)
-
-			if self.tradingplan.current_price_level == 2:
-				self.ppro_out.send([action,self.symbol_name,share,self.description])
-				self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[AVERAGE_PRICE]
-				self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[AVERAGE_PRICE])
-				#move the stop to break even.
-
-			if self.tradingplan.current_price_level == 3:
-				self.ppro_out.send([action,self.symbol_name,self.tradingplan.data[CURRENT_SHARE],"manage "])
-
-				#move the stop to first price level. 
-		else:
-			log_print("unidentified side. ")
-
-		log_print(self.symbol_name," Hit price target", self.tradingplan.current_price_level,"New Stop:",self.tradingplan.data[STOP_LEVEL])
-		self.set_mind("Covered No."+str(self.tradingplan.current_price_level)+" lot.",GREEN)
-		self.tradingplan.current_price_level+=1
-		self.tradingplan.update_displays()
-
 class TwoToOneTriggerOLD(AbstractTrigger):
 	#Special type of trigger, overwrites action part. everything else is generic.
 	def __init__(self,description,ppro_out):
@@ -772,6 +706,127 @@ class TwoToOneTriggerOLD(AbstractTrigger):
 
 """ The new trigger only adjust the stops. 
 """
+
+
+class FibonacciManager(AbstractTrigger):
+	def __init__(self,description,strategy):
+		super().__init__(description,None,trigger_timer=0,trigger_limit=999)
+		self.strategy =strategy
+		self.conditions = [] 
+
+	def check_conditions(self):
+
+		if self.tradingplan.data[POSITION] == LONG:
+			self.conditions = [[SYMBOL_DATA,ASK,">",TP_DATA,FIBCURRENT_MAX]]
+		elif self.tradingplan.data[POSITION] == SHORT:
+			self.conditions = [[SYMBOL_DATA,BID,"<",TP_DATA,FIBCURRENT_MAX]]
+
+		#if self.tradingplan.data[POSITION]!="" and self.tradingplan.data[CURRENT_SHARE]>0:
+		if self.tradingplan.data[POSITION]!="":
+			return(super().check_conditions())
+	"""
+	Do three things. 
+	1. Reset tradingplan Fibo level.
+	2. Recalculate the Fibo levels. (Break price - current max.)
+	3. Bring up the new FIB max. 
+	"""
+	def trigger_event(self):
+		#1. reset level.
+		#self.tradingplan.data[CURRENT_FIB_LEVEL] == 1:
+		self.strategy.fib_level = 1
+
+
+		#2.  Recalculate the Fibo levels. (Break price - current max.)
+		gap = abs(self.tradingplan.data[FIBCURRENT_MAX]-self.tradingplan.data[BREAKPRICE])
+
+		if self.tradingplan.data[POSITION] == LONG:
+
+			self.tradingplan.data[FIBLEVEL1] = round(self.tradingplan.data[FIBCURRENT_MAX] - (0.214*gap),2)
+			self.tradingplan.data[FIBLEVEL2] = round(self.tradingplan.data[FIBCURRENT_MAX] - (0.382*gap),2)
+			self.tradingplan.data[FIBLEVEL3] = round(self.tradingplan.data[FIBCURRENT_MAX] - (0.5*gap),2)
+			self.tradingplan.data[FIBLEVEL4] = round(self.tradingplan.data[FIBCURRENT_MAX] - (0.618*gap),2)
+
+		elif self.tradingplan.data[POSITION] == SHORT:
+			self.tradingplan.data[FIBLEVEL1] = round(self.tradingplan.data[FIBCURRENT_MAX] + (0.214*gap),2)
+			self.tradingplan.data[FIBLEVEL2] = round(self.tradingplan.data[FIBCURRENT_MAX] + (0.382*gap),2)
+			self.tradingplan.data[FIBLEVEL3] = round(self.tradingplan.data[FIBCURRENT_MAX] + (0.5*gap),2)
+			self.tradingplan.data[FIBLEVEL4] = round(self.tradingplan.data[FIBCURRENT_MAX] + (0.618*gap),2)
+
+		#3. Bring up the new FIB max. 
+		if self.tradingplan.data[POSITION] == LONG:
+			self.tradingplan.data[FIBCURRENT_MAX] += round(0.1*self.strategy.risk_per_share,2)
+			
+		elif self.tradingplan.data[POSITION] == SHORT:
+			self.tradingplan.data[FIBCURRENT_MAX] -= round(0.1*self.strategy.risk_per_share,2)
+
+		log_print("Fib new high calculated:",self.tradingplan.data[FIBCURRENT_MAX],"levels:",self.tradingplan.data[FIBLEVEL1],self.tradingplan.data[FIBLEVEL2],self.tradingplan.data[FIBLEVEL3],self.tradingplan.data[FIBLEVEL4])
+
+class FibonacciTrigger(AbstractTrigger):
+	#Special type of trigger, overwrites action part. everything else is generic.
+	def __init__(self,description,strategy):
+		super().__init__(description,None,trigger_timer=0,trigger_limit=999)
+
+		self.strategy =strategy
+		self.conditions = [] 
+
+	def check_conditions(self):
+
+		level = ""
+
+		if self.strategy.fib_level ==1: level= FIBLEVEL1
+		elif self.strategy.fib_level ==2: level= FIBLEVEL2
+		elif self.strategy.fib_level ==3: level= FIBLEVEL3
+		elif self.strategy.fib_level ==4: level= FIBLEVEL4
+
+		if self.tradingplan.data[POSITION] == LONG:
+			self.conditions = [[SYMBOL_DATA,ASK,">",TP_DATA,level]]
+		elif self.tradingplan.data[POSITION] == SHORT:
+			self.conditions = [[SYMBOL_DATA,BID,"<",TP_DATA,level]]
+
+		#if self.tradingplan.data[POSITION]!="" and self.tradingplan.data[CURRENT_SHARE]>0:
+
+		if self.tradingplan.data[POSITION]!="":
+			return(super().check_conditions())
+
+		#add the actual stuff here.
+
+	def bring_up_stop(self,new_stop):
+
+		coefficient = 1
+		if self.tradingplan.data[POSITION] ==SHORT:
+			coefficient = -1
+
+		#print(new_stop,self.tradingplan.data[STOP_LEVEL])
+		if new_stop*coefficient >self.tradingplan.data[STOP_LEVEL]*coefficient:
+			self.tradingplan.data[STOP_LEVEL]=new_stop
+			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[STOP_LEVEL])
+
+		#print("new stop:",self.tradingplan.data[STOP_LEVEL])
+
+	def trigger_event(self):
+
+		if self.strategy.fib_level == 1:
+			self.tradingplan.manage_trades(self.tradingplan.data[POSITION],MINUS,0.1)
+
+		if self.strategy.fib_level == 2:
+
+			self.tradingplan.manage_trades(self.tradingplan.data[POSITION],MINUS,0.25)
+
+		if self.strategy.fib_level == 3:
+			self.tradingplan.manage_trades(self.tradingplan.data[POSITION],MINUS,0.4)
+
+		#if self.strategy.fib_level == 4: #fLATTEN
+
+
+
+		if self.tradingplan.data[USING_STOP]==False:
+			self.set_mind("STOP BYPASSING: ON")
+
+		self.strategy.fib_level +=1
+		self.tradingplan.adjusting_risk()
+		self.tradingplan.update_displays()
+
+
 class TwoToOneTrigger(AbstractTrigger):
 	#Special type of trigger, overwrites action part. everything else is generic.
 	def __init__(self,description,strategy):
@@ -901,6 +956,43 @@ class TwoToOneTrigger(AbstractTrigger):
 
 
 
+# s = SingleEntry(ASK,">",PREMARKETHIGH,0,"BUY BREAK UP")
+# s.trigger_event()
+
+
+
+
+
+
+#### Purchase Trigger AC backup
+		# if self.tradingplan.tkvars[MANAGEMENTPLAN].get() == ANCARTMETHOD:
+
+		# 	share = int(self.tradingplan.data[TARGET_SHARE]/self.trigger_limit)
+
+		# 	if self.pos!="":
+		# 		self.tradingplan.expect_orders = self.pos
+		# 		if self.trigger_count!= self.trigger_limit:
+		# 			self.set_mind("Entry: "+str(self.trigger_count)+"/"+str(self.trigger_limit),DEFAULT)
+		# 		else:
+		# 			self.set_mind("Entry: Complete",GREEN)
+		# 	if self.pos == LONG:
+
+		# 		self.tradingplan.data[STOP_LEVEL]= round(self.symbol_data[BID]-self.tradingplan.data[RISK_PER_SHARE],2)
+		# 		self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[STOP_LEVEL])
+		# 		if share>0:
+		# 			self.ppro_out.send(["Buy",self.symbol_name,share,self.description])
+		# 	elif self.pos ==SHORT:
+
+		# 		self.tradingplan.data[STOP_LEVEL]= round(self.symbol_data[ASK]+self.tradingplan.data[RISK_PER_SHARE],2)
+		# 		self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[STOP_LEVEL])
+
+		# 		if share>0:
+		# 			self.ppro_out.send(["Sell",self.symbol_name,share,self.description])
+		# 	else:
+		# 		log_print("unidentified side. ")
+
+		# else:
+
 class ANCART_trigger(AbstractTrigger):
 	#Special type of trigger, overwrites action part. everything else is generic.
 	def __init__(self,description,ppro_out):
@@ -968,7 +1060,6 @@ class ANCART_trigger(AbstractTrigger):
 		self.set_mind("Covered No."+str(self.tradingplan.current_price_level)+" lot.",GREEN)
 		self.tradingplan.current_price_level+=1
 		self.tradingplan.update_displays()
-
 
 class SmartTrailing_trigger(AbstractTrigger):
 	#Special type of trigger, overwrites action part. everything else is generic.
@@ -1048,39 +1139,68 @@ class SmartTrailing_trigger(AbstractTrigger):
 
 		self.tradingplan.current_price_level+=1
 		self.tradingplan.update_displays()
-# s = SingleEntry(ASK,">",PREMARKETHIGH,0,"BUY BREAK UP")
-# s.trigger_event()
 
+class Three_price_trigger(AbstractTrigger):
+	#Special type of trigger, overwrites action part. everything else is generic.
+	def __init__(self,description,ppro_out):
+		super().__init__(description,None,trigger_timer=0,trigger_limit=3)
 
+		self.ppro_out =ppro_out
+		self.conditions = [] 
 
+	def check_conditions(self):
 
+		level = ""
+		if self.tradingplan.current_price_level ==1: level= PXT1
+		if self.tradingplan.current_price_level ==2: level= PXT2
+		if self.tradingplan.current_price_level ==3: level= PXT3
 
+		if self.tradingplan.data[POSITION] == LONG:
+			self.conditions = [[SYMBOL_DATA,ASK,">",TP_DATA,level]]
+		elif self.tradingplan.data[POSITION] == SHORT:
+			self.conditions = [[SYMBOL_DATA,BID,"<",TP_DATA,level]]
 
-#### Purchase Trigger AC backup
-		# if self.tradingplan.tkvars[MANAGEMENTPLAN].get() == ANCARTMETHOD:
+		#if self.tradingplan.data[POSITION]!="" and self.tradingplan.data[CURRENT_SHARE]>0:
+		if self.tradingplan.data[POSITION]!="":
+			return(super().check_conditions())
+	#add the actual stuff here.
+	def trigger_event(self):
 
-		# 	share = int(self.tradingplan.data[TARGET_SHARE]/self.trigger_limit)
+		share = min(self.tradingplan.data[TARGET_SHARE]//4,self.tradingplan.data[CURRENT_SHARE])
 
-		# 	if self.pos!="":
-		# 		self.tradingplan.expect_orders = self.pos
-		# 		if self.trigger_count!= self.trigger_limit:
-		# 			self.set_mind("Entry: "+str(self.trigger_count)+"/"+str(self.trigger_limit),DEFAULT)
-		# 		else:
-		# 			self.set_mind("Entry: Complete",GREEN)
-		# 	if self.pos == LONG:
+		self.pos = self.tradingplan.data[POSITION]
+		#log_print("Trigger: Purchase PPRO EVENT: ",self.symbol_name,s,share,"at","stop:",self.stop,self.symbol_data[self.stop],self.symbol.get_time())
 
-		# 		self.tradingplan.data[STOP_LEVEL]= round(self.symbol_data[BID]-self.tradingplan.data[RISK_PER_SHARE],2)
-		# 		self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[STOP_LEVEL])
-		# 		if share>0:
-		# 			self.ppro_out.send(["Buy",self.symbol_name,share,self.description])
-		# 	elif self.pos ==SHORT:
+		####################  SIDE.  ########################################
+		action = ""
+		if self.pos ==LONG:
+			action = SELL
+		elif self.pos ==SHORT:
+			action = BUY
 
-		# 		self.tradingplan.data[STOP_LEVEL]= round(self.symbol_data[ASK]+self.tradingplan.data[RISK_PER_SHARE],2)
-		# 		self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[STOP_LEVEL])
+		if action !="":
+			if self.tradingplan.current_price_level == 1:
+				self.ppro_out.send([action,self.symbol_name,share,self.description])
 
-		# 		if share>0:
-		# 			self.ppro_out.send(["Sell",self.symbol_name,share,self.description])
-		# 	else:
-		# 		log_print("unidentified side. ")
+				#half way.
+				half_way = round((self.tradingplan.data[STOP_LEVEL] + self.tradingplan.data[AVERAGE_PRICE])/2,2)
+				self.tradingplan.data[STOP_LEVEL]=half_way
+				self.tradingplan.tkvars[STOP_LEVEL].set(half_way)
 
-		# else:
+			if self.tradingplan.current_price_level == 2:
+				self.ppro_out.send([action,self.symbol_name,share,self.description])
+				self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[AVERAGE_PRICE]
+				self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[AVERAGE_PRICE])
+				#move the stop to break even.
+
+			if self.tradingplan.current_price_level == 3:
+				self.ppro_out.send([action,self.symbol_name,self.tradingplan.data[CURRENT_SHARE],"manage "])
+
+				#move the stop to first price level. 
+		else:
+			log_print("unidentified side. ")
+
+		log_print(self.symbol_name," Hit price target", self.tradingplan.current_price_level,"New Stop:",self.tradingplan.data[STOP_LEVEL])
+		self.set_mind("Covered No."+str(self.tradingplan.current_price_level)+" lot.",GREEN)
+		self.tradingplan.current_price_level+=1
+		self.tradingplan.update_displays()

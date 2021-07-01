@@ -71,6 +71,13 @@ TRIGGER_PRICE_7 = "Trigger_price_7"
 TRIGGER_PRICE_8 = "Trigger_price_8"
 TRIGGER_PRICE_9 = "Trigger_price_9"
 
+#CURRENT_FIB_LEVEL = "Current Fib Level"
+FIBCURRENT_MAX = "Fib Current Max"
+FIBLEVEL1 = "Fib level 1"
+FIBLEVEL2 = "Fib level 2"
+FIBLEVEL3 = "Fib level 3"
+FIBLEVEL4 = "Fib level 4"
+
 STATUS = "Status"
 POSITION="Position"
 MANASTRAT = "ManaStart"
