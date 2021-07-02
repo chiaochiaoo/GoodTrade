@@ -13,6 +13,6 @@ manual/OPENING.PNG
 data/
 debug.log
 list.txt
-
+signals/
 cores/commlink.json
 
