@@ -295,7 +295,7 @@ class Bullish(EntryStrategy):
 
 		self.transitional_trigger = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],0,1,"Waiting for recross")
 		self.transitional_trigger2 = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],60,1,"Waiting for recross")
-		self.buyreversalTrigger = NoStop_trigger([[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],LOW,self.risk,"long reversal",timer,repeat,LONG,self.ppro_out)
+		self.buyreversalTrigger = WideStop_trigger([[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],LOW,self.risk,"long reversal",timer,repeat,LONG,self.ppro_out)
 		
 
 		self.transitional_trigger.add_next_trigger(self.transitional_trigger2)
@@ -340,7 +340,7 @@ class Bearish(EntryStrategy):
 
 		self.transitional_trigger = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,RESISTENCE]],0,1,"Waiting for recross")
 		self.transitional_trigger2 = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],60,1,"Waiting for recross")
-		self.sellreversalTrigger = NoStop_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],HIGH,self.risk,"short reversal",timer,repeat,SHORT,self.ppro_out)
+		self.sellreversalTrigger = WideStop_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],HIGH,self.risk,"short reversal",timer,repeat,SHORT,self.ppro_out)
 
 		self.transitional_trigger.add_next_trigger(self.transitional_trigger2)
 		self.transitional_trigger2.add_next_trigger(self.sellreversalTrigger)
@@ -382,7 +382,7 @@ class Ripsell(EntryStrategy):
 		#self,description,trigger_timer:int,trigger_limit
 		self.transitional_trigger = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,RESISTENCE]],0,1,"Waiting for recross")
 		self.transitional_trigger2 = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],60,1,"Waiting for recross")
-		self.sellreversalTrigger = NoStop_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],HIGH,self.risk,"short reversal",30,repeat,SHORT,self.ppro_out)
+		self.sellreversalTrigger = WideStop_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],HIGH,self.risk,"short reversal",30,repeat,SHORT,self.ppro_out)
 
 		self.transitional_trigger.add_next_trigger(self.transitional_trigger2)
 		self.transitional_trigger2.add_next_trigger(self.sellreversalTrigger)
@@ -407,7 +407,7 @@ class Dipbuy(EntryStrategy):
 
 		self.transitional_trigger = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],0,1,"Waiting for recross ")
 		self.transitional_trigger2 = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],60,1,"Waiting for recross ")
-		self.buyreversalTrigger = NoStop_trigger([[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],LOW,self.risk,"long reversal",timer,repeat,LONG,self.ppro_out)
+		self.buyreversalTrigger = WideStop_trigger([[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],LOW,self.risk,"long reversal",timer,repeat,LONG,self.ppro_out)
 		
 
 		self.transitional_trigger.add_next_trigger(self.transitional_trigger2)
@@ -433,7 +433,7 @@ class Fadeany(EntryStrategy):
 
 		self.transitional_trigger_buy = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],0,1,"Waiting for recross ")
 		self.transitional_trigger_buy_2 = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],60,1,"Waiting for recross ")
-		self.buyreversalTrigger = NoStop_trigger([[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],LOW,self.risk,"long reversal",timer,repeat,LONG,self.ppro_out)
+		self.buyreversalTrigger = WideStop_trigger([[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],LOW,self.risk,"long reversal",timer,repeat,LONG,self.ppro_out)
 		
 		self.transitional_trigger_buy.add_next_trigger(self.transitional_trigger_buy_2)
 		self.transitional_trigger_buy_2.add_next_trigger(self.buyreversalTrigger)
@@ -443,7 +443,7 @@ class Fadeany(EntryStrategy):
 
 		self.transitional_trigger_sell = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,RESISTENCE]],0,1,"Waiting for recross")
 		self.transitional_trigger_sell_2 = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],60,1,"Waiting for recross")
-		self.sellreversalTrigger = NoStop_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],HIGH,self.risk,"short reversal",timer,repeat,SHORT,self.ppro_out)
+		self.sellreversalTrigger = WideStop_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],HIGH,self.risk,"short reversal",timer,repeat,SHORT,self.ppro_out)
 		
 		self.transitional_trigger_sell.add_next_trigger(self.transitional_trigger_sell_2)
 		self.transitional_trigger_sell_2.add_next_trigger(self.sellreversalTrigger)

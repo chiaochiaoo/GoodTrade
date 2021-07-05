@@ -367,6 +367,7 @@ class Manager:
 				bid = data["bid"]
 				ask = data["ask"]
 				ts = data["timestamp"]
+				#print(data)
 
 				if symbol in self.tradingplan:
 					self.tradingplan[symbol].ppro_update_price(bid,ask,ts)
@@ -471,6 +472,9 @@ class Tester:
 
 		self.buy_book = {}
 		self.sell_book = {}
+
+		self.price_stay = True
+		self.price_flip = True
 
 		# self.init= tk.Button(self.root ,text="Register",width=10,bg="#5BFF80",command=self.start_test)
 		# self.init.grid(column=1,row=1) m
@@ -617,7 +621,7 @@ class Tester:
 			time.sleep(self.wait_time)
 
 	def price_stay(self):
-		self.change_sum = 0
+		self.price_stay = True
 
 	def time_facotr_1(self):
 		self.wait_time=1
@@ -626,10 +630,12 @@ class Tester:
 		self.wait_time=0.1
 
 	def price_up(self):
+		self.price_stay = False
 		self.change_sum = 0.01
 		# self.price.set(round(self.price.get()+0.1,2))
 		# self.change()
 	def price_down(self):
+		self.price_stay = False
 		self.change_sum = -0.01
 
 		# self.price.set(round(self.price.get()-0.1,2))
@@ -653,9 +659,17 @@ class Tester:
 
 	def change(self):
 		self.sec+=1
+		#print(self.sec)
 		data={}
 		data["symbol"]= "SPY.AM"
 
+		if self.price_stay:
+			if self.price_flip:
+				self.price.set(round(self.price.get()+0.01,2))
+				self.price_flip = False
+			else:
+				self.price.set(round(self.price.get()-0.01,2))
+				self.price_flip = True
 		self.bid = round(float(self.price.get()-0.01),2)
 		self.ask = round(float(self.price.get()+0.01),2)
 
