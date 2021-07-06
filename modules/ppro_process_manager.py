@@ -504,7 +504,7 @@ def load_historical_data(symbol):
 				d[key].set(item)
 
 			d["historical_data_loaded"] = True
-			print(symbol,"loaded successful")
+			print(symbol,"loaded successful",d)
 
 
 def historical_eval(symbol):
