@@ -593,6 +593,12 @@ def process_and_send(lst,pipe):
 		if d["pos_range"]>=0.9 and d["pos_range"]<=0.97 and change_high<0 and change_low<0:
 			d["status"]="High Reversing"
 
+	############ RANGE CHEKER #########################
+	if timestamp <570:
+		d["open_percentage"] = range_eval(d["highs"],d["lows"])
+	################################################
+
+
 	if prev_close!=0:
 		d["prev_close_percentage"] = round(d["prev_close_gap"]*100/(prev_close+0.0000000001),2)
 	else:
@@ -671,6 +677,32 @@ def process_and_send(lst,pipe):
 		register(symbol)
 
 	lock[symbol] = False
+
+def range_eval(highs,lows):
+
+	#look back 30 minutes. report the one with least amount of change.
+
+	a=highs[-30:]
+	b=lows[-30:]
+
+	count_a=0
+	init = a[0]
+	for i in a:
+		if i>init:
+			init = i
+			count_a+=1
+
+	count_b=0
+	init = b[0]
+	for i in b:
+		if i<init:
+			init = i
+			count_b+=1
+
+	diff = abs(count_a-count_b)
+
+	return round(diff/30,2)
+
 
 def getinfo(symbol,pipe):
 
