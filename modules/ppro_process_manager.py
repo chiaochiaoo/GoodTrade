@@ -701,7 +701,7 @@ def range_eval(highs,lows):
 
 	diff = abs(count_a-count_b)
 
-	return round(1-diff/30,2)
+	return round(diff/30,2)
 
 
 def getinfo(symbol,pipe):
