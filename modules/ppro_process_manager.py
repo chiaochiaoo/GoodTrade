@@ -419,6 +419,26 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 	# for i in keys:
 	# 	d["last_send"][i] = d[i]
 
+	d["historical_data_loaded"] = False
+
+def load_historical_data(symbol)
+	global data
+	d = data[symbol]
+
+
+	if d["historical_data_loaded"] == False:
+		file = "data/"+symbol+"_"+date.today().strftime("%m%d")+".txt"
+
+		if os.path.isfile(file):
+			print(symbol,"process loading from db.")
+			with open(file) as json_file:
+				d = json.load(json_file)
+
+			for i in range(len(self.data)):
+				self.data[i][symbol].set(d[i+1])
+
+			d["historical_data_loaded"] = True
+
 
 def historical_eval(symbol):
 

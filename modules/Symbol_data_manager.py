@@ -33,6 +33,42 @@ symbol_percentage_last_5 = "symbol_percentage_last_5"
 symbol_position_status = "symbol_position_status"
 
 
+open_high_range ="open_high_range"
+open_high_val ="open_high_val"
+open_high_std ="open_high_std"
+
+open_low_range ="open_low_range"
+open_low_val ="open_low_val"
+open_low_std ="open_low_std"
+
+high_low_range ="high_low_range"
+high_low_val ="high_low_val"
+high_low_std ="high_low_std"
+
+first_5_range ="first_5_range"
+first_5_val ="first_5_val"
+first_5_std ="first_5_std"
+
+first_5_vol_range ="first_5_vol_range"
+first_5_vol_val ="first_5_vol_val"
+first_5_vol_std ="first_5_vol_std"
+
+normal_5_range ="normal_5_range"
+normal_5_val ="normal_5_val"
+normal_5_std ="normal_5_std"
+
+normal_5_vol_range ="normal_5_vol_range"
+normal_5_vol_val ="normal_5_vol_val"
+normal_5_vol_std ="normal_5_vol_std"
+
+prev_close_range ="prev_close_range"
+prev_close_val ="prev_close_val"
+prev_close_std ="prev_close_std"
+
+symbol_data_ATR ="symbol_data_ATR"
+
+
+
 class Symbol_data_manager:	
 
 	"""if file does not exist, create an empty file. """
@@ -219,7 +255,49 @@ class Symbol_data_manager:
 		self.symbol_data_normal5_vol_std,
 		self.symbol_data_prev_close_val,self.symbol_data_prev_close_range,self.symbol_data_prev_close_std,self.symbol_data_ATR]
 		#self.symbol_data_openhigh_dis,self.symbol_data_openlow_dis,self.symbol_data_range_dis,self.symbol_data_prev_close_dis
-		
+
+
+		self.data_list = {}
+
+		self.data_list[open_high_range] = self.symbol_data_openhigh_range
+		self.data_list[open_high_val] = self.symbol_data_openhigh_val
+		self.data_list[open_high_std] = self.symbol_data_openhigh_std
+
+		self.data_list[open_low_range] = self.symbol_data_openlow_range
+		self.data_list[open_low_val] = self.symbol_data_openlow_val
+		self.data_list[open_low_std] = self.symbol_data_openlow_std
+
+		self.data_list[high_low_range] = self.symbol_data_range_range
+		self.data_list[high_low_val] = self.symbol_data_range_val
+		self.data_list[high_low_std] = self.symbol_data_range_std
+
+		self.data_list[first_5_range] = self.symbol_data_first5_range
+		self.data_list[first_5_val] = self.symbol_data_first5_val
+		self.data_list[first_5_std] = self.symbol_data_first5_std
+
+		self.data_list[first_5_vol_range] = self.symbol_data_first5_vol_range
+		self.data_list[first_5_vol_val] =  self.symbol_data_first5_vol_val
+		self.data_list[first_5_vol_std] = self.symbol_data_first5_vol_std
+
+		self.data_list[normal_5_range] = self.symbol_data_normal5_range
+		self.data_list[normal_5_val] = self.symbol_data_normal5_val
+		self.data_list[normal_5_std] = self.symbol_data_normal5_std
+
+		self.data_list[normal_5_vol_range] = self.symbol_data_normal5_vol_range
+		self.data_list[normal_5_vol_val] = self.symbol_data_normal5_vol_val
+		self.data_list[normal_5_vol_std] = self.symbol_data_normal5_vol_std
+
+		self.data_list[prev_close_range] = self.symbol_data_prev_close_range
+		self.data_list[prev_close_val] = self.symbol_data_prev_close_val
+		self.data_list[prev_close_std] = self.symbol_data_prev_close_std
+
+		self.data_list[symbol_data_ATR] = self.symbol_data_ATR
+
+
+
+
+
+
 		self.data_ready = {}
 
 		#self.symbol_data_openhigh_dis,self,symbol_data_openlow_dis,self.symbol_data_range_dis
