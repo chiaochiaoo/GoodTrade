@@ -3,7 +3,7 @@ from tkinter import ttk
 import threading
 import pandas as pd
 import time
-
+from datetime import datetime
 #from pannel import *
 #from modules.pannel import *
 
@@ -80,6 +80,8 @@ class TNV_Scanner():
 			elif key == "Open_Reseral":
 				self.open_reversal.update_entry(item)
 
+			elif key == "Open_Break":
+				self.open_break.update_entry(item)
 
 class Volatility_break():
 	def __init__(self,root,NT):
@@ -149,7 +151,7 @@ class Volatility_break():
 		df = data
 
 
-		df.to_csv("tttt.csv")
+		#df.to_csv("tttt.csv")
 		entry = 0
 
 		try:
@@ -203,6 +205,7 @@ class Open_Reversal():
 		self.root = root
 		self.recreate_labels(self.root)
 
+		self.file = "signals/open_resersal_"+datetime.now().strftime("%m-%d")+".csv"
 
 		#self.update_entry([pd.read_csv("test2.csv",index_col=0)])
 
@@ -252,7 +255,7 @@ class Open_Reversal():
 
 		#self.NT_stat["text"] = "Last update: "+timestamp
 
-		df.to_csv("tttt.csv")
+		#df.to_csv("tttt.csv")
 		entry = 0
 
 		try:
@@ -269,7 +272,7 @@ class Open_Reversal():
 
 				since = ts_to_min(row['reversal_timer'])
 
-
+				row['Signal Time'] = since
 				############ add since, and been to the thing #############
 
 				if self.NT != None:
@@ -295,6 +298,13 @@ class Open_Reversal():
 				for i in range(10):
 					self.entries[entry][i]["text"] = ""
 				entry+=1
+
+			keep = ['Symbol', "Signal Time", 'rel vol', 'SC', 'reversalside','reversal_score','Signal Time',]
+
+			for i in df.columns:
+				if i not in keep:
+					df.pop(i)
+			df.to_csv(self.file)
 		except Exception as e:
 			print("TNV scanner construction:",e)
 
@@ -306,6 +316,7 @@ class Open_Break():
 		self.NT = NT
 		self.labels_width = [9,6,5,7,5,5,6,6,6,6,8,6]
 		self.labels = ["Symbol","A.Vol","Rel.V","Br.SCORE","5M","SO%","SC%","Listed","Since","Last","Ignore","Add"]
+		self.file = "signals/open_break_"+datetime.now().strftime("%m-%d")+".csv"
 		self.root = root
 		self.recreate_labels(self.root)
 
@@ -362,14 +373,14 @@ class Open_Break():
 	def update_entry(self,data):
 
 		#at most 8.
-		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
 
+		#["Symbol","A.Vol","Rel.V","Br.SCORE","5M","SO%","SC%","Listed","Since","Last","Ignore","Add"]
 		df = data[0]
 		timestamp = data[1]
 
 		self.NT_stat["text"] = "Last update: "+timestamp
-
-		df.to_csv("tttt.csv")
+		print("open break is here")
+		df.to_csv("open_break_out.csv")
 		entry = 0
 
 		try:
@@ -378,13 +389,10 @@ class Open_Break():
 				rank = index
 				vol = row['Avg VolumeSTR']
 				relv = row['rel vol']
+				brscore = row['score2']
 				roc5 = row['5ROCP']
-				roc10 = row['10ROCP']
-				roc15 = row['15ROCP']
-				score = row['score']
-				sc = row['SC']
 				so = row['SO']
-
+				sc = row['SC']
 				since = row['since']
 				last = row['last']
 
@@ -396,7 +404,7 @@ class Open_Break():
 				#print(self.NT.nasdaq_trader_symbols)
 				if 1: #score>0:	
 
-					lst = [rank,vol,relv,score,roc5,sc,so,listed,since,last]
+					lst = [rank,vol,relv,brscore,roc5,so,sc,listed,since,last]
 
 					for i in range(len(lst)):
 						self.entries[entry][i]["text"] = lst[i]
@@ -409,6 +417,7 @@ class Open_Break():
 				for i in range(10):
 					self.entries[entry][i]["text"] = ""
 				entry+=1
+
 		except Exception as e:
 			print("TNV scanner construction:",e)
 
