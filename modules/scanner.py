@@ -7,6 +7,7 @@ import time
 #from pannel import *
 from modules.pannel import *
 #from modules.scanner_process_manager import *
+from datetime import datetime
 
 from modules.TNV_Scanner import *
 from tkinter import *
@@ -35,6 +36,7 @@ class scanner(pannel):
 		self.scanner_request = scanner_process
 
 		self.extra_count = 101
+
 
 		self.tabControl = ttk.Notebook(root)
 		self.tabControl.place(x=0,rely=0.01,relheight=1,width=640)
@@ -225,7 +227,9 @@ class scanner(pannel):
 		self.buttons =[]
 				#3,14,5,6,4,6,6,6,10,5
 		self.nasdaq_width = [4,14,5,6,4,4,6,6,6,12,5]
+
 		self.labels = ["Rank","Symbol","Market","Price","Since","Been","SC%","SO%","L5R%","Status","Add"]
+
 
 		self.labels_position = {}
 
@@ -288,6 +292,7 @@ class scanner(pannel):
 		self.buttons[8]["command"] = self.last5_button
 
 		self.buttons[9]["command"] = self.status_button
+
 
 	def change_sorting_order(self,order):
 		self.sorting_order = order
@@ -838,6 +843,14 @@ class scanner(pannel):
 	def add_nasdaq_labels(self,data):
 
 		print("receive new data")
+
+		now = datetime.now()
+		ts = now.hour*60 + now.minute
+
+		if ts>=570:
+			self.buttons[7]["text"] = "SO%"
+		else:
+			self.buttons[7]["text"] = "Rng.Scr"	
 
 		if 1:
 			if self.nasdaq_is_working_on_it==False:
