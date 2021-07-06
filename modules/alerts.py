@@ -119,6 +119,8 @@ class alert(pannel):
 
 		self.alerts = {}
 
+		self.eval_time = 0
+
 		if commlink:
 			self.algo_commlink = commlink
 
@@ -174,8 +176,8 @@ class alert(pannel):
 				value_position = alerts[j][0]
 				alert_position = alerts[j][1]
 				alert_vals = alerts[j][2]
-				#m=format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
-				#self.tickers_tracers[i].append((format[value_position],m))
+				m=format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
+				self.tickers_tracers[i].append((format[value_position],m))
 			elif j>1:
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
@@ -238,8 +240,8 @@ class alert(pannel):
 				value_position = alerts[j][0]
 				alert_position = alerts[j][1]
 				alert_vals = alerts[j][2]
-				# m=format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
-				# self.tickers_tracers[i].append((format[value_position],m))
+				m=format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
+				self.tickers_tracers[i].append((format[value_position],m))
 			elif j==9:
 				self.tickers_labels[i].append(tk.Checkbutton(self.frame,variable=format[j]))
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
@@ -377,217 +379,218 @@ class alert(pannel):
 				auto_trade = self.data.auto_trade
 
 				#print(time,ts)
-
-
 				#print(alert_type)
-				if alert_type=="breakout":
+
+				if self.eval_time != ts:
+					 self.eval_time = ts
+					if alert_type=="breakout":
 
 
-					### ASSUME NUMBER ONLY.
-					cur_price= round(alerts_vals[2].get(),3)
-					support= to_number(alerts_vals[3].get())
-					resistance =  to_number(alerts_vals[4].get())
+						### ASSUME NUMBER ONLY.
+						cur_price= round(alerts_vals[2].get(),3)
+						support= to_number(alerts_vals[3].get())
+						resistance =  to_number(alerts_vals[4].get())
 
-					#print("breakout check:",cur_price,support,resistance)
+						#print("breakout check:",cur_price,support,resistance)
 
-					if support != 0.00 and resistance != 0.00 and ts>569:
-						#print(support,resistance,cur_price)
+						if support != 0.00 and resistance != 0.00 and ts>569:
+							#print(support,resistance,cur_price)
 
-						break_up_confirmation = ["Pending","BreakDn"]
-						break_down_confirmation = ["Pending","BreakUp"]
-						if cur_price<support and cur_price<resistance and self.alerts[symbol][alert_type]!=2:
+							break_up_confirmation = ["Pending","BreakDn"]
+							break_down_confirmation = ["Pending","BreakUp"]
+							if cur_price<support and cur_price<resistance and self.alerts[symbol][alert_type]!=2:
 
-							self.alerts[symbol][alert_type] = 2
+								self.alerts[symbol][alert_type] = 2
 
-							if self.breakout_time[symbol] == 0:
-								self.breakout_time[symbol] = seconds
+								if self.breakout_time[symbol] == 0:
+									self.breakout_time[symbol] = seconds
 
-							been = seconds - self.breakout_time[symbol]
+								been = seconds - self.breakout_time[symbol]
 
-							#print(seconds,self.breakout_time[symbol],been)
+								#print(seconds,self.breakout_time[symbol],been)
 
-							alert_str = "Support "+alert_type +" :"+str(been)+" sec ago"
+								alert_str = "Support "+alert_type +" :"+str(been)+" sec ago"
 
-							eval_string.set(alert_str)
-
-							#self.alert_pannel.add_alerts([symbol,time,alert_str])
-							self.set_latest_alert(symbol, alert_str, time)
-
-
-							if self.data.algo_breakout_down[symbol].get()!="" and self.data.algo_breakout_status[symbol].get() in break_down_confirmation:
-
-								timer = int(self.data.algo_breakout_timer[symbol].get())
-								if timer ==0:
-									#send id.
-									order_id = self.data.algo_breakout_down[symbol].get()
-
-									self.data.algo_breakout_status[symbol].set("BreakDn")
-
-									print(order_id,"confirmed")
-									self.confirm_trade(order_id)
-
-						elif cur_price>resistance and cur_price>support and self.alerts[symbol][alert_type]!=1 :
-
-							self.alerts[symbol][alert_type] = 1
-							#check time. 
-							if self.breakout_time[symbol] == 0:
-								self.breakout_time[symbol] = seconds
-
-							been = seconds - self.breakout_time[symbol]
-
-							if been<60:
-								alert_str = "Resistance "+alert_type +" :"+str(been)+" sec ago"
-							else:
-								alert_str = "Resistance "+alert_type +" :"+str(been//60)+" min ago"
-
-
-							eval_string.set(alert_str)
-
-							#self.alert_pannel.add_alerts([symbol,time,alert_str])
-							self.set_latest_alert(symbol, alert_str, time)
-
-							#send out confirm.
-
-							if self.data.algo_breakout_up[symbol].get()!=""  and self.data.algo_breakout_status[symbol].get() in break_up_confirmation:
-
-								timer = int(self.data.algo_breakout_timer[symbol].get())
-								if timer ==0:
-									#send id.
-									order_id = self.data.algo_breakout_up[symbol].get()
-									self.data.algo_breakout_status[symbol].set("BreakUp")
-
-									print(order_id,"confirmed")
-									self.confirm_trade(order_id)
-
-						elif cur_price<resistance and cur_price>support and self.alerts[symbol][alert_type]!=0 :
-
-							#refresh it back.
-							self.breakout_time[symbol] = 0
-
-							self.alerts[symbol][alert_type] = 0
-
-							#normal white color
-							eval_label["background"]="#d9d9d9"
-							eval_string.set("")
-
-						#only update the time
-						else:
-							#print("ts:",seconds,self.breakout_time[symbol])
-							been = seconds - self.breakout_time[symbol]
-
-							if self.alerts[symbol][alert_type]==2:
-								if been<60:
-									alert_str = "Support "+alert_type +" :"+str(been)+" sec ago"
-								else:
-									alert_str = "Support "+alert_type +" :"+str(been//60)+" min ago"
 								eval_string.set(alert_str)
+
+								#self.alert_pannel.add_alerts([symbol,time,alert_str])
+								self.set_latest_alert(symbol, alert_str, time)
 
 
 								if self.data.algo_breakout_down[symbol].get()!="" and self.data.algo_breakout_status[symbol].get() in break_down_confirmation:
 
 									timer = int(self.data.algo_breakout_timer[symbol].get())
-									if been>=timer :
+									if timer ==0:
 										#send id.
 										order_id = self.data.algo_breakout_down[symbol].get()
 
 										self.data.algo_breakout_status[symbol].set("BreakDn")
 
 										print(order_id,"confirmed")
-
 										self.confirm_trade(order_id)
 
+							elif cur_price>resistance and cur_price>support and self.alerts[symbol][alert_type]!=1 :
 
-							if self.alerts[symbol][alert_type]==1:
+								self.alerts[symbol][alert_type] = 1
+								#check time. 
+								if self.breakout_time[symbol] == 0:
+									self.breakout_time[symbol] = seconds
+
+								been = seconds - self.breakout_time[symbol]
 
 								if been<60:
 									alert_str = "Resistance "+alert_type +" :"+str(been)+" sec ago"
 								else:
-									alert_str = "Resistance "+alert_type +" :"+str(been//60)+" min ago"	
+									alert_str = "Resistance "+alert_type +" :"+str(been//60)+" min ago"
+
 
 								eval_string.set(alert_str)
 
+								#self.alert_pannel.add_alerts([symbol,time,alert_str])
+								self.set_latest_alert(symbol, alert_str, time)
 
-								if self.data.algo_breakout_up[symbol].get()!="" and self.data.algo_breakout_status[symbol].get() in break_up_confirmation:
+								#send out confirm.
+
+								if self.data.algo_breakout_up[symbol].get()!=""  and self.data.algo_breakout_status[symbol].get() in break_up_confirmation:
 
 									timer = int(self.data.algo_breakout_timer[symbol].get())
-									if been>=timer :
+									if timer ==0:
 										#send id.
 										order_id = self.data.algo_breakout_up[symbol].get()
 										self.data.algo_breakout_status[symbol].set("BreakUp")
 
 										print(order_id,"confirmed")
-
 										self.confirm_trade(order_id)
 
-							if self.alerts[symbol][alert_type]!=0:
-								if been>60 and been<180:
-									#green
-									eval_label["background"]="#67FF37"
-								if been>180 and been <300:
-									eval_label["background"]="yellow"
+							elif cur_price<resistance and cur_price>support and self.alerts[symbol][alert_type]!=0 :
 
-								# if been >180 and been <190:
-								# 	if auto_trade[symbol].get()==1 and self.alerts[symbol][alert_type]==1:
-								# 		self.data.ppro.long(symbol)
-								# 	if auto_trade[symbol].get()==1 and self.alerts[symbol][alert_type]==2:
-								# 		self.data.ppro.short(symbol)
+								#refresh it back.
+								self.breakout_time[symbol] = 0
 
-								if been>300 and been <600:
-									eval_label["background"]="#FF5B5B"
-								if been>600:
-									eval_label["background"]="red"
+								self.alerts[symbol][alert_type] = 0
 
-				else:
+								#normal white color
+								eval_label["background"]="#d9d9d9"
+								eval_string.set("")
 
-					cur_price= abs(round(alerts_vals[2].get(),3))
-					mean= round(alerts_vals[3].get(),3)
-					std=  round(alerts_vals[4].get(),3)
+							#only update the time
+							else:
+								#print("ts:",seconds,self.breakout_time[symbol])
+								been = seconds - self.breakout_time[symbol]
 
-					#on certain alert_type, the math can be different. 
+								if self.alerts[symbol][alert_type]==2:
+									if been<60:
+										alert_str = "Support "+alert_type +" :"+str(been)+" sec ago"
+									else:
+										alert_str = "Support "+alert_type +" :"+str(been//60)+" min ago"
+									eval_string.set(alert_str)
 
 
-					if std != 0:
-						cur = round((cur_price-mean)/std,1)
-						eval_string.set(str(cur)+" from mean")
+									if self.data.algo_breakout_down[symbol].get()!="" and self.data.algo_breakout_status[symbol].get() in break_down_confirmation:
+
+										timer = int(self.data.algo_breakout_timer[symbol].get())
+										if been>=timer :
+											#send id.
+											order_id = self.data.algo_breakout_down[symbol].get()
+
+											self.data.algo_breakout_status[symbol].set("BreakDn")
+
+											print(order_id,"confirmed")
+
+											self.confirm_trade(order_id)
+
+
+								if self.alerts[symbol][alert_type]==1:
+
+									if been<60:
+										alert_str = "Resistance "+alert_type +" :"+str(been)+" sec ago"
+									else:
+										alert_str = "Resistance "+alert_type +" :"+str(been//60)+" min ago"	
+
+									eval_string.set(alert_str)
+
+
+									if self.data.algo_breakout_up[symbol].get()!="" and self.data.algo_breakout_status[symbol].get() in break_up_confirmation:
+
+										timer = int(self.data.algo_breakout_timer[symbol].get())
+										if been>=timer :
+											#send id.
+											order_id = self.data.algo_breakout_up[symbol].get()
+											self.data.algo_breakout_status[symbol].set("BreakUp")
+
+											print(order_id,"confirmed")
+
+											self.confirm_trade(order_id)
+
+								if self.alerts[symbol][alert_type]!=0:
+									if been>60 and been<180:
+										#green
+										eval_label["background"]="#67FF37"
+									if been>180 and been <300:
+										eval_label["background"]="yellow"
+
+									# if been >180 and been <190:
+									# 	if auto_trade[symbol].get()==1 and self.alerts[symbol][alert_type]==1:
+									# 		self.data.ppro.long(symbol)
+									# 	if auto_trade[symbol].get()==1 and self.alerts[symbol][alert_type]==2:
+									# 		self.data.ppro.short(symbol)
+
+									if been>300 and been <600:
+										eval_label["background"]="#FF5B5B"
+									if been>600:
+										eval_label["background"]="red"
+
 					else:
-						cur = 0
-						eval_string.set("Unable to process std 0")
 
-					#color.
-					#cur = abs(cur)
-					alert_val = alerts_vals[6]
-					alert_val.set(cur)
+						cur_price= abs(round(alerts_vals[2].get(),3))
+						mean= round(alerts_vals[3].get(),3)
+						std=  round(alerts_vals[4].get(),3)
 
-					if cur <0.5:
-						eval_label["background"]="white"
+						#on certain alert_type, the math can be different. 
 
-					elif cur>0.5 and cur<1:
 
-						alert_str = "Moderate "+alert_type
-						eval_label["background"]="#97FEA8"
+						if std != 0:
+							cur = round((cur_price-mean)/std,1)
+							eval_string.set(str(cur)+" from mean")
+						else:
+							cur = 0
+							eval_string.set("Unable to process std 0")
 
-						if ts>570 and self.alerts[symbol][alert_type] < 0.5:
-							self.alerts[symbol][alert_type] = 0.5
-							#self.alert_pannel.add_alerts([symbol,time,alert_str])
-							self.set_latest_alert(symbol, alert_str, time)
+						#color.
+						#cur = abs(cur)
+						alert_val = alerts_vals[6]
+						alert_val.set(cur)
 
-					elif cur>1 and cur<2 and self.alerts[symbol][alert_type] < 1:
-						self.alerts[symbol][alert_type] = 1
-						alert_str = "High "+alert_type
-						eval_label["background"]="yellow"
-						if ts>570:
-							#only set when there is higher severity. 
-							#self.alert_pannel.add_alerts([symbol,time,alert_str])
-							self.set_latest_alert(symbol, alert_str, time)
-					elif cur>2 and self.alerts[symbol][alert_type] < 2:
+						if cur <0.5:
+							eval_label["background"]="white"
 
-						self.alerts[symbol][alert_type] = 2
-						### Send the alert to alert pannel.
-						alert_str = "Very high "+alert_type
-						eval_label["background"]="red"
-						if ts>570:
-							#self.alert_pannel.add_alerts([symbol,time,alert_str])
-							self.set_latest_alert(symbol, alert_str, time)
+						elif cur>0.5 and cur<1:
+
+							alert_str = "Moderate "+alert_type
+							eval_label["background"]="#97FEA8"
+
+							if ts>570 and self.alerts[symbol][alert_type] < 0.5:
+								self.alerts[symbol][alert_type] = 0.5
+								#self.alert_pannel.add_alerts([symbol,time,alert_str])
+								self.set_latest_alert(symbol, alert_str, time)
+
+						elif cur>1 and cur<2 and self.alerts[symbol][alert_type] < 1:
+							self.alerts[symbol][alert_type] = 1
+							alert_str = "High "+alert_type
+							eval_label["background"]="yellow"
+							if ts>570:
+								#only set when there is higher severity. 
+								#self.alert_pannel.add_alerts([symbol,time,alert_str])
+								self.set_latest_alert(symbol, alert_str, time)
+						elif cur>2 and self.alerts[symbol][alert_type] < 2:
+
+							self.alerts[symbol][alert_type] = 2
+							### Send the alert to alert pannel.
+							alert_str = "Very high "+alert_type
+							eval_label["background"]="red"
+							if ts>570:
+								#self.alert_pannel.add_alerts([symbol,time,alert_str])
+								self.set_latest_alert(symbol, alert_str, time)
 
 		except Exception as e:
 			print("Alert Error:",e)
