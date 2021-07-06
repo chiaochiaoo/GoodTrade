@@ -5,7 +5,7 @@ import time
 import json
 from datetime import datetime
 from datetime import date
-
+import os.path
 from modules.Symbol_data_manager import *
 from modules.ppro_process_manager_client import *
 
@@ -496,15 +496,15 @@ def load_historical_data(symbol):
 		file = "data/"+symbol+"_"+date.today().strftime("%m%d")+".txt"
 
 		if os.path.isfile(file):
-			print(symbol,"process loading from db.")
+			#print(symbol,"process loading from db.")
 			with open(file) as json_file:
 				da = json.load(json_file)
-
+			#print(da)
 			for key,item in da.items():
-				d[key].set(item)
+				d[key] = item 
 
 			d["historical_data_loaded"] = True
-			print(symbol,"loaded successful",d)
+			print(symbol,"loaded successful")
 
 
 def historical_eval(symbol):
@@ -692,6 +692,9 @@ def process_and_send(lst,pipe):
 		d["prev_close_percentage"] = 0
 	d["last_5_range_percentage"] = round(d["last_5_range"]*100/(price+0.00000001),2)
 
+
+	#### Historical Eval ####
+	load_historical_data(symbol)
 
 	update_list={}
 
