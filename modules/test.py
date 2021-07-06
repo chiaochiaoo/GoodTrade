@@ -1,7 +1,7 @@
 
 
-a=[1,2,3,4,5,6,7,8,9,10]
-b=[5,3,4,5,2,3,4,5,6,2]
+a=[6,4,5,6,3,4,5,6,7,3,10,10,10,10]
+b=[5,3,4,5,2,3,4,5,6,2,9,9,9,1]
 
 def range_eval(highs,lows):
 
@@ -24,6 +24,7 @@ def range_eval(highs,lows):
 			init = i
 			count_b+=1
 
+	print(count_a,count_b)
 	diff = abs(count_a-count_b)
 
 	return round(diff/30,2)
