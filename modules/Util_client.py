@@ -62,9 +62,9 @@ class util_client:
 			with open(file) as json_file:
 				d = json.load(json_file)
 
-			for i in range(len(self.data)):
-				self.data[i][symbol].set(d[i+1])
-
+				for key,item in d.items():
+					self.data[key][symbol].set(item)
+					
 			self.data_status[symbol].set(True)
 
 			return True
@@ -82,8 +82,8 @@ class util_client:
 			with open(file) as json_file:
 				d = json.load(json_file)
 
-			for i in range(len(self.data)):
-				self.data[i][symbol].set(d[i+1])
+			for key,item in d.items():
+				self.data[key][symbol].set(item)
 
 			self.data_status[symbol].set(True)
 		else:
@@ -130,15 +130,18 @@ class util_client:
 					dic = d[1]
 					#print(dic)
 					for symbol,d in dic.items():
-						if len(d)-1 == len(self.data):
-							for i in range(len(self.data)):
-								self.data[i][symbol].set(d[i+1])
+						#if len(d)-1 == len(self.data):
+						for key,item in d.items():
+							self.data[key][symbol].set(item)
 
-							self.data_status[symbol].set(True)
+						# for i in range(len(self.data)):
+						# 	self.data[i][symbol].set(d[i+1])
 
-							file = "data/"+symbol+"_"+self.today+".txt"
-							with open(file, 'w') as outfile:
-									json.dump(d, outfile)
+						self.data_status[symbol].set(True)
+
+						file = "data/"+symbol+"_"+self.today+".txt"
+						with open(file, 'w') as outfile:
+								json.dump(d, outfile)
 
 							#save the file here.
 
@@ -201,12 +204,6 @@ def util_comms(ulti_response): #connects to server for db, nt, and finviz.
 		print("Util server Connection Successful")
 		#ulti_response.send(["Util init"])
 		while connection:
-			# try:
-			# 	s.sendall(b'Alive check')
-			# except:
-			# 	connection = False
-			# 	break
-			
 			print("Util server: taking data")
 			while True:
 
