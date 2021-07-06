@@ -378,11 +378,12 @@ class alert(pannel):
 
 				auto_trade = self.data.auto_trade
 
+				#print("eval.")
 				#print(time,ts)
 				#print(alert_type)
 
 				if self.eval_time != ts:
-					 self.eval_time = ts
+					self.eval_time = ts
 					if alert_type=="breakout":
 
 
