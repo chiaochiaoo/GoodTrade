@@ -71,8 +71,6 @@ class ppro_process_manager:
 				# print("Threads:",threading.active_count())
 				# for thread in threading.enumerate(): 
 				# 	print(thread.name)
-
-
 				d = self.request.recv()
 
 				status = d[0]

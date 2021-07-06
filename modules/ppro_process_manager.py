@@ -421,7 +421,7 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 
 	d["historical_data_loaded"] = False
 
-def load_historical_data(symbol)
+def load_historical_data(symbol):
 	global data
 	d = data[symbol]
 
