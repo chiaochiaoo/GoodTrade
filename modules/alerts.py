@@ -176,8 +176,8 @@ class alert(pannel):
 				value_position = alerts[j][0]
 				alert_position = alerts[j][1]
 				alert_vals = alerts[j][2]
-				m=format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
-				self.tickers_tracers[i].append((format[value_position],m))
+				#m=format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
+				#self.tickers_tracers[i].append((format[value_position],m))
 			elif j>1:
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
@@ -219,8 +219,8 @@ class alert(pannel):
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
 				self.label_default_configure(self.tickers_labels[i][j])
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
-				m=format[j].trace('w', lambda *_, text=format[j],label=self.tickers_labels[i][j]: self.status_change_color(text,label))
-				self.tickers_tracers[i].append((format[j],m))
+				#m=format[j].trace('w', lambda *_, text=format[j],label=self.tickers_labels[i][j]: self.status_change_color(text,label))
+				#self.tickers_tracers[i].append((format[j],m))
 
 			elif j ==2 :
 				self.tickers_labels[i].append(tk.Checkbutton(self.frame,variable=format[j]))
@@ -382,8 +382,8 @@ class alert(pannel):
 				#print(time,ts)
 				#print(alert_type)
 
-				if self.eval_time != ts:
-					self.eval_time = ts
+				if self.eval_time != seconds:
+					self.eval_time = seconds
 					if alert_type=="breakout":
 
 
