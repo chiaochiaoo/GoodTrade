@@ -38,6 +38,41 @@ TEST = False
 ####  send the updates back to the client.					  ####
 ##################################################################
 
+open_high_range ="open_high_range"
+open_high_val ="open_high_val"
+open_high_std ="open_high_std"
+
+open_low_range ="open_low_range"
+open_low_val ="open_low_val"
+open_low_std ="open_low_std"
+
+high_low_range ="high_low_range"
+high_low_val ="high_low_val"
+high_low_std ="high_low_std"
+
+first_5_range ="first_5_range"
+first_5_val ="first_5_val"
+first_5_std ="first_5_std"
+
+first_5_vol_range ="first_5_vol_range"
+first_5_vol_val ="first_5_vol_val"
+first_5_vol_std ="first_5_vol_std"
+
+normal_5_range ="normal_5_range"
+normal_5_val ="normal_5_val"
+normal_5_std ="normal_5_std"
+
+normal_5_vol_range ="normal_5_vol_range"
+normal_5_vol_val ="normal_5_vol_val"
+normal_5_vol_std ="normal_5_vol_std"
+
+prev_close_range ="prev_close_range"
+prev_close_val ="prev_close_val"
+prev_close_std ="prev_close_std"
+
+symbol_data_ATR ="symbol_data_ATR"
+
+
 def round_up(i):
 
 	if i<1:
@@ -421,10 +456,41 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 
 	d["historical_data_loaded"] = False
 
+	d[open_high_range] = 0
+	d[open_high_val] = 0
+	d[open_high_std]= 0
+
+	d[open_low_range] = 0
+	d[open_low_val] = 0
+	d[open_low_std] = 0
+
+	d[high_low_range] = 0
+	d[high_low_val] = 0
+	d[high_low_std] = 0
+
+	d[first_5_range] = 0
+	d[first_5_val] = 0
+	d[first_5_std] = 0
+
+	d[first_5_vol_range] = 0
+	d[first_5_vol_val] = 0
+	d[first_5_vol_std] = 0
+
+	d[normal_5_range] = 0
+	d[normal_5_val] = 0
+	d[normal_5_std] = 0
+
+	d[normal_5_vol_range] = 0
+	d[normal_5_vol_val] = 0
+	d[normal_5_vol_std] = 0
+
+	d[prev_close_range] = 0
+	d[prev_close_val] = 0
+	d[prev_close_std] = 0
+
 def load_historical_data(symbol):
 	global data
 	d = data[symbol]
-
 
 	if d["historical_data_loaded"] == False:
 		file = "data/"+symbol+"_"+date.today().strftime("%m%d")+".txt"
@@ -432,12 +498,13 @@ def load_historical_data(symbol):
 		if os.path.isfile(file):
 			print(symbol,"process loading from db.")
 			with open(file) as json_file:
-				d = json.load(json_file)
+				da = json.load(json_file)
 
-			for i in range(len(self.data)):
-				self.data[i][symbol].set(d[i+1])
+			for key,item in da.items():
+				d[key].set(item)
 
 			d["historical_data_loaded"] = True
+			print(symbol,"loaded successful")
 
 
 def historical_eval(symbol):
