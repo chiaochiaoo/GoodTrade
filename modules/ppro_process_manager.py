@@ -560,7 +560,7 @@ def historical_eval(symbol):
 	global data
 	d = data[symbol]
 
-		if d["historical_data_loaded"]:
+	if d["historical_data_loaded"]:
 		#normal ones
 		if d["open_current_range"]>0:
 			d[open_high_eval_alert] = round((d["open_current_range"]-d[open_high_val])/d[open_high_std],1)
