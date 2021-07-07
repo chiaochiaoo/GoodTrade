@@ -85,6 +85,7 @@ class AbstractTrigger:
 
 		for i in self.conditions:
 			s1,s2,t1,t2,type_= self.decode_conditions(i)
+
 			if type_ ==">":
 				if not s1[t1] > s2[t2]:
 					eval = False	
@@ -106,14 +107,19 @@ class AbstractTrigger:
 		3. If time trigger is above 0. Check if it is already triggered. 
 		"""
 		if self.activation:
+			#print(self.conditions)
 			for i in self.conditions:
 				s1,s2,t1,t2,type_= self.decode_conditions(i)
-				if type_ ==">":
-					if not s1[t1] > s2[t2]:
-						eval = False	
-				elif type_ =="<":
-					if not s1[t1] < s2[t2]:
-						eval = False
+
+				try:
+					if type_ ==">":
+						if not s1[t1] > s2[t2]:
+							eval = False	
+					elif type_ =="<":
+						if not s1[t1] < s2[t2]:
+							eval = False
+				except Exception as e:
+					log_print("Error",self.symbol_name,e,self.description)
 
 			if eval ==True:
 
@@ -926,6 +932,7 @@ class FibonacciTrigger(AbstractTrigger):
 
 			#if self.tradingplan.data[POSITION]!="" and self.tradingplan.data[CURRENT_SHARE]>0:
 			#print(self.conditions)
+			#print(self.strategy.fib_level)
 			if self.tradingplan.data[POSITION]!="":
 				return(super().check_conditions())
 
@@ -965,7 +972,8 @@ class FibonacciTrigger(AbstractTrigger):
 		if self.tradingplan.data[USING_STOP]==False:
 			self.set_mind("STOP BYPASSING: ON")
 
-		self.strategy.fib_level +=1
+		if self.strategy.fib_level<4:
+			self.strategy.fib_level +=1
 		self.tradingplan.adjusting_risk()
 		self.tradingplan.update_displays()
 

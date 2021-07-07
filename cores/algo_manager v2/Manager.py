@@ -622,11 +622,14 @@ class Tester:
 
 	def price_stay(self):
 		self.price_stay = True
-
+		self.change_sum = 0
 	def time_facotr_1(self):
 		self.wait_time=1
 
 	def time_factor_10(self):
+		self.wait_time=0.02
+
+	def time_factor_50(self):
 		self.wait_time=0.1
 
 	def price_up(self):
