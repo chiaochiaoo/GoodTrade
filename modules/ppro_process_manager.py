@@ -935,7 +935,8 @@ def range_eval(highs,lows):
 
 	diff = abs(count_a-count_b)
 
-	return round(1-diff/90,2)
+	total = min(90,len(highs))
+	return round(1-diff/total,2)
 
 
 def getinfo(symbol,pipe):
