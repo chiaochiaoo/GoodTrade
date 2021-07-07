@@ -915,8 +915,8 @@ def range_eval(highs,lows):
 
 	#look back 30 minutes. report the one with least amount of change.
 
-	a=highs[-30:]
-	b=lows[-30:]
+	a=highs[-90:]
+	b=lows[-90:]
 
 	count_a=0
 	init = a[0]
@@ -934,7 +934,7 @@ def range_eval(highs,lows):
 
 	diff = abs(count_a-count_b)
 
-	return round(1-diff/30,2)
+	return round(1-diff/90,2)
 
 
 def getinfo(symbol,pipe):
