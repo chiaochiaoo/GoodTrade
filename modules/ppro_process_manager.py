@@ -560,88 +560,89 @@ def historical_eval(symbol):
 	global data
 	d = data[symbol]
 
-	#normal ones
-	if d["open_current_range"]>0:
-		d[open_high_eval_alert] = round((d["open_current_range"]-d[open_high_val])/d[open_high_std],1)
-		d[open_high_eval_value] = "Cur:"+str(d[open_high_eval_alert])+","+"Max:"+str( round((d["oh"]-d[open_high_val])/d[open_high_std],1))
+		if d["historical_data_loaded"]:
+		#normal ones
+		if d["open_current_range"]>0:
+			d[open_high_eval_alert] = round((d["open_current_range"]-d[open_high_val])/d[open_high_std],1)
+			d[open_high_eval_value] = "Cur:"+str(d[open_high_eval_alert])+","+"Max:"+str( round((d["oh"]-d[open_high_val])/d[open_high_std],1))
 
-		d[open_low_eval_alert] =  0
-		d[open_low_eval_value] = "Cur:"+str(d[open_low_eval_alert])+","+"Max:"+str( round((d["ol"]-d[open_low_val])/d[open_low_std],1))
-	else:
-		d[open_high_eval_alert] = 0
-		d[open_high_eval_value] = "Cur:"+str(d[open_high_eval_alert])+","+"Max:"+str( round((d["oh"]-d[open_high_val])/d[open_high_std],1))
+			d[open_low_eval_alert] =  0
+			d[open_low_eval_value] = "Cur:"+str(d[open_low_eval_alert])+","+"Max:"+str( round((d["ol"]-d[open_low_val])/d[open_low_std],1))
+		else:
+			d[open_high_eval_alert] = 0
+			d[open_high_eval_value] = "Cur:"+str(d[open_high_eval_alert])+","+"Max:"+str( round((d["oh"]-d[open_high_val])/d[open_high_std],1))
 
-		d[open_low_eval_alert] =  round((-d["open_current_range"]-d[open_high_val])/d[open_high_std],1)
-		d[open_low_eval_value] = "Cur:"+str(d[open_low_eval_alert])+","+"Max:"+str( round((d["ol"]-d[open_low_val])/d[open_low_std],1))
+			d[open_low_eval_alert] =  round((-d["open_current_range"]-d[open_high_val])/d[open_high_std],1)
+			d[open_low_eval_value] = "Cur:"+str(d[open_low_eval_alert])+","+"Max:"+str( round((d["ol"]-d[open_low_val])/d[open_low_std],1))
 
-	try:
-		d[high_low_alert] =  round((d["range"]-d[high_low_val])/d[high_low_std],1)
-	except:
-		d[high_low_alert] = 0
-	d[high_low_eval] = str(d[high_low_alert])
+		try:
+			d[high_low_alert] =  round((d["range"]-d[high_low_val])/d[high_low_std],1)
+		except:
+			d[high_low_alert] = 0
+		d[high_low_eval] = str(d[high_low_alert])
 
-	try:
-		d[first_5_alert] = round((d["f5r"]-d[first_5_val])/d[first_5_std],1)
-	except:
-		d[first_5_alert] = 0
-	d[first_5_eval] = str(d[first_5_alert])
-	
-	try:
-		d[first_5_vol_alert] =  round((d["f5v"]-d[first_5_vol_val])/d[first_5_vol_std],1)
-	except:
-		d[first_5_vol_alert] =0
-	d[first_5_vol_eval] =str(d[first_5_vol_alert])
-	
-	try:
-		d[normal_5_alert] = round((d["last_5_range"]-d[normal_5_val])/d[normal_5_std],1)
-	except:
-		d[normal_5_alert] = 0
-	d[normal_5_eval] = str(d[normal_5_alert])
-	
-	try:
-		d[normal_5_vol_alert] =  round((d["vol"]-d[normal_5_vol_val])/d[normal_5_vol_std],1)
-	except:
-		d[normal_5_vol_alert] =0
-	d[normal_5_vol_eval] =  str(d[normal_5_vol_alert])
-	
-	try:
-		d[prev_alert] = round((d["prev_close_gap"]-d[prev_close_val])/d[prev_close_std],1)
-	except:
-		d[prev_alert] = 0
-	d[prev_eval] = str(d[prev_alert])
+		try:
+			d[first_5_alert] = round((d["f5r"]-d[first_5_val])/d[first_5_std],1)
+		except:
+			d[first_5_alert] = 0
+		d[first_5_eval] = str(d[first_5_alert])
+		
+		try:
+			d[first_5_vol_alert] =  round((d["f5v"]-d[first_5_vol_val])/d[first_5_vol_std],1)
+		except:
+			d[first_5_vol_alert] =0
+		d[first_5_vol_eval] =str(d[first_5_vol_alert])
+		
+		try:
+			d[normal_5_alert] = round((d["last_5_range"]-d[normal_5_val])/d[normal_5_std],1)
+		except:
+			d[normal_5_alert] = 0
+		d[normal_5_eval] = str(d[normal_5_alert])
+		
+		try:
+			d[normal_5_vol_alert] =  round((d["vol"]-d[normal_5_vol_val])/d[normal_5_vol_std],1)
+		except:
+			d[normal_5_vol_alert] =0
+		d[normal_5_vol_eval] =  str(d[normal_5_vol_alert])
+		
+		try:
+			d[prev_alert] = round((d["prev_close_gap"]-d[prev_close_val])/d[prev_close_std],1)
+		except:
+			d[prev_alert] = 0
+		d[prev_eval] = str(d[prev_alert])
 
-	#ones with current vals. 
-	# d[open_high_range] = 0
-	# d[open_high_val] = 0
-	# d[open_high_std]= 0
+		#ones with current vals. 
+		# d[open_high_range] = 0
+		# d[open_high_val] = 0
+		# d[open_high_std]= 0
 
-	# d[open_low_range] = 0
-	# d[open_low_val] = 0
-	# d[open_low_std] = 0
+		# d[open_low_range] = 0
+		# d[open_low_val] = 0
+		# d[open_low_std] = 0
 
-	# d[high_low_range] = 0
-	# d[high_low_val] = 0
-	# d[high_low_std] = 0
+		# d[high_low_range] = 0
+		# d[high_low_val] = 0
+		# d[high_low_std] = 0
 
-	# d[first_5_range] = 0
-	# d[first_5_val] = 0
-	# d[first_5_std] = 0
+		# d[first_5_range] = 0
+		# d[first_5_val] = 0
+		# d[first_5_std] = 0
 
-	# d[first_5_vol_range] = 0
-	# d[first_5_vol_val] = 0
-	# d[first_5_vol_std] = 0
+		# d[first_5_vol_range] = 0
+		# d[first_5_vol_val] = 0
+		# d[first_5_vol_std] = 0
 
-	# d[normal_5_range] = 0
-	# d[normal_5_val] = 0
-	# d[normal_5_std] = 0
+		# d[normal_5_range] = 0
+		# d[normal_5_val] = 0
+		# d[normal_5_std] = 0
 
-	# d[normal_5_vol_range] = 0
-	# d[normal_5_vol_val] = 0
-	# d[normal_5_vol_std] = 0
+		# d[normal_5_vol_range] = 0
+		# d[normal_5_vol_val] = 0
+		# d[normal_5_vol_std] = 0
 
-	# d[prev_close_range] = 0
-	# d[prev_close_val] = 0
-	# d[prev_close_std] = 0
+		# d[prev_close_range] = 0
+		# d[prev_close_val] = 0
+		# d[prev_close_std] = 0
 
 
 def process_and_send(lst,pipe):
