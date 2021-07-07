@@ -33,6 +33,30 @@ symbol_percentage_last_5 = "symbol_percentage_last_5"
 symbol_position_status = "symbol_position_status"
 
 
+open_high_eval_alert = "open_high_eval_alert"
+open_high_eval_value = "open_high_eval_value"
+
+open_low_eval_alert = "open_low_eval_alert"
+open_low_eval_value = "open_low_eval_value"
+
+high_low_alert = "high_low_alert"
+high_low_eval = "high_low_eval"
+
+first_5_eval = "first_5_eval"
+first_5_alert ="first_5_alert"
+first_5_vol_eval ="first_5_vol_eval"
+first_5_vol_alert = "first_5_vol_alert"
+
+normal_5_eval = "normal_5_eval"
+normal_5_alert =  "normal_5_alert"
+
+normal_5_vol_eval = "normal_5_vol_eval"
+normal_5_vol_alert =  "normal_5_vol_alert"
+
+prev_eval = "prev_eval"
+prev_alert = "prev_alert"
+
+
 open_high_range ="open_high_range"
 open_high_val ="open_high_val"
 open_high_std ="open_high_std"
@@ -294,10 +318,6 @@ class Symbol_data_manager:
 		self.data_list[symbol_data_ATR] = self.symbol_data_ATR
 
 
-
-
-
-
 		self.data_ready = {}
 
 		#self.symbol_data_openhigh_dis,self,symbol_data_openlow_dis,self.symbol_data_range_dis
@@ -328,6 +348,7 @@ class Symbol_data_manager:
 		symbol_percentage_last_5,
 		symbol_position_status]
 
+
 		self.update_list = {}
 
 		self.update_list[symbol_status] = self.symbol_status
@@ -354,6 +375,31 @@ class Symbol_data_manager:
 		self.update_list[symbol_percentage_last_5] = self.symbol_percentage_last_5
 		self.update_list[symbol_position_status] = self.symbol_position_status
 		
+
+
+		self.update_list[open_high_eval_alert] = self.alert_oh_val
+		self.update_list[open_high_eval_value] = self.symbol_data_openhigh_eval
+
+		self.update_list[open_low_eval_alert] = self.alert_ol_val
+		self.update_list[open_low_eval_value] = self.symbol_data_openlow_eval
+
+		self.update_list[high_low_alert] = self.alert_hl_val
+		self.update_list[high_low_eval] = self.symbol_data_range_eval
+
+		self.update_list[first_5_eval] = self.symbol_data_first5_range_eval
+		self.update_list[first_5_alert] = self.alert_openning_rg_val
+		self.update_list[first_5_vol_eval] = self.symbol_data_first5_vol_eval
+		self.update_list[first_5_vol_alert] = self.alert_openning_vol_val
+
+		self.update_list[normal_5_eval] = self.symbol_data_normal5_range_eval
+		self.update_list[normal_5_alert] =self.alert_recent5_rg
+
+		self.update_list[normal_5_vol_eval] = self.symbol_data_normal5_vol_eval
+		self.update_list[normal_5_vol_alert] = self.alert_recent5_vol
+										
+		self.update_list[prev_eval] = self.symbol_data_prev_close_eval
+		self.update_list[prev_alert] = self.alert_prev_val
+
 		# self.update_list = [self.symbol_status,self.symbol_price,self.symbol_update_time,
 		# self.minute_timestamp_val,
 		# self.symbol_price_high,

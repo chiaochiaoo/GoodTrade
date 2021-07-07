@@ -73,6 +73,30 @@ prev_close_std ="prev_close_std"
 symbol_data_ATR ="symbol_data_ATR"
 
 
+open_high_eval_alert = "open_high_eval_alert"
+open_high_eval_value = "open_high_eval_value"
+
+open_low_eval_alert = "open_low_eval_alert"
+open_low_eval_value = "open_low_eval_value"
+
+high_low_alert = "high_low_alert"
+high_low_eval = "high_low_eval"
+
+first_5_eval = "first_5_eval"
+first_5_alert ="first_5_alert"
+first_5_vol_eval ="first_5_vol_eval"
+first_5_vol_alert = "first_5_vol_alert"
+
+normal_5_eval = "normal_5_eval"
+normal_5_alert =  "normal_5_alert"
+
+normal_5_vol_eval = "normal_5_vol_eval"
+normal_5_vol_alert =  "normal_5_vol_alert"
+
+prev_eval = "prev_eval"
+prev_alert = "prev_alert"
+
+
 def round_up(i):
 
 	if i<1:
@@ -488,6 +512,30 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 	d[prev_close_val] = 0
 	d[prev_close_std] = 0
 
+	################## ALERTS ########################
+	d[open_high_eval_alert] = 0
+	d[open_high_eval_value] = "0"
+
+	d[open_low_eval_alert] = 0
+	d[open_low_eval_value] = "0"
+
+	d[high_low_alert] = 0
+	d[high_low_eval] = "0"
+
+	d[first_5_eval] = "0"
+	d[first_5_alert] = 0
+	d[first_5_vol_eval] = "0"
+	d[first_5_vol_alert] = 0
+
+	d[normal_5_eval] = "0"
+	d[normal_5_alert] = 0
+
+	d[normal_5_vol_eval] = "0"
+	d[normal_5_vol_alert] = 0
+
+	d[prev_eval] = "0"
+	d[prev_alert] = 0
+
 def load_historical_data(symbol):
 	global data
 	d = data[symbol]
@@ -509,19 +557,91 @@ def load_historical_data(symbol):
 
 def historical_eval(symbol):
 
-	global data_historical
+	global data
+	d = data[symbol]
 
-	#try to see if the file exist.
-	if symbol not in data_historical:
-		date.today().strftime("%m%d")
+	#normal ones
+	if d["open_current_range"]>0:
+		d[open_high_eval_alert] = round((d["open_current_range"]-d[open_high_val])/d[open_high_std],1)
+		d[open_high_eval_value] = "Cur:"+str(d[open_high_eval_alert])+","+"Max:"+str( round((d["oh"]-d[open_high_val])/d[open_high_std],1))
 
-		file = "data/"+symbol+"_"+self.today+".txt"
+		d[open_low_eval_alert] =  0
+		d[open_low_eval_value] = "Cur:"+str(d[open_low_eval_alert])+","+"Max:"+str( round((d["ol"]-d[open_low_val])/d[open_low_std],1))
+	else:
+		d[open_high_eval_alert] = 0
+		d[open_high_eval_value] = "Cur:"+str(d[open_high_eval_alert])+","+"Max:"+str( round((d["oh"]-d[open_high_val])/d[open_high_std],1))
 
-		if os.path.isfile(file):
-			with open(file) as json_file:
-				d = json.load(json_file)
+		d[open_low_eval_alert] =  round((-d["open_current_range"]-d[open_high_val])/d[open_high_std],1)
+		d[open_low_eval_value] = "Cur:"+str(d[open_low_eval_alert])+","+"Max:"+str( round((d["ol"]-d[open_low_val])/d[open_low_std],1))
 
-			self.data_status[symbol].set(True)
+	try:
+		d[high_low_alert] =  round((d["range"]-d[high_low_val])/d[high_low_std],1)
+	except:
+		d[high_low_alert] = 0
+	d[high_low_eval] = str(d[high_low_alert])
+
+	try:
+		d[first_5_alert] = round((d["f5r"]-d[first_5_val])/d[first_5_std],1)
+	except:
+		d[first_5_alert] = 0
+	d[first_5_eval] = str(d[first_5_alert])
+	
+	try:
+		d[first_5_vol_alert] =  round((d["f5v"]-d[first_5_vol_val])/d[first_5_vol_std],1)
+	except:
+		d[first_5_vol_alert] =0
+	d[first_5_vol_eval] =str(d[first_5_vol_alert])
+	
+	try:
+		d[normal_5_alert] = round((d["last_5_range"]-d[normal_5_val])/d[normal_5_std],1)
+	except:
+		d[normal_5_alert] = 0
+	d[normal_5_eval] = str(d[normal_5_alert])
+	
+	try:
+		d[normal_5_vol_alert] =  round((d["vol"]-d[normal_5_vol_val])/d[normal_5_vol_std],1)
+	except:
+		d[normal_5_vol_alert] =0
+	d[normal_5_vol_eval] =  str(d[normal_5_vol_alert])
+	
+	try:
+		d[prev_alert] = round((d["prev_close_gap"]-d[prev_close_val])/d[prev_close_std],1)
+	except:
+		d[prev_alert] = 0
+	d[prev_eval] = str(d[prev_alert])
+
+	#ones with current vals. 
+	# d[open_high_range] = 0
+	# d[open_high_val] = 0
+	# d[open_high_std]= 0
+
+	# d[open_low_range] = 0
+	# d[open_low_val] = 0
+	# d[open_low_std] = 0
+
+	# d[high_low_range] = 0
+	# d[high_low_val] = 0
+	# d[high_low_std] = 0
+
+	# d[first_5_range] = 0
+	# d[first_5_val] = 0
+	# d[first_5_std] = 0
+
+	# d[first_5_vol_range] = 0
+	# d[first_5_vol_val] = 0
+	# d[first_5_vol_std] = 0
+
+	# d[normal_5_range] = 0
+	# d[normal_5_val] = 0
+	# d[normal_5_std] = 0
+
+	# d[normal_5_vol_range] = 0
+	# d[normal_5_vol_val] = 0
+	# d[normal_5_vol_std] = 0
+
+	# d[prev_close_range] = 0
+	# d[prev_close_val] = 0
+	# d[prev_close_std] = 0
 
 
 def process_and_send(lst,pipe):
@@ -695,7 +815,7 @@ def process_and_send(lst,pipe):
 
 	#### Historical Eval ####
 	load_historical_data(symbol)
-
+	historical_eval(symbol)
 	update_list={}
 
 	send_list={}
@@ -734,6 +854,29 @@ def process_and_send(lst,pipe):
 		update_list[symbol_percentage_last_5] = d["last_5_range_percentage"]
 		update_list[symbol_position_status] = d["status"]
 
+
+		update_list[open_high_eval_alert] = d[open_high_eval_alert] 
+		update_list[open_high_eval_value] = d[open_high_eval_value]
+
+		update_list[open_low_eval_alert] = d[open_low_eval_alert] 
+		update_list[open_low_eval_value] = d[open_low_eval_value] 
+
+		update_list[high_low_alert] = d[high_low_alert] 
+		update_list[high_low_eval] = d[high_low_eval] 
+
+		update_list[first_5_eval] = d[first_5_eval]
+		update_list[first_5_alert] = d[first_5_alert] 
+		update_list[first_5_vol_eval] = d[first_5_vol_eval] 
+		update_list[first_5_vol_alert] = d[first_5_vol_alert] 
+
+		update_list[normal_5_eval] = d[normal_5_eval] 
+		update_list[normal_5_alert] = d[normal_5_alert] 
+
+		update_list[normal_5_vol_eval] = d[normal_5_vol_eval]
+		update_list[normal_5_vol_alert] = d[normal_5_vol_alert] 
+		update_list[prev_eval] = d[prev_eval] 
+		update_list[prev_alert] = d[prev_alert] 
+						
 	#check the list. del if repeate.
 	for key,item in update_list.items():
 
