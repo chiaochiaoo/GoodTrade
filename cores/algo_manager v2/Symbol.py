@@ -28,7 +28,7 @@ class Symbol:
 		self.count = 0
 		self.last_ts = 0
 		self.init_ts = 0
-
+		self.stats = stats
 		self.mind = None
 		self.mind_label = None
 
@@ -175,6 +175,9 @@ class Symbol:
 		self.data[RESISTENCE]=v
 
 
+	def get_stats(self):
+		return self.stats
+		
 	def get_data(self):
 		return self.data
 

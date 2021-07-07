@@ -14,5 +14,6 @@ data/
 debug.log
 list.txt
 signals/
+algo_orders/
 cores/commlink.json
 

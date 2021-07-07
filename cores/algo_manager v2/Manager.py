@@ -446,6 +446,31 @@ class Manager:
 	def cancel_all(self):
 		for d in self.tradingplan.values():
 			d.cancel_algo()
+
+	def export_algos(self):
+
+		export = []
+		count = 0
+		for d in self.tradingplan.values():
+			entryplan = d.tkvars[ENTRYPLAN].get()
+			symbol =d.symbol_name
+			support = d.symbol.get_support()
+			resistence =  d.symbol.get_resistence()
+			risk = d.data[ESTRISK]
+			stats = d.symbol.get_stats()
+			export.append([entryplan,symbol,support,resistence,risk,stats])
+
+		with open("../../algo_orders/"+"algo_setting", 'w') as outfile:
+			json.dump(export, outfile)
+
+	def import_algos(self):
+
+		with open("../../algo_orders/"+"algo_setting") as outfile:
+			algo_file = json.load(outfile)
+
+		for i in algo_file:
+			self.add_new_tradingplan(i,self.test_mode)
+
 	
 class Tester:
 

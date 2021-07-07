@@ -282,8 +282,6 @@ class BreakFirst(EntryStrategy):
 
 
 
-
-
 class Bullish(EntryStrategy):
 	def __init__(self,timer,repeat,symbol,tradingplan):
 
