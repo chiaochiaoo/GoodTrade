@@ -177,7 +177,6 @@ class Symbol:
 
 	def get_stats(self):
 		return self.stats
-		
 	def get_data(self):
 		return self.data
 

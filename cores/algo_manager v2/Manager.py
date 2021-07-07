@@ -452,24 +452,26 @@ class Manager:
 
 	def export_algos(self):
 
-		if 1:
+		try:
 			export = []
-			count = 0
+
 			for d in self.tradingplan.values():
-				entryplan = d.tkvars[ENTRYPLAN].get()
-				symbol =d.symbol_name
-				support = d.symbol.data[SUPPORT]
-				resistence =  d.symbol.data[RESISTENCE]
-				risk = d.data[ESTRISK]
-				stats = d.symbol.get_stats()
-				export.append([entryplan,symbol,support,resistence,risk,stats])
+
+				if d.tkvars[STATUS].get()==PENDING:
+					entryplan = d.tkvars[ENTRYPLAN].get()
+					symbol =d.symbol_name
+					support = d.symbol.data[SUPPORT]
+					resistence =  d.symbol.data[RESISTENCE]
+					risk = d.data[ESTRISK]
+					stats = d.symbol.get_stats()
+					export.append([entryplan,symbol,support,resistence,risk,stats])
 
 			with open("../../algo_orders/"+"algo_setups", 'w') as outfile:
 				json.dump(export, outfile)
 			self.ui.set_command_text("Export successful.")
-		# except Exception as e:
-		# 	log_print("Export failed:",e)
-		# 	self.ui.set_command_text("Export failed.plz send log to chiao ")
+		except Exception as e:
+			log_print("Export failed:",e)
+			self.ui.set_command_text("Export failed.plz send log to chiao ")
 
 	def import_algos(self):
 
