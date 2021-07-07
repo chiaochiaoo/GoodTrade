@@ -68,7 +68,7 @@ class TNV_Scanner():
 
 		self.volatility_scanner = Volatility_break(self.vb_frame,NT)
 		self.open_reversal = Open_Reversal(self.or_frame,NT)
-		self.open_break = Volatility_break(self.ob_frame,NT)
+		self.open_break = Open_Break(self.ob_frame,NT)
 		#self.update_entry()
 
 	def update_entry(self,data):
@@ -375,11 +375,9 @@ class Open_Break():
 		#at most 8.
 
 		#["Symbol","A.Vol","Rel.V","Br.SCORE","5M","SO%","SC%","Listed","Since","Last","Ignore","Add"]
-		df = data[0]
-		timestamp = data[1]
+		df = data
 
-		self.NT_stat["text"] = "Last update: "+timestamp
-		print("open break is here")
+
 		df.to_csv("open_break_out.csv")
 		entry = 0
 

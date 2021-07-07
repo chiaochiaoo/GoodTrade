@@ -96,85 +96,84 @@ class util_client:
 
 			d = self.util_request.recv()
 			#print("receiving:",d)
+			try:
+				if len(d)>0:
 
-			if len(d)>0:
+					print(d[0])
+					######### SCANNER PART ############
+					if d[0]=="Database Request":
+						#print("send send send",d)
+						self.util_request.send(d)
 
-				print(d[0])
+					elif d[0]=="Finviz Request":
 
+						self.util_request.send(d)
 
-				######### SCANNER PART ############
-				if d[0]=="Database Request":
-					#print("send send send",d)
-					self.util_request.send(d)
-
-				elif d[0]=="Finviz Request":
-
-					self.util_request.send(d)
-
-				elif d[0]=="NasdaqTrader update":
-					self.pannel.add_nasdaq_labels(d[1])
-					try:
+					elif d[0]=="NasdaqTrader update":
 						self.pannel.add_nasdaq_labels(d[1])
-					except Exception as e:
-						print("Error updating Nasdaq:",e)
+						try:
+							self.pannel.add_nasdaq_labels(d[1])
+						except Exception as e:
+							print("Error updating Nasdaq:",e)
 
-				elif d[0]=="Scanner update":
-					self.pannel.update_TNVscanner(d[1])
-					try:
+					elif d[0]=="Scanner update":
 						self.pannel.update_TNVscanner(d[1])
-					except Exception as e:
-						print("Error updating Nasdaq:",e)
+						try:
+							self.pannel.update_TNVscanner(d[1])
+						except Exception as e:
+							print("Error updating Nasdaq:",e)
 
-				elif d[0] =="Database Response":
+					elif d[0] =="Database Response":
 
-					dic = d[1]
-					#print(dic)
-					for symbol,d in dic.items():
-						#if len(d)-1 == len(self.data):
-						for key,item in d.items():
-							self.data[key][symbol].set(item)
+						dic = d[1]
+						#print(dic)
+						for symbol,d in dic.items():
+							#if len(d)-1 == len(self.data):
+							for key,item in d.items():
+								self.data[key][symbol].set(item)
 
-						# for i in range(len(self.data)):
-						# 	self.data[i][symbol].set(d[i+1])
+							# for i in range(len(self.data)):
+							# 	self.data[i][symbol].set(d[i+1])
 
-						self.data_status[symbol].set(True)
+							self.data_status[symbol].set(True)
 
-						file = "data/"+symbol+"_"+self.today+".txt"
-						with open(file, 'w') as outfile:
-								json.dump(d, outfile)
+							file = "data/"+symbol+"_"+self.today+".txt"
+							with open(file, 'w') as outfile:
+									json.dump(d, outfile)
 
-							#save the file here.
+								#save the file here.
 
-				elif d[0] =="Finviz Response":
-					try:
-						self.pannel.add_labels(d)
-					except Exception as e:
-						print("Error updating finviz:",e)
+					elif d[0] =="Finviz Response":
+						try:
+							self.pannel.add_labels(d)
+						except Exception as e:
+							print("Error updating finviz:",e)
 
 
-				########## ALGO PART ###############
-				elif d[0] =="Algo placed":
-					symbols = d[1]
-					#button. 
-					for symbol in symbols:
-						self.symbol_data_manager.algo_breakout_placement[symbol].set("Placed")
-				elif d[0] =="algo manager":
-	
-					status = d[1]
-					if status == "Connected":
-						self.symbol_data_manager.algo_manager_connected.set("AM:True")
+					########## ALGO PART ###############
+					elif d[0] =="Algo placed":
+						symbols = d[1]
+						#button. 
+						for symbol in symbols:
+							self.symbol_data_manager.algo_breakout_placement[symbol].set("Placed")
+					elif d[0] =="algo manager":
+		
+						status = d[1]
+						if status == "Connected":
+							self.symbol_data_manager.algo_manager_connected.set("AM:True")
+						else:
+							self.symbol_data_manager.algo_manager_connected.set("AM:False")
+					elif d[0] =="socket":
+						status = d[1]
+						if status == "Connected":
+							self.symbol_data_manager.algo_socket.set("Socket:True")
+						else:
+							self.symbol_data_manager.algo_socket.set("Socket:False")
+
 					else:
-						self.symbol_data_manager.algo_manager_connected.set("AM:False")
-				elif d[0] =="socket":
-					status = d[1]
-					if status == "Connected":
-						self.symbol_data_manager.algo_socket.set("Socket:True")
-					else:
-						self.symbol_data_manager.algo_socket.set("Socket:False")
-
-				else:
-					print("unkown server package:",d)
-
+						print("unkown server package:",d)
+			except Exception as e:
+				print("Util receive:",e)
 
 def util_comms(ulti_response): #connects to server for db, nt, and finviz. 
 
