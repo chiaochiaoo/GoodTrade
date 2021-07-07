@@ -77,12 +77,13 @@ class TNV_Scanner():
 		for key,item in data[0].items():
 			if key == "Volitality_Break":
 				self.volatility_scanner.update_entry(item)
+				#item.to_csv("1.csv")
 			elif key == "Open_Reseral":
 				self.open_reversal.update_entry(item)
-
+				#item.to_csv("2.csv")
 			elif key == "Open_Break":
 				self.open_break.update_entry(item)
-
+				#item.to_csv("3.csv")
 class Volatility_break():
 	def __init__(self,root,NT):
 
@@ -192,7 +193,7 @@ class Volatility_break():
 					self.entries[entry][i]["text"] = ""
 				entry+=1
 		except Exception as e:
-			print("TNV scanner construction:",e)
+			print("TNV scanner construction voli:",e)
 
 class Open_Reversal():
 	def __init__(self,root,NT):
@@ -299,14 +300,14 @@ class Open_Reversal():
 					self.entries[entry][i]["text"] = ""
 				entry+=1
 
-			keep = ['Symbol', "Signal Time", 'rel vol', 'SC', 'reversalside','reversal_score','Signal Time',]
+			# keep = ['Symbol', "Signal Time", 'rel vol', 'SC', 'reversalside','reversal_score','Signal Time',]
 
-			for i in df.columns:
-				if i not in keep:
-					df.pop(i)
+			# for i in df.columns:
+			# 	if i not in keep:
+			# 		df.pop(i)
 			df.to_csv(self.file)
 		except Exception as e:
-			print("TNV scanner construction:",e)
+			print("TNV scanner construction open reversal:",e)
 
 class Open_Break():
 	def __init__(self,root,NT):
@@ -417,7 +418,7 @@ class Open_Break():
 				entry+=1
 
 		except Exception as e:
-			print("TNV scanner construction:",e)
+			print("TNV scanner construction open break:",e)
 
 if __name__ == '__main__':
 

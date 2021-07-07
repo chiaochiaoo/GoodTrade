@@ -114,14 +114,14 @@ class util_client:
 						try:
 							self.pannel.add_nasdaq_labels(d[1])
 						except Exception as e:
-							print("Error updating Nasdaq:",e)
+							print("Error updating NasdaqTrader:",e)
 
 					elif d[0]=="Scanner update":
 						self.pannel.update_TNVscanner(d[1])
-						try:
+						if 1:
 							self.pannel.update_TNVscanner(d[1])
-						except Exception as e:
-							print("Error updating Nasdaq:",e)
+						# except Exception as e:
+						# 	print("Error updating Nasdaq:",e)
 
 					elif d[0] =="Database Response":
 
