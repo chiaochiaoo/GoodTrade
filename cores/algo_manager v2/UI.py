@@ -78,55 +78,72 @@ class UI(pannel):
 
 		ttk.Label(self.config, text="All timer:").grid(sticky="w",column=1,row=5,padx=10)
 
-		ttk.Label(self.config, text="All EnPlan:").grid(sticky="w",column=1,row=6,padx=10)
+		ttk.Label(self.config, text="All Risk:").grid(sticky="w",column=1,row=6,padx=10)
 
-		ttk.Label(self.config, text="All EnType:").grid(sticky="w",column=1,row=7,padx=10)
+		ttk.Label(self.config, text="All EnPlan:").grid(sticky="w",column=1,row=7,padx=10)
 
-		ttk.Label(self.config, text="All Manaplan:",anchor="w").grid(sticky="w",column=1,row=8,padx=10)
+		ttk.Label(self.config, text="All EnType:").grid(sticky="w",column=1,row=8,padx=10)
+
+		ttk.Label(self.config, text="All Manaplan:",anchor="w").grid(sticky="w",column=1,row=9,padx=10)
+
+
 
 		self.all_timer = tk.DoubleVar(value=0)
 		tk.Entry(self.config,textvariable=self.all_timer,width=5).grid(sticky="w",column=2,row=5,padx=10)
 
+		self.all_risk = tk.DoubleVar(value=50)
+		tk.Entry(self.config,textvariable=self.all_risk,width=5).grid(sticky="w",column=2,row=6,padx=10)
+
+
+
 		self.all_enp = tk.StringVar(value=BREAKFIRST)
-		tk.OptionMenu(self.config, self.all_enp, *sorted(self.entry_plan_options)).grid(sticky="w",column=2,row=6,padx=10)
+		tk.OptionMenu(self.config, self.all_enp, *sorted(self.entry_plan_options)).grid(sticky="w",column=2,row=7,padx=10)
 
 		self.all_ent = tk.StringVar(value=INCREMENTAL)
-		tk.OptionMenu(self.config, self.all_ent, *sorted(self.entry_type_options)).grid(sticky="w",column=2,row=7,padx=10)
+		tk.OptionMenu(self.config, self.all_ent, *sorted(self.entry_type_options)).grid(sticky="w",column=2,row=8,padx=10)
 
 		self.all_mana = tk.StringVar(value=ONETOTWORISKREWARD)
-		tk.OptionMenu(self.config, self.all_mana, *sorted(self.management_plan_options)).grid(sticky="w",column=2,row=8,padx=10)
+		tk.OptionMenu(self.config, self.all_mana, *sorted(self.management_plan_options)).grid(sticky="w",column=2,row=9,padx=10)
 
 		self.algo_deploy = ttk.Button(self.config, text="Apply to selected",command=self.manager.set_selected_tp)#,command=self.manager.set_all_tp)
-		self.algo_deploy.grid(column=1,row=9)
+		self.algo_deploy.grid(column=1,row=10)
 
 		self.algo_deploy = ttk.Button(self.config, text="Apply to all",command=self.manager.set_all_tp)#,command=self.deploy_all_stoporders)
-		self.algo_deploy.grid(column=2,row=9)
+		self.algo_deploy.grid(column=2,row=10)
 
 
-
+	def set_command_text(self,string):
+		self.command_text.set(string)
 
 	def init_command(self):
 
+		self.command_text = tk.StringVar(value="Ready:")
+
+		ttk.Label(self.cmd, text="").grid(sticky="w",column=1,row=1)
+
+		ttk.Label(self.cmd, textvariable=self.command_text).place(x=0,y=0)
+
+
 
 		self.algo_deploy = ttk.Button(self.cmd, text="Deploy all algo",command=self.manager.deploy_all)#,command=self.deploy_all_stoporders)
-		self.algo_deploy.grid(sticky="w",column=1,row=1)
+		self.algo_deploy.grid(sticky="w",column=1,row=2)
 
 		self.algo_pend = ttk.Button(self.cmd, text="Withdraw all algo",command=self.manager.withdraw_all)#,command=self.cancel_all_stoporders)
-		self.algo_pend.grid(sticky="w",column=2,row=1)
+		self.algo_pend.grid(sticky="w",column=2,row=2)
 
 		self.flatten = ttk.Button(self.cmd, text="Flatten all algo",command=self.manager.flatten_all)
-		self.flatten.grid(sticky="w",column=1,row=2)
-
-		self.algo_cancel = ttk.Button(self.cmd, text="Cancel all algo",command=self.manager.cancel_all)
-		self.algo_cancel.grid(sticky="w",column=2,row=2)
-
-		self.flatten = ttk.Button(self.cmd, text="Export Algos",command=self.manager.export_algos)
 		self.flatten.grid(sticky="w",column=1,row=3)
 
-		self.algo_cancel = ttk.Button(self.cmd, text="Import Algos",command=self.manager.import_algos)
+		self.algo_cancel = ttk.Button(self.cmd, text="Cancel all algo",command=self.manager.cancel_all)
 		self.algo_cancel.grid(sticky="w",column=2,row=3)
 
-		row=3
+		self.flatten = ttk.Button(self.cmd, text="Export Algos",command=self.manager.export_algos)
+		self.flatten.grid(sticky="w",column=1,row=4)
+
+		self.algo_cancel = ttk.Button(self.cmd, text="Import Algos",command=self.manager.import_algos)
+		self.algo_cancel.grid(sticky="w",column=2,row=4)
+
+		row=5
 		ttk.Label(self.cmd, text=" ").grid(sticky="w",column=1,row=row)
 		row+=1
 		ttk.Label(self.cmd, text="All Active Longs:").grid(sticky="w",column=1,row=row)
@@ -195,10 +212,10 @@ class UI(pannel):
 		self.init_HQ_pannel()
 
 		self.config = ttk.LabelFrame(self.root,text="Config") 
-		self.config.place(x=10,y=140,height=160,width=210)
+		self.config.place(x=10,y=140,height=200,width=210)
 
 		self.cmd = ttk.LabelFrame(self.root,text="Command") 
-		self.cmd.place(x=10,y=310,height=400,width=210)
+		self.cmd.place(x=10,y=350,height=500,width=210)
 
 
 		self.init_config_pannel()

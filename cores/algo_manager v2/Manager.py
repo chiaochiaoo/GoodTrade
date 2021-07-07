@@ -387,12 +387,15 @@ class Manager:
 		ep=self.ui.all_enp.get()
 		et=self.ui.all_ent.get()
 		managment=self.ui.all_mana.get() 
-
+		risk = int(self.ui.all_risk.get())
 		for d in self.tradingplan.values():
 			d.tkvars[ENTRYPLAN].set(ep)
 			d.tkvars[ENTYPE].set(et)
 			d.tkvars[MANAGEMENTPLAN].set(managment)
 			d.tkvars[TIMER].set(timer)
+			d.data[ESTRISK] = risk
+			d.tkvars[ESTRISK].set(risk)
+			d.adjusting_risk()
 
 	def set_selected_tp(self):
 
@@ -449,27 +452,37 @@ class Manager:
 
 	def export_algos(self):
 
-		export = []
-		count = 0
-		for d in self.tradingplan.values():
-			entryplan = d.tkvars[ENTRYPLAN].get()
-			symbol =d.symbol_name
-			support = d.symbol.get_support()
-			resistence =  d.symbol.get_resistence()
-			risk = d.data[ESTRISK]
-			stats = d.symbol.get_stats()
-			export.append([entryplan,symbol,support,resistence,risk,stats])
+		if 1:
+			export = []
+			count = 0
+			for d in self.tradingplan.values():
+				entryplan = d.tkvars[ENTRYPLAN].get()
+				symbol =d.symbol_name
+				support = d.symbol.data[SUPPORT]
+				resistence =  d.symbol.data[RESISTENCE]
+				risk = d.data[ESTRISK]
+				stats = d.symbol.get_stats()
+				export.append([entryplan,symbol,support,resistence,risk,stats])
 
-		with open("../../algo_orders/"+"algo_setting", 'w') as outfile:
-			json.dump(export, outfile)
+			with open("../../algo_orders/"+"algo_setting", 'w') as outfile:
+				json.dump(export, outfile)
+			self.ui.set_command_text("Export successful.")
+		# except Exception as e:
+		# 	log_print("Export failed:",e)
+		# 	self.ui.set_command_text("Export failed.plz send log to chiao ")
 
 	def import_algos(self):
 
-		with open("../../algo_orders/"+"algo_setting") as outfile:
-			algo_file = json.load(outfile)
+		try:
+			with open("../../algo_orders/"+"algo_setting") as outfile:
+				algo_file = json.load(outfile)
 
-		for i in algo_file:
-			self.add_new_tradingplan(i,self.test_mode)
+			for i in algo_file:
+				self.add_new_tradingplan(i,self.test_mode)
+			self.ui.set_command_text("Import successful.")
+		except Exception as e:
+			log_print("Import failed:",e)
+			self.ui.set_command_text("Import failed.plz send log to chiao ")
 
 	
 class Tester:
