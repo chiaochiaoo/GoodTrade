@@ -466,7 +466,7 @@ class Manager:
 					stats = d.symbol.get_stats()
 					export.append([entryplan,symbol,support,resistence,risk,stats])
 
-			with open("../../algo_orders/"+"algo_setups", 'w') as outfile:
+			with open("../../algo_setups/"+"algo_setups", 'w') as outfile:
 				json.dump(export, outfile)
 			self.ui.set_command_text("Export successful.")
 		except Exception as e:
@@ -476,7 +476,7 @@ class Manager:
 	def import_algos(self):
 
 		try:
-			with open("../../algo_orders/"+"algo_setups") as outfile:
+			with open("../../algo_setups/"+"algo_setups") as outfile:
 				algo_file = json.load(outfile)
 
 			for i in algo_file:
