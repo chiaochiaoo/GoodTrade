@@ -26,7 +26,7 @@ class UI(pannel):
 
 	def option_values(self):
 
-		self.entry_type_options = {INSTANT,INCREMENTAL}
+		self.entry_type_options = {INSTANT,INCREMENTAL,INCREMENTAL2}
 
 		self.entry_plan_options = {BREAISH,BULLISH,BREAKUP,BREAKDOWN,BREAKFIRST,BREAKANY,RIPSELL,DIPBUY,FADEANY}
 
@@ -122,7 +122,6 @@ class UI(pannel):
 		ttk.Label(self.cmd, text="").grid(sticky="w",column=1,row=1)
 
 		ttk.Label(self.cmd, textvariable=self.command_text).place(x=0,y=0)
-
 
 
 		self.algo_deploy = ttk.Button(self.cmd, text="Deploy all algo",command=self.manager.deploy_all)#,command=self.deploy_all_stoporders)

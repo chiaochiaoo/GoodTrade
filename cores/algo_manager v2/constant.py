@@ -109,6 +109,7 @@ SHORT = "Short"
 #Entry Type
 INSTANT=      'Instant'
 INCREMENTAL = 'Incrmntl'
+INCREMENTAL2 = 'NewIncremtl'
 
 #Entry Plan
 BREAISH =   "  Bearish"

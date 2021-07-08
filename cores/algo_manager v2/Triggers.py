@@ -125,6 +125,9 @@ class AbstractTrigger:
 
 				if self.trigger_timer == 0:
 					return self.is_trigger()
+				###add a special case for the new incremental.###				
+				elif self.trigger_count == 0 and self.trigger_limit == 5:
+					return self.is_trigger()
 				else:
 					if not self.triggered:
 						self.triggered = True
@@ -725,9 +728,9 @@ class Break_any_Purchase_trigger(AbstractTrigger):
 				log_print(self.symbol_name,"entry near completion, using day low as new stop,low:",self.symbol_data[LOW]," adjusted:",mid_," risk per share:",risk_per_share)
 				self.stop_price = self.symbol_data[LOW]
 
-			if risk_per_share < self.symbol_data[ASK]*0.0006:
-				log_print(self.symbol_name,": stop too close:",round(risk_per_share,2)," adjusted to",str(round(self.symbol_data[ASK]*0.0006,2)))
-				risk_per_share = self.symbol_data[ASK]*0.0006
+			if risk_per_share < self.symbol_data[ASK]*0.0012:
+				log_print(self.symbol_name,": stop too close:",round(risk_per_share,2)," adjusted to",str(round(self.symbol_data[ASK]*0.0012,2)))
+				risk_per_share = self.symbol_data[ASK]*0.0012
 
 				#overwrite the stop price here
 				self.stop_price = round(self.symbol_data[BID] - risk_per_share,2)
@@ -744,19 +747,20 @@ class Break_any_Purchase_trigger(AbstractTrigger):
 				log_print(self.symbol_name,"entry near completion, using day high as new stop. high:",self.symbol_data[HIGH],"adjusted",mid_," risk per share:",risk_per_share)
 				self.stop_price = self.symbol_data[HIGH]
 
-			if risk_per_share < self.symbol_data[ASK]*0.0006:
-				log_print(self.symbol_name,": stop too close:",round(risk_per_share,2)," adjusted to",str(round(self.symbol_data[ASK]*0.0006,2)))
-				risk_per_share = self.symbol_data[ASK]*0.0006
+			if risk_per_share < self.symbol_data[ASK]*0.0012:
+				log_print(self.symbol_name,": stop too close:",round(risk_per_share,2)," adjusted to",str(round(self.symbol_data[ASK]*0.0012,2)))
+				risk_per_share = self.symbol_data[ASK]*0.0012
 				self.stop_price = round(self.symbol_data[ASK] + risk_per_share,2)
 
-		if self.symbol_data[ASK]>100 and risk_per_share <0.12:
-			risk_per_share = 0.12
 
-		if self.symbol_data[ASK]<100 and self.symbol_data[ASK]>5 and risk_per_share <0.1:
-			risk_per_share = 0.1
+		if self.symbol_data[ASK]>100 and risk_per_share <0.2:
+			risk_per_share = 0.2
 
-		if self.symbol_data[ASK]<5 and risk_per_share <0.02:
-			risk_per_share = 0.02
+		if self.symbol_data[ASK]<100 and self.symbol_data[ASK]>5 and risk_per_share <0.15:
+			risk_per_share = 0.15
+
+		if self.symbol_data[ASK]<5 and risk_per_share <0.04:
+			risk_per_share = 0.04
 
 		shares = int((self.risk)/risk_per_share)
 
@@ -875,16 +879,16 @@ class FibonacciManager(AbstractTrigger):
 			self.tradingplan.data[FIBLEVEL1] = round(self.tradingplan.data[FIBCURRENT_MAX] - (0.214*gap),2)
 			self.tradingplan.data[FIBLEVEL2] = round(self.tradingplan.data[FIBCURRENT_MAX] - (0.382*gap),2)
 			self.tradingplan.data[FIBLEVEL3] = round(self.tradingplan.data[FIBCURRENT_MAX] - (0.5*gap),2)
-			self.tradingplan.data[FIBLEVEL4] = round(self.tradingplan.data[FIBCURRENT_MAX] - (0.618*gap),2)
-			self.tradingplan.data[STOP_LEVEL] = round(self.tradingplan.data[FIBCURRENT_MAX] - (0.618*gap),2)
+			self.tradingplan.data[FIBLEVEL4] = round(self.tradingplan.data[FIBCURRENT_MAX] - (0.67*gap),2)
+			self.tradingplan.data[STOP_LEVEL] = round(self.tradingplan.data[FIBCURRENT_MAX] - (0.67*gap),2)
 
 		elif self.tradingplan.data[POSITION] == SHORT:
 
 			self.tradingplan.data[FIBLEVEL1] = round(self.tradingplan.data[FIBCURRENT_MAX] + (0.214*gap),2)
 			self.tradingplan.data[FIBLEVEL2] = round(self.tradingplan.data[FIBCURRENT_MAX] + (0.382*gap),2)
 			self.tradingplan.data[FIBLEVEL3] = round(self.tradingplan.data[FIBCURRENT_MAX] + (0.5*gap),2)
-			self.tradingplan.data[FIBLEVEL4] = round(self.tradingplan.data[FIBCURRENT_MAX] + (0.618*gap),2)
-			self.tradingplan.data[STOP_LEVEL] = round(self.tradingplan.data[FIBCURRENT_MAX] + (0.618*gap),2)
+			self.tradingplan.data[FIBLEVEL4] = round(self.tradingplan.data[FIBCURRENT_MAX] + (0.67*gap),2)
+			self.tradingplan.data[STOP_LEVEL] = round(self.tradingplan.data[FIBCURRENT_MAX] + (0.67*gap),2)
 		#3. Bring up the new FIB max. 
 
 		self.tradingplan.data[PXT1] =self.tradingplan.data[FIBLEVEL1] 

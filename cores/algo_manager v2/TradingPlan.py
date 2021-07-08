@@ -551,6 +551,8 @@ class TradingPlan:
 			instant = 1 
 		if entry_type ==INCREMENTAL:
 			instant = 3 
+		if entry_type ==INCREMENTAL2:
+			instant = 5
 
 		if instant >1:
 			if entrytimer<5:
