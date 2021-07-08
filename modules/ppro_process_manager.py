@@ -606,7 +606,7 @@ def historical_eval(symbol):
 		d[normal_5_vol_eval] =  str(d[normal_5_vol_alert])
 		
 		try:
-			d[prev_alert] = round((d["prev_close_gap"]-d[prev_close_val])/d[prev_close_std],1)
+			d[prev_alert] = round(abs(d["prev_close_gap"]-d[prev_close_val])/d[prev_close_std],1)
 		except:
 			d[prev_alert] = 0
 		d[prev_eval] = str(d[prev_alert])
