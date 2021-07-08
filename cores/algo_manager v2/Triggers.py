@@ -966,8 +966,9 @@ class FibonacciTrigger(AbstractTrigger):
 			log_print(self.symbol_name,"retracement level:2","Taking off 25%.")
 			self.set_mind("retracement level:2")
 		if self.strategy.fib_level == 3:
-			self.tradingplan.manage_trades(self.tradingplan.data[POSITION],MINUS,0.4)
-			log_print(self.symbol_name,"retracement level:3","Taking off 40%.")
+			if self.tradingplan.flatten_order==False:
+				self.tradingplan.manage_trades(self.tradingplan.data[POSITION],MINUS,0.4)
+				log_print(self.symbol_name,"retracement level:3","Taking off 40%.")
 			self.set_mind("retracement level:3")
 		if self.strategy.fib_level == 4: #fLATTEN
 			log_print(self.symbol_name,"Critial level reached, flattening")
