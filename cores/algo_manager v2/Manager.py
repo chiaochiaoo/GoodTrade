@@ -389,12 +389,17 @@ class Manager:
 		managment=self.ui.all_mana.get() 
 		risk = int(self.ui.all_risk.get())
 		for d in self.tradingplan.values():
-			d.tkvars[ENTRYPLAN].set(ep)
-			d.tkvars[ENTYPE].set(et)
-			d.tkvars[MANAGEMENTPLAN].set(managment)
-			d.tkvars[TIMER].set(timer)
-			d.data[ESTRISK] = risk
-			d.tkvars[ESTRISK].set(risk)
+			if self.ui.all_timer_b.get()==1:
+				d.tkvars[TIMER].set(timer)
+			if self.ui.all_risk_b.get()==1:
+				d.data[ESTRISK] = risk
+			if self.ui.all_enplan_b.get()==1:
+				d.tkvars[ENTRYPLAN].set(ep)
+			if self.ui.all_entype_b.get()==1:
+				d.tkvars[ENTYPE].set(et)
+			if self.ui.all_manaplan_b.get()==1:
+				d.tkvars[MANAGEMENTPLAN].set(managment)
+			
 			d.adjusting_risk()
 
 	def set_selected_tp(self):

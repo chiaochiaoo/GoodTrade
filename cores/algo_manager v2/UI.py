@@ -32,148 +32,6 @@ class UI(pannel):
 
 		self.management_plan_options = {ONETOTWORISKREWARD,ONETOTWORISKREWARDOLD,FIBO}#THREE_TARGETS,SMARTTRAIL,ANCARTMETHOD,
 
-	def init_HQ_pannel(self):
-
-		self.main_app_status = tk.StringVar()
-		self.main_app_status.set("")
-
-		self.ppro_status = tk.StringVar()
-		self.ppro_status.set("")
-
-
-		self.algo_count_number = tk.DoubleVar(value=0)
-		self.algo_number = 0
-
-		self.algo_count_string = tk.StringVar(value="0")
-		self.algo_timer_string = tk.StringVar(value="0")
-		self.algo_count_string.set("Activated Algos:"+str(self.algo_count_number))
-
-		self.main = ttk.Label(self.comms, text="Main:")
-		self.main.grid(sticky="w",column=1,row=1,padx=10)
-		self.main_status = ttk.Label(self.comms, textvariable=self.main_app_status)
-		self.main_status.grid(sticky="w",column=2,row=1)
-
-		self.ppro = ttk.Label(self.comms, text="Ppro:")
-		self.ppro.grid(sticky="w",column=1,row=2,padx=10)
-		self.ppro_status_ = ttk.Label(self.comms, textvariable=self.ppro_status)
-		self.ppro_status_.grid(sticky="w",column=2,row=2)
-
-		self.al = ttk.Label(self.comms, text="Algo count::")
-		self.al.grid(sticky="w",column=1,row=3,padx=10)
-		self.algo_count_ = ttk.Label(self.comms,  textvariable=self.algo_count_number)
-		self.algo_count_.grid(sticky="w",column=2,row=3,padx=10)
-
-		self.timerc = ttk.Label(self.comms, text="Deploy in:")
-		self.timerc.grid(sticky="w",column=1,row=4,padx=10)
-		self.timersx = ttk.Label(self.comms,  textvariable=self.algo_timer_string)
-		self.timersx.grid(sticky="w",column=2,row=4,padx=10)
-
-
-		ttk.Label(self.comms, text="Risk timer:").grid(sticky="w",column=1,row=5,padx=10)
-		tk.Entry(self.comms,textvariable=self.risk_timer,width=5).grid(sticky="w",column=2,row=5,padx=10)
-		# self.deconstruct = ttk.Button(self.comms, text="Terminate GT",command=self.manager.terminateGT)#,command=self.deploy_all_stoporders)
-		# self.deconstruct.grid(sticky="w",column=1,row=5)
-
-	def init_config_pannel(self):
-
-		ttk.Label(self.config, text="All timer:").grid(sticky="w",column=1,row=5,padx=10)
-
-		ttk.Label(self.config, text="All Risk:").grid(sticky="w",column=1,row=6,padx=10)
-
-		ttk.Label(self.config, text="All EnPlan:").grid(sticky="w",column=1,row=7,padx=10)
-
-		ttk.Label(self.config, text="All EnType:").grid(sticky="w",column=1,row=8,padx=10)
-
-		ttk.Label(self.config, text="All Manaplan:",anchor="w").grid(sticky="w",column=1,row=9,padx=10)
-
-
-
-		self.all_timer = tk.DoubleVar(value=0)
-		tk.Entry(self.config,textvariable=self.all_timer,width=5).grid(sticky="w",column=2,row=5,padx=10)
-
-		self.all_risk = tk.DoubleVar(value=50)
-		tk.Entry(self.config,textvariable=self.all_risk,width=5).grid(sticky="w",column=2,row=6,padx=10)
-
-
-
-		self.all_enp = tk.StringVar(value=BREAKFIRST)
-		tk.OptionMenu(self.config, self.all_enp, *sorted(self.entry_plan_options)).grid(sticky="w",column=2,row=7,padx=10)
-
-		self.all_ent = tk.StringVar(value=INCREMENTAL)
-		tk.OptionMenu(self.config, self.all_ent, *sorted(self.entry_type_options)).grid(sticky="w",column=2,row=8,padx=10)
-
-		self.all_mana = tk.StringVar(value=ONETOTWORISKREWARD)
-		tk.OptionMenu(self.config, self.all_mana, *sorted(self.management_plan_options)).grid(sticky="w",column=2,row=9,padx=10)
-
-		self.algo_deploy = ttk.Button(self.config, text="Apply to selected",command=self.manager.set_selected_tp)#,command=self.manager.set_all_tp)
-		self.algo_deploy.grid(column=1,row=10)
-
-		self.algo_deploy = ttk.Button(self.config, text="Apply to all",command=self.manager.set_all_tp)#,command=self.deploy_all_stoporders)
-		self.algo_deploy.grid(column=2,row=10)
-
-
-	def set_command_text(self,string):
-		self.command_text.set(string)
-
-	def init_command(self):
-
-		self.command_text = tk.StringVar(value="Ready:")
-
-		ttk.Label(self.cmd, text="").grid(sticky="w",column=1,row=1)
-
-		ttk.Label(self.cmd, textvariable=self.command_text).place(x=0,y=0)
-
-
-		self.algo_deploy = ttk.Button(self.cmd, text="Deploy all algo",command=self.manager.deploy_all)#,command=self.deploy_all_stoporders)
-		self.algo_deploy.grid(sticky="w",column=1,row=2)
-
-		self.algo_pend = ttk.Button(self.cmd, text="Withdraw all algo",command=self.manager.withdraw_all)#,command=self.cancel_all_stoporders)
-		self.algo_pend.grid(sticky="w",column=2,row=2)
-
-		self.flatten = ttk.Button(self.cmd, text="Flatten all algo",command=self.manager.flatten_all)
-		self.flatten.grid(sticky="w",column=1,row=3)
-
-		self.algo_cancel = ttk.Button(self.cmd, text="Cancel all algo",command=self.manager.cancel_all)
-		self.algo_cancel.grid(sticky="w",column=2,row=3)
-
-		self.flatten = ttk.Button(self.cmd, text="Export Algos",command=self.manager.export_algos)
-		self.flatten.grid(sticky="w",column=1,row=4)
-
-		self.algo_cancel = ttk.Button(self.cmd, text="Import Algos",command=self.manager.import_algos)
-		self.algo_cancel.grid(sticky="w",column=2,row=4)
-
-		row=5
-		ttk.Label(self.cmd, text=" ").grid(sticky="w",column=1,row=row)
-		row+=1
-		ttk.Label(self.cmd, text="All Active Longs:").grid(sticky="w",column=1,row=row)
-
-		row+=1
-		ttk.Button(self.cmd, text="Add 10%",command= lambda side=LONG,action=ADD,percent=0.1:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=1,row=row)
-		ttk.Button(self.cmd, text="Add 25%",command= lambda side=LONG,action=ADD,percent=0.25:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=2,row=row)
-
-		row+=1
-		ttk.Button(self.cmd, text="Minus 10%",command= lambda side=LONG,action=MINUS,percent=0.1:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=1,row=row)
-		ttk.Button(self.cmd, text="Minus 25%",command= lambda side=LONG,action=MINUS,percent=0.25:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=2,row=row)
-
-		row+=1
-		ttk.Label(self.cmd, text=" ").grid(sticky="w",column=1,row=row)
-		row+=1
-		ttk.Label(self.cmd, text="All Active Shorts:").grid(sticky="w",column=1,row=row)
-
-		row+=1
-		ttk.Button(self.cmd, text="Add 10%",command= lambda side=SHORT,action=ADD,percent=0.1:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=1,row=row)
-		ttk.Button(self.cmd, text="Add 25%",command= lambda side=SHORT,action=ADD,percent=0.25:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=2,row=row)
-
-		row+=1
-		ttk.Button(self.cmd, text="Minus 10%",command= lambda side=SHORT,action=MINUS,percent=0.1:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=1,row=row)
-		ttk.Button(self.cmd, text="Minus 25%",command= lambda side=SHORT,action=MINUS,percent=0.25:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=2,row=row)
-
-
-		#iterate all the trading plans.
-		#if position ="LONG"
-		#if shares>= 25.
-		#calculate the shares to be taken off. 
-
 	def init_pannel(self):
 		self.labels = {"":4,\
 						"Symbol":8,\
@@ -244,6 +102,162 @@ class UI(pannel):
 
 		self.rebind(self.dev_canvas,self.deployment_frame)
 		self.recreate_labels()
+
+	def init_HQ_pannel(self):
+
+		self.main_app_status = tk.StringVar()
+		self.main_app_status.set("")
+
+		self.ppro_status = tk.StringVar()
+		self.ppro_status.set("")
+
+
+		self.algo_count_number = tk.DoubleVar(value=0)
+		self.algo_number = 0
+
+		self.algo_count_string = tk.StringVar(value="0")
+		self.algo_timer_string = tk.StringVar(value="0")
+		self.algo_count_string.set("Activated Algos:"+str(self.algo_count_number))
+
+		self.main = ttk.Label(self.comms, text="Main:")
+		self.main.grid(sticky="w",column=1,row=1,padx=10)
+		self.main_status = ttk.Label(self.comms, textvariable=self.main_app_status)
+		self.main_status.grid(sticky="w",column=2,row=1)
+
+		self.ppro = ttk.Label(self.comms, text="Ppro:")
+		self.ppro.grid(sticky="w",column=1,row=2,padx=10)
+		self.ppro_status_ = ttk.Label(self.comms, textvariable=self.ppro_status)
+		self.ppro_status_.grid(sticky="w",column=2,row=2)
+
+		self.al = ttk.Label(self.comms, text="Algo count::")
+		self.al.grid(sticky="w",column=1,row=3,padx=10)
+		self.algo_count_ = ttk.Label(self.comms,  textvariable=self.algo_count_number)
+		self.algo_count_.grid(sticky="w",column=2,row=3,padx=10)
+
+		self.timerc = ttk.Label(self.comms, text="Deploy in:")
+		self.timerc.grid(sticky="w",column=1,row=4,padx=10)
+		self.timersx = ttk.Label(self.comms,  textvariable=self.algo_timer_string)
+		self.timersx.grid(sticky="w",column=2,row=4,padx=10)
+
+
+		ttk.Label(self.comms, text="Risk timer:").grid(sticky="w",column=1,row=5,padx=10)
+		tk.Entry(self.comms,textvariable=self.risk_timer,width=5).grid(sticky="w",column=2,row=5,padx=10)
+		# self.deconstruct = ttk.Button(self.comms, text="Terminate GT",command=self.manager.terminateGT)#,command=self.deploy_all_stoporders)
+		# self.deconstruct.grid(sticky="w",column=1,row=5)
+
+	def init_config_pannel(self):
+
+		self.all_timer_b = tk.IntVar(value=1)
+		self.all_risk_b = tk.IntVar(value=1)
+		self.all_enplan_b = tk.IntVar(value=1)
+		self.all_entype_b = tk.IntVar(value=1)
+		self.all_manaplan_b = tk.IntVar(value=1)
+
+		ttk.Checkbutton(self.config, variable=self.all_timer_b).grid(sticky="w",column=1,row=5)
+		ttk.Checkbutton(self.config, variable=self.all_risk_b).grid(sticky="w",column=1,row=6)
+		ttk.Checkbutton(self.config, variable=self.all_enplan_b).grid(sticky="w",column=1,row=7,padx=0)
+		ttk.Checkbutton(self.config, variable=self.all_entype_b).grid(sticky="w",column=1,row=8)
+		ttk.Checkbutton(self.config, variable=self.all_manaplan_b).grid(sticky="w",column=1,row=9)
+
+
+
+		ttk.Label(self.config, text="timer:").grid(sticky="w",column=2,row=5,padx=10)
+		ttk.Label(self.config, text="Rsk:").grid(sticky="w",column=2,row=6,padx=10)
+		ttk.Label(self.config, text="Entry:").grid(sticky="w",column=2,row=7,padx=10)
+		ttk.Label(self.config, text="EnType:").grid(sticky="w",column=2,row=8,padx=10)
+		ttk.Label(self.config, text="Manage:").grid(sticky="w",column=2,row=9,padx=10)
+
+
+		self.all_timer = tk.DoubleVar(value=0)
+		tk.Entry(self.config,textvariable=self.all_timer,width=5).grid(sticky="w",column=3,row=5,padx=10)
+
+		self.all_risk = tk.DoubleVar(value=50)
+		tk.Entry(self.config,textvariable=self.all_risk,width=5).grid(sticky="w",column=3,row=6,padx=10)
+
+
+		self.all_enp = tk.StringVar(value=BREAKFIRST)
+		tk.OptionMenu(self.config, self.all_enp, *sorted(self.entry_plan_options)).grid(sticky="w",column=3,row=7,padx=10)
+
+		self.all_ent = tk.StringVar(value=INCREMENTAL)
+		tk.OptionMenu(self.config, self.all_ent, *sorted(self.entry_type_options)).grid(sticky="w",column=3,row=8,padx=10)
+
+		self.all_mana = tk.StringVar(value=ONETOTWORISKREWARD)
+		tk.OptionMenu(self.config, self.all_mana, *sorted(self.management_plan_options)).grid(sticky="w",column=3,row=9,padx=10)
+
+
+
+		self.config2 = ttk.LabelFrame(self.config) 
+		self.config2.place(x=0,y=130,height=100,width=210)
+		self.algo_deploy = ttk.Button(self.config2, text="Apply Slctd",command=self.manager.set_selected_tp)#,command=self.manager.set_all_tp)
+		self.algo_deploy.grid(sticky="w",column=1,row=1,padx=10)
+		#self.algo_deploy.place(x=5,y=5)
+
+		self.algo_deploy = ttk.Button(self.config2, text="Apply All",command=self.manager.set_all_tp)#,command=self.deploy_all_stoporders)
+		self.algo_deploy.grid(sticky="w",column=2,row=1,padx=10)
+		#self.algo_deploy.place(x=5,y=25)
+
+
+	def set_command_text(self,string):
+		self.command_text.set(string)
+
+	def init_command(self):
+
+		self.command_text = tk.StringVar(value="Ready:")
+
+		ttk.Label(self.cmd, text="").grid(sticky="w",column=1,row=1)
+
+		ttk.Label(self.cmd, textvariable=self.command_text).place(x=0,y=0)
+
+
+		self.algo_deploy = ttk.Button(self.cmd, text="Deploy all algo",command=self.manager.deploy_all)#,command=self.deploy_all_stoporders)
+		self.algo_deploy.grid(sticky="w",column=1,row=2)
+
+		self.algo_pend = ttk.Button(self.cmd, text="Withdraw all algo",command=self.manager.withdraw_all)#,command=self.cancel_all_stoporders)
+		self.algo_pend.grid(sticky="w",column=2,row=2)
+
+		self.flatten = ttk.Button(self.cmd, text="Flatten all algo",command=self.manager.flatten_all)
+		self.flatten.grid(sticky="w",column=1,row=3)
+
+		self.algo_cancel = ttk.Button(self.cmd, text="Cancel all algo",command=self.manager.cancel_all)
+		self.algo_cancel.grid(sticky="w",column=2,row=3)
+
+		self.flatten = ttk.Button(self.cmd, text="Export Algos",command=self.manager.export_algos)
+		self.flatten.grid(sticky="w",column=1,row=4)
+
+		self.algo_cancel = ttk.Button(self.cmd, text="Import Algos",command=self.manager.import_algos)
+		self.algo_cancel.grid(sticky="w",column=2,row=4)
+
+		row=5
+		ttk.Label(self.cmd, text=" ").grid(sticky="w",column=1,row=row)
+		row+=1
+		ttk.Label(self.cmd, text="All Active Longs:").grid(sticky="w",column=1,row=row)
+
+		row+=1
+		ttk.Button(self.cmd, text="Add 10%",command= lambda side=LONG,action=ADD,percent=0.1:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=1,row=row)
+		ttk.Button(self.cmd, text="Add 25%",command= lambda side=LONG,action=ADD,percent=0.25:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=2,row=row)
+
+		row+=1
+		ttk.Button(self.cmd, text="Minus 10%",command= lambda side=LONG,action=MINUS,percent=0.1:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=1,row=row)
+		ttk.Button(self.cmd, text="Minus 25%",command= lambda side=LONG,action=MINUS,percent=0.25:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=2,row=row)
+
+		row+=1
+		ttk.Label(self.cmd, text=" ").grid(sticky="w",column=1,row=row)
+		row+=1
+		ttk.Label(self.cmd, text="All Active Shorts:").grid(sticky="w",column=1,row=row)
+
+		row+=1
+		ttk.Button(self.cmd, text="Add 10%",command= lambda side=SHORT,action=ADD,percent=0.1:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=1,row=row)
+		ttk.Button(self.cmd, text="Add 25%",command= lambda side=SHORT,action=ADD,percent=0.25:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=2,row=row)
+
+		row+=1
+		ttk.Button(self.cmd, text="Minus 10%",command= lambda side=SHORT,action=MINUS,percent=0.1:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=1,row=row)
+		ttk.Button(self.cmd, text="Minus 25%",command= lambda side=SHORT,action=MINUS,percent=0.25:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=2,row=row)
+
+
+		#iterate all the trading plans.
+		#if position ="LONG"
+		#if shares>= 25.
+		#calculate the shares to be taken off. 
 
 
 	def create_new_entry(self,tradingplan):
