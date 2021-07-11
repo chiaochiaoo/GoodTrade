@@ -81,7 +81,7 @@ class TradingPlan:
 
 		self.tkvars[ENTRYPLAN].set(entry_plan)
 		self.tkvars[ENTYPE].set(entry_type)
-		self.tkvars[MANAGEMENTPLAN].set(ONETOTWORISKREWARD)
+		self.tkvars[MANAGEMENTPLAN].set(FIBO)
 
 		self.data[STATUS] = PENDING
 		self.tkvars[STATUS].set(PENDING)
@@ -329,27 +329,33 @@ class TradingPlan:
 
 	def manage_trades(self,side,action,percentage):
 
-		if self.data[POSITION] == side:
-			if self.data[CURRENT_SHARE]>0:
-				shares = int(self.data[CURRENT_SHARE]*percentage)
-				pproaction = ""
-				if shares ==0:
-					shares = 1
+		process = False
+		if side!=None:
+			if self.data[POSITION] == side:
+				process = True
+		else:
+			process = True
 
-				if action ==ADD:
-					if self.data[POSITION] == LONG:
-						pproaction = BUY
-					elif self.data[POSITION] == SHORT:
-						pproaction = SELL
-				elif action ==MINUS:
-					if self.data[POSITION] == LONG:
-						pproaction = SELL
-					elif self.data[POSITION] == SHORT:
-						pproaction = BUY
+		if self.data[CURRENT_SHARE]>0 and process:
+			shares = int(self.data[CURRENT_SHARE]*percentage)
+			pproaction = ""
+			if shares ==0:
+				shares = 1
 
-				description = "Trades aggregation"
-				if pproaction!="":
-					self.ppro_out.send([pproaction,self.symbol_name,shares,description])
+			if action ==ADD:
+				if self.data[POSITION] == LONG:
+					pproaction = BUY
+				elif self.data[POSITION] == SHORT:
+					pproaction = SELL
+			elif action ==MINUS:
+				if self.data[POSITION] == LONG:
+					pproaction = SELL
+				elif self.data[POSITION] == SHORT:
+					pproaction = BUY
+
+			description = "Trades aggregation"
+			if pproaction!="":
+				self.ppro_out.send([pproaction,self.symbol_name,shares,description])
 
 	""" risk related ## """
 

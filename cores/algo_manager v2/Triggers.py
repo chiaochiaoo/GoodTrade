@@ -726,14 +726,17 @@ class Break_any_Purchase_trigger(AbstractTrigger):
 				risk_per_share = round(abs(self.symbol_data[ASK]-mid_),2)
 
 				log_print(self.symbol_name,"entry near completion, using day low as new stop,low:",self.symbol_data[LOW]," adjusted:",mid_," risk per share:",risk_per_share)
-				self.stop_price = self.symbol_data[LOW]
+				#self.stop_price = self.symbol_data[LOW]
 
-			if risk_per_share < self.symbol_data[ASK]*0.0012:
-				log_print(self.symbol_name,": stop too close:",round(risk_per_share,2)," adjusted to",str(round(self.symbol_data[ASK]*0.0012,2)))
-				risk_per_share = self.symbol_data[ASK]*0.0012
+				if risk_per_share < self.symbol_data[ASK]*0.0012:
+					log_print(self.symbol_name,": stop too close:",round(risk_per_share,2)," adjusted to",str(round(self.symbol_data[ASK]*0.0012,2)))
+					risk_per_share = self.symbol_data[ASK]*0.0012
 
-				#overwrite the stop price here
-				self.stop_price = round(self.symbol_data[BID] - risk_per_share,2)
+					#overwrite the stop price here
+					self.stop_price = round(self.symbol_data[BID] - risk_per_share,2)
+
+				else:
+					self.stop_price = mid_
 
 		elif self.pos ==SHORT:
 			risk_per_share = abs(self.symbol_data[self.stop]-self.symbol_data[BID])
@@ -745,13 +748,14 @@ class Break_any_Purchase_trigger(AbstractTrigger):
 				risk_per_share = round(abs(mid_ -self.symbol_data[BID]),2)
 
 				log_print(self.symbol_name,"entry near completion, using day high as new stop. high:",self.symbol_data[HIGH],"adjusted",mid_," risk per share:",risk_per_share)
-				self.stop_price = self.symbol_data[HIGH]
+				
 
-			if risk_per_share < self.symbol_data[ASK]*0.0012:
-				log_print(self.symbol_name,": stop too close:",round(risk_per_share,2)," adjusted to",str(round(self.symbol_data[ASK]*0.0012,2)))
-				risk_per_share = self.symbol_data[ASK]*0.0012
-				self.stop_price = round(self.symbol_data[ASK] + risk_per_share,2)
-
+				if risk_per_share < self.symbol_data[ASK]*0.0012:
+					log_print(self.symbol_name,": stop too close:",round(risk_per_share,2)," adjusted to",str(round(self.symbol_data[ASK]*0.0012,2)))
+					risk_per_share = self.symbol_data[ASK]*0.0012
+					self.stop_price = round(self.symbol_data[ASK] + risk_per_share,2)
+				else:
+					self.stop_price = mid_
 
 		if self.symbol_data[ASK]>100 and risk_per_share <0.2:
 			risk_per_share = 0.2
@@ -860,10 +864,10 @@ class FibonacciManager(AbstractTrigger):
 		if self.tradingplan.data[POSITION]!="":
 			return(super().check_conditions())
 	"""
-	Do three things. 
+	Do three things.
 	1. Reset tradingplan Fibo level.
 	2. Recalculate the Fibo levels. (Break price - current max.)
-	3. Bring up the new FIB max. 
+	3. Bring up the new FIB max.
 	"""
 	def trigger_event(self):
 		#1. reset level.
@@ -917,7 +921,7 @@ class FibonacciTrigger(AbstractTrigger):
 		super().__init__(description,None,trigger_timer=5,trigger_limit=999)
 
 		self.strategy =strategy
-		self.conditions = [] 
+		self.conditions = []
 
 	def check_conditions(self):
 

@@ -423,7 +423,7 @@ class Manager:
 	# 		self.termination = False
 	# 	else:
 	# 		print("Already terminated or not connected")
-			
+
 	def deploy_all(self):
 		for d in self.tradingplan.values():
 			d.deploy()
@@ -436,7 +436,7 @@ class Manager:
 		for d in self.tradingplan.values():
 			d.flatten_cmd()
 
-	def trades_aggregation(self,side,action,percent):
+	def trades_aggregation(self,side,action,percent,positive_pnl):
 
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second
@@ -446,7 +446,12 @@ class Manager:
 
 			log_print("All",side," ",action," ",percent*100,"%")
 			for d in self.tradingplan.values():
-				d.manage_trades(side,action,percent)
+				if positive_pnl==True:
+					if d.data[UNREAL] >0:
+						print(d.data[UNREAL])
+						d.manage_trades(side,action,percent)
+				else:
+					d.manage_trades(side,action,percent)
 
 			self.manage_lock = ts
 		log_print("Trades aggregation under cooldown:",diff)
@@ -543,7 +548,7 @@ class Tester:
 
 		tk.Button(self.root ,text="add 1 share",command=self.add1).grid(column=1,row=7)	
 		tk.Button(self.root ,text="sub 1 share",command=self.sub1).grid(column=2,row=7)	
-		self.gt.send(["pkg",[[BREAKANY, 'SPY.AM', 412, 413, 50.0, {'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441}]]])
+		self.gt.send(["pkg",[[BREAKFIRST, 'SPY.AM', 412, 413, 50.0, {'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441}]]])
 
 		time.sleep(1)
 		wish_granter = threading.Thread(target=self.wish, daemon=True)

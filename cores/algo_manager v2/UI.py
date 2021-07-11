@@ -181,7 +181,7 @@ class UI(pannel):
 		self.all_ent = tk.StringVar(value=INCREMENTAL)
 		tk.OptionMenu(self.config, self.all_ent, *sorted(self.entry_type_options)).grid(sticky="w",column=3,row=8,padx=10)
 
-		self.all_mana = tk.StringVar(value=ONETOTWORISKREWARD)
+		self.all_mana = tk.StringVar(value=FIBO)
 		tk.OptionMenu(self.config, self.all_mana, *sorted(self.management_plan_options)).grid(sticky="w",column=3,row=9,padx=10)
 
 
@@ -230,15 +230,28 @@ class UI(pannel):
 		row=5
 		ttk.Label(self.cmd, text=" ").grid(sticky="w",column=1,row=row)
 		row+=1
+		ttk.Label(self.cmd, text="All Active Winnings:").grid(sticky="w",column=1,row=row)
+
+		row+=1
+		ttk.Button(self.cmd, text="Add 10%",command= lambda action=ADD,percent=0.1:self.manager.trades_aggregation(None,action,percent,True)).grid(sticky="w",column=1,row=row)
+		ttk.Button(self.cmd, text="Add 25%",command= lambda action=ADD,percent=0.25:self.manager.trades_aggregation(None,action,percent,True)).grid(sticky="w",column=2,row=row)
+
+		row+=1
+		ttk.Button(self.cmd, text="Minus 10%",command= lambda action=MINUS,percent=0.1:self.manager.trades_aggregation(None,action,percent,True)).grid(sticky="w",column=1,row=row)
+		ttk.Button(self.cmd, text="Minus 25%",command= lambda action=MINUS,percent=0.25:self.manager.trades_aggregation(None,action,percent,True)).grid(sticky="w",column=2,row=row)
+
+
+		ttk.Label(self.cmd, text=" ").grid(sticky="w",column=1,row=row)
+		row+=1
 		ttk.Label(self.cmd, text="All Active Longs:").grid(sticky="w",column=1,row=row)
 
 		row+=1
-		ttk.Button(self.cmd, text="Add 10%",command= lambda side=LONG,action=ADD,percent=0.1:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=1,row=row)
-		ttk.Button(self.cmd, text="Add 25%",command= lambda side=LONG,action=ADD,percent=0.25:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=2,row=row)
+		ttk.Button(self.cmd, text="Add 10%",command= lambda side=LONG,action=ADD,percent=0.1:self.manager.trades_aggregation(side,action,percent,False)).grid(sticky="w",column=1,row=row)
+		ttk.Button(self.cmd, text="Add 25%",command= lambda side=LONG,action=ADD,percent=0.25:self.manager.trades_aggregation(side,action,percent,False)).grid(sticky="w",column=2,row=row)
 
 		row+=1
-		ttk.Button(self.cmd, text="Minus 10%",command= lambda side=LONG,action=MINUS,percent=0.1:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=1,row=row)
-		ttk.Button(self.cmd, text="Minus 25%",command= lambda side=LONG,action=MINUS,percent=0.25:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=2,row=row)
+		ttk.Button(self.cmd, text="Minus 10%",command= lambda side=LONG,action=MINUS,percent=0.1:self.manager.trades_aggregation(side,action,percent,False)).grid(sticky="w",column=1,row=row)
+		ttk.Button(self.cmd, text="Minus 25%",command= lambda side=LONG,action=MINUS,percent=0.25:self.manager.trades_aggregation(side,action,percent,False)).grid(sticky="w",column=2,row=row)
 
 		row+=1
 		ttk.Label(self.cmd, text=" ").grid(sticky="w",column=1,row=row)
@@ -246,12 +259,12 @@ class UI(pannel):
 		ttk.Label(self.cmd, text="All Active Shorts:").grid(sticky="w",column=1,row=row)
 
 		row+=1
-		ttk.Button(self.cmd, text="Add 10%",command= lambda side=SHORT,action=ADD,percent=0.1:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=1,row=row)
-		ttk.Button(self.cmd, text="Add 25%",command= lambda side=SHORT,action=ADD,percent=0.25:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=2,row=row)
+		ttk.Button(self.cmd, text="Add 10%",command= lambda side=SHORT,action=ADD,percent=0.1:self.manager.trades_aggregation(side,action,percent,False)).grid(sticky="w",column=1,row=row)
+		ttk.Button(self.cmd, text="Add 25%",command= lambda side=SHORT,action=ADD,percent=0.25:self.manager.trades_aggregation(side,action,percent,False)).grid(sticky="w",column=2,row=row)
 
 		row+=1
-		ttk.Button(self.cmd, text="Minus 10%",command= lambda side=SHORT,action=MINUS,percent=0.1:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=1,row=row)
-		ttk.Button(self.cmd, text="Minus 25%",command= lambda side=SHORT,action=MINUS,percent=0.25:self.manager.trades_aggregation(side,action,percent)).grid(sticky="w",column=2,row=row)
+		ttk.Button(self.cmd, text="Minus 10%",command= lambda side=SHORT,action=MINUS,percent=0.1:self.manager.trades_aggregation(side,action,percent,False)).grid(sticky="w",column=1,row=row)
+		ttk.Button(self.cmd, text="Minus 25%",command= lambda side=SHORT,action=MINUS,percent=0.25:self.manager.trades_aggregation(side,action,percent,False)).grid(sticky="w",column=2,row=row)
 
 
 		#iterate all the trading plans.
