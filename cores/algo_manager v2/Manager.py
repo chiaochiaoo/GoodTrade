@@ -7,6 +7,7 @@ from Ppro_in import *
 from Ppro_out import *
 from constant import *
 
+from BackTester import *
 from Util_functions import *
 import sys
 import socket
@@ -798,10 +799,10 @@ if __name__ == '__main__':
 	root.title("GoodTrade Algo Manager v2 b6") 
 	root.geometry("1920x800")
 
-	Manager(root,goodtrade_pipe,ppro_out,ppro_in,TEST)
+	manager=Manager(root,goodtrade_pipe,ppro_out,ppro_in,TEST)
 
 	if len(sys.argv)>1:
-		Tester(receive_pipe,ppro_pipe_end,ppro_pipe_end2)
+		BackTester(manager,receive_pipe,ppro_pipe_end,ppro_pipe_end2)
 	else:
 		algo_voxcom.start()
 		ppro_out_manager.start()
