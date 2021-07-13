@@ -53,8 +53,8 @@ def flatten_symbol(symbol):
 
 def buy_market_order(symbol,share):
 
-	
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=0.01&ordername=ARCA Buy ARCX Market DAY&shares='+str(share)
+
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=0.01&ordername=MEMX Buy MEMX Market DAY&shares='+str(share)
 	sucess='buy market order success on'+symbol
 	failure="Error buy order on"+symbol
    
@@ -65,7 +65,7 @@ def buy_market_order(symbol,share):
 
 def sell_market_order(symbol,share):
 
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=0.01&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(share)
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=0.01&ordername=MEMX Sell->Short MEMX Market DAY&shares='+str(share)
 	sucess='sell market order success on'+symbol
 	failure="Error sell order on"+symbol
    
@@ -245,14 +245,15 @@ def Ppro_out(pipe,port): #a sperate process. GLOBALLY.
 			log_print(e)
 
 
-# if __name__ == '__main__':  #TEST BLOCK
+if __name__ == '__main__':  #TEST BLOCK
 
 
+	buy_market_order("NIO.NY",1)
 
 # 	buy_limit_order("AAL.NQ",24.22,1)
 
-# 	while True:
-# 		a=1
+	while True:
+		a=1
 	#sell_market_order("AAL.NQ",1)
 
 	# def register(self,symbol):
