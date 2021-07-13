@@ -24,14 +24,16 @@ except ImportError:
 #Thoughts:
 #Combine PPRO sutff with VOXCOM into one process.
 #Create subclass for the algo manager.
-#Entry strategy 
+#Entry strategy
 #Manage strategy
 #How to get the machine to read chart?
-#DATA CLASS. SUPPORT/RESISTENCE. 
+#DATA CLASS. SUPPORT/RESISTENCE.
 #everything ppro related. sending orders, receiving orders. ,flatten.
+
 def register(symbol,port):
 	req = threading.Thread(target=register_to_ppro, args=(symbol, True,port,),daemon=True)
 	req.start()
+
 def register_to_ppro(symbol,status,port):
 
 	#log_print("Registering",symbol,status)
@@ -49,14 +51,16 @@ def register_to_ppro(symbol,status,port):
 	except:
 		log_print("register failed")
 		return False
+
 def flatten_symbol(symbol):
 
 	r = 'http://localhost:8080/Flatten?symbol='+str(symbol)
 	sucess='flatten '+symbol+' Success!'
 	failure='flatten '+symbol+' Failure.'
-   
-	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,),daemon=True)
-	req.start()
+
+	return r,sucess,failure
+	#req = threading.Thread(target=ppro_request, args=(r,sucess,failure,),daemon=True)
+	#req.start()
 
 def buy_market_order(symbol,share):
 
@@ -64,19 +68,22 @@ def buy_market_order(symbol,share):
 	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=0.01&ordername=MEMX Buy MEMX Market DAY&shares='+str(share)
 	sucess='buy market order success on'+symbol
 	failure="Error buy order on"+symbol
-   
 
-	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,),daemon=True)
-	req.start()
+	return r,sucess,failure
+	#req = threading.Thread(target=ppro_request, args=(r,sucess,failure,),daemon=True)
+	#req.start()
 
 def sell_market_order(symbol,share):
+
+
 
 	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=0.01&ordername=MEMX Sell->Short MEMX Market DAY&shares='+str(share)
 	sucess='sell market order success on'+symbol
 	failure="Error sell order on"+symbol
-   
-	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,),daemon=True)
-	req.start()
+
+	return r,sucess,failure
+	#req = threading.Thread(target=ppro_request, args=(r,sucess,failure,),daemon=True)
+	#req.start()
 
 def find_between(data, first, last):
 	try:
@@ -92,7 +99,7 @@ def buy_limit_order(symbol, price,share,wait=0):
 	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Buy ARCX Limit DAY&shares='+str(share)
 	sucess='buy limit order success on'+symbol
 	failure="Error buy limit order on"+symbol
-   
+
 	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,wait,),daemon=True)
 	req.start()
 
@@ -102,7 +109,7 @@ def sell_limit_order(symbol, price,share,wait=0):
 	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Sell->Short ARCX Limit DAY&shares='+str(share)
 	sucess='sell limit order success on'+symbol
 	failure="Error sell limit order on"+symbol
-   
+
 	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,wait,),daemon=True)
 	req.start()
 
@@ -253,9 +260,11 @@ def init_driver():
 
 	return driver
 def Ppro_out(pipe,port): #a sperate process. GLOBALLY. 
-	
+
 	driver = init_driver()
 	request_str = ""
+	sucess_str= ""
+	failure_str = ""
 	while True:
 		try:
 			d = pipe.recv()
@@ -270,17 +279,17 @@ def Ppro_out(pipe,port): #a sperate process. GLOBALLY.
 				share = d[2]
 				rationale = d[3]
 
-				buy_market_order(symbol,share)
+				request_str,sucess_str,failure_str=buy_market_order(symbol,share)
 
 			elif type_ ==SELL:
 
 				symbol = d[1]
 				share = d[2]
 				rationale = d[3]
-				sell_market_order(symbol,share)
+				request_str,sucess_str,failure_str=sell_market_order(symbol,share)
 
 			elif type_ == LIMITBUY:
-				
+
 				symbol = d[1]
 				price = round(d[2],2)
 				share = d[3]
@@ -296,7 +305,7 @@ def Ppro_out(pipe,port): #a sperate process. GLOBALLY.
 				wait = d[4]
 				rationale = d[5]
 
-				sell_limit_order(symbol,price,share,wait)
+				request_str,sucess_str,failure_str=sell_limit_order(symbol,price,share,wait)
 
 
 			elif type_ == "Register":
@@ -307,38 +316,48 @@ def Ppro_out(pipe,port): #a sperate process. GLOBALLY.
 			elif type_ == FLATTEN:
 
 				symbol = d[1]
-				flatten_symbol(symbol)
+				request_str,sucess_str,failure_str=flatten_symbol(symbol)
 			else:
 
 				log_print("Unrecognized ppro command received.")
+
+			sucessful = False
+
+			while not sucessful:
+				try:
+					driver.get(request_str)
+					log_print(e,sucess_str)
+					sucessful = True
+				except Exception as e:
+					log_print(e,failure_str," driver restart")
+					driver = init_driver()
 
 		except Exception as e:
 			log_print(e)
 
 
-if __name__ == '__main__':  #TEST BLOCK
-	PATH = "sys/chromedriver.exe"
-	driver = webdriver.Chrome(PATH)
-	# postbody = "http://localhost:8080/SetOutput?region=1&feedtype=OSTAT&output=4040&status=on"
-	# r= requests.get(postbody)
+# if __name__ == '__main__':  #TEST BLOCK
+# 	PATH = "sys/chromedriver.exe"
+# 	driver = webdriver.Chrome(PATH)
+# 	# postbody = "http://localhost:8080/SetOutput?region=1&feedtype=OSTAT&output=4040&status=on"
+# 	# r= requests.get(postbody)
 
-	
-	req = threading.Thread(target=test, args=(),daemon=True)
-	req.start()
-	global lst
-	lst = []
-	A=["NIO.NY","SPY.AM"]
-	for i in range(20):
-		global now 
-		now = datetime.now()
-		#dt = datetime.now().strftime('%M:%S.%f')[:-4]
-		#print(dt)
-		#buy_market_order("NIO.NY",1)
-		current = i%2
-		driver.get('http://localhost:8080/ExecuteOrder?symbol='+A[current]+'&limitprice=0.01&ordername=MEMX Buy MEMX Market DAY&shares=1')
-		#time.sleep(1)
-	while True:
-		time.sleep(1)
+# 	req = threading.Thread(target=test, args=(),daemon=True)
+# 	req.start()
+# 	global lst
+# 	lst = []
+# 	A=["NIO.NY","SPY.AM"]
+# 	for i in range(20):
+# 		global now 
+# 		now = datetime.now()
+# 		#dt = datetime.now().strftime('%M:%S.%f')[:-4]
+# 		#print(dt)
+# 		#buy_market_order("NIO.NY",1)
+# 		current = i%2
+# 		driver.get('http://localhost:8080/ExecuteOrder?symbol='+A[current]+'&limitprice=0.01&ordername=MEMX Buy MEMX Market DAY&shares=1')
+# 		#time.sleep(1)
+# 	while True:
+# 		time.sleep(1)
 
 
 	
