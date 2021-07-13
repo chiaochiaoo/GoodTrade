@@ -257,6 +257,7 @@ def Ppro_outx(pipe,port): #a sperate process. GLOBALLY.
 def init_driver():
 	PATH = "sys/chromedriver.exe"
 	driver = webdriver.Chrome(PATH)
+	driver.minimize_window()
 
 	return driver
 def Ppro_out(pipe,port): #a sperate process. GLOBALLY. 
@@ -267,6 +268,9 @@ def Ppro_out(pipe,port): #a sperate process. GLOBALLY.
 	failure_str = ""
 	while True:
 		try:
+			request_str = ""
+			sucess_str= ""
+			failure_str = ""
 			d = pipe.recv()
 			type_ = d[0]
 
@@ -323,14 +327,15 @@ def Ppro_out(pipe,port): #a sperate process. GLOBALLY.
 
 			sucessful = False
 
-			while not sucessful:
-				try:
-					driver.get(request_str)
-					log_print(e,sucess_str)
-					sucessful = True
-				except Exception as e:
-					log_print(e,failure_str," driver restart")
-					driver = init_driver()
+			if request_str!="":
+				while not sucessful:
+					try:
+						driver.get(request_str)
+						log_print(sucess_str)
+						sucessful = True
+					except Exception as e:
+						log_print(e,failure_str," driver restart")
+						driver = init_driver()
 
 		except Exception as e:
 			log_print(e)
