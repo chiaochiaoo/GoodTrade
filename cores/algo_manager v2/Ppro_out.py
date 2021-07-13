@@ -5,26 +5,33 @@ import threading
 from constant import *
 from Util_functions import *
 import time
+from datetime import datetime
+import numpy as np
+import socket
+
+try:
+	from bs4 import BeautifulSoup
+except ImportError:
+	pip.main(['install', 'BeautifulSoup4'])
+	from bs4 import BeautifulSoup
+
+try:
+	from selenium import webdriver
+except ImportError:
+	pip.main(['install', 'selenium'])
+	from selenium import webdriver
+
 #Thoughts:
 #Combine PPRO sutff with VOXCOM into one process.
-
 #Create subclass for the algo manager.
-
 #Entry strategy 
-
 #Manage strategy
-
 #How to get the machine to read chart?
-
-
 #DATA CLASS. SUPPORT/RESISTENCE. 
-
-
 #everything ppro related. sending orders, receiving orders. ,flatten.
 def register(symbol,port):
 	req = threading.Thread(target=register_to_ppro, args=(symbol, True,port,),daemon=True)
 	req.start()
-
 def register_to_ppro(symbol,status,port):
 
 	#log_print("Registering",symbol,status)
@@ -62,7 +69,6 @@ def buy_market_order(symbol,share):
 	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,),daemon=True)
 	req.start()
 
-
 def sell_market_order(symbol,share):
 
 	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=0.01&ordername=MEMX Sell->Short MEMX Market DAY&shares='+str(share)
@@ -71,9 +77,6 @@ def sell_market_order(symbol,share):
    
 	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,),daemon=True)
 	req.start()
-
-
-
 
 def find_between(data, first, last):
 	try:
@@ -155,7 +158,6 @@ def stoporder_to_market_buy(symbol,price,share,pipe=None):
 	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,True,symbol,"B",pipe),daemon=True)
 	req.start()
 
-
 def get_stoporder_status(id_):
 
 	req = 'http://localhost:8080/GetScriptState?scriptid='+id_
@@ -186,7 +188,7 @@ def cancel_stoporder(id_):
 	req = threading.Thread(target=ppro_request, args=(r,sucess,failure),daemon=True)
 	req.start()	
 
-def Ppro_out(pipe,port): #a sperate process. GLOBALLY. 
+def Ppro_outx(pipe,port): #a sperate process. GLOBALLY. 
 	while True:
 		try:
 			d = pipe.recv()
@@ -245,20 +247,107 @@ def Ppro_out(pipe,port): #a sperate process. GLOBALLY.
 			log_print(e)
 
 
-if __name__ == '__main__':  #TEST BLOCK
+def init_driver():
+	PATH = "sys/chromedriver.exe"
+	driver = webdriver.Chrome(PATH)
 
-
-	buy_market_order("NIO.NY",1)
-
-# 	buy_limit_order("AAL.NQ",24.22,1)
-
+	return driver
+def Ppro_out(pipe,port): #a sperate process. GLOBALLY. 
+	
+	driver = init_driver()
+	request_str = ""
 	while True:
-		a=1
+		try:
+			d = pipe.recv()
+			type_ = d[0]
+
+			log_print("PPRO ORDER:",d)
+
+
+			if type_ == BUY:
+
+				symbol = d[1]
+				share = d[2]
+				rationale = d[3]
+
+				buy_market_order(symbol,share)
+
+			elif type_ ==SELL:
+
+				symbol = d[1]
+				share = d[2]
+				rationale = d[3]
+				sell_market_order(symbol,share)
+
+			elif type_ == LIMITBUY:
+				
+				symbol = d[1]
+				price = round(d[2],2)
+				share = d[3]
+				wait = d[4]
+				rationale = d[5]
+				buy_limit_order(symbol,price,share,wait)
+
+			elif type_ == LIMITSELL:
+
+				symbol = d[1]
+				price = round(d[2],2)
+				share = d[3]
+				wait = d[4]
+				rationale = d[5]
+
+				sell_limit_order(symbol,price,share,wait)
+
+
+			elif type_ == "Register":
+
+				symbol = d[1]
+				register(symbol,port)
+
+			elif type_ == FLATTEN:
+
+				symbol = d[1]
+				flatten_symbol(symbol)
+			else:
+
+				log_print("Unrecognized ppro command received.")
+
+		except Exception as e:
+			log_print(e)
+
+
+if __name__ == '__main__':  #TEST BLOCK
+	PATH = "sys/chromedriver.exe"
+	driver = webdriver.Chrome(PATH)
+	# postbody = "http://localhost:8080/SetOutput?region=1&feedtype=OSTAT&output=4040&status=on"
+	# r= requests.get(postbody)
+
+	
+	req = threading.Thread(target=test, args=(),daemon=True)
+	req.start()
+	global lst
+	lst = []
+	A=["NIO.NY","SPY.AM"]
+	for i in range(20):
+		global now 
+		now = datetime.now()
+		#dt = datetime.now().strftime('%M:%S.%f')[:-4]
+		#print(dt)
+		#buy_market_order("NIO.NY",1)
+		current = i%2
+		driver.get('http://localhost:8080/ExecuteOrder?symbol='+A[current]+'&limitprice=0.01&ordername=MEMX Buy MEMX Market DAY&shares=1')
+		#time.sleep(1)
+	while True:
+		time.sleep(1)
+
+
+	
+
+
 	#sell_market_order("AAL.NQ",1)
 
 	# def register(self,symbol):
-	# 	req = threading.Thread(target=self.register_to_ppro, args=(symbol, True,),daemon=True)
-	# 	req.start()
+
 			
 	# def deregister(self,symbol):
 
