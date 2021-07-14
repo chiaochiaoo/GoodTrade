@@ -883,16 +883,16 @@ class FibonacciManager(AbstractTrigger):
 			self.tradingplan.data[FIBLEVEL1] = round(self.tradingplan.data[FIBCURRENT_MAX] - (0.214*gap),2)
 			self.tradingplan.data[FIBLEVEL2] = round(self.tradingplan.data[FIBCURRENT_MAX] - (0.382*gap),2)
 			self.tradingplan.data[FIBLEVEL3] = round(self.tradingplan.data[FIBCURRENT_MAX] - (0.5*gap),2)
-			self.tradingplan.data[FIBLEVEL4] = round(self.tradingplan.data[FIBCURRENT_MAX] - (0.67*gap),2)
-			self.tradingplan.data[STOP_LEVEL] = round(self.tradingplan.data[FIBCURRENT_MAX] - (0.67*gap),2)
+			self.tradingplan.data[FIBLEVEL4] = round(self.tradingplan.data[FIBCURRENT_MAX] - (0.61*gap),2)
+			self.tradingplan.data[STOP_LEVEL] = round(self.tradingplan.data[FIBCURRENT_MAX] - (0.61*gap),2)
 
 		elif self.tradingplan.data[POSITION] == SHORT:
 
 			self.tradingplan.data[FIBLEVEL1] = round(self.tradingplan.data[FIBCURRENT_MAX] + (0.214*gap),2)
 			self.tradingplan.data[FIBLEVEL2] = round(self.tradingplan.data[FIBCURRENT_MAX] + (0.382*gap),2)
 			self.tradingplan.data[FIBLEVEL3] = round(self.tradingplan.data[FIBCURRENT_MAX] + (0.5*gap),2)
-			self.tradingplan.data[FIBLEVEL4] = round(self.tradingplan.data[FIBCURRENT_MAX] + (0.67*gap),2)
-			self.tradingplan.data[STOP_LEVEL] = round(self.tradingplan.data[FIBCURRENT_MAX] + (0.67*gap),2)
+			self.tradingplan.data[FIBLEVEL4] = round(self.tradingplan.data[FIBCURRENT_MAX] + (0.61*gap),2)
+			self.tradingplan.data[STOP_LEVEL] = round(self.tradingplan.data[FIBCURRENT_MAX] + (0.61*gap),2)
 		#3. Bring up the new FIB max. 
 
 		self.tradingplan.data[PXT1] =self.tradingplan.data[FIBLEVEL1] 
@@ -1033,12 +1033,12 @@ class FibonacciTrigger_trigger_time0(AbstractTrigger):
 	def trigger_event(self):
 
 		if self.strategy.fib_level == 1:
-			self.tradingplan.manage_trades(self.tradingplan.data[POSITION],MINUS,0.05)
+			self.tradingplan.manage_trades(self.tradingplan.data[POSITION],MINUS,0.10)
 			log_print(self.symbol_name,"retracement level:1","Taking off 10%.")
 			self.set_mind("retracement level:1")
 		if self.strategy.fib_level == 2:
-			self.tradingplan.manage_trades(self.tradingplan.data[POSITION],MINUS,0.15)
-			log_print(self.symbol_name,"retracement level:2","Taking off 25%.")
+			self.tradingplan.manage_trades(self.tradingplan.data[POSITION],MINUS,1)
+			log_print(self.symbol_name,"retracement level:2","Taking off all.")
 			self.set_mind("retracement level:2")
 		if self.strategy.fib_level == 3:
 			if self.tradingplan.flatten_order==False:
