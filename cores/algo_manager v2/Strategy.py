@@ -147,7 +147,7 @@ class EntryStrategy(Strategy):
 		self.set_mind("")
 
 
-	""" REQUIRED: Fill in the conditions for each type of triggers. 
+	""" REQUIRED: Fill in the conditions for each type of triggers.
 	   Will determine what triggers to use should the system decides to reload. """
 
 	def reload_triggers(self):
@@ -181,9 +181,12 @@ class EntryStrategy(Strategy):
 """ PLANS : seperate management plan and entry plan"""
 
 """ENTRY PLAN"""
-class BreakUp(EntryStrategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry. 
+class BreakUp(EntryStrategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry.
 	def __init__(self,timer,repeat,symbol,tradingplan):
 		super().__init__("Entry : Break up",symbol,tradingplan)
+
+		self.timer = timer
+		self.repeat = repeat
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 		self.buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
@@ -194,12 +197,29 @@ class BreakUp(EntryStrategy): #the parameters contains? dk. yet .  #Can make sin
 
 		if not self.buyTrigger.pre_deploying_check():
 			self.buyTrigger.total_reset()
+		else:
+			self.transitional_trigger = AbstractTrigger("transition to below pH.",[[SYMBOL_DATA,BID,"<",SYMBOL_DATA,RESISTENCE]],0,1,"REACTIVATE")
+			self.buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",self.timer,self.repeat,LONG,self.ppro_out)
+			self.transitional_trigger.add_next_trigger(self.buyTrigger)
+
+			###Where continuation trigger goes.#####
+			self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
+			self.symbol.data[ENTRY] = self.symbol.data[HIGH]
+
+			self.cont_buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"Break Up contituation",self.timer,self.repeat,LONG,self.ppro_out)
+			log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),self.timer,self.repeat)
+
+			self.set_initial_trigger(self.transitional_trigger)
+			self.add_initial_triggers(self.cont_buyTrigger)
+			self.restart()
 
 
 
-class BreakDown(EntryStrategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry. 
+class BreakDown(EntryStrategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry.
 	def __init__(self,timer,repeat,symbol,tradingplan):
 		super().__init__("Entry : Break up",symbol,tradingplan)
+		self.timer = timer
+		self.repeat = repeat
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 		self.sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
@@ -211,6 +231,21 @@ class BreakDown(EntryStrategy): #the parameters contains? dk. yet .  #Can make s
 
 		if not self.sellTrigger.pre_deploying_check():
 			self.sellTrigger.total_reset()
+		else:
+			self.transitional_trigger = AbstractTrigger("transition to below pH.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],0,1,"REACTIVATE")
+			self.sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",self.timer,self.repeat,SHORT,self.ppro_out)
+			self.transitional_trigger.add_next_trigger(self.sellTrigger)
+
+
+			self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
+			self.symbol.data[ENTRY] = self.symbol.data[LOW]
+
+			self.cont_sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"break down contituation",self.timer,self.repeat,SHORT,self.ppro_out)
+			log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),self.timer,self.repeat)
+
+			self.set_initial_trigger(self.transitional_trigger)
+			self.add_initial_triggers(self.cont_sellTrigger)
+			self.restart()
 
 
 class BreakAny(EntryStrategy):
@@ -221,6 +256,8 @@ class BreakAny(EntryStrategy):
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 		self.buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
 		self.sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
+		self.timer = timer
+		self.repeat = repeat
 
 		self.add_initial_triggers(self.buyTrigger)
 		self.add_initial_triggers(self.sellTrigger)
@@ -228,12 +265,31 @@ class BreakAny(EntryStrategy):
 	def on_redeploying(self):
 
 		""" if one is used and does not vilate the entry condition (failed trade) reset it."""
-		if self.sellTrigger.get_trigger_state()==False and not self.sellTrigger.pre_deploying_check():
-			self.sellTrigger.total_reset()
+		if self.sellTrigger.get_trigger_state()==False:
+			if not self.sellTrigger.pre_deploying_check():
+				self.sellTrigger.total_reset()
 
-		if self.buyTrigger.get_trigger_state()==False and not self.buyTrigger.pre_deploying_check():
-			self.buyTrigger.total_reset()
+			else:
+				self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
+				self.symbol.data[ENTRY] = self.symbol.data[LOW]
 
+				self.cont_sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"break down contituation",self.timer,self.repeat,SHORT,self.ppro_out)
+				log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),self.timer,self.repeat)
+				self.add_initial_triggers(self.cont_sellTrigger)
+
+		if self.buyTrigger.get_trigger_state()==False:
+			if not self.buyTrigger.pre_deploying_check():
+				self.buyTrigger.total_reset()
+
+			else:
+				self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
+				self.symbol.data[ENTRY] = self.symbol.data[HIGH]
+
+				self.cont_buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"Break Up contituation",self.timer,self.repeat,LONG,self.ppro_out)
+				log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),self.timer,self.repeat)
+				self.add_initial_triggers(self.cont_buyTrigger)
+
+		self.restart()
 
 class BreakFirst(EntryStrategy):
 	def __init__(self,timer,repeat,symbol,tradingplan):
@@ -253,7 +309,6 @@ class BreakFirst(EntryStrategy):
 
 
 		if self.buyTrigger.get_trigger_state()==False:
-			print(1)
 			self.sellTrigger.deactivate()
 
 			if not self.buyTrigger.pre_deploying_check():
@@ -263,9 +318,18 @@ class BreakFirst(EntryStrategy):
 				self.transitional_trigger = AbstractTrigger("transition to below pH.",[[SYMBOL_DATA,BID,"<",SYMBOL_DATA,RESISTENCE]],0,1,"REACTIVATE")
 				self.buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",self.timer,self.repeat,LONG,self.ppro_out)
 				self.transitional_trigger.add_next_trigger(self.buyTrigger)
-				
+
+				###Where continuation trigger goes.#####
+				self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
+				self.symbol.data[ENTRY] = self.symbol.data[HIGH]
+
+				self.cont_buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"Break Up contituation",self.timer,self.repeat,LONG,self.ppro_out)
+				log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),self.timer,self.repeat)
+
 				self.set_initial_trigger(self.transitional_trigger)
+				self.add_initial_triggers(self.cont_buyTrigger)
 				self.restart()
+
 		elif self.sellTrigger.get_trigger_state()==False:
 			self.buyTrigger.deactivate()
 
@@ -276,10 +340,16 @@ class BreakFirst(EntryStrategy):
 				self.sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",self.timer,self.repeat,SHORT,self.ppro_out)
 				self.transitional_trigger.add_next_trigger(self.sellTrigger)
 
+
+				self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
+				self.symbol.data[ENTRY] = self.symbol.data[LOW]
+
+				self.cont_sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"break down contituation",self.timer,self.repeat,SHORT,self.ppro_out)
+				log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),self.timer,self.repeat)
+
 				self.set_initial_trigger(self.transitional_trigger)
+				self.add_initial_triggers(self.cont_sellTrigger)
 				self.restart()
-
-
 
 
 class Bullish(EntryStrategy):
@@ -367,9 +437,6 @@ class Bearish(EntryStrategy):
 					self.sellTrigger.deactivate()  #it's a successful run. deactive the other one. 
 
 
-
-
-
 class Ripsell(EntryStrategy):
 	def __init__(self,timer,repeat,symbol,tradingplan):
 
@@ -424,6 +491,8 @@ class Dipbuy(EntryStrategy):
 
 class Fadeany(EntryStrategy):
 	def __init__(self,timer,repeat,symbol,tradingplan):
+		self.timer = timer
+		self.repeat = repeat
 
 		super().__init__("Entry :Fadeany",symbol,tradingplan)
 		#description,trigger_timer:int,trigger_limit=1
@@ -432,7 +501,7 @@ class Fadeany(EntryStrategy):
 		self.transitional_trigger_buy = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],0,1,"Waiting for recross ")
 		self.transitional_trigger_buy_2 = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],45,1,"Waiting for recross ")
 		self.buyreversalTrigger = WideStop_trigger([[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],LOW,self.risk,"long reversal",timer,repeat,LONG,self.ppro_out)
-		
+
 		self.transitional_trigger_buy.add_next_trigger(self.transitional_trigger_buy_2)
 		self.transitional_trigger_buy_2.add_next_trigger(self.buyreversalTrigger)
 		self.add_initial_triggers(self.transitional_trigger_buy)
@@ -442,7 +511,77 @@ class Fadeany(EntryStrategy):
 		self.transitional_trigger_sell = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,RESISTENCE]],0,1,"Waiting for recross")
 		self.transitional_trigger_sell_2 = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],45,1,"Waiting for recross")
 		self.sellreversalTrigger = WideStop_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],HIGH,self.risk,"short reversal",timer,repeat,SHORT,self.ppro_out)
-		
+
+		self.transitional_trigger_sell.add_next_trigger(self.transitional_trigger_sell_2)
+		self.transitional_trigger_sell_2.add_next_trigger(self.sellreversalTrigger)
+		self.add_initial_triggers(self.transitional_trigger_sell)
+
+
+	def on_redeploying(self):
+
+		""" whicheer gets used gets re-deploy """
+		if  self.buyreversalTrigger.get_trigger_state()==False:
+			if not self.buyreversalTrigger.pre_deploying_check():
+				self.buyreversalTrigger = WideStop_trigger([[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],LOW,self.risk,"long reversal",self.timer,self.repeat,LONG,self.ppro_out)
+				self.set_initial_trigger(self.buyreversalTrigger)
+
+			else:
+				self.transitional_trigger_buy.total_reset()
+				self.transitional_trigger_buy_2.total_reset()
+				self.buyreversalTrigger.total_reset()
+
+				self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
+				self.symbol.data[ENTRY] = self.symbol.data[HIGH]
+
+				self.cont_buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"fade Up contituation",self.timer,self.repeat,LONG,self.ppro_out)
+				log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),self.timer,self.repeat)
+
+				self.set_initial_trigger(self.transitional_trigger_buy)
+				self.add_initial_triggers(self.cont_buyTrigger)
+
+				#just cross the resistence. short.
+
+		if  self.sellreversalTrigger.get_trigger_state()==False:
+			if not self.sellreversalTrigger.pre_deploying_check():
+				 #just cross the support.  long
+				self.sellreversalTrigger = WideStop_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],HIGH,self.risk,"short reversal",self.timer,self.repeat,SHORT,self.ppro_out)
+				self.set_initial_trigger(self.sellreversalTrigger)
+			else:
+				self.transitional_trigger_sell.total_reset()
+				self.transitional_trigger_sell_2.total_reset()
+				self.sellreversalTrigger.total_reset()
+
+				self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
+				self.symbol.data[ENTRY] = self.symbol.data[LOW]
+
+				self.cont_sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"fade down contituation",self.timer,self.repeat,SHORT,self.ppro_out)
+				log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),self.timer,self.repeat)
+
+				self.set_initial_trigger(self.transitional_trigger_sell)
+				self.add_initial_triggers(self.cont_sellTrigger)
+				
+		self.restart()
+class Fadeany_cont(EntryStrategy):
+	def __init__(self,timer,repeat,symbol,tradingplan):
+
+		super().__init__("Entry :Fadeany",symbol,tradingplan)
+		#description,trigger_timer:int,trigger_limit=1
+		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
+
+		self.transitional_trigger_buy = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],0,1,"Waiting for recross ")
+		self.transitional_trigger_buy_2 = AbstractTrigger("transitional trigger to long.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],45,1,"Waiting for recross ")
+		self.buyreversalTrigger = WideStop_trigger([[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],LOW,self.risk,"long reversal",timer,repeat,LONG,self.ppro_out)
+
+		self.transitional_trigger_buy.add_next_trigger(self.transitional_trigger_buy_2)
+		self.transitional_trigger_buy_2.add_next_trigger(self.buyreversalTrigger)
+		self.add_initial_triggers(self.transitional_trigger_buy)
+
+
+
+		self.transitional_trigger_sell = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,RESISTENCE]],0,1,"Waiting for recross")
+		self.transitional_trigger_sell_2 = AbstractTrigger("transitional trigger to short.",[[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],45,1,"Waiting for recross")
+		self.sellreversalTrigger = WideStop_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,RESISTENCE]],HIGH,self.risk,"short reversal",timer,repeat,SHORT,self.ppro_out)
+
 		self.transitional_trigger_sell.add_next_trigger(self.transitional_trigger_sell_2)
 		self.transitional_trigger_sell_2.add_next_trigger(self.sellreversalTrigger)
 		self.add_initial_triggers(self.transitional_trigger_sell)

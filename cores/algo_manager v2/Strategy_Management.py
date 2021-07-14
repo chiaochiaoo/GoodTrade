@@ -212,8 +212,6 @@ class OneToTWORiskReward(ManagementStrategy):
 		self.total_orders = total_orders
 
 
-
-
 class FibonacciOnly(ManagementStrategy):
 
 	def __init__(self,symbol,tradingplan):
@@ -239,16 +237,11 @@ class FibonacciOnly(ManagementStrategy):
 		self.stop = self.tradingplan.data[STOP_LEVEL]
 
 
-	"""
-	Only case needs to activate management in loading up: Instant.
-
-	"""
 
 	def on_loading_up(self): #call this whenever the break at price changes. Onl
 
 		log_print("LOADING UP!!!!","init:",self.initialized,self.management_start)
 		if not self.initialized:
-
 
 			self.price = self.tradingplan.data[AVERAGE_PRICE]
 			self.stop = self.tradingplan.data[STOP_LEVEL]
@@ -270,22 +263,123 @@ class FibonacciOnly(ManagementStrategy):
 			"""
 			self.tradingplan.data[TRIGGER_PRICE_1] = round(self.price+coefficient*self.risk_per_share*0.2,2)  #75%
 			self.tradingplan.data[TRIGGER_PRICE_2] = round(self.price+coefficient*self.risk_per_share*0.3,2)  #half
-			
 			self.tradingplan.data[FIBCURRENT_MAX] = round(self.price+coefficient*self.risk_per_share*0.5,2)  #br even
 			self.tradingplan.data[TRIGGER_PRICE_3] = round(self.price+coefficient*self.risk_per_share*0.5,2)  #br even
 
 
 			self.tradingplan.data[PXT1] =self.tradingplan.data[FIBCURRENT_MAX]
 			self.tradingplan.tkvars[PXT1].set(self.tradingplan.data[PXT1])
-			# self.tradingplan.data[TRIGGER_PRICE_4] = round(self.price+coefficient*self.gap*0.7,2)  #second
-			# self.tradingplan.data[TRIGGER_PRICE_5] = round(self.price+coefficient*self.gap*1.2,2)  #third
-			# self.tradingplan.data[TRIGGER_PRICE_6] = round(self.price+coefficient*self.gap*1.7,2)  #fourth
-			# self.tradingplan.data[TRIGGER_PRICE_7] = round(self.price+coefficient*self.gap*2.2,2)  #fifth
-			# self.tradingplan.data[TRIGGER_PRICE_8] = round(self.price+coefficient*self.gap*2.7,2)  #sixth
-			# self.tradingplan.data[TRIGGER_PRICE_9] = round(self.price+coefficient*self.gap*3.2,2)  #FINAL
 
-			#set the price levels.
-			#log_print(id_,"updating price levels.",price,self.price_levels[id_][1],self.price_levels[id_][2],self.price_levels[id_][3])
+
+			self.tradingplan.tkvars[AUTOMANAGE].set(True)
+			# self.tradingplan.tkvars[PXT1].set(self.tradingplan.data[TRIGGER_PRICE_1])
+			# self.tradingplan.tkvars[PXT2].set(self.tradingplan.data[TRIGGER_PRICE_7])
+			# self.tradingplan.tkvars[PXT3].set(self.tradingplan.data[TRIGGER_PRICE_9])
+
+			#log_print(self.symbol_name,"Management price target adjusted:",self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
+
+			self.shares_loaded = True
+
+			#shouldn't start here. because, sometime multiple entry is required. 7/10
+			#No. This is a mechanism that works for INSTANT. if already started, but not intialized. restart the whole thing.
+
+			if self.initialized == False and self.management_start==True:
+				self.on_start()
+
+	def on_start(self):
+
+		if self.shares_loaded:
+
+			super().on_start()
+
+
+			""" send out the limit orders """
+
+			if self.tradingplan.data[USING_STOP]==False:
+				self.set_mind("STOP BYPASSING: ON")
+
+			self.fib_level = 1
+			self.FibActivated = False
+			self.tradingplan.current_price_level = 1
+			self.orders_level = 1
+			self.initialized = True
+			#log_print("HELLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLO",self.initialized)
+		else:
+			self.management_start=True
+
+	def shares_calculator(self,shares):
+
+		if shares<3:
+			return 0,shares,0
+		else:
+			# first_lot = int(shares/3)
+			# third_lot = shares - 2*first_lot
+			third_lot = int(shares/2)
+			first_lot = int((shares - third_lot)/3)
+			second_lot = shares - first_lot - third_lot
+			#print(first_lot,second_lot,third_lot)
+			return first_lot,second_lot,third_lot
+
+	def on_deploying(self): #refresh it when reusing.
+		self.initialized = False
+		super().on_deploying()
+
+class FiboNoSoft(ManagementStrategy):
+
+	def __init__(self,symbol,tradingplan):
+
+		super().__init__("Management: 1-to-2 risk-reward with Fibo",symbol,tradingplan)
+
+		self.manaTrigger = FibonacciManager("Fibonacci manager",self)
+		self.fiboTrigger = FibonacciTrigger_trigger_time0("Fibonacci trigger",self)
+
+		self.add_initial_triggers(self.manaTrigger)
+		self.add_initial_triggers(self.fiboTrigger)
+		#description,trigger_timer:int,trigger_limit=1
+		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
+		###upon activating, reset all parameters.
+		self.total_orders = None
+		self.FibActivated = False
+		self.risk_per_share = 0
+		self.orders_level = 1
+		self.fib_level = 1
+		self.initialized = False
+
+		self.price = self.tradingplan.data[AVERAGE_PRICE]
+		self.stop = self.tradingplan.data[STOP_LEVEL]
+
+	def on_loading_up(self): #call this whenever the break at price changes. Onl
+
+		log_print("LOADING UP!!!!","init:",self.initialized,self.management_start)
+		if not self.initialized:
+
+			self.price = self.tradingplan.data[AVERAGE_PRICE]
+			self.stop = self.tradingplan.data[STOP_LEVEL]
+			self.risk_per_share = abs(self.price-self.stop)
+
+			coefficient = 1
+
+			if self.tradingplan.data[POSITION] == LONG:
+				coefficient = 1
+			elif self.tradingplan.data[POSITION] == SHORT:
+				coefficient = -1
+
+			"""
+			px1 = 0.3 #break even
+			px2 = 1 #set second barage
+			px3 = 2 #set third barage
+			px4 = 3.2 #over and out.
+
+			"""
+			self.tradingplan.data[TRIGGER_PRICE_1] = round(self.price+coefficient*self.risk_per_share*0.2,2)  #75%
+			self.tradingplan.data[TRIGGER_PRICE_2] = round(self.price+coefficient*self.risk_per_share*0.3,2)  #half
+			self.tradingplan.data[FIBCURRENT_MAX] = round(self.price+coefficient*self.risk_per_share*0.5,2)  #br even
+			self.tradingplan.data[TRIGGER_PRICE_3] = round(self.price+coefficient*self.risk_per_share*0.5,2)  #br even
+
+
+			self.tradingplan.data[PXT1] =self.tradingplan.data[FIBCURRENT_MAX]
+			self.tradingplan.tkvars[PXT1].set(self.tradingplan.data[PXT1])
+
 
 			self.tradingplan.tkvars[AUTOMANAGE].set(True)
 			# self.tradingplan.tkvars[PXT1].set(self.tradingplan.data[TRIGGER_PRICE_1])
