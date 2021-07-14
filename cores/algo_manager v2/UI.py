@@ -30,7 +30,7 @@ class UI(pannel):
 
 		self.entry_plan_options = {BREAISH,BULLISH,BREAKUP,BREAKDOWN,BREAKFIRST,BREAKANY,RIPSELL,DIPBUY,FADEANY}
 
-		self.management_plan_options = {ONETOTWORISKREWARD,ONETOTWORISKREWARDOLD,FIBO}#THREE_TARGETS,SMARTTRAIL,ANCARTMETHOD,
+		self.management_plan_options = {FIBO,FIBONO}#THREE_TARGETS,SMARTTRAIL,ANCARTMETHOD,ONETOTWORISKREWARD,ONETOTWORISKREWARDOLD,
 
 	def init_pannel(self):
 		self.labels = {"":4,\
@@ -178,7 +178,7 @@ class UI(pannel):
 		self.all_enp = tk.StringVar(value=BREAKFIRST)
 		tk.OptionMenu(self.config, self.all_enp, *sorted(self.entry_plan_options)).grid(sticky="w",column=3,row=7,padx=10)
 
-		self.all_ent = tk.StringVar(value=INCREMENTAL)
+		self.all_ent = tk.StringVar(value=INCREMENTAL2)
 		tk.OptionMenu(self.config, self.all_ent, *sorted(self.entry_type_options)).grid(sticky="w",column=3,row=8,padx=10)
 
 		self.all_mana = tk.StringVar(value=FIBO)

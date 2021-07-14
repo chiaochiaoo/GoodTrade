@@ -15,6 +15,15 @@ import json
 
 class BackTester:
 
+
+	def ts_to_min(self,ts):
+
+		hour= ts//3600
+		minute = (ts%3600)//60
+		secnds = (ts%3600)%60
+
+		return str(hour)+":"+ str(minute)+":"+ str(secnds)
+
 	def __init__(self,manager,receive_pipe,ppro_in,ppro_out):
 
 		now = datetime.now()
@@ -42,15 +51,25 @@ class BackTester:
 		self.price_stay = True
 		self.price_flip = True
 
+		self.pause = False
+		self.rewind = False
+
 		self.manager = manager
 		# self.init= tk.Button(self.root ,text="Register",width=10,bg="#5BFF80",command=self.start_test)
 		# self.init.grid(column=1,row=1) m
 
 		self.price = tk.DoubleVar(value=412.55)
+		tk.Label(self.root ,textvariable=self.price,width=10).grid(column=2,row=1)
 
-		tk.Entry(self.root ,textvariable=self.price,width=10).grid(column=1,row=2)
+		self.time = tk.StringVar()
+		tk.Label(self.root ,textvariable=self.time,width=10).grid(column=1,row=1)
 
-		tk.Button(self.root ,text="deploy",command=self.deploy).grid(column=1,row=4)
+		tk.Button(self.root ,text="Start",command=self.deploy).grid(column=1,row=2)
+
+		self.pause_button = tk.Button(self.root ,text="Pause",command=self.pause_function)
+		self.pause_button.grid(column=1,row=3)
+		tk.Button(self.root ,text="Rewind",command=self.rewind_function).grid(column=1,row=4)
+
 		# tk.Button(self.root ,text="stay",command=self.price_stay).grid(column=2,row=4)
 		# tk.Button(self.root ,text="down",command=self.price_down).grid(column=3,row=4)
 		# tk.Button(self.root ,text="TimeX1",command=self.time_facotr_1).grid(column=1,row=3)
@@ -63,7 +82,7 @@ class BackTester:
 		# tk.Button(self.root ,text="sub 1 share",command=self.sub1).grid(column=2,row=7)
 
 		#read the file
-		with open('backtest/AMD.NQ.txt') as json_file:
+		with open('backtest/XLE.AM.txt') as json_file:
 			tester = json.load(json_file)
 
 		self.gt.send(["pkg",[[BREAKFIRST, tester['symbol'], tester["support"], tester["resistence"], 50.0, {'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441}]]])
@@ -77,27 +96,46 @@ class BackTester:
 		# price_changer = threading.Thread(target=self.price_changer, daemon=True)
 		# price_changer.start()
 
+	def rewind_function(self):
+		self.rewind = True
 	def price_changer(self):
 		start = np.where(np.array(self.tester['ts'])>34200)[0][0]
-		for i in range(start,len(self.tester['ts'])):
-			data={}
-			data["bid"]= self.tester['bid'][i]
-			data["ask"]= self.tester['ask'][i]
-			data["symbol"]= self.tester['symbol']
-			data["timestamp"]= self.tester['ts'][i]
-			self.bid = data["bid"]
-			self.ask = data["ask"]
-			self.ppro.send(["order update",data])
-			if i%1000 ==0:
-				print(data)
-			time.sleep(0.01)
 
+		while True:
+			self.rewind = False
+			for i in range(start,len(self.tester['ts'])):
+				data={}
+				data["bid"]= self.tester['bid'][i]
+				data["ask"]= self.tester['ask'][i]
+				data["symbol"]= self.tester['symbol']
+				data["timestamp"]= self.tester['ts'][i]
+				self.bid = data["bid"]
+				self.ask = data["ask"]
+				self.ppro.send(["order update",data])
+				self.price.set(data["bid"])
+				self.time.set(self.ts_to_min(data["timestamp"]))
+				if i%1000 ==0:
+					print(data)
+
+				while self.pause==True:
+					time.sleep(1)
+				time.sleep(0.01)
+				if self.rewind:
+					break
+	def pause_function(self):
+
+		if self.pause:
+			self.pause_button["text"] = "Pause"
+			self.pause = False
+		else:
+			self.pause_button["text"] = "Resume"
+			self.pause = True
+
+		print(self.pause)
 	def deploy(self):
-
 		#do couple thing. 1. deploy. 2. jump to 34200 and start feading ppro. 
 		self.manager.deploy_all()
 		time.sleep(1)
-
 		price_changer = threading.Thread(target=self.price_changer, daemon=True)
 		price_changer.start()
 
@@ -311,3 +349,6 @@ class BackTester:
 
 		for i in used:
 			del self.sell_book[i]
+
+
+

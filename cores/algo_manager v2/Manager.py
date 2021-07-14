@@ -247,7 +247,7 @@ class Manager:
 		if symbol not in self.symbols:
 
 			self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats)  #register in Symbol.
-			self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INCREMENTAL,NONE,risk,self.pipe_ppro_out,TEST_MODE)
+			self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INCREMENTAL2,NONE,risk,self.pipe_ppro_out,TEST_MODE)
 
 			self.ui.create_new_entry(self.tradingplan[symbol])
 			
@@ -782,7 +782,7 @@ if __name__ == '__main__':
 
 	algo_voxcom = multiprocessing.Process(target=algo_manager_voxcom, args=(receive_pipe,),daemon=True)
 	algo_voxcom.daemon=True
-	
+
 
 	ppro_in, ppro_pipe_end = multiprocessing.Pipe()
 
@@ -794,16 +794,18 @@ if __name__ == '__main__':
 
 	ppro_out_manager = multiprocessing.Process(target=Ppro_out, args=(ppro_pipe_end2,port,),daemon=True)
 	ppro_out_manager.daemon=True
-	
 
-	root = tk.Tk() 
-	root.title("GoodTrade Algo Manager v2 b6") 
+
+	root = tk.Tk()
+	root.title("GoodTrade Algo Manager v2 b6")
 	root.geometry("1920x800")
 
 	manager=Manager(root,goodtrade_pipe,ppro_out,ppro_in,TEST)
-
-	if len(sys.argv)>1:
+	print(len(sys.argv))
+	if len(sys.argv)==2:
 		BackTester(manager,receive_pipe,ppro_pipe_end,ppro_pipe_end2)
+	elif len(sys.argv)==3:
+		Tester(receive_pipe,ppro_pipe_end,ppro_pipe_end2)
 	else:
 		algo_voxcom.start()
 		ppro_out_manager.start()

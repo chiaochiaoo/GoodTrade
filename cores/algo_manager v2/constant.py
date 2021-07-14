@@ -78,6 +78,8 @@ FIBLEVEL1 = "Fib level 1"
 FIBLEVEL2 = "Fib level 2"
 FIBLEVEL3 = "Fib level 3"
 FIBLEVEL4 = "Fib level 4"
+EXIT = "Exit price"
+ENTRY = "Entry price"
 
 STATUS = "Status"
 POSITION="Position"
@@ -124,11 +126,12 @@ BREAKFIRST = "BreakFirst"
 #MANA Plan
 NONE =          "NONE"
 THREE_TARGETS = "Three tgts "
-SMARTTRAIL =  "SmartTrail" 
+SMARTTRAIL =  "SmartTrail"
 ANCARTMETHOD =  "AC METHOD"
 ONETOTWORISKREWARD = "1:2 Exprmntl"
-
+FIBONO = "FibAdjstd"
 FIBO = "Fib only"
+
 ONETOTWORISKREWARDOLD = "1:2 RiskReward"
 ##### ORDER TYPE ####
 
