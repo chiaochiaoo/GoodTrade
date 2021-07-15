@@ -48,6 +48,8 @@ class ManagementStrategy(Strategy):
 		for i in self.initial_triggers:
 			self.current_triggers.add(i)
 
+	def reset(self):
+		pass
 
 class OneToTWORiskReward(ManagementStrategy):
 
@@ -239,10 +241,9 @@ class FibonacciOnly(ManagementStrategy):
 
 
 	def on_loading_up(self): #call this whenever the break at price changes. Onl
-
-		log_print("LOADING UP!!!!","init:",self.initialized,self.management_start)
+		#print("loading up:",self.initialized)
 		if not self.initialized:
-
+			log_print("LOADING UP!!!!","init:",self.initialized,self.management_start)
 			self.price = self.tradingplan.data[AVERAGE_PRICE]
 			self.stop = self.tradingplan.data[STOP_LEVEL]
 			self.risk_per_share = abs(self.price-self.stop)
@@ -321,8 +322,13 @@ class FibonacciOnly(ManagementStrategy):
 			return first_lot,second_lot,third_lot
 
 	def on_deploying(self): #refresh it when reusing.
+		#print("ON DEPLOYING")
 		self.initialized = False
+		self.shares_loaded = False
 		super().on_deploying()
+
+	def reset(self):
+		self.initialized = False
 
 class FiboNoSoft(ManagementStrategy):
 

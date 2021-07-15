@@ -206,8 +206,8 @@ class BreakUp(EntryStrategy): #the parameters contains? dk. yet .  #Can make sin
 			self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
 			self.symbol.data[ENTRY] = self.symbol.data[HIGH]
 
-			self.cont_buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"Break Up contituation",self.timer,self.repeat,LONG,self.ppro_out)
-			log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),self.timer,self.repeat)
+			self.cont_buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"Break Up contituation",0,1,LONG,self.ppro_out)
+			log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),0,1)
 
 			self.set_initial_trigger(self.transitional_trigger)
 			self.add_initial_triggers(self.cont_buyTrigger)
@@ -240,8 +240,8 @@ class BreakDown(EntryStrategy): #the parameters contains? dk. yet .  #Can make s
 			self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
 			self.symbol.data[ENTRY] = self.symbol.data[LOW]
 
-			self.cont_sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"break down contituation",self.timer,self.repeat,SHORT,self.ppro_out)
-			log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),self.timer,self.repeat)
+			self.cont_sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"break down contituation",0,1,SHORT,self.ppro_out)
+			log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),0,1)
 
 			self.set_initial_trigger(self.transitional_trigger)
 			self.add_initial_triggers(self.cont_sellTrigger)
@@ -273,8 +273,8 @@ class BreakAny(EntryStrategy):
 				self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
 				self.symbol.data[ENTRY] = self.symbol.data[LOW]
 
-				self.cont_sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"break down contituation",self.timer,self.repeat,SHORT,self.ppro_out)
-				log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),self.timer,self.repeat)
+				self.cont_sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"break down contituation",0,1,SHORT,self.ppro_out)
+				log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),0,1)
 				self.add_initial_triggers(self.cont_sellTrigger)
 
 		if self.buyTrigger.get_trigger_state()==False:
@@ -285,8 +285,8 @@ class BreakAny(EntryStrategy):
 				self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
 				self.symbol.data[ENTRY] = self.symbol.data[HIGH]
 
-				self.cont_buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"Break Up contituation",self.timer,self.repeat,LONG,self.ppro_out)
-				log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),self.timer,self.repeat)
+				self.cont_buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"Break Up contituation",0,1,LONG,self.ppro_out)
+				log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),0,1)
 				self.add_initial_triggers(self.cont_buyTrigger)
 
 		self.restart()
@@ -323,8 +323,8 @@ class BreakFirst(EntryStrategy):
 				self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
 				self.symbol.data[ENTRY] = self.symbol.data[HIGH]
 
-				self.cont_buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"Break Up contituation",self.timer,self.repeat,LONG,self.ppro_out)
-				log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),self.timer,self.repeat)
+				self.cont_buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,ENTRY]],EXIT,self.risk/2,"Break Up contituation",0,1,LONG,self.ppro_out)
+				log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),0,1)
 
 				self.set_initial_trigger(self.transitional_trigger)
 				self.add_initial_triggers(self.cont_buyTrigger)
@@ -344,8 +344,8 @@ class BreakFirst(EntryStrategy):
 				self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
 				self.symbol.data[ENTRY] = self.symbol.data[LOW]
 
-				self.cont_sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"break down contituation",self.timer,self.repeat,SHORT,self.ppro_out)
-				log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),self.timer,self.repeat)
+				self.cont_sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,ENTRY]],EXIT,self.risk/2,"break down contituation",0,1,SHORT,self.ppro_out)
+				log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),0,1)
 
 				self.set_initial_trigger(self.transitional_trigger)
 				self.add_initial_triggers(self.cont_sellTrigger)
@@ -533,7 +533,7 @@ class Fadeany(EntryStrategy):
 				self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
 				self.symbol.data[ENTRY] = self.symbol.data[HIGH]
 
-				self.cont_buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"fade Up contituation",self.timer,self.repeat,LONG,self.ppro_out)
+				self.cont_buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"fade Up contituation",0,1,LONG,self.ppro_out)
 				log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),self.timer,self.repeat)
 
 				self.set_initial_trigger(self.transitional_trigger_buy)
@@ -554,7 +554,7 @@ class Fadeany(EntryStrategy):
 				self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
 				self.symbol.data[ENTRY] = self.symbol.data[LOW]
 
-				self.cont_sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"fade down contituation",self.timer,self.repeat,SHORT,self.ppro_out)
+				self.cont_sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"fade down contituation",0,1,SHORT,self.ppro_out)
 				log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),self.timer,self.repeat)
 
 				self.set_initial_trigger(self.transitional_trigger_sell)

@@ -962,8 +962,8 @@ class FibonacciTrigger(AbstractTrigger):
 	def trigger_event(self):
 
 		if self.strategy.fib_level == 1:
-			self.tradingplan.manage_trades(self.tradingplan.data[POSITION],MINUS,0.05)
-			log_print(self.symbol_name,"retracement level:1","Taking off 10%.")
+			self.tradingplan.manage_trades(self.tradingplan.data[POSITION],MINUS,0.08)
+			log_print(self.symbol_name,"retracement level:1","Taking off 8%.")
 			self.set_mind("retracement level:1")
 		if self.strategy.fib_level == 2:
 			self.tradingplan.manage_trades(self.tradingplan.data[POSITION],MINUS,0.15)
