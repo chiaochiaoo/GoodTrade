@@ -231,6 +231,7 @@ class Symbol_data_manager:
 
 		self.symbol_data_ATR = {}
 		self.expected_momentum = {}
+		self.risk_reward_ratio = {}
 		#alerts
 		self.symbol_last_alert = {}
 		self.symbol_last_alert_time ={}
@@ -589,6 +590,7 @@ class Symbol_data_manager:
 
 		self.symbol_data_ATR[i] = DoubleVar()
 		self.expected_momentum[i] = DoubleVar()
+		self.risk_reward_ratio[i] = DoubleVar()
 
 		###
 		self.symbol_data_resistance[i] = DoubleVar()

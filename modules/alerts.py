@@ -1306,7 +1306,7 @@ class breakout(alert):
 
 		super().__init__(frame,data,commlink)
 
-		self.labels = ["Ticker","Status","AR","Support","Resistance ","Range","ATR","Cur Price","Evaluation","Algo","Trigger Type","Trigger Timer","Configure Entry",]
+		self.labels = ["Ticker","Status","AR","Support","Resistance ","Range","RRR","Cur Price","Evaluation","Algo","Trigger Type","Trigger Timer","Configure Entry",]
 		self.width = [8,10,4,7,7,7,7,7,25,4,10,10,12]
 		self.labels_creator(self.frame)
 
@@ -1405,10 +1405,11 @@ class breakout(alert):
 		self.data.toggle_all(vals,v)
 
 
-	def range_tracker(self,support,resistance,rg):
+	def range_tracker(self,support,resistance,rg,rrr,em):
 		try:
 			num = float(resistance.get())-float(support.get())
 			if num>0:
+				rrr.set(round(em/num,2))
 				rg.set(round(num,2))
 			else:
 				rg.set(0)
@@ -1432,13 +1433,14 @@ class breakout(alert):
 
 		range_ = self.data.symbol_data_support_resistance_range[symbol]
 
-		atr = self.data.symbol_data_ATR[symbol]
+		atr = self.data.risk_reward_ratio[symbol]
+		em = self.data.expected_momentum[symbol].get()
 		self.tickers_tracers[symbol] = []
 
-		m=support.trace('w', lambda *_, support=support,resist=resistance,rg=range_: self.range_tracker(support,resist,rg))
+		m=support.trace('w', lambda *_, support=support,resist=resistance,rg=range_: self.range_tracker(support,resist,rg,atr,em))
 		self.tickers_tracers[symbol].append((support,m))
 
-		n=resistance.trace('w', lambda *_, support=support,resist=resistance,rg=range_: self.range_tracker(support,resist,rg))
+		n=resistance.trace('w', lambda *_, support=support,resist=resistance,rg=range_: self.range_tracker(support,resist,rg,atr,em))
 		self.tickers_tracers[symbol].append((resistance,n))
 
 
