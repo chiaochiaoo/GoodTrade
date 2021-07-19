@@ -4,6 +4,7 @@ from modules.pannel import *
 from modules.Symbol_data_manager import *
 from cores.algo_placer import *
 import threading
+from modules.hex_functions import *
 
 
 BREAISH =   "  Bearish"
@@ -265,6 +266,7 @@ class alert(pannel):
 				info = [symbol,support,resistence,timer_trade,type_trade,default_risk]
 				self.tickers_labels[i].append(tk.Button(self.frame,textvariable=format[j],width=10,command = lambda info=info: self.break_out_trade(info)))
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
+
 
 			elif j>1:
 				self.tickers_labels[i].append(tk.Label(self.frame ,textvariable=format[j],width=self.width[j]))
@@ -1405,17 +1407,21 @@ class breakout(alert):
 		self.data.toggle_all(vals,v)
 
 
-	def range_tracker(self,support,resistance,rg,rrr,em):
+	def range_tracker(self,support,resistance,rg,rrr,em,symbol):
 		try:
 			num = float(resistance.get())-float(support.get())
 			if num>0:
 				rrr.set(round(em/num,2))
+
+				self.tickers_labels[symbol][6]["background"] = hex_white_to_green(em/num)
+				#print(hex_white_to_green(em/num))
 				rg.set(round(num,2))
 			else:
 				rg.set(0)
 			#print("setting rg suc")
-		except:
+		except Exception as e:
 			#print("setting rg failed")
+			print(e)
 			return None
 
 	def add_symbol(self,symbol):
@@ -1437,10 +1443,10 @@ class breakout(alert):
 		em = self.data.expected_momentum[symbol].get()
 		self.tickers_tracers[symbol] = []
 
-		m=support.trace('w', lambda *_, support=support,resist=resistance,rg=range_: self.range_tracker(support,resist,rg,atr,em))
+		m=support.trace('w', lambda *_, support=support,resist=resistance,rg=range_: self.range_tracker(support,resist,rg,atr,em,symbol))
 		self.tickers_tracers[symbol].append((support,m))
 
-		n=resistance.trace('w', lambda *_, support=support,resist=resistance,rg=range_: self.range_tracker(support,resist,rg,atr,em))
+		n=resistance.trace('w', lambda *_, support=support,resist=resistance,rg=range_: self.range_tracker(support,resist,rg,atr,em,symbol))
 		self.tickers_tracers[symbol].append((resistance,n))
 
 
