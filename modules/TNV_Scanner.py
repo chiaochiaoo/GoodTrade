@@ -74,6 +74,8 @@ class TNV_Scanner():
 		self.open_reversal = Open_Reversal(self.or_frame,NT)
 		self.open_break = Open_Break(self.ob_frame,NT)
 		self.corey_pick = CoreysPick(self.cp_frame,NT)
+		self.pre_pick = Premarket_pick(self.pb_frame,NT)
+		
 		#self.update_entry()
 
 	def update_entry(self,data):
@@ -89,6 +91,9 @@ class TNV_Scanner():
 			elif key == "Open_Break":
 				self.open_break.update_entry(item)
 				#item.to_csv("3.csv")
+			elif key =="premarket_pick":
+				self.pre_pick.update_entry(item)
+
 class Volatility_break():
 	def __init__(self,root,NT):
 
@@ -313,6 +318,119 @@ class Open_Reversal():
 			df.to_csv(self.file)
 		except Exception as e:
 			print("TNV scanner construction open reversal:",e)
+class Premarket_pick():
+	def __init__(self,root,NT):
+		self.buttons = []
+		self.entries = []
+		self.l = 1
+		self.NT = NT
+		self.labels_width = [9,6,5,7,7,7,7,7,6,6,6,6,8,6]
+		self.labels = ["Symbol","A.Vol","Rel.V","RR.ratio","Ex.Mmtm","Rg.SCORE","SC%","Listed","Add"]
+		self.root = root
+		self.recreate_labels(self.root)
+
+		self.file = "signals/premarket_pick_"+datetime.now().strftime("%m-%d")+".csv"
+
+		#self.update_entry([pd.read_csv("test2.csv",index_col=0)])
+
+	def recreate_labels(self,frame):
+
+		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
+
+		self.status_code = {}
+		self.status_num = 0
+
+		for i in range(len(self.labels)): #Rows
+			self.b = tk.Button(self.root, text=self.labels[i],width=self.labels_width[i])#,command=self.rank
+			self.b.configure(activebackground="#f9f9f9")
+			self.b.configure(activeforeground="black")
+			self.b.configure(background="#d9d9d9")
+			self.b.configure(disabledforeground="#a3a3a3")
+			self.b.configure(relief="ridge")
+			self.b.configure(foreground="#000000")
+			self.b.configure(highlightbackground="#d9d9d9")
+			self.b.configure(highlightcolor="black")
+			self.b.grid(row=self.l, column=i)
+			self.buttons.append(self.b)
+
+		self.l+=1
+		self.create_entry()
+
+	def create_entry(self):
+
+		for k in range(0,50):
+
+			self.entries.append([])
+
+			for i in range(len(self.labels)): #Rows
+				self.b = tk.Label(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
+				self.b.grid(row=self.l, column=i)
+				self.entries[k].append(self.b)
+			self.l+=1
+
+
+	def update_entry(self,data):
+
+		#at most 8.
+		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
+
+		df = data
+		#timestamp = data[1]
+
+		#self.NT_stat["text"] = "Last update: "+timestamp
+
+		#df.to_csv("tttt.csv")
+		entry = 0
+
+		try:
+			for index, row in df.iterrows():
+				#print(row)
+
+				#["Symbol","Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Ignore","Add"]
+				rank = index
+				vol = row['Avg VolumeSTR']
+				relv = row['rel vol']
+				side = row['reversalside']
+				rscore = row['rangescore']
+				sc = row['SC']
+
+				since = ts_to_min(row['reversal_timer'])
+
+				row['Signal Time'] = since
+				############ add since, and been to the thing #############
+
+				if self.NT != None:
+					if rank in self.NT.nasdaq_trader_symbols_ranking:
+						listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
+					else:
+						listed = "No"
+				else:
+					listed = "No"
+				#print(self.NT.nasdaq_trader_symbols)
+				if 1: #score>0:	
+
+					lst = [rank,vol,relv,side,rscore,sc,listed,since]
+
+					for i in range(len(lst)):
+						self.entries[entry][i]["text"] = lst[i]
+					entry+=1
+					if entry ==50:
+						break
+
+			while entry<50:
+				#print("ok")
+				for i in range(10):
+					self.entries[entry][i]["text"] = ""
+				entry+=1
+
+			# keep = ['Symbol', "Signal Time", 'rel vol', 'SC', 'reversalside','reversal_score','Signal Time',]
+
+			# for i in df.columns:
+			# 	if i not in keep:
+			# 		df.pop(i)
+			df.to_csv(self.file)
+		except Exception as e:
+			print("TNV scanner construction open reversal:",e)
 
 class Open_Break():
 	def __init__(self,root,NT):
@@ -397,7 +515,7 @@ class Open_Break():
 				roc5 = row['5ROCP']
 				so = row['SO']
 				sc = row['SC']
-				since = row['since']
+				since = ts_to_min(row['since'])
 				last = row['last']
 
 				############ add since, and been to the thing #############

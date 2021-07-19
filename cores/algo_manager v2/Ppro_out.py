@@ -73,9 +73,26 @@ def buy_market_order(symbol,share):
 	#req = threading.Thread(target=ppro_request, args=(r,sucess,failure,),daemon=True)
 	#req.start()
 
+
+def buy_aggressive_limit_order(symbol,share,ask):
+
+	ask = round((ask*1.01)+0.05,2)
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(ask)+'&ordername=ARCA Buy ARCX 20Limit IOC&shares='+str(share)
+	sucess='buy market order success on'+symbol
+	failure="Error buy order on"+symbol
+
+	return r,sucess,failure
+
+def short_aggressive_limit_order(symbol,share,bid):
+
+	bid = round((ask*0.99)-0.05,2)
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(bid)+'&ordername=ARCA Sell->Short ARCX 20Limit IOC&shares='+str(share)
+	sucess='buy market order success on'+symbol
+	failure="Error buy order on"+symbol
+
+	return r,sucess,failure
+
 def sell_market_order(symbol,share):
-
-
 
 	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=0.01&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(share)
 	sucess='sell market order success on'+symbol
@@ -209,6 +226,8 @@ def Ppro_outx(pipe,port): #a sperate process. GLOBALLY.
 				rationale = d[3]
 
 				buy_market_order(symbol,share)
+
+
 
 			elif type_ ==SELL:
 
