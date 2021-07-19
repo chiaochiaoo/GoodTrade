@@ -311,7 +311,7 @@ class Purchase_trigger(AbstractTrigger):
 			#log_print("Trigger: Purchase: ",self.symbol_name,self.pos,share,"at",self.symbol.get_time())
 		
 			if share>0:
-				self.ppro_out.send(["Buy",self.symbol_name,share,self.description])
+				self.ppro_out.send([IOCSELL,self.symbol_name,share,self.symbol_data[ASK]])
 				
 		elif self.pos ==SHORT:
 
@@ -322,7 +322,7 @@ class Purchase_trigger(AbstractTrigger):
 			#self.tradingplan.tkvars[BREAKPRICE].set(self.entry_price)
 
 			if share>0:
-				self.ppro_out.send(["Sell",self.symbol_name,share,self.description])
+				self.ppro_out.send([IOCSELL,self.symbol_name,share,self.symbol_data[BID]])
 		else:
 			log_print("unidentified side. ")
 
@@ -564,7 +564,7 @@ class WideStop_trigger(AbstractTrigger):
 			#log_print("Trigger: Purchase: ",self.symbol_name,self.pos,share,"at",self.symbol.get_time())
 		
 			if share>0:
-				self.ppro_out.send(["Buy",self.symbol_name,share,self.description])
+				self.ppro_out.send([IOCBUY,self.symbol_name,share,self.symbol_data[ASK]])
 				
 		elif self.pos ==SHORT:
 
@@ -575,7 +575,7 @@ class WideStop_trigger(AbstractTrigger):
 			#self.tradingplan.tkvars[BREAKPRICE].set(self.entry_price)
 
 			if share>0:
-				self.ppro_out.send(["Sell",self.symbol_name,share,self.description])
+				self.ppro_out.send([IOCSELL,self.symbol_name,share,self.symbol_data[BID]])
 		else:
 			log_print("unidentified side. ")
 
@@ -690,7 +690,7 @@ class Break_any_Purchase_trigger(AbstractTrigger):
 			#log_print("Trigger: Purchase: ",self.symbol_name,self.pos,share,"at",self.symbol.get_time())
 		
 			if share>0:
-				self.ppro_out.send(["Buy",self.symbol_name,share,self.description])
+				self.ppro_out.send([IOCBUY,self.symbol_name,share,self.symbol_data[ASK]])
 				
 		elif self.pos ==SHORT:
 
@@ -701,7 +701,7 @@ class Break_any_Purchase_trigger(AbstractTrigger):
 			#self.tradingplan.tkvars[BREAKPRICE].set(self.entry_price)
 
 			if share>0:
-				self.ppro_out.send(["Sell",self.symbol_name,share,self.description])
+				self.ppro_out.send([IOCSELL,self.symbol_name,share,self.symbol_data[BID]])
 		else:
 			log_print("unidentified side. ")
 

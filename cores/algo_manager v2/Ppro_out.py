@@ -76,18 +76,18 @@ def buy_market_order(symbol,share):
 
 def buy_aggressive_limit_order(symbol,share,ask):
 
-	ask = round((ask*1.01)+0.05,2)
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(ask)+'&ordername=ARCA Buy ARCX 20Limit IOC&shares='+str(share)
-	sucess='buy market order success on'+symbol
+	ask = round((ask*1.02)+0.1,2)
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(ask)+'&ordername=ARCA Buy ARCX Limit IOC&shares='+str(share)
+	sucess='Agrresive limit buy order success on'+symbol
 	failure="Error buy order on"+symbol
 
 	return r,sucess,failure
 
 def short_aggressive_limit_order(symbol,share,bid):
 
-	bid = round((ask*0.99)-0.05,2)
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(bid)+'&ordername=ARCA Sell->Short ARCX 20Limit IOC&shares='+str(share)
-	sucess='buy market order success on'+symbol
+	bid = round((bid*0.98)-0.1,2)
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(bid)+'&ordername=ARCA Sell->Short ARCX Limit IOC&shares='+str(share)
+	sucess='Aggresive limit sell order success on'+symbol
 	failure="Error buy order on"+symbol
 
 	return r,sucess,failure
@@ -310,6 +310,20 @@ def Ppro_out(pipe,port): #a sperate process. GLOBALLY.
 				share = d[2]
 				rationale = d[3]
 				request_str,sucess_str,failure_str=sell_market_order(symbol,share)
+
+			elif type_ ==IOCBUY:
+				symbol = d[1]
+				share = d[2]
+				ask = d[3]
+				#print("iocbuy",ask)
+				request_str,sucess_str,failure_str=buy_aggressive_limit_order(symbol,share,ask)
+
+			elif type_ ==IOCSELL:	
+				symbol = d[1]
+				share = d[2]
+				bid = d[3]
+				#print("iocsell",bid)
+				request_str,sucess_str,failure_str=short_aggressive_limit_order(symbol,share,bid)
 
 			elif type_ == LIMITBUY:
 

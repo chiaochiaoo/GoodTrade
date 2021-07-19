@@ -139,6 +139,9 @@ BUY = "Buy"
 SELL = "Sell"
 FLATTEN = "Flatten"
 
+IOCBUY = "IoCBuy"
+IOCSELL = "IoCSell"
+
 LIMITBUY = "Litmit Buy" 
 LIMITSELL = "Limit Sell"
 
