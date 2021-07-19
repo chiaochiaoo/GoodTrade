@@ -567,7 +567,7 @@ class Tester:
 				type_ = d[0]
 
 				#time.sleep(1)
-				if type_ == "Buy":
+				if type_ == "Buy" or type_ == IOCBUY:
 
 					symbol = d[1]
 					share = d[2]
@@ -589,7 +589,7 @@ class Tester:
 					data["timestamp"]= self.sec
 					self.ppro.send(["order confirm",data])
 
-				elif type_ =="Sell":
+				elif type_ =="Sell" or type_ == IOCSELL:
 
 					symbol = d[1]
 					share = d[2]

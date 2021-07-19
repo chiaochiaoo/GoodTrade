@@ -76,7 +76,7 @@ def buy_market_order(symbol,share):
 
 def buy_aggressive_limit_order(symbol,share,ask):
 
-	ask = round((ask*1.02)+0.1,2)
+	ask = round((ask*1.02)+0.2,2)
 	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(ask)+'&ordername=ARCA Buy ARCX Limit IOC&shares='+str(share)
 	sucess='Agrresive limit buy order success on'+symbol
 	failure="Error buy order on"+symbol
@@ -85,7 +85,7 @@ def buy_aggressive_limit_order(symbol,share,ask):
 
 def short_aggressive_limit_order(symbol,share,bid):
 
-	bid = round((bid*0.98)-0.1,2)
+	bid = round((bid*0.98)-0.2,2)
 	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(bid)+'&ordername=ARCA Sell->Short ARCX Limit IOC&shares='+str(share)
 	sucess='Aggresive limit sell order success on'+symbol
 	failure="Error buy order on"+symbol
