@@ -298,17 +298,19 @@ class alert(pannel):
 			risk = 0
 
 		data_list = {}
-		atr,oha,ohs,ola,ols = self.data.symbol_data_ATR[symbol].get(),\
+		atr,oha,ohs,ola,ols,em = self.data.symbol_data_ATR[symbol].get(),\
 		self.data.symbol_data_openhigh_val[symbol].get(),\
 		self.data.symbol_data_openhigh_std[symbol].get(),\
 		self.data.symbol_data_openlow_val[symbol].get(),\
-		self.data.symbol_data_openlow_std[symbol].get()
+		self.data.symbol_data_openlow_std[symbol].get(),\
+		self.data.expected_momentum[symbol].get()
 
 		data_list = {"ATR":atr,
 					 "OHavg":oha,
 					 "OHstd":ohs,
 					 "OLavg":ola,
-					 "OLstd":ols}
+					 "OLstd":ols,
+					 "expected_momentum":em}
 		#'Break Up','Break Down','Any'
 
 
@@ -1369,18 +1371,20 @@ class breakout(alert):
 
 				#print("Placing ",symbol)
 				symbol,support,resistence,timer_trade,type_trade,default_risk = info[0],float(info[1].get()),float(info[2].get()),info[3].get(),info[4].get(),info[5].get()
-				atr,oha,ohs,ola,ols = self.data.symbol_data_ATR[symbol].get(),\
+				atr,oha,ohs,ola,ols,em = self.data.symbol_data_ATR[symbol].get(),\
 				self.data.symbol_data_openhigh_val[symbol].get(),\
 				self.data.symbol_data_openhigh_std[symbol].get(),\
 				self.data.symbol_data_openlow_val[symbol].get(),\
-				self.data.symbol_data_openlow_std[symbol].get()
+				self.data.symbol_data_openlow_std[symbol].get(),\
+				self.data.expected_momentum[symbol].get()
 
 				default_risk = float(default_risk)
 				data_list = {"ATR":atr,
 							 "OHavg":oha,
 							 "OHstd":ohs,
 							 "OLavg":ola,
-							 "OLstd":ols}
+							 "OLstd":ols,
+							 "expected_momentum":em}
 				if default_risk!=0 and support!=0 and resistence!=0:
 					total.append([type_trade,symbol,support,resistence,default_risk,data_list])
 	

@@ -91,6 +91,7 @@ prev_close_std ="prev_close_std"
 
 symbol_data_ATR ="symbol_data_ATR"
 
+expected_momentum ="expected_momentum"
 
 
 class Symbol_data_manager:	
@@ -229,7 +230,7 @@ class Symbol_data_manager:
 		self.symbol_data_prev_close_eval = {}
 
 		self.symbol_data_ATR = {}
-
+		self.expected_momentum = {}
 		#alerts
 		self.symbol_last_alert = {}
 		self.symbol_last_alert_time ={}
@@ -317,6 +318,7 @@ class Symbol_data_manager:
 
 		self.data_list[symbol_data_ATR] = self.symbol_data_ATR
 
+		self.data_list[expected_momentum] = self.expected_momentum
 
 		self.data_ready = {}
 
@@ -586,7 +588,7 @@ class Symbol_data_manager:
 		self.symbol_data_prev_close_eval[i] = StringVar()
 
 		self.symbol_data_ATR[i] = DoubleVar()
-
+		self.expected_momentum[i] = DoubleVar()
 
 		###
 		self.symbol_data_resistance[i] = DoubleVar()
