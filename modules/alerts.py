@@ -1407,10 +1407,11 @@ class breakout(alert):
 		self.data.toggle_all(vals,v)
 
 
-	def range_tracker(self,support,resistance,rg,rrr,em,symbol):
+	def range_tracker(self,support,resistance,rg,rrr,emv,symbol):
 		try:
 			num = float(resistance.get())-float(support.get())
 			if num>0:
+				em=emv.get()
 				rrr.set(round(em/num,2))
 
 				self.tickers_labels[symbol][6]["background"] = hex_white_to_green(em/num)
@@ -1440,7 +1441,7 @@ class breakout(alert):
 		range_ = self.data.symbol_data_support_resistance_range[symbol]
 
 		atr = self.data.risk_reward_ratio[symbol]
-		em = self.data.expected_momentum[symbol].get()
+		em = self.data.expected_momentum[symbol]
 		self.tickers_tracers[symbol] = []
 
 		m=support.trace('w', lambda *_, support=support,resist=resistance,rg=range_: self.range_tracker(support,resist,rg,atr,em,symbol))
