@@ -287,8 +287,9 @@ class TradingPlan:
 		#finish a trade if current share is 0.
 
 		if self.data[CURRENT_SHARE] <= 0:
-			
+
 			self.clear_trade()
+			log_print(self.symbol_name,"Trade completed."," this trade:",self.data[REALIZED]," total:",self.data[TOTAL_REALIZED])
 
 	def clear_trade(self):
 
@@ -582,29 +583,33 @@ class TradingPlan:
 			self.set_EntryStrategy(Fadeany(entrytimer,instant,self.symbol,self))
 		elif entry_plan == BREAKFIRST:
 			self.set_EntryStrategy(BreakFirst(entrytimer,instant,self.symbol,self))
+
 		else:
 			log_print("unkown plan")
 
 	def manage_plan_decoder(self,manage_plan):
 
 		if manage_plan ==NONE: self.tkvars[MANAGEMENTPLAN].set(NONE)
-		if manage_plan == THREE_TARGETS:
+		elif manage_plan == THREE_TARGETS:
 			self.set_ManagementStrategy(ThreePriceTargets(self.symbol,self))
-		if manage_plan == SMARTTRAIL:
+		elif manage_plan == SMARTTRAIL:
 			self.set_ManagementStrategy(SmartTrail(self.symbol,self))
 
-		if manage_plan == ANCARTMETHOD:
+		elif manage_plan == ANCARTMETHOD:
 			self.set_ManagementStrategy(AncartMethod(self.symbol,self))
 
-		if manage_plan == ONETOTWORISKREWARD:
+		elif manage_plan == ONETOTWORISKREWARD:
 			self.set_ManagementStrategy(OneToTWORiskReward(self.symbol,self))
 
-		if manage_plan == ONETOTWORISKREWARDOLD:
+		elif manage_plan == ONETOTWORISKREWARDOLD:
 			self.set_ManagementStrategy(OneToTWORiskReward_OLD(self.symbol,self))
-		if manage_plan == FIBO:
+		elif manage_plan == FIBO:
 			self.set_ManagementStrategy(FibonacciOnly(self.symbol,self))
-		if manage_plan == FIBONO:
+		elif manage_plan == FIBONO:
 			self.set_ManagementStrategy(FiboNoSoft(self.symbol,self))
+		elif manage_plan == EM_STRATEGY:
+			self.set_ManagementStrategy(ExpectedMomentum(self.symbol,self))
+
 
 	def set_EntryStrategy(self,entry_plan:Strategy):
 		self.entry_plan = entry_plan

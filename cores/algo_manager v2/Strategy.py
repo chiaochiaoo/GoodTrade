@@ -248,6 +248,7 @@ class BreakDown(EntryStrategy): #the parameters contains? dk. yet .  #Can make s
 			self.restart()
 
 
+#Continuation trigger relies on FIBLEVEl. 
 class BreakAny(EntryStrategy):
 	def __init__(self,timer,repeat,symbol,tradingplan):
 
@@ -270,24 +271,37 @@ class BreakAny(EntryStrategy):
 				self.sellTrigger.total_reset()
 
 			else:
-				self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
-				self.symbol.data[ENTRY] = self.symbol.data[LOW]
+				# self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
+				# self.symbol.data[ENTRY] = self.symbol.data[LOW]
+				# self.cont_sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"break down contituation",0,1,SHORT,self.ppro_out)
+				# log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),0,1)
+				# self.add_initial_triggers(self.cont_sellTrigger)
 
-				self.cont_sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"break down contituation",0,1,SHORT,self.ppro_out)
-				log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),0,1)
-				self.add_initial_triggers(self.cont_sellTrigger)
+				self.transitional_trigger = AbstractTrigger("transition to below pH.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],0,1,"REACTIVATE")
+				self.sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",self.timer,self.repeat,SHORT,self.ppro_out)
+				self.transitional_trigger.add_next_trigger(self.sellTrigger)
+
+				self.set_initial_trigger(self.transitional_trigger)
+
 
 		if self.buyTrigger.get_trigger_state()==False:
 			if not self.buyTrigger.pre_deploying_check():
 				self.buyTrigger.total_reset()
 
 			else:
-				self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
-				self.symbol.data[ENTRY] = self.symbol.data[HIGH]
 
-				self.cont_buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"Break Up contituation",0,1,LONG,self.ppro_out)
-				log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),0,1)
-				self.add_initial_triggers(self.cont_buyTrigger)
+
+				self.transitional_trigger = AbstractTrigger("transition to below pH.",[[SYMBOL_DATA,BID,"<",SYMBOL_DATA,RESISTENCE]],0,1,"REACTIVATE")
+				self.buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",self.timer,self.repeat,LONG,self.ppro_out)
+				self.transitional_trigger.add_next_trigger(self.buyTrigger)
+
+				self.set_initial_trigger(self.transitional_trigger)
+
+				# self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
+				# self.symbol.data[ENTRY] = self.symbol.data[HIGH]
+				# self.cont_buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"Break Up contituation",0,1,LONG,self.ppro_out)
+				# log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),0,1)
+				# self.add_initial_triggers(self.cont_buyTrigger)
 
 		self.restart()
 
@@ -327,7 +341,7 @@ class BreakFirst(EntryStrategy):
 				log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),0,1)
 
 				self.set_initial_trigger(self.transitional_trigger)
-				self.add_initial_triggers(self.cont_buyTrigger)
+				#self.add_initial_triggers(self.cont_buyTrigger)
 				self.restart()
 
 		elif self.sellTrigger.get_trigger_state()==False:
@@ -348,7 +362,7 @@ class BreakFirst(EntryStrategy):
 				log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),0,1)
 
 				self.set_initial_trigger(self.transitional_trigger)
-				self.add_initial_triggers(self.cont_sellTrigger)
+				#self.add_initial_triggers(self.cont_sellTrigger)
 				self.restart()
 
 

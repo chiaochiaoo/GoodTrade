@@ -91,6 +91,7 @@ MANAGEMENTPLAN = "ManagementPlan"
 TRADING_PLAN ="TradingPlan"
 RISKTIMER = "Risktimer"
 
+EXPECTED_MOMENTUM = "expected_momentum"
 #TRIGGER PARA
 SYMBOL_DATA = "symbol_data"
 TP_DATA = "TP_DATA" 
@@ -133,6 +134,8 @@ FIBONO = "FibAdjstd"
 FIBO = "Fib only"
 
 ONETOTWORISKREWARDOLD = "1:2 RiskReward"
+
+EM_STRATEGY = "Exp.Mtm"
 ##### ORDER TYPE ####
 
 BUY = "Buy"

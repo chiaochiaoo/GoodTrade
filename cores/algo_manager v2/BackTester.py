@@ -85,7 +85,8 @@ class BackTester:
 		with open('backtest/XLE.AM.txt') as json_file:
 			tester = json.load(json_file)
 
-		self.gt.send(["pkg",[[BREAKFIRST, tester['symbol'], tester["support"], tester["resistence"], 50.0, {'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441}]]])
+
+		self.gt.send(["pkg",[[BREAKANY, tester['symbol'], tester["support"], tester["resistence"], 50.0, {'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441,"expected_momentum":0.5}]]])
 
 		time.sleep(1)
 
@@ -114,6 +115,7 @@ class BackTester:
 				self.ppro.send(["order update",data])
 				self.price.set(data["bid"])
 				self.time.set(self.ts_to_min(data["timestamp"]))
+				self.limit_buy_sell()
 				if i%1000 ==0:
 					print(data)
 
@@ -147,7 +149,7 @@ class BackTester:
 				type_ = d[0]
 
 				#time.sleep(1)
-				if type_ == "Buy":
+				if type_ == "Buy" or type_ == IOCBUY:
 
 					symbol = d[1]
 					share = d[2]
@@ -169,7 +171,7 @@ class BackTester:
 					data["timestamp"]= self.sec
 					self.ppro.send(["order confirm",data])
 
-				elif type_ =="Sell":
+				elif type_ =="Sell" or type_ == IOCSELL:
 
 					symbol = d[1]
 					share = d[2]
@@ -202,7 +204,7 @@ class BackTester:
 					symbol = d[1]
 					price = d[2]
 					share = d[3]
-
+					#print(symbol,price,share)
 					self.sell_book[price] = share
 				elif type_ == "Flatten":
 
@@ -230,7 +232,7 @@ class BackTester:
 
 	def add1(self):
 		data = {}
-		data["symbol"]= "SPY.AM"
+		data["symbol"]= self.tester['symbol']
 		data["side"]= LONG
 		data["price"]= float(self.ask)
 		data["shares"]= int(1)
@@ -239,7 +241,7 @@ class BackTester:
 
 	def sub1(self):
 		data = {}
-		data["symbol"]= "SPY.AM"
+		data["symbol"]= self.tester['symbol']
 		data["side"]= SHORT
 		data["price"]= float(self.ask)
 		data["shares"]= int(1)
@@ -296,7 +298,7 @@ class BackTester:
 		self.sec+=1
 		#print(self.sec)
 		data={}
-		data["symbol"]= "SPY.AM"
+		data["symbol"]= self.tester['symbol']
 
 		if self.price_stay:
 			if self.price_flip:
@@ -321,14 +323,14 @@ class BackTester:
 		for key,item in self.buy_book.items():
 			if self.bid <= key:
 				data={}
-				data["symbol"]= "SPY.AM"
+				data["symbol"]= self.tester['symbol']
 				data["side"]= LONG
 				data["price"]= float(self.ask)
 				data["shares"]= self.buy_book[key]
 				data["timestamp"]= self.sec
 				self.ppro.send(["order confirm",data])
 				self.share -= data["shares"]
-
+				print(data)
 				used.append(key)
 
 		for i in used:
@@ -338,13 +340,14 @@ class BackTester:
 		for key,item in self.sell_book.items():
 			if self.ask >= key:
 				data={}
-				data["symbol"]= "SPY.AM"
+				data["symbol"]= self.tester['symbol']
 				data["side"]= SHORT
 				data["price"]= float(self.bid)
 				data["shares"]= self.sell_book[key]
 				data["timestamp"]= self.sec
 				self.ppro.send(["order confirm",data])
 				self.share-= data["shares"]
+				print(data)
 				used.append(key)
 
 		for i in used:
