@@ -686,6 +686,11 @@ class Symbol_data_manager:
 		return symbol in self.symbol_init
 
 
+	def retech_database(self):
+		for i in self.symbols:
+			self.database.send_request(i)
+
+
 	def add(self,symbol):
 
 		#check if already registered.

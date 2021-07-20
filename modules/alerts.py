@@ -1450,8 +1450,8 @@ class breakout(alert):
 		n=resistance.trace('w', lambda *_, support=support,resist=resistance,rg=range_: self.range_tracker(support,resist,rg,atr,em,symbol))
 		self.tickers_tracers[symbol].append((resistance,n))
 
-		x=atr.trace('w', lambda *_, support=support,resist=resistance,rg=range_: self.range_tracker(support,resist,rg,atr,em,symbol))
-		self.tickers_tracers[symbol].append((atr,x))
+		x=em.trace('w', lambda *_, support=support,resist=resistance,rg=range_: self.range_tracker(support,resist,rg,atr,em,symbol))
+		self.tickers_tracers[symbol].append((em,x))
 
 		algo_placement = self.data.algo_breakout_placement[symbol]
 

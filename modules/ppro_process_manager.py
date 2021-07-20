@@ -253,7 +253,7 @@ def deregister(symbol):
 
 def thread_waiting_mechanism():
 	#print(threading.active_count())
-	while threading.active_count()>30:
+	while threading.active_count()>50:
 		#print("wait")
 		time.sleep(1)
 

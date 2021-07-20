@@ -130,6 +130,7 @@ class ticker_manager(pannel):
 		self.authen = authen_comm
 
 		self.alerts = alerts
+		self.data = data
 
 		self.Entry1 = tk.Entry(frame)
 		self.Entry1.place(x=5, y=5, height=30, width=80, bordermode='ignore')
@@ -157,18 +158,30 @@ class ticker_manager(pannel):
 		self.ppro_status.place(x = 200, y =12)
 		#data.ppro_status.set("Hello")
 
+		self.symbol = tk.Button(frame,command=self.data.retech_database) #,command=self.loadsymbol
+		self.symbol.place(x=400, y=5, height=30, width=120, bordermode='ignore')
+		self.symbol.configure(activebackground="#ececec")
+		self.symbol.configure(activeforeground="#000000")
+		self.symbol.configure(background="#d9d9d9")
+		self.symbol.configure(disabledforeground="#a3a3a3")
+		self.symbol.configure(foreground="#000000")
+		self.symbol.configure(highlightbackground="#d9d9d9")
+		self.symbol.configure(highlightcolor="black")
+		self.symbol.configure(pady="0")
+		self.symbol.configure(text='''Refresh Database''')
+
 		self.trader_stats = ttk.Label(frame, text="User Authentication:")
-		self.trader_stats.place(x = 400, y =12)
+		#self.trader_stats.place(x = 400, y =12)
 
 		self.permission_stats = ttk.Label(frame, text="Permission Status:")
-		self.permission_stats.place(x = 600, y =12)
+		#self.permission_stats.place(x = 600, y =12)
 
 		self.ticker_stats = ttk.Label(frame, text="Current Registered Tickers: "+str(self.ticker_count))
 		self.ticker_stats.place(x = 800, y =12)
 
 		#############Registration Window ####################
 
-		self.data = data
+		
 
 
 		self.width = [8,10,12,10,15,24,10,10]
