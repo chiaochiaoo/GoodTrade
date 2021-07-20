@@ -76,6 +76,8 @@ class TNV_Scanner():
 		self.corey_pick = CoreysPick(self.cp_frame,NT)
 		self.pre_pick = Premarket_pick(self.pb_frame,NT)
 		
+		#item = pd.read_csv("tttt.csv")
+		#self.open_reversal.update_entry(item)
 		#self.update_entry()
 
 	def update_entry(self,data):
@@ -211,7 +213,7 @@ class Open_Reversal():
 		self.entries = []
 		self.l = 1
 		self.NT = NT
-		self.labels_width = [9,6,5,7,7,5,6,6,6,6,6,6,8,6]
+		self.labels_width = [9,6,5,7,7,5,6,6,6,6,6,6,8,6,6,6,6]
 		self.labels = ["Symbol","A.Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Ignore","Add"]
 		self.root = root
 		self.recreate_labels(self.root)
@@ -269,7 +271,7 @@ class Open_Reversal():
 		#df.to_csv("tttt.csv")
 		entry = 0
 
-		try:
+		if 1:
 			for index, row in df.iterrows():
 				#print(row)
 
@@ -315,9 +317,9 @@ class Open_Reversal():
 			# for i in df.columns:
 			# 	if i not in keep:
 			# 		df.pop(i)
-			df.to_csv(self.file)
-		except Exception as e:
-			print("TNV scanner construction open reversal:",e)
+			#df.to_csv(self.file)
+		# except Exception as e:
+		# 	print("TNV scanner construction open reversal:",e)
 class Premarket_pick():
 	def __init__(self,root,NT):
 		self.buttons = []
