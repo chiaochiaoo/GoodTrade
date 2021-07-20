@@ -321,7 +321,7 @@ class alert(pannel):
 
 		#type_,symbol,description,entry_price,stop_price,position,capital,total_risk
 
-		if risk!=0 and support!=0 and resistence!=0:
+		if risk!=0 and support!=0 and resistence!=0 and em!=0:
 			self.algo_commlink.send(info)
 
 	def break_out_trades(self,infos):
@@ -342,6 +342,7 @@ class alert(pannel):
 		l[0]="Orders Request finish"
 		self.algo_commlink.send(l)
 		#self.algo_commlink.send("sdsdsdsdsdsds")
+
 	def delete_symbol(self,symbol):
 		for i in self.tickers_tracers[symbol]:
 			i[0].trace_vdelete("w",i[1])
