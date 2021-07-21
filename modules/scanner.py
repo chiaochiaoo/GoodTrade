@@ -850,7 +850,7 @@ class scanner(pannel):
 		if ts>=570:
 			self.buttons[7]["text"] = "SO%"
 		else:
-			self.buttons[7]["text"] = "Rng.Scr"	
+			self.buttons[7]["text"] = "RRR"	
 
 		if 1:
 			if self.nasdaq_is_working_on_it==False:

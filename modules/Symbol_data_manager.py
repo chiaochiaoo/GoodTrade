@@ -92,7 +92,7 @@ prev_close_std ="prev_close_std"
 symbol_data_ATR ="symbol_data_ATR"
 
 expected_momentum ="expected_momentum"
-
+risk_reward_ratio_nt = "risk_reward_ratio_nt"
 
 class Symbol_data_manager:	
 
@@ -232,6 +232,7 @@ class Symbol_data_manager:
 		self.symbol_data_ATR = {}
 		self.expected_momentum = {}
 		self.risk_reward_ratio = {}
+		self.risk_reward_ratio_nt ={}
 		#alerts
 		self.symbol_last_alert = {}
 		self.symbol_last_alert_time ={}
@@ -320,7 +321,7 @@ class Symbol_data_manager:
 		self.data_list[symbol_data_ATR] = self.symbol_data_ATR
 
 		self.data_list[expected_momentum] = self.expected_momentum
-
+		self.data_list[risk_reward_ratio_nt] = self.risk_reward_ratio_nt
 		self.data_ready = {}
 
 		#self.symbol_data_openhigh_dis,self,symbol_data_openlow_dis,self.symbol_data_range_dis
@@ -591,7 +592,7 @@ class Symbol_data_manager:
 		self.symbol_data_ATR[i] = DoubleVar()
 		self.expected_momentum[i] = DoubleVar()
 		self.risk_reward_ratio[i] = DoubleVar()
-
+		self.risk_reward_ratio_nt[i] = DoubleVar()
 		###
 		self.symbol_data_resistance[i] = DoubleVar()
 		self.symbol_data_support[i] = DoubleVar()

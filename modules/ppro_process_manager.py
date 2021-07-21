@@ -71,7 +71,7 @@ prev_close_val ="prev_close_val"
 prev_close_std ="prev_close_std"
 
 symbol_data_ATR ="symbol_data_ATR"
-
+expected_momentum ="expected_momentum"
 
 open_high_eval_alert = "open_high_eval_alert"
 open_high_eval_value = "open_high_eval_value"
@@ -95,7 +95,7 @@ normal_5_vol_alert =  "normal_5_vol_alert"
 
 prev_eval = "prev_eval"
 prev_alert = "prev_alert"
-
+risk_reward_ratio_nt = "risk_reward_ratio_nt"
 
 def round_up(i):
 
@@ -512,6 +512,8 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 	d[prev_close_val] = 0
 	d[prev_close_std] = 0
 
+	d[expected_momentum] = 0
+
 	################## ALERTS ########################
 	d[open_high_eval_alert] = 0
 	d[open_high_eval_value] = "0"
@@ -611,6 +613,10 @@ def historical_eval(symbol):
 			d[prev_alert] = 0
 		d[prev_eval] = str(d[prev_alert])
 
+		# try:
+		# 	d["open_percentage"] =  round((d["high"]-d["low"])/d[expected_momentum],2)
+		# except:
+		# 	pass
 		#ones with current vals. 
 		# d[open_high_range] = 0
 		# d[open_high_val] = 0
@@ -803,7 +809,10 @@ def process_and_send(lst,pipe):
 
 	############ RANGE CHEKER #########################
 	if timestamp <570:
-		d["open_percentage"] = range_eval(d["highs"],d["lows"])
+		#d["open_percentage"] = range_eval(d["highs"],d["lows"])
+		#		d["phigh"] = d["high"] d["plow"] = d["low"]
+		if d[expected_momentum]!=0:
+			d["open_percentage"] =  round((d["phigh"]-d["plow"])/d[expected_momentum],2)
 	################################################
 
 
