@@ -271,55 +271,56 @@ class Open_Reversal():
 		#df.to_csv("tttt.csv")
 		entry = 0
 
-		if 1:
-			for index, row in df.iterrows():
-				#print(row)
+		if len(data)>1:
+			if 1:
+				for index, row in df.iterrows():
+					#print(row)
 
-				#["Symbol","Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Ignore","Add"]
-				rank = index
-				vol = row['Avg VolumeSTR']
-				relv = row['rel vol']
-				side = row['reversalside']
-				rscore = row['reversal_score']
-				sc = row['SC']
+					#["Symbol","Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Ignore","Add"]
+					rank = index
+					vol = row['Avg VolumeSTR']
+					relv = row['rel vol']
+					side = row['reversalside']
+					rscore = row['reversal_score']
+					sc = row['SC']
 
-				since = ts_to_min(row['reversal_timer'])
+					since = ts_to_min(row['reversal_timer'])
 
-				row['Signal Time'] = since
-				############ add since, and been to the thing #############
+					row['Signal Time'] = since
+					############ add since, and been to the thing #############
 
-				if self.NT != None:
-					if rank in self.NT.nasdaq_trader_symbols_ranking:
-						listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
+					if self.NT != None:
+						if rank in self.NT.nasdaq_trader_symbols_ranking:
+							listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
+						else:
+							listed = "No"
 					else:
 						listed = "No"
-				else:
-					listed = "No"
-				#print(self.NT.nasdaq_trader_symbols)
-				if 1: #score>0:	
+					#print(self.NT.nasdaq_trader_symbols)
+					if 1: #score>0:	
 
-					lst = [rank,vol,relv,side,rscore,sc,listed,since]
+						lst = [rank,vol,relv,side,rscore,sc,listed,since]
 
-					for i in range(len(lst)):
-						self.entries[entry][i]["text"] = lst[i]
+						for i in range(len(lst)):
+							self.entries[entry][i]["text"] = lst[i]
+						entry+=1
+						if entry ==50:
+							break
+
+				while entry<50:
+					#print("ok")
+					for i in range(10):
+						self.entries[entry][i]["text"] = ""
 					entry+=1
-					if entry ==50:
-						break
 
-			while entry<50:
-				#print("ok")
-				for i in range(10):
-					self.entries[entry][i]["text"] = ""
-				entry+=1
+				# keep = ['Symbol', "Signal Time", 'rel vol', 'SC', 'reversalside','reversal_score','Signal Time',]
 
-			# keep = ['Symbol', "Signal Time", 'rel vol', 'SC', 'reversalside','reversal_score','Signal Time',]
-
-			# for i in df.columns:
-			# 	if i not in keep:
-			# 		df.pop(i)
-			#df.to_csv(self.file)
-		# except Exception as e:
-		# 	print("TNV scanner construction open reversal:",e)
+				# for i in df.columns:
+				# 	if i not in keep:
+				# 		df.pop(i)
+				#df.to_csv(self.file)
+			# except Exception as e:
+			# 	print("TNV scanner construction open reversal:",e)
 class Premarket_pick():
 	def __init__(self,root,NT):
 		self.buttons = []
@@ -384,55 +385,56 @@ class Premarket_pick():
 		#df.to_csv("tttt.csv")
 		entry = 0
 
-		try:
-			for index, row in df.iterrows():
-				#print(row)
+		if len(data)>1:
+			try:
+				for index, row in df.iterrows():
+					#print(row)
 
-				#["Symbol","Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Ignore","Add"]
-				rank = index
-				vol = row['Avg VolumeSTR']
-				relv = row['rel vol']
-				side = row['reversalside']
-				rscore = row['rangescore']
-				sc = row['SC']
+					#["Symbol","Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Ignore","Add"]
+					rank = index
+					vol = row['Avg VolumeSTR']
+					relv = row['rel vol']
+					side = row['reversalside']
+					rscore = row['rangescore']
+					sc = row['SC']
 
-				since = ts_to_min(row['reversal_timer'])
+					since = ts_to_min(row['reversal_timer'])
 
-				row['Signal Time'] = since
-				############ add since, and been to the thing #############
+					row['Signal Time'] = since
+					############ add since, and been to the thing #############
 
-				if self.NT != None:
-					if rank in self.NT.nasdaq_trader_symbols_ranking:
-						listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
+					if self.NT != None:
+						if rank in self.NT.nasdaq_trader_symbols_ranking:
+							listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
+						else:
+							listed = "No"
 					else:
 						listed = "No"
-				else:
-					listed = "No"
-				#print(self.NT.nasdaq_trader_symbols)
-				if 1: #score>0:	
+					#print(self.NT.nasdaq_trader_symbols)
+					if 1: #score>0:	
 
-					lst = [rank,vol,relv,side,rscore,sc,listed,since]
+						lst = [rank,vol,relv,side,rscore,sc,listed,since]
 
-					for i in range(len(lst)):
-						self.entries[entry][i]["text"] = lst[i]
+						for i in range(len(lst)):
+							self.entries[entry][i]["text"] = lst[i]
+						entry+=1
+						if entry ==50:
+							break
+
+				while entry<50:
+					#print("ok")
+					for i in range(10):
+						self.entries[entry][i]["text"] = ""
 					entry+=1
-					if entry ==50:
-						break
 
-			while entry<50:
-				#print("ok")
-				for i in range(10):
-					self.entries[entry][i]["text"] = ""
-				entry+=1
+				# keep = ['Symbol', "Signal Time", 'rel vol', 'SC', 'reversalside','reversal_score','Signal Time',]
 
-			# keep = ['Symbol', "Signal Time", 'rel vol', 'SC', 'reversalside','reversal_score','Signal Time',]
-
-			# for i in df.columns:
-			# 	if i not in keep:
-			# 		df.pop(i)
-			df.to_csv(self.file)
-		except Exception as e:
-			print("TNV scanner construction open reversal:",e)
+				# for i in df.columns:
+				# 	if i not in keep:
+				# 		df.pop(i)
+				df.to_csv(self.file)
+			except Exception as e:
+				print("TNV scanner construction Premarket_pick:",e)
 
 class Open_Break():
 	def __init__(self,root,NT):
