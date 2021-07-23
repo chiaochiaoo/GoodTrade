@@ -253,7 +253,7 @@ def deregister(symbol):
 
 def thread_waiting_mechanism():
 	#print(threading.active_count())
-	while threading.active_count()>50:
+	while threading.active_count()>75:
 		#print("wait")
 		time.sleep(1)
 
@@ -403,10 +403,10 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 	d = data[symbol]
 
 	if timestamp <571:
-		d["phigh"] = ppro_high
-		d["plow"] = ppro_low
-		d["high"] = ppro_high
-		d["low"] = ppro_low
+		d["phigh"] = price#ppro_high
+		d["plow"] = price#ppro_low
+		d["high"] = price#ppro_high
+		d["low"] = price#ppro_low
 		d["f5r"] = 0
 		d["f5v"] = 0
 		d["already_opened"] = False
