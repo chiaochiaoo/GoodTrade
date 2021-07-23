@@ -76,7 +76,7 @@ def buy_market_order(symbol,share):
 
 def buy_aggressive_limit_order(symbol,share,ask):
 
-	ask = ask*1.02
+	ask = ask*1.03
 
 	if ask>10:
 		ask = round((ask+0.1),2)  
@@ -92,7 +92,7 @@ def buy_aggressive_limit_order(symbol,share,ask):
 
 def short_aggressive_limit_order(symbol,share,bid):
 
-	bid = bid*0.98
+	bid = bid*0.97
 
 	if bid>10:
 		bid = round((bid-0.1),2)
