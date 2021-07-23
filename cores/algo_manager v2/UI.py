@@ -551,15 +551,17 @@ class adjust_stop:
 			old = self.stopvalue
 			val = float(self.new_stop.get())
 
-			if abs(val-self.stopvalue)/val <0.02:
-				self.tp.data[STOP_LEVEL] = val
-				self.stopvaluetk.set(val) 
-				self.tp.adjusting_risk()
-				self.tp.update_displays()
-				log_print(self.symbol,"stop adjusted from",old,"to",val)
-				self.root.destroy()
-			else:
-				self.input["background"] = "red"
+
+			self.tp.data[STOP_LEVEL] = val
+			self.stopvaluetk.set(val) 
+			self.tp.adjusting_risk()
+			self.tp.update_displays()
+			log_print(self.symbol,"stop adjusted from",old,"to",val)
+			self.root.destroy()
+			# if abs(val-self.stopvalue)/val <0.02:
+
+			# else:
+			# 	self.input["background"] = "red"
 		except Exception as e:
 			print(e)
 			self.input["background"] = "red"
