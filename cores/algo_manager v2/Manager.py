@@ -388,8 +388,10 @@ class Manager:
 		timer=self.ui.all_timer.get()
 		ep=self.ui.all_enp.get()
 		et=self.ui.all_ent.get()
-		managment=self.ui.all_mana.get() 
+		managment=self.ui.all_mana.get()
 		risk = int(self.ui.all_risk.get())
+		reloa = int(self.ui.all_reload.get())
+
 		for d in self.tradingplan.values():
 			if self.ui.all_timer_b.get()==1:
 				d.tkvars[TIMER].set(timer)
@@ -401,7 +403,8 @@ class Manager:
 				d.tkvars[ENTYPE].set(et)
 			if self.ui.all_manaplan_b.get()==1:
 				d.tkvars[MANAGEMENTPLAN].set(managment)
-			
+			if self.ui.all_reload_b.get()==1:
+				d.data[RELOAD_TIMES] = reloa
 			d.adjusting_risk()
 
 	def set_selected_tp(self):
@@ -409,7 +412,8 @@ class Manager:
 		timer=self.ui.all_timer.get()
 		ep=self.ui.all_enp.get()
 		et=self.ui.all_ent.get()
-		managment=self.ui.all_mana.get() 
+		managment=self.ui.all_mana.get()
+		reloa = int(self.ui.all_reload.get())
 
 		for d in self.tradingplan.values():
 			if d.tkvars[SELECTED].get()==True:
@@ -417,7 +421,7 @@ class Manager:
 				d.tkvars[ENTYPE].set(et)
 				d.tkvars[MANAGEMENTPLAN].set(managment)
 				d.tkvars[TIMER].set(timer)
-
+				d.data[RELOAD_TIMES] = reloa
 	# def terminateGT(self):
 
 	# 	if self.termination:

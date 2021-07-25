@@ -293,9 +293,8 @@ class FibonacciOnly(ManagementStrategy):
 
 			super().on_start()
 
-
 			""" send out the limit orders """
-
+			log_print(self.symbol_name,"Fib-only starting")
 			if self.tradingplan.data[USING_STOP]==False:
 				self.set_mind("STOP BYPASSING: ON")
 
@@ -325,6 +324,10 @@ class FibonacciOnly(ManagementStrategy):
 		#print("ON DEPLOYING")
 		self.initialized = False
 		self.shares_loaded = False
+		self.fib_level = 1
+		self.FibActivated = False
+		self.tradingplan.current_price_level = 1
+		self.orders_level = 1
 		super().on_deploying()
 
 	def reset(self):

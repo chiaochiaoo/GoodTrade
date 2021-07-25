@@ -44,7 +44,7 @@ class TradingPlan:
 		self.current_price_level = 0
 		self.price_levels = {}
 
-		self.numeric_labels = [ACTRISK,ESTRISK,CURRENT_SHARE,TARGET_SHARE,INPUT_TARGET_SHARE,AVERAGE_PRICE,LAST_AVERAGE_PRICE,RISK_PER_SHARE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3,FLATTENTIMER,BREAKPRICE,RISKTIMER,FIBCURRENT_MAX,FIBLEVEL1,FIBLEVEL2,FIBLEVEL3,FIBLEVEL4,EXIT]
+		self.numeric_labels = [ACTRISK,ESTRISK,CURRENT_SHARE,TARGET_SHARE,INPUT_TARGET_SHARE,AVERAGE_PRICE,LAST_AVERAGE_PRICE,RISK_PER_SHARE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3,FLATTENTIMER,BREAKPRICE,RISKTIMER,FIBCURRENT_MAX,FIBLEVEL1,FIBLEVEL2,FIBLEVEL3,FIBLEVEL4,EXIT,RELOAD_TIMES]
 		self.string_labels = [MIND,STATUS,POSITION,RISK_RATIO,SIZE_IN,ENTRYPLAN,ENTYPE,MANAGEMENTPLAN]
 
 		self.bool_labels= [AUTORANGE,AUTOMANAGE,RELOAD,SELECTED,ANCART_OVERRIDE,USING_STOP]
@@ -53,7 +53,7 @@ class TradingPlan:
 
 	def init_data(self,risk,entry_plan,entry_type,manage_plan):
 
-		
+
 		for i in self.numeric_labels:
 			self.data[i] = 0
 			self.tkvars[i] = tk.DoubleVar(value=0)
@@ -71,7 +71,11 @@ class TradingPlan:
 
 		self.data[ANCART_OVERRIDE]=False
 
+
+		#default values.
 		self.tkvars[SELECTED].set(False)
+		self.tkvars[RELOAD].set(False)
+		self.data[RELOAD_TIMES]=1
 		#Non String, Non Numeric Value
 
 		#Set some default value
@@ -317,10 +321,10 @@ class TradingPlan:
 
 		#if reload is on, revert it back to entry stage. 
 		if self.tkvars[RELOAD].get() == True:
-			log_print("TP processing:",self.symbol_name,":"," Reload activated. Trading triggers re-initialized. ")
+			log_print("TP processing:",self.symbol_name,":"," Reload activated. Trading triggers re-initialized. reload remaining:",self.data[RELOAD_TIMES])
 			self.tkvars[RELOAD].set(False)
 			self.start_tradingplan()
-			
+
 	def ppro_order_rejection(self):
 
 		self.mark_algo_status(REJECTED)
@@ -534,7 +538,7 @@ class TradingPlan:
 				self.manage_plan_decoder(manage_plan)
 
 				if self.AR_toggle_check():
-					log_print("Deploying:",self.symbol_name,self.entry_plan.get_name(),self.symbol.get_support(),self.symbol.get_resistence(),entry_type,entrytimer,self.management_plan.get_name(),"risk:",self.data[ESTRISK],"risk timer:",self.data[RISKTIMER])
+					log_print("Deploying:",self.symbol_name,self.entry_plan.get_name(),self.symbol.get_support(),self.symbol.get_resistence(),entry_type,entrytimer,self.management_plan.get_name(),"risk:",self.data[ESTRISK],"risk timer:",self.data[RISKTIMER],"reload:",self.data[RELOAD_TIMES])
 				
 					self.start_tradingplan()
 			except Exception as e:
@@ -547,6 +551,15 @@ class TradingPlan:
 		self.entry_plan.on_deploying()
 		self.management_plan.on_deploying()
 		self.current_running_strategy = self.entry_plan
+
+		if self.tkvars[RELOAD].get()==False:
+			#print("h",self.data[RELOAD_TIMES] )
+			if self.data[RELOAD_TIMES] >0:
+				self.tkvars[RELOAD].set(True)
+				self.data[RELOAD_TIMES] -= 1
+				if self.data[RELOAD_TIMES]== 0:
+					log_print(self.symbol_name," no more reload.")
+
 
 	def stop_tradingplan(self):
 		self.current_running_strategy = None

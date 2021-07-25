@@ -69,10 +69,10 @@ class UI(pannel):
 		self.init_HQ_pannel()
 
 		self.config = ttk.LabelFrame(self.root,text="Config") 
-		self.config.place(x=10,y=140,height=200,width=210)
+		self.config.place(x=10,y=140,height=300,width=210)
 
 		self.cmd = ttk.LabelFrame(self.root,text="Command") 
-		self.cmd.place(x=10,y=350,height=500,width=210)
+		self.cmd.place(x=10,y=380,height=500,width=210)
 
 
 		self.init_config_pannel()
@@ -152,42 +152,50 @@ class UI(pannel):
 		self.all_enplan_b = tk.IntVar(value=1)
 		self.all_entype_b = tk.IntVar(value=1)
 		self.all_manaplan_b = tk.IntVar(value=1)
-
-		ttk.Checkbutton(self.config, variable=self.all_timer_b).grid(sticky="w",column=1,row=5)
-		ttk.Checkbutton(self.config, variable=self.all_risk_b).grid(sticky="w",column=1,row=6)
-		ttk.Checkbutton(self.config, variable=self.all_enplan_b).grid(sticky="w",column=1,row=7,padx=0)
-		ttk.Checkbutton(self.config, variable=self.all_entype_b).grid(sticky="w",column=1,row=8)
-		ttk.Checkbutton(self.config, variable=self.all_manaplan_b).grid(sticky="w",column=1,row=9)
+		self.all_reload_b = tk.IntVar(value=1)
 
 
+		row = 5
 
-		ttk.Label(self.config, text="timer:").grid(sticky="w",column=2,row=5,padx=10)
-		ttk.Label(self.config, text="Rsk:").grid(sticky="w",column=2,row=6,padx=10)
-		ttk.Label(self.config, text="Entry:").grid(sticky="w",column=2,row=7,padx=10)
-		ttk.Label(self.config, text="EnType:").grid(sticky="w",column=2,row=8,padx=10)
-		ttk.Label(self.config, text="Manage:").grid(sticky="w",column=2,row=9,padx=10)
+		ttk.Checkbutton(self.config, variable=self.all_reload_b).grid(sticky="w",column=1,row=row)
+		ttk.Checkbutton(self.config, variable=self.all_timer_b).grid(sticky="w",column=1,row=row+1)
+		ttk.Checkbutton(self.config, variable=self.all_risk_b).grid(sticky="w",column=1,row=row+2)
+		ttk.Checkbutton(self.config, variable=self.all_enplan_b).grid(sticky="w",column=1,row=row+3,padx=0)
+		ttk.Checkbutton(self.config, variable=self.all_entype_b).grid(sticky="w",column=1,row=row+4)
+		ttk.Checkbutton(self.config, variable=self.all_manaplan_b).grid(sticky="w",column=1,row=row+5)
 
+
+		ttk.Label(self.config, text="reload:").grid(sticky="w",column=2,row=row,padx=10)
+		ttk.Label(self.config, text="timer:").grid(sticky="w",column=2,row=row+1,padx=10)
+		ttk.Label(self.config, text="Rsk:").grid(sticky="w",column=2,row=row+2,padx=10)
+		ttk.Label(self.config, text="Entry:").grid(sticky="w",column=2,row=row+3,padx=10)
+		ttk.Label(self.config, text="EnType:").grid(sticky="w",column=2,row=row+4,padx=10)
+		ttk.Label(self.config, text="Manage:").grid(sticky="w",column=2,row=row+5,padx=10)
+
+
+		self.all_reload = tk.DoubleVar(value=1)
+		tk.Entry(self.config,textvariable=self.all_reload,width=5).grid(sticky="w",column=3,row=row,padx=10)
 
 		self.all_timer = tk.DoubleVar(value=0)
-		tk.Entry(self.config,textvariable=self.all_timer,width=5).grid(sticky="w",column=3,row=5,padx=10)
+		tk.Entry(self.config,textvariable=self.all_timer,width=5).grid(sticky="w",column=3,row=row+1,padx=10)
 
 		self.all_risk = tk.DoubleVar(value=50)
-		tk.Entry(self.config,textvariable=self.all_risk,width=5).grid(sticky="w",column=3,row=6,padx=10)
+		tk.Entry(self.config,textvariable=self.all_risk,width=5).grid(sticky="w",column=3,row=row+2,padx=10)
 
 
 		self.all_enp = tk.StringVar(value=BREAKFIRST)
-		tk.OptionMenu(self.config, self.all_enp, *sorted(self.entry_plan_options)).grid(sticky="w",column=3,row=7,padx=10)
+		tk.OptionMenu(self.config, self.all_enp, *sorted(self.entry_plan_options)).grid(sticky="w",column=3,row=row+3,padx=10)
 
 		self.all_ent = tk.StringVar(value=INCREMENTAL2)
-		tk.OptionMenu(self.config, self.all_ent, *sorted(self.entry_type_options)).grid(sticky="w",column=3,row=8,padx=10)
+		tk.OptionMenu(self.config, self.all_ent, *sorted(self.entry_type_options)).grid(sticky="w",column=3,row=row+4,padx=10)
 
 		self.all_mana = tk.StringVar(value=FIBO)
-		tk.OptionMenu(self.config, self.all_mana, *sorted(self.management_plan_options)).grid(sticky="w",column=3,row=9,padx=10)
+		tk.OptionMenu(self.config, self.all_mana, *sorted(self.management_plan_options)).grid(sticky="w",column=3,row=row+5,padx=10)
 
 
 
 		self.config2 = ttk.LabelFrame(self.config) 
-		self.config2.place(x=0,y=130,height=100,width=210)
+		self.config2.place(x=0,y=160,height=100,width=210)
 		self.algo_deploy = ttk.Button(self.config2, text="Apply Slctd",command=self.manager.set_selected_tp)#,command=self.manager.set_all_tp)
 		self.algo_deploy.grid(sticky="w",column=1,row=1,padx=10)
 		#self.algo_deploy.place(x=5,y=5)

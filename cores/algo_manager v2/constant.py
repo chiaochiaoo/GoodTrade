@@ -51,7 +51,7 @@ STOP = "Stop"
 STOP_LEVEL = "Stop_level"
 SYMBOL = "Symbol"
 MIND = "MIND"
-
+RELOAD_TIMES = "Reloadtimes"
 
 BREAKPRICE = "Breakprice"
 
