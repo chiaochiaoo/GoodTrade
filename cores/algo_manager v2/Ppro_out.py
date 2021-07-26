@@ -76,13 +76,15 @@ def buy_market_order(symbol,share):
 
 def buy_aggressive_limit_order(symbol,share,ask):
 
-	ask = ask*1.03
-
-	if ask>10:
+	#ask = ask*1.03
+	if ask<2:
+		ask = round((ask+0.02),2) 
+	elif ask>=2 and ask<=10:
+		ask = round((ask+0.05),2) 
+	elif ask>10:
 		ask = round((ask+0.1),2)  
 	elif ask>100:
 		ask = round((ask+0.2),2)
-
 
 	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(ask)+'&ordername=ARCA Buy ARCX Limit IOC&shares='+str(share)
 	sucess='Agrresive limit buy order success on'+symbol
@@ -92,9 +94,13 @@ def buy_aggressive_limit_order(symbol,share,ask):
 
 def short_aggressive_limit_order(symbol,share,bid):
 
-	bid = bid*0.97
+	#bid = bid*0.97
 
-	if bid>10:
+	if bid <2:
+		bid = round((bid-0.02),2)
+	elif bid>=2 and bid<=10:
+		bid = round((bid-0.05),2) 
+	elif bid>10:
 		bid = round((bid-0.1),2)
 	elif bid>100:
 		bid = round((bid-0.2),2)
