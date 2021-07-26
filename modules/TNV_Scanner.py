@@ -214,7 +214,7 @@ class Open_Reversal():
 		self.l = 1
 		self.NT = NT
 		self.labels_width = [9,6,5,7,7,5,6,6,6,6,6,6,8,6,6,6,6]
-		self.labels = ["Symbol","A.Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Ignore","Add"]
+		self.labels = ["Symbol","A.Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Algo","Add"]
 		self.root = root
 		self.recreate_labels(self.root)
 
