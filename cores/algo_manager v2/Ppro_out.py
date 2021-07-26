@@ -246,8 +246,6 @@ def Ppro_outx(pipe,port): #a sperate process. GLOBALLY.
 
 				buy_market_order(symbol,share)
 
-
-
 			elif type_ ==SELL:
 
 				symbol = d[1]

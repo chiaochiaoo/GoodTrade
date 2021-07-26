@@ -121,6 +121,7 @@ class UI(pannel):
 
 		self.main = ttk.Label(self.comms, text="Main:")
 		self.main.grid(sticky="w",column=1,row=1,padx=10)
+		
 		self.main_status = ttk.Label(self.comms, textvariable=self.main_app_status)
 		self.main_status.grid(sticky="w",column=2,row=1)
 

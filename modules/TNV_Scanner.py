@@ -220,9 +220,20 @@ class Open_Reversal():
 
 		self.file = "signals/open_resersal_"+datetime.now().strftime("%m-%d")+".csv"
 
-		#self.update_entry([pd.read_csv("test2.csv",index_col=0)])
+		#self.update_entry(pd.read_csv("test2.csv",index_col=0))
 
 	def recreate_labels(self,frame):
+
+		self.algo_frame = ttk.LabelFrame(self.root,text="Algo setup")
+		self.algo_frame.place(x=0, rely=0, relheight=0.15, relwidth=1)
+
+		self.root = ttk.LabelFrame(self.root,text="")
+		self.root.place(x=0, rely=0.12, relheight=0.8, relwidth=1)
+
+		self.algo_pannel()
+				# self.breakout_frame = ttk.LabelFrame(self.root,text="Volatility Breakout")
+		# self.breakout_frame.place(x=0, rely=0.05, relheight=1, relwidth=0.95)
+
 
 		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
 
@@ -245,9 +256,32 @@ class Open_Reversal():
 		self.l+=1
 		self.create_entry()
 
+	def algo_pannel(self):
+		self.algo_risk = tk.DoubleVar(value=0)
+		self.algo_activate = tk.BooleanVar(value=0)
+
+		row = 1
+		col = 1
+		ttk.Label(self.algo_frame, text="Algo:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.algo_frame, variable=self.algo_activate).grid(sticky="w",column=col+1,row=row)
+
+		ttk.Label(self.algo_frame, text="Risk:").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(self.algo_frame, textvariable=self.algo_risk).grid(sticky="w",column=col+3,row=row)
+
+
+		self.rel_v = tk.DoubleVar(value=0)
+		self.re_score = tk.DoubleVar(value=0)
+		row = 2
+		col = 1
+		ttk.Label(self.algo_frame, text="Rel V>=").grid(sticky="w",column=col,row=row)
+		ttk.Entry(self.algo_frame, textvariable=self.rel_v).grid(sticky="w",column=col+1,row=row)
+
+		ttk.Label(self.algo_frame, text="Score>").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(self.algo_frame, textvariable=self.re_score).grid(sticky="w",column=col+3,row=row)
+
 	def create_entry(self):
 
-		for k in range(0,50):
+		for k in range(0,30):
 
 			self.entries.append([])
 
@@ -303,11 +337,16 @@ class Open_Reversal():
 
 						for i in range(len(lst)):
 							self.entries[entry][i]["text"] = lst[i]
+							if entry<3:
+								self.entries[entry][i]["background"] = "LIGHTGREEN"
+
+						#add the button here?
+
 						entry+=1
-						if entry ==50:
+						if entry ==30:
 							break
 
-				while entry<50:
+				while entry<30:
 					#print("ok")
 					for i in range(10):
 						self.entries[entry][i]["text"] = ""
