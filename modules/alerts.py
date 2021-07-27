@@ -227,7 +227,7 @@ class alert(pannel):
 				format[j].set(self.auto_range.get())
 				#self.tickers_labels[i][j].configure(text='Auto range detection')
 			#text filed for hmm,,,entry, 
-			elif j ==3 or j ==4:
+			elif j ==4 or j ==5:
 				self.tickers_labels[i].append(tk.Entry(self.frame ,textvariable=format[j],width=self.width[j]))
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 			#when it is alert label creation, create a trace set for value position 
@@ -239,8 +239,8 @@ class alert(pannel):
 				value_position = alerts[j][0]
 				alert_position = alerts[j][1]
 				alert_vals = alerts[j][2]
-				m=format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
-				self.tickers_tracers[i].append((format[value_position],m))
+				# m=format[value_position].trace('w', lambda *_, eval_string=format[j],label=self.tickers_labels[i][j],alertsvals=alert_vals,ready=data_ready,status=format[1]: self.alert(eval_string,label,alertsvals,ready,status))
+				# self.tickers_tracers[i].append((format[value_position],m))
 			elif j==9:
 				self.tickers_labels[i].append(tk.Checkbutton(self.frame,variable=format[j]))
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
@@ -1305,12 +1305,13 @@ class breakout(alert):
 
 		super().__init__(frame,data,commlink)
 
-		self.labels = ["Ticker","Status","AR","Support","Resistance ","Range","RRR","Cur Price","Evaluation","Algo","Trigger Type","Trigger Timer","Configure Entry",]
-		self.width = [8,10,4,7,7,7,7,7,25,4,10,10,12]
+		self.labels = ["Ticker","Status","AR","Cur Price","Support","Resistance ","Range","RRR","SC%","Algo","Trigger Type","Trigger Timer","Configure Entry",]
+		self.width = [8,10,4,7,7,7,7,7,7,4,10,10,12]
 
 		command={}
 		command["Range"] = lambda :self.sort_cur_range(self.data.symbol_data_support_resistance_range)
 		command["RRR"] = lambda :self.sort_cur_range(self.data.risk_reward_ratio)
+		command["SC%"] = lambda :self.sort_cur_range(self.data.symbol_percentage_since_close)
 
 		self.labels_creator(self.frame,command)
 
@@ -1414,7 +1415,7 @@ class breakout(alert):
 				em=emv.get()
 				rrr.set(round(em/num,2))
 
-				self.tickers_labels[symbol][6]["background"] = hex_white_to_green(em/num)
+				self.tickers_labels[symbol][7]["background"] = hex_white_to_green(em/num)
 				#print(hex_white_to_green(em/num))
 				rg.set(round(num,2))
 			else:
@@ -1451,6 +1452,8 @@ class breakout(alert):
 
 		algo_placement = self.data.algo_breakout_placement[symbol]
 
+		sc =self.data.symbol_percentage_since_close[symbol]
+
 		eva= self.data.symbol_data_breakout_eval[symbol]
 
 		time = self.data.symbol_update_time[symbol]
@@ -1469,7 +1472,7 @@ class breakout(alert):
 
 		#cur, mean, std. symbol, time. 
 		alertvals= [symbol,time,cur_price,support,resistance ,alert_type]
-		labels = [symbol,status,checker,support,resistance ,range_,atr,cur_price,eva,algo_trade,trigger_type,trigger_timer,algo_placement]
+		labels = [symbol,status,checker,cur_price,support,resistance ,range_,atr,sc,algo_trade,trigger_type,trigger_timer,algo_placement]
 
 		#any alert will need a threshold. deviation. std. or type.
 
