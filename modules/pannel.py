@@ -101,6 +101,7 @@ class pannel:
 				self.tickers_labels[key][j].grid(row=symbol_list[key]+2,column=j,padx=0)
 
 
+
 	def labels_creator(self,frame,cmd=None):
 
 		if cmd ==None:
@@ -135,6 +136,7 @@ class pannel:
 				self.b.configure(highlightbackground="#d9d9d9")
 				self.b.configure(highlightcolor="black")
 				self.b.grid(row=1, column=i)
+
 
 
 def timestamp(s):

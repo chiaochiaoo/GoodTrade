@@ -134,8 +134,6 @@ class alert(pannel):
 
 	#any alert will need a threshold. deviation. std. 
 
-
-
 	def add_symbol(self,symbol,format,alert_positions,alerts,data_ready):
 
 		#init the alert value
@@ -354,7 +352,6 @@ class alert(pannel):
 		self.tickers_labels.pop(symbol,None)
 
 		self.rebind(self.canvas,self.frame)
-
 
 	def set_latest_alert(self,symbol,alert,time):
 
@@ -600,7 +597,6 @@ class alert(pannel):
 
 		except Exception as e:
 			print("Alert Error:",e)
-
 
 	def confirm_trade(self,order_id):
 
@@ -1311,7 +1307,12 @@ class breakout(alert):
 
 		self.labels = ["Ticker","Status","AR","Support","Resistance ","Range","RRR","Cur Price","Evaluation","Algo","Trigger Type","Trigger Timer","Configure Entry",]
 		self.width = [8,10,4,7,7,7,7,7,25,4,10,10,12]
-		self.labels_creator(self.frame)
+
+		command={}
+		command["Range"] = lambda :self.sort_cur_range(self.data.symbol_data_support_resistance_range)
+		command["RRR"] = lambda :self.sort_cur_range(self.data.risk_reward_ratio)
+
+		self.labels_creator(self.frame,command)
 
 
 		self.checker = tk.Checkbutton(frame,variable=self.data.all_auto)
@@ -1333,7 +1334,6 @@ class breakout(alert):
 		tk.Label(frame,text="Default risk per trade:",height=1,width=20).place(x=340,y=10)
 
 		tk.Entry(frame,textvariable=self.default_risk,width=5).place(x=480,y=10)
-
 
 		tk.Button(frame,text="Place all algos",command=self.placeall).place(x=550,y=10)
 
@@ -1407,7 +1407,6 @@ class breakout(alert):
 		print(v)
 		self.data.toggle_all(vals,v)
 
-
 	def range_tracker(self,support,resistance,rg,rrr,emv,symbol):
 		try:
 			num = float(resistance.get())-float(support.get())
@@ -1429,16 +1428,12 @@ class breakout(alert):
 	def add_symbol(self,symbol):
 
 		status = self.data.symbol_status[symbol]
-
 		cur_price = self.data.symbol_price[symbol]
-
 		checker = self.data.auto_support_resistance[symbol]
-
 		checker_trade = self.data.auto_trade[symbol]
 
 		support = self.data.symbol_data_support[symbol]
 		resistance  = self.data.symbol_data_resistance[symbol]
-
 		range_ = self.data.symbol_data_support_resistance_range[symbol]
 
 		atr = self.data.risk_reward_ratio[symbol]
