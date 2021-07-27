@@ -214,13 +214,15 @@ class Open_Reversal():
 		self.l = 1
 		self.NT = NT
 		self.labels_width = [9,6,5,7,7,5,6,6,6,6,6,6,8,6,6,6,6]
-		self.labels = ["Symbol","A.Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Algo","Add"]
+		self.labels = ["Symbol","A.Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Add","Algo"]
+
+		self.ts_location = 7
 		self.root = root
 		self.recreate_labels(self.root)
 
 		self.file = "signals/open_resersal_"+datetime.now().strftime("%m-%d")+".csv"
 
-		#self.update_entry(pd.read_csv("test2.csv",index_col=0))
+		#self.update_entry(pd.read_csv("tttt.csv",index_col=0))
 
 	def recreate_labels(self,frame):
 
@@ -228,7 +230,7 @@ class Open_Reversal():
 		self.algo_frame.place(x=0, rely=0, relheight=0.15, relwidth=1)
 
 		self.root = ttk.LabelFrame(self.root,text="")
-		self.root.place(x=0, rely=0.12, relheight=0.8, relwidth=1)
+		self.root.place(x=0, rely=0.08, relheight=0.8, relwidth=1)
 
 		self.algo_pannel()
 				# self.breakout_frame = ttk.LabelFrame(self.root,text="Volatility Breakout")
@@ -286,17 +288,29 @@ class Open_Reversal():
 			self.entries.append([])
 
 			for i in range(len(self.labels)): #Rows
-				self.b = tk.Label(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
+				
+				if i == 8:
+					self.b = tk.Button(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
+				elif i ==9:
+					self.b = tk.Button(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
+				else:
+					self.b = tk.Label(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
 				self.b.grid(row=self.l, column=i)
 				self.entries[k].append(self.b)
+				if i == 9:
+					self.b.grid_remove()
 			self.l+=1
-
 
 	def update_entry(self,data):
 
 		#at most 8.
 		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
 
+		now = datetime.now()
+		ts = now.hour*60+now.minute-30
+
+		#TEST
+		print(ts)
 		df = data
 		#timestamp = data[1]
 
@@ -318,7 +332,7 @@ class Open_Reversal():
 					rscore = row['reversal_score']
 					sc = row['SC']
 
-					since = ts_to_min(row['reversal_timer'])
+					since = row['reversal_timer']
 
 					row['Signal Time'] = since
 					############ add since, and been to the thing #############
@@ -335,11 +349,22 @@ class Open_Reversal():
 
 						lst = [rank,vol,relv,side,rscore,sc,listed,since]
 
-						for i in range(len(lst)):
-							self.entries[entry][i]["text"] = lst[i]
-							if entry<3:
-								self.entries[entry][i]["background"] = "LIGHTGREEN"
+						ts_location = 7
 
+						for i in range(len(lst)):
+							
+							if lst[ts_location] >ts:
+								self.entries[entry][i]["background"] = "LIGHTGREEN"
+								self.entries[entry][8].grid()
+
+							if i == ts_location:
+								self.entries[entry][i]["text"] = ts_to_min(lst[i])
+							else:
+								self.entries[entry][i]["text"] = lst[i]
+								self.entries[entry][8].grid_remove() 
+								#self.entries[entry][8].grid_remove() 
+								#self.entries[entry][9].grid_forget()
+							#self.entries[entry][8].grid() 
 						#add the button here?
 
 						entry+=1
