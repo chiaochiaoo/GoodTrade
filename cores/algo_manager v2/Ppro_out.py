@@ -333,15 +333,27 @@ def Ppro_out(pipe,port): #a sperate process. GLOBALLY.
 				share = d[2]
 				ask = d[3]
 				#print("iocbuy",ask)
-				request_str,sucess_str,failure_str=buy_aggressive_limit_order(symbol,share,ask)
+				now = datetime.now()
+				ts = now.hour*60+now.minute
+
+				if ts<570:
+					request_str,sucess_str,failure_str=buy_aggressive_limit_order(symbol,share,ask)
+				else:
+					request_str,sucess_str,failure_str=buy_market_order(symbol,share)
 
 			elif type_ ==IOCSELL:	
 				symbol = d[1]
 				share = d[2]
 				bid = d[3]
 				#print("iocsell",bid)
-				request_str,sucess_str,failure_str=short_aggressive_limit_order(symbol,share,bid)
+				now = datetime.now()
+				ts = now.hour*60+now.minute
 
+				if ts<570:
+					request_str,sucess_str,failure_str=short_aggressive_limit_order(symbol,share,bid)
+				else:
+					request_str,sucess_str,failure_str=sell_market_order(symbol,share)
+					
 			elif type_ == LIMITBUY:
 
 				symbol = d[1]
