@@ -208,7 +208,7 @@ class Manager:
 
 		self.symbols = []
 
-		self.symbol_data = {}		
+		self.symbol_data = {}
 		self.tradingplan = {}
 
 
@@ -540,7 +540,7 @@ class Tester:
 		tk.Entry(self.root ,textvariable=self.price,width=10).grid(column=1,row=2)	
 
 		tk.Button(self.root ,text="up",command=self.price_up).grid(column=1,row=4)	
-		tk.Button(self.root ,text="stay",command=self.price_stay).grid(column=2,row=4)	
+		tk.Button(self.root ,text="stay",command=self.price_stayx).grid(column=2,row=4)	
 		tk.Button(self.root ,text="down",command=self.price_down).grid(column=3,row=4)	
 
 		tk.Button(self.root ,text="TimeX1",command=self.time_facotr_1).grid(column=1,row=3)
@@ -676,9 +676,12 @@ class Tester:
 			self.change()
 			time.sleep(self.wait_time)
 
-	def price_stay(self):
+	def price_stayx(self):
+		#print("stay")
 		self.price_stay = True
 		self.change_sum = 0
+		
+
 	def time_facotr_1(self):
 		self.wait_time=1
 
@@ -729,6 +732,8 @@ class Tester:
 			else:
 				self.price.set(round(self.price.get()-0.01,2))
 				self.price_flip = True
+			#print("hello")
+
 		self.bid = round(float(self.price.get()-0.01),2)
 		self.ask = round(float(self.price.get()+0.01),2)
 
@@ -801,7 +806,7 @@ if __name__ == '__main__':
 
 
 	root = tk.Tk()
-	root.title("GoodTrade Algo Manager v2 b6")
+	root.title("GoodTrade Algo Manager v2 b8")
 	root.geometry("1920x800")
 
 	manager=Manager(root,goodtrade_pipe,ppro_out,ppro_in,TEST)

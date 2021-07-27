@@ -161,7 +161,10 @@ class TradingPlan:
 			price = bid
 			gain = round((price-self.data[AVERAGE_PRICE]),4)
 
-			if price < self.data[BREAKPRICE]:
+
+			gap = abs(self.data[BREAKPRICE]-self.data[STOP_LEVEL])*0.05
+
+			if price < self.data[BREAKPRICE]-gap:
 				stillbreak = False
 
 			if price <= self.data[STOP_LEVEL]:
@@ -171,7 +174,9 @@ class TradingPlan:
 			price = ask
 			gain = round(self.data[AVERAGE_PRICE]-price,4)
 
-			if price > self.data[BREAKPRICE]:
+			gap = abs(self.data[STOP_LEVEL]-self.data[BREAKPRICE])*0.05
+
+			if price > self.data[BREAKPRICE]+gap:
 				stillbreak = False
 
 			if price >=  self.data[STOP_LEVEL]:
@@ -189,11 +194,11 @@ class TradingPlan:
 				self.data[FLATTENTIMER] = ts
 		else:
 			if not stillbreak:
-				#print(self.symbol_name,"timer:",ts-self.data[FLATTENTIMER])
+				#print(self.symbol_name,"timer:",ts-self.data[FLATTENTIMER],self.data[RISKTIMER])
 				if ts-self.data[FLATTENTIMER]>self.data[RISKTIMER]:
 					flatten=True
-
-				#print(ts-self.data[FLATTENTIMER])
+				if self.data[RISKTIMER]<20:
+					log_print(self.symbol_name," risk timer:",ts-self.data[FLATTENTIMER],"/",self.data[RISKTIMER])
 			else:
 				self.data[FLATTENTIMER]=0
 				#print("reset flatten timer to 0")
