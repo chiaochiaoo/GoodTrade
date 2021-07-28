@@ -322,7 +322,7 @@ class Open_Reversal():
 		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
 
 		now = datetime.now()
-		ts = now.hour*60+now.minute-5
+		ts = now.hour*60+now.minute-25
 
 		#TEST
 		#ts = 660
