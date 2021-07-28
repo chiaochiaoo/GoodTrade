@@ -258,7 +258,7 @@ class alert(pannel):
 				self.tickers_labels[i][j].grid(row= l+2, column=j,padx=0)
 
 			elif j==len(format)-1:
-				support,resistence = format[3],format[4]
+				support,resistence = format[4],format[5]
 				timer_trade = format[11]
 				type_trade = format[10]
 				info = [symbol,support,resistence,timer_trade,type_trade,default_risk]
