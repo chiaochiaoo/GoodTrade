@@ -260,6 +260,8 @@ class Manager:
 				status = data[6]
 				mana = data[7]
 				self.tradingplan[symbol].tkvars[MANAGEMENTPLAN].set(mana)
+				#self.tradingplan[symbol].tkvars[ENTRYPLAN].set(entry_plan)
+				self.tradingplan[symbol].tkvars[ENTYPE].set(INSTANT)
 				if status =="deploy":
 					self.tradingplan[symbol].deploy()
 		else:
