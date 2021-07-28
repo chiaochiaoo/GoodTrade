@@ -375,11 +375,11 @@ class Open_Reversal():
 
 								#def send_algo(self,symbol,side,open_,stop_,risk_)
 								if side == "UP":
-									support = row['open']
-									resistence = row['low']
-								else:
-									support = row['high']
+									support = row['low']
 									resistence = row['open']
+								else:
+									support = row['open']
+									resistence = row['high']
 
 								self.entries[entry][8]["command"]= lambda symbol=rank,support=support,resistence=resistence,risk_=self.algo_risk:self.send_algo(symbol,support,resistence,risk_)
 
