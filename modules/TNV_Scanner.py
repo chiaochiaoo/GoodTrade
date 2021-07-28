@@ -19,13 +19,14 @@ def ts_to_min(ts):
 
 class TNV_Scanner():
 
-	def __init__(self,root,NT):
+	def __init__(self,root,NT,commlink):
 
 		
 		self.root = root
 
 		self.NT = NT
 
+		self.algo_commlink = commlink
 
 		#self.NT_update_time = tk.StringVar(value='Last updated')
 		#self.NT_update_time.set('Last updated')
@@ -71,7 +72,7 @@ class TNV_Scanner():
 		# self.NT_scanner_canvas.create_window(0, 0, window=self.NT_scanner_frame, anchor=tk.NW)
 
 		self.volatility_scanner = Volatility_break(self.vb_frame,NT)
-		self.open_reversal = Open_Reversal(self.or_frame,NT)
+		self.open_reversal = Open_Reversal(self.or_frame,NT,self)
 		self.open_break = Open_Break(self.ob_frame,NT)
 		self.corey_pick = CoreysPick(self.cp_frame,NT)
 		self.pre_pick = Premarket_pick(self.pb_frame,NT)
@@ -79,6 +80,9 @@ class TNV_Scanner():
 		#item = pd.read_csv("tttt.csv")
 		#self.open_reversal.update_entry(item)
 		#self.update_entry()
+
+	def send_algo(self,msg):
+		self.algo_commlink.send(msg)
 
 	def update_entry(self,data):
 		timestamp = data[1]
@@ -208,7 +212,9 @@ class Volatility_break():
 			print("TNV scanner construction voli:",e)
 
 class Open_Reversal():
-	def __init__(self,root,NT):
+	def __init__(self,root,NT,TNV_scanner):
+
+		self.tnv_scanner = TNV_scanner
 		self.buttons = []
 		self.entries = []
 		self.l = 1
@@ -258,8 +264,17 @@ class Open_Reversal():
 		self.l+=1
 		self.create_entry()
 
+	def send_algo(self,symbol,support,resistence,risk_):
+
+		#self.entries[entry][8]["command"]= lambda symbol=rank,side=side,open_=row['open'],stop_=rscore,risk_=self.algo_risk:self.send_algo(self,symbol,side,open_,stop_,risk_)
+		risk = risk_.get()
+
+		if risk>0:
+			info = ["New order",["BreakFirst",symbol,support,resistence,risk,{},"deploy","1:2 Exprmntl"]]
+			self.tnv_scanner.send_algo(info)
+		
 	def algo_pannel(self):
-		self.algo_risk = tk.DoubleVar(value=0)
+		self.algo_risk = tk.DoubleVar(value=10)
 		self.algo_activate = tk.BooleanVar(value=0)
 
 		row = 1
@@ -307,10 +322,11 @@ class Open_Reversal():
 		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
 
 		now = datetime.now()
-		ts = now.hour*60+now.minute-30
+		ts = now.hour*60+now.minute-5
 
 		#TEST
-		print(ts)
+		#ts = 660
+		#print(ts)
 		df = data
 		#timestamp = data[1]
 
@@ -356,6 +372,16 @@ class Open_Reversal():
 							if lst[ts_location] >ts:
 								self.entries[entry][i]["background"] = "LIGHTGREEN"
 								self.entries[entry][8].grid()
+
+								#def send_algo(self,symbol,side,open_,stop_,risk_)
+								if side == "UP":
+									support = row['open']
+									resistence = row['low']
+								else:
+									support = row['high']
+									resistence = row['open']
+
+								self.entries[entry][8]["command"]= lambda symbol=rank,support=support,resistence=resistence,risk_=self.algo_risk:self.send_algo(symbol,support,resistence,risk_)
 
 							if i == ts_location:
 								self.entries[entry][i]["text"] = ts_to_min(lst[i])
