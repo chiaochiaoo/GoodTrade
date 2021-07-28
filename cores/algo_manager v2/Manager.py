@@ -256,6 +256,12 @@ class Manager:
 
 			self.symbols.append(symbol)
 			#append it to, UI.
+			if len(data)>6:
+				status = data[6]
+				mana = data[7]
+				self.tradingplan[symbol].tkvars[MANAGEMENTPLAN].set(mana)
+				if status =="deploy":
+					self.tradingplan[symbol].deploy()
 		else:
 			log_print("symbols already exists, modifying current parameter.")
 

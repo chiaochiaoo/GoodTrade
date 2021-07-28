@@ -117,7 +117,7 @@ class viewer:
 		
 		self.pair =  spread_trader(self.tab12,self.data)
 
-		self.scanner_pannel = scanner(root,self.tm,util_process,self.data,util_request)
+		self.scanner_pannel = scanner(root,self.tm,util_process,self.data,util_request,algo_comm)
 
 		util_process.set_pannel(self.scanner_pannel)
 
