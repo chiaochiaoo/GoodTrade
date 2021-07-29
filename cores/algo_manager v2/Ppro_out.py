@@ -12,12 +12,14 @@ import socket
 try:
 	from bs4 import BeautifulSoup
 except ImportError:
+	import pip
 	pip.main(['install', 'BeautifulSoup4'])
 	from bs4 import BeautifulSoup
 
 try:
 	from selenium import webdriver
 except ImportError:
+	import pip
 	pip.main(['install', 'selenium'])
 	from selenium import webdriver
 
