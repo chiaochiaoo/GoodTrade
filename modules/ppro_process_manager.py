@@ -811,7 +811,7 @@ def process_and_send(lst,pipe):
 	if timestamp <570:
 		#d["open_percentage"] = range_eval(d["highs"],d["lows"])
 		#		d["phigh"] = d["high"] d["plow"] = d["low"]
-		if d[expected_momentum]!=0:
+		if d[expected_momentum]!=0 and d["phigh"]!=d["plow"]:
 			#print(symbol,d["phigh"],d["plow"],d[expected_momentum])
 			d["open_percentage"] =  round(d[expected_momentum]/(d["phigh"]-d["plow"]),2)
 	################################################
