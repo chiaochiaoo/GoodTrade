@@ -478,7 +478,7 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 	# 	d["last_send"][i] = d[i]
 
 	d["historical_data_loaded"] = False
-
+	d["requested_time"] = 0
 	d[open_high_range] = 0
 	d[open_high_val] = 0
 	d[open_high_std]= 0
@@ -555,8 +555,9 @@ def load_historical_data(symbol,database):
 			d["historical_data_loaded"] = True
 			print(symbol,"loaded successful")
 		else:
-			database.send_request(symbol)
-
+			if d["requested_time"]<5:
+				database.send_request(symbol)
+			d["requested_time"]+=1
 
 def historical_eval(symbol):
 
