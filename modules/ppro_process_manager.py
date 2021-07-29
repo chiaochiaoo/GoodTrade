@@ -257,8 +257,7 @@ def thread_waiting_mechanism():
 		#print("wait")
 		time.sleep(1)
 
-def multi_processing_price(pipe_receive):
-
+def multi_processing_price(pipe_receive,database):
 
 	global black_list
 	global reg_list
@@ -341,7 +340,7 @@ def multi_processing_price(pipe_receive):
 				#print("sending",i)
 				if i not in black_list:
 					thread_waiting_mechanism()
-					info = threading.Thread(target=getinfo,args=(i,pipe_receive,), daemon=True)
+					info = threading.Thread(target=getinfo,args=(i,pipe_receive,database), daemon=True)
 					info.start()
 
 			# if k%5 == 0:
@@ -538,7 +537,7 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 	d[prev_eval] = "0"
 	d[prev_alert] = 0
 
-def load_historical_data(symbol):
+def load_historical_data(symbol,database):
 	global data
 	d = data[symbol]
 
@@ -555,6 +554,8 @@ def load_historical_data(symbol):
 
 			d["historical_data_loaded"] = True
 			print(symbol,"loaded successful")
+		else:
+			database.send_request(symbol)
 
 
 def historical_eval(symbol):
@@ -651,7 +652,7 @@ def historical_eval(symbol):
 		# d[prev_close_std] = 0
 
 
-def process_and_send(lst,pipe):
+def process_and_send(lst,pipe,database):
 
 	global lock
 	status,symbol,time,timestamp,price,high,low,open_,vol,prev_close  = lst[0],lst[1],lst[2],lst[3],lst[4],lst[5],lst[6],lst[7],lst[8],lst[9]
@@ -825,7 +826,7 @@ def process_and_send(lst,pipe):
 
 
 	#### Historical Eval ####
-	load_historical_data(symbol)
+	load_historical_data(symbol,database)
 	historical_eval(symbol)
 	update_list={}
 
@@ -949,7 +950,7 @@ def range_eval(highs,lows):
 	return round(1-diff/total,2)
 
 
-def getinfo(symbol,pipe):
+def getinfo(symbol,pipe,database):
 
 	global black_list
 
@@ -998,7 +999,7 @@ def getinfo(symbol,pipe):
 					ts = timestamp(time[:5])
 
 					try:
-						process_and_send(["Connected",symbol,time,ts,price,high,low,open_,vol,prev_close],pipe)
+						process_and_send(["Connected",symbol,time,ts,price,high,low,open_,vol,prev_close],pipe,database)
 					except Exception as e:
 						print("PPro Process error",e)
 						lock[symbol] = False

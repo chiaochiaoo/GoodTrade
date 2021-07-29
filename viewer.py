@@ -404,13 +404,7 @@ if __name__ == '__main__':
 	multiprocessing.freeze_support()
 
 
-	# PPRO SECTION ##
-	request_pipe, receive_pipe = multiprocessing.Pipe()
-	process_ppro = multiprocessing.Process(target=multi_processing_price, args=(receive_pipe,),daemon=True)
-	process_ppro.daemon=True
-	process_ppro.start()
 
-	ppro = ppro_process_manager(request_pipe)
 
 	### scanner pannel needs the manager. 
 
@@ -465,8 +459,20 @@ if __name__ == '__main__':
 	root.protocol("WM_DELETE_WINDOW", on_closing)
 
 	util_process = util_client(util_request)
+
+	request_pipe, receive_pipe = multiprocessing.Pipe()
+	process_ppro = multiprocessing.Process(target=multi_processing_price, args=(receive_pipe,util_process,),daemon=True)
+	process_ppro.daemon=True
+	process_ppro.start()
+	ppro = ppro_process_manager(request_pipe)
 	
 	view = viewer(root,util_process,ppro,algo_manager_process_comm,authen_clientside_comm,util_request)
+	
+	# PPRO SECTION ##
+
+
+	
+
 	utility.start()
 
 	root.mainloop()
