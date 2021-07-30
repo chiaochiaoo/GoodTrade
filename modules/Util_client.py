@@ -206,6 +206,12 @@ def util_comms(ulti_response): #connects to server for db, nt, and finviz.
 			print("Util server: taking data")
 			while True:
 
+				try:
+					s.send(b'alive check')
+				except:
+					connection = False
+					break
+
 				ready = select.select([s], [], [], 1)
 				if ready[0]:
 					data = []
@@ -247,7 +253,8 @@ def util_comms(ulti_response): #connects to server for db, nt, and finviz.
 								s.sendall(pickle.dumps(d))
 				except Exception as e:
 					print(e)
-
+					connection = False
+					break
 				time.sleep(1)
 				#ulti_response.send(["Util init"])
 		print("Server disconnected")
@@ -255,35 +262,74 @@ def util_comms(ulti_response): #connects to server for db, nt, and finviz.
 
 #main part.
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
 
-# 	multiprocessing.freeze_support()
+	while True:
 
-# 	util_request, util_response = multiprocessing.Pipe()
+		HOST = '10.29.10.132'  # The server's hostname or IP address
+		PORT = 65424       # The port used by the server
 
-# 	#util_request.send(["Database Request","aapl"])
 
-# 	s=util_client(util_request)
-# 	#s.send_request("msft")
-# 	util_comms(util_response)
-# 	# s = util_client(util_request)
-# 	# utility = multiprocessing.Process(target=util_comms, args=(util_response,),daemon=True)
-# 	# utility.daemon=True
-# 	# utility.start()
+		print("Trying to connect to the Util server")
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		connected = False
 
-# 	while True:
-# 		a=1
-# 	request_pipe, receive_pipe = multiprocessing.Pipe()
-# 	p = multiprocessing.Process(target=multi_processing_scanner, args=(receive_pipe,),daemon=True)
-# 	p.daemon=True
-# 	p.start()
+		reg_list = ["Database Request"]
+		while not connected:
+			try:
+				s.connect((HOST, PORT))
+				connected = True
+			except:
+				#pipe.send(["msg","Cannot connected. Try again in 2 seconds."])
+				print("Cannot connect Util server. Try again in 2 seconds.")
+				time.sleep(2)
 
-# 	t = scanner_process_manager(None,request_pipe)
-# 	t.send_request()
+		connection = True
+		s.setblocking(0)
+		print("Util server Connection Successful")
+		#ulti_response.send(["Util init"])
+		while connection:
+			print("Util server: taking data")
+			while True:
 
-# 	while True:
-# 		a = 1
-# 		
+				try:
+					s.send(b'alive check')
+				except:
+					connection = False
+					print("server disconection detected")
+					break
+
+				ready = select.select([s], [], [], 1)
+				if ready[0]:
+					data = []
+					while True:
+
+						try:
+							part = s.recv(2048)
+						except:
+							connection = False
+							break
+
+						data.append(part)
+						if len(part) < 2048:
+							
+							try:
+								k = pickle.loads(b"".join(data))
+								break
+							except:
+								pass
+					#print("received:",k)
+					ulti_response.send(k)
+
+				try:
+					time.sleep(1)
+				except Exception as e:
+					print(e)
+					connection = False
+					break
+				time.sleep(1)
+				#ulti_response.send(["Util init"])
+		print("Server disconnected")
 
 
 
