@@ -207,7 +207,7 @@ def util_comms(ulti_response): #connects to server for db, nt, and finviz.
 			while True:
 
 				try:
-					s.send(b'alive check')
+					s.sendall(pickle.dumps('alive check'))
 				except:
 					connection = False
 					break
@@ -299,30 +299,31 @@ if __name__ == '__main__':
 					print("server disconection detected")
 					break
 
-				ready = select.select([s], [], [], 1)
-				if ready[0]:
-					data = []
-					while True:
+				# ready = select.select([s], [], [], 1)
+				# if ready[0]:
+				# 	data = []
+				# 	while True:
 
-						try:
-							part = s.recv(2048)
-						except:
-							connection = False
-							break
+				# 		try:
+				# 			part = s.recv(2048)
+				# 		except:
+				# 			connection = False
+				# 			break
 
-						data.append(part)
-						if len(part) < 2048:
+				# 		data.append(part)
+				# 		if len(part) < 2048:
 							
-							try:
-								k = pickle.loads(b"".join(data))
-								break
-							except:
-								pass
-					#print("received:",k)
-					ulti_response.send(k)
+				# 			try:
+				# 				k = pickle.loads(b"".join(data))
+				# 				break
+				# 			except:
+				# 				pass
+				# 			print("received:",k)
+				# 	#ulti_response.send(k)
 
 				try:
-					time.sleep(1)
+					s.send(pickle.dumps(["Database Request","PTON.NQ"]))
+					print("send")
 				except Exception as e:
 					print(e)
 					connection = False
