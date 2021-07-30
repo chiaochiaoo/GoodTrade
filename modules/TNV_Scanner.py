@@ -387,11 +387,10 @@ class Open_Reversal():
 								self.entries[entry][8]["command"]= lambda symbol=rank,support=support,resistence=resistence,risk_=self.algo_risk:self.send_algo(symbol,support,resistence,risk_)
 
 								if self.algo_activate.get()==1:
-
 									if rank not in self.algo_placed:
 										self.send_algo(rank,support,resistence,self.algo_risk)
-									else:
 										self.algo_placed.append(rank)
+										
 							if i == ts_location:
 								self.entries[entry][i]["text"] = ts_to_min(lst[i])
 							else:
