@@ -207,7 +207,7 @@ def util_comms(ulti_response): #connects to server for db, nt, and finviz.
 			while True:
 
 				try:
-					s.sendall(pickle.dumps('alive check'))
+					s.sendall(pickle.dumps(['connection check']))
 				except:
 					connection = False
 					break
