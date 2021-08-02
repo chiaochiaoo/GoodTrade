@@ -57,7 +57,7 @@ class moudule_2:
 		#self.register(symbol)
 
 		dc = threading.Thread(target=self.TOS_listener, daemon=True)
-		#dc.start()
+		dc.start()
 
 		#up = threading.Thread(target=self.update_graph, daemon=True)
 		#up.start()
@@ -104,6 +104,7 @@ class moudule_2:
 
 			t = [t1,t5,t60]
 			increment = False
+			increment_ = 0
 			for i in range(3):
 
 				timestamp = t[i]
@@ -123,11 +124,14 @@ class moudule_2:
 				else:
 					obj["v"]+=size
 					obj["t"]+=1
-					print(self.c1)
+					#print(self.c1)
+
 			if increment: ###bar, every second. Distribution, every 5 second. (with cap capacity.)
 				#print("update")
 				self.update_complete.set(self.update_complete.get()+1)
-				print(self.c1)
+				#print(self.c1)
+
+
 				#for i in range(3):
 					# self.vol[self.timeframe[i]].cla()
 					# self.trades[self.timeframe[i]].cla()
@@ -200,14 +204,36 @@ class moudule_2:
 		print("done")
 
 
-	def update_curret(self):
+	def update_curret(self,a,b,c):
 		#Call every second.
+		#print("update chart")
+		vol = [self.vol1,self.vol5,self.vol60]
+		tra = [self.trade1,self.trade5,self.trade60]
+		
+		if self.update_complete.get()%10==0:
 
-		lst = [self.vol1,self.vol5,self.vol60,self.trade1,self.trade5,self.trade60]
-		for i in range(6):
-			self.vol[self.timeframe[i%3]+"current"].set_data(lst[i].get(),[0,1])
-			self.trades[self.timeframe[i%3]+"current"].set_data(lst[i].get(),[0,1])
+			d = [self.c1,self.c5,self.c60]
+			for i in range(3):
 
+				obj=d[i]
+				self.vol[self.timeframe[i]].cla()
+				self.trades[self.timeframe[i]].cla()
+
+				self.vol[self.timeframe[i]].axvline(vol[i].get(),color="r")
+
+				self.vol[self.timeframe[i]].boxplot(obj["vs"],vert=False)
+				self.vol[self.timeframe[i]].set_title(self.timeframe[i%3]+" "+self.types[0])
+
+				self.trades[self.timeframe[i]].axvline(tra[i].get(),color="r")
+				self.trades[self.timeframe[i]].boxplot(obj["ts"],vert=False)
+				self.trades[self.timeframe[i]].set_title(self.timeframe[i%3]+" "+self.types[1])
+
+		else:
+			for i in range(3):
+				self.vol[self.timeframe[i%3]+"current"].set_data(vol[i].get(),[0,1])
+				self.trades[self.timeframe[i%3]+"current"].set_data(tra[i].get(),[0,1])
+
+			print("only current,",self.vol1.get())
 		self.figc.canvas.draw()
 
 	def update_chart(self):
@@ -246,7 +272,7 @@ class moudule_2:
 			#self.charts[title[i]] = axs[i//3][i%3]
 		#print(self.vol)
 
-		self.update_complete.trace('w',self.update_chart)
+		self.update_complete.trace('w',self.update_curret)
 
 		self.canvas = FigureCanvasTkAgg(self.figc, master=self.window)
 		self.canvas.get_tk_widget().pack()
