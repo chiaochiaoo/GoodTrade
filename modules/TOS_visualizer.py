@@ -4,36 +4,48 @@ import numpy as np
 matplotlib.use('TkAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
-#import matplotlib.animation as animation
+
+
 from tkinter import *
 import time
 import threading
 import json
 import csv
+import requests
+import threading
+import socket
+def find_between(data, first, last):
+    try:
+        start = data.index(first) + len(first)
+        end = data.index(last, start)
+        return data[start:end]
+    except ValueError:
+        return data
+def get_sec(time_str):
+    """Get Seconds from time."""
+    h, m, s = time_str.split(':')
+    return 1000*(int(h) * 3600 + int(m) * 60 + int(s))
 
-
-class mclass:
-	def __init__(self,  window):
+class moudule_2:
+	def __init__(self,  window,symbol):
 		self.window = window
 		self.box = Entry(window)
-
-
-		self.plot()
-		self.button = Button (window, text="check", command=self.plot)
-		self.box.pack ()
-		self.button.pack()
-		self.button2 = Button (window, text="Simulated", command=self.simulated_input)
-		self.button2.pack()
+		
+		# self.button = Button (window, text="check", command=self.plot)
+		# self.box.pack ()
+		# self.button.pack()
+		# self.button2 = Button (window, text="Simulated", command=self.simulated_input)
+		# self.button2.pack()
 		self.i = 0
 
+		self.register(symbol)
+		dc = threading.Thread(target=self.TOS_listener, daemon=True)
+		dc.start()
+		self.plot()
 
 	def set(self):
-
-		# self.ac.set_xlim(min(self.v)-self.i, max(self.v)+self.i)
-		# self.i+=1
 		self.v.append(self.v[-1]+1)
 		self.ac.cla()
-		#self.ac.boxplot(self.v,vert=False)
 		self.line.set_data(self.v)
 		self.fig.canvas.draw()
 
@@ -69,7 +81,7 @@ class mclass:
 
 
 						increment = True
- #       self.ac.cla()
+
 						self.vol[self.timeframe[i]].cla()
 						self.trades[self.timeframe[i]].cla()
 
@@ -92,6 +104,7 @@ class mclass:
 					#time.sleep(1)
 
 		print("done")
+
 	def plot (self):
 
 
@@ -131,8 +144,32 @@ class mclass:
 		self.canvas = FigureCanvasTkAgg(self.fig, master=self.window)
 		self.canvas.get_tk_widget().pack()
 
+	def register(self,symbol):
+		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&feedtype=TOS&output=4400&status=on"
+		r= requests.post(postbody)
+		print("status:",r.status_code)
+
+
+	def TOS_listener(self):
+		UDP_IP = "127.0.0.1"
+		UDP_PORT = 4400
+
+		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		sock.bind((UDP_IP, UDP_PORT))
+
+		print("socket start")
+		while True:
+			data, addr = sock.recvfrom(1024)
+			stream_data = str(data)
+			print(stream_data)
+			time = find_between(stream_data, "MarketTime=", ",")
+			stime = get_sec(time[:-4])
+			size = find_between(stream_data, "Size=", ",")
+			price = float(find_between(stream_data, "Price=", ","))
+			#print(stime,price,size)
+
 
 
 window= Tk()
-start= mclass (window)
+start= moudule_2(window,"XLE.AM")
 window.mainloop()
