@@ -24,7 +24,7 @@ def find_between(data, first, last):
 def get_sec(time_str):
     """Get Seconds from time."""
     h, m, s = time_str.split(':')
-    return 1000*(int(h) * 3600 + int(m) * 60 + int(s))
+    return int(h) * 3600 + int(m) * 60 + int(s)
 
 class moudule_2:
 	def __init__(self,  window,symbol):
