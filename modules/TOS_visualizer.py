@@ -145,14 +145,14 @@ class moudule_2:
 		self.canvas.get_tk_widget().pack()
 
 	def register(self,symbol):
-		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&feedtype=TOS&output=4400&status=on"
+		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&feedtype=TOS&output=4401&status=on"
 		r= requests.post(postbody)
 		print("status:",r.status_code)
 
 
 	def TOS_listener(self):
 		UDP_IP = "127.0.0.1"
-		UDP_PORT = 4400
+		UDP_PORT = 4401
 
 		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		sock.bind((UDP_IP, UDP_PORT))
@@ -161,14 +161,22 @@ class moudule_2:
 		while True:
 			data, addr = sock.recvfrom(1024)
 			stream_data = str(data)
-			print(stream_data)
+			#print(stream_data)
 			time = find_between(stream_data, "MarketTime=", ",")
 			stime = get_sec(time[:-4])
 			size = find_between(stream_data, "Size=", ",")
 			price = float(find_between(stream_data, "Price=", ","))
-			#print(stime,price,size)
+			print(stime,price,size)
 
-
+"""
+b'LocalTime=11:38:56.592,Message=TOS,MarketTime=11:38:56.839,Symbol=XLE.AM,Type=0,Price=49.09000,Size=230,Source=25,Condition= ,Tick=?,Mmid=Z,SubMarketId=32,Date=2021-08-02,BuyerId=0,SellerId=0\n'
+b'LocalTime=11:38:56.593,Message=TOS,MarketTime=11:38:56.839,Symbol=XLE.AM,Type=0,Price=49.09000,Size=90,Source=25,Condition= ,Tick=?,Mmid=Z,SubMarketId=32,Date=2021-08-02,BuyerId=0,SellerId=0\n'
+b'LocalTime=11:38:56.593,Message=TOS,MarketTime=11:38:56.839,Symbol=XLE.AM,Type=0,Price=49.09000,Size=180,Source=25,Condition= ,Tick=?,Mmid=Z,SubMarketId=32,Date=2021-08-02,BuyerId=0,SellerId=0\n'
+b'LocalTime=11:38:56.593,Message=TOS,MarketTime=11:38:56.839,Symbol=XLE.AM,Type=0,Price=49.09000,Size=270,Source=25,Condition= ,Tick=?,Mmid=Z,SubMarketId=32,Date=2021-08-02,BuyerId=0,SellerId=0\n'
+b'LocalTime=11:38:56.593,Message=TOS,MarketTime=11:38:56.839,Symbol=XLE.AM,Type=0,Price=49.09000,Size=260,Source=25,Condition= ,Tick=?,Mmid=Z,SubMarketId=32,Date=2021-08-02,BuyerId=0,SellerId=0\n'
+b'LocalTime=11:38:56.593,Message=TOS,MarketTime=11:38:56.839,Symbol=XLE.AM,Type=0,Price=49.09000,Size=10,Source=25,Condition= ,Tick=?,Mmid=Z,SubMarketId=32,Date=2021-08-02,BuyerId=0,SellerId=0\n'
+b'LocalTime=11:38:56.593,Message=TOS,MarketTime=11:38:56.839,Symbol=XLE.AM,Type=0,Price=49.09000,Size=270,Source=25,Condition= ,Tick=?,Mmid=Z,SubMarketId=32,Date=2021-08-02,BuyerId=0,SellerId=0\n'
+"""
 
 window= Tk()
 start= moudule_2(window,"XLE.AM")
