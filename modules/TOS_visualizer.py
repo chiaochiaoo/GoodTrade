@@ -1,9 +1,9 @@
-import matplotlib
+#import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-matplotlib.use('TkAgg')
+# matplotlib.use('TkAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
+# from matplotlib.figure import Figure
 
 
 from tkinter import *
@@ -29,7 +29,7 @@ def get_sec(time_str):
 class moudule_2:
 	def __init__(self,  window,symbol):
 		self.window = window
-		self.box = Entry(window)
+		#self.box = Entry(window)
 		
 		# self.button = Button (window, text="check", command=self.plot)
 		# self.box.pack ()
@@ -38,16 +38,107 @@ class moudule_2:
 		# self.button2.pack()
 		self.i = 0
 
-		self.register(symbol)
-		dc = threading.Thread(target=self.TOS_listener, daemon=True)
-		dc.start()
+		self.c1={"tms":0,"v":0,"t":0,"ts":[],"vs":[]}
+		self.c5={"tms":0,"v":0,"t":0,"ts":[],"vs":[]}
+		self.c60={"tms":0,"v":0,"t":0,"ts":[],"vs":[]}
 		self.plot()
+		self.register(symbol)
+		#dc = threading.Thread(target=self.TOS_listener, daemon=True)
+		#dc.start()
 
-	def set(self):
-		self.v.append(self.v[-1]+1)
-		self.ac.cla()
-		self.line.set_data(self.v)
-		self.fig.canvas.draw()
+		up = threading.Thread(target=self.update_graph, daemon=True)
+		up.start()
+
+		#self.setx()
+
+		#self.TOS_listener()
+		#self.update_graph()
+
+	def setx(self,count):
+		#self.v.append(self.v[-1]+1)
+		#self.ac.cla()
+		self.vol[self.timeframe[0]+"current"].set_data(1+count/100,[0,1])
+		print(self.vol[self.timeframe[0]+"current"].get_data())
+		self.figc.canvas.draw()
+
+
+	def TOS_listener(self):
+		UDP_IP = "127.0.0.1"
+		UDP_PORT = 4401
+
+		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		sock.bind((UDP_IP, UDP_PORT))
+
+		print("socket start")
+
+		
+		d = [self.c1,self.c5,self.c60]
+
+		while True:
+			data, addr = sock.recvfrom(1024)
+			stream_data = str(data)
+
+			time = find_between(stream_data, "MarketTime=", ",")
+			t1 = get_sec(time[:-4])
+			size = int(find_between(stream_data, "Size=", ","))
+			price = float(find_between(stream_data, "Price=", ","))
+			
+
+			t5 = t1//5
+			t60= t1//60
+
+			t = [t1,t5,t60]
+			increment = False
+			for i in range(3):
+
+				timestamp = t[i]
+				obj = d[i]
+
+				if timestamp != obj["tms"]:
+					obj["tms"]=timestamp
+					obj["ts"].append(obj["t"])
+					obj["vs"].append(obj["v"])
+
+					increment = True
+					obj["v"]=size
+					obj["t"]=1
+				else:
+					obj["v"]+=size
+					obj["t"]+=1			
+					print(self.c1)
+			if increment: ###bar, every second. Distribution, every 5 second. (with cap capacity.)
+				#print("update")
+				print(self.c1)
+				#for i in range(3):
+					# self.vol[self.timeframe[i]].cla()
+					# self.trades[self.timeframe[i]].cla()
+
+					# self.vol[self.timeframe[i]].boxplot(obj["vs"],vert=False)
+					# self.vol[self.timeframe[i]].set_title(self.timeframe[i%3]+" "+self.types[0])
+					# self.trades[self.timeframe[i]].boxplot(obj["ts"],vert=False)
+					# self.trades[self.timeframe[i]].set_title(self.timeframe[i%3]+" "+self.types[1])
+
+					#print(type(self.vol[self.timeframe[i]+"current"]))
+				# 	self.vol[self.timeframe[i]+"current"].set_data(1,[0,1])
+				# 	self.trades[self.timeframe[i]+"current"].set_data(1.15,[0,1])
+
+				# self.fig.canvas.draw()
+
+
+	def update_graph(self):
+
+		count = 0
+		while True:
+			self.setx(count)
+
+			count+=1
+			# for i in range(3):
+			# 	self.vol[self.timeframe[i]+"current"].set_data(count,[0,1])
+			# 	self.trades[self.timeframe[i]+"current"].set_data(count,[0,1])
+
+			# self.fig.canvas.draw()
+			# count+=1
+			time.sleep(1)
 
 	def simulated_input(self):
 		c1={"tms":0,"v":0,"t":0,"ts":[],"vs":[]}
@@ -108,10 +199,8 @@ class moudule_2:
 	def plot (self):
 
 
-		self.fig, axs = plt.subplots(2,3,figsize=(15,7))
-
+		self.figc, axs = plt.subplots(2,3,figsize=(15,7))
 		#title = ["1s Volume","5s Volume","1m Volume","1s Trades","5s Trades","1m Trades"]
-
 		self.timeframe = ["1s","5s","1m"]
 		self.types = ["Volume","Trades"]
 
@@ -140,33 +229,16 @@ class moudule_2:
 			total[i//3][self.timeframe[i%3]] = axs[i//3][i%3]
 
 			#self.charts[title[i]] = axs[i//3][i%3]
-
-		self.canvas = FigureCanvasTkAgg(self.fig, master=self.window)
+		#print(self.vol)
+		self.canvas = FigureCanvasTkAgg(self.figc, master=self.window)
 		self.canvas.get_tk_widget().pack()
+		self.canvas.draw()
 
 	def register(self,symbol):
 		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&feedtype=TOS&output=4401&status=on"
 		r= requests.post(postbody)
 		print("status:",r.status_code)
 
-
-	def TOS_listener(self):
-		UDP_IP = "127.0.0.1"
-		UDP_PORT = 4401
-
-		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		sock.bind((UDP_IP, UDP_PORT))
-
-		print("socket start")
-		while True:
-			data, addr = sock.recvfrom(1024)
-			stream_data = str(data)
-			#print(stream_data)
-			time = find_between(stream_data, "MarketTime=", ",")
-			stime = get_sec(time[:-4])
-			size = find_between(stream_data, "Size=", ",")
-			price = float(find_between(stream_data, "Price=", ","))
-			print(stime,price,size)
 
 """
 b'LocalTime=11:38:56.592,Message=TOS,MarketTime=11:38:56.839,Symbol=XLE.AM,Type=0,Price=49.09000,Size=230,Source=25,Condition= ,Tick=?,Mmid=Z,SubMarketId=32,Date=2021-08-02,BuyerId=0,SellerId=0\n'
