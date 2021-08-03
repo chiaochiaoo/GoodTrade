@@ -166,7 +166,7 @@ class moudule_2:
 			if symbol!=self.symbol:
 				self.deregister(symbol)
 			else:
-				self.data_process(t1,size,price)
+				self.data_process(t1,size,price,time[:-4])
 
 
 	def update_curret(self,a,b,c):
@@ -346,7 +346,7 @@ class moudule_2:
 				time.sleep(0.15)
 				#print("next turn")
 
-	def data_process(self,t1,vol,prize):
+	def data_process(self,t1,vol,prize,t1str):
 
 		if t1 > self.default["tms"]:
 			#do two things. 1. update current second val. 2. update this value to all other bins.
@@ -359,7 +359,7 @@ class moudule_2:
 				self.default["vs"].pop(0)
 				self.default["timestamps"].pop(0)
 
-			self.default["timestamps"].append(ts_to_min(t1))
+			self.default["timestamps"].append(t1str)
 			self.default["ts"].append(self.default["t"])
 			self.default["vs"].append(self.default["v"])
 
