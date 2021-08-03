@@ -81,7 +81,7 @@ class moudule_2:
 
 		#self.box = Entry(window)
 		self.symbol = None
-		self.alert_sound = BooleanVar()
+		self.alert_sound = BooleanVar(value=True)
 
 		self.p = DoubleVar(value=1)
 
