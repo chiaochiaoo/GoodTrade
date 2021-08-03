@@ -390,7 +390,8 @@ class moudule_2:
 
 			if self.default["v"]>cutoff:
 				try:
-					winsound.Beep(37,1)
+					winsound.PlaySound("SystemExit", winsound.SND_ALIAS)
+					#winsound.Beep(37,1)
 					#playsound('chime.wav')
 					print("alert triggered")
 				except Exception as e:
@@ -417,9 +418,9 @@ b'LocalTime=11:38:56.593,Message=TOS,MarketTime=11:38:56.839,Symbol=XLE.AM,Type=
 # playsound('chime.wav')
 
 
-winsound.Beep(37,1)
+#winsound.Beep(37,1)
 
-#winsound.PlaySound("SystemExit", winsound.SND_ALIAS)
+winsound.PlaySound("SystemExit", winsound.SND_ALIAS)
 
 root = Tk() 
 root.title("TOS visualizer") 
