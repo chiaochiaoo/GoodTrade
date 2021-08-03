@@ -9,11 +9,11 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
 try:
-	from playsound import playsound
+	import simpleaudio as sa
 except ImportError:
 	import pip
-	pip.main(['install', 'playsound'])
-	from playsound import playsound
+	pip.main(['install', 'simpleaudio'])
+	import simpleaudio as sa
 
 
 import pandas as pd
@@ -71,6 +71,9 @@ def IQR(x):
 class moudule_2:
 	def __init__(self,  window):
 
+
+		self.alert_obj = sa.WaveObject.from_wave_file("chime.wav")
+
 		self.window=window
 		#self.all = LabelFrame(window).place(x=0,y=0,relheight=1,relwidth=1)
 
@@ -127,7 +130,6 @@ class moudule_2:
 
 	def reset_data(self):
 
-		self.default={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"timestamps":[],"vvar":self.vol1,"tvar":self.trade1}
 
 		self.vol1 = IntVar()
 		self.trade1 = IntVar()
@@ -137,6 +139,7 @@ class moudule_2:
 
 		self.vol60 = IntVar()
 		self.trade60 = IntVar()
+		self.default={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"timestamps":[],"vvar":self.vol1,"tvar":self.trade1}
 
 		self.c1={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"vvar":self.vol1,"tvar":self.trade1}
 		self.c5={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"vvar":self.vol5,"tvar":self.trade5}
@@ -301,7 +304,7 @@ class moudule_2:
 
 		if self.symbol!=None:
 			self.deregister(self.symbol)
-			
+
 		self.reset_data()
 		symbol = self.symbol_reg.get()
 		self.symbol = symbol
@@ -394,7 +397,7 @@ class moudule_2:
 
 			if self.default["v"]>cutoff:
 				try:
-					playsound('chime.wav')
+					self.alert_obj.play()
 					print("alert triggered")
 				except Exception as e:
 					print(e)
@@ -418,6 +421,8 @@ b'LocalTime=11:38:56.593,Message=TOS,MarketTime=11:38:56.839,Symbol=XLE.AM,Type=
 # print(q75,q25)
 # playsound('chime.wav')
 # playsound('chime.wav')
+
+
 
 root = Tk() 
 root.title("TOS visualizer") 
