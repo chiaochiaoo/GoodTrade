@@ -417,8 +417,8 @@ b'LocalTime=11:38:56.593,Message=TOS,MarketTime=11:38:56.839,Symbol=XLE.AM,Type=
 # playsound('chime.wav')
 
 
-#winsound.Beep(4000,1)
-winsound.SND_FILENAME('chime.wav')
+winsound.Beep(37,1)
+
 #winsound.PlaySound("SystemExit", winsound.SND_ALIAS)
 
 root = Tk() 
