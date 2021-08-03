@@ -16,23 +16,23 @@ import threading
 import socket
 
 def find_between(data, first, last):
-    try:
-        start = data.index(first) + len(first)
-        end = data.index(last, start)
-        return data[start:end]
-    except ValueError:
-        return data
+	try:
+		start = data.index(first) + len(first)
+		end = data.index(last, start)
+		return data[start:end]
+	except ValueError:
+		return data
 def get_sec(time_str):
-    """Get Seconds from time."""
-    h, m, s = time_str.split(':')
-    return int(h) * 3600 + int(m) * 60 + int(s)
+	"""Get Seconds from time."""
+	h, m, s = time_str.split(':')
+	return int(h) * 3600 + int(m) * 60 + int(s)
 
 class moudule_2:
 	def __init__(self,  window,symbol):
 		self.window = window
 		#self.box = Entry(window)
-		# self.button = Button (window, text="check", command=self.plot)
-		# self.box.pack ()
+		self.button = Button (window, text="check", command=self.update_chart)
+		self.button.pack()
 		# self.button.pack()
 		# self.button2 = Button (window, text="Simulated", command=self.simulated_input)
 		# self.button2.pack()
@@ -49,14 +49,19 @@ class moudule_2:
 		self.vol60 = IntVar()
 		self.trade60 = IntVar()
 
-		self.c1={"tms":0,"v":0,"t":0,"ts":[],"vs":[]}
-		self.c5={"tms":0,"v":0,"t":0,"ts":[],"vs":[]}
-		self.c60={"tms":0,"v":0,"t":0,"ts":[],"vs":[]}
+
+		self.default={"tms":0,"v":0,"t":0,"ts":[],"vs":[]}
+
+		self.c1={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"vvar":self.vol1,"tvar":self.trade1}
+		self.c5={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"vvar":self.vol5,"tvar":self.trade5}
+		self.c60={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"vvar":self.vol60,"tvar":self.trade60}
 
 		self.plot()
 		#self.register(symbol)
 
-		dc = threading.Thread(target=self.TOS_listener, daemon=True)
+		#dc = threading.Thread(target=self.TOS_listener, daemon=True)
+		dc = threading.Thread(target=self.simulated_input, daemon=True)
+
 		dc.start()
 
 		#up = threading.Thread(target=self.update_graph, daemon=True)
@@ -68,14 +73,17 @@ class moudule_2:
 		#self.update_graph()
 
 
+	# def setx(self,count):
+	# 	#self.v.append(self.v[-1]+1)
+	# 	#self.ac.cla()
+	# 	self.vol[self.timeframe[0]+"current"].set_data(1+count/100,[0,1])
+	# 	print(self.vol[self.timeframe[0]+"current"].get_data())
+	# 	self.figc.canvas.draw()
 
-	def setx(self,count):
-		#self.v.append(self.v[-1]+1)
-		#self.ac.cla()
-		self.vol[self.timeframe[0]+"current"].set_data(1+count/100,[0,1])
-		print(self.vol[self.timeframe[0]+"current"].get_data())
+	def update_chart(self):
+		self.vol[self.timeframe[0]+"current"].set_data(self.update_complete.get(),[0,1])
+		print(self.update_complete.get())
 		self.figc.canvas.draw()
-
 
 	def TOS_listener(self):
 		UDP_IP = "127.0.0.1"
@@ -147,98 +155,123 @@ class moudule_2:
 
 				# self.fig.canvas.draw()
 
+
+	def update_interval(self,data,ts,v,t,interval):
+
+		nts = ts//interval
+
+		if nts != data["tms"]:
+
+			data["tms"]=ts
+			data["ts"].append(data["t"])
+			data["vs"].append(data["v"])
+
+			data["vvar"].set(sum(self.default["vs"][-interval:]))
+			data["tvar"].set(sum(self.default["ts"][-interval:]))
+			data["v"] = v
+			data["t"] = t
+		else:
+			data["v"]+=v
+			data["t"]+=t
+
+			data["vvar"].set(data["t"])
+			data["tvar"].set(data["v"])
+
+
 	def simulated_input(self):
-		c1={"tms":0,"v":0,"t":0,"ts":[],"vs":[]}
-		c5={"tms":0,"v":0,"t":0,"ts":[],"vs":[]}
-		c60={"tms":0,"v":0,"t":0,"ts":[],"vs":[]}
 
-		d=[c1,c5,c60]
+		trades= [self.trade1,self.trade5,self.trade60]
+		volume = [self.vol1,self.vol5,self.vol60]
 
 
-		with open('test.csv') as csvfile:
+		count = 0
+		with open('tos_test.csv') as csvfile:
 
 			reader = csv.DictReader(csvfile)
 			field = reader.fieldnames
 
 			for row in reader:
-				t1,p,v=int(row['timestamp'])//1000,float(row['price']),int(row['size'])
-				t5=t1//5
-				t60=t1//60
 
-				t=[t1,t5,t60]
-
-				increment = False
-				for i in range(3):
-					timestamp = t[i]
-					obj = d[i]
-
-					if timestamp != obj["tms"]:
-						obj["tms"]=timestamp
-						obj["ts"].append(obj["t"])
-						obj["vs"].append(obj["v"])
+				l=list(row.values())
+				t1,size,price=int(l[0]),int(l[1]),float(l[2])
 
 
-						increment = True
+				if t1 != self.default["tms"]:
 
-						self.vol[self.timeframe[i]].cla()
-						self.trades[self.timeframe[i]].cla()
+					#do two things. 1. update current second val. 2. update this value to all other bins.
+					self.default["v"] = self.default["v"]//1000
+					self.default["tms"]=t1
+					self.default["ts"].append(self.default["t"])
+					self.default["vs"].append(self.default["v"])
 
-						self.vol[self.timeframe[i]].boxplot(obj["vs"],vert=False)
-						self.vol[self.timeframe[i]].set_title(self.timeframe[i%3]+" "+self.types[0])
-						self.trades[self.timeframe[i]].boxplot(obj["ts"],vert=False)
-						self.trades[self.timeframe[i]].set_title(self.timeframe[i%3]+" "+self.types[1])
+					self.trade1.set(self.default["t"])
+					self.vol1.set(self.default["v"])
 
-						#print(type(self.vol[self.timeframe[i]+"current"]))
-						self.vol[self.timeframe[i]+"current"].set_data([-1,1],1)
-						self.trades[self.timeframe[i]+"current"].set_data([-1,1],obj["t"])
+					self.update_interval(self.c5,self.default["tms"],self.default["v"],self.default["t"],5)
+					self.update_interval(self.c60,self.default["tms"],self.default["v"],self.default["t"],60)
 
-						obj["v"]=v
-						obj["t"]=1
-					else:
-						obj["v"]+=v
-						obj["t"]+=1
-				if increment:
-					self.fig.canvas.draw()
-					#time.sleep(1)
+					count+=1
+					self.update_complete.set(count)
+				else:
+					self.default["v"]+=size
+					self.default["t"]+=1
 
-		print("done")
+					
 
+					#print(self.c1)
+				#print("hold")
+				time.sleep(0.01)
+				#print("next turn")
+
+	# def update_curret(self,a,b,c):
+	# 	print("X")
+	# 	pass
 
 	def update_curret(self,a,b,c):
 		#Call every second.
 		#print("update chart")
+		
 		vol = [self.vol1,self.vol5,self.vol60]
 		tra = [self.trade1,self.trade5,self.trade60]
-		
-		if self.update_complete.get()%10==0:
+		d = [self.default,self.c5,self.c60]
 
-			d = [self.c1,self.c5,self.c60]
+		if self.update_complete.get()%3==0:
+
+			
 			for i in range(3):
 
 				obj=d[i]
 				self.vol[self.timeframe[i]].cla()
 				self.trades[self.timeframe[i]].cla()
 
-				self.vol[self.timeframe[i]].axvline(vol[i].get(),color="r")
+				self.vol[self.timeframe[i]+"current"]=self.vol[self.timeframe[i]].axvline(vol[i].get(),color="r")
 
 				self.vol[self.timeframe[i]].boxplot(obj["vs"],vert=False)
+				self.vol[self.timeframe[i]].set_xlim(-2,max(max(obj["vs"]),vol[i].get())+5)
 				self.vol[self.timeframe[i]].set_title(self.timeframe[i%3]+" "+self.types[0])
 
-				self.trades[self.timeframe[i]].axvline(tra[i].get(),color="r")
+				self.trades[self.timeframe[i]+"current"]=self.trades[self.timeframe[i]].axvline(tra[i].get(),color="r")
 				self.trades[self.timeframe[i]].boxplot(obj["ts"],vert=False)
+				self.trades[self.timeframe[i]].set_xlim(-2,max(max(obj["ts"]),tra[i].get())+5)
 				self.trades[self.timeframe[i]].set_title(self.timeframe[i%3]+" "+self.types[1])
 
 		else:
 			for i in range(3):
+				obj=d[i]
+
+				self.vol[self.timeframe[i]].set_xlim(-2,max(max(obj["vs"]),vol[i].get())+5)
 				self.vol[self.timeframe[i%3]+"current"].set_data(vol[i].get(),[0,1])
+
+				self.trades[self.timeframe[i]].set_xlim(-2,max(max(obj["ts"]),tra[i].get())+5)
 				self.trades[self.timeframe[i%3]+"current"].set_data(tra[i].get(),[0,1])
 
-			print("only current,",self.vol1.get())
+		print(self.c5["vs"],self.vol5.get())
+			#self.vol[self.timeframe[0]+"current"].set_data(self.update_complete.get(),[0,1])
+		#print(self.c1["vs"],self.vol1.get())
 		self.figc.canvas.draw()
 
-	def update_chart(self):
-		chart.set_data(val.get(),[0,1])
-		self.figc.canvas.draw()
+
+
 
 	def plot (self):
 
