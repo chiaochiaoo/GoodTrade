@@ -2,8 +2,19 @@
 import matplotlib.pyplot as plt
 import numpy as np
 # matplotlib.use('TkAgg')
+
+
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # from matplotlib.figure import Figure
+
+
+try:
+	from playsound import playsound
+except ImportError:
+	import pip
+	pip.main(['install', 'playsound'])
+	from playsound import playsound
+
 
 import pandas as pd
 from tkinter import *
@@ -40,19 +51,52 @@ def ts_to_min(ts):
 	else:s=str(s)
 	#print(m,s)
 	return h+":"+m+":"+s
+
+def IQR(x):
+	
+	if len(x)> 5:
+		q75, q25 = np.percentile(x, [75 ,25])
+		iqr = (q75 - q25)*1.5
+		### only take the good one.
+		y = []
+		for i in x:
+			if (i <= q75 + iqr) and (i >= q25 - iqr):
+				y.append(i)
+				
+		x = y[:]
+		#print(q75,q25,iqr)
+		
+	return x
+
 class moudule_2:
-	def __init__(self,  window,symbol):
-		self.window = window
+	def __init__(self,  window):
+
+		self.window=window
+		#self.all = LabelFrame(window).place(x=0,y=0,relheight=1,relwidth=1)
+
+
+		#self.config = LabelFrame(self.window,text="Config").place(x=0,y=80,relheight=0.1,relwidth=1)
+		#self.graph = LabelFrame(window,text="Graph").place(x=0,rely=1,relheight=0.9,relwidth=1)
+
+
 		#self.box = Entry(window)
+		self.symbol = None
+		self.alert_sound = BooleanVar()
 
-		self.alert_sound = IntVar()
+		self.p = DoubleVar(value=1)
 
-		self.checker = Checkbutton(window, text="alert sound",variable=self.alert_sound)
-		# self.button = Button (window, text="check", command=self.update_chart)
-		self.checker.pack()
-		# self.button.pack()
-		# self.button2 = Button (window, text="Simulated", command=self.simulated_input)
-		# self.button2.pack()
+		#v=LabelFrame(window).pack()
+
+		self.symbol_reg = StringVar()
+
+		Label(self.window,text="Symbol:").grid(column=1,row=1)
+		Entry(self.window, text="symbol register",textvariable=self.symbol_reg).grid(column=2,row=1)
+		Button(self.window, text="register", command=self.register).grid(column=3,row=1)
+
+		Label(self.window,text="Alert threshold (Top X%)").grid(column=1,row=2)
+		self.alert_config = Entry(self.window, text="alert sound",textvariable=self.p).grid(column=2,row=2)
+		self.checker = Checkbutton(self.window, text="alert sound",variable=self.alert_sound).grid(column=3,row=2)
+
 		self.i = 0
 
 		self.update_complete = IntVar()
@@ -74,10 +118,9 @@ class moudule_2:
 		self.c60={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"vvar":self.vol60,"tvar":self.trade60}
 
 		self.plot()
-		#self.register(symbol)
 
-		#dc = threading.Thread(target=self.TOS_listener, daemon=True)
-		dc = threading.Thread(target=self.simulated_input, daemon=True)
+		dc = threading.Thread(target=self.TOS_listener, daemon=True)
+		#dc = threading.Thread(target=self.simulated_input, daemon=True)
 
 		dc.start()
 
@@ -116,12 +159,16 @@ class moudule_2:
 			data, addr = sock.recvfrom(1024)
 			stream_data = str(data)
 
+			symbol = find_between(stream_data, "Symbol=", ",")
 			time = find_between(stream_data, "MarketTime=", ",")
 			t1 = get_sec(time[:-4])
 			size = int(find_between(stream_data, "Size=", ","))
 			price = float(find_between(stream_data, "Price=", ","))
 
-			self.data_process(t1,size,price)
+			if symbol!=self.symbol:
+				self.deregister(symbol)
+			else:
+				self.data_process(t1,size,price)
 
 
 	def update_curret(self,a,b,c):
@@ -244,11 +291,21 @@ class moudule_2:
 		self.update_complete.trace('w',self.update_curret)
 
 		self.canvas = FigureCanvasTkAgg(self.f, master=self.window)
-		self.canvas.get_tk_widget().pack()
-		self.canvas.draw()
+		#self.canvas.get_tk_widget().pack()
+		self.canvas.get_tk_widget().place(x=0,y=50,relheight=0.8,relwidth=0.8)
+		#self.canvas.draw()
 
-	def register(self,symbol):
+	def register(self):
+
+		symbol = self.symbol_reg.get()
+		self.symbol = symbol
+
 		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&feedtype=TOS&output=4401&status=on"
+		r= requests.post(postbody)
+		print("status:",r.status_code)
+
+	def deregister(self,symbol):
+		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&feedtype=TOS&output=4401&status=off"
 		r= requests.post(postbody)
 		print("status:",r.status_code)
 
@@ -310,6 +367,8 @@ class moudule_2:
 			self.update_interval(self.c5,self.default["tms"],self.default["v"],self.default["t"],5)
 			#self.update_interval(self.c60,self.default["tms"],self.default["v"],self.default["t"],60)
 
+			self.alert_check()
+
 			self.update_complete.set(t1)
 
 			self.default["v"] = vol
@@ -318,6 +377,21 @@ class moudule_2:
 			self.default["v"]+=vol
 			self.default["t"]+=1
 
+	def alert_check(self):
+
+
+		if self.alert_sound.get()==True:
+			p = self.p.get()
+			#print(p)
+			x=100-p
+			cutoff, q25 = np.percentile(self.default["vs"], [x ,0])
+
+			if self.default["v"]>cutoff:
+				try:
+					playsound('chime.wav')
+					print("alert triggered")
+				except Exception as e:
+					print(e)
 	# def update_curret(self,a,b,c):
 	# 	print("X")
 	# 	pass
@@ -333,6 +407,17 @@ b'LocalTime=11:38:56.593,Message=TOS,MarketTime=11:38:56.839,Symbol=XLE.AM,Type=
 b'LocalTime=11:38:56.593,Message=TOS,MarketTime=11:38:56.839,Symbol=XLE.AM,Type=0,Price=49.09000,Size=270,Source=25,Condition= ,Tick=?,Mmid=Z,SubMarketId=32,Date=2021-08-02,BuyerId=0,SellerId=0\n'
 """
 
-window= Tk()
-start= moudule_2(window,"XLE.AM")
-window.mainloop()
+# x=[1,2,3,4,5,6,7,8,9,10]
+# q75, q25 = np.percentile(x, [95 ,25])
+# print(q75,q25)
+# playsound('chime.wav')
+# playsound('chime.wav')
+
+root = Tk() 
+root.title("TOS visualizer") 
+root.geometry("1800x900")
+root.minsize(1500, 600)
+root.maxsize(3000, 1500)
+
+start= moudule_2(root)
+root.mainloop()
