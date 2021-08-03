@@ -299,6 +299,9 @@ class moudule_2:
 
 	def register(self):
 
+		if self.symbol!=None:
+			self.deregister(self.symbol)
+			
 		self.reset_data()
 		symbol = self.symbol_reg.get()
 		self.symbol = symbol
