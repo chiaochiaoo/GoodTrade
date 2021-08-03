@@ -59,8 +59,8 @@ class moudule_2:
 		self.plot()
 		#self.register(symbol)
 
-		#dc = threading.Thread(target=self.TOS_listener, daemon=True)
-		dc = threading.Thread(target=self.simulated_input, daemon=True)
+		dc = threading.Thread(target=self.TOS_listener, daemon=True)
+		#dc = threading.Thread(target=self.simulated_input, daemon=True)
 
 		dc.start()
 
@@ -96,7 +96,6 @@ class moudule_2:
 
 		trades= [self.trade1,self.trade5,self.trade60]
 		volume = [self.vol1,self.vol5,self.vol60]
-		d = [self.c1,self.c5,self.c60]
 
 		while True:
 			data, addr = sock.recvfrom(1024)
@@ -107,75 +106,44 @@ class moudule_2:
 			size = int(find_between(stream_data, "Size=", ","))
 			price = float(find_between(stream_data, "Price=", ","))
 
-			t5 = t1//5
-			t60= t1//60
+			if t1 != self.default["tms"]:
 
-			t = [t1,t5,t60]
-			increment = False
-			increment_ = 0
-			for i in range(3):
+				#do two things. 1. update current second val. 2. update this value to all other bins.
+				self.default["v"] = self.default["v"]//1000
+				self.default["tms"]=t1
+				self.default["ts"].append(self.default["t"])
+				self.default["vs"].append(self.default["v"])
 
-				timestamp = t[i]
-				obj = d[i]
+				self.trade1.set(self.default["t"])
+				self.vol1.set(self.default["v"])
 
-				if timestamp != obj["tms"]:
-					obj["tms"]=timestamp
-					obj["ts"].append(obj["t"])
-					obj["vs"].append(obj["v"])
+				self.update_interval(self.c5,self.default["tms"],self.default["v"],self.default["t"],5)
+				self.update_interval(self.c60,self.default["tms"],self.default["v"],self.default["t"],60)
 
-					volume[i].set(obj["v"])
-					trades[i].set(obj["t"])
+				count+=1
+				self.update_complete.set(count)
 
-					increment = True
-					obj["v"]=size
-					obj["t"]=1
-				else:
-					obj["v"]+=size
-					obj["t"]+=1
-					#print(self.c1)
+				self.default["v"] = size
+				self.default["t"] = 1
+			else:
+				self.default["v"]+=size
+				self.default["t"]+=1
 
-			if increment: ###bar, every second. Distribution, every 5 second. (with cap capacity.)
-				#print("update")
-				self.update_complete.set(self.update_complete.get()+1)
-				#print(self.c1)
-
-
-				#for i in range(3):
-					# self.vol[self.timeframe[i]].cla()
-					# self.trades[self.timeframe[i]].cla()
-
-					# self.vol[self.timeframe[i]].boxplot(obj["vs"],vert=False)
-					# self.vol[self.timeframe[i]].set_title(self.timeframe[i%3]+" "+self.types[0])
-					# self.trades[self.timeframe[i]].boxplot(obj["ts"],vert=False)
-					# self.trades[self.timeframe[i]].set_title(self.timeframe[i%3]+" "+self.types[1])
-
-					#print(type(self.vol[self.timeframe[i]+"current"]))
-				# 	self.vol[self.timeframe[i]+"current"].set_data(1,[0,1])
-				# 	self.trades[self.timeframe[i]+"current"].set_data(1.15,[0,1])
-
-				# self.fig.canvas.draw()
+					
 
 
 	def update_interval(self,data,ts,v,t,interval):
 
 		nts = ts//interval
 
+		data["vvar"].set(sum(self.default["vs"][-interval:]))
+		data["tvar"].set(sum(self.default["ts"][-interval:]))
+
 		if nts != data["tms"]:
 
-			data["tms"]=ts
-			data["ts"].append(data["t"])
-			data["vs"].append(data["v"])
-
-			data["vvar"].set(sum(self.default["vs"][-interval:]))
-			data["tvar"].set(sum(self.default["ts"][-interval:]))
-			data["v"] = v
-			data["t"] = t
-		else:
-			data["v"]+=v
-			data["t"]+=t
-
-			data["vvar"].set(data["t"])
-			data["tvar"].set(data["v"])
+			data["tms"]=nts
+			data["ts"].append(data["tvar"].get())
+			data["vs"].append(data["vvar"].get())
 
 
 	def simulated_input(self):
@@ -212,6 +180,9 @@ class moudule_2:
 
 					count+=1
 					self.update_complete.set(count)
+
+					self.default["v"] = size
+					self.default["t"] = 1
 				else:
 					self.default["v"]+=size
 					self.default["t"]+=1
@@ -220,7 +191,7 @@ class moudule_2:
 
 					#print(self.c1)
 				#print("hold")
-				time.sleep(0.01)
+				time.sleep(0.15)
 				#print("next turn")
 
 	# def update_curret(self,a,b,c):
@@ -265,7 +236,8 @@ class moudule_2:
 				self.trades[self.timeframe[i]].set_xlim(-2,max(max(obj["ts"]),tra[i].get())+5)
 				self.trades[self.timeframe[i%3]+"current"].set_data(tra[i].get(),[0,1])
 
-		print(self.c5["vs"],self.vol5.get())
+		print(self.default["tms"],self.c5["tms"],self.c5["vs"],sum(self.default["vs"][-5:]),self.vol5.get(),self.vol1.get())
+		#print(self.default["vs"][-5:],sum(self.default["vs"][-60:]),self.vol60.get())
 			#self.vol[self.timeframe[0]+"current"].set_data(self.update_complete.get(),[0,1])
 		#print(self.c1["vs"],self.vol1.get())
 		self.figc.canvas.draw()
