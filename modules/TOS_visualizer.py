@@ -57,7 +57,7 @@ class moudule_2:
 		self.c60={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"vvar":self.vol60,"tvar":self.trade60}
 
 		self.plot()
-		#self.register(symbol)
+		self.register(symbol)
 
 		dc = threading.Thread(target=self.TOS_listener, daemon=True)
 		#dc = threading.Thread(target=self.simulated_input, daemon=True)
@@ -96,7 +96,7 @@ class moudule_2:
 
 		trades= [self.trade1,self.trade5,self.trade60]
 		volume = [self.vol1,self.vol5,self.vol60]
-
+		count = 0
 		while True:
 			data, addr = sock.recvfrom(1024)
 			stream_data = str(data)
