@@ -7,14 +7,7 @@ import numpy as np
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # from matplotlib.figure import Figure
 
-
-try:
-	import simpleaudio as sa
-except ImportError:
-	import pip
-	pip.main(['install', 'simpleaudio'])
-	import simpleaudio as sa
-
+import winsound 
 
 import pandas as pd
 from tkinter import *
@@ -72,7 +65,7 @@ class moudule_2:
 	def __init__(self,  window):
 
 
-		self.alert_obj = sa.WaveObject.from_wave_file("chime.wav")
+		#self.alert_obj = sa.WaveObject.from_wave_file("chime.wav")
 
 		self.window=window
 		#self.all = LabelFrame(window).place(x=0,y=0,relheight=1,relwidth=1)
@@ -397,7 +390,8 @@ class moudule_2:
 
 			if self.default["v"]>cutoff:
 				try:
-					self.alert_obj.play()
+					winsound.Beep(37,1)
+					#playsound('chime.wav')
 					print("alert triggered")
 				except Exception as e:
 					print(e)
@@ -423,6 +417,9 @@ b'LocalTime=11:38:56.593,Message=TOS,MarketTime=11:38:56.839,Symbol=XLE.AM,Type=
 # playsound('chime.wav')
 
 
+#winsound.Beep(4000,1)
+winsound.SND_FILENAME('chime.wav')
+#winsound.PlaySound("SystemExit", winsound.SND_ALIAS)
 
 root = Tk() 
 root.title("TOS visualizer") 
