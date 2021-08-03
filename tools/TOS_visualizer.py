@@ -101,22 +101,7 @@ class moudule_2:
 
 		self.update_complete = IntVar()
 
-		self.vol1 = IntVar()
-		self.trade1 = IntVar()
-
-		self.vol5 = IntVar()
-		self.trade5 = IntVar()
-
-		self.vol60 = IntVar()
-		self.trade60 = IntVar()
-
-
-		self.default={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"timestamps":[]}
-
-		self.c1={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"vvar":self.vol1,"tvar":self.trade1}
-		self.c5={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"vvar":self.vol5,"tvar":self.trade5}
-		self.c60={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"vvar":self.vol60,"tvar":self.trade60}
-
+		self.reset_data()
 		self.plot()
 
 		dc = threading.Thread(target=self.TOS_listener, daemon=True)
@@ -139,6 +124,23 @@ class moudule_2:
 	# 	self.vol[self.timeframe[0]+"current"].set_data(1+count/100,[0,1])
 	# 	print(self.vol[self.timeframe[0]+"current"].get_data())
 	# 	self.figc.canvas.draw()
+
+	def reset_data(self):
+
+		self.default={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"timestamps":[],"vvar":self.vol1,"tvar":self.trade1}
+
+		self.vol1 = IntVar()
+		self.trade1 = IntVar()
+
+		self.vol5 = IntVar()
+		self.trade5 = IntVar()
+
+		self.vol60 = IntVar()
+		self.trade60 = IntVar()
+
+		self.c1={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"vvar":self.vol1,"tvar":self.trade1}
+		self.c5={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"vvar":self.vol5,"tvar":self.trade5}
+		self.c60={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"vvar":self.vol60,"tvar":self.trade60}
 
 	def update_chart(self):
 		self.vol[self.timeframe[0]+"current"].set_data(self.update_complete.get(),[0,1])
@@ -297,6 +299,7 @@ class moudule_2:
 
 	def register(self):
 
+		self.reset_data()
 		symbol = self.symbol_reg.get()
 		self.symbol = symbol
 
