@@ -164,7 +164,7 @@ class moudule_2:
 			size = int(find_between(stream_data, "Size=", ","))
 			price = float(find_between(stream_data, "Price=", ","))
 
-			print(symbol,self.symbol,self.default)
+			#print(symbol,self.symbol,self.default)
 			if symbol!=self.symbol:
 				self.deregister(symbol)
 			else:
