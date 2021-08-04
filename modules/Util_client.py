@@ -110,7 +110,7 @@ class util_client:
 						self.util_request.send(d)
 
 					elif d[0]=="NasdaqTrader update":
-						self.pannel.add_nasdaq_labels(d[1])
+						#self.pannel.add_nasdaq_labels(d[1])
 						try:
 							self.pannel.add_nasdaq_labels(d[1])
 						except Exception as e:
@@ -246,6 +246,7 @@ def util_comms(ulti_response): #connects to server for db, nt, and finviz.
 								#print(reg_list)
 								reg_list.extend(d[1:])
 								print("sending request:",reg_list)
+
 								s.sendall(pickle.dumps(reg_list))
 								reg_list = ["Database Request"]
 							else:
