@@ -299,7 +299,9 @@ class moudule_2:
 			self.deregister(self.symbol)
 
 		self.reset_data()
-		symbol = self.symbol_reg.get().capitalize()
+		symbol = self.symbol_reg.get().upper()
+
+		print("registering:",symbol)
 		self.symbol = symbol
 
 		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&feedtype=TOS&output=4401&status=on"
