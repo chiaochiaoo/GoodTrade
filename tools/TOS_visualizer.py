@@ -223,12 +223,14 @@ class moudule_2:
 		for i in range(2):
 			obj=d[i]
 
+			try:
+				self.vol[self.timeframe[i]].set_xlim(max(max(obj["vs"]),vol[i].get())*-0.2,max(max(obj["vs"]),vol[i].get())*1.2)
+				self.vol[self.timeframe[i%2]+"current"].set_data(vol[i].get(),[0,1])
 
-			self.vol[self.timeframe[i]].set_xlim(max(max(obj["vs"]),vol[i].get())*-0.2,max(max(obj["vs"]),vol[i].get())*1.2)
-			self.vol[self.timeframe[i%2]+"current"].set_data(vol[i].get(),[0,1])
-
-			self.trades[self.timeframe[i]].set_xlim(max(max(obj["ts"]),tra[i].get())*-0.2,max(max(obj["ts"]),tra[i].get())*1.2)
-			self.trades[self.timeframe[i%2]+"current"].set_data(tra[i].get(),[0,1])
+				self.trades[self.timeframe[i]].set_xlim(max(max(obj["ts"]),tra[i].get())*-0.2,max(max(obj["ts"]),tra[i].get())*1.2)
+				self.trades[self.timeframe[i%2]+"current"].set_data(tra[i].get(),[0,1])
+			except Exception as e:
+				print(e)
 		self.f.canvas.draw()
 
 
