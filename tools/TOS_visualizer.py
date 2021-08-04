@@ -307,6 +307,7 @@ class moudule_2:
 			self.deregister(self.symbol)
 
 		self.reset_data()
+		
 		symbol = self.symbol_reg.get().upper()
 
 		print("registering:",symbol)
@@ -319,7 +320,7 @@ class moudule_2:
 	def deregister(self,symbol):
 		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&feedtype=TOS&output=4401&status=off"
 		r= requests.post(postbody)
-		print("status:",r.status_code)
+		print("deregister status:",symbol,r.status_code)
 
 	def update_interval(self,data,ts,v,t,interval):
 
