@@ -132,6 +132,7 @@ class moudule_2:
 
 		self.vol60 = IntVar()
 		self.trade60 = IntVar()
+
 		self.default={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"timestamps":[],"vvar":self.vol1,"tvar":self.trade1}
 
 		self.c1={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"vvar":self.vol1,"tvar":self.trade1}
@@ -163,6 +164,7 @@ class moudule_2:
 			size = int(find_between(stream_data, "Size=", ","))
 			price = float(find_between(stream_data, "Price=", ","))
 
+			print(symbol,self.default)
 			if symbol!=self.symbol:
 				self.deregister(symbol)
 			else:
