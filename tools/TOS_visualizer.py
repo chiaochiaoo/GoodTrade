@@ -223,6 +223,7 @@ class moudule_2:
 		for i in range(2):
 			obj=d[i]
 
+
 			self.vol[self.timeframe[i]].set_xlim(max(max(obj["vs"]),vol[i].get())*-0.2,max(max(obj["vs"]),vol[i].get())*1.2)
 			self.vol[self.timeframe[i%2]+"current"].set_data(vol[i].get(),[0,1])
 
@@ -370,9 +371,10 @@ class moudule_2:
 
 			self.update_interval(self.c5,self.default["tms"],self.default["v"],self.default["t"],5)
 			#self.update_interval(self.c60,self.default["tms"],self.default["v"],self.default["t"],60)
-
-			self.alert_check()
-
+			try:
+				self.alert_check()
+			except Exception as e:
+				print(e)
 			self.update_complete.set(t1)
 
 			self.default["v"] = vol
