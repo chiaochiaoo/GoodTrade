@@ -18,7 +18,7 @@ class UI(pannel):
 
 		self.algo_counts = 0
 
-		self.risk_timer = tk.DoubleVar(value=1200)
+		self.risk_timer = tk.DoubleVar(value=300)
 
 		self.option_values()
 
@@ -111,7 +111,6 @@ class UI(pannel):
 		self.ppro_status = tk.StringVar()
 		self.ppro_status.set("")
 
-
 		self.algo_count_number = tk.DoubleVar(value=0)
 		self.algo_number = 0
 
@@ -145,6 +144,7 @@ class UI(pannel):
 		tk.Entry(self.comms,textvariable=self.risk_timer,width=5).grid(sticky="w",column=2,row=5,padx=10)
 		# self.deconstruct = ttk.Button(self.comms, text="Terminate GT",command=self.manager.terminateGT)#,command=self.deploy_all_stoporders)
 		# self.deconstruct.grid(sticky="w",column=1,row=5)
+
 
 	def init_config_pannel(self):
 
