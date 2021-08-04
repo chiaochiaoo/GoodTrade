@@ -164,7 +164,7 @@ class moudule_2:
 			size = int(find_between(stream_data, "Size=", ","))
 			price = float(find_between(stream_data, "Price=", ","))
 
-			print(symbol,self.default)
+			print(symbol,self.symbol,self.default)
 			if symbol!=self.symbol:
 				self.deregister(symbol)
 			else:
@@ -307,7 +307,7 @@ class moudule_2:
 			self.deregister(self.symbol)
 
 		self.reset_data()
-		
+
 		symbol = self.symbol_reg.get().upper()
 
 		print("registering:",symbol)
@@ -318,7 +318,8 @@ class moudule_2:
 		print("status:",r.status_code)
 
 	def deregister(self,symbol):
-		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&feedtype=TOS&output=4401&status=off"
+
+		postbody = "http://localhost:8080/Deregister?symbol=" + symbol + "&feedtype=TOS"
 		r= requests.post(postbody)
 		print("deregister status:",symbol,r.status_code)
 
