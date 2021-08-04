@@ -73,6 +73,28 @@ class util_client:
 	def set_pannel(self,scanner_pannel):
 		self.pannel = scanner_pannel
 
+
+	def send_requests(self,symbols):
+
+		no = ["Database Request"]
+		for symbol in symbols:
+			file = "data/"+symbol+"_"+self.today+".txt"
+
+			if os.path.isfile(file):
+				print(symbol,"already exisit, loading local copy instd.")
+				with open(file) as json_file:
+					d = json.load(json_file)
+
+				for key,item in d.items():
+					self.data[key][symbol].set(item)
+
+				self.data_status[symbol].set(True)
+			else:
+				no.append(symbol)
+
+		if len(no)>1:
+			self.util_request.send(no)
+
 	def send_request(self,symbol):
 
 		file = "data/"+symbol+"_"+self.today+".txt"
@@ -102,7 +124,7 @@ class util_client:
 					print(d[0])
 					######### SCANNER PART ############
 					if d[0]=="Database Request":
-						#print("send send send",d)
+						print("send: ",d)
 						self.util_request.send(d)
 
 					elif d[0]=="Finviz Request":

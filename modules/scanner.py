@@ -874,10 +874,13 @@ class scanner(pannel):
 				#registration 
 
 				self.df = df
-
+				reg_list = []
 				for index, row in df.iterrows():
 					if row['symbol'] not in self.symbols_registry:
-						self.data.partial_register(row['symbol'])
+						reg_list.append(row['symbol'])
+						#self.data.partial_register(row['symbol'])
+
+				self.data.bulk_register(reg_list)
 				time.sleep(1)
 				#update the SDM data to the PD
 

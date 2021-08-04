@@ -682,20 +682,24 @@ class Symbol_data_manager:
 			self.ppro.register(symbol)
 			#print("partial registering:",symbol)
 
+	def bulk_register(self,symbols):
+		for i in symbols:
+			self.partial_register(i)
+
+		self.database.send_requests(symbols)
+
+
 	def if_registered(self,symbol):
 
 		return symbol in self.symbol_init
-
 
 	def retech_database(self):
 		for i in self.symbols:
 			self.database.send_request(i)
 
-
 	def add(self,symbol):
 
 		#check if already registered.
-
 		if symbol not in self.symbols:
 
 			if symbol not in self.symbol_init:
