@@ -173,66 +173,69 @@ class moudule_2:
 		#Call every second.
 		#print("update chart")
 		
-		vol = [self.vol1,self.vol5,self.vol60]
-		tra = [self.trade1,self.trade5,self.trade60]
-		d = [self.default,self.c5,self.c60]
+		try:
 
-		if self.update_complete.get()%5==0:
+			vol = [self.vol1,self.vol5,self.vol60]
+			tra = [self.trade1,self.trade5,self.trade60]
+			d = [self.default,self.c5,self.c60]
 
+			if self.update_complete.get()%5==0:
+
+
+				for i in range(2):
+
+					obj=d[i]
+
+
+					self.vol[self.timeframe[i]].cla()
+					self.trades[self.timeframe[i]].cla()
+
+					self.vol[self.timeframe[i]+"current"]=self.vol[self.timeframe[i]].axvline(vol[i].get(),color="r")
+
+					self.vol[self.timeframe[i]].boxplot(obj["vs"],vert=False)
+					#self.vol[self.timeframe[i]].set_xlim(-2,max(max(obj["vs"]),vol[i].get())+5)
+					self.vol[self.timeframe[i]].set_title(self.timeframe[i%2]+" "+self.types[0])
+
+					self.trades[self.timeframe[i]+"current"]=self.trades[self.timeframe[i]].axvline(tra[i].get(),color="r")
+					self.trades[self.timeframe[i]].boxplot(obj["ts"],vert=False)
+					#self.trades[self.timeframe[i]].set_xlim(-2,max(max(obj["ts"]),tra[i].get())+5)
+					self.trades[self.timeframe[i]].set_title(self.timeframe[i%2]+" "+self.types[1])
+
+				#print(self.default["timestamps"],self.default["vs"])
+				#self.chart.cla()
+				
+
+				#self.spread_line.set_data(spread_time,self.spreads)
+
+				#can i set a bit ahead of time?
+
+			else:
+				spread_time = pd.to_datetime(self.default["timestamps"],format='%H:%M:%S')
+
+				self.chart.set_data(spread_time,self.default["vs"])
+				self.chartframe.set_xlim(spread_time[0], spread_time[-1])
+				self.chartframe.set_ylim(min(self.default["vs"])-0.1,max(self.default["vs"])+0.1)
+				self.chartline.set_data(self.default["v"],[0,1])
+			#print(self.default["tms"],self.c5["tms"],self.c5["vs"],sum(self.default["vs"][-5:]),self.vol5.get(),self.vol1.get())
+			#print(self.default["vs"][-5:],sum(self.default["vs"][-60:]),self.vol60.get())
+				#self.vol[self.timeframe[0]+"current"].set_data(self.update_complete.get(),[0,1])
+			#print(self.c1["vs"],self.vol1.get())
+			#print(self.chart.get_data())
 
 			for i in range(2):
-
 				obj=d[i]
 
+				try:
+					self.vol[self.timeframe[i]].set_xlim(max(max(obj["vs"]),vol[i].get())*-0.2,max(max(obj["vs"]),vol[i].get())*1.2)
+					self.vol[self.timeframe[i%2]+"current"].set_data(vol[i].get(),[0,1])
 
-				self.vol[self.timeframe[i]].cla()
-				self.trades[self.timeframe[i]].cla()
-
-				self.vol[self.timeframe[i]+"current"]=self.vol[self.timeframe[i]].axvline(vol[i].get(),color="r")
-
-				self.vol[self.timeframe[i]].boxplot(obj["vs"],vert=False)
-				#self.vol[self.timeframe[i]].set_xlim(-2,max(max(obj["vs"]),vol[i].get())+5)
-				self.vol[self.timeframe[i]].set_title(self.timeframe[i%2]+" "+self.types[0])
-
-				self.trades[self.timeframe[i]+"current"]=self.trades[self.timeframe[i]].axvline(tra[i].get(),color="r")
-				self.trades[self.timeframe[i]].boxplot(obj["ts"],vert=False)
-				#self.trades[self.timeframe[i]].set_xlim(-2,max(max(obj["ts"]),tra[i].get())+5)
-				self.trades[self.timeframe[i]].set_title(self.timeframe[i%2]+" "+self.types[1])
-
-			#print(self.default["timestamps"],self.default["vs"])
-			#self.chart.cla()
-			
-
-			#self.spread_line.set_data(spread_time,self.spreads)
-
-			#can i set a bit ahead of time?
-
-		else:
-			spread_time = pd.to_datetime(self.default["timestamps"],format='%H:%M:%S')
-
-			self.chart.set_data(spread_time,self.default["vs"])
-			self.chartframe.set_xlim(spread_time[0], spread_time[-1])
-			self.chartframe.set_ylim(min(self.default["vs"])-0.1,max(self.default["vs"])+0.1)
-			self.chartline.set_data(self.default["v"],[0,1])
-		#print(self.default["tms"],self.c5["tms"],self.c5["vs"],sum(self.default["vs"][-5:]),self.vol5.get(),self.vol1.get())
-		#print(self.default["vs"][-5:],sum(self.default["vs"][-60:]),self.vol60.get())
-			#self.vol[self.timeframe[0]+"current"].set_data(self.update_complete.get(),[0,1])
-		#print(self.c1["vs"],self.vol1.get())
-		#print(self.chart.get_data())
-
-		for i in range(2):
-			obj=d[i]
-
-			try:
-				self.vol[self.timeframe[i]].set_xlim(max(max(obj["vs"]),vol[i].get())*-0.2,max(max(obj["vs"]),vol[i].get())*1.2)
-				self.vol[self.timeframe[i%2]+"current"].set_data(vol[i].get(),[0,1])
-
-				self.trades[self.timeframe[i]].set_xlim(max(max(obj["ts"]),tra[i].get())*-0.2,max(max(obj["ts"]),tra[i].get())*1.2)
-				self.trades[self.timeframe[i%2]+"current"].set_data(tra[i].get(),[0,1])
-			except Exception as e:
-				print(e)
-		self.f.canvas.draw()
-
+					self.trades[self.timeframe[i]].set_xlim(max(max(obj["ts"]),tra[i].get())*-0.2,max(max(obj["ts"]),tra[i].get())*1.2)
+					self.trades[self.timeframe[i%2]+"current"].set_data(tra[i].get(),[0,1])
+				except Exception as e:
+					print(e)
+			self.f.canvas.draw()
+		except Exception as e:
+			print(e)
 
 	def plot (self):
 
