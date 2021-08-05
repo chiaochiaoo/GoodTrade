@@ -555,8 +555,10 @@ def load_historical_data(symbol,database):
 			d["historical_data_loaded"] = True
 			print(symbol,"loaded successful")
 		else:
+			
 			if d["requested_time"]<5:
-				database.send_request(symbol)
+				print(symbol,"data not found")
+			# 	database.send_request(symbol)
 			d["requested_time"]+=1
 
 def historical_eval(symbol):
