@@ -187,12 +187,12 @@ class TradingPlan:
 			self.data[UNREAL_PSHR] = gain
 			self.data[UNREAL]= round(gain*self.data[CURRENT_SHARE],4)
 
-		if  self.data[UNREAL] < -self.data[ACTRISK]*0.1:#+gap:
+		if  self.data[UNREAL] < -self.data[ACTRISK]*0.05:#+gap:
 			stillbreak = False
 
 		##IMPlement PNL timer here
 
-		print(self.symbol_name,gain,round(-self.data[ACTRISK]*0.1,2),self.data[BREAKPRICE],price,self.data[FLATTENTIMER],self.data[RISKTIMER],stillbreak)
+		#print(self.symbol_name,self.data[UNREAL],round(-self.data[ACTRISK]*0.1,2),self.data[BREAKPRICE],price,self.data[FLATTENTIMER],self.data[RISKTIMER],stillbreak)
 
 		if self.data[FLATTENTIMER]==0:
 			if not stillbreak: #first time set. 
@@ -202,7 +202,7 @@ class TradingPlan:
 				#print(self.symbol_name,"timer:",ts-self.data[FLATTENTIMER],self.data[RISKTIMER])
 				if ts-self.data[FLATTENTIMER]>self.data[RISKTIMER]:
 					flatten=True
-					log_print(self.symbol_name,"risk timer triggered.")
+					log_print(self.symbol_name,"risk timer triggered. flattening")
 			else:
 				self.data[FLATTENTIMER]=0
 				#print("reset flatten timer to 0")
