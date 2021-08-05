@@ -161,11 +161,9 @@ class TradingPlan:
 			price = bid
 			gain = round((price-self.data[AVERAGE_PRICE]),4)
 
-
 			#gap = abs(self.data[BREAKPRICE]-self.data[STOP_LEVEL])*0.05
-
-			if price < self.data[BREAKPRICE]:#-gap:
-				stillbreak = False
+			# if price < self.data[BREAKPRICE]:#-gap:
+			# 	stillbreak = False
 
 			if price <= self.data[STOP_LEVEL]:
 				flatten=True
@@ -176,11 +174,15 @@ class TradingPlan:
 
 			#gap = abs(self.data[STOP_LEVEL]-self.data[BREAKPRICE])*0.05
 
-			if price > self.data[BREAKPRICE]:#+gap:
-				stillbreak = False
+
+			# if price > self.data[BREAKPRICE]:#+gap:
+			# 	stillbreak = False
 
 			if price >=  self.data[STOP_LEVEL]:
 				flatten=True
+
+		if  gain < -self.data[ACTRISK]*0.1:#+gap:
+			stillbreak = False
 
 		if self.data[CURRENT_SHARE] >0:
 			self.data[UNREAL_PSHR] = gain
@@ -189,7 +191,7 @@ class TradingPlan:
 
 		##IMPlement PNL timer here
 
-		print(self.symbol_name,self.data[BREAKPRICE],price,self.data[FLATTENTIMER],self.data[RISKTIMER],stillbreak)
+		print(self.symbol_name,gain,-self.data[ACTRISK]*0.1,self.data[BREAKPRICE],price,self.data[FLATTENTIMER],self.data[RISKTIMER],stillbreak)
 
 		if self.data[FLATTENTIMER]==0:
 			if not stillbreak: #first time set. 
