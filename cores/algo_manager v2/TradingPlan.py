@@ -162,9 +162,9 @@ class TradingPlan:
 			gain = round((price-self.data[AVERAGE_PRICE]),4)
 
 
-			gap = abs(self.data[BREAKPRICE]-self.data[STOP_LEVEL])*0.05
+			#gap = abs(self.data[BREAKPRICE]-self.data[STOP_LEVEL])*0.05
 
-			if price < self.data[BREAKPRICE]-gap:
+			if price < self.data[BREAKPRICE]:#-gap:
 				stillbreak = False
 
 			if price <= self.data[STOP_LEVEL]:
@@ -174,9 +174,9 @@ class TradingPlan:
 			price = ask
 			gain = round(self.data[AVERAGE_PRICE]-price,4)
 
-			gap = abs(self.data[STOP_LEVEL]-self.data[BREAKPRICE])*0.05
+			#gap = abs(self.data[STOP_LEVEL]-self.data[BREAKPRICE])*0.05
 
-			if price > self.data[BREAKPRICE]+gap:
+			if price > self.data[BREAKPRICE]:#+gap:
 				stillbreak = False
 
 			if price >=  self.data[STOP_LEVEL]:
@@ -188,6 +188,8 @@ class TradingPlan:
 
 
 		##IMPlement PNL timer here
+
+		print(self.data[FLATTENTIMER],self.data[RISKTIMER],stillbreak)
 
 		if self.data[FLATTENTIMER]==0:
 			if not stillbreak: #first time set. 
