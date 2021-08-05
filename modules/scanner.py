@@ -875,9 +875,11 @@ class scanner(pannel):
 
 				self.df = df
 				reg_list = []
+				
 				for index, row in df.iterrows():
 					if row['symbol'] not in self.symbols_registry:
 						reg_list.append(row['symbol'])
+						self.symbols_registry.append(row['symbol'])
 						#self.data.partial_register(row['symbol'])
 
 				self.data.bulk_register(reg_list)
