@@ -189,7 +189,7 @@ class TradingPlan:
 
 		##IMPlement PNL timer here
 
-		#print(self.data[BREAKPRICE],price,self.data[FLATTENTIMER],self.data[RISKTIMER],stillbreak)
+		print(self.symbol_name,self.data[BREAKPRICE],price,self.data[FLATTENTIMER],self.data[RISKTIMER],stillbreak)
 
 		if self.data[FLATTENTIMER]==0:
 			if not stillbreak: #first time set. 
@@ -199,8 +199,7 @@ class TradingPlan:
 				#print(self.symbol_name,"timer:",ts-self.data[FLATTENTIMER],self.data[RISKTIMER])
 				if ts-self.data[FLATTENTIMER]>self.data[RISKTIMER]:
 					flatten=True
-				if self.data[RISKTIMER]<20:
-					log_print(self.symbol_name," risk timer:",ts-self.data[FLATTENTIMER],"/",self.data[RISKTIMER])
+					log_print(self.symbol_name,"risk timer triggered.")
 			else:
 				self.data[FLATTENTIMER]=0
 				#print("reset flatten timer to 0")
