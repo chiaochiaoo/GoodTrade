@@ -187,7 +187,7 @@ class TradingPlan:
 			self.data[UNREAL_PSHR] = gain
 			self.data[UNREAL]= round(gain*self.data[CURRENT_SHARE],4)
 
-		if  self.data[UNREAL] < -self.data[ACTRISK]*0.1,2:#+gap:
+		if  self.data[UNREAL] < -self.data[ACTRISK]*0.1:#+gap:
 			stillbreak = False
 
 		##IMPlement PNL timer here
