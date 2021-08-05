@@ -18,6 +18,7 @@ import csv
 import requests
 import threading
 import socket
+import os
 
 def find_between(data, first, last):
 	try:
@@ -443,3 +444,5 @@ root.maxsize(3000, 1500)
 
 start= moudule_2(root)
 root.mainloop()
+os._exit(1) 
+print("exit")
