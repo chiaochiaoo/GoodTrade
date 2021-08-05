@@ -189,7 +189,7 @@ class TradingPlan:
 
 		##IMPlement PNL timer here
 
-		print(self.data[BREAKPRICE],price,self.data[FLATTENTIMER],self.data[RISKTIMER],stillbreak)
+		#print(self.data[BREAKPRICE],price,self.data[FLATTENTIMER],self.data[RISKTIMER],stillbreak)
 
 		if self.data[FLATTENTIMER]==0:
 			if not stillbreak: #first time set. 
