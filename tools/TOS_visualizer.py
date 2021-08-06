@@ -305,7 +305,7 @@ class moudule_2:
 
 			if data["v"]>cutoff:
 				data["extreme_v"].append(data["v"])
-				data["vvar"].set(data["v"])
+				#data["vvar"].set(data["v"])
 
 
 			#print(self.default["v"],cutoff,self.default["vs"])
@@ -314,7 +314,7 @@ class moudule_2:
 
 			if data["t"]>cutoff:
 				data["extreme_t"].append(data["t"])
-				data["tvar"].set(data["t"])
+				#data["tvar"].set(data["t"])
 
 	def simulated_input(self):
 
@@ -424,8 +424,10 @@ class moudule_2:
 			try:
 				self.default["extreme_t"].append(self.default["t"])
 				self.trade1.set(self.default["t"])
-
+				self.trade5.set(self.c5["t"])
 				self.default["last_alert"] =  self.default["timestamps"][-1]
+
+
 				#print(self.default["last_alert"])
 				if self.alert_sound.get()==True:
 
@@ -441,7 +443,8 @@ class moudule_2:
 		if self.default["v"]>cutoff:
 			self.default["extreme_v"].append(self.default["v"])
 			self.vol1.set(self.default["v"])
-
+			self.vol5.set(self.c5["v"])
+			
 		if len(self.default["extreme_v"])>200:
 			self.default["extreme_v"].pop(0)
 		if len(self.default["extreme_t"])>200:
