@@ -215,9 +215,9 @@ class moudule_2:
 			else:
 				spread_time = pd.to_datetime(self.default["timestamps"],format='%H:%M:%S')
 
-				self.chart.set_data(spread_time,self.default["vs"])
+				self.chart.set_data(spread_time,self.default["ts"])
 				self.chartframe.set_xlim(spread_time[0], spread_time[-1])
-				self.chartframe.set_ylim(min(self.default["vs"])-0.1,max(self.default["vs"])+0.1)
+				self.chartframe.set_ylim(min(self.default["ts"])-0.1,max(self.default["ts"])+0.1)
 				self.chartline.set_data(self.default["v"],[0,1])
 			#print(self.default["tms"],self.c5["tms"],self.c5["vs"],sum(self.default["vs"][-5:]),self.vol5.get(),self.vol1.get())
 			#print(self.default["vs"][-5:],sum(self.default["vs"][-60:]),self.vol60.get())
