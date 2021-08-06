@@ -592,7 +592,7 @@ def historical_eval(symbol):
 			d[open_high_eval_alert] = 0
 			d[open_high_eval_value] = "Cur:"+str(d[open_high_eval_alert])+","+"Max:"+str(evaluator(d["oh"],d[open_high_val],d[open_high_std]))
 
-			d[open_low_eval_alert] =  evaluator(d["open_current_range"],d[open_low_val],d[open_low_std])
+			d[open_low_eval_alert] =  evaluator(-d["open_current_range"],d[open_low_val],d[open_low_std])
 			d[open_low_eval_value] = "Cur:"+str(d[open_low_eval_alert])+","+"Max:"+str(evaluator(d["ol"],d[open_low_val],d[open_low_std]))
 
 		try:
