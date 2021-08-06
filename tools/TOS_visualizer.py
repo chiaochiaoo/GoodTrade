@@ -282,7 +282,7 @@ class moudule_2:
 		print("status:",r.status_code)
 
 	def deregister(self,symbol):
-
+		return True
 		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&feedtype=TOS&output=4401&status=off"
 		r= requests.post(postbody)
 		print("deregister status:",symbol,r.status_code)
