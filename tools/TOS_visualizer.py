@@ -172,12 +172,12 @@ class moudule_2:
 					self.vol[self.timeframe[i]+"current"]=self.vol[self.timeframe[i]].axvline(vol[i].get(),color="r")
 					self.vol[self.timeframe[i]].boxplot(obj["extreme_v"],vert=False)
 					#self.vol[self.timeframe[i]].set_xlim(-2,max(max(obj["vs"]),vol[i].get())+5)
-					self.vol[self.timeframe[i]].set_title(self.timeframe[i%2]+" "+self.types[0] +"Extremas")
+					self.vol[self.timeframe[i]].set_title(self.timeframe[i%2]+" "+self.types[0] +"Extrema")
 
 					self.trades[self.timeframe[i]+"current"]=self.trades[self.timeframe[i]].axvline(tra[i].get(),color="r")
 					self.trades[self.timeframe[i]].boxplot(obj["extreme_t"],vert=False)
 					#self.trades[self.timeframe[i]].set_xlim(-2,max(max(obj["ts"]),tra[i].get())+5)
-					self.trades[self.timeframe[i]].set_title(self.timeframe[i%2]+" "+self.types[1]+"Extremas")
+					self.trades[self.timeframe[i]].set_title(self.timeframe[i%2]+" "+self.types[1]+"Extrema")
 
 				#print(self.default["timestamps"],self.default["vs"])
 				#self.chart.cla()
