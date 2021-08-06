@@ -561,7 +561,77 @@ def load_historical_data(symbol,database):
 			# 	database.send_request(symbol)
 			d["requested_time"]+=1
 
+
+def evaluator(val,mean,std):
+
+	if val>mean:
+
+		coefficient=(val-mean)/std
+
+		return round(1+coefficient,1)
+	else:
+
+		return round(val/mean,1)
+
+
 def historical_eval(symbol):
+
+	global data
+	d = data[symbol]
+
+	if d["historical_data_loaded"]:
+		#normal ones
+		if d["open_current_range"]>0:
+			d[open_high_eval_alert] = evaluator(d["open_current_range"],d[open_high_val],d[open_high_std])
+
+			d[open_high_eval_value] = "Cur:"+str(d[open_high_eval_alert])+","+"Max:"+str(evaluator(d["oh"],d[open_high_val],d[open_high_std]))
+
+			d[open_low_eval_alert] =  0
+			d[open_low_eval_value] = "Cur:"+str(d[open_low_eval_alert])+","+"Max:"+str(evaluator(d["ol"],d[open_low_val],d[open_low_std]))
+		else:
+			d[open_high_eval_alert] = 0
+			d[open_high_eval_value] = "Cur:"+str(d[open_high_eval_alert])+","+"Max:"+str(evaluator(d["oh"],d[open_high_val],d[open_high_std]))
+
+			d[open_low_eval_alert] =  evaluator(d["open_current_range"],d[open_low_val],d[open_low_std])
+			d[open_low_eval_value] = "Cur:"+str(d[open_low_eval_alert])+","+"Max:"+str(evaluator(d["ol"],d[open_low_val],d[open_low_std]))
+
+		try:
+			d[high_low_alert] =  evaluator(d["range"],d[high_low_val],d[high_low_std])
+		except:
+			d[high_low_alert] = 0
+		d[high_low_eval] = str(d[high_low_alert])
+
+		try:
+			d[first_5_alert] = evaluator(d["f5r"],d[first_5_val],d[first_5_std]) 
+		except:
+			d[first_5_alert] = 0
+		d[first_5_eval] = str(d[first_5_alert])
+		
+		try:
+			d[first_5_vol_alert] =  evaluator(d["f5v"],d[first_5_vol_val],d[first_5_vol_std]) 
+		except:
+			d[first_5_vol_alert] =0
+		d[first_5_vol_eval] =str(d[first_5_vol_alert])
+		
+		try:
+			d[normal_5_alert] =evaluator(d["last_5_range"],d[normal_5_val],d[normal_5_std]) 
+		except:
+			d[normal_5_alert] = 0
+		d[normal_5_eval] = str(d[normal_5_alert])
+		
+		try:
+			d[normal_5_vol_alert] = evaluator(d["vol"],d[normal_5_vol_val],d[normal_5_vol_std]) 
+		except:
+			d[normal_5_vol_alert] =0
+		d[normal_5_vol_eval] =  str(d[normal_5_vol_alert])
+		
+		try:
+			d[prev_alert] = evaluator(d["prev_close_gap"],d[prev_close_val],d[prev_close_std])
+		except:
+			d[prev_alert] = 0
+		d[prev_eval] = str(d[prev_alert])
+
+def historical_eval2(symbol):
 
 	global data
 	d = data[symbol]
@@ -616,43 +686,6 @@ def historical_eval(symbol):
 		except:
 			d[prev_alert] = 0
 		d[prev_eval] = str(d[prev_alert])
-
-		# try:
-		# 	d["open_percentage"] =  round((d["high"]-d["low"])/d[expected_momentum],2)
-		# except:
-		# 	pass
-		#ones with current vals. 
-		# d[open_high_range] = 0
-		# d[open_high_val] = 0
-		# d[open_high_std]= 0
-
-		# d[open_low_range] = 0
-		# d[open_low_val] = 0
-		# d[open_low_std] = 0
-
-		# d[high_low_range] = 0
-		# d[high_low_val] = 0
-		# d[high_low_std] = 0
-
-		# d[first_5_range] = 0
-		# d[first_5_val] = 0
-		# d[first_5_std] = 0
-
-		# d[first_5_vol_range] = 0
-		# d[first_5_vol_val] = 0
-		# d[first_5_vol_std] = 0
-
-		# d[normal_5_range] = 0
-		# d[normal_5_val] = 0
-		# d[normal_5_std] = 0
-
-		# d[normal_5_vol_range] = 0
-		# d[normal_5_vol_val] = 0
-		# d[normal_5_vol_std] = 0
-
-		# d[prev_close_range] = 0
-		# d[prev_close_val] = 0
-		# d[prev_close_std] = 0
 
 
 def process_and_send(lst,pipe,database):
