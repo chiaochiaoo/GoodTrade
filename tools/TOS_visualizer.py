@@ -431,9 +431,9 @@ class moudule_2:
 				#print(self.default["last_alert"])
 				if self.alert_sound.get()==True:
 
-					sound = threading.Thread(target=winsound.PlaySound,args=("SystemExit", winsound.SND_ALIAS,), daemon=True)
-					sound.start()
-					#winsound.PlaySound("SystemExit", winsound.SND_ALIAS)
+					# sound = threading.Thread(target=winsound.PlaySound,args=("SystemExit", winsound.SND_ALIAS,), daemon=True)
+					# sound.start()
+					winsound.PlaySound("SystemExit", winsound.SND_ALIAS)
 				print("alert triggered")
 			except Exception as e:
 				print(e)
@@ -444,7 +444,7 @@ class moudule_2:
 			self.default["extreme_v"].append(self.default["v"])
 			self.vol1.set(self.default["v"])
 			self.vol5.set(self.c5["v"])
-			
+
 		if len(self.default["extreme_v"])>200:
 			self.default["extreme_v"].pop(0)
 		if len(self.default["extreme_t"])>200:
