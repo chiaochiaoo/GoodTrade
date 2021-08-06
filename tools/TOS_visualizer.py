@@ -285,7 +285,7 @@ class moudule_2:
 
 	def deregister(self,symbol):
 
-		postbody = "http://localhost:8080/Deregister?symbol=" + symbol + "&feedtype=TOS"
+		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&feedtype=TOS&output=4401&status=off"
 		r= requests.post(postbody)
 		print("deregister status:",symbol,r.status_code)
 
@@ -344,6 +344,7 @@ class moudule_2:
 			size = int(find_between(stream_data, "Size=", ","))
 			price = float(find_between(stream_data, "Price=", ","))
 
+			print(stream_data)
 			#print(symbol,self.symbol,self.default)
 			if symbol!=self.symbol:
 				self.deregister(symbol)
@@ -352,6 +353,7 @@ class moudule_2:
 
 	def data_process(self,t1,vol,prize,t1str):
 
+		#print(t1,self.default["tms"])
 		if t1 > self.default["tms"]:
 			#do two things. 1. update current second val. 2. update this value to all other bins.
 			
@@ -384,6 +386,7 @@ class moudule_2:
 			self.default["v"] = vol
 			self.default["t"] = 1
 
+			#print(self.default["vs"],self.default["ts"])
 
 		else:
 			self.default["v"]+=vol
@@ -415,6 +418,7 @@ class moudule_2:
 				self.default["extreme_v"].pop(0)
 			if len(self.default["extreme_t"])>200:
 				self.default["extreme_t"].pop(0)
+
 	def alert_check(self):
 
 		if self.alert_sound.get()==True:
@@ -427,7 +431,7 @@ class moudule_2:
 				#print(self.default["t"],cutoff,q25,self.default["extreme_t"])
 
 				try:
-					#winsound.PlaySound("SystemExit", winsound.SND_ALIAS)
+					winsound.PlaySound("SystemExit", winsound.SND_ALIAS)
 					#winsound.Beep(37,1)
 					#playsound('chime.wav')
 					print("alert triggered")
