@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 # matplotlib.use('TkAgg')
 
+import random
+
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # from matplotlib.figure import Figure
@@ -101,8 +103,8 @@ class moudule_2:
 		self.reset_data()
 		self.plot()
 
-		dc = threading.Thread(target=self.TOS_listener, daemon=True)
-		#dc = threading.Thread(target=self.simulated_input, daemon=True)
+		#dc = threading.Thread(target=self.TOS_listener, daemon=True)
+		dc = threading.Thread(target=self.simulated_input, daemon=True)
 
 		dc.start()
 
@@ -134,43 +136,16 @@ class moudule_2:
 		self.vol60 = IntVar()
 		self.trade60 = IntVar()
 
-		self.default={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"timestamps":[],"vvar":self.vol1,"tvar":self.trade1}
+		self.default={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"extreme_v":[],"extreme_t":[],"timestamps":[],"vvar":self.vol1,"tvar":self.trade1}
 
-		self.c1={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"vvar":self.vol1,"tvar":self.trade1}
-		self.c5={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"vvar":self.vol5,"tvar":self.trade5}
-		self.c60={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"vvar":self.vol60,"tvar":self.trade60}
+		self.c1={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"extreme_v":[],"extreme_t":[],"vvar":self.vol1,"tvar":self.trade1}
+		self.c5={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"extreme_v":[],"extreme_t":[],"vvar":self.vol5,"tvar":self.trade5}
+		self.c60={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"extreme_v":[],"extreme_t":[],"vvar":self.vol60,"tvar":self.trade60}
 
 	def update_chart(self):
 		self.vol[self.timeframe[0]+"current"].set_data(self.update_complete.get(),[0,1])
 		print(self.update_complete.get())
 		self.figc.canvas.draw()
-
-	def TOS_listener(self):
-		UDP_IP = "127.0.0.1"
-		UDP_PORT = 4401
-
-		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		sock.bind((UDP_IP, UDP_PORT))
-
-		print("socket start")
-
-		count = 0
-		while True:
-			data, addr = sock.recvfrom(1024)
-			stream_data = str(data)
-
-			symbol = find_between(stream_data, "Symbol=", ",")
-			time = find_between(stream_data, "MarketTime=", ",")
-			t1 = get_sec(time[:-4])
-			size = int(find_between(stream_data, "Size=", ","))
-			price = float(find_between(stream_data, "Price=", ","))
-
-			#print(symbol,self.symbol,self.default)
-			if symbol!=self.symbol:
-				self.deregister(symbol)
-			else:
-				self.data_process(t1,size,price,time[:-4])
-
 
 	def update_curret(self,a,b,c):
 		#Call every second.
@@ -194,15 +169,14 @@ class moudule_2:
 					self.trades[self.timeframe[i]].cla()
 
 					self.vol[self.timeframe[i]+"current"]=self.vol[self.timeframe[i]].axvline(vol[i].get(),color="r")
-
-					self.vol[self.timeframe[i]].boxplot(obj["vs"],vert=False)
+					self.vol[self.timeframe[i]].boxplot(obj["extreme_v"],vert=False)
 					#self.vol[self.timeframe[i]].set_xlim(-2,max(max(obj["vs"]),vol[i].get())+5)
-					self.vol[self.timeframe[i]].set_title(self.timeframe[i%2]+" "+self.types[0])
+					self.vol[self.timeframe[i]].set_title(self.timeframe[i%2]+" "+self.types[0] +"Extremas")
 
 					self.trades[self.timeframe[i]+"current"]=self.trades[self.timeframe[i]].axvline(tra[i].get(),color="r")
-					self.trades[self.timeframe[i]].boxplot(obj["ts"],vert=False)
+					self.trades[self.timeframe[i]].boxplot(obj["extreme_t"],vert=False)
 					#self.trades[self.timeframe[i]].set_xlim(-2,max(max(obj["ts"]),tra[i].get())+5)
-					self.trades[self.timeframe[i]].set_title(self.timeframe[i%2]+" "+self.types[1])
+					self.trades[self.timeframe[i]].set_title(self.timeframe[i%2]+" "+self.types[1]+"Extremas")
 
 				#print(self.default["timestamps"],self.default["vs"])
 				#self.chart.cla()
@@ -216,6 +190,8 @@ class moudule_2:
 				spread_time = pd.to_datetime(self.default["timestamps"],format='%H:%M:%S')
 
 				self.chart.set_data(spread_time,self.default["ts"])
+
+				self.chartframe.set_title("#Trades by second")
 				self.chartframe.set_xlim(spread_time[0], spread_time[-1])
 				self.chartframe.set_ylim(min(self.default["ts"])-0.1,max(self.default["ts"])+0.1)
 				self.chartline.set_data(self.default["v"],[0,1])
@@ -229,11 +205,13 @@ class moudule_2:
 				obj=d[i]
 
 				try:
-					self.vol[self.timeframe[i]].set_xlim(max(max(obj["vs"]),vol[i].get())*-0.2,max(max(obj["vs"]),vol[i].get())*1.2)
+					#self.vol[self.timeframe[i]].set_xlim(max(max(obj["extreme_v"]),vol[i].get())*-0.2,max(max(obj["extreme_v"]),vol[i].get())*1.2)
 					self.vol[self.timeframe[i%2]+"current"].set_data(vol[i].get(),[0,1])
 
-					self.trades[self.timeframe[i]].set_xlim(max(max(obj["ts"]),tra[i].get())*-0.2,max(max(obj["ts"]),tra[i].get())*1.2)
+					#self.trades[self.timeframe[i]].set_xlim(max(max(obj["extreme_t"]),tra[i].get())*-0.2,max(max(obj["extreme_t"]),tra[i].get())*1.2)
 					self.trades[self.timeframe[i%2]+"current"].set_data(tra[i].get(),[0,1])
+
+					print(tra[i].get())
 				except Exception as e:
 					print(e)
 			self.f.canvas.draw()
@@ -281,19 +259,6 @@ class moudule_2:
 		self.trades["1s"+"current"] = self.trade1chart.axvline(1,linestyle="--")
 		self.trades["5s"+"current"] =self.trade5chart.axvline(1,linestyle="--")
 
-		#self.figc, axs = plt.subplots(2,3,figsize=(15,7))
-		# for i in range(6):
-
-		# 	axs[i//3][i%3].set_title(self.timeframe[i%3]+" "+self.types[i//3])
-
-		# 	axs[i//3][i%3].boxplot([],flierprops=outlier,vert=False, whis=1)
-
-		# 	total[i//3][self.timeframe[i%3]+"current"] = axs[i//3][i%3].axvline(1,linestyle="--")
-		# 	#print(type(total[i//3][self.timeframe[i%3]+"current"]),total[i//3][self.timeframe[i%3]+"current"])
-		# 	total[i//3][self.timeframe[i%3]] = axs[i//3][i%3]
-
-		# 	#self.charts[title[i]] = axs[i//3][i%3]
-		#print(self.vol)
 
 		self.update_complete.trace('w',self.update_curret)
 
@@ -337,7 +302,6 @@ class moudule_2:
 			data["ts"].append(data["tvar"].get())
 			data["vs"].append(data["vvar"].get())
 
-
 	def simulated_input(self):
 
 		trades= [self.trade1,self.trade5,self.trade60]
@@ -355,9 +319,36 @@ class moudule_2:
 				l=list(row.values())
 				t1,size,price=int(l[0]),int(l[1]),float(l[2])
 
-				self.data_process(t1,size,price)
-				time.sleep(0.15)
+				size+=random.randrange(1,100)
+				self.data_process(t1,size,price,ts_to_min(t1))
+				time.sleep(0.01)
 				#print("next turn")
+
+	def TOS_listener(self):
+		UDP_IP = "127.0.0.1"
+		UDP_PORT = 4401
+
+		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		sock.bind((UDP_IP, UDP_PORT))
+
+		print("socket start")
+
+		count = 0
+		while True:
+			data, addr = sock.recvfrom(1024)
+			stream_data = str(data)
+
+			symbol = find_between(stream_data, "Symbol=", ",")
+			time = find_between(stream_data, "MarketTime=", ",")
+			t1 = get_sec(time[:-4])
+			size = int(find_between(stream_data, "Size=", ","))
+			price = float(find_between(stream_data, "Price=", ","))
+
+			#print(symbol,self.symbol,self.default)
+			if symbol!=self.symbol:
+				self.deregister(symbol)
+			else:
+				self.data_process(t1,size,price,time[:-4])
 
 	def data_process(self,t1,vol,prize,t1str):
 
@@ -376,11 +367,14 @@ class moudule_2:
 			self.default["ts"].append(self.default["t"])
 			self.default["vs"].append(self.default["v"])
 
-			self.trade1.set(self.default["t"])
-			self.vol1.set(self.default["v"])
+			#self.trade1.set(self.default["t"])
+			#self.vol1.set(self.default["v"])
 
 			self.update_interval(self.c5,self.default["tms"],self.default["v"],self.default["t"],5)
 			#self.update_interval(self.c60,self.default["tms"],self.default["v"],self.default["t"],60)
+
+			self.extreme_check()
+
 			try:
 				self.alert_check()
 			except Exception as e:
@@ -389,22 +383,51 @@ class moudule_2:
 
 			self.default["v"] = vol
 			self.default["t"] = 1
+
+
 		else:
 			self.default["v"]+=vol
 			self.default["t"]+=1
 
-	def alert_check(self):
+			#self.default["t"]+=random.randrange(1,50)
 
+	def extreme_check(self):
+
+		#if current is more than 3% of current distribution. add it to the extreme. 
+		
+		if len(self.default["vs"])>10:
+			cutoff, q25 = np.percentile(self.default["vs"], [90 ,0])
+
+			if self.default["v"]>cutoff:
+				self.default["extreme_v"].append(self.default["v"])
+				self.vol1.set(self.default["v"])
+
+
+			#print(self.default["v"],cutoff,self.default["vs"])
+
+			cutoff, q25 = np.percentile(self.default["ts"], [95 ,0])
+
+			if self.default["t"]>cutoff:
+				self.default["extreme_t"].append(self.default["t"])
+				self.trade1.set(self.default["t"])
+
+			if len(self.default["extreme_v"])>200:
+				self.default["extreme_v"].pop(0)
+			if len(self.default["extreme_t"])>200:
+				self.default["extreme_t"].pop(0)
+	def alert_check(self):
 
 		if self.alert_sound.get()==True:
 			p = self.p.get()
 			#print(p)
 			x=100-p
-			cutoff, q25 = np.percentile(self.default["vs"], [x ,0])
+			cutoff, q25 = np.percentile(self.default["ts"], [x ,0])
 
-			if self.default["v"]>cutoff:
+			if self.default["t"]>cutoff:
+				#print(self.default["t"],cutoff,q25,self.default["extreme_t"])
+
 				try:
-					winsound.PlaySound("SystemExit", winsound.SND_ALIAS)
+					#winsound.PlaySound("SystemExit", winsound.SND_ALIAS)
 					#winsound.Beep(37,1)
 					#playsound('chime.wav')
 					print("alert triggered")
