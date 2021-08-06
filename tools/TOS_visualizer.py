@@ -103,8 +103,8 @@ class moudule_2:
 		self.reset_data()
 		self.plot()
 
-		#dc = threading.Thread(target=self.TOS_listener, daemon=True)
-		dc = threading.Thread(target=self.simulated_input, daemon=True)
+		dc = threading.Thread(target=self.TOS_listener, daemon=True)
+		#dc = threading.Thread(target=self.simulated_input, daemon=True)
 
 		dc.start()
 
