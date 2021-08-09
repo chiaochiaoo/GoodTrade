@@ -318,9 +318,11 @@ class Manager:
 				log_print("new package arrived",d)
 
 				for i in d[1]:
-					self.add_new_tradingplan(i,self.test_mode)
-					#except:
-					#	log_print("adding con porra")
+
+					try:
+						self.add_new_tradingplan(i,self.test_mode)
+					except Exception as e:
+						log_print("adding algo novo con culpa",e)
 
 	def ppro_order_confirmation(self,data):
 
