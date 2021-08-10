@@ -136,8 +136,7 @@ class moudule_2:
 		self.vol60 = IntVar()
 		self.trade60 = IntVar()
 
-
-		self.default={"tms":0,"v":0,"t":0,"last_alert":0,"ts":[],"vs":[],"extreme_v":[],"extreme_t":[],"timestamps":[],"vvar":self.vol1,"tvar":self.trade1}
+		self.default={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"extreme_v":[],"extreme_t":[],"timestamps":[],"vvar":self.vol1,"tvar":self.trade1}
 
 		self.c1={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"extreme_v":[],"extreme_t":[],"vvar":self.vol1,"tvar":self.trade1}
 		self.c5={"tms":0,"v":0,"t":0,"ts":[],"vs":[],"extreme_v":[],"extreme_t":[],"vvar":self.vol5,"tvar":self.trade5}
@@ -172,12 +171,12 @@ class moudule_2:
 					self.vol[self.timeframe[i]+"current"]=self.vol[self.timeframe[i]].axvline(vol[i].get(),color="r")
 					self.vol[self.timeframe[i]].boxplot(obj["extreme_v"],vert=False)
 					#self.vol[self.timeframe[i]].set_xlim(-2,max(max(obj["vs"]),vol[i].get())+5)
-					self.vol[self.timeframe[i]].set_title(self.timeframe[i%2]+" "+self.types[0] +"Extrema")
+					self.vol[self.timeframe[i]].set_title(self.timeframe[i%2]+" "+self.types[0] +"Extremas")
 
 					self.trades[self.timeframe[i]+"current"]=self.trades[self.timeframe[i]].axvline(tra[i].get(),color="r")
 					self.trades[self.timeframe[i]].boxplot(obj["extreme_t"],vert=False)
 					#self.trades[self.timeframe[i]].set_xlim(-2,max(max(obj["ts"]),tra[i].get())+5)
-					self.trades[self.timeframe[i]].set_title(self.timeframe[i%2]+" "+self.types[1]+"Extrema")
+					self.trades[self.timeframe[i]].set_title(self.timeframe[i%2]+" "+self.types[1]+"Extremas")
 
 				#print(self.default["timestamps"],self.default["vs"])
 				#self.chart.cla()
@@ -188,12 +187,12 @@ class moudule_2:
 				#can i set a bit ahead of time?
 
 			else:
-				#spread_time = pd.to_datetime(self.default["timestamps"],format='%H:%M:%S')
+				spread_time = pd.to_datetime(self.default["timestamps"],format='%H:%M:%S')
 
-				self.chart.set_data(self.default["timestamps"],self.default["ts"])
-				self.marker.set_data(self.default["last_alert"],self.trade1.get())
+				self.chart.set_data(spread_time,self.default["ts"])
+
 				self.chartframe.set_title("#Trades by second")
-				self.chartframe.set_xlim(self.default["timestamps"][0], self.default["timestamps"][-1])
+				self.chartframe.set_xlim(spread_time[0], spread_time[-1])
 				self.chartframe.set_ylim(min(self.default["ts"])-0.1,max(self.default["ts"])+0.1)
 				self.chartline.set_data(self.default["v"],[0,1])
 			#print(self.default["tms"],self.c5["tms"],self.c5["vs"],sum(self.default["vs"][-5:]),self.vol5.get(),self.vol1.get())
@@ -212,7 +211,7 @@ class moudule_2:
 					#self.trades[self.timeframe[i]].set_xlim(max(max(obj["extreme_t"]),tra[i].get())*-0.2,max(max(obj["extreme_t"]),tra[i].get())*1.2)
 					self.trades[self.timeframe[i%2]+"current"].set_data(tra[i].get(),[0,1])
 
-					#print(tra[i].get())
+					print(tra[i].get())
 				except Exception as e:
 					print(e)
 			self.f.canvas.draw()
@@ -233,13 +232,16 @@ class moudule_2:
 
 		self.charts={}
 
+		# for i in range(4):
+		# 	lst.append(d[i]["vs"])
+		# for i in range(4):
+		# 	lst.append(d[i]["ts"])
 		self.f = plt.figure(1,figsize=(12,7))
 		self.gs = self.f.add_gridspec(2, 4)
 
 
 		self.chartframe = self.f.add_subplot(self.gs[0,:4])
 		self.chart, = self.chartframe.plot([],[])
-		self.marker, = self.chartframe.plot([],[],"ro",markersize = 15)
 		self.chartline = self.chartframe.axhline(1,linestyle="--")
 
 		self.vol1chart =self.f.add_subplot(self.gs[1,0])
@@ -282,7 +284,7 @@ class moudule_2:
 		print("status:",r.status_code)
 
 	def deregister(self,symbol):
-		return True
+
 		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&feedtype=TOS&output=4401&status=off"
 		r= requests.post(postbody)
 		print("deregister status:",symbol,r.status_code)
@@ -291,30 +293,14 @@ class moudule_2:
 
 		nts = ts//interval
 
-		data["v"]=sum(self.default["vs"][-interval:])
-		data["t"]=sum(self.default["ts"][-interval:])
+		data["vvar"].set(sum(self.default["vs"][-interval:]))
+		data["tvar"].set(sum(self.default["ts"][-interval:]))
 
 		if nts != data["tms"]:
 
 			data["tms"]=nts
 			data["ts"].append(data["tvar"].get())
 			data["vs"].append(data["vvar"].get())
-
-		if len(data["vs"])>10:
-			cutoff, q25 = np.percentile(data["vs"], [95 ,0])
-
-			if data["v"]>cutoff:
-				data["extreme_v"].append(data["v"])
-				#data["vvar"].set(data["v"])
-
-
-			#print(self.default["v"],cutoff,self.default["vs"])
-
-			cutoff, q25 = np.percentile(data["ts"], [95 ,0])
-
-			if data["t"]>cutoff:
-				data["extreme_t"].append(data["t"])
-				#data["tvar"].set(data["t"])
 
 	def simulated_input(self):
 
@@ -333,7 +319,6 @@ class moudule_2:
 				l=list(row.values())
 				t1,size,price=int(l[0]),int(l[1]),float(l[2])
 
-				#print(t1)
 				size+=random.randrange(1,100)
 				self.data_process(t1,size,price,ts_to_min(t1))
 				time.sleep(0.01)
@@ -359,7 +344,7 @@ class moudule_2:
 			size = int(find_between(stream_data, "Size=", ","))
 			price = float(find_between(stream_data, "Price=", ","))
 
-			#print(stream_data)
+			print(stream_data)
 			#print(symbol,self.symbol,self.default)
 			if symbol!=self.symbol:
 				self.deregister(symbol)
@@ -380,7 +365,7 @@ class moudule_2:
 				self.default["vs"].pop(0)
 				self.default["timestamps"].pop(0)
 
-			self.default["timestamps"].append(pd.to_datetime(t1str,format='%H:%M:%S'))
+			self.default["timestamps"].append(t1str)
 			self.default["ts"].append(self.default["t"])
 			self.default["vs"].append(self.default["v"])
 
@@ -390,11 +375,10 @@ class moudule_2:
 			self.update_interval(self.c5,self.default["tms"],self.default["v"],self.default["t"],5)
 			#self.update_interval(self.c60,self.default["tms"],self.default["v"],self.default["t"],60)
 
-			#self.extreme_check()
+			self.extreme_check()
 
 			try:
-				if len(self.default["vs"])>15:
-					self.alert_check()
+				self.alert_check()
 			except Exception as e:
 				print(e)
 			self.update_complete.set(t1)
@@ -408,52 +392,7 @@ class moudule_2:
 			self.default["v"]+=vol
 			self.default["t"]+=1
 
-			self.default["t"]+=random.randrange(0,100)
-
-
-	def alert_check(self):
-
-		
-		p = self.p.get()
-		#print(p)
-		x=100-p
-		cutoff, q25 = np.percentile(self.default["ts"], [x ,0])
-
-		if self.default["t"]>cutoff:
-			#print(self.default["t"],cutoff,q25,self.default["extreme_t"])
-			try:
-				self.default["extreme_t"].append(self.default["t"])
-				self.trade1.set(self.default["t"])
-				self.trade5.set(self.c5["t"])
-				self.default["last_alert"] =  self.default["timestamps"][-1]
-
-
-				#print(self.default["last_alert"])
-				if self.alert_sound.get()==True:
-
-					# sound = threading.Thread(target=winsound.PlaySound,args=("SystemExit", winsound.SND_ALIAS,), daemon=True)
-					# sound.start()
-					winsound.PlaySound("SystemExit", winsound.SND_ALIAS)
-				print("alert triggered")
-			except Exception as e:
-				print(e)
-
-		cutoff, q25 = np.percentile(self.default["vs"], [x ,0])
-
-		if self.default["v"]>cutoff:
-			self.default["extreme_v"].append(self.default["v"])
-			self.vol1.set(self.default["v"])
-			self.vol5.set(self.c5["v"])
-
-		if len(self.default["extreme_v"])>200:
-			self.default["extreme_v"].pop(0)
-		if len(self.default["extreme_t"])>200:
-			self.default["extreme_t"].pop(0)
-
-		#print(self.default["v"],cutoff,self.default["extreme_v"],self.default["extreme_t"])
-	# def update_curret(self,a,b,c):
-	# 	print("X")
-	# 	pass
+			#self.default["t"]+=random.randrange(1,50)
 
 	def extreme_check(self):
 
@@ -465,7 +404,6 @@ class moudule_2:
 			if self.default["v"]>cutoff:
 				self.default["extreme_v"].append(self.default["v"])
 				self.vol1.set(self.default["v"])
-
 
 			#print(self.default["v"],cutoff,self.default["vs"])
 
@@ -479,6 +417,29 @@ class moudule_2:
 				self.default["extreme_v"].pop(0)
 			if len(self.default["extreme_t"])>200:
 				self.default["extreme_t"].pop(0)
+
+	def alert_check(self):
+
+		if self.alert_sound.get()==True:
+			p = self.p.get()
+			#print(p)
+			x=100-p
+			cutoff, q25 = np.percentile(self.default["ts"], [x ,0])
+
+			if self.default["t"]>cutoff:
+				#print(self.default["t"],cutoff,q25,self.default["extreme_t"])
+
+				try:
+					winsound.PlaySound("SystemExit", winsound.SND_ALIAS)
+					#winsound.Beep(37,1)
+					#playsound('chime.wav')
+					print("alert triggered")
+				except Exception as e:
+					print(e)
+	# def update_curret(self,a,b,c):
+	# 	print("X")
+	# 	pass
+
 
 """
 b'LocalTime=11:38:56.592,Message=TOS,MarketTime=11:38:56.839,Symbol=XLE.AM,Type=0,Price=49.09000,Size=230,Source=25,Condition= ,Tick=?,Mmid=Z,SubMarketId=32,Date=2021-08-02,BuyerId=0,SellerId=0\n'

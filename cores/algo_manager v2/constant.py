@@ -62,6 +62,18 @@ PXT4 = "tpx4"
 PXT5 = "tpx5"
 PXTF = "tpxF"
 
+EMA8H="EMA8H"
+EMA8L="EMA8L"
+EMA8C="EMA8C"
+
+EMA5H= "EMA5H"
+EMA5L= "EMA5L"
+EMA5C = "EMA5C"
+
+EMA21H= "EMA21H"
+EMA21L= "EMA21L"
+EMA21C = "EMA21C"
+
 TRIGGER_PRICE_1 = "Trigger_price_1"
 TRIGGER_PRICE_2 = "Trigger_price_2"
 TRIGGER_PRICE_3 = "Trigger_price_3"
