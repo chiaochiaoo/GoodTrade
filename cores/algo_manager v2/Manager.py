@@ -199,6 +199,8 @@ class Manager:
 
 	def __init__(self,root,goodtrade_pipe=None,ppro_out=None,ppro_in=None,TEST_MODE=False):
 
+		self.root = root
+
 		self.termination = False
 		self.pipe_ppro_in = ppro_in
 		self.pipe_ppro_out = ppro_out
@@ -285,7 +287,7 @@ class Manager:
 			seconds = remain%60
 
 			if minute>0:
-				self.ui.algo_timer_string.set(str(minute)+" minutes and "+str(seconds)+" seconds")
+				self.ui.algo_timer_string.set(str(minute)+" M : "+str(seconds)+" S")
 			else:
 				self.ui.algo_timer_string.set(str(seconds)+" seconds")
 			if remain<0:
@@ -296,6 +298,26 @@ class Manager:
 
 		self.ui.algo_timer_string.set("Deployed")
 		self.deploy_all()
+
+		timestamp = 965
+		while True:
+			now = datetime.now()
+			ts = now.hour*60 + now.minute
+			remain = timestamp - ts
+			#log_print(timestamp,ts)
+			hour = remain//60
+			minute = remain%60
+
+			if minute>0:
+				self.ui.algo_timer_close_string.set(str(hour)+" H : "+str(minute)+" M")
+			else:
+				self.ui.algo_timer_close_string.set(str(minute)+" minutes")
+			if remain<0:
+				log_print("Trigger")
+				break
+
+			time.sleep(60)
+		self.root.destroy()
 
 	def goodtrade_in(self):
 		time.sleep(3)
