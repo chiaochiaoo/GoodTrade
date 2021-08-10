@@ -319,7 +319,7 @@ class alert(pannel):
 
 		#type_,symbol,description,entry_price,stop_price,position,capital,total_risk
 
-		if risk!=0 and support!=0 and resistence!=0 and em!=0:
+		if risk!=0 and support!=0 and resistence!=0:
 			self.algo_commlink.send(info)
 
 	def break_out_trades(self,infos):
@@ -1389,7 +1389,7 @@ class breakout(alert):
 							 "OLavg":ola,
 							 "OLstd":ols,
 							 "expected_momentum":em}
-				if default_risk!=0 and support!=0 and resistence!=0 and em!=0:
+				if default_risk!=0 and support!=0 and resistence!=0:
 					total.append([type_trade,symbol,support,resistence,default_risk,data_list])
 	
 		self.break_out_trades(total)
