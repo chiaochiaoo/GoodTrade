@@ -630,8 +630,31 @@ class TradingPlan:
 		elif manage_plan == FIBONO:
 			self.set_ManagementStrategy(FiboNoSoft(self.symbol,self))
 		elif manage_plan == EM_STRATEGY:
-			self.set_ManagementStrategy(ExpectedMomentum(self.symbol,self))
 
+			### NEED TO MAKE SURE IT IS WHAT IT IS. otherwise, switch. 
+
+			valid = True
+			#check if it's 0
+			#check if rrr exceed 1.5.
+			em = self.symbol.stats['expected_momentum']
+			if em==0:
+				valid = False
+			sup= self.symbol.get_support()
+			res= self.symbol.get_resistence()
+
+			l = res-sup
+			rrr = round(em/l,2) 
+
+			if rrr<1.5:
+				valid = False
+
+			if valid:
+				log_print(self.symbol_name,"EM:",em,"SUP:",sup,"RES:",res,"RPS:",l,"RRR:",rrr)
+				self.set_ManagementStrategy(ExpectedMomentum(self.symbol,self))
+			else:
+				log_print(self.symbol_name,"EM:",em,"SUP:",sup,"RES:",res,"RPS:",l,"RRR:",rrr, "RRR to low, using Fib instd.")
+				self.tkvars[MANAGEMENTPLAN].set(FIBO)
+				self.set_ManagementStrategy(FibonacciOnly(self.symbol,self))
 
 	def set_EntryStrategy(self,entry_plan:Strategy):
 		self.entry_plan = entry_plan
