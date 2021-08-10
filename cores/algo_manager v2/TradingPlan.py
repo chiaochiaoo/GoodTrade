@@ -642,7 +642,7 @@ class TradingPlan:
 			sup= self.symbol.get_support()
 			res= self.symbol.get_resistence()
 
-			l = res-sup
+			l = round(res-sup,2)
 			rrr = round(em/l,2) 
 
 			if rrr<1.5:
