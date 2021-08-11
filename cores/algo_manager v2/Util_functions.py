@@ -10,12 +10,14 @@ def log_print(*args):
 	#send this via a pipe to another processor 
 
 	try:
-		f = open("../../algo_logs/"+datetime.now().strftime("%m-%d")+".txt", "a+")
-		time_ = datetime.now().strftime("%H:%M:%S : ")
 		listToStr = ' '.join([str(elem) for elem in args])
-		f.write("\n"+time_+listToStr)
-		f.close()
-		print(time_,*args)
+
+		if len(listToStr)>5:
+			f = open("../../algo_logs/"+datetime.now().strftime("%m-%d")+".txt", "a+")
+			time_ = datetime.now().strftime("%H:%M:%S : ")
+			f.write("\n"+time_+listToStr)
+			f.close()
+			print(time_,*args)
 	except Exception as e:
 		print(*args,e,"failed to write")
 
