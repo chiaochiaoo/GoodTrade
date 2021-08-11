@@ -237,10 +237,10 @@ class Open_Reversal():
 	def recreate_labels(self,frame):
 
 		self.algo_frame = ttk.LabelFrame(self.root,text="Algo setup")
-		self.algo_frame.place(x=0, rely=0, relheight=0.15, relwidth=1)
+		self.algo_frame.place(x=0, rely=0, relheight=0.2, relwidth=1)
 
 		self.root = ttk.LabelFrame(self.root,text="")
-		self.root.place(x=0, rely=0.08, relheight=0.8, relwidth=1)
+		self.root.place(x=0, rely=0.12, relheight=0.8, relwidth=1)
 
 		self.algo_pannel()
 				# self.breakout_frame = ttk.LabelFrame(self.root,text="Volatility Breakout")
@@ -279,7 +279,6 @@ class Open_Reversal():
 		
 	def algo_pannel(self):
 
-
 		row = 1
 		col = 1
 		ttk.Label(self.algo_frame, text="Algo:").grid(sticky="w",column=col,row=row)
@@ -298,6 +297,21 @@ class Open_Reversal():
 
 		ttk.Label(self.algo_frame, text="Score>").grid(sticky="w",column=col+2,row=row)
 		ttk.Entry(self.algo_frame, textvariable=self.re_score).grid(sticky="w",column=col+3,row=row)
+
+		self.side_ = tk.StringVar(value='x')
+		self.listed_ = tk.BooleanVar(value=False)
+		
+		row = 3
+		col = 1
+		ttk.Label(self.algo_frame, text="Side:").grid(sticky="w",column=col,row=row)
+		l={"Up","Down","Any","Any"}
+		ttk.OptionMenu(self.algo_frame, self.side_, *sorted(l)).grid(sticky="w",column=col+1,row=row)
+
+
+		ttk.Label(self.algo_frame, text="Listed?").grid(sticky="w",column=col+2,row=row)
+		ttk.Checkbutton(self.algo_frame, variable=self.listed_).grid(sticky="w",column=col+3,row=row)
+
+
 
 	def create_entry(self):
 
@@ -416,7 +430,7 @@ class Open_Reversal():
 				# for i in df.columns:
 				# 	if i not in keep:
 				# 		df.pop(i)
-				#df.to_csv(self.file)
+				df.to_csv(self.file)
 			# except Exception as e:
 			# 	print("TNV scanner construction open reversal:",e)
 class Premarket_pick():
@@ -468,7 +482,6 @@ class Premarket_pick():
 				self.b.grid(row=self.l, column=i)
 				self.entries[k].append(self.b)
 			self.l+=1
-
 
 	def update_entry(self,data):
 
@@ -593,8 +606,6 @@ class Open_Break():
 				self.b.grid(row=self.l, column=i)
 				self.entries[k].append(self.b)
 			self.l+=1
-
-
 
 	def update_entry(self,data):
 
@@ -762,7 +773,7 @@ if __name__ == '__main__':
 	root.title("GoodTrade v489") 
 	root.geometry("640x840")
 
-	TNV_Scanner(root,None)
+	TNV_Scanner(root,None,None)
 
 	root.mainloop()
 
