@@ -246,29 +246,31 @@ class Manager:
 		risk = data[4]
 		stats = data[5]
 
-		if symbol not in self.symbols:
+		try:
+			if symbol not in self.symbols:
 
-			self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats)  #register in Symbol.
-			self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INCREMENTAL2,NONE,risk,self.pipe_ppro_out,TEST_MODE)
+				self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats)  #register in Symbol.
+				self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INCREMENTAL2,NONE,risk,self.pipe_ppro_out,TEST_MODE)
 
-			self.ui.create_new_entry(self.tradingplan[symbol])
-			
-			#register in ppro
-			self.pipe_ppro_out.send(["Register",symbol])
+				self.ui.create_new_entry(self.tradingplan[symbol])
+				
+				#register in ppro
+				self.pipe_ppro_out.send(["Register",symbol])
 
-			self.symbols.append(symbol)
-			#append it to, UI.
-			if len(data)>6:
-				status = data[6]
-				mana = data[7]
-				self.tradingplan[symbol].tkvars[MANAGEMENTPLAN].set(mana)
-				#self.tradingplan[symbol].tkvars[ENTRYPLAN].set(entry_plan)
-				self.tradingplan[symbol].tkvars[ENTYPE].set(INSTANT)
-				if status =="deploy":
-					self.tradingplan[symbol].deploy()
-		else:
-			log_print("symbols already exists, modifying current parameter.")
-
+				self.symbols.append(symbol)
+				#append it to, UI.
+				if len(data)>6:
+					status = data[6]
+					mana = data[7]
+					self.tradingplan[symbol].tkvars[MANAGEMENTPLAN].set(mana)
+					#self.tradingplan[symbol].tkvars[ENTRYPLAN].set(entry_plan)
+					self.tradingplan[symbol].tkvars[ENTYPE].set(INSTANT)
+					if status =="deploy":
+						self.tradingplan[symbol].deploy()
+			else:
+				log_print("symbols already exists, modifying current parameter.")
+		except Exception as e:
+			log_print("adding new tradingplan problem",e)
 	def timer(self):
 
 		#570  34200
