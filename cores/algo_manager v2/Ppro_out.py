@@ -36,6 +36,12 @@ def register(symbol,port):
 	req = threading.Thread(target=register_to_ppro, args=(symbol, True,port,),daemon=True)
 	req.start()
 
+def register_web(symbol,port):
+
+	postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&feedtype=L1&output=" + str(port)+"&status=on"
+
+	return postbody,"register "+symbol,"register failed "+symbol
+	
 def register_to_ppro(symbol,status,port):
 
 	#log_print("Registering",symbol,status)
@@ -233,63 +239,64 @@ def cancel_stoporder(id_):
 	req = threading.Thread(target=ppro_request, args=(r,sucess,failure),daemon=True)
 	req.start()	
 
-def Ppro_outx(pipe,port): #a sperate process. GLOBALLY. 
-	while True:
-		try:
-			d = pipe.recv()
-			type_ = d[0]
+# def Ppro_outx(pipe,port): #a sperate process. GLOBALLY. 
+# 	while True:
+# 		try:
+# 			d = pipe.recv()
+# 			type_ = d[0]
 
-			log_print("PPRO ORDER:",d)
-			if type_ == BUY:
+# 			log_print("PPRO ORDER:",d)
+# 			if type_ == BUY:
 
-				symbol = d[1]
-				share = d[2]
-				rationale = d[3]
+# 				symbol = d[1]
+# 				share = d[2]
+# 				rationale = d[3]
 
-				buy_market_order(symbol,share)
+# 				buy_market_order(symbol,share)
 
-			elif type_ ==SELL:
+# 			elif type_ ==SELL:
 
-				symbol = d[1]
-				share = d[2]
-				rationale = d[3]
-				sell_market_order(symbol,share)
+# 				symbol = d[1]
+# 				share = d[2]
+# 				rationale = d[3]
+# 				sell_market_order(symbol,share)
 
-			elif type_ == LIMITBUY:
+# 			elif type_ == LIMITBUY:
 				
-				symbol = d[1]
-				price = round(d[2],2)
-				share = d[3]
-				wait = d[4]
-				rationale = d[5]
-				buy_limit_order(symbol,price,share,wait)
+# 				symbol = d[1]
+# 				price = round(d[2],2)
+# 				share = d[3]
+# 				wait = d[4]
+# 				rationale = d[5]
+# 				buy_limit_order(symbol,price,share,wait)
 
-			elif type_ == LIMITSELL:
+# 			elif type_ == LIMITSELL:
 
-				symbol = d[1]
-				price = round(d[2],2)
-				share = d[3]
-				wait = d[4]
-				rationale = d[5]
+# 				symbol = d[1]
+# 				price = round(d[2],2)
+# 				share = d[3]
+# 				wait = d[4]
+# 				rationale = d[5]
 
-				sell_limit_order(symbol,price,share,wait)
+# 				sell_limit_order(symbol,price,share,wait)
 
 
-			elif type_ == "Register":
+# 			elif type_ == "Register":
 
-				symbol = d[1]
-				register(symbol,port)
+# 				symbol = d[1]
+# 				#register(symbol,port)
+# 				register_web(symbol,port)
 
-			elif type_ == FLATTEN:
+# 			elif type_ == FLATTEN:
 
-				symbol = d[1]
-				flatten_symbol(symbol)
-			else:
+# 				symbol = d[1]
+# 				flatten_symbol(symbol)
+# 			else:
 
-				log_print("Unrecognized ppro command received.")
+# 				log_print("Unrecognized ppro command received.")
 
-		except Exception as e:
-			log_print(e)
+# 		except Exception as e:
+# 			log_print(e)
 
 
 def init_driver():
@@ -379,7 +386,8 @@ def Ppro_out(pipe,port): #a sperate process. GLOBALLY.
 			elif type_ == "Register":
 
 				symbol = d[1]
-				register(symbol,port)
+				#register(symbol,port)
+				request_str,sucess_str,failure_str = register_web(symbol,port)
 
 			elif type_ == FLATTEN:
 
