@@ -317,6 +317,7 @@ class Manager:
 				break
 
 			time.sleep(60)
+
 		self.root.destroy()
 
 	def goodtrade_in(self):
@@ -339,12 +340,11 @@ class Manager:
 			if d[0] =="pkg":
 				log_print("new package arrived",d)
 
-				for i in d[1]:
-
-					try:
+				try:
+					for i in d[1]:
 						self.add_new_tradingplan(i,self.test_mode)
-					except Exception as e:
-						log_print("adding algo novo con culpa",e)
+				except Exception as e:
+					log_print("adding algo errors:",e,i)
 
 	def ppro_order_confirmation(self,data):
 
@@ -401,10 +401,23 @@ class Manager:
 				bid = data["bid"]
 				ask = data["ask"]
 				ts = data["timestamp"]
-				#print(data)
 
 				if symbol in self.tradingplan:
 					self.tradingplan[symbol].ppro_update_price(bid,ask,ts)
+
+			if d[0] =='order update_m':
+				data = d[1]
+				symbol = data["symbol"]
+				bid = data["bid"]
+				ask = data["ask"]
+				ts = data["timestamp"]
+
+				techindicator = d[2]
+
+				if symbol in self.tradingplan:
+					self.tradingplan[symbol].ppro_update_price(bid,ask,ts)
+					#self.tradingplan[symbol].update_techindicators(techindicator)
+				### UPDATE THE EMAs. 
 
 			if d[0] =="order rejected":
 

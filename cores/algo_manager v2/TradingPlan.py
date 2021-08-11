@@ -295,7 +295,7 @@ class TradingPlan:
 
 		self.adjusting_risk()
 
-		log_print(self.symbol_name," sold:",shares," current shares:",self.data[CURRENT_SHARE],"realized:",self.data[REALIZED])
+		#log_print(self.symbol_name," sold:",shares," current shares:",self.data[CURRENT_SHARE],"realized:",self.data[REALIZED])
 
 		#finish a trade if current share is 0.
 
