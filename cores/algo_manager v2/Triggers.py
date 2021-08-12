@@ -1186,9 +1186,52 @@ class TwoToOneTrigger(AbstractTrigger):
 		self.tradingplan.update_displays()
 
 
+### once ema count exceed X. 
 
-# s = SingleEntry(ASK,">",PREMARKETHIGH,0,"BUY BREAK UP")
-# s.trigger_event()
+class EMAManager(AbstractTrigger):
+	def __init__(self,description,strategy):
+		super().__init__(description,None,trigger_timer=0,trigger_limit=999)
+		self.strategy =strategy
+		self.conditions = [] 
+
+	def check_conditions(self):
+
+		
+		self.conditions = [[SYMBOL_DATA,EMACOUNT,">",SYMBOL_DATA,CUSTOM]]
+
+		if self.tradingplan.data[POSITION]!="":
+			return(super().check_conditions())
+	"""
+	Do three things.
+	1. Reset tradingplan Fibo level.
+	2. Recalculate the Fibo levels. (Break price - current max.)
+	3. Bring up the new FIB max.
+	"""
+	def trigger_event(self):
+		#1. reset level.
+		#self.tradingplan.data[CURRENT_FIB_LEVEL] == 1:
+
+		self.symbol.data[CUSTOM] = self.symbol.data[EMACOUNT]
+
+
+		if self.tradingplan.data[POSITION] == LONG:
+
+			new_stop = self.symbol.data[EMA8L]
+
+			self.tradingplan.data[STOP_LEVEL]=new_stop
+			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[STOP_LEVEL])
+
+		elif self.tradingplan.data[POSITION] == SHORT:
+
+
+			new_stop = self.symbol.data[EMA8H]
+			self.tradingplan.data[STOP_LEVEL]=new_stop
+			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[STOP_LEVEL])
+
+		self.tradingplan.adjusting_risk()
+		self.tradingplan.update_displays()
+		log_print(self.symbol_name,"EMA recalibrate:",self.tradingplan.data[STOP_LEVEL])
+
 
 
 

@@ -891,6 +891,91 @@ class ExpectedMomentum(ManagementStrategy):
 		self.total_orders = total_orders
 
 
+class EMAStrategy(ManagementStrategy):
+
+	def __init__(self,symbol,tradingplan):
+
+		super().__init__("Management: EMA8",symbol,tradingplan)
+
+		self.manaTrigger = EMAManager("EMA trigger",self)
+
+		self.add_initial_triggers(self.manaTrigger)
+
+		#description,trigger_timer:int,trigger_limit=1
+		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
+		###upon activating, reset all parameters. 
+
+		
+
+		self.total_orders = None
+		self.EMA_activated = False
+		self.risk_per_share = 0
+
+		self.initialized = False
+
+		self.price = self.tradingplan.data[AVERAGE_PRICE]
+		self.stop = self.tradingplan.data[STOP_LEVEL]
+
+
+
+	def on_loading_up(self): #call this whenever the break at price changes. Onl
+		#print("loading up:",self.initialized)
+		if not self.initialized:
+			log_print("LOADING UP!!!!","init:",self.initialized,self.management_start)
+			self.price = self.tradingplan.data[AVERAGE_PRICE]
+			self.stop = self.tradingplan.data[STOP_LEVEL]
+
+			coefficient = 1
+
+			"""
+			px1 = 0.3 #break even
+			px2 = 1 #set second barage
+			px3 = 2 #set third barage
+			px4 = 3.2 #over and out.
+
+			"""
+
+			self.tradingplan.tkvars[AUTOMANAGE].set(True)
+			# self.tradingplan.tkvars[PXT1].set(self.tradingplan.data[TRIGGER_PRICE_1])
+			# self.tradingplan.tkvars[PXT2].set(self.tradingplan.data[TRIGGER_PRICE_7])
+			# self.tradingplan.tkvars[PXT3].set(self.tradingplan.data[TRIGGER_PRICE_9])
+
+			#log_print(self.symbol_name,"Management price target adjusted:",self.tradingplan.data[PXT1],self.tradingplan.data[PXT2],self.tradingplan.data[PXT3])
+
+			self.shares_loaded = True
+
+			#shouldn't start here. because, sometime multiple entry is required. 7/10
+			#No. This is a mechanism that works for INSTANT. if already started, but not intialized. restart the whole thing.
+
+			if self.initialized == False and self.management_start==True:
+				self.on_start()
+
+	def on_start(self):
+
+		if self.shares_loaded:
+
+			super().on_start()
+			log_print(self.symbol_name,"EMA manage starting")
+
+			self.symbol.data[CUSTOM] = self.symbol.data[EMACOUNT]+5
+			self.tradingplan.current_price_level = 1
+			self.initialized = True
+			#log_print("HELLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLO",self.initialized)
+		else:
+			self.management_start=True
+
+
+	def on_deploying(self): #refresh it when reusing.
+		#print("ON DEPLOYING")
+		self.initialized = False
+		self.shares_loaded = False
+		self.tradingplan.current_price_level = 1
+		self.orders_level = 1
+		super().on_deploying()
+
+	def reset(self):
+		self.initialized = False
+
 # clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
 
 # log_print(clsmembers)

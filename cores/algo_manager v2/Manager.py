@@ -252,11 +252,8 @@ class Manager:
 				self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats)  #register in Symbol.
 				self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INCREMENTAL2,NONE,risk,self.pipe_ppro_out,TEST_MODE)
 
-				self.ui.create_new_entry(self.tradingplan[symbol])
-				
 				#register in ppro
 				self.pipe_ppro_out.send(["Register",symbol])
-
 				self.symbols.append(symbol)
 				#append it to, UI.
 				if len(data)>6:
@@ -265,8 +262,12 @@ class Manager:
 					self.tradingplan[symbol].tkvars[MANAGEMENTPLAN].set(mana)
 					#self.tradingplan[symbol].tkvars[ENTRYPLAN].set(entry_plan)
 					self.tradingplan[symbol].tkvars[ENTYPE].set(INSTANT)
+
+					self.ui.create_new_entry_system(self.tradingplan[symbol])
 					if status =="deploy":
 						self.tradingplan[symbol].deploy()
+				else:
+					self.ui.create_new_entry(self.tradingplan[symbol])
 			else:
 				log_print("symbols already exists, modifying current parameter.")
 		except Exception as e:
@@ -418,7 +419,7 @@ class Manager:
 
 				if symbol in self.tradingplan:
 					self.tradingplan[symbol].ppro_update_price(bid,ask,ts)
-					#self.tradingplan[symbol].update_techindicators(techindicator)
+					self.tradingplan[symbol].symbol.update_techindicators(techindicator)
 				### UPDATE THE EMAs. 
 
 			if d[0] =="order rejected":
@@ -560,7 +561,7 @@ class Tester:
 		print(self.sec)
 		self.bid=0
 		self.ask=0
-
+		self.data = {}
 		self.root = tk.Toplevel(width=780,height=250)
 		self.gt = receive_pipe
 		self.ppro = ppro_in
@@ -769,8 +770,8 @@ class Tester:
 	def change(self):
 		self.sec+=1
 		#print(self.sec)
-		data={}
-		data["symbol"]= "SPY.AM"
+
+		
 
 		if self.price_stay:
 			if self.price_flip:
@@ -784,12 +785,149 @@ class Tester:
 		self.bid = round(float(self.price.get()-0.01),2)
 		self.ask = round(float(self.price.get()+0.01),2)
 
-		data["bid"]= round(float(self.price.get()-0.01),2)
-		data["ask"]= round(float(self.price.get()+0.01),2)
+		# data["symbol"]= "SPY.AM"
+		# data["bid"]= round(float(self.price.get()-0.01),2)
+		# data["ask"]= round(float(self.price.get()+0.01),2)
+		# data["timestamp"]= self.sec
 
-		data["timestamp"]= self.sec
-		self.ppro.send(["order update",data])
+		#self.ppro.send(["order update",data])
+
+		self.decode_l1("SPY.AM",self.bid,self.ask,self.sec,self.ppro,self.data)
 		self.limit_buy_sell()
+
+	def decode_l1(self,symbol,bid,ask,ts,pipe,l1data):
+
+		#ts= timestamp_seconds(find_between(stream_data, "MarketTime=", ",")[:-4])
+
+		ms = ts//60
+
+		send = False
+
+		if symbol in l1data:
+			#if either level has changed. register. 
+			if l1data[symbol]["bid"]!=bid or l1data[symbol]["ask"]!=ask:
+				send = True
+			elif ts-l1data[symbol]["timestamp"] >1:
+				send = True
+
+			#if has been more then 2 leconds. registered.
+
+		else:
+			l1data[symbol] = {}
+
+			l1data[symbol]["symbol"] = symbol
+			l1data[symbol]["bid"] = bid
+			l1data[symbol]["ask"] = ask
+			l1data[symbol]["timestamp"] = ts
+
+			l1data[symbol]["internal"] = {}
+			l1data[symbol]["internal"]["timestamp"] = ms
+			l1data[symbol]["internal"]["current_minute_bins"] = [bid,ask]
+			l1data[symbol]["internal"]["EMA_count"] = 0
+
+			#Realizing - I won't need to track these values no more.
+			l1data[symbol]["internal"]["high"] = ask
+			l1data[symbol]["internal"]["low"] = bid
+			l1data[symbol]["internal"]["open"] = ask
+			l1data[symbol]["internal"]["close"] = bid
+
+			l1data[symbol]["internal"]["EMA_count"] = 0
+
+			l1data[symbol]["internal"]["EMA5H"] = 0
+			l1data[symbol]["internal"]["EMA5L"] = 0
+			l1data[symbol]["internal"]["EMA5C"] = 0
+
+			l1data[symbol]["internal"]["EMA8H"] = 0
+			l1data[symbol]["internal"]["EMA8L"] = 0
+			l1data[symbol]["internal"]["EMA8C"] = 0
+			send = True
+
+		#process the informations. process internal only. 
+
+		#two kinds of update. normal second; and new second. 
+		if send:
+
+			update = process_l1(l1data[symbol]["internal"],bid,ask,ms)
+			"""two cases. small, and big."""
+			l1data[symbol]["symbol"] = symbol
+			l1data[symbol]["bid"] = bid
+			l1data[symbol]["ask"] = ask
+			l1data[symbol]["timestamp"] = ts
+
+			if update:
+				update_ = {}
+				update_["EMA5H"]=l1data[symbol]["internal"]["EMA5H"]
+				update_["EMA5L"]=l1data[symbol]["internal"]["EMA5L"]
+				update_["EMA5C"]=l1data[symbol]["internal"]["EMA5C"]
+				update_["EMA8H"]=l1data[symbol]["internal"]["EMA8H"]
+				update_["EMA8L"]=l1data[symbol]["internal"]["EMA8L"]
+				update_["EMA8C"]=l1data[symbol]["internal"]["EMA8C"]
+				update_["EMAcount"]=l1data[symbol]["internal"]["EMA_count"]
+				pipe.send(["order update_m",l1data[symbol],update_])
+
+				print(l1data[symbol])
+				# writer.writerow([symbol,mili_ts,bid,ask,\
+				# 	l1data[symbol]["internal"]["EMA5H"],\
+				# 	l1data[symbol]["internal"]["EMA5L"],\
+				# 	l1data[symbol]["internal"]["EMA5C"],\
+				# 	l1data[symbol]["internal"]["EMA8H"],\
+				# 	l1data[symbol]["internal"]["EMA8L"],\
+				# 	l1data[symbol]["internal"]["EMA8C"]])
+				#print(symbol,l1data[symbol],update_)
+			else:
+
+				#print(l1data[symbol])
+				#add time
+				pipe.send(["order update",l1data[symbol]])
+				#writer.writerow([symbol,mili_ts,bid,ask])
+
+
+	def process_l1(dic,bid,ask,ms):
+
+		"""two senarios. within current timestamp, and out. """
+
+		if dic["timestamp"]  != ms: #a new minute. 
+
+			dic["timestamp"] = ms
+			if len(dic["current_minute_bins"])>1:
+				dic["high"]=max(dic["current_minute_bins"])
+				dic["low"]=min(dic["current_minute_bins"])
+				dic["open"]=dic["current_minute_bins"][0]
+				dic["close"]=dic["current_minute_bins"][-1]
+
+				dic["current_minute_bins"] = []
+
+				if dic["EMA_count"]==0: #first time setting up.
+					### HERE. What i need to do is have the GT&server also track the EMA values of these. 
+					dic["EMA5H"] = dic["high"]
+					dic["EMA5L"] = dic["low"]
+					dic["EMA5C"] = dic["close"]
+
+					dic["EMA8H"] = dic["high"]
+					dic["EMA8L"] = dic["low"]
+					dic["EMA8C"] = dic["close"]
+
+				else: #induction! 
+					dic["EMA5H"] = self.new_ema(dic["high"],dic["EMA5H"],5)
+					dic["EMA5L"] = self.new_ema(dic["low"],dic["EMA5L"],5)
+					dic["EMA5C"] = self.new_ema(dic["close"],dic["EMA5C"],5)
+
+					dic["EMA8H"] = self.new_ema(dic["high"],dic["EMA8H"],8)
+					dic["EMA8L"] = self.new_ema(dic["low"],dic["EMA8L"],8)
+					dic["EMA8C"] = self.new_ema(dic["close"],dic["EMA8C"],8)
+
+				dic["EMA_count"]+=1
+				return True
+			else:
+				return False
+		else: #same minute 
+			dic["current_minute_bins"].append(bid)
+			dic["current_minute_bins"].append(ask)
+			return False
+			
+	def new_ema(self,current,last_EMA,n):
+	    
+	    return round((current - last_EMA)*(2/(n+1)) + last_EMA,2)
 
 	def limit_buy_sell(self):
 
@@ -825,7 +963,7 @@ class Tester:
 
 		for i in used:
 			del self.sell_book[i]
-
+	
 
 if __name__ == '__main__':
 
@@ -853,7 +991,7 @@ if __name__ == '__main__':
 
 
 	root = tk.Tk()
-	root.title("GoodTrade Algo Manager v2 b8")
+	root.title("GoodTrade Algo Manager v2 b9")
 	root.geometry("1920x800")
 
 	manager=Manager(root,goodtrade_pipe,ppro_out,ppro_in,TEST)

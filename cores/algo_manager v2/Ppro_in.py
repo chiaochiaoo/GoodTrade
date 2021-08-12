@@ -11,11 +11,12 @@ def open_file():
 
 	try:
 		f = open("../../algo_logs/"+datetime.now().strftime("%m-%d")+"data.csv", "a")
+		writer = csv.writer(f,lineterminator = '\n')
 	except:
 		f = open("../../algo_logs/"+datetime.now().strftime("%m-%d")+"data.csv", "w")
-
-	writer = csv.writer(f,lineterminator = '\n')
-
+		writer = csv.writer(f,lineterminator = '\n')
+		writer.writerow(['symbol', 'timestamp','bid','ask','EMA5H','EMA5L','EMA5C','EMA8H','EMA8L','EMA8C'])
+	
 	return f,writer 
 
 def save_file(f):
@@ -43,8 +44,7 @@ def Ppro_in(port,pipe):
 	count = 0
 
 	f,writer = open_file()
-	writer.writerow(['symbol', 'timestamp','bid','ask','EMA5H','EMA5L','EMA5C','EMA8H','EMA8L','EMA8C'])
-	
+
 	pipe.send(["msg","algo_ppro working"])
 	write_count = 0
 	while True:
@@ -257,12 +257,14 @@ def decode_l1(stream_data,pipe,writer,l1data):
 		l1data[symbol]["timestamp"] = ts
 
 		if update:
-			update_ = [l1data[symbol]["internal"]["EMA5H"],\
-				l1data[symbol]["internal"]["EMA5L"],\
-				l1data[symbol]["internal"]["EMA5C"],\
-				l1data[symbol]["internal"]["EMA8H"],\
-				l1data[symbol]["internal"]["EMA8L"],\
-				l1data[symbol]["internal"]["EMA8C"]]
+			update_ = {}
+			update_["EMA5H"]=l1data[symbol]["internal"]["EMA5H"]
+			update_["EMA5L"]=l1data[symbol]["internal"]["EMA5L"]
+			update_["EMA5C"]=l1data[symbol]["internal"]["EMA5C"]
+			update_["EMA8H"]=l1data[symbol]["internal"]["EMA8H"]
+			update_["EMA8L"]=l1data[symbol]["internal"]["EMA8L"]
+			update_["EMA8C"]=l1data[symbol]["internal"]["EMA8C"]
+			update_["EMAcount"]=l1data[symbol]["internal"]["EMA_count"]
 			pipe.send(["order update_m",l1data[symbol],update_])
 			writer.writerow([symbol,mili_ts,bid,ask,\
 				l1data[symbol]["internal"]["EMA5H"],\
@@ -271,7 +273,7 @@ def decode_l1(stream_data,pipe,writer,l1data):
 				l1data[symbol]["internal"]["EMA8H"],\
 				l1data[symbol]["internal"]["EMA8L"],\
 				l1data[symbol]["internal"]["EMA8C"]])
-			print(symbol,l1data[symbol],update_)
+			#print(symbol,l1data[symbol],update_)
 		else:
 
 			#print(l1data[symbol])
@@ -322,9 +324,10 @@ def process_l1(dic,bid,ask,ms):
 		dic["current_minute_bins"].append(bid)
 		dic["current_minute_bins"].append(ask)
 		return False
+
 def new_ema(current,last_EMA,n):
     
-    return (current - last_EMA)*(2/(n+1)) + last_EMA
+    return round((current - last_EMA)*(2/(n+1)) + last_EMA,2)
 
 
 

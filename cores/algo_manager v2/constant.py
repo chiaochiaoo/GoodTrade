@@ -55,6 +55,8 @@ RELOAD_TIMES = "Reloadtimes"
 
 BREAKPRICE = "Breakprice"
 
+
+CUSTOM = "custom"
 PXT1 = "tpx1"
 PXT2 = "tpx2"
 PXT3 = "tpx3"
@@ -62,6 +64,8 @@ PXT4 = "tpx4"
 PXT5 = "tpx5"
 PXTF = "tpxF"
 
+
+EMACOUNT = "EMAcount"
 EMA8H="EMA8H"
 EMA8L="EMA8L"
 EMA8C="EMA8C"
@@ -144,6 +148,7 @@ ANCARTMETHOD =  "AC METHOD"
 ONETOTWORISKREWARD = "1:2 Exprmntl"
 FIBONO = "FibAdjstd"
 FIBO = "Fib only"
+EMASTRAT =  "EMA strategy"
 
 ONETOTWORISKREWARDOLD = "1:2 RiskReward"
 

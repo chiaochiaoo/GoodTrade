@@ -30,7 +30,7 @@ class UI(pannel):
 
 		self.entry_plan_options = {BREAISH,BULLISH,BREAKUP,BREAKDOWN,BREAKFIRST,BREAKANY,RIPSELL,DIPBUY,FADEANY}
 
-		self.management_plan_options = {FIBO,EM_STRATEGY,ONETOTWORISKREWARD}#THREE_TARGETS,SMARTTRAIL,ANCARTMETHOD,ONETOTWORISKREWARD,ONETOTWORISKREWARDOLD,
+		self.management_plan_options = {FIBO,EM_STRATEGY,EMASTRAT,ONETOTWORISKREWARD}#THREE_TARGETS,SMARTTRAIL,ANCARTMETHOD,ONETOTWORISKREWARD,ONETOTWORISKREWARDOLD,
 
 	def init_pannel(self):
 		self.labels = {"":4,\
@@ -401,6 +401,113 @@ class UI(pannel):
 		self.label_count +=1
 
 
+
+		self.algo_count_number.set(self.label_count-1)
+		self.rebind(self.dev_canvas,self.deployment_frame)
+		self.recreate_labels()
+		tradingplan.update_displays()
+
+
+	def create_new_entry_system(self,tradingplan):
+
+
+		infos = {
+		SELECTED:tradingplan.tkvars[SELECTED],\
+		'Symbol':tradingplan.symbol_name, \
+		STATUS:tradingplan.tkvars[STATUS],\
+		MIND: tradingplan.tkvars[MIND],\
+		ENTRYPLAN:tradingplan.tkvars[ENTRYPLAN], \
+		ENTYPE:tradingplan.tkvars[ENTYPE], \
+		TIMER:tradingplan.tkvars[TIMER], \
+		MANAGEMENTPLAN:tradingplan.tkvars[MANAGEMENTPLAN], \
+		"Reload":tradingplan.tkvars[RELOAD], \
+		'AR':tradingplan.tkvars[AUTORANGE], \
+		SUPPORT:tradingplan.tkvars[SUPPORT], \
+		RESISTENCE:tradingplan.tkvars[RESISTENCE], \
+		RISK_RATIO:tradingplan.tkvars[RISK_RATIO], \
+		'SzIn':tradingplan.tkvars[SIZE_IN], \
+		'Position':tradingplan.tkvars[POSITION], \
+		'Stop':tradingplan.tkvars[STOP_LEVEL],\
+		'AvgPx':tradingplan.tkvars[AVERAGE_PRICE], \
+		PXT1: tradingplan.tkvars[PXT1], \
+		PXT2:tradingplan.tkvars[PXT2], \
+		PXT3:tradingplan.tkvars[PXT3], \
+		UNREAL_PSHR:tradingplan.tkvars[UNREAL_PSHR], \
+		UNREAL:tradingplan.tkvars[UNREAL], \
+		REALIZED:tradingplan.tkvars[REALIZED], \
+		TOTAL_REALIZED:tradingplan.tkvars[TOTAL_REALIZED], \
+		'flatten':"", \
+		'log':""}
+
+
+		#link the global variable 
+		tradingplan.tkvars[RISKTIMER] = self.risk_timer 
+
+
+		l = self.label_count
+
+		info = list(infos.values())
+		labels = list(infos.keys())
+		symbol = info[1]
+		self.tklabels[symbol] = {}
+		for j in range(len(info)):
+			#"symbol","algo_status","description","break_at","position","act_r/est_r","stoplevel","average_price","shares","pxtgt1","pxtgt1","pxtgt1","unrealized_pshr","unrealized","realized"
+			label_name = labels[j]
+
+			if label_name == "Symbol":
+				self.tklabels[symbol][label_name] = tk.Button(self.deployment_frame ,text=info[j],width=self.width[j],command=tradingplan.deploy)
+			elif label_name == STATUS:
+				self.tklabels[symbol][label_name] = tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command=tradingplan.cancle_deployment)
+
+			elif label_name ==TIMER:
+				self.tklabels[symbol][label_name] = tk.Entry(self.deployment_frame,textvariable=info[j],width=self.width[j])
+
+			elif label_name =="AR" :
+				self.tklabels[symbol][label_name] = tk.Checkbutton(self.deployment_frame,variable=info[j],width=2,command=tradingplan.AR_toggle)
+			elif label_name =="Reload" or label_name==SELECTED:
+				self.tklabels[symbol][label_name] = tk.Checkbutton(self.deployment_frame,variable=info[j],width=2)
+
+			elif label_name =="MIND":
+				self.tklabels[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
+			elif label_name =="Stop":
+				self.tklabels[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command= lambda tp=tradingplan:adjust_stop(tp))
+
+
+			elif label_name ==RISK_RATIO:
+				self.tklabels[symbol][RISK_PER_SHARE]=tk.Entry(self.deployment_frame ,textvariable=tradingplan.tkvars[RISK_PER_SHARE],width=self.width[j])
+				tradingplan.tklabels[RISK_PER_SHARE] = self.tklabels[symbol][RISK_PER_SHARE]
+				tradingplan.tklabels[RISK_PER_SHARE].grid(row= l+2, column=j,padx=0)
+
+				self.tklabels[symbol][label_name]=tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
+
+			elif label_name =='SzIn':
+				self.tklabels[symbol][TARGET_SHARE]=tk.Entry(self.deployment_frame ,textvariable=tradingplan.tkvars[INPUT_TARGET_SHARE],width=self.width[j])
+				tradingplan.tklabels[TARGET_SHARE] = self.tklabels[symbol][TARGET_SHARE]
+				tradingplan.tklabels[TARGET_SHARE].grid(row= l+2, column=j,padx=0)
+
+				self.tklabels[symbol][label_name]=tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
+
+			elif label_name =="flatten":
+				self.tklabels[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command=tradingplan.flatten_cmd)
+
+			elif label_name == SUPPORT or label_name == RESISTENCE or label_name == "pxtgt1" or label_name == "pxtgt2" or label_name == "pxtgt3":
+				self.tklabels[symbol][label_name] =tk.Entry(self.deployment_frame ,textvariable=info[j],width=self.width[j],state="disabled")	
+			else:
+				if str(type(info[j]))=="<class 'tkinter.StringVar'>" or str(type(info[j]))=="<class 'tkinter.DoubleVar'>":
+					self.tklabels[symbol][label_name]=tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
+				else:
+					#print(self.tklabels[symbol])
+					self.tklabels[symbol][label_name]=tk.Button(self.deployment_frame ,text=info[j],width=self.width[j])
+			try:
+				self.label_default_configure(self.tklabels[symbol][label_name])
+			except:
+				pass
+
+			tradingplan.tklabels[label_name] = self.tklabels[symbol][label_name]
+
+			self.tklabels[symbol][label_name].grid(row= l+2, column=j,padx=0)
+
+		self.label_count +=1
 
 		self.algo_count_number.set(self.label_count-1)
 		self.rebind(self.dev_canvas,self.deployment_frame)

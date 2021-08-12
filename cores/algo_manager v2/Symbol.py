@@ -17,7 +17,9 @@ class Symbol:
 		self.init_open = False
 		self.init_high_low = False
 
-		self.numeric_labels = [TIMESTAMP,BID,ASK,RESISTENCE,SUPPORT,OPEN,HIGH,LOW,PREMARKETHIGH,PREMARKETLOW,STOP,EXIT,ENTRY]
+		self.numeric_labels = [TIMESTAMP,BID,ASK,RESISTENCE,SUPPORT,OPEN,HIGH,LOW,PREMARKETHIGH,PREMARKETLOW,STOP,EXIT,ENTRY,CUSTOM]
+
+		self.tech_indicators = [EMACOUNT,EMA8H,EMA8L,EMA8C,EMA5H,EMA5L,EMA5C,EMA21H,EMA21L,EMA21C]
 
 		self.data = {}
 		self.tkvars = {}
@@ -39,7 +41,10 @@ class Symbol:
 
 		for i in self.numeric_labels:
 			self.data[i] = 0
-			#self.tkvars[i] = tk.DoubleVar()
+			
+		for i in self.tech_indicators:
+			self.data[i] = 0
+			self.tkvars[i] = tk.DoubleVar()
 
 		for key,value in stats.items():
 			self.data[key] = value
@@ -48,6 +53,14 @@ class Symbol:
 		self.data[SUPPORT] = support
 
 		
+	def update_techindicators(self,dic):
+		for key,value in dic.items():
+			if key in self.data:
+				self.data[key]=value
+				self.tkvars[key].set(value)
+				
+		#print(dic)
+#
 	def toggle_autorange(self,Bool):
 		self.data[AUTORANGE] = Bool
 
