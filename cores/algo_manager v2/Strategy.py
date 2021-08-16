@@ -279,31 +279,35 @@ class BreakAny(EntryStrategy):
 
 		self.clear_initial_triggers()
 
-		if self.buyTrigger.get_trigger_state()==False:
-			if not self.buyTrigger.pre_deploying_check():   #below the premarket high.
-				self.add_initial_triggers(self.buyTrigger)
-				self.add_initial_triggers(self.sellTrigger)
+		if self.buyTrigger.get_trigger_state()==False and not self.buyTrigger.pre_deploying_check(): #below the premarket high.
+
+			self.add_initial_triggers(self.buyTrigger)
+			self.add_initial_triggers(self.sellTrigger)
 				#print(1)
-			else:    #above the premarket high.
-				self.transitional_trigger = AbstractTrigger("transition trigger to below Res.",[[SYMBOL_DATA,BID,"<",SYMBOL_DATA,RESISTENCE]],0,1,"REACTIVATE")
-				self.transitional_trigger.add_next_trigger(self.buyTrigger)
-				self.transitional_trigger.add_next_trigger(self.sellTrigger)
-				self.set_initial_trigger(self.transitional_trigger)
-				#print(2)
+			# else:    #above the premarket high.
+			# 	self.transitional_trigger = AbstractTrigger("transition trigger to below Res.",[[SYMBOL_DATA,BID,"<",SYMBOL_DATA,RESISTENCE]],0,1,"REACTIVATE")
+			# 	self.transitional_trigger.add_next_trigger(self.buyTrigger)
+			# 	self.transitional_trigger.add_next_trigger(self.sellTrigger)
+			# 	self.set_initial_trigger(self.transitional_trigger)
+			# 	#print(2)
 			self.buyTrigger.total_reset()
-		elif self.sellTrigger.get_trigger_state()==False:
-			if not self.sellTrigger.pre_deploying_check():  #above the premarket low.
-				self.add_initial_triggers(self.buyTrigger)
-				self.add_initial_triggers(self.sellTrigger)
+			self.restart()
+		elif self.sellTrigger.get_trigger_state()==False and not self.sellTrigger.pre_deploying_check():
+
+			self.add_initial_triggers(self.buyTrigger)
+			self.add_initial_triggers(self.sellTrigger)
 				#print(3)
-			else:	#below the premarket low.
-				self.transitional_trigger = AbstractTrigger("transitional trigger to above Sus.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],0,1,"REACTIVATE")
-				self.transitional_trigger.add_next_trigger(self.buyTrigger)
-				self.transitional_trigger.add_next_trigger(self.sellTrigger)
-				self.set_initial_trigger(self.transitional_trigger)
-				#print(4)
+			# else:	#below the premarket low.
+			# 	self.transitional_trigger = AbstractTrigger("transitional trigger to above Sus.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],0,1,"REACTIVATE")
+			# 	self.transitional_trigger.add_next_trigger(self.buyTrigger)
+			# 	self.transitional_trigger.add_next_trigger(self.sellTrigger)
+			# 	self.set_initial_trigger(self.transitional_trigger)
+			# 	#print(4)
 			self.sellTrigger.total_reset()
-		self.restart()
+
+			self.restart()
+		else:
+			self.tradingplan.mark_algo_status(DONE)
 
 
 		# if not self.sellTrigger.pre_deploying_check() and not self.buyTrigger.pre_deploying_check(): #fit in both conditions.
@@ -378,43 +382,46 @@ class BreakFirst(EntryStrategy):
 
 			if not self.buyTrigger.pre_deploying_check():
 				self.buyTrigger.total_reset()
-			else:
+			# else:
 
-				self.transitional_trigger = AbstractTrigger("transition to below pH.",[[SYMBOL_DATA,BID,"<",SYMBOL_DATA,RESISTENCE]],0,1,"REACTIVATE")
-				self.buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",self.timer,self.repeat,LONG,self.ppro_out)
-				self.transitional_trigger.add_next_trigger(self.buyTrigger)
+			# 	self.transitional_trigger = AbstractTrigger("transition to below pH.",[[SYMBOL_DATA,BID,"<",SYMBOL_DATA,RESISTENCE]],0,1,"REACTIVATE")
+			# 	self.buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",self.timer,self.repeat,LONG,self.ppro_out)
+			# 	self.transitional_trigger.add_next_trigger(self.buyTrigger)
 
-				###Where continuation trigger goes.#####
-				# self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
-				# self.symbol.data[ENTRY] = self.symbol.data[HIGH]
+			# 	###Where continuation trigger goes.#####
+			# 	# self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
+			# 	# self.symbol.data[ENTRY] = self.symbol.data[HIGH]
 
-				# self.cont_buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,ENTRY]],EXIT,self.risk/2,"Break Up contituation",0,1,LONG,self.ppro_out)
-				# log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),0,1)
+			# 	# self.cont_buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,ENTRY]],EXIT,self.risk/2,"Break Up contituation",0,1,LONG,self.ppro_out)
+			# 	# log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),0,1)
 
-				self.add_initial_triggers(self.transitional_trigger)
-				#self.add_initial_triggers(self.cont_buyTrigger)
+			# 	self.add_initial_triggers(self.transitional_trigger)
+			# 	#self.add_initial_triggers(self.cont_buyTrigger)
 				self.restart()
+			else:
+				self.tradingplan.mark_algo_status(DONE)
 
 		elif self.sellTrigger.get_trigger_state()==False:
 			self.buyTrigger.deactivate()
 
 			if not self.sellTrigger.pre_deploying_check():
 				self.sellTrigger.total_reset()
-			else:
-				self.transitional_trigger = AbstractTrigger("transition to below pH.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],0,1,"REACTIVATE")
-				self.sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",self.timer,self.repeat,SHORT,self.ppro_out)
-				self.transitional_trigger.add_next_trigger(self.sellTrigger)
+			# else:
+			# 	self.transitional_trigger = AbstractTrigger("transition to below pH.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],0,1,"REACTIVATE")
+			# 	self.sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",self.timer,self.repeat,SHORT,self.ppro_out)
+			# 	self.transitional_trigger.add_next_trigger(self.sellTrigger)
 
+			# 	# self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
+			# 	# self.symbol.data[ENTRY] = self.symbol.data[LOW]
 
-				# self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
-				# self.symbol.data[ENTRY] = self.symbol.data[LOW]
+			# 	# self.cont_sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,ENTRY]],EXIT,self.risk/2,"break down contituation",0,1,SHORT,self.ppro_out)
+			# 	# log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),0,1)
 
-				# self.cont_sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,ENTRY]],EXIT,self.risk/2,"break down contituation",0,1,SHORT,self.ppro_out)
-				# log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),0,1)
-
-				self.add_initial_triggers(self.transitional_trigger)
-				#self.add_initial_triggers(self.cont_sellTrigger)
+			# 	self.add_initial_triggers(self.transitional_trigger)
+			# 	#self.add_initial_triggers(self.cont_sellTrigger)
 				self.restart()
+			else:
+				self.tradingplan.mark_algo_status(DONE)
 
 
 class Bullish(EntryStrategy):
