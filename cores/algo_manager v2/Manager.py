@@ -252,7 +252,7 @@ class Manager:
 				self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats)  #register in Symbol.
 
 				self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
-				self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INCREMENTAL2,NONE,risk,self.pipe_ppro_out,TEST_MODE)
+				#self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INCREMENTAL2,NONE,risk,self.pipe_ppro_out,TEST_MODE)
 
 				#register in ppro
 				self.pipe_ppro_out.send(["Register",symbol])
@@ -261,6 +261,8 @@ class Manager:
 				if len(data)>6:
 					status = data[6]
 					mana = data[7]
+					self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,NONE,risk,self.pipe_ppro_out,0,TEST_MODE)
+
 					self.tradingplan[symbol].tkvars[MANAGEMENTPLAN].set(mana)
 					#self.tradingplan[symbol].tkvars[ENTRYPLAN].set(entry_plan)
 					self.tradingplan[symbol].tkvars[ENTYPE].set(INSTANT)
@@ -269,11 +271,12 @@ class Manager:
 					if status =="deploy":
 						self.tradingplan[symbol].deploy()
 				else:
+					self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,NONE,risk,self.pipe_ppro_out,1,TEST_MODE)
 					self.ui.create_new_entry(self.tradingplan[symbol])
 			else:
 				log_print("symbols already exists, modifying current parameter.")
 		except Exception as e:
-			log_print("adding new tradingplan problem",e)
+			log_print("adding new tradingplan problem",e,data)
 	def timer(self):
 
 		#570  34200
