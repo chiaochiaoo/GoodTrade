@@ -12,7 +12,7 @@ import threading
 
 class TradingPlan:
 
-	def __init__(self,symbol:Symbol,entry_plan=None,entry_type=None,manage_plan=None,risk=None,ppro_out=None,TEST_MODE=False):
+	def __init__(self,symbol:Symbol,entry_plan=None,entry_type=None,manage_plan=None,risk=None,ppro_out=None,default_reload=0,TEST_MODE=False):
 
 		self.symbol = symbol
 
@@ -26,6 +26,8 @@ class TradingPlan:
 		self.entry_plan = None
 		self.entry_type = None
 		self.management_plan = None
+
+		self.default_reload = default_reload
 
 		self.ppro_out = ppro_out
 
@@ -75,7 +77,7 @@ class TradingPlan:
 		#default values.
 		self.tkvars[SELECTED].set(False)
 		self.tkvars[RELOAD].set(False)
-		self.data[RELOAD_TIMES]=1
+		self.data[RELOAD_TIMES]=self.default_reload
 		#Non String, Non Numeric Value
 
 		#Set some default value
