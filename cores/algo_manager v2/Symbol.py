@@ -131,6 +131,8 @@ class Symbol:
 				
 
 				#print(ts,self.data[BID],self.data[ASK],self.data[RESISTENCE],self.data[SUPPORT],self.data[HIGH],self.data[LOW])
+				if pos ==PENDING:
+					self.set_mind("REGISTERED",VERYLIGHTGREEN)
 
 				if AR==True and pos==PENDING and ts<34200:
 					if ask>self.data[RESISTENCE]:
@@ -161,7 +163,7 @@ class Symbol:
 				self.data[ASK] = ask
 				self.data[TIMESTAMP] = ts
 
-				self.false_range_detection(bid,ask,ts)
+				#self.false_range_detection(bid,ask,ts)
 
 				#print(self.data)
 				#notify trading plan that price has changed. 
