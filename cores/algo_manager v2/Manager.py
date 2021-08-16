@@ -276,7 +276,9 @@ class Manager:
 			else:
 				log_print("symbols already exists, modifying current parameter.")
 		except Exception as e:
-			log_print("adding new tradingplan problem",e,data)
+			log_print("adding new tradingplan problem",data)
+			PrintException("adding new tradingplan problem"+" Updating price error :")
+			
 	def timer(self):
 
 		#570  34200
