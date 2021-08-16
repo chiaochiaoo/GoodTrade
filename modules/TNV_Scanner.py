@@ -274,7 +274,7 @@ class Open_Reversal():
 		risk = risk_.get()
 
 		if risk>0:
-			info = ["New order",["BreakAny",symbol,support,resistence,risk,{},"deploy","Fib only"]]
+			info = ["New order",["BreakAny",symbol,support,resistence,risk,{},"deploy","EMA strategy"]]
 			self.tnv_scanner.send_algo(info)
 		
 	def algo_pannel(self):
