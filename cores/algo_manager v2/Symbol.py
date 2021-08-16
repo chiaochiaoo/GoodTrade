@@ -2,6 +2,8 @@ from constant import *
 import tkinter as tk
 #from Triggers import *
 from Util_functions import *
+
+
 class Symbol:
 
 	#Symbol class tracks every data related to the symbol. Output it in a dictionary form.
@@ -79,12 +81,14 @@ class Symbol:
 
 	def set_mind(self,str,color=DEFAULT):
 
-		if self.mind==None:
-			self.set_mind_object()
-		if self.mind!=None:
-			self.mind.set(str)
-			self.mind_label["background"]=color
-
+		try:
+			if self.mind==None:
+				self.set_mind_object()
+			if self.mind!=None and self.mind_label !=None:
+				self.mind.set(str)
+				self.mind_label["background"]=color
+		except:
+			pass
 
 	def false_range_detection(self,bid,ask,ts):
 
@@ -168,8 +172,8 @@ class Symbol:
 				#print(self.data)
 				#notify trading plan that price has changed. 
 
-		except Exception as e:
-			log_print(self.get_name(),"Updating price error :",e)
+		except:
+			PrintException(self.get_name()+" Updating price error :")
 
 	def set_phigh(self,v):
 		self.data[PREMARKETHIGH]=v
