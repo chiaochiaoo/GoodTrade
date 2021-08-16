@@ -250,6 +250,8 @@ class Manager:
 			if symbol not in self.symbols:
 
 				self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats)  #register in Symbol.
+
+				self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
 				self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INCREMENTAL2,NONE,risk,self.pipe_ppro_out,TEST_MODE)
 
 				#register in ppro
