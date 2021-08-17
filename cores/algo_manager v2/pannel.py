@@ -33,8 +33,10 @@ class pannel:
 		canvas.config(scrollregion=frame.bbox()) 
 		
 	def label_default_configure(self,label):
+
 		label.configure(activebackground="#f9f9f9")
 		label.configure(activeforeground="black")
+
 		label.configure(background="#d9d9d9")
 		label.configure(disabledforeground="#a3a3a3")
 		label.configure(relief="ridge")
@@ -99,3 +101,34 @@ def timestamp_seconds(s):
 		return 0
 
 #print(timestamp_seconds("13:23:46"))
+
+"""
+		try:
+			label.configure(activebackground="#f9f9f9")
+		except:
+			pass
+		try:
+			label.configure(background="#d9d9d9")
+		except:
+			pass
+		try:
+			label.configure(disabledforeground="#a3a3a3")
+		except:
+			pass
+		try:
+			label.configure(relief="ridge")
+		except:
+			pass
+		try:
+			label.configure(foreground="#000000")
+		except:
+			pass
+		try:
+			label.configure(highlightbackground="#d9d9d9")
+		except:
+			pass
+		try:
+			label.configure(highlightcolor="black")
+		except:
+			pass
+"""

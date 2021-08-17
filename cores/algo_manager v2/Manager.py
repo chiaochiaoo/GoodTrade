@@ -217,10 +217,6 @@ class Manager:
 		self.manage_lock = 0
 
 		self.ui = UI(root,self)
-		#self.add_new_tradingplan("AAPL")
-		#self.add_new_tradingplan("SDS")
-
-		#self.add_new_tradingplan(['Break Any', 'SPY.AM', 10.0, 12.0, 5.0, {'ATR': 3.6, 'OHavg': 1.551, 'OHstd': 1.556, 'OLavg': 1.623, 'OLstd': 1.445}])
 
 		good = threading.Thread(target=self.goodtrade_in, daemon=True)
 		good.start()
@@ -249,36 +245,41 @@ class Manager:
 		try:
 			if symbol not in self.symbols:
 
-				self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats)  #register in Symbol.
+				if self.ui.algo_count_number.get()<50:
+					#print(symbol,self.ui.algo_count_number.get())
+					self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats)  #register in Symbol.
 
-				self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
-				#self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INCREMENTAL2,NONE,risk,self.pipe_ppro_out,TEST_MODE)
+					self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
+					#self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INCREMENTAL2,NONE,risk,self.pipe_ppro_out,TEST_MODE)
 
-				#register in ppro
-				self.pipe_ppro_out.send(["Register",symbol])
-				self.symbols.append(symbol)
-				#append it to, UI.
-				if len(data)>6:
-					status = data[6]
-					mana = data[7]
-					self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,NONE,risk,self.pipe_ppro_out,0,TEST_MODE)
+					#register in ppro
+					self.pipe_ppro_out.send(["Register",symbol])
+					self.symbols.append(symbol)
+					#append it to, UI.
+					if len(data)>6:
+						status = data[6]
+						mana = data[7]
+						self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,NONE,risk,self.pipe_ppro_out,0,TEST_MODE)
 
-					self.tradingplan[symbol].tkvars[MANAGEMENTPLAN].set(mana)
-					#self.tradingplan[symbol].tkvars[ENTRYPLAN].set(entry_plan)
-					self.tradingplan[symbol].tkvars[ENTYPE].set(INSTANT)
+						self.tradingplan[symbol].tkvars[MANAGEMENTPLAN].set(mana)
+						#self.tradingplan[symbol].tkvars[ENTRYPLAN].set(entry_plan)
+						self.tradingplan[symbol].tkvars[ENTYPE].set(INSTANT)
 
-					self.ui.create_new_entry_system(self.tradingplan[symbol])
-					if status =="deploy":
-						self.tradingplan[symbol].deploy()
+						self.ui.create_new_entry(self.tradingplan[symbol])
+						if status =="deploy":
+							self.tradingplan[symbol].deploy()
+					else:
+						self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,NONE,risk,self.pipe_ppro_out,1,TEST_MODE)
+						self.ui.create_new_entry(self.tradingplan[symbol])
+
 				else:
-					self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,NONE,risk,self.pipe_ppro_out,1,TEST_MODE)
-					self.ui.create_new_entry(self.tradingplan[symbol])
+					log_print("System at full capacity.")
 			else:
 				log_print("symbols already exists, modifying current parameter.")
 		except Exception as e:
 			log_print("adding new tradingplan problem",data)
-			PrintException("adding new tradingplan problem"+" Updating price error :")
-			
+			PrintException("adding new tradingplan problem")
+
 	def timer(self):
 
 		#570  34200
@@ -461,6 +462,11 @@ class Manager:
 			if self.ui.all_reload_b.get()==1:
 				d.data[RELOAD_TIMES] = reloa
 			d.adjusting_risk()
+			d.update_displays()
+
+	def deselect_all(self):
+		for d in self.tradingplan.values():
+			d.tkvars[SELECTED].set(False)
 
 	def set_selected_tp(self):
 
@@ -477,6 +483,9 @@ class Manager:
 				d.tkvars[MANAGEMENTPLAN].set(managment)
 				d.tkvars[TIMER].set(timer)
 				d.data[RELOAD_TIMES] = reloa
+
+				d.adjusting_risk()
+				d.update_displays()
 	# def terminateGT(self):
 
 	# 	if self.termination:
