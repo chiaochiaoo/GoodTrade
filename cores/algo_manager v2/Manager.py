@@ -262,7 +262,6 @@ class Manager:
 						self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,NONE,risk,self.pipe_ppro_out,0,TEST_MODE)
 
 						self.tradingplan[symbol].tkvars[MANAGEMENTPLAN].set(mana)
-						#self.tradingplan[symbol].tkvars[ENTRYPLAN].set(entry_plan)
 						self.tradingplan[symbol].tkvars[ENTYPE].set(INSTANT)
 
 						self.ui.create_new_entry(self.tradingplan[symbol])
