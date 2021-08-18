@@ -195,7 +195,7 @@ class util_client:
 					else:
 						print("unkown server package:",d)
 			except Exception as e:
-				print("Util receive:",e)
+				print("Util receive:",e,d)
 
 def util_comms(ulti_response): #connects to server for db, nt, and finviz. 
 

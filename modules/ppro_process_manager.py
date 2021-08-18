@@ -566,13 +566,17 @@ def evaluator(val,mean,std):
 
 	if val>mean:
 
-		coefficient=(val-mean)/std
+		if std!=0:
+			coefficient=(val-mean)/std
 
-		return round(1+coefficient,1)
+			return round(1+coefficient,1)
+		else:
+			return 0
 	else:
-
-		return round(val/mean,1)
-
+		if mean!=0:
+			return round(val/mean,1)
+		else:
+			return 0
 
 def historical_eval(symbol):
 
