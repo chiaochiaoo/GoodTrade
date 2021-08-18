@@ -275,17 +275,21 @@ class Open_Reversal():
 
 		if risk>0:
 			info = ["New order",["BreakAny",symbol,support,resistence,risk,{},"deploy","EMA strategy"]]
+			#print("sending",info)
 			self.tnv_scanner.send_algo(info)
 
-	def send_algos(self,lst):
+	def send_group_algos(self,lst):
 
 		risk = self.algo_risk.get()
 
+		#print("HELLO.",lst)
+		order = ["New order"]
 		if risk>0:
-			info = ["New order"]
-			for i in range(lst):
-				info.append(["BreakAny",lst["symbol"],lst["support"],lst["resistence"],risk,{},"deploy","EMA strategy"])
-			self.tnv_scanner.send_algo(info)
+			for i in range(len(lst)):
+				#print(lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"])
+				order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","EMA strategy"])
+
+			self.tnv_scanner.send_algo(order)
 
 	def algo_pannel(self):
 
@@ -349,7 +353,7 @@ class Open_Reversal():
 		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
 
 		now = datetime.now()
-		ts = now.hour*60+now.minute-3
+		ts = now.hour*60+now.minute-60
 
 		df = data
 
@@ -452,7 +456,8 @@ class Open_Reversal():
 			# 	print("TNV scanner construction open reversal:",e)
 
 			if len(send_algo)>0:
-				self.send_algos(send_algos)
+				self.send_group_algos(send_algo)
+
 class Premarket_pick():
 	def __init__(self,root,NT):
 		self.buttons = []
