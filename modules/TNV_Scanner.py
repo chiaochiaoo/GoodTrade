@@ -268,15 +268,25 @@ class Open_Reversal():
 		self.l+=1
 		self.create_entry()
 
-	def send_algo(self,symbol,support,resistence,risk_):
+	def send_algo(self,symbol,support,resistence):
 
 		#self.entries[entry][8]["command"]= lambda symbol=rank,side=side,open_=row['open'],stop_=rscore,risk_=self.algo_risk:self.send_algo(self,symbol,side,open_,stop_,risk_)
-		risk = risk_.get()
+		risk = self.algo_risk.get()
 
 		if risk>0:
 			info = ["New order",["BreakAny",symbol,support,resistence,risk,{},"deploy","EMA strategy"]]
 			self.tnv_scanner.send_algo(info)
-		
+
+	def send_algos(self,lst):
+
+		risk = self.algo_risk.get()
+
+		if risk>0:
+			info = ["New order"]
+			for i in range(lst):
+				info.append(["BreakAny",lst["symbol"],lst["support"],lst["resistence"],risk,{},"deploy","EMA strategy"])
+			self.tnv_scanner.send_algo(info)
+
 	def algo_pannel(self):
 
 		row = 1
@@ -341,16 +351,14 @@ class Open_Reversal():
 		now = datetime.now()
 		ts = now.hour*60+now.minute-3
 
-		#TEST
-		#ts = 660
-		#print(ts)
 		df = data
+
 		#timestamp = data[1]
-
 		#self.NT_stat["text"] = "Last update: "+timestamp
-
 		#df.to_csv("tttt.csv")
 		entry = 0
+
+		send_algo=[]
 
 		if len(data)>1:
 			if 1:
@@ -390,7 +398,6 @@ class Open_Reversal():
 								self.entries[entry][i]["background"] = "LIGHTGREEN"
 								self.entries[entry][8].grid()
 
-								#def send_algo(self,symbol,side,open_,stop_,risk_)
 								if side == "UP":
 									support = row['low']
 									resistence = row['open']
@@ -398,12 +405,22 @@ class Open_Reversal():
 									support = row['open']
 									resistence = row['high']
 
-								self.entries[entry][8]["command"]= lambda symbol=rank,support=support,resistence=resistence,risk_=self.algo_risk:self.send_algo(symbol,support,resistence,risk_)
+								self.entries[entry][8]["command"]= lambda symbol=rank,support=support,resistence=resistence:self.send_algo(symbol,support,resistence)
 
 								if self.algo_activate.get()==1:
 									if rank not in self.algo_placed:
-										self.send_algo(rank,support,resistence,self.algo_risk)
+
+										#self.send_algo(rank,support,resistence,self.algo_risk)
 										self.algo_placed.append(rank)
+
+										order = {}
+
+										order["symbol"] = rank
+										order["support"] = support
+										order["resistence"] = resistence
+										send_algo.append(order)
+
+										#print(rank,self.algo_placed)
 										
 							if i == ts_location:
 								self.entries[entry][i]["text"] = ts_to_min(lst[i])
@@ -433,6 +450,9 @@ class Open_Reversal():
 				df.to_csv(self.file)
 			# except Exception as e:
 			# 	print("TNV scanner construction open reversal:",e)
+
+			if len(send_algo)>0:
+				self.send_algos(send_algos)
 class Premarket_pick():
 	def __init__(self,root,NT):
 		self.buttons = []
