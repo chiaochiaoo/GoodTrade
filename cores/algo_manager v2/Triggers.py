@@ -855,9 +855,9 @@ class FibonacciManager(AbstractTrigger):
 	def check_conditions(self):
 
 		if self.tradingplan.data[POSITION] == LONG:
-			self.conditions = [[SYMBOL_DATA,ASK,">",TP_DATA,FIBCURRENT_MAX]]
+			self.conditions = [[SYMBOL_DATA,ASK,">",TP_DATA,FIBCURRENT_MAX],[SYMBOL_DATA,TIMESTAMP,">",SYMBOL_DATA,TRADE_TIMESTAMP]]
 		elif self.tradingplan.data[POSITION] == SHORT:
-			self.conditions = [[SYMBOL_DATA,BID,"<",TP_DATA,FIBCURRENT_MAX]]
+			self.conditions = [[SYMBOL_DATA,BID,"<",TP_DATA,FIBCURRENT_MAX],[SYMBOL_DATA,TIMESTAMP,">",SYMBOL_DATA,TRADE_TIMESTAMP]]
 
 		#print(self.conditions)
 		#if self.tradingplan.data[POSITION]!="" and self.tradingplan.data[CURRENT_SHARE]>0:

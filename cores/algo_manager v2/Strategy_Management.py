@@ -291,6 +291,8 @@ class FibonacciOnly(ManagementStrategy):
 
 		if self.shares_loaded:
 
+			self.symbol.data[TRADE_TIMESTAMP] = self.symbol.data[TIMESTAMP]+180
+
 			super().on_start()
 
 			""" send out the limit orders """
@@ -889,7 +891,6 @@ class ExpectedMomentum(ManagementStrategy):
 				total_orders[i][orders[i][j]] = share_distribution[orders[i][j]]
 			
 		self.total_orders = total_orders
-
 
 
 
