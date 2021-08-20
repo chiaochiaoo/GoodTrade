@@ -61,7 +61,7 @@ class Symbol:
 				self.data[key]=value
 				self.tkvars[key].set(value)
 				
-		print(self.data)
+		#print(self.data)
 		#print(dic)
 #
 	def toggle_autorange(self,Bool):
