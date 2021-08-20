@@ -658,6 +658,8 @@ class TradingPlan:
 				self.tkvars[MANAGEMENTPLAN].set(FIBO)
 				self.set_ManagementStrategy(FibonacciOnly(self.symbol,self))
 
+		elif manage_plan == HOLDTILCLOSE:
+			self.set_ManagementStrategy(HoldTilClose(self.symbol,self))
 		elif manage_plan == EMASTRAT:
 			self.set_ManagementStrategy(EMAStrategy(self.symbol,self))
 	def set_EntryStrategy(self,entry_plan:Strategy):

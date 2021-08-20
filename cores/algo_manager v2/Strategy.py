@@ -568,6 +568,7 @@ class Dipbuy(EntryStrategy):
 			self.buyreversalTrigger.total_reset()
 
 
+
 class Fadeany(EntryStrategy):
 	def __init__(self,timer,repeat,symbol,tradingplan):
 		self.timer = timer

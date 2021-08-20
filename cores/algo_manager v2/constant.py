@@ -10,8 +10,12 @@ OPEN="open"
 HIGH="high"
 LOW="low" 
 TIMESTAMP="timestamp"
+TRADE_TIMESTAMP = "TRADE_timestamp"
 PREMARKETHIGH="phigh"
 PREMARKETLOW="plow"
+
+
+
 
 
 #STATS
@@ -146,7 +150,7 @@ THREE_TARGETS = "Three tgts "
 SMARTTRAIL =  "SmartTrail"
 ANCARTMETHOD =  "AC METHOD"
 ONETOTWORISKREWARD = "1:2 Exprmntl"
-HOLDTILCLOSE = "Hold Until Close"
+HOLDTILCLOSE = "HTC"
 FIBONO = "FibAdjstd"
 FIBO = "Fib only"
 EMASTRAT =  "EMA strategy"

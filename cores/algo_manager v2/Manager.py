@@ -572,7 +572,7 @@ class Tester:
 
 		now = datetime.now()
 
-		self.sec =  34180
+		self.sec =  now.hour*3600 + now.minute*60 + now.second
 		print(self.sec)
 		self.bid=0
 		self.ask=0
@@ -880,7 +880,7 @@ class Tester:
 				update_["EMAcount"]=l1data[symbol]["internal"]["EMA_count"]
 				pipe.send(["order update_m",l1data[symbol],update_])
 
-				print(l1data[symbol])
+				#print(l1data[symbol])
 				# writer.writerow([symbol,mili_ts,bid,ask,\
 				# 	l1data[symbol]["internal"]["EMA5H"],\
 				# 	l1data[symbol]["internal"]["EMA5L"],\
