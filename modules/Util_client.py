@@ -202,7 +202,7 @@ def util_comms(ulti_response): #connects to server for db, nt, and finviz.
 	k=""
 	while True:
 
-		HOST = '10.29.10.132'  # The server's hostname or IP address
+		HOST = '10.29.10.133'  # The server's hostname or IP address
 		PORT = 65424       # The port used by the server
 
 
