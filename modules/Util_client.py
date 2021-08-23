@@ -236,25 +236,38 @@ def algo_server(ulti_response):
 
 			data = []
 			while True:
+
 				try:
-					part = s.recv(2048)
+					s.sendall(pickle.dumps(['connection check']))
 				except:
 					connection = False
 					break
-				#if not part: break
-				print("rec")
-				data.append(part)
-				if len(part) < 2048:
-					#try to assemble it, if successful.jump. else, get more. 
-					try:
-						k = pickle.loads(b"".join(data))
-						#k = pd.read_pickle(b"".join(data))
-						break
-					except:
-						pass
-			time_ = datetime.now().strftime("%H:%M:%S : ") 
-			print(time_,"Algo update")
-			ulti_response.send(k)
+
+				ready = select.select([s], [], [])
+				if ready[0]:
+					data = []
+					while True:
+
+						try:
+							part = s.recv(2048)
+						except:
+							connection = False
+							break
+
+						data.append(part)
+						if len(part) < 2048:
+							
+							try:
+								k = pickle.loads(b"".join(data))
+								break
+							except:
+								pass
+					#print("received:",k)
+					time_ = datetime.now().strftime("%H:%M:%S : ") 
+					print(time_,"Algo update")
+					ulti_response.send(k)
+
+
 				#ulti_response.send(["Util init"])
 		print("Algo Server disconnected")
 
