@@ -253,7 +253,6 @@ def algo_server(ulti_response):
 						except:
 							connection = False
 							break
-						print(data)
 
 						data.append(part)
 						if len(part) < 2048:
