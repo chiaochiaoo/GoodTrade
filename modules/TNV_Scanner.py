@@ -274,7 +274,7 @@ class Open_Reversal():
 		risk = self.algo_risk.get()
 
 		if risk>0:
-			info = ["New order",["BreakAny",symbol,support,resistence,risk,{},"deploy","1:2 Exprmntl"]]
+			info = ["New order",["BreakAny",symbol,support,resistence,risk,{},"deploy","Fib only"]]
 			#print("sending",info)
 			self.tnv_scanner.send_algo(info)
 
@@ -287,7 +287,7 @@ class Open_Reversal():
 		if risk>0:
 			for i in range(len(lst)):
 				#print(lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"])
-				order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","1:2 Exprmntl"])
+				order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","Fib only"])
 
 			self.tnv_scanner.send_algo(order)
 
