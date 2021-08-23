@@ -396,6 +396,9 @@ def utils(algo_manager_receive_comm,util_response):
 		algo_comm = threading.Thread(target=algo_manager_commlink,args=(algo_manager_receive_comm,util_response,),daemon=True)
 		algo_comm.start()
 
+		receiver = threading.Thread(target=algo_server,args=(util_response,),daemon=True)
+		receiver.start()
+
 		util_comms(util_response)
 if __name__ == '__main__':
 

@@ -7,6 +7,8 @@ import socket
 import pickle
 import select
 from datetime import date
+from datetime import datetime
+
 import os.path
 import json
 #from Symbol_data_manager import *
@@ -196,6 +198,64 @@ class util_client:
 						print("unkown server package:",d)
 			except Exception as e:
 				print("Util receive:",e,d)
+
+
+
+# def server_group(ulti_response):
+# 	receiver = threading.Thread(target=algo_server,args=(ulti_response,) daemon=True)
+# 	receiver.start()
+
+# 	util_comms(ulti_response)
+
+def algo_server(ulti_response):
+
+	k=""
+	while True:
+
+		HOST = '10.29.10.133'  # The server's hostname or IP address
+		PORT = 65425       # The port used by the server
+
+		print("Trying to connect to the Algo server")
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		connected = False
+		while not connected:
+			try:
+				s.connect((HOST, PORT))
+				connected = True
+			except:
+				#pipe.send(["msg","Cannot connected. Try again in 2 seconds."])
+				print("Cannot connect Algo server. Try again in 2 seconds.")
+				time.sleep(2)
+
+		connection = True
+
+		print("Algo server Connection Successful")
+
+		while connection:
+			print("Algo server: taking data")
+
+			data = []
+			while True:
+				try:
+					part = s.recv(2048)
+				except:
+					connection = False
+					break
+				#if not part: break
+				data.append(part)
+				if len(part) < 2048:
+					#try to assemble it, if successful.jump. else, get more. 
+					try:
+						k = pickle.loads(b"".join(data))
+						#k = pd.read_pickle(b"".join(data))
+						break
+					except:
+						pass
+			time_ = datetime.now().strftime("%H:%M:%S : ") 
+			print(time_,"Algo update")
+			ulti_response.send(k)
+				#ulti_response.send(["Util init"])
+		print("Algo Server disconnected")
 
 def util_comms(ulti_response): #connects to server for db, nt, and finviz. 
 
