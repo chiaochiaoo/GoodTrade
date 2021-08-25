@@ -302,7 +302,6 @@ class Open_Reversal():
 		ttk.Entry(self.algo_frame, textvariable=self.algo_risk).grid(sticky="w",column=col+3,row=row)
 
 
-
 		row = 2
 		col = 1
 
@@ -343,6 +342,8 @@ class Open_Reversal():
 		ttk.Checkbutton(self.algo_frame, variable=self.listed_).grid(sticky="w",column=col+3,row=row)
 
 
+		algo_timer = self.hour.get()*60 + self.minute.get()
+		#print("algo time",algo_timer)
 
 	def create_entry(self):
 
@@ -370,7 +371,9 @@ class Open_Reversal():
 		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
 
 		now = datetime.now()
-		ts = now.hour*60+now.minute-2
+		ts = now.hour*60+now.minute 
+		
+		algo_timer = self.hour.get()*60 + self.minute.get()
 
 		df = data
 
@@ -415,7 +418,7 @@ class Open_Reversal():
 
 						for i in range(len(lst)):
 							
-							if lst[ts_location] >ts:
+							if lst[ts_location] >ts and lst[ts_location]>algo_timer:
 								self.entries[entry][i]["background"] = "LIGHTGREEN"
 								self.entries[entry][8].grid()
 
