@@ -371,7 +371,7 @@ class Open_Reversal():
 		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
 
 		now = datetime.now()
-		ts = now.hour*60+now.minute 
+		ts = now.hour*60+now.minute
 		
 		algo_timer = self.hour.get()*60 + self.minute.get()
 
@@ -418,7 +418,7 @@ class Open_Reversal():
 
 						for i in range(len(lst)):
 							
-							if lst[ts_location] >ts and lst[ts_location]>algo_timer:
+							if lst[ts_location] >=ts and lst[ts_location]>algo_timer:
 								self.entries[entry][i]["background"] = "LIGHTGREEN"
 								self.entries[entry][8].grid()
 
@@ -660,7 +660,7 @@ class Open_Break():
 		df = data
 
 
-		df.to_csv("open_break_out.csv")
+		#df.to_csv("open_break_out.csv")
 		entry = 0
 
 		try:
