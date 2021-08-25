@@ -302,9 +302,24 @@ class Open_Reversal():
 		ttk.Entry(self.algo_frame, textvariable=self.algo_risk).grid(sticky="w",column=col+3,row=row)
 
 
+
+		row = 2
+		col = 1
+
+		self.hour = tk.IntVar(value=9)
+		self.minute = tk.IntVar(value=30)
+
+		ttk.Label(self.algo_frame, text="Hour:").grid(sticky="w",column=col,row=row)
+		ttk.Entry(self.algo_frame, textvariable=self.hour).grid(sticky="w",column=col+1,row=row)
+
+		ttk.Label(self.algo_frame, text="Minute").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(self.algo_frame, textvariable=self.minute).grid(sticky="w",column=col+3,row=row)
+
+
 		self.rel_v = tk.DoubleVar(value=0)
 		self.re_score = tk.DoubleVar(value=0)
-		row = 2
+
+		row = 3
 		col = 1
 		ttk.Label(self.algo_frame, text="Rel V>=").grid(sticky="w",column=col,row=row)
 		ttk.Entry(self.algo_frame, textvariable=self.rel_v).grid(sticky="w",column=col+1,row=row)
@@ -315,8 +330,10 @@ class Open_Reversal():
 		self.side_ = tk.StringVar(value='x')
 		self.listed_ = tk.BooleanVar(value=False)
 		
-		row = 3
+		row = 4
 		col = 1
+
+
 		ttk.Label(self.algo_frame, text="Side:").grid(sticky="w",column=col,row=row)
 		l={"Up","Down","Any","Any"}
 		ttk.OptionMenu(self.algo_frame, self.side_, *sorted(l)).grid(sticky="w",column=col+1,row=row)
