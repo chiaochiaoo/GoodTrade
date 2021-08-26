@@ -418,7 +418,7 @@ class Open_Reversal():
 
 						for i in range(len(lst)):
 							
-							if lst[ts_location] >=ts and lst[ts_location]>algo_timer:
+							if lst[ts_location] >=ts and lst[ts_location]>=algo_timer:
 								self.entries[entry][i]["background"] = "LIGHTGREEN"
 								self.entries[entry][8].grid()
 
