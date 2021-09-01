@@ -2,8 +2,11 @@ import time
 import random
 import subprocess
 import datetime
-from . import Meta_extractor_lib
-from . import Spread_extractor_lib
+# from . import 
+# from . import 
+
+from modules.Meta_extractor_lib import *
+from modules.Spread_extractor_lib import *
 import pandas as pd
 import numpy as np
 import os
@@ -192,6 +195,7 @@ def fetch_volume(symbols):
 if not os.path.exists("data"):
     os.mkdir("data")
 
+#download(symbols,45,1)
 # if len(sys.argv)>1:
 #     if sys.argv[1] == "a":
 #         auto_run()

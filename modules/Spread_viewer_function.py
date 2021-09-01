@@ -1,6 +1,10 @@
 import pandas as pd
 import numpy as np
-from . import database as db
+
+#from . import database as db
+#import database as db
+
+from  modules.database import *
 import json
 import pandas as pd
 from datetime import datetime
@@ -148,7 +152,7 @@ def find_info(symbols):
 
 	#Download the data.
 
-	db.download(symbols,45,1)
+	download(symbols,45,1)
 
 	s= symbols
 
@@ -165,6 +169,7 @@ def find_info(symbols):
 	m_dis=[]
 	for day in days:
 		gap = p.loc[(p["day_x"]==day)]["price_gap"]
+		print(gap)
 		if len(gap)>1:
 			mi,ma=change_min_max(gap)
 			m_dis.append(mi)
@@ -246,7 +251,7 @@ def fetch_data_yahoo(symbol):
     #print(symbol+"missing data downloaded",ts,op)
     return ts,op
 
-#find_info(["SPY.AM","QQQ.NQ"])
+#find_info(["SPY","QQQ"])
 # symbols=["SPY.AM","QQQ.NQ"]
 # m_dis,w_dis,roc1l,roc5l,roc15l = find_info(symbols)
 
