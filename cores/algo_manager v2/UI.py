@@ -140,7 +140,7 @@ class UI(pannel):
 		self.ppro = ttk.Label(self.comms, text="Ppro out:")
 		self.ppro.grid(sticky="w",column=1,row=3,padx=10)
 		self.ppro_status_out = ttk.Label(self.comms, textvariable=self.ppro_out_status)
-		self.ppro_status_out.grid(sticky="w",column=3,row=2)
+		self.ppro_status_out.grid(sticky="w",column=2,row=3)
 
 
 		self.al = ttk.Label(self.comms, text="Algo count::")

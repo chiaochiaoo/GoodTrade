@@ -321,7 +321,7 @@ def init_driver(pipe_status):
 def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY. 
 
 
-	driver = init_driver()
+	driver = init_driver(pipe_status)
 	log_print("Orders output moudule online.")
 	request_str = ""
 	sucess_str= ""
@@ -422,7 +422,7 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 						sucessful = True
 					except Exception as e:
 						log_print(e,failure_str," driver restart")
-						driver = init_driver()
+						driver = init_driver(pipe_status)
 
 		except Exception as e:
 			log_print(e)
