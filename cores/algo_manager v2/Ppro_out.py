@@ -310,14 +310,15 @@ def init_driver():
 			#driver = webdriver.Chrome(ChromeDriverManager().install())
 			driver = webdriver.Chrome(PATH)
 			driver.minimize_window()
-
+			pipe_status.send(["ppro_out","Connected"])
 			return driver
 		except:
 			log_print("Driver init failed. restarting.")
+			pipe_status.send(["ppro_out","Disconnected"])
 			time.sleep(1)
 			pass
 
-def Ppro_out(pipe,port): #a sperate process. GLOBALLY. 
+def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY. 
 
 
 	driver = init_driver()

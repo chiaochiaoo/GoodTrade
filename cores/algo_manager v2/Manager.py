@@ -376,7 +376,7 @@ class Manager:
 
 			#log_print("Ppro in:",d)
 
-			if d[0] =="status":
+			if d[0] =="ppro_in":
 				
 				try:
 					self.ui.ppro_status.set(str(d[1]))
@@ -388,10 +388,22 @@ class Manager:
 				except Exception as e:
 					log_print(e)
 
-			if d[0] =="msg":
+			elif d[0] =="ppro_out":
+
+				try:
+					self.ui.ppro_out_status.set(str(d[1]))
+
+					if str(d[1])=="Connected":
+						self.ui.ppro_status_out["background"] = "#97FEA8"
+					else:
+						self.ui.ppro_status_out["background"] = "red"
+				except Exception as e:
+					log_print(e)
+
+			elif d[0] =="msg":
 				log_print(d[1])
 
-			if d[0] =="order confirm":
+			elif d[0] =="order confirm":
 
 				data = d[1]
 				symbol = data["symbol"]
@@ -405,7 +417,7 @@ class Manager:
 				#if TEST:
 					#log_print(self.tradingplan[symbol].data)
 
-			if d[0] =="order update":
+			elif d[0] =="order update":
 				data = d[1]
 				symbol = data["symbol"]
 				bid = data["bid"]
@@ -415,7 +427,7 @@ class Manager:
 				if symbol in self.tradingplan:
 					self.tradingplan[symbol].ppro_update_price(bid,ask,ts)
 
-			if d[0] =='order update_m':
+			elif d[0] =='order update_m':
 				data = d[1]
 				symbol = data["symbol"]
 				bid = data["bid"]
@@ -429,7 +441,7 @@ class Manager:
 					self.tradingplan[symbol].symbol.update_techindicators(techindicator)
 				### UPDATE THE EMAs. 
 
-			if d[0] =="order rejected":
+			elif d[0] =="order rejected":
 
 				if symbol in self.tradingplan:
 					self.tradingplan[symbol].ppro_order_rejection()
@@ -1001,7 +1013,7 @@ if __name__ == '__main__':
 
 	ppro_out, ppro_pipe_end2 = multiprocessing.Pipe()
 
-	ppro_out_manager = multiprocessing.Process(target=Ppro_out, args=(ppro_pipe_end2,port,),daemon=True)
+	ppro_out_manager = multiprocessing.Process(target=Ppro_out, args=(ppro_pipe_end2,port,ppro_pipe_end,),daemon=True)
 	ppro_out_manager.daemon=True
 
 

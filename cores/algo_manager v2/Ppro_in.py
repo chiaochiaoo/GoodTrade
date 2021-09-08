@@ -71,7 +71,7 @@ def ppro_connection_service(pipe,port):
 	state = False
 	while True:
 		if test_register():
-			pipe.send(["status","Connected"])
+			pipe.send(["ppro_in","Connected"])
 			if state == False:
 				log_print("Ppro connected. Registering OSTAT")
 				i = 3
@@ -84,7 +84,7 @@ def ppro_connection_service(pipe,port):
 						log_print("OSTAT registeration failed")
 					i-=1 
 		else:
-			pipe.send(["status","Disconnected"])
+			pipe.send(["ppro_in","Disconnected"])
 			state = False
 			
 def test_register():

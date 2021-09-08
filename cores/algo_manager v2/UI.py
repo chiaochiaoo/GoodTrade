@@ -73,10 +73,10 @@ class UI(pannel):
 		self.init_HQ_pannel()
 
 		self.config = ttk.LabelFrame(self.root,text="Config") 
-		self.config.place(x=10,y=140,height=300,width=210)
+		self.config.place(x=10,y=160,height=300,width=210)
 
 		self.cmd = ttk.LabelFrame(self.root,text="Command") 
-		self.cmd.place(x=10,y=380,height=500,width=210)
+		self.cmd.place(x=10,y=400,height=500,width=210)
 
 
 		self.init_config_pannel()
@@ -115,6 +115,9 @@ class UI(pannel):
 		self.ppro_status = tk.StringVar()
 		self.ppro_status.set("")
 
+		self.ppro_out_status = tk.StringVar()
+		self.ppro_out_status.set("")
+
 		self.algo_count_number = tk.DoubleVar(value=0)
 		self.algo_number = 0
 
@@ -129,28 +132,34 @@ class UI(pannel):
 		self.main_status = ttk.Label(self.comms, textvariable=self.main_app_status)
 		self.main_status.grid(sticky="w",column=2,row=1)
 
-		self.ppro = ttk.Label(self.comms, text="Ppro:")
+		self.ppro = ttk.Label(self.comms, text="Ppro in:")
 		self.ppro.grid(sticky="w",column=1,row=2,padx=10)
 		self.ppro_status_ = ttk.Label(self.comms, textvariable=self.ppro_status)
 		self.ppro_status_.grid(sticky="w",column=2,row=2)
 
+		self.ppro = ttk.Label(self.comms, text="Ppro out:")
+		self.ppro.grid(sticky="w",column=1,row=3,padx=10)
+		self.ppro_status_out = ttk.Label(self.comms, textvariable=self.ppro_out_status)
+		self.ppro_status_out.grid(sticky="w",column=3,row=2)
+
+
 		self.al = ttk.Label(self.comms, text="Algo count::")
-		self.al.grid(sticky="w",column=1,row=3,padx=10)
+		self.al.grid(sticky="w",column=1,row=4,padx=10)
 		self.algo_count_ = ttk.Label(self.comms,  textvariable=self.algo_count_number)
-		self.algo_count_.grid(sticky="w",column=2,row=3,padx=10)
+		self.algo_count_.grid(sticky="w",column=2,row=4,padx=10)
 
 		self.timerc = ttk.Label(self.comms, text="Deploy in:")
-		self.timerc.grid(sticky="w",column=1,row=4,padx=10)
-		self.timersx = ttk.Label(self.comms,  textvariable=self.algo_timer_string)
-		self.timersx.grid(sticky="w",column=2,row=4,padx=10)
-
-		self.timerc = ttk.Label(self.comms, text="Close in:")
 		self.timerc.grid(sticky="w",column=1,row=5,padx=10)
-		self.timersx = ttk.Label(self.comms,  textvariable=self.algo_timer_close_string)
+		self.timersx = ttk.Label(self.comms,  textvariable=self.algo_timer_string)
 		self.timersx.grid(sticky="w",column=2,row=5,padx=10)
 
-		ttk.Label(self.comms, text="Risk timer:").grid(sticky="w",column=1,row=6,padx=10)
-		tk.Entry(self.comms,textvariable=self.risk_timer,width=5).grid(sticky="w",column=2,row=6,padx=10)
+		self.timerc = ttk.Label(self.comms, text="Close in:")
+		self.timerc.grid(sticky="w",column=1,row=6,padx=10)
+		self.timersx = ttk.Label(self.comms,  textvariable=self.algo_timer_close_string)
+		self.timersx.grid(sticky="w",column=2,row=6,padx=10)
+
+		ttk.Label(self.comms, text="Risk timer:").grid(sticky="w",column=1,row=7,padx=10)
+		tk.Entry(self.comms,textvariable=self.risk_timer,width=7).grid(sticky="w",column=2,row=7,padx=10)
 		# self.deconstruct = ttk.Button(self.comms, text="Terminate GT",command=self.manager.terminateGT)#,command=self.deploy_all_stoporders)
 		# self.deconstruct.grid(sticky="w",column=1,row=5)
 
