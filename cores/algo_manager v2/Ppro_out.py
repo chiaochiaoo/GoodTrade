@@ -301,7 +301,7 @@ def cancel_stoporder(id_):
 # 			log_print(e)
 
 
-def init_driver():
+def init_driver(pipe_status):
 
 	while True:
 		try:
