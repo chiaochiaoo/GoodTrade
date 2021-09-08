@@ -18,8 +18,10 @@ except ImportError:
 
 try:
 	from selenium import webdriver
+	#from webdriver_manager.chrome import ChromeDriverManager
 except ImportError:
 	import pip
+	#pip.main(['install', 'webdriver-manager'])
 	pip.main(['install', 'selenium'])
 	from selenium import webdriver
 
@@ -300,14 +302,26 @@ def cancel_stoporder(id_):
 
 
 def init_driver():
-	PATH = "sys/chromedriver.exe"
-	driver = webdriver.Chrome(PATH)
-	driver.minimize_window()
 
-	return driver
+	while True:
+		try:
+			PATH = "sys/chromedriver.exe"
+
+			#driver = webdriver.Chrome(ChromeDriverManager().install())
+			driver = webdriver.Chrome(PATH)
+			driver.minimize_window()
+
+			return driver
+		except:
+			log_print("Driver init failed. restarting.")
+			time.sleep(1)
+			pass
+
 def Ppro_out(pipe,port): #a sperate process. GLOBALLY. 
 
+
 	driver = init_driver()
+	log_print("Orders output moudule online.")
 	request_str = ""
 	sucess_str= ""
 	failure_str = ""
