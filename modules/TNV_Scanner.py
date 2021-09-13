@@ -47,7 +47,7 @@ class TNV_Scanner():
 		self.or_frame = tk.Canvas(self.TNV_TAB)
 		self.nh_frame = tk.Canvas(self.TNV_TAB)
 		self.nl_frame = tk.Canvas(self.TNV_TAB)
-		self.cp_frame = tk.Canvas(self.TNV_TAB)
+		self.trending_frame = tk.Canvas(self.TNV_TAB)
 
 
 		self.TNV_TAB.add(self.or_frame, text ='Open Reversal')
@@ -56,10 +56,10 @@ class TNV_Scanner():
 		self.TNV_TAB.add(self.nh_frame, text ='Near High')
 		self.TNV_TAB.add(self.nl_frame, text ='Near Low')
 
-		self.TNV_TAB.add(self.cp_frame, text ='Corey\'s Pick')
+		self.TNV_TAB.add(self.trending_frame, text ='Trending')
 
 		# self.breakout_frame = ttk.LabelFrame(self.root,text="Volatility Breakout")
-		# self.breakout_frame.place(x=0, rely=0.05, relheight=1, relwidth=0.95)
+		# self.breakout_frame.place(x=0, rely=0.05, relheight=1, relwidth=0.95) 
 
 		# self.reversal_frame = ttk.LabelFrame(self.root,text="Reversal")
 		# self.reversal_frame.place(x=0, rely=0.36, relheight=0.268, relwidth=0.95)
@@ -81,7 +81,7 @@ class TNV_Scanner():
 		self.open_reversal = Open_Reversal(self.or_frame,NT,self)
 		self.near_high = Near_high(self.nh_frame,NT)
 		self.near_low = Near_low(self.nl_frame,NT)
-		self.corey_pick = CoreysPick(self.cp_frame,NT)
+		self.trending = ADX(self.trending_frame,NT)
 		
 		
 		# item = pd.read_csv("test.csv",index_col=0)
@@ -110,7 +110,8 @@ class TNV_Scanner():
 				#item.to_csv("3.csv")
 			elif key =="near_high":
 				self.near_high.update_entry(item)
-
+			elif key =="adx":
+				self.trending.update_entry(item)
 class Just_break():
 	def __init__(self,root,NT):
 
@@ -119,7 +120,7 @@ class Just_break():
 		self.l = 1
 		self.labels_width = [9,6,5,5,5,5,6,6,6,6,6,6,8,6]
 		self.NT = NT
-		self.labels = ["Symbol","Sector","Rel.V","Side","Been","SO%","SC%","listed","Add"]
+		self.labels = ["Symbol","Sector","Rel.V","Side","Been","SO%","SC%","Rg eval","Vol eval","listed","Add"]
 		self.root = root
 		self.total_len = len(self.labels)
 		self.recreate_labels(self.root)
@@ -195,6 +196,9 @@ class Just_break():
 				so = row['reversal_score']
 				sc = row['SC']
 
+				tr =  row['tr_eval']
+				vol = row['vol_eval']
+
 				############ add since, and been to the thing #############
 				if rank in self.NT.nasdaq_trader_symbols_ranking:
 					listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
@@ -203,7 +207,7 @@ class Just_break():
 				#print(self.NT.nasdaq_trader_symbols)
 				if 1: #score>0:	
 
-					lst = [rank,sec,relv,side,span,so,sc]
+					lst = [rank,sec,relv,side,span,so,sc,tr,vol]
 
 					for i in range(len(lst)):
 						self.entries[entry][i]["text"] = lst[i]
@@ -439,6 +443,116 @@ class Near_low():
 		except Exception as e:
 			print("TNV scanner construction near low:",e)
 
+class ADX():
+	def __init__(self,root,NT):
+
+		self.buttons = []
+		self.entries = []
+		self.l = 1
+		self.labels_width = [9,6,5,5,8,5,6,6,6,6,6,6,8,6]
+		self.NT = NT
+		self.labels = ["Symbol","Sector","ADX","Rg.Score","Rel.V","SO%","SC%","listed","Add"]
+		#[rank,sec,relv,near,high,so,sc]
+		self.total_len = len(self.labels)
+		self.root = root
+		self.recreate_labels(self.root)
+
+	def recreate_labels(self,frame):
+
+		self.labels_position = {}
+		self.labels_position["Rank"]=0
+		self.labels_position["Symbol"]=1
+		self.labels_position["Market"]=2
+		self.labels_position["Price"]=3
+		self.labels_position["Since"]=4
+		self.labels_position["Been"]=5
+		self.labels_position["SC%"]=6
+		self.labels_position["SO%"]=7
+		self.labels_position["L5R%"]=8
+		self.labels_position["Status"]=9
+		self.labels_position["Add"]=10
+
+		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
+
+		self.status_code = {}
+		self.status_num = 0
+
+		for i in range(len(self.labels)): #Rows
+			self.b = tk.Button(self.root, text=self.labels[i],width=self.labels_width[i])#,command=self.rank
+			self.b.configure(activebackground="#f9f9f9")
+			self.b.configure(activeforeground="black")
+			self.b.configure(background="#d9d9d9")
+			self.b.configure(disabledforeground="#a3a3a3")
+			self.b.configure(relief="ridge")
+			self.b.configure(foreground="#000000")
+			self.b.configure(highlightbackground="#d9d9d9")
+			self.b.configure(highlightcolor="black")
+			self.b.grid(row=self.l, column=i)
+			self.buttons.append(self.b)
+
+		self.l+=1
+		self.create_entry()
+
+	def create_entry(self):
+
+		for k in range(0,50):
+
+			self.entries.append([])
+
+			for i in range(len(self.labels)): #Rows
+				self.b = tk.Label(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
+				self.b.grid(row=self.l, column=i)
+				self.entries[k].append(self.b)
+			self.l+=1
+
+	def update_entry(self,data):
+
+		#at most 8.
+		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
+
+		df = data
+
+
+		#df.to_csv("tttt.csv")
+		entry = 0
+
+		if 1:
+			for index, row in df.iterrows():
+				#print(row)
+				rank = index
+				sec = row['sector']
+				relv = row['rel vol']
+				near = row['rangescore']
+
+				adx = row['adx']
+				so = row['SO']
+				sc = row['SC']
+
+				############ add since, and been to the thing #############
+				if rank in self.NT.nasdaq_trader_symbols_ranking:
+					listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
+				else:
+					listed = "No"
+				#print(self.NT.nasdaq_trader_symbols)
+				if 1: #score>0:	
+
+					lst = [rank,sec,adx,near,relv,so,sc]
+
+					for i in range(len(lst)):
+						self.entries[entry][i]["text"] = lst[i]
+					entry+=1
+					if entry ==50:
+						break
+
+			while entry<50:
+				#print("ok")
+				for i in range(self.total_len):
+					self.entries[entry][i]["text"] = ""
+				entry+=1
+		# except Exception as e:
+		# 	print("TNV scanner construction near high:",e)
+
+
 class Open_Reversal():
 	def __init__(self,root,NT,TNV_scanner):
 
@@ -470,7 +584,7 @@ class Open_Reversal():
 		self.root = ttk.LabelFrame(self.root,text="")
 		self.root.place(x=0, rely=0.12, relheight=0.8, relwidth=1)
 
-		self.algo_pannel()
+		self.algo_pannel(self.algo_frame)
 				# self.breakout_frame = ttk.LabelFrame(self.root,text="Volatility Breakout")
 		# self.breakout_frame.place(x=0, rely=0.05, relheight=1, relwidth=0.95)
 
@@ -519,15 +633,15 @@ class Open_Reversal():
 
 			self.tnv_scanner.send_algo(order)
 
-	def algo_pannel(self):
+	def algo_pannel(self,frame):
 
 		row = 1
 		col = 1
-		ttk.Label(self.algo_frame, text="Algo:").grid(sticky="w",column=col,row=row)
-		ttk.Checkbutton(self.algo_frame, variable=self.algo_activate).grid(sticky="w",column=col+1,row=row)
+		ttk.Label(frame, text="Algo:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(frame, variable=self.algo_activate).grid(sticky="w",column=col+1,row=row)
 
-		ttk.Label(self.algo_frame, text="Risk:").grid(sticky="w",column=col+2,row=row)
-		ttk.Entry(self.algo_frame, textvariable=self.algo_risk).grid(sticky="w",column=col+3,row=row)
+		ttk.Label(frame, text="Risk:").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(frame, textvariable=self.algo_risk).grid(sticky="w",column=col+3,row=row)
 
 
 		row = 2
@@ -536,11 +650,11 @@ class Open_Reversal():
 		self.hour = tk.IntVar(value=9)
 		self.minute = tk.IntVar(value=30)
 
-		ttk.Label(self.algo_frame, text="Hour:").grid(sticky="w",column=col,row=row)
-		ttk.Entry(self.algo_frame, textvariable=self.hour).grid(sticky="w",column=col+1,row=row)
+		ttk.Label(frame, text="Hour:").grid(sticky="w",column=col,row=row)
+		ttk.Entry(frame, textvariable=self.hour).grid(sticky="w",column=col+1,row=row)
 
-		ttk.Label(self.algo_frame, text="Minute").grid(sticky="w",column=col+2,row=row)
-		ttk.Entry(self.algo_frame, textvariable=self.minute).grid(sticky="w",column=col+3,row=row)
+		ttk.Label(frame, text="Minute").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(frame, textvariable=self.minute).grid(sticky="w",column=col+3,row=row)
 
 
 		self.rel_v = tk.DoubleVar(value=0)
@@ -548,11 +662,11 @@ class Open_Reversal():
 
 		row = 3
 		col = 1
-		ttk.Label(self.algo_frame, text="Rel V>=").grid(sticky="w",column=col,row=row)
-		ttk.Entry(self.algo_frame, textvariable=self.rel_v).grid(sticky="w",column=col+1,row=row)
+		ttk.Label(frame, text="Rel V>=").grid(sticky="w",column=col,row=row)
+		ttk.Entry(frame, textvariable=self.rel_v).grid(sticky="w",column=col+1,row=row)
 
-		ttk.Label(self.algo_frame, text="Score>").grid(sticky="w",column=col+2,row=row)
-		ttk.Entry(self.algo_frame, textvariable=self.re_score).grid(sticky="w",column=col+3,row=row)
+		ttk.Label(frame, text="Score>").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(frame, textvariable=self.re_score).grid(sticky="w",column=col+3,row=row)
 
 		self.side_ = tk.StringVar(value='x')
 		self.listed_ = tk.BooleanVar(value=False)
@@ -561,13 +675,13 @@ class Open_Reversal():
 		col = 1
 
 
-		ttk.Label(self.algo_frame, text="Side:").grid(sticky="w",column=col,row=row)
+		ttk.Label(frame, text="Side:").grid(sticky="w",column=col,row=row)
 		l={"Up","Down","Any","Any"}
-		ttk.OptionMenu(self.algo_frame, self.side_, *sorted(l)).grid(sticky="w",column=col+1,row=row)
+		ttk.OptionMenu(frame, self.side_, *sorted(l)).grid(sticky="w",column=col+1,row=row)
 
 
-		ttk.Label(self.algo_frame, text="Listed?").grid(sticky="w",column=col+2,row=row)
-		ttk.Checkbutton(self.algo_frame, variable=self.listed_).grid(sticky="w",column=col+3,row=row)
+		ttk.Label(frame, text="Listed?").grid(sticky="w",column=col+2,row=row)
+		ttk.Checkbutton(frame, variable=self.listed_).grid(sticky="w",column=col+3,row=row)
 
 
 		algo_timer = self.hour.get()*60 + self.minute.get()
