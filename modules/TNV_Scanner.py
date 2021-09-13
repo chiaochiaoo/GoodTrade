@@ -207,7 +207,7 @@ class Just_break():
 				#print(self.NT.nasdaq_trader_symbols)
 				if 1: #score>0:	
 
-					lst = [rank,sec,relv,side,span,so,sc,tr,vol]
+					lst = [rank,sec,relv,side,span,so,sc,tr,vol,listed]
 
 					for i in range(len(lst)):
 						self.entries[entry][i]["text"] = lst[i]
@@ -317,7 +317,7 @@ class Near_high():
 				#print(self.NT.nasdaq_trader_symbols)
 				if 1: #score>0:	
 
-					lst = [rank,sec,relv,near,high,so,sc]
+					lst = [rank,sec,relv,near,high,so,sc,listed]
 
 					for i in range(len(lst)):
 						self.entries[entry][i]["text"] = lst[i]
@@ -427,7 +427,7 @@ class Near_low():
 				#print(self.NT.nasdaq_trader_symbols)
 				if 1: #score>0:	
 
-					lst = [rank,sec,relv,near,high,so,sc]
+					lst = [rank,sec,relv,near,high,so,sc,listed]
 
 					for i in range(len(lst)):
 						self.entries[entry][i]["text"] = lst[i]
@@ -536,7 +536,7 @@ class ADX():
 				#print(self.NT.nasdaq_trader_symbols)
 				if 1: #score>0:	
 
-					lst = [rank,sec,adx,near,relv,so,sc]
+					lst = [rank,sec,adx,near,relv,so,sc,listed]
 
 					for i in range(len(lst)):
 						self.entries[entry][i]["text"] = lst[i]
