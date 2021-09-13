@@ -599,7 +599,7 @@ class Open_Reversal():
 		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
 
 		now = datetime.now()
-		ts = now.hour*60+now.minute
+		ts = now.hour*60+now.minute-1
 		
 		algo_timer = self.hour.get()*60 + self.minute.get()
 
