@@ -193,7 +193,7 @@ class Just_break():
 				side = row['just_break']
 
 				span = row['break_span']
-				so = row['reversal_score']
+				so = row['SO']
 				sc = row['SC']
 
 				tr =  row['tr_eval']
