@@ -143,6 +143,7 @@ def buy_limit_order(symbol, price,share,wait=0):
 
 	price = round(float(price),2)
 	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Buy ARCX Limit DAY&shares='+str(share)
+	#r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit DAY BookOnly&shares='+str(share)
 	sucess='buy limit order success on'+symbol
 	failure="Error buy limit order on"+symbol
 
@@ -153,6 +154,7 @@ def sell_limit_order(symbol, price,share,wait=0):
 	price = round(float(price),2)
 
 	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Sell->Short ARCX Limit DAY&shares='+str(share)
+	#r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit DAY BookOnly&shares='+str(share)
 	sucess='sell limit order success on'+symbol
 	failure="Error sell limit order on"+symbol
 
@@ -312,8 +314,8 @@ def init_driver(pipe_status):
 			driver.minimize_window()
 			pipe_status.send(["ppro_out","Connected"])
 			return driver
-		except:
-			log_print("Driver init failed. restarting.")
+		except Exception as e:
+			log_print("Driver init failed. restarting.",e)
 			pipe_status.send(["ppro_out","Disconnected"])
 			time.sleep(1)
 			pass
