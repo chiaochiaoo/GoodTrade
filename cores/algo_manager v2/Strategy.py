@@ -99,7 +99,7 @@ class Strategy:
 					self.on_finish()
 
 		else:
-			log_print("Strategy: nothing to trigger.")
+			log_print(self.strategy_name,": nothing to trigger.")
 
 	def on_finish(self):
 		self.tradingplan.on_finish(self)	
@@ -686,3 +686,8 @@ class FreeControl(EntryStrategy):
 
 		super().__init__("empty",symbol,tradingplan)
 		super().on_finish()
+
+
+	def update(self):
+		super().on_finish()
+		

@@ -1044,7 +1044,7 @@ class ScalpaTron(ManagementStrategy):
 
 	def __init__(self,symbol,tradingplan):
 
-		super().__init__("Management:ScalpaTron",symbol,tradingplan)
+		super().__init__("ScalpaTron",symbol,tradingplan)
 
 		#self.manaTrigger = HoldTilCloseManager("HTC trigger",self)
 
@@ -1060,6 +1060,7 @@ class ScalpaTron(ManagementStrategy):
 		self.price = self.tradingplan.data[AVERAGE_PRICE]
 		self.stop = self.tradingplan.data[STOP_LEVEL]
 
+		self.gear = 1
 
 		###KEY BOARD EVENT HERE.
 		keyboard = threading.Thread(target=self.keyboard, daemon=True)
@@ -1070,10 +1071,9 @@ class ScalpaTron(ManagementStrategy):
 
 	def keyboard(self):
 		print("KEY BAORD ACTIVEAETED")
-
+		last_key = ""
 		while True:  # making a loop
-			key = keyboard.read_key()
-
+			key = keyboard.read_key(True)
 
 			#################################################################################
 			# self.ppro_out.send([BUY,self.symbol_name,share,self.description])
@@ -1084,31 +1084,82 @@ class ScalpaTron(ManagementStrategy):
 			# self.ppro_out.send([STOPSELL,self.symbol_name,price,share])
 			# self.ppro_out.send([CANCEL,self.symbol_name])
 			##################################################################################
+			last_key = key 
+
 
 			if key == "+":
 				self.ppro_out.send([BUY,self.symbol_name,5,""])
 			elif key =="-":
+
 				self.ppro_out.send([SELL,self.symbol_name,5,""])
 
 
-			time.sleep(1)
+			elif key =="8":
+				self.gear = 3
+				log_print("Gear swithching:",3)
+			elif key =="5":
+				self.gear = 2
+				log_print("Gear swithching:",2)
+			elif key =="2":
+				self.gear = 1
+				log_print("Gear swithching:",1)
+
+			elif key =="3":
+				bid = self.symbol.get_bid()
+				l = round(bid+0.05*self.gear,2)
+				self.ppro_out.send([LIMITSELL,self.symbol_name,l,5,0,"Exit price "])
+			elif key =="6":
+				bid = self.symbol.get_bid()
+				l = round(bid+0.08*self.gear,2)
+				self.ppro_out.send([LIMITSELL,self.symbol_name,l,5,0,"Exit price "])
+			elif key =="9":
+				bid = self.symbol.get_bid()
+				l = round(bid+0.12*self.gear,2)
+				self.ppro_out.send([LIMITSELL,self.symbol_name,l,5,0,"Exit price "])
+			elif key =="1":
+				bid = self.symbol.get_ask()
+				l = round(bid-0.05*self.gear,2)
+				self.ppro_out.send([LIMITBUY,self.symbol_name,l,5,0,"Exit price "])
+			elif key =="4":
+				bid = self.symbol.get_ask()
+				l = round(bid-0.08*self.gear,2)
+				self.ppro_out.send([LIMITBUY,self.symbol_name,l,5,0,"Exit price "])
+			elif key =="7":
+				bid = self.symbol.get_ask()
+				l = round(bid-0.12*self.gear,2)
+				self.ppro_out.send([LIMITBUY,self.symbol_name,l,5,0,"Exit price "])
+
+			elif key =="*":
+				self.ppro_out.send([CANCEL,self.symbol_name])
+
+			elif key =="/":
+				self.ppro_out.send(["Flatten",self.symbol_name])
+			time.sleep(0.25)
 
 
 	def on_loading_up(self): #call this whenever the break at price changes. Onl
 		#print("loading up:",self.initialized)
-		if not self.initialized:
+	
 
-			log_print("LOADING UP!!!!","init:",self.initialized)
+		log_print("LOADING UP!!!!","init:",self.initialized)
 
-			self.price = self.tradingplan.data[AVERAGE_PRICE]
-			self.stop = self.tradingplan.data[STOP_LEVEL]
+		self.price = self.tradingplan.data[AVERAGE_PRICE]
+		self.stop = self.tradingplan.data[STOP_LEVEL]
 
-			self.shares_loaded = True
+		self.shares_loaded = True
 
+		if self.tradingplan.data[POSITION] ==LONG:
+			self.stop = self.price-0.2
+			self.tradingplan.data[STOP_LEVEL]=self.stop#self.symbol_data[self.stop]
+			self.tradingplan.tkvars[STOP_LEVEL].set(round(self.stop,2))
 
-			if self.initialized == False and self.management_start==True:
-				self.on_start()
+		elif self.tradingplan.data[POSITION] ==SHORT:
+			self.stop = self.price+0.2
+			self.tradingplan.data[STOP_LEVEL]=self.stop#self.symbol_data[self.stop]
+			self.tradingplan.tkvars[STOP_LEVEL].set(round(self.stop,2))
 
+		if self.initialized == False and self.management_start==True:
+			self.on_start()
 
 	def on_start(self):
 		pass
@@ -1118,13 +1169,14 @@ class ScalpaTron(ManagementStrategy):
 
 		#print("ON DEPLOYING")
 		self.shares_loaded = False
-		self.tradingplan.data[RELOAD] +=1
+		self.tradingplan.data[RELOAD_TIMES] +=1
 		super().on_deploying()
 
 
 	def reset(self):
+		self.tradingplan.data[RELOAD_TIMES] +=1
 		self.initialized = False
-
+		self.shares_loaded = False
 
 
 # clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
@@ -1133,10 +1185,11 @@ class ScalpaTron(ManagementStrategy):
 
 # for i in clsmembers:
 # 	log_print(i)
-#if __name__ == '__main__':
+if __name__ == '__main__':
 	
-	# while True:  # making a loop
-	# 	print(keyboard.read_key())
+	while True:  # making a loop14564qerz
+		print(keyboard.read_key(True))
+		time.sleep(0.15)
 	# def shares_calculator(shares):
 
 	# 	if shares<3:
