@@ -657,9 +657,10 @@ class TradingPlan:
 				log_print(self.symbol_name,"EM:",em,"SUP:",sup,"RES:",res,"RPS:",l,"RRR:",rrr, "RRR to low, using Fib instd.")
 				self.tkvars[MANAGEMENTPLAN].set(FIBO)
 				self.set_ManagementStrategy(FibonacciOnly(self.symbol,self))
-
 		elif manage_plan == HOLDTILCLOSE:
 			self.set_ManagementStrategy(HoldTilClose(self.symbol,self))
+		elif manage_plan == SCALPATRON:
+			self.set_ManagementStrategy(ScalpaTron(self.symbol,self))
 		elif manage_plan == EMASTRAT:
 			self.set_ManagementStrategy(EMAStrategy(self.symbol,self))
 	def set_EntryStrategy(self,entry_plan:Strategy):

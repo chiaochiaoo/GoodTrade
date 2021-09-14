@@ -154,6 +154,7 @@ HOLDTILCLOSE = "HTC"
 FIBONO = "FibAdjstd"
 FIBO = "Fib only"
 EMASTRAT =  "EMA strategy"
+SCALPATRON = "Scalpatron"
 
 ONETOTWORISKREWARDOLD = "1:2 RiskReward"
 

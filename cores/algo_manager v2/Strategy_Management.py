@@ -3,8 +3,15 @@ from Symbol import *
 from Triggers import *
 from Util_functions import *
 from Strategy import *
+import threading
+import time
 #import sys, inspect
 # "Omnissiah, Omnissiah.
+
+try:
+	import keyboard
+except:
+	print("keyboard not found")
 
 # From the Bleakness of the mind
 # Omnissiah save us
@@ -1032,6 +1039,77 @@ class HoldTilClose(ManagementStrategy):
 
 	def reset(self):
 		self.initialized = False
+
+
+class ScalpaTron(ManagementStrategy):
+
+	def __init__(self,symbol,tradingplan):
+
+		super().__init__("Management:ScalpaTron",symbol,tradingplan)
+
+		#self.manaTrigger = HoldTilCloseManager("HTC trigger",self)
+
+		#self.add_initial_triggers(self.manaTrigger)
+
+		#description,trigger_timer:int,trigger_limit=1
+		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
+		###upon activating, reset all parameters. 
+
+		self.initialized = False
+		self.shares_loaded = False
+
+		self.price = self.tradingplan.data[AVERAGE_PRICE]
+		self.stop = self.tradingplan.data[STOP_LEVEL]
+
+
+		###KEY BOARD EVENT HERE.
+		keyboard = threading.Thread(target=self.keyboard, daemon=True)
+		keyboard.start()
+
+	def update(self):
+		pass
+
+	def keyboard(self):
+		print("KEY BAORD ACTIVEAETED")
+		while True:  # making a loop
+			print(keyboard.read_key())
+
+			time.sleep(1)
+
+
+	def on_loading_up(self): #call this whenever the break at price changes. Onl
+		#print("loading up:",self.initialized)
+		if not self.initialized:
+
+			log_print("LOADING UP!!!!","init:",self.initialized)
+
+			self.price = self.tradingplan.data[AVERAGE_PRICE]
+			self.stop = self.tradingplan.data[STOP_LEVEL]
+
+			self.shares_loaded = True
+
+
+			if self.initialized == False and self.management_start==True:
+				self.on_start()
+
+
+	def on_start(self):
+		pass
+
+
+	def on_deploying(self): #refresh it when reusing.
+
+		#print("ON DEPLOYING")
+		self.shares_loaded = False
+		self.tradingplan.data[RELOAD] +=1
+		super().on_deploying()
+
+
+	def reset(self):
+		self.initialized = False
+
+
+
 # clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
 
 # log_print(clsmembers)
@@ -1039,70 +1117,72 @@ class HoldTilClose(ManagementStrategy):
 # for i in clsmembers:
 # 	log_print(i)
 if __name__ == '__main__':
+	
+	while True:  # making a loop
+		print(keyboard.read_key())
+	# def shares_calculator(shares):
 
-	def shares_calculator(shares):
+	# 	if shares<3:
+	# 		return 0,shares,0
+	# 	else:
+	# 		# first_lot = int(shares/3)
+	# 		# third_lot = shares - 2*first_lot
+	# 		third_lot = int(shares/3)
+	# 		first_lot = int((shares - third_lot)/2)
+	# 		second_lot = shares - first_lot - third_lot
+	# 		#print(first_lot,second_lot,third_lot)
+	# 		return first_lot,second_lot,third_lot
+	# def orders_organizer(first,second,third):
 
-		if shares<3:
-			return 0,shares,0
-		else:
-			# first_lot = int(shares/3)
-			# third_lot = shares - 2*first_lot
-			third_lot = int(shares/3)
-			first_lot = int((shares - third_lot)/2)
-			second_lot = shares - first_lot - third_lot
-			#print(first_lot,second_lot,third_lot)
-			return first_lot,second_lot,third_lot
-	def orders_organizer(first,second,third):
+	# 	### Arange this way to distribute it around the key areas.
+	# 	first_lot  =  [0.3,0.7,0.35,0.65,0.4,0.6,0.45,0.55,0.5]
+	# 	second_lot =  [0.8, 1.2, 0.85, 1.15, 0.9, 1.1, 0.95, 1.05, 1.0]
+	# 	third_lot  =  [1.3, 1.7, 1.35, 1.65, 1.4, 1.6, 1.45, 1.55, 1.5]
 
-		### Arange this way to distribute it around the key areas.
-		first_lot  =  [0.3,0.7,0.35,0.65,0.4,0.6,0.45,0.55,0.5]
-		second_lot =  [0.8, 1.2, 0.85, 1.15, 0.9, 1.1, 0.95, 1.05, 1.0]
-		third_lot  =  [1.3, 1.7, 1.35, 1.65, 1.4, 1.6, 1.45, 1.55, 1.5]
+	# 	all_lots = [first_lot,second_lot,third_lot]
+	# 	shares = [first,second,third]
 
-		all_lots = [first_lot,second_lot,third_lot]
-		shares = [first,second,third]
+	# 	new_shares = [[0,0,0,0,0,0,0,0,0] for i in range(3)]
 
-		new_shares = [[0,0,0,0,0,0,0,0,0] for i in range(3)]
+	# 	for i in range(len(new_shares)):
+	# 		for j in range(shares[i]):
+	# 			new_shares[i][j%9] +=1
 
-		for i in range(len(new_shares)):
-			for j in range(shares[i]):
-				new_shares[i][j%9] +=1
+	# 	share_distribution = {}
+	# 	for i in range(len(new_shares)):
+	# 		for j in range(len(new_shares[i])):
+	# 			share_distribution[all_lots[i][j]] = new_shares[i][j]
 
-		share_distribution = {}
-		for i in range(len(new_shares)):
-			for j in range(len(new_shares[i])):
-				share_distribution[all_lots[i][j]] = new_shares[i][j]
+	# 	# Now we have all orders. let's slice them up.
 
-		# Now we have all orders. let's slice them up.
+	# 	total_list = []
+	# 	total_list.extend(first_lot)
+	# 	total_list.extend(second_lot)
+	# 	total_list.extend(third_lot)
+	# 	list.sort(total_list)
 
-		total_list = []
-		total_list.extend(first_lot)
-		total_list.extend(second_lot)
-		total_list.extend(third_lot)
-		list.sort(total_list)
+	# 	print(len(total_list))
+	# 	orders = [total_list[4*i:4*i+4] for i in range(7)]
+	# 	#now chop the total_list into 6 sections. then grab the shares from all_orders
 
-		print(len(total_list))
-		orders = [total_list[4*i:4*i+4] for i in range(7)]
-		#now chop the total_list into 6 sections. then grab the shares from all_orders
-
-		total_orders = []
-		for i in range(len(orders)):
-			total_orders.append({})
-			for j in range(len(orders[i])):
-				total_orders[i][orders[i][j]] = share_distribution[orders[i][j]]
+	# 	total_orders = []
+	# 	for i in range(len(orders)):
+	# 		total_orders.append({})
+	# 		for j in range(len(orders[i])):
+	# 			total_orders[i][orders[i][j]] = share_distribution[orders[i][j]]
 			
-		for i in total_orders:
-			print(i)
+	# 	for i in total_orders:
+	# 		print(i)
 
-		return total_orders
+	# 	return total_orders
 
 
-	first_lot,second_lot,third_lot = shares_calculator(200)
-	t=orders_organizer(first_lot,second_lot,third_lot)
-	count = 0
+	# first_lot,second_lot,third_lot = shares_calculator(200)
+	# t=orders_organizer(first_lot,second_lot,third_lot)
+	# count = 0
 
-	for i in t:
-		for key,v in i.items():
-			count+= key*v
+	# for i in t:
+	# 	for key,v in i.items():
+	# 		count+= key*v
 
-	print(count)
+	# print(count)
