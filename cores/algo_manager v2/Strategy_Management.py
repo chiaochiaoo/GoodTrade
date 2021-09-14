@@ -1133,7 +1133,7 @@ class ScalpaTron(ManagementStrategy):
 
 # for i in clsmembers:
 # 	log_print(i)
-if __name__ == '__main__':
+#if __name__ == '__main__':
 	
 	# while True:  # making a loop
 	# 	print(keyboard.read_key())
