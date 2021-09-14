@@ -173,7 +173,7 @@ LIMITSELL = "Limit Sell"
 
 CANCEL = "Cancel"
 REGISTER = "Register"
-STOPBUY == "StopBuy"
+STOPBUY = "StopBuy"
 STOPSELL= "StopSell"
 
 ADD ="add"
