@@ -680,3 +680,9 @@ class Fadeany_cont(EntryStrategy):
 			self.transitional_trigger_sell_2.total_reset()
 			self.buyreversalTrigger.total_reset()
 
+class FreeControl(EntryStrategy):
+
+	def __init__(self,timer,repeat,symbol,tradingplan):
+
+		super().__init__("empty",symbol,tradingplan)
+		super().on_finish()

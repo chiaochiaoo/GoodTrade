@@ -607,7 +607,8 @@ class TradingPlan:
 			self.set_EntryStrategy(Fadeany(entrytimer,instant,self.symbol,self))
 		elif entry_plan == BREAKFIRST:
 			self.set_EntryStrategy(BreakFirst(entrytimer,instant,self.symbol,self))
-
+		elif entry_plan == FREECONTROL:
+			self.set_EntryStrategy(FreeControl(entrytimer,instant,self.symbol,self))
 		else:
 			log_print("unkown plan")
 
