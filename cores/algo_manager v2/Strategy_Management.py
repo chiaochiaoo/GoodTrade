@@ -900,7 +900,6 @@ class ExpectedMomentum(ManagementStrategy):
 		self.total_orders = total_orders
 
 
-
 class EMAStrategy(ManagementStrategy):
 
 	def __init__(self,symbol,tradingplan):
@@ -1071,8 +1070,26 @@ class ScalpaTron(ManagementStrategy):
 
 	def keyboard(self):
 		print("KEY BAORD ACTIVEAETED")
+
 		while True:  # making a loop
-			print(keyboard.read_key())
+			key = keyboard.read_key()
+
+
+			#################################################################################
+			# self.ppro_out.send([BUY,self.symbol_name,share,self.description])
+			# self.ppro_out.send([SELL,self.symbol_name,share,self.description])
+			# self.ppro_out.send([LIMITBUY,self.symbol_name,price,share,wait[c],"Exit price "])
+			# self.ppro_out.send([LIMITSELL,self.symbol_name,price,share,wait[c],"Exit price "])
+			# self.ppro_out.send([STOPBUY,self.symbol_name,price,share])
+			# self.ppro_out.send([STOPSELL,self.symbol_name,price,share])
+			# self.ppro_out.send([CANCEL,self.symbol_name])
+			##################################################################################
+
+			if key == "+":
+				self.ppro_out.send([BUY,self.symbol_name,5,""])
+			elif key =="-":
+				self.ppro_out.send([SELL,self.symbol_name,5,""])
+
 
 			time.sleep(1)
 
@@ -1118,8 +1135,8 @@ class ScalpaTron(ManagementStrategy):
 # 	log_print(i)
 if __name__ == '__main__':
 	
-	while True:  # making a loop
-		print(keyboard.read_key())
+	# while True:  # making a loop
+	# 	print(keyboard.read_key())
 	# def shares_calculator(shares):
 
 	# 	if shares<3:

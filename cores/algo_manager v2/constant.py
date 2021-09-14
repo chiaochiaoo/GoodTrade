@@ -171,6 +171,10 @@ IOCSELL = "IoCSell"
 LIMITBUY = "Litmit Buy" 
 LIMITSELL = "Limit Sell"
 
+CANCEL = "Cancel":
+REGISTER = "Register":
+STOPBUY == "StopBuy":
+STOPSELL= "StopSell":
 
 ADD ="add"
 MINUS="minus"
