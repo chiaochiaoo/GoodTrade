@@ -1,0 +1,10 @@
+1. Edit symbol list
+
+To add new symbols, open input.csv and add the desired symbols at the end of the list.
+
+To delete symbols, simply delete the symbols rows. (Please make sure the row is deleted too so there is no empty row between symbols.) 
+
+
+2. Download 
+
+Run run_me.cmd and the file will be processed and generated a csv file.
