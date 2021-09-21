@@ -115,6 +115,9 @@ class TNV_Scanner():
 				self.near_high.update_entry(item)
 			elif key =="adx":
 				self.trending.update_entry(item)
+
+			elif key =="spread":
+				self.spread.update_entry(item)
 class Just_break():
 	def __init__(self,root,NT):
 
@@ -830,9 +833,9 @@ class Spread():
 		self.buttons = []
 		self.entries = []
 		self.l = 1
-		self.labels_width = [9,6,8,8,8,8,8,8,6,6,6,6,8,6]
+		self.labels_width = [9,8,6,6,6,8,8,8,8,6,6,6,8,6]
 		self.NT = NT
-		self.labels = ["Pairs","S.I","Max Spread","Cur Spread","Long ratio","Short Ratio","Add"]
+		self.labels = ["Pairs","CurSpread","Cur σ","PC σ","OP σ","Last5m σ","Ratio","R.Stability","Add"]
 		#[rank,sec,relv,near,high,so,sc]
 		self.total_len = len(self.labels)
 		self.root = root
@@ -890,7 +893,11 @@ class Spread():
 
 		#at most 8.
 		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
-
+		# Index(['symbol1', 'symbol2', 'current_spread', 'date', 'ratio_mean',
+		#        'ratio_stability', 'outlier', 'neg_tail997', 'pos_tail997',
+		#        'neg_tail990', 'pos_tail990', 'neg_tail970', 'pos_tail970',
+		#        'coefficient', 'intercept', 'std', 'pe', 'pr', 'avgr', 'stdr',
+		#        'quality', 'current_sigma'],
 		df = data
 
 
@@ -900,24 +907,25 @@ class Spread():
 		if 1:
 			for index, row in df.iterrows():
 				#print(row)
+				#["Pairs","CurSpread","Cur σ","PC σ","OP σ","DayMax σ","DayLow σ","Ratio","R.Stability","Add"]
+				#"current_sigma","close_sigma","open_sigma","max_sigma","min_sigma","last5_sigma"
 				rank = index
-				sec = row['sector']
-				relv = row['rel vol']
-				near = row['rangescore']
+				spread = round(row['current_spread'],2)
+				sig = round(row['current_sigma'],2)
 
-				adx = row['adx']
-				so = row['SO']
-				sc = row['SC']
+				pcsig = round(row['close_sigma'],2)
+				opsig = round(row['open_sigma'],2)
 
-				############ add since, and been to the thing #############
-				if rank in self.NT.nasdaq_trader_symbols_ranking:
-					listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
-				else:
-					listed = "No"
+				last5 = round(row['last5_sigma'],2)
+
+				ratio = ratio_compute(row['coefficient'])
+				ratio_stability = round(1-row['ratio_stability'],2)
+
+
 				#print(self.NT.nasdaq_trader_symbols)
 				if 1: #score>0:	
 
-					lst = [rank,sec,adx,near,relv,so,sc,listed]
+					lst = [rank,spread,sig,pcsig,opsig,last5,ratio,ratio_stability]
 
 					for i in range(len(lst)):
 						self.entries[entry][i]["text"] = lst[i]
@@ -1268,15 +1276,27 @@ class CoreysPick():
 		except Exception as e:
 			print("TNV scanner construction open break:",e)
 
+
+def ratio_compute(n):
+
+	if n<1:
+		return "100:"+str(int(100*n))
+	else:
+		return str(int(100/n)) +":100"
 if __name__ == '__main__':
 
 	root = tk.Tk() 
 	root.title("GoodTrade v489") 
 	root.geometry("640x840")
 
+	print(ratio_compute(0.8))
+	print(ratio_compute(1.2))
+
 	TNV_Scanner(root,fake_NT(),None)
 
 	root.mainloop()
+
+
 
 
 
