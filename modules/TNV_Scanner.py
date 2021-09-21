@@ -1280,9 +1280,9 @@ class CoreysPick():
 def ratio_compute(n):
 
 	if n<1:
-		return "100:"+str(int(100*n))
+		return str(int(100*n)) +":100"
 	else:
-		return str(int(100/n)) +":100"
+		return "100:"+str(int(100/n)) 
 if __name__ == '__main__':
 
 	root = tk.Tk() 
