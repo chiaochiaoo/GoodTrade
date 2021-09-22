@@ -47,22 +47,33 @@ def Ppro_in(port,pipe):
 
 	pipe.send(["msg","algo_ppro working"])
 	write_count = 0
+	sock.settimeout(10)
 	while True:
-		data, addr = sock.recvfrom(1024)
-		stream_data = str(data)
-		if work==False:
-			pipe.send(["msg","algo_ppro msg receive. all functional."])
-		work=True
-		type_ = find_between(stream_data, "Message=", ",")
+		rec= False
+		try:
+			data, addr = sock.recvfrom(1024)
+			rec = True
+		except Exception as e:
+			log_print(e)
+			register_order_listener(port)
+			pipe.send(["ppro_in","Disconnected"])
 
-		if type_ == "OrderStatus":
-			decode_order(stream_data,pipe)
-		elif type_ =="L1":
-			decode_l1(stream_data,pipe,writer,l1data)
-			count+=1
-			if count %1000 ==0:
-				save_file(f)
-				f,writer = open_file()
+		if rec:
+			stream_data = str(data)
+			if work==False:
+				pipe.send(["ppro_in","Connected"])
+				#pipe.send(["msg","algo_ppro msg receive. all functional."])
+			work=True
+			type_ = find_between(stream_data, "Message=", ",")
+
+			if type_ == "OrderStatus":
+				decode_order(stream_data,pipe)
+			elif type_ =="L1":
+				decode_l1(stream_data,pipe,writer,l1data)
+				count+=1
+				if count %1000 ==0:
+					save_file(f)
+					f,writer = open_file()
 	f.close()
 	
 def ppro_connection_service(pipe,port):
@@ -367,6 +378,7 @@ def decode_l1_(stream_data,pipe,writer,l1data):
 		#add time
 		pipe.send(["order update",l1data[symbol]])
 		writer.writerow([symbol,mili_ts,bid,ask])
+
 
 # x= "LocalTime=15:56:54.742,Message=OrderStatus,MarketDateTime=20210504-15:56:55.000,Currency=1,Symbol=QQQ.NQ,Gateway=2030,Side=T,OrderNumber=QIAOSUN_02000326M1791F8100000,Price=329.540000,Shares=70,Position=4,OrderState=Filled,CurrencyChargeGway=1,ChargeGway=0.21000,CurrencyChargeAct=1,ChargeAct=0.0096600,CurrencyChargeSec=1,ChargeSec=0.47750,CurrencyChargeExec=0,ChargeExec=0,CurrencyChargeClr=1,ChargeClr=0.012950,OrderFlags=129,CurrencyCharge=1,Account=1TRUENV001TNVQIAOSUN_USD1,InfoCode=255,InfoText=LiqFlags:^Tag30:14^Tag31:329.5400000^Tag150:2^Tag9730:"
 # log_print(find_between(x, "MarketDateTime=", ",")[9:-4])
