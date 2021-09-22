@@ -80,23 +80,23 @@ def ppro_connection_service(pipe,port):
 
 	#keep running and don't stop
 	state = False
-	while True:
-		if test_register():
-			pipe.send(["ppro_in","Connected"])
-			if state == False:
-				log_print("Ppro connected. Registering OSTAT")
-				i = 3
-				while i >0:
-					if register_order_listener(port):
-						log_print("OSTAT registered")
-						state = True
-						break
-					else:
-						log_print("OSTAT registeration failed")
-					i-=1 
-		else:
-			pipe.send(["ppro_in","Disconnected"])
-			state = False
+
+	if test_register():
+		pipe.send(["ppro_in","Connected"])
+		if state == False:
+			log_print("Ppro connected. Registering OSTAT")
+			i = 3
+			while i >0:
+				if register_order_listener(port):
+					log_print("OSTAT registered")
+					state = True
+					break
+				else:
+					log_print("OSTAT registeration failed")
+				i-=1 
+	else:
+		pipe.send(["ppro_in","Disconnected"])
+		state = False
 			
 def test_register():
 	try:
