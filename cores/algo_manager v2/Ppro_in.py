@@ -47,15 +47,18 @@ def Ppro_in(port,pipe):
 
 	pipe.send(["msg","algo_ppro working"])
 	write_count = 0
-	sock.settimeout(10)
+	sock.settimeout(5)
 	while True:
 		rec= False
+		#print("restart")
 		try:
 			data, addr = sock.recvfrom(1024)
+			#print(data)
 			rec = True
 		except Exception as e:
 			log_print(e)
-			register_order_listener(port)
+			#register_order_listener(port)
+			work = False
 			pipe.send(["ppro_in","Disconnected"])
 
 		if rec:

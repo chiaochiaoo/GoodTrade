@@ -228,7 +228,8 @@ class Manager:
 		timer.start()
 
 		#if Testerx==True:
-			
+		
+		self.pipe_ppro_out.send(["Register","QQQ.NQ"])
 
 	#data part, UI part
 	def add_new_tradingplan(self,data,TEST_MODE):
@@ -385,6 +386,11 @@ class Manager:
 						self.ui.ppro_status_["background"] = "#97FEA8"
 					else:
 						self.ui.ppro_status_["background"] = "red"
+
+						for symbol in self.symbols:
+							self.pipe_ppro_out.send(["Register",symbol])
+						self.pipe_ppro_out.send(["Register","QQQ.NQ"])
+						# re-register the symbols
 				except Exception as e:
 					log_print(e)
 
@@ -1018,7 +1024,7 @@ if __name__ == '__main__':
 
 
 	root = tk.Tk()
-	root.title("GoodTrade Algo Manager v2 b9")
+	root.title("GoodTrade Algo Manager v2 b10")
 	root.geometry("1920x800")
 
 	manager=Manager(root,goodtrade_pipe,ppro_out,ppro_in,TEST)
