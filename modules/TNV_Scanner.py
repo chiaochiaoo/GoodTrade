@@ -719,7 +719,7 @@ class Open_Reversal():
 		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
 
 		now = datetime.now()
-		ts = now.hour*60+now.minute-1
+		ts = now.hour*60+now.minute
 		
 		algo_timer = self.hour.get()*60 + self.minute.get()
 
@@ -833,7 +833,7 @@ class Spread():
 		self.buttons = []
 		self.entries = []
 		self.l = 1
-		self.labels_width = [9,8,6,6,6,8,8,8,8,6,6,6,8,6]
+		self.labels_width = [9,8,4,4,4,8,6,8,6,6,6,6,8,6]
 		self.NT = NT
 		self.labels = ["Pairs","CurSpread","Cur σ","PC σ","OP σ","Last5m σ","Ratio","R.Stability","Add"]
 		#[rank,sec,relv,near,high,so,sc]
@@ -919,7 +919,7 @@ class Spread():
 				last5 = round(row['last5_sigma'],2)
 
 				ratio = ratio_compute(row['coefficient'])
-				ratio_stability = round(1-row['ratio_stability'],2)
+				ratio_stability = str(round((1-row['ratio_stability'])*100))+"%"
 
 
 				#print(self.NT.nasdaq_trader_symbols)
