@@ -1024,7 +1024,7 @@ if __name__ == '__main__':
 
 
 	root = tk.Tk()
-	root.title("GoodTrade Algo Manager v2 b10")
+	root.title("GoodTrade Algo Manager v2 b11 Pampa")
 	root.geometry("1920x800")
 
 	manager=Manager(root,goodtrade_pipe,ppro_out,ppro_in,TEST)
