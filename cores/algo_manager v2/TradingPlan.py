@@ -531,7 +531,7 @@ class TradingPlan:
 		else:
 			log_print("cannot cancel, holding positions.")
 
-	def deploy(self):
+	def deploy(self,risktimer=0):
 
 		if self.tkvars[STATUS].get() ==PENDING:
 
@@ -541,9 +541,12 @@ class TradingPlan:
 				entrytimer=int(self.tkvars[TIMER].get())
 				manage_plan =self.tkvars[MANAGEMENTPLAN].get()
 
-				self.data[RISKTIMER] = int(self.tkvars[RISKTIMER].get())
+				if risktimer ==0:
+					self.data[RISKTIMER] = int(self.tkvars[RISKTIMER].get())
+				else:
+					self.data[RISKTIMER] = risktimer
 
-
+				print("risk timer",self.data[RISKTIMER])
 				self.set_mind("",DEFAULT)
 				self.entry_plan_decoder(entryplan, entry_type, entrytimer)
 				self.manage_plan_decoder(manage_plan)
