@@ -207,13 +207,22 @@ def decode_order(stream_data,pipe):
 
 
 #'LocalTime=14:24:34.886,Message=L1,MarketTime=14:24:38.206,Symbol=SNDL.NQ,BidPrice=0.828300,BidSize=13899,AskPrice=0.828400,AskSize=2364,Tick=?\n'
+
 def decode_l1(stream_data,pipe,writer,l1data):
 	symbol = find_between(stream_data, "Symbol=", ",")
 	bid=float(find_between(stream_data, "BidPrice=", ","))
 	ask=float(find_between(stream_data, "AskPrice=", ","))
+	ms,ts,mili_ts = timestamp_mili_seconds(find_between(stream_data, "MarketTime=", ","))
+
+	bidsize = int(find_between(stream_data, "BidSize=", ","))
+	asksize = int(find_between(stream_data, "AskSize=", ","))
 	#ts= timestamp_seconds(find_between(stream_data, "MarketTime=", ",")[:-4])
 
-	ms,ts,mili_ts = timestamp_mili_seconds(find_between(stream_data, "MarketTime=", ","))
+	# writer.writerow([symbol,mili_ts,bid,ask,bidsize,asksize])
+
+	# if symbol!="QQQ.NQ":
+	# 	print(stream_data)
+	
 
 	send = False
 
@@ -254,10 +263,6 @@ def decode_l1(stream_data,pipe,writer,l1data):
 		l1data[symbol]["internal"]["EMA8H"] = 0
 		l1data[symbol]["internal"]["EMA8L"] = 0
 		l1data[symbol]["internal"]["EMA8C"] = 0
-
-		l1data[symbol]["internal"]["EMA21H"] = 0
-		l1data[symbol]["internal"]["EMA21L"] = 0
-		l1data[symbol]["internal"]["EMA21C"] = 0
 		send = True
 
 	#process the informations. process internal only. 
@@ -275,31 +280,24 @@ def decode_l1(stream_data,pipe,writer,l1data):
 		l1data[symbol]["timestamp"] = ts
 
 		if update:
-
 			update_ = {}
 			update_["EMA5H"]=l1data[symbol]["internal"]["EMA5H"]
 			update_["EMA5L"]=l1data[symbol]["internal"]["EMA5L"]
 			update_["EMA5C"]=l1data[symbol]["internal"]["EMA5C"]
-
 			update_["EMA8H"]=l1data[symbol]["internal"]["EMA8H"]
 			update_["EMA8L"]=l1data[symbol]["internal"]["EMA8L"]
 			update_["EMA8C"]=l1data[symbol]["internal"]["EMA8C"]
-
-			update_["EMA21H"]=l1data[symbol]["internal"]["EMA21H"]
-			update_["EMA21L"]=l1data[symbol]["internal"]["EMA21L"]
-			update_["EMA21C"]=l1data[symbol]["internal"]["EMA21C"]
-
-
 			update_["EMAcount"]=l1data[symbol]["internal"]["EMA_count"]
-
 			pipe.send(["order update_m",l1data[symbol],update_])
-			writer.writerow([symbol,mili_ts,bid,ask,\
-				l1data[symbol]["internal"]["EMA8H"],\
-				l1data[symbol]["internal"]["EMA8L"],\
-				l1data[symbol]["internal"]["EMA8C"],\
-				l1data[symbol]["internal"]["EMA21H"],\
-				l1data[symbol]["internal"]["EMA21L"],\
-				l1data[symbol]["internal"]["EMA21C"]])
+
+			# writer.writerow([symbol,mili_ts,bid,ask,\
+			# 	l1data[symbol]["internal"]["EMA5H"],\
+			# 	l1data[symbol]["internal"]["EMA5L"],\
+			# 	l1data[symbol]["internal"]["EMA5C"],\
+			# 	l1data[symbol]["internal"]["EMA8H"],\
+			# 	l1data[symbol]["internal"]["EMA8L"],\
+			# 	l1data[symbol]["internal"]["EMA8C"]])
+
 			#print(symbol,l1data[symbol],update_)
 		else:
 
@@ -334,10 +332,6 @@ def process_l1(dic,bid,ask,ms):
 				dic["EMA8L"] = dic["low"]
 				dic["EMA8C"] = dic["close"]
 
-				dic["EMA21H"] = dic["high"]
-				dic["EMA21L"] = dic["low"]
-				dic["EMA21C"] = dic["close"]
-
 			else: #induction! 
 				dic["EMA5H"] = new_ema(dic["high"],dic["EMA5H"],5)
 				dic["EMA5L"] = new_ema(dic["low"],dic["EMA5L"],5)
@@ -346,10 +340,6 @@ def process_l1(dic,bid,ask,ms):
 				dic["EMA8H"] = new_ema(dic["high"],dic["EMA8H"],8)
 				dic["EMA8L"] = new_ema(dic["low"],dic["EMA8L"],8)
 				dic["EMA8C"] = new_ema(dic["close"],dic["EMA8C"],8)
-
-				dic["EMA21H"] = new_ema(dic["high"],dic["EMA21H"],21)
-				dic["EMA21L"] = new_ema(dic["low"],dic["EMA21L"],21)
-				dic["EMA21C"] = new_ema(dic["close"],dic["EMA21C"],21)
 
 			dic["EMA_count"]+=1
 			return True
