@@ -876,6 +876,12 @@ class Tester:
 			l1data[symbol]["internal"]["EMA8H"] = 0
 			l1data[symbol]["internal"]["EMA8L"] = 0
 			l1data[symbol]["internal"]["EMA8C"] = 0
+
+
+			l1data[symbol]["internal"]["EMA21H"] = 0
+			l1data[symbol]["internal"]["EMA21L"] = 0
+			l1data[symbol]["internal"]["EMA21C"] = 0
+
 			send = True
 
 		#process the informations. process internal only. 
@@ -898,6 +904,11 @@ class Tester:
 				update_["EMA8H"]=l1data[symbol]["internal"]["EMA8H"]
 				update_["EMA8L"]=l1data[symbol]["internal"]["EMA8L"]
 				update_["EMA8C"]=l1data[symbol]["internal"]["EMA8C"]
+
+				update_["EMA21H"]=l1data[symbol]["internal"]["EMA21H"]
+				update_["EMA21L"]=l1data[symbol]["internal"]["EMA21L"]
+				update_["EMA21C"]=l1data[symbol]["internal"]["EMA21C"]
+
 				update_["EMAcount"]=l1data[symbol]["internal"]["EMA_count"]
 				pipe.send(["order update_m",l1data[symbol],update_])
 
@@ -952,6 +963,10 @@ class Tester:
 					dic["EMA8L"] = self.new_ema(dic["low"],dic["EMA8L"],8)
 					dic["EMA8C"] = self.new_ema(dic["close"],dic["EMA8C"],8)
 
+					dic["EMA21H"] = new_ema(dic["high"],dic["EMA21H"],21)
+					dic["EMA21L"] = new_ema(dic["low"],dic["EMA21L"],21)
+					dic["EMA21C"] = new_ema(dic["close"],dic["EMA21C"],21)
+					
 				dic["EMA_count"]+=1
 				return True
 			else:

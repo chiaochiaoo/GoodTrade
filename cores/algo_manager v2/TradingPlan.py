@@ -46,7 +46,7 @@ class TradingPlan:
 		self.current_price_level = 0
 		self.price_levels = {}
 
-		self.numeric_labels = [ACTRISK,ESTRISK,CURRENT_SHARE,TARGET_SHARE,INPUT_TARGET_SHARE,AVERAGE_PRICE,LAST_AVERAGE_PRICE,RISK_PER_SHARE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3,FLATTENTIMER,BREAKPRICE,RISKTIMER,FIBCURRENT_MAX,FIBLEVEL1,FIBLEVEL2,FIBLEVEL3,FIBLEVEL4,EXIT,RELOAD_TIMES]
+		self.numeric_labels = [ACTRISK,ESTRISK,CUR_PROFIT_LEVEL,CURRENT_SHARE,TARGET_SHARE,INPUT_TARGET_SHARE,AVERAGE_PRICE,LAST_AVERAGE_PRICE,RISK_PER_SHARE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3,FLATTENTIMER,BREAKPRICE,RISKTIMER,FIBCURRENT_MAX,FIBLEVEL1,FIBLEVEL2,FIBLEVEL3,FIBLEVEL4,EXIT,RELOAD_TIMES]
 		self.string_labels = [MIND,STATUS,POSITION,RISK_RATIO,SIZE_IN,ENTRYPLAN,ENTYPE,MANAGEMENTPLAN]
 
 		self.bool_labels= [AUTORANGE,AUTOMANAGE,RELOAD,SELECTED,ANCART_OVERRIDE,USING_STOP]
@@ -188,6 +188,10 @@ class TradingPlan:
 		if self.data[CURRENT_SHARE] >0:
 			self.data[UNREAL_PSHR] = gain
 			self.data[UNREAL]= round(gain*self.data[CURRENT_SHARE],4)
+
+			self.data[CUR_PROFIT_LEVEL] = self.data[UNREAL_PSHR]/self.data[RISK_PER_SHARE]
+			
+			#print("profit level:",round(self.data[CUR_PROFIT_LEVEL],2))
 
 		if  self.data[UNREAL] < -self.data[ACTRISK]*0.05:#+gap:
 			stillbreak = False
@@ -535,29 +539,31 @@ class TradingPlan:
 
 		if self.tkvars[STATUS].get() ==PENDING:
 
-			try:
-				entryplan=self.tkvars[ENTRYPLAN].get()
-				entry_type=self.tkvars[ENTYPE].get()
-				entrytimer=int(self.tkvars[TIMER].get())
-				manage_plan =self.tkvars[MANAGEMENTPLAN].get()
+#			try:
+			entryplan=self.tkvars[ENTRYPLAN].get()
+			entry_type=self.tkvars[ENTYPE].get()
+			entrytimer=int(self.tkvars[TIMER].get())
+			manage_plan =self.tkvars[MANAGEMENTPLAN].get()
 
-				if risktimer ==0:
-					self.data[RISKTIMER] = int(self.tkvars[RISKTIMER].get())
-				else:
-					self.data[RISKTIMER] = risktimer
+			if risktimer ==0:
+				self.data[RISKTIMER] = int(self.tkvars[RISKTIMER].get())
+			else:
+				self.data[RISKTIMER] = risktimer
 
-				print("risk timer",self.data[RISKTIMER])
-				self.set_mind("",DEFAULT)
-				self.entry_plan_decoder(entryplan, entry_type, entrytimer)
-				self.manage_plan_decoder(manage_plan)
+			self.data[RISK_PER_SHARE] = abs(self.symbol.get_resistence()-self.symbol.get_support())
 
-				if self.AR_toggle_check():
-					log_print("Deploying:",self.symbol_name,self.entry_plan.get_name(),self.symbol.get_support(),self.symbol.get_resistence(),entry_type,entrytimer,self.management_plan.get_name(),"risk:",self.data[ESTRISK],"risk timer:",self.data[RISKTIMER],"reload:",self.data[RELOAD_TIMES])
-				
-					self.start_tradingplan()
-			except Exception as e:
+			self.set_mind("",DEFAULT)
+			self.entry_plan_decoder(entryplan, entry_type, entrytimer)
+			self.manage_plan_decoder(manage_plan)
 
-				log_print("Deplying Error:",self.symbol_name,e)
+			if self.AR_toggle_check():
+				log_print("Deploying:",self.symbol_name,self.entry_plan.get_name(),self.symbol.get_support(),self.symbol.get_resistence(),entry_type,entrytimer,self.management_plan.get_name(),"risk:",self.data[ESTRISK],"risk timer:",self.data[RISKTIMER],"reload:",self.data[RELOAD_TIMES],"rps",self.data[RISK_PER_SHARE])
+			
+				self.start_tradingplan()
+
+			# except Exception as e:
+
+			# 	log_print("Deplying Error:",self.symbol_name,e)
 	
 	def start_tradingplan(self):
 		self.mark_algo_status(DEPLOYED)
@@ -633,8 +639,10 @@ class TradingPlan:
 			self.set_ManagementStrategy(OneToTWORiskReward_OLD(self.symbol,self))
 		elif manage_plan == FIBO:
 			self.set_ManagementStrategy(FibonacciOnly(self.symbol,self))
+
 		elif manage_plan == FIBONO:
 			self.set_ManagementStrategy(FiboNoSoft(self.symbol,self))
+			
 		elif manage_plan == EM_STRATEGY:
 
 			### NEED TO MAKE SURE IT IS WHAT IT IS. otherwise, switch. 
@@ -665,8 +673,13 @@ class TradingPlan:
 			self.set_ManagementStrategy(HoldTilClose(self.symbol,self))
 		elif manage_plan == SCALPATRON:
 			self.set_ManagementStrategy(ScalpaTron(self.symbol,self))
+
 		elif manage_plan == EMASTRAT:
 			self.set_ManagementStrategy(EMAStrategy(self.symbol,self))
+
+		elif manage_plan == TRENDRIDER:
+			self.set_ManagementStrategy(TrendStrategy(self.symbol,self))
+
 	def set_EntryStrategy(self,entry_plan:Strategy):
 		self.entry_plan = entry_plan
 		#self.entry_plan.set_symbol(self.symbol,self)

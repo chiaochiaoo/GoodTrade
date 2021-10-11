@@ -82,7 +82,7 @@ class BackTester:
 		# tk.Button(self.root ,text="sub 1 share",command=self.sub1).grid(column=2,row=7)
 
 		#read the file
-		with open('backtest/XLE.AM.txt') as json_file:
+		with open('backtest/AMD.NQ.txt') as json_file:
 			tester = json.load(json_file)
 
 

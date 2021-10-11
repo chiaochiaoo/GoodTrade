@@ -34,6 +34,7 @@ ANCART_OVERRIDE = "ancartoverride"
 USING_STOP = "Using_STOP"
 FLATTENTIMER = "flattentimer"
 
+
 TIMER = "timer"
 ACTRISK="actrisk"
 ESTRISK="estrisk"
@@ -56,6 +57,8 @@ STOP_LEVEL = "Stop_level"
 SYMBOL = "Symbol"
 MIND = "MIND"
 RELOAD_TIMES = "Reloadtimes"
+
+CUR_PROFIT_LEVEL = "Current_profit_level"
 
 BREAKPRICE = "Breakprice"
 
@@ -156,6 +159,7 @@ FIBONO = "FibAdjstd"
 FIBO = "Fib only"
 EMASTRAT =  "EMA strategy"
 SCALPATRON = "Scalpatron"
+TRENDRIDER = "TrendRider"
 
 ONETOTWORISKREWARDOLD = "1:2 RiskReward"
 
