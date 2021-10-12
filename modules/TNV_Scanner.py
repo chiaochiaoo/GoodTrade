@@ -624,10 +624,10 @@ class Open_Reversal():
 		if risk>0:
 
 			if side =="UP":
-				info = ["New order",["BreakAny",symbol,support-0.02,resistence,risk,{},"deploy","Fib only"]]
+				info = ["New order",["BreakAny",symbol,support-0.02,resistence,risk,{},"deploy","TrendRider"]]
 				#print("sending",info)
 			else:
-				info = ["New order",["BreakAny",symbol,support,resistence+0.02,risk,{},"deploy","Fib only"]]
+				info = ["New order",["BreakAny",symbol,support,resistence+0.02,risk,{},"deploy","TrendRider"]]
 			self.tnv_scanner.send_algo(info)
 
 	def send_group_algos(self,lst):
