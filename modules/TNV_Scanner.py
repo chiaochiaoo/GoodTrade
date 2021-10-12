@@ -639,7 +639,7 @@ class Open_Reversal():
 		if risk>0:
 			for i in range(len(lst)):
 				#print(lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"])
-				order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","Fib only"])
+				order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","TrendRider"])
 
 			self.tnv_scanner.send_algo(order)
 
