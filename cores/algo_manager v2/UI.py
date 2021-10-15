@@ -151,8 +151,7 @@ class UI(pannel):
 		self.t2_ = ttk.Label(self.stats, textvariable=self.u_winning)
 		self.t2_.grid(sticky="w",column=2,row=row)
 
-		self.t2_ = ttk.Label(self.stats, textvariable=self.u_winning_min)
-		self.t2_.grid(sticky="w",column=3,row=row)
+
 
 		self.t2_ = ttk.Label(self.stats, textvariable=self.u_winning_max)
 		self.t2_.grid(sticky="w",column=4,row=row)
@@ -164,8 +163,7 @@ class UI(pannel):
 		self.t2_ = ttk.Label(self.stats, textvariable=self.u_losing)
 		self.t2_.grid(sticky="w",column=2,row=row)
 
-		self.t2_ = ttk.Label(self.stats, textvariable=self.u_losing_min)
-		self.t2_.grid(sticky="w",column=3,row=row)
+
 
 		self.t2_ = ttk.Label(self.stats, textvariable=self.u_losing_max)
 		self.t2_.grid(sticky="w",column=4,row=row)
