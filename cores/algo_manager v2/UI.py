@@ -77,7 +77,7 @@ class UI(pannel):
 		self.stats.place(x=10,y=160,height=260,width=210)
 
 		self.active_trade = tk.IntVar()
-		self.finish_trade = tk.IntVar()
+		self.active_trade_max = tk.IntVar()
 
 		self.total_u = tk.DoubleVar()
 		self.total_u_max = tk.DoubleVar()
@@ -90,8 +90,22 @@ class UI(pannel):
 
 		self.current_total_risk = tk.DoubleVar()
 		self.current_downside = tk.DoubleVar()
+
+		self.net = tk.DoubleVar()
+		self.net_max = tk.DoubleVar()
+		self.net_min = tk.DoubleVar()
+
 		self.current_upside = tk.DoubleVar()
 
+
+		self.current_downside_max = tk.DoubleVar()
+		self.u_winning = tk.DoubleVar()
+		self.u_winning_min = tk.DoubleVar()
+		self.u_winning_max = tk.DoubleVar()
+
+		self.u_losing = tk.DoubleVar()
+		self.u_losing_min = tk.DoubleVar()
+		self.u_losing_max = tk.DoubleVar()
 
 		self.x1 = ttk.Label(self.stats, text="Cur:")
 		self.x1.grid(sticky="w",column=2,row=1,padx=3)
@@ -106,11 +120,17 @@ class UI(pannel):
 		self.t1_ = ttk.Label(self.stats, textvariable=self.active_trade)
 		self.t1_.grid(sticky="w",column=2,row=row)
 
-		row += 1 
-		self.t1b = ttk.Label(self.stats, text="Finished:")
-		self.t1b.grid(sticky="w",column=1,row=row,padx=10)
-		self.t1b_ = ttk.Label(self.stats, textvariable=self.finish_trade)
-		self.t1b_.grid(sticky="w",column=2,row=row)
+		ttk.Label(self.stats, textvariable=self.active_trade_max).grid(sticky="w",column=4,row=row)
+
+		row +=1 
+		self.t2 = ttk.Label(self.stats, text="Total Net:")
+		self.t2.grid(sticky="w",column=1,row=row,padx=10)
+		self.t2_ = ttk.Label(self.stats, textvariable=self.net)
+		self.t2_.grid(sticky="w",column=2,row=row)
+
+		ttk.Label(self.stats, textvariable=self.net_min).grid(sticky="w",column=3,row=row)
+		ttk.Label(self.stats, textvariable=self.net_max).grid(sticky="w",column=4,row=row)
+
 
 		row +=1 
 		self.t2 = ttk.Label(self.stats, text="Total U:")
@@ -118,11 +138,40 @@ class UI(pannel):
 		self.t2_ = ttk.Label(self.stats, textvariable=self.total_u)
 		self.t2_.grid(sticky="w",column=2,row=row)
 
-		self.t2_ = ttk.Label(self.stats, textvariable=self.total_u_max)
+		self.t2_ = ttk.Label(self.stats, textvariable=self.total_u_min)
 		self.t2_.grid(sticky="w",column=3,row=row)
 
-		self.t2_ = ttk.Label(self.stats, textvariable=self.total_u_min)
+		self.t2_ = ttk.Label(self.stats, textvariable=self.total_u_max)
 		self.t2_.grid(sticky="w",column=4,row=row)
+
+
+		row +=1 
+		self.t2 = ttk.Label(self.stats, text="Winnig:")
+		self.t2.grid(sticky="w",column=1,row=row,padx=10)
+		self.t2_ = ttk.Label(self.stats, textvariable=self.u_winning)
+		self.t2_.grid(sticky="w",column=2,row=row)
+
+		self.t2_ = ttk.Label(self.stats, textvariable=self.u_winning_min)
+		self.t2_.grid(sticky="w",column=3,row=row)
+
+		self.t2_ = ttk.Label(self.stats, textvariable=self.u_winning_max)
+		self.t2_.grid(sticky="w",column=4,row=row)
+
+
+		row +=1 
+		self.t2 = ttk.Label(self.stats, text="Losing:")
+		self.t2.grid(sticky="w",column=1,row=row,padx=10)
+		self.t2_ = ttk.Label(self.stats, textvariable=self.u_losing)
+		self.t2_.grid(sticky="w",column=2,row=row)
+
+		self.t2_ = ttk.Label(self.stats, textvariable=self.u_losing_min)
+		self.t2_.grid(sticky="w",column=3,row=row)
+
+		self.t2_ = ttk.Label(self.stats, textvariable=self.u_losing_max)
+		self.t2_.grid(sticky="w",column=4,row=row)
+
+
+
 
 
 		row +=1 
@@ -130,10 +179,10 @@ class UI(pannel):
 		self.t3.grid(sticky="w",column=1,row=row,padx=10)
 		self.t3_ = ttk.Label(self.stats, textvariable=self.total_r)
 		self.t3_.grid(sticky="w",column=2,row=row)
-		self.t3_ = ttk.Label(self.stats, textvariable=self.total_r_max)
+		self.t3_ = ttk.Label(self.stats, textvariable=self.total_r_min)
 		self.t3_.grid(sticky="w",column=3,row=row)
 
-		self.t3_ = ttk.Label(self.stats, textvariable=self.total_r_min)
+		self.t3_ = ttk.Label(self.stats, textvariable=self.total_r_max)
 		self.t3_.grid(sticky="w",column=4,row=row)
 
 		row +=1 
@@ -152,11 +201,7 @@ class UI(pannel):
 		self.t6_ = ttk.Label(self.stats, textvariable=self.current_upside)
 		self.t6_.grid(sticky="w",column=2,row=row)
 
-		row +=1 
-		self.t6 = ttk.Label(self.stats, text="Downside:")
-		self.t6.grid(sticky="w",column=1,row=row,padx=10)
-		self.t6_ = ttk.Label(self.stats, textvariable=self.current_downside)
-		self.t6_.grid(sticky="w",column=2,row=row)
+
 
 
 		self.config = ttk.LabelFrame(self.root,text="Config") 

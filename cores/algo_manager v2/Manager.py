@@ -219,7 +219,7 @@ class Manager:
 		self.ui = UI(root,self)
 
 		self.active_trade = 0
-		self.finish_trade = 0
+		self.active_trade_max = 0
 
 		self.total_u = 0
 		self.total_u_max = 0
@@ -228,13 +228,24 @@ class Manager:
 		self.total_r_max =0
 		self.total_r_min = 0
 
+		self.net = 0
+		self.net_max = 0
+		self.net_min = 0
+
 		self.max_risk = 0
 
 		self.current_total_risk = 0
 		self.current_downside = 0
 		self.current_upside = 0
 
+		self.current_downside_max = 0
+		self.u_winning = 0
+		self.u_winning_min = 0
+		self.u_winning_max = 0
 
+		self.u_losing = 0
+		self.u_losing_min = 0
+		self.u_losing_max = 0
 
 		good = threading.Thread(target=self.goodtrade_in, daemon=True)
 		good.start()
@@ -362,32 +373,35 @@ class Manager:
 
 	def update_stats(self):
 
-
 		self.active_trade = 0
-		self.finish_trade = 0
-
 		self.total_u = 0
-		self.total_u_max = 0
-		self.total_u_min = 0
 		self.total_r = 0
-		self.total_r_max =0
-		self.total_r_min = 0
-
 		self.max_risk = 0
-
 		self.current_total_risk = 0
 		self.current_downside = 0
 		self.current_upside = 0
 
+		############# added ###############
+
+		self.u_winning = 0
+		self.u_losing = 0
+
+
+
 
 		for trade in self.tradingplan.values():
 
-			if trade.data[STATUS] == DONE:
-				self.finish_trade +=1
-			elif trade.data[STATUS] == RUNNING:
+			if trade.data[STATUS] == RUNNING:
 				self.active_trade +=1 
 
 			self.total_u += trade.data[UNREAL]
+
+			if trade.data[UNREAL]>0:
+				self.u_winning +=  trade.data[UNREAL]
+			else:
+				self.u_losing +=  trade.data[UNREAL]
+
+
 			self.total_r += trade.data[TOTAL_REALIZED]
 
 			self.current_total_risk +=  trade.data[ACTRISK]
@@ -396,6 +410,24 @@ class Manager:
 				self.current_downside +=  trade.data[ACTRISK]
 			else:
 				self.current_upside +=  trade.data[ACTRISK]
+
+
+
+
+		if self.active_trade > self.active_trade_max:
+			self.active_trade_max = self.active_trade
+
+
+		# net 
+
+		self.net = self.total_u + self.total_r
+
+
+		if self.net > self.net_max:
+			self.net_max = self.net
+			
+		if self.net < self.net_min:
+			self.net_min = self.net	
 
 
 		if self.total_u > self.total_u_max:
@@ -409,25 +441,51 @@ class Manager:
 
 		if self.total_r < self.total_r_min:
 			self.total_r_min = self.total_r
+		# winning
 
-		if self.current_downside < self.max_risk:
+		if self.u_winning > self.u_winning_max:
+			self.u_winning_max = self.u_winning
+			
+		if self.u_losing < self.u_losing_max:
+			self.u_losing_max = self.u_losing	
+
+		if self.current_downside > self.current_downside_max:
+			self.current_downside_max = self.current_downside
+
+
+
+		if self.current_downside > self.max_risk:
 			self.max_risk = self.current_downside
 
-		self.ui.active_trade.set(self.active_trade)  
-		self.ui.finish_trade.set(self.finish_trade)  
 
-		self.ui.total_u.set(round(self.total_u,2))  
-		self.ui.total_u_max.set(round(self.total_u_max,2))  
-		self.ui.total_u_min.set(round(self.total_u_min,2))  
-		self.ui.total_r.set(round(self.total_r,2))  
-		self.ui.total_r_max.set(round(self.total_r_max,2))  	
-		self.ui.total_r_min.set(round(self.total_r_min,2))  
+
+
+		self.ui.active_trade.set(self.active_trade)  
+		self.ui.active_trade_max.set(self.active_trade_max)  
+
+		self.ui.net.set(round(self.net,1))
+		self.ui.net_min.set(round(self.net_min,1))
+		self.ui.net_max.set(round(self.net_max,1))
+
+
+		self.ui.u_winning.set(round(self.u_winning,1))
+		self.ui.u_winning_max.set(round(self.u_winning_max,1))
+
+		self.ui.u_losing.set(round(self.u_losing,1))
+		self.ui.u_losing_max.set(round(self.u_losing_max,1))
+
+		self.ui.total_u.set(round(self.total_u,1))  
+		self.ui.total_u_max.set(round(self.total_u_max,1))  
+		self.ui.total_u_min.set(round(self.total_u_min,1))  
+		self.ui.total_r.set(round(self.total_r,1))  
+		self.ui.total_r_max.set(round(self.total_r_max,1))  	
+		self.ui.total_r_min.set(round(self.total_r_min,1))  
 
 		self.ui.max_risk.set(int(self.max_risk))  
 
-		self.ui.current_total_risk.set(round(self.current_total_risk,2))  
-		self.ui.current_downside.set(round(self.current_downside,2))  
-		self.ui.current_upside.set(round(self.current_upside,2))  
+		self.ui.current_total_risk.set(int(self.current_total_risk))  
+		self.ui.current_downside.set(int(self.current_downside))  
+		self.ui.current_upside.set(int(-self.current_upside))  
 
 
 	def goodtrade_in(self):
