@@ -354,7 +354,7 @@ class Manager:
 
 			self.update_stats()
 
-			
+
 			time.sleep(5)
 
 		self.root.destroy()
@@ -384,7 +384,7 @@ class Manager:
 
 			if trade.data[STATUS] == DONE:
 				self.finish_trade +=1
-			elif trade.data[STATUS] == PENDING:
+			elif trade.data[STATUS] == RUNNING:
 				self.active_trade +=1 
 
 			self.total_u += trade.data[UNREAL]
