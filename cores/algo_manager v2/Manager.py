@@ -218,6 +218,24 @@ class Manager:
 
 		self.ui = UI(root,self)
 
+		self.active_trade = 0
+		self.finish_trade = 0
+
+		self.total_u = 0
+		self.total_u_max = 0
+		self.total_u_min = 0
+		self.total_r = 0
+		self.total_r_max =0
+		self.total_r_min = 0
+
+		self.max_risk = 0
+
+		self.current_total_risk = 0
+		self.current_downside = 0
+		self.current_upside = 0
+
+
+
 		good = threading.Thread(target=self.goodtrade_in, daemon=True)
 		good.start()
 		
@@ -292,6 +310,7 @@ class Manager:
 		timestamp = 34200
 
 		log_print("timer start")
+
 		while True:
 			now = datetime.now()
 			ts = now.hour*3600 + now.minute*60 + now.second
@@ -330,9 +349,86 @@ class Manager:
 				log_print("Trigger")
 				break
 
-			time.sleep(60)
+			## UPPDAtes
+
+
+			self.update_stats()
+
+			
+			time.sleep(5)
 
 		self.root.destroy()
+
+
+	def update_stats(self):
+
+
+		self.active_trade = 0
+		self.finish_trade = 0
+
+		self.total_u = 0
+		self.total_u_max = 0
+		self.total_u_min = 0
+		self.total_r = 0
+		self.total_r_max =0
+		self.total_r_min = 0
+
+		self.max_risk = 0
+
+		self.current_total_risk = 0
+		self.current_downside = 0
+		self.current_upside = 0
+
+
+		for trade in self.tradingplan.values():
+
+			if trade.data[STATUS] == DONE:
+				self.finish_trade +=1
+			elif trade.data[STATUS] == PENDING:
+				self.active_trade +=1 
+
+			self.total_u += trade.data[UNREAL]
+			self.total_r += trade.data[TOTAL_REALIZED]
+
+			self.current_total_risk +=  trade.data[ACTRISK]
+
+			if trade.data[ACTRISK]>0:
+				self.current_downside +=  trade.data[ACTRISK]
+			else:
+				self.current_upside +=  trade.data[ACTRISK]
+
+
+		if self.total_u > self.total_u_max:
+			self.total_u_max = self.total_u
+
+		if self.total_u < self.total_u_min:
+			self.total_u_min = self.total_u
+
+		if self.total_r > self.total_r_max:
+			self.total_r_max = self.total_r
+
+		if self.total_r < self.total_r_min:
+			self.total_r_min = self.total_r
+
+		if self.current_downside < self.max_risk:
+			self.max_risk = self.current_downside
+
+		self.ui.active_trade.set(self.active_trade)  
+		self.ui.finish_trade.set(self.finish_trade)  
+
+		self.ui.total_u.set(round(self.total_u,2))  
+		self.ui.total_u_max.set(round(self.total_u_max,2))  
+		self.ui.total_u_min.set(round(self.total_u_min,2))  
+		self.ui.total_r.set(round(self.total_r,2))  
+		self.ui.total_r_max.set(round(self.total_r_max,2))  	
+		self.ui.total_r_min.set(round(self.total_r_min,2))  
+
+		self.ui.max_risk.set(int(self.max_risk))  
+
+		self.ui.current_total_risk.set(round(self.current_total_risk,2))  
+		self.ui.current_downside.set(round(self.current_downside,2))  
+		self.ui.current_upside.set(round(self.current_upside,2))  
+
 
 	def goodtrade_in(self):
 		time.sleep(3)

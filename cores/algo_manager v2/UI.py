@@ -70,13 +70,100 @@ class UI(pannel):
 		self.comms = ttk.LabelFrame(self.root,text="HQ") 
 		self.comms.place(x=10,y=10,height=150,width=210)
 
+
 		self.init_HQ_pannel()
 
+		self.stats = ttk.LabelFrame(self.root,text="Statistics") 
+		self.stats.place(x=10,y=160,height=260,width=210)
+
+		self.active_trade = tk.IntVar()
+		self.finish_trade = tk.IntVar()
+
+		self.total_u = tk.DoubleVar()
+		self.total_u_max = tk.DoubleVar()
+		self.total_u_min = tk.DoubleVar()
+		self.total_r = tk.DoubleVar()
+		self.total_r_max = tk.DoubleVar()
+		self.total_r_min = tk.DoubleVar()
+
+		self.max_risk = tk.DoubleVar()
+
+		self.current_total_risk = tk.DoubleVar()
+		self.current_downside = tk.DoubleVar()
+		self.current_upside = tk.DoubleVar()
+
+
+		self.x1 = ttk.Label(self.stats, text="Cur:")
+		self.x1.grid(sticky="w",column=2,row=1,padx=3)
+		self.x2 = ttk.Label(self.stats, text="Min:")
+		self.x2.grid(sticky="w",column=3,row=1,padx=3)
+		self.x3 = ttk.Label(self.stats, text="Max:")
+		self.x3.grid(sticky="w",column=4,row=1,padx=3)
+
+		row = 2 
+		self.t1 = ttk.Label(self.stats, text="Activated:")
+		self.t1.grid(sticky="w",column=1,row=row,padx=10)
+		self.t1_ = ttk.Label(self.stats, textvariable=self.active_trade)
+		self.t1_.grid(sticky="w",column=2,row=row)
+
+		row += 1 
+		self.t1b = ttk.Label(self.stats, text="Finished:")
+		self.t1b.grid(sticky="w",column=1,row=row,padx=10)
+		self.t1b_ = ttk.Label(self.stats, textvariable=self.finish_trade)
+		self.t1b_.grid(sticky="w",column=2,row=row)
+
+		row +=1 
+		self.t2 = ttk.Label(self.stats, text="Total U:")
+		self.t2.grid(sticky="w",column=1,row=row,padx=10)
+		self.t2_ = ttk.Label(self.stats, textvariable=self.total_u)
+		self.t2_.grid(sticky="w",column=2,row=row)
+
+		self.t2_ = ttk.Label(self.stats, textvariable=self.total_u_max)
+		self.t2_.grid(sticky="w",column=3,row=row)
+
+		self.t2_ = ttk.Label(self.stats, textvariable=self.total_u_min)
+		self.t2_.grid(sticky="w",column=4,row=row)
+
+
+		row +=1 
+		self.t3 = ttk.Label(self.stats, text="Total R:")
+		self.t3.grid(sticky="w",column=1,row=row,padx=10)
+		self.t3_ = ttk.Label(self.stats, textvariable=self.total_r)
+		self.t3_.grid(sticky="w",column=2,row=row)
+		self.t3_ = ttk.Label(self.stats, textvariable=self.total_r_max)
+		self.t3_.grid(sticky="w",column=3,row=row)
+
+		self.t3_ = ttk.Label(self.stats, textvariable=self.total_r_min)
+		self.t3_.grid(sticky="w",column=4,row=row)
+
+		row +=1 
+		self.t6 = ttk.Label(self.stats, text="Total Risk:")
+		self.t6.grid(sticky="w",column=1,row=row,padx=10)
+		self.t6_ = ttk.Label(self.stats, textvariable=self.current_total_risk)
+		self.t6_.grid(sticky="w",column=2,row=row)
+		self.t6_ = ttk.Label(self.stats, textvariable=self.max_risk)
+		self.t6_.grid(sticky="w",column=4,row=row)
+
+
+
+		row +=1 
+		self.t6 = ttk.Label(self.stats, text="Locked in:")
+		self.t6.grid(sticky="w",column=1,row=row,padx=10)
+		self.t6_ = ttk.Label(self.stats, textvariable=self.current_upside)
+		self.t6_.grid(sticky="w",column=2,row=row)
+
+		row +=1 
+		self.t6 = ttk.Label(self.stats, text="Downside:")
+		self.t6.grid(sticky="w",column=1,row=row,padx=10)
+		self.t6_ = ttk.Label(self.stats, textvariable=self.current_downside)
+		self.t6_.grid(sticky="w",column=2,row=row)
+
+
 		self.config = ttk.LabelFrame(self.root,text="Config") 
-		self.config.place(x=10,y=160,height=300,width=210)
+		self.config.place(x=10,y=360,height=260,width=210)
 
 		self.cmd = ttk.LabelFrame(self.root,text="Command") 
-		self.cmd.place(x=10,y=400,height=500,width=210)
+		self.cmd.place(x=10,y=600,height=500,width=210)
 
 
 		self.init_config_pannel()
@@ -84,11 +171,13 @@ class UI(pannel):
 		# self.log_panel = ttk.LabelFrame(self.root,text="Events") 
 		# self.log_panel.place(x=10,y=300,relheight=0.5,width=210)
 
+		# self.stats_panel = ttk.LabelFrame(self.root,text="Algo Stats") 
+		# self.stats_panel.place(x=210,y=10,height=50,width=1650)
+
 		self.deployment_panel = ttk.LabelFrame(self.root,text="Algo deployment") 
 		self.deployment_panel.place(x=210,y=10,relheight=0.85,width=1650)
 
-		self.total_u = tk.StringVar()
-		self.total_r = tk.StringVar()
+		###########################################################################################################
 
 		self.dev_canvas = tk.Canvas(self.deployment_panel)
 		self.dev_canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
@@ -109,6 +198,7 @@ class UI(pannel):
 
 	def init_HQ_pannel(self):
 
+
 		self.main_app_status = tk.StringVar()
 		self.main_app_status.set("")
 
@@ -124,6 +214,7 @@ class UI(pannel):
 		self.algo_count_string = tk.StringVar(value="0")
 		self.algo_timer_string = tk.StringVar(value="0")
 		self.algo_timer_close_string = tk.StringVar(value="0")
+
 		self.algo_count_string.set("Activated Algos:"+str(self.algo_count_number))
 
 		self.main = ttk.Label(self.comms, text="Main:")
