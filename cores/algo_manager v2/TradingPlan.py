@@ -189,8 +189,10 @@ class TradingPlan:
 			self.data[UNREAL_PSHR] = gain
 			self.data[UNREAL]= round(gain*self.data[CURRENT_SHARE],4)
 
-			self.data[CUR_PROFIT_LEVEL] = self.data[UNREAL_PSHR]/self.data[RISK_PER_SHARE]
-			
+			try:
+				self.data[CUR_PROFIT_LEVEL] = self.data[UNREAL_PSHR]/self.data[RISK_PER_SHARE]
+			except:
+				self.data[CUR_PROFIT_LEVEL] = 0 
 			#print("profit level:",round(self.data[CUR_PROFIT_LEVEL],2))
 
 		if  self.data[UNREAL] < -self.data[ACTRISK]*0.05:#+gap:
