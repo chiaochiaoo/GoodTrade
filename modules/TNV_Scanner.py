@@ -1059,7 +1059,7 @@ class Premarket_breakout():
 					#print(self.NT.nasdaq_trader_symbols)
 					if 1: #score>0:	
 
-						lst = [rank,sec,sc,relv,vol,ph,pl,listed]
+						lst = [rank,sec,sc,relv,vol,ph,pl,pr,listed]
 
 						ts_location = 7
 
