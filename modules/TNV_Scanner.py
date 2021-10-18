@@ -1059,51 +1059,53 @@ class Premarket_breakout():
 					#print(self.NT.nasdaq_trader_symbols)
 					if 1: #score>0:	
 
-						lst = [rank,sec,sc,vol,relv,ph,pl,listed]
+						lst = [rank,sec,sc,relv,vol,ph,pl,listed]
 
 						ts_location = 7
 
 						for i in range(len(lst)):
-							
-							if lst[ts_location] >=ts and lst[ts_location]>=algo_timer and lst[ts_location]<=end_timer:
-								self.entries[entry][i]["background"] = "LIGHTGREEN"
-								self.entries[entry][8].grid()
+							self.entries[entry][i]["text"] = lst[i]
+							self.entries[entry][8].grid_remove() 	
 
-								if side == "UP":
-									support = row['low']
-									resistence = row['open']
-								else:
-									support = row['open']
-									resistence = row['high']
+							# if lst[ts_location] >=ts and lst[ts_location]>=algo_timer and lst[ts_location]<=end_timer:
+							# 	self.entries[entry][i]["background"] = "LIGHTGREEN"
+							# 	self.entries[entry][8].grid()
 
-								self.entries[entry][8]["command"]= lambda symbol=rank,support=support,side=side,resistence=resistence:self.send_algo(symbol,support,resistence,side)
+							# 	if side == "UP":
+							# 		support = row['low']
+							# 		resistence = row['open']
+							# 	else:
+							# 		support = row['open']
+							# 		resistence = row['high']
 
-								if self.algo_activate.get()==1:
-									if rank not in self.algo_placed:
+							# 	self.entries[entry][8]["command"]= lambda symbol=rank,support=support,side=side,resistence=resistence:self.send_algo(symbol,support,resistence,side)
 
-										#self.send_algo(rank,support,resistence,self.algo_risk)
-										self.algo_placed.append(rank)
+							# 	if self.algo_activate.get()==1:
+							# 		if rank not in self.algo_placed:
 
-										order = {}
+							# 			#self.send_algo(rank,support,resistence,self.algo_risk)
+							# 			self.algo_placed.append(rank)
 
-										order["symbol"] = rank
-										order["support"] = support
-										order["resistence"] = resistence
+							# 			order = {}
 
-										order["side"] = side
+							# 			order["symbol"] = rank
+							# 			order["support"] = support
+							# 			order["resistence"] = resistence
 
-										send_algo.append(order)
+							# 			order["side"] = side
 
-										#print(rank,self.algo_placed)
+							# 			send_algo.append(order)
+
+							# 			#print(rank,self.algo_placed)
 										
-							if i == ts_location:
-								self.entries[entry][i]["text"] = ts_to_min(lst[i])
-							else:
-								self.entries[entry][i]["text"] = lst[i]
-								self.entries[entry][8].grid_remove() 
-								#self.entries[entry][8].grid_remove() 
-								#self.entries[entry][9].grid_forget()
-							#self.entries[entry][8].grid() 
+							# if i == ts_location:
+							# 	self.entries[entry][i]["text"] = ts_to_min(lst[i])
+							# else:
+							# 	self.entries[entry][i]["text"] = lst[i]
+							# 	self.entries[entry][8].grid_remove() 
+							# 	#self.entries[entry][8].grid_remove() 
+							# 	#self.entries[entry][9].grid_forget()
+							# #self.entries[entry][8].grid() 
 						#add the button here?
 
 						entry+=1
