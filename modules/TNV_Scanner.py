@@ -858,8 +858,8 @@ class Premarket_breakout():
 		self.entries = []
 		self.l = 1
 		self.NT = NT
-		self.labels_width = [9,6,5,7,7,5,6,6,6,6,6,6,8,6,6,6,6]
-		self.labels = ["Symbol","Sector","SC%","Rel.V","Vol","PH","PL","Listed","Toggle","Add"]
+		self.labels_width = [9,5,5,5,7,5,5,5,5,5,5,5,8,6,6,6,6]
+		self.labels = ["Symbol","Sector","SC%","Rel.V","Vol","PH","PL","Prange","Listed","Toggle","Add"]
 
 		self.algo_risk = tk.DoubleVar(value=10)
 		self.algo_activate = tk.BooleanVar(value=0)
@@ -1045,7 +1045,7 @@ class Premarket_breakout():
 					vol = row['volume']
 					ph = row['ph']
 					pl = row['pl']
-
+					pr = row['prange']
 
 					############ add since, and been to the thing #############
 
