@@ -141,11 +141,11 @@ class util_client:
 							print("Error updating NasdaqTrader:",e)
 
 					elif d[0]=="Scanner update":
-						self.pannel.update_TNVscanner(d[1])
-						if 1:
+
+						try:
 							self.pannel.update_TNVscanner(d[1])
-						# except Exception as e:
-						# 	print("Error updating Nasdaq:",e)
+						except Exception as e:
+							print("Error updating Nasdaq:",e)
 
 					elif d[0] =="Database Response":
 
@@ -212,65 +212,72 @@ def algo_server(ulti_response):
 	k=""
 	while True:
 
-		HOST = '10.29.10.133'  # The server's hostname or IP address
-		PORT = 65425       # The port used by the server
 
-		print("Trying to connect to the Algo server")
-		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		connected = False
-		while not connected:
-			try:
-				s.connect((HOST, PORT))
-				connected = True
-			except:
-				#pipe.send(["msg","Cannot connected. Try again in 2 seconds."])
-				print("Cannot connect Algo server. Try again in 2 seconds.")
-				time.sleep(2)
+		try:
+			HOST = '10.29.10.133'  # The server's hostname or IP address
+			PORT = 65425       # The port used by the server
 
-		connection = True
-
-		print("Algo server Connection Successful")
-
-		while connection:
-			print("Algo server: taking data")
-
-			data = []
-			while True:
-
+			print("Trying to connect to the Algo server")
+			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			connected = False
+			while not connected:
 				try:
-					s.sendall(pickle.dumps(['connection check']))
+					s.connect((HOST, PORT))
+					connected = True
 				except:
-					connection = False
-					break
+					#pipe.send(["msg","Cannot connected. Try again in 2 seconds."])
+					print("Cannot connect Algo server. Try again in 2 seconds.")
+					time.sleep(2)
 
-				ready = select.select([s], [], [])
-				if ready[0]:
-					data = []
-					while True:
+			connection = True
 
-						try:
-							part = s.recv(2048)
-						except:
-							connection = False
-							break
+			print("Algo server Connection Successful")
 
-						data.append(part)
-						if len(part) < 2048:
-							
+			while connection:
+				print("Algo server: taking data")
+
+				data = []
+				while True:
+
+
+					try:
+						s.sendall(pickle.dumps(['connection check']))
+					except:
+						connection = False
+						break
+
+					ready = select.select([s], [], [])
+					if ready[0]:
+						data = []
+						while True:
+
 							try:
-								k = pickle.loads(b"".join(data))
-								break
+								part = s.recv(2048)
 							except:
-								pass
-					#print("received:",k)
-					time_ = datetime.now().strftime("%H:%M:%S : ") 
-					print(time_,"Algo update")
-					ulti_response.send(k)
+								connection = False
+								break
+
+							data.append(part)
+							if len(part) < 2048:
+								
+								try:
+									k = pickle.loads(b"".join(data))
+									break
+								except:
+									pass
+						#print("received:",k)
+						time_ = datetime.now().strftime("%H:%M:%S : ") 
+
+						print(time_,"Algo update")
+
+						ulti_response.send(k)
 
 
-				#ulti_response.send(["Util init"])
-		print("Algo Server disconnected")
+					#ulti_response.send(["Util init"])
+			print("Algo Server disconnected")
+		except Exception as e:
 
+			print("algo server error",e)
 def util_comms(ulti_response): #connects to server for db, nt, and finviz. 
 
 	k=""
