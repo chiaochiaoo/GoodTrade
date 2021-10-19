@@ -239,14 +239,13 @@ def algo_server(ulti_response):
 				data = []
 				while True:
 
-
 					try:
 						s.sendall(pickle.dumps(['connection check']))
 					except:
 						connection = False
 						break
 
-					ready = select.select([s], [], [])
+					ready = select.select([s], [], [],10)
 					if ready[0]:
 						data = []
 						while True:
@@ -271,6 +270,8 @@ def algo_server(ulti_response):
 						print(time_,"Algo update")
 
 						ulti_response.send(k)
+					else:
+						print(time_,"No algo update")
 
 
 					#ulti_response.send(["Util init"])
