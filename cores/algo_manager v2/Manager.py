@@ -299,7 +299,7 @@ class Manager:
 						self.ui.create_new_entry(self.tradingplan[symbol])
 
 						if status =="deploy":
-							self.tradingplan[symbol].deploy(960)
+							self.tradingplan[symbol].deploy(9600)
 					else:
 						self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,NONE,risk,self.pipe_ppro_out,1,TEST_MODE)
 						self.ui.create_new_entry(self.tradingplan[symbol])
