@@ -271,6 +271,8 @@ def algo_server(ulti_response):
 
 						ulti_response.send(k)
 					else:
+
+						time_ = datetime.now().strftime("%H:%M:%S : ") 
 						print(time_,"No algo update")
 
 
