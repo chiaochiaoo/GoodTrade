@@ -878,10 +878,10 @@ class Premarket_breakout():
 	def recreate_labels(self,frame):
 
 		self.algo_frame = ttk.LabelFrame(self.root,text="Algo setup")
-		self.algo_frame.place(x=0, rely=0, relheight=0.2, relwidth=1)
+		self.algo_frame.place(x=0, rely=0, relheight=0.06, relwidth=1)
 
 		self.root = ttk.LabelFrame(self.root,text="")
-		self.root.place(x=0, rely=0.12, relheight=0.8, relwidth=1)
+		self.root.place(x=0, rely=0.12, relheight=0.94, relwidth=1)
 
 		self.algo_pannel(self.algo_frame)
 				# self.breakout_frame = ttk.LabelFrame(self.root,text="Volatility Breakout")
@@ -947,35 +947,35 @@ class Premarket_breakout():
 		ttk.Entry(frame, textvariable=self.algo_risk).grid(sticky="w",column=col+3,row=row)
 
 
-		row = 2
-		col = 1
+		# row = 2
+		# col = 1
 
-		self.hour = tk.IntVar(value=9)
-		self.minute = tk.IntVar(value=30)
+		# self.hour = tk.IntVar(value=9)
+		# self.minute = tk.IntVar(value=30)
 
-		ttk.Label(frame, text="Start:").grid(sticky="w",column=col,row=row)
-		ttk.Entry(frame, textvariable=self.hour).grid(sticky="w",column=col+1,row=row)
+		# ttk.Label(frame, text="Start:").grid(sticky="w",column=col,row=row)
+		# ttk.Entry(frame, textvariable=self.hour).grid(sticky="w",column=col+1,row=row)
 
-		ttk.Label(frame, text=":").grid(sticky="w",column=col+2,row=row)
-		ttk.Entry(frame, textvariable=self.minute).grid(sticky="w",column=col+3,row=row)
-
-
-		self.rel_v = tk.DoubleVar(value=0)
-		self.re_score = tk.DoubleVar(value=0)
+		# ttk.Label(frame, text=":").grid(sticky="w",column=col+2,row=row)
+		# ttk.Entry(frame, textvariable=self.minute).grid(sticky="w",column=col+3,row=row)
 
 
-		self.ehour = tk.IntVar(value=10)
-		self.eminute = tk.IntVar(value=00)
-		row = 3
-		col = 1
-		ttk.Label(frame, text="End").grid(sticky="w",column=col,row=row)
-		ttk.Entry(frame, textvariable=self.ehour).grid(sticky="w",column=col+1,row=row)
+		# self.rel_v = tk.DoubleVar(value=0)
+		# self.re_score = tk.DoubleVar(value=0)
 
-		ttk.Label(frame, text=":").grid(sticky="w",column=col+2,row=row)
-		ttk.Entry(frame, textvariable=self.eminute).grid(sticky="w",column=col+3,row=row)
 
-		self.side_ = tk.StringVar(value='x')
-		self.listed_ = tk.BooleanVar(value=False)
+		# self.ehour = tk.IntVar(value=10)
+		# self.eminute = tk.IntVar(value=00)
+		# row = 3
+		# col = 1
+		# ttk.Label(frame, text="End").grid(sticky="w",column=col,row=row)
+		# ttk.Entry(frame, textvariable=self.ehour).grid(sticky="w",column=col+1,row=row)
+
+		# ttk.Label(frame, text=":").grid(sticky="w",column=col+2,row=row)
+		# ttk.Entry(frame, textvariable=self.eminute).grid(sticky="w",column=col+3,row=row)
+
+		# self.side_ = tk.StringVar(value='x')
+		# self.listed_ = tk.BooleanVar(value=False)
 		
 		# row = 4
 		# col = 1
@@ -990,7 +990,7 @@ class Premarket_breakout():
 		# ttk.Checkbutton(frame, variable=self.listed_).grid(sticky="w",column=col+3,row=row)
 
 
-		algo_timer = self.hour.get()*60 + self.minute.get()
+		#algo_timer = self.hour.get()*60 + self.minute.get()
 		#print("algo time",algo_timer)
 
 	def create_entry(self):
