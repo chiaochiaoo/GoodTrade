@@ -1073,6 +1073,10 @@ class Premarket_breakout():
 							# 	self.entries[entry][i]["background"] = "LIGHTGREEN"
 							# 	self.entries[entry][8].grid()
 
+							if sc>0:
+								side = "UP"
+							else:
+								side = "DOWN"
 							support = row['pl']
 							resistence = row['ph']
 
