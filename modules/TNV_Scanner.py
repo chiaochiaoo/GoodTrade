@@ -93,7 +93,9 @@ class TNV_Scanner():
 		self.trending = ADX(self.trending_frame,NT)
 		self.pmb = Premarket_breakout(self.pmb_frame,NT,self)
 		self.spread = Spread(self.spread_frame,NT)
+
 		# item = pd.read_csv("test.csv",index_col=0)
+		# self.pmb.update_entry(item)
 		# self.near_high.update_entry(item)
 		# self.near_low.update_entry(item)
 		#self.open_reversal.update_entry(item)
@@ -720,7 +722,7 @@ class Open_Reversal():
 				
 				if i == 8:
 					self.b = tk.Button(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
-				elif i ==9:
+				if i ==9:
 					self.b = tk.Button(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
 				else:
 					self.b = tk.Label(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
@@ -787,7 +789,7 @@ class Open_Reversal():
 							
 							if lst[ts_location] >=ts and lst[ts_location]>=algo_timer and lst[ts_location]<=end_timer:
 								self.entries[entry][i]["background"] = "LIGHTGREEN"
-								self.entries[entry][8].grid()
+								self.entries[entry][9].grid()
 
 								if side == "UP":
 									support = row['low']
@@ -796,7 +798,7 @@ class Open_Reversal():
 									support = row['open']
 									resistence = row['high']
 
-								self.entries[entry][8]["command"]= lambda symbol=rank,support=support,side=side,resistence=resistence:self.send_algo(symbol,support,resistence,side)
+								self.entries[entry][9]["command"]= lambda symbol=rank,support=support,side=side,resistence=resistence:self.send_algo(symbol,support,resistence,side)
 
 								if self.algo_activate.get()==1:
 									if rank not in self.algo_placed:
@@ -999,7 +1001,7 @@ class Premarket_breakout():
 
 			for i in range(len(self.labels)): #Rows
 				
-				if i == 8:
+				if i == 9:
 					self.b = tk.Button(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
 				elif i ==9:
 					self.b = tk.Button(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
@@ -1007,8 +1009,8 @@ class Premarket_breakout():
 					self.b = tk.Label(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
 				self.b.grid(row=self.l, column=i)
 				self.entries[k].append(self.b)
-				if i == 9:
-					self.b.grid_remove()
+				# if i == 9:
+				# 	self.b.grid_remove()
 			self.l+=1
 
 	def update_entry(self,data):
@@ -1065,11 +1067,14 @@ class Premarket_breakout():
 
 						for i in range(len(lst)):
 							self.entries[entry][i]["text"] = lst[i]
-							self.entries[entry][8].grid_remove() 	
+							#self.entries[entry][9].grid_remove() 	
 
 							# if lst[ts_location] >=ts and lst[ts_location]>=algo_timer and lst[ts_location]<=end_timer:
 							# 	self.entries[entry][i]["background"] = "LIGHTGREEN"
 							# 	self.entries[entry][8].grid()
+
+							support = row['pl']
+							resistence = row['ph']
 
 							# 	if side == "UP":
 							# 		support = row['low']
@@ -1078,7 +1083,7 @@ class Premarket_breakout():
 							# 		support = row['open']
 							# 		resistence = row['high']
 
-							# 	self.entries[entry][8]["command"]= lambda symbol=rank,support=support,side=side,resistence=resistence:self.send_algo(symbol,support,resistence,side)
+							self.entries[entry][9]["command"]= lambda symbol=rank,support=support,side=side,resistence=resistence:self.send_algo(symbol,support,resistence,side)
 
 							# 	if self.algo_activate.get()==1:
 							# 		if rank not in self.algo_placed:
@@ -1123,7 +1128,7 @@ class Premarket_breakout():
 				# for i in df.columns:
 				# 	if i not in keep:
 				# 		df.pop(i)
-				df.to_csv(self.file)
+				#df.to_csv(self.file)
 			# except Exception as e:
 			# 	print("TNV scanner construction open reversal:",e)
 
