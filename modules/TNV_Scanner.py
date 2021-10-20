@@ -917,10 +917,10 @@ class Premarket_breakout():
 		if risk>0:
 
 			if side =="UP":
-				info = ["New order",["BreakAny",symbol,support-0.02,resistence,risk,{},"TrendRider"]]
+				info = ["New order",["BreakAny",symbol,support-0.02,resistence,risk,{},"Notdeploy","TrendRider"]]
 				#print("sending",info)
 			else:
-				info = ["New order",["BreakAny",symbol,support,resistence+0.02,risk,{},"TrendRider"]]
+				info = ["New order",["BreakAny",symbol,support,resistence+0.02,risk,{},"Notdeploy","TrendRider"]]
 			self.tnv_scanner.send_algo(info)
 
 	def send_group_algos(self,lst):
@@ -932,7 +932,7 @@ class Premarket_breakout():
 		if risk>0:
 			for i in range(len(lst)):
 				#print(lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"])
-				order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"TrendRider"])
+				order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"Notdeploy","TrendRider"])
 
 			self.tnv_scanner.send_algo(order)
 
