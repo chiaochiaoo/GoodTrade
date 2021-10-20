@@ -1,2 +1,2 @@
 @echo off
-python data_processor
+python data_processor.py
