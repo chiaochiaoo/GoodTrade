@@ -16,6 +16,7 @@ def ts_to_min(ts):
 	s = ts%60
 
 	return str(m)+":"+str(s)
+
 class Premarket_breakout():
 	def __init__(self,root,NT,TNV_scanner):
 
@@ -97,6 +98,34 @@ class Premarket_breakout():
 				info = ["New order",["BreakAny",symbol,support,resistence+change,risk,{},"Notdeploy","TrendRider"]]
 			self.tnv_scanner.send_algo(info)
 
+	# def send_group_algos(self,lst):
+
+	# 	risk = self.algo_risk.get()
+
+	# 	#print("HELLO.",lst)
+	# 	order = ["New order"]
+	# 	if risk>0:
+	# 		for i in range(len(lst)):
+	# 			#print(lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"])
+
+	# 			change = 0.03
+			
+	# 			if lst[i]["support"]>10 and lst[i]["support"]<20:
+	# 				change = 0.05
+
+	# 			if lst[i]["support"] >20:
+	# 				change = 0.06
+
+
+	# 			if lst[i]["side"] =="UP":
+	# 				order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"]-change,lst[i]["resistence"],risk,{},"Notdeploy","TrendRider"])
+
+	# 				#print("sending",info)
+	# 			else:
+	# 				order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"]+change,risk,{},"Notdeploy","TrendRider"])
+
+	# 		self.tnv_scanner.send_algo(order)
+
 	def send_group_algos(self,lst):
 
 		risk = self.algo_risk.get()
@@ -105,7 +134,7 @@ class Premarket_breakout():
 		order = ["New order"]
 		if risk>0:
 			for i in range(len(lst)):
-				#print(lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"])
+
 				order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"Notdeploy","TrendRider"])
 
 			self.tnv_scanner.send_algo(order)
@@ -125,7 +154,7 @@ class Premarket_breakout():
 		# col = 1
 
 		self.hour = tk.IntVar(value=9)
-		self.minute = tk.IntVar(value=30)
+		self.minute = tk.IntVar(value=10)
 
 		# ttk.Label(frame, text="Start:").grid(sticky="w",column=col,row=row)
 		# ttk.Entry(frame, textvariable=self.hour).grid(sticky="w",column=col+1,row=row)
@@ -138,8 +167,8 @@ class Premarket_breakout():
 		# self.re_score = tk.DoubleVar(value=0)
 
 
-		self.ehour = tk.IntVar(value=10)
-		self.eminute = tk.IntVar(value=00)
+		self.ehour = tk.IntVar(value=9)
+		self.eminute = tk.IntVar(value=28)
 		# row = 3
 		# col = 1
 		# ttk.Label(frame, text="End").grid(sticky="w",column=col,row=row)
@@ -241,6 +270,7 @@ class Premarket_breakout():
 
 						for i in range(len(lst)):
 							self.entries[entry][i]["text"] = lst[i]
+
 							#self.entries[entry][9].grid_remove() 	
 
 							# if lst[ts_location] >=ts and lst[ts_location]>=algo_timer and lst[ts_location]<=end_timer:
@@ -254,32 +284,25 @@ class Premarket_breakout():
 							support = row['pl']
 							resistence = row['ph']
 
-							# 	if side == "UP":
-							# 		support = row['low']
-							# 		resistence = row['open']
-							# 	else:
-							# 		support = row['open']
-							# 		resistence = row['high']
-
 							self.entries[entry][9]["command"]= lambda symbol=rank,support=support,side=side,resistence=resistence:self.send_algo(symbol,support,resistence,side)
 
-							# 	if self.algo_activate.get()==1:
-							# 		if rank not in self.algo_placed:
+							if self.algo_activate.get()==1 and ts>=algo_timer and ts<=end_timer:
+								if rank not in self.algo_placed:
 
-							# 			#self.send_algo(rank,support,resistence,self.algo_risk)
-							# 			self.algo_placed.append(rank)
+									#self.send_algo(rank,support,resistence,self.algo_risk)
+									self.algo_placed.append(rank)
 
-							# 			order = {}
+									order = {}
 
-							# 			order["symbol"] = rank
-							# 			order["support"] = support
-							# 			order["resistence"] = resistence
+									order["symbol"] = rank
+									order["support"] = support
+									order["resistence"] = resistence
 
-							# 			order["side"] = side
+									order["side"] = side
 
-							# 			send_algo.append(order)
+									send_algo.append(order)
 
-							# 			#print(rank,self.algo_placed)
+									#print(rank,self.algo_placed)
 										
 							# if i == ts_location:
 							# 	self.entries[entry][i]["text"] = ts_to_min(lst[i])
