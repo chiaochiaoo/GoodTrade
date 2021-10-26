@@ -9,6 +9,12 @@ from datetime import datetime
 
 from tkinter import *
 
+def ts_to_min(ts):
+	ts = int(ts)
+	m = ts//60
+	s = ts%60
+
+	return str(m)+":"+str(s)
 
 class Open_Reversal():
 	def __init__(self,root,NT,TNV_scanner):

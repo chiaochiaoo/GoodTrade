@@ -8,8 +8,8 @@ from datetime import datetime
 #from modules.pannel import *
 
 from tkinter import *
-from TNV_PMB import *
-from TNV_OR import *
+from modules.TNV_PMB import *
+from modules.TNV_OR import *
 
 class fake_NT():
 
