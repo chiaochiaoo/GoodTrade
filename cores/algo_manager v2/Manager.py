@@ -28,6 +28,7 @@ except:
 f.close()
 
 
+
 TEST = True
 def algo_manager_voxcom(pipe):
 
@@ -345,6 +346,7 @@ class Manager:
 
 		timestamp = 965
 		while True:
+
 			now = datetime.now()
 			ts = now.hour*60 + now.minute
 			remain = timestamp - ts
@@ -368,8 +370,10 @@ class Manager:
 
 			time.sleep(5)
 
-		self.root.destroy()
-
+		try:
+			self.root.destroy()
+		except Exception as e:
+			pass
 
 	def update_stats(self):
 
@@ -1206,6 +1210,7 @@ if __name__ == '__main__':
 	elif len(sys.argv)==3:
 		Tester(receive_pipe,ppro_pipe_end,ppro_pipe_end2)
 	else:
+		a=1
 		algo_voxcom.start()
 		ppro_out_manager.start()
 		ppro_in_manager.start()		
@@ -1215,6 +1220,9 @@ if __name__ == '__main__':
 	# root.maxsize(1800, 1200)
 	root.mainloop()
 
+	ppro_out.send(["shutdown"])
+
+	time.sleep(2)
 
 	algo_voxcom.terminate()
 	ppro_in_manager.terminate()
@@ -1225,6 +1233,8 @@ if __name__ == '__main__':
 	ppro_in_manager.join()
 	ppro_out_manager.join()
 	print("All subprocesses terminated")
-	
-	os._exit(1) 
+
+	print("checking",multiprocessing.active_children(),threading.active_count())
+	os._exit(1)
+
 	print("exit")

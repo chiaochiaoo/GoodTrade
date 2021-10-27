@@ -216,7 +216,8 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 	request_str = ""
 	sucess_str= ""
 	failure_str = ""
-	while True:
+	termination = False
+	while True and not termination:
 		try:
 			request_str = ""
 			sucess_str= ""
@@ -227,6 +228,12 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 			log_print("PPRO ORDER:",d)
 
 
+			if type_ == "shutdown":
+				log_print("ppro out termination")
+				driver.close()
+				pipe_status.send("terminated")
+				log_print("ppro out shutdown successful")
+				termination = True
 			if type_ == BUY:
 
 				symbol = d[1]
@@ -322,7 +329,7 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 				request_str,sucess_str,failure_str=flatten_symbol(symbol)
 			else:
 
-				log_print("Unrecognized ppro command received.")
+				log_print("Unrecognized ppro command received.",type_)
 
 			sucessful = False
 
@@ -338,6 +345,9 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 
 		except Exception as e:
 			log_print(e)
+
+
+	log_print("ppro out terminated")
 
 
 def ppro_request(request,success=None,failure=None,wait=0,traceid=False,symbol=None,side=None,pipe=None):
@@ -588,3 +598,4 @@ def cancel_stoporder(id_):
    
 # 	req = threading.Thread(target=ppro_request, args=(r,sucess,failure,True,symbol,"S",pipe),daemon=True)
 # 	req.start()
+
