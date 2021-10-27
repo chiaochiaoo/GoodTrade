@@ -27,6 +27,8 @@ import sys
 from tkinter import messagebox
 
 from modules.Util_client import *
+from modules.database_functions import *
+
 from modules.alerts import *
 from modules.pannel import *	
 from modules.Symbol_data_manager import *
@@ -399,7 +401,10 @@ def utils(algo_manager_receive_comm,util_response):
 		receiver = threading.Thread(target=algo_server,args=(util_response,),daemon=True)
 		receiver.start()
 
-		util_comms(util_response)
+		db = threading.Thread(target=database_service,args=(util_response,),daemon=True)
+		db.start()
+
+		util_comms(util_response) #for nasdaq trader 
 if __name__ == '__main__':
 
 	#try:

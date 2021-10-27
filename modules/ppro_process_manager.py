@@ -542,7 +542,7 @@ def load_historical_data(symbol,database):
 	d = data[symbol]
 
 	if d["historical_data_loaded"] == False:
-		file = "data/"+symbol+"_"+date.today().strftime("%m%d")+".txt"
+		file = "data/"+symbol[:-3]+"_"+date.today().strftime("%m%d")+".txt"
 
 		if os.path.isfile(file):
 			#print(symbol,"process loading from db.")
@@ -554,12 +554,12 @@ def load_historical_data(symbol,database):
 
 			d["historical_data_loaded"] = True
 			print(symbol,"loaded successful")
-		else:
+		# else:
 			
-			if d["requested_time"]<5:
-				print(symbol,"data not found")
-			# 	database.send_request(symbol)
-			d["requested_time"]+=1
+		# 	if d["requested_time"]<5:
+		# 		print(symbol,"data not found")
+		# 	# 	database.send_request(symbol)
+		# 	d["requested_time"]+=1
 
 
 def evaluator(val,mean,std):

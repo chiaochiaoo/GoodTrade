@@ -42,22 +42,24 @@ class util_client:
 
 		symbols = self.symbol_data_manager.get_list()[:]
 	
-		count = 0
-		for i in symbols:
-			if count %5 ==0:
-				if count !=0:
-					self.util_request.send(l)
-				l=["Database Request init"]
-			if not self.check_if_file_exist(i):
-				l.append(i)
-			count+=1
-		if len(l)>1:
-			l[0]="Database Request finish"
-			self.util_request.send(l)
+		self.send_requests(symbols)
+
+		# count = 0
+		# for i in symbols:
+		# 	if count %5 ==0:
+		# 		if count !=0:
+		# 			self.util_request.send(l)
+		# 		l=["Database Request init"]
+		# 	if not self.check_if_file_exist(i):
+		# 		l.append(i)
+		# 	count+=1
+		# if len(l)>1:
+		# 	l[0]="Database Request finish"
+		# 	self.util_request.send(l)
 
 	def check_if_file_exist(self,symbol):
 
-		file = "data/"+symbol+"_"+self.today+".txt"
+		file = "data/"+symbol[:-3]+"_"+self.today+".txt"
 
 		if os.path.isfile(file):
 			print(symbol,"already exisit, loading local copy instd.")
@@ -80,7 +82,7 @@ class util_client:
 
 		no = ["Database Request"]
 		for symbol in symbols:
-			file = "data/"+symbol+"_"+self.today+".txt"
+			file = "data/"+symbol[:-3]+"_"+self.today+".txt"
 
 			if os.path.isfile(file):
 				print(symbol,"already exisit, loading local copy instd.")
@@ -113,6 +115,9 @@ class util_client:
 		else:
 			self.util_request.send(["Database Request",symbol])
 
+
+
+
 	def receive_request(self):
 
 		#self.util_request.send("HELLO!")
@@ -125,15 +130,15 @@ class util_client:
 
 					print(d[0])
 					######### SCANNER PART ############
-					if d[0]=="Database Request":
-						print("send: ",d)
-						self.util_request.send(d)
+					# if d[0]=="Database Request":
+					# 	print("send: ",d)
+					# 	self.util_request.send(d)
 
-					elif d[0]=="Finviz Request":
+					# elif d[0]=="Finviz Request":
 
-						self.util_request.send(d)
+					# 	self.util_request.send(d)
 
-					elif d[0]=="NasdaqTrader update":
+					if d[0]=="NasdaqTrader update":
 						#self.pannel.add_nasdaq_labels(d[1])
 						try:
 							self.pannel.add_nasdaq_labels(d[1])
@@ -161,9 +166,9 @@ class util_client:
 
 							self.data_status[symbol].set(True)
 
-							file = "data/"+symbol+"_"+self.today+".txt"
-							with open(file, 'w') as outfile:
-									json.dump(d, outfile)
+							# file = "data/"+symbol+"_"+self.today+".txt"
+							# with open(file, 'w') as outfile:
+							# 		json.dump(d, outfile)
 
 								#save the file here.
 
@@ -197,7 +202,7 @@ class util_client:
 					else:
 						print("unkown server package:",d)
 			except Exception as e:
-				print("Util receive:",e,d)
+				print("Util receive unkown:",e,d)
 
 
 
@@ -227,7 +232,7 @@ def algo_server(ulti_response):
 				except:
 					#pipe.send(["msg","Cannot connected. Try again in 2 seconds."])
 					print("Cannot connect Algo server. Try again in 2 seconds.")
-					time.sleep(2)
+					time.sleep(5)
 
 			connection = True
 
@@ -302,7 +307,7 @@ def util_comms(ulti_response): #connects to server for db, nt, and finviz.
 			except:
 				#pipe.send(["msg","Cannot connected. Try again in 2 seconds."])
 				print("Cannot connect Util server. Try again in 2 seconds.")
-				time.sleep(2)
+				time.sleep(5)
 
 		connection = True
 		s.setblocking(0)
@@ -340,28 +345,29 @@ def util_comms(ulti_response): #connects to server for db, nt, and finviz.
 					#print("received:",k)
 					ulti_response.send(k)
 
-				try:
-					if ulti_response.poll(2):
-						d = ulti_response.recv()
-						if d is not None:
-							print(d)
-							if d[0] == "Database Request init":
-								reg_list.extend(d[1:])
-								#print(reg_list)
-							elif d[0] == "Database Request finish":
-								#print(reg_list)
-								reg_list.extend(d[1:])
-								print("sending request:",reg_list)
+				# i think this part jam the signals. 
+				# try:
+				# 	if ulti_response.poll(2):
+				# 		d = ulti_response.recv()
+				# 		if d is not None:
+				# 			print(d)
+				# 			if d[0] == "Database Request init":
+				# 				reg_list.extend(d[1:])
+				# 				#print(reg_list)
+				# 			elif d[0] == "Database Request finish":
+				# 				#print(reg_list)
+				# 				reg_list.extend(d[1:])
+				# 				print("sending request:",reg_list)
 
-								s.sendall(pickle.dumps(reg_list))
-								reg_list = ["Database Request"]
-							else:
-								print("sending request:",d)
-								s.sendall(pickle.dumps(d))
-				except Exception as e:
-					print(e)
-					connection = False
-					break
+				# 				s.sendall(pickle.dumps(reg_list))
+				# 				reg_list = ["Database Request"]
+				# 			else:
+				# 				print("sending request:",d)
+				# 				s.sendall(pickle.dumps(d))
+				# except Exception as e:
+				# 	print(e)
+				# 	connection = False
+				# 	break
 				time.sleep(1)
 				#ulti_response.send(["Util init"])
 		print("Server disconnected")
