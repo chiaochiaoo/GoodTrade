@@ -608,10 +608,12 @@ class alert_map(pannel):
 		self.reverse= True
 		super().__init__(frame)
 
-		self.labels = ["Ticker","Status","Prev Close","High-Low","Open-High","Open-Low","Open Range","Open Vol","5m Range","5m Vol"]
-		self.width = [8,10,8,8,8,8,8,8,8,8]
+		self.labels = ["Ticker","Status","RRVol","Prev Close","High-Low","Open-High","Open-Low","Open Range","Open Vol","5m Range","5m Vol"]
+		self.width = [8,10,8,8,8,8,8,8,8,8,8]
 
 		command={}
+
+		command["RRVol"] = lambda :self.sort_cur_range(self.data.rel_v_eval)
 		command["Prev Close"] = lambda :self.sort_cur_range(self.data.alert_prev_val)
 		command["High-Low"] = lambda :self.sort_cur_range(self.data.alert_hl_val)
 		command["Open-High"] = lambda :self.sort_cur_range(self.data.alert_oh_val)
@@ -635,9 +637,10 @@ class alert_map(pannel):
 		self.tickers_tracers[symbol] = []
 		i = symbol
 
-
+		#			self.data.rel_val_eval[symbol],\
 		info = [i,\
 			self.data.symbol_status[symbol],\
+			self.data.rel_v_eval[symbol],\
 			self.data.alert_prev_val[symbol],\
 			self.data.alert_hl_val[symbol],\
 			self.data.alert_oh_val[symbol],

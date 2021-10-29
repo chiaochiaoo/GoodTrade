@@ -4,6 +4,7 @@ import pandas as pd
 import json
 import requests
 import json
+import datetime
 from datetime import date
 import os.path
 import numpy as np
@@ -16,6 +17,8 @@ except ImportError:
     pip.main(['install', 'finviz'])
     from finviz.screener import Screener
 
+
+rel_v = "rel_volume"
 
 open_high_range ="open_high_range"
 open_high_val ="open_high_val"
@@ -111,6 +114,13 @@ def database_handler(symbols):
 
 	return total
 
+
+def timestamp(st):
+
+	h,m = st.split(":")
+
+	return int(h)*60+int(m)
+
 def fetch_data(symbol):
 
 	i = symbol
@@ -191,9 +201,11 @@ def fetch_data(symbol):
 
 		###ADD the first 5 here. seperate them later.
 
-		postbody = "http://api.kibot.com/?action=history&symbol="+symbol+"&interval=5&period=14&regularsession=1" +l(v)
+		postbody = "http://api.kibot.com/?action=history&symbol="+symbol+"&interval=5&period=14&regularsession=0" +l(v)
 	
 		r= request(postbody, symbol)
+
+		tod = datetime.date.today().strftime("%m/%d/%Y")
 
 		if r!="":
 			a=[]#data.symbol_data_first5_dis[i]
@@ -202,6 +214,9 @@ def fetch_data(symbol):
 			c=[]#data.symbol_data_normal5_dis[i]
 			d=[]#data.symbol_data_normal5_vol_dis[i]
 
+			stamps = np.array([570+i*5 for i in range(79)])
+			df = pd.DataFrame(columns = stamps)
+
 			if r[:3]=="402":
 				print("Not authorize to",symbol)
 				a=[0]#data.symbol_data_first5_dis[i]
@@ -209,16 +224,42 @@ def fetch_data(symbol):
 
 				c=[0]#data.symbol_data_normal5_dis[i]
 				d=[0]#data.symbol_data_normal5_vol_dis[i]
+
+
 			else:
 				for line in r.splitlines():
+					
 					lst=line.split(",")
-					r = round(float(lst[3])-float(lst[4]),3)
 					v = int(lst[6])
-					if lst[1]=='09:30':
-						a.append(r)
-						b.append(v)
-					c.append(r)
-					d.append(v)
+					date = lst[0]
+
+					if date!=tod:
+
+						ts = timestamp(lst[1])
+
+						if date not in df.index:
+
+							df.loc[date] = [0 for i in range(len(stamps))]
+
+							accv = v
+						else:
+							accv +=v 
+
+						if ts>= 570 and ts<=961:
+
+							df.loc[date,ts] = accv
+
+							r = round(float(lst[3])-float(lst[4]),3)
+							
+							if lst[1]=='09:30':
+								a.append(r)
+								b.append(v)
+							c.append(r)
+							d.append(v)
+
+
+
+			rel_vol = df.mean().tolist()
 
 			first5_range=str(round(min(a),3))+"-"+str(round(max(a),3))
 			first5_vol_range=str(int(min(b)//1000))+"k-"+str(int(max(b)/1000))+"k"
@@ -241,6 +282,8 @@ def fetch_data(symbol):
 
 			#data_list[symbol] = symbol
 			data_list = {}
+
+			data_list[rel_v] = rel_vol
 			data_list[open_high_range] = openhigh_range
 			data_list[open_high_val] = openhigh_val
 			data_list[open_high_std]= openhigh_std
@@ -388,7 +431,11 @@ if __name__ == '__main__':
 	# print(s[-9:-3])
 
 	#print(database_handler(["OCGN"]))
+
+	
 	print(fetch_data("QQQ"))
+
+
 
 # df['y'] = 0
 # df.loc[df['x'] < -2, 'y'] = 1
@@ -407,3 +454,21 @@ if __name__ == '__main__':
 ### UPDATE LOGIC #####
 ### Couple lists.
 ### 4 lists? 
+
+	# col  = np.array([1,2,3,4])
+
+	# k = ["q","w","e"]
+
+	# d = pd.DataFrame(columns=col)
+
+	
+	# for i in k:
+	# 	if i not in d:
+	# 		d.loc[i] = [0,0,0,0]
+
+	# 		for j in col:
+	# 			k = np.where(col<=j)[0]
+	# 			d.loc[i,col[k]]+=1
+
+	# print(d)
+	# print(d.mean().tolist())

@@ -67,8 +67,11 @@ class util_client:
 				d = json.load(json_file)
 
 				for key,item in d.items():
-					self.data[key][symbol].set(item)
-					
+
+					if key!= "rel_volume":
+						self.data[key][symbol].set(item)
+					else:
+						self.data[key][symbol] = item[:] 
 			self.data_status[symbol].set(True)
 
 			return True
@@ -90,7 +93,10 @@ class util_client:
 					d = json.load(json_file)
 
 				for key,item in d.items():
-					self.data[key][symbol].set(item)
+					if key!= "rel_volume":
+						self.data[key][symbol].set(item)
+					else:
+						self.data[key][symbol] = item[:] 
 
 				self.data_status[symbol].set(True)
 			else:

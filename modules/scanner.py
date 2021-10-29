@@ -228,7 +228,7 @@ class scanner(pannel):
 				#3,14,5,6,4,6,6,6,10,5
 		self.nasdaq_width = [4,14,5,6,4,4,6,6,6,12,5]
 
-		self.labels = ["Rank","Symbol","Market","Price","Since","Been","SC%","SO%","L5R%","Status","Add"]
+		self.labels = ["Rank","Symbol","Market","Price","Since","RRvol","SC%","SO%","L5R%","Status","Add"]
 
 
 		self.labels_position = {}
@@ -712,6 +712,7 @@ class scanner(pannel):
 					market = symbol[-2:]
 					since = row['fa']
 					been = row['been']
+
 					info = [rank,index,market,price,since,been,status,symbol]
 
 				
@@ -719,6 +720,19 @@ class scanner(pannel):
 
 						if j ==0 or j==2 or j==4 or j==5:
 							self.nasdaq[i][j]["text"] = info[j]
+
+
+						elif j == 5:
+							try:
+								var =  self.data.get_relv(symbol)
+							except:
+								var == None
+
+							if var != None:
+								self.nasdaq[i][j]["textvariable"] = var
+							else:
+								self.nasdaq[i][j]["text"] = "NA"
+
 						elif j == 3:
 							try:
 								var =  self.data.get_symbol_price(symbol)

@@ -30,8 +30,10 @@ global connection_error
 global yahoo_same_time
 yahoo_same_time = 0
 
+global all_ts
+all_ts = np.array([570+i*5 for i in range(79)])
 
-TEST = False
+TEST = True
 ##################################################################
 ####  pipe in, symbol. if symbol not reg, reg. if reg, dereg  ####
 ####  main loop. for each reg, thread out and return.		  ####
@@ -96,6 +98,10 @@ normal_5_vol_alert =  "normal_5_vol_alert"
 prev_eval = "prev_eval"
 prev_alert = "prev_alert"
 risk_reward_ratio_nt = "risk_reward_ratio_nt"
+
+
+rel_v = "rel_volume"
+rel_v_eval = "rel_volume_evaluation"
 
 def round_up(i):
 
@@ -513,6 +519,8 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 
 	d[expected_momentum] = 0
 
+
+	d[rel_v] = []
 	################## ALERTS ########################
 	d[open_high_eval_alert] = 0
 	d[open_high_eval_value] = "0"
@@ -537,6 +545,7 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 	d[prev_eval] = "0"
 	d[prev_alert] = 0
 
+	d[rel_v_eval] = 0
 def load_historical_data(symbol,database):
 	global data
 	d = data[symbol]
@@ -579,6 +588,8 @@ def evaluator(val,mean,std):
 			return 0
 
 def historical_eval(symbol):
+
+	global all_ts
 
 	global data
 	d = data[symbol]
@@ -633,6 +644,24 @@ def historical_eval(symbol):
 			d[prev_alert] = evaluator(d["prev_close_gap"],d[prev_close_val],d[prev_close_std])
 		except:
 			d[prev_alert] = 0
+
+		try:
+			#find current timestamp. location of the relv. 
+			
+
+			cur = np.where(all_ts>=d["timestamp"])[0]
+
+			#print(symbol,d["timestamp"],all_ts[cur[0]],d["volume"]/d[rel_v][cur[0]])
+			if len(cur)>0:
+				d[rel_v_eval] = round(d["volume"]/d[rel_v][cur[0]],2)
+			else:
+				d[rel_v_eval] = round(d["volume"]/d[rel_v][-1],2)
+
+				
+		except:
+			pass
+
+
 		d[prev_eval] = str(d[prev_alert])
 
 def historical_eval2(symbol):
@@ -722,7 +751,7 @@ def process_and_send(lst,pipe,database):
 	d["price"] = price
 	d["open"] = open_
 	d["prev_close"] = prev_close
-
+	d["volume"] = vol
 	#else:
 	#here I set them. 
 
@@ -928,6 +957,8 @@ def process_and_send(lst,pipe,database):
 		update_list[normal_5_vol_alert] = d[normal_5_vol_alert] 
 		update_list[prev_eval] = d[prev_eval] 
 		update_list[prev_alert] = d[prev_alert] 
+
+		update_list[rel_v_eval] = d[rel_v_eval]
 						
 	#check the list. del if repeate.
 	for key,item in update_list.items():

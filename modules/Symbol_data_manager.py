@@ -33,6 +33,10 @@ symbol_percentage_last_5 = "symbol_percentage_last_5"
 symbol_position_status = "symbol_position_status"
 
 
+rel_v = "rel_volume"
+rel_v_eval = "rel_volume_evaluation"
+
+
 open_high_eval_alert = "open_high_eval_alert"
 open_high_eval_value = "open_high_eval_value"
 
@@ -146,6 +150,10 @@ class Symbol_data_manager:
 		self.symbol_price_prevclose = {}
 		self.symbol_price_prevclose_to_now= {}
 
+
+
+		self.rel_v = {}
+		self.rel_v_eval = {}
 		### Update these upon new ticks 
 		self.minute_count = {}
 		self.minute_data = {}
@@ -166,6 +174,7 @@ class Symbol_data_manager:
 		self.symbol_update_time = {}
 
 		#data
+
 
 		self.symbol_data_openhigh_range = {}
 		self.symbol_data_openlow_range = {}
@@ -286,6 +295,7 @@ class Symbol_data_manager:
 
 		self.data_list = {}
 
+		self.data_list[rel_v] = self.rel_v
 		self.data_list[open_high_range] = self.symbol_data_openhigh_range
 		self.data_list[open_high_val] = self.symbol_data_openhigh_val
 		self.data_list[open_high_std] = self.symbol_data_openhigh_std
@@ -355,6 +365,9 @@ class Symbol_data_manager:
 
 		self.update_list = {}
 
+
+		self.update_list[rel_v_eval] = self.rel_v_eval
+
 		self.update_list[symbol_status] = self.symbol_status
 		self.update_list[symbol_price] = self.symbol_price
 		self.update_list[symbol_update_time] = self.symbol_update_time
@@ -379,7 +392,6 @@ class Symbol_data_manager:
 		self.update_list[symbol_percentage_last_5] = self.symbol_percentage_last_5
 		self.update_list[symbol_position_status] = self.symbol_position_status
 		
-
 
 		self.update_list[open_high_eval_alert] = self.alert_oh_val
 		self.update_list[open_high_eval_value] = self.symbol_data_openhigh_eval
@@ -472,6 +484,14 @@ class Symbol_data_manager:
 			print("Cannot find symbol",symbol)
 			return None
 
+
+	def get_relv(self,symbol):
+		if symbol in self.symbol_init:
+			return self.rel_v_eval[symbol]
+		else:
+			print("Cannot find symbol",symbol)
+			return None	
+		
 	def get_last_5_range_percentage(self,symbol):
 		if symbol in self.symbol_init:
 			return self.symbol_percentage_last_5[symbol]
@@ -496,6 +516,9 @@ class Symbol_data_manager:
 		self.symbol_status[i] = StringVar()
 		self.symbol_status_color[i] = StringVar()
 		self.symbol_price[i] = DoubleVar()
+
+		self.rel_v[i] = []
+		self.rel_v_eval[i] = DoubleVar()
 
 		self.symbol_price_open[i] = DoubleVar()
 		self.symbol_price_range[i] = DoubleVar()

@@ -329,7 +329,7 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 				request_str,sucess_str,failure_str=flatten_symbol(symbol)
 			else:
 
-				log_print("Unrecognized ppro command received.",type_)
+				log_print("Unrecognized  command received.",type_)
 
 			sucessful = False
 
