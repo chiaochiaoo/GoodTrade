@@ -395,9 +395,9 @@ class scanner(pannel):
 
 	def sorting_been(self):
 		if self.been_sort==True:
-			self.df=self.df.sort_values(by=["been"],ascending=False)
+			self.df=self.df.sort_values(by=["relv"],ascending=False)
 		else:
-			self.df=self.df.sort_values(by=["been"],ascending=True)		
+			self.df=self.df.sort_values(by=["relv"],ascending=True)		
 
 	def sorting_since(self):
 		if self.since_sort==True:
@@ -598,7 +598,7 @@ class scanner(pannel):
 							self.nasdaq[i][j]["textvariable"] = var
 						else:
 							self.nasdaq[i][j]["text"] = "NA"
-							
+
 					elif j ==3:
 						try:
 							var =  self.data.get_symbol_price(symbol)
@@ -840,18 +840,20 @@ class scanner(pannel):
 				close_ = self.data.get_close_percentage(symbol)
 				open_ = self.data.get_open_percentage(symbol)
 				last5 = self.data.get_last_5_range_percentage(symbol)
+				relv = self.data.get_relv(symbol)
 
 				if status != None:
 					df.loc[index,"status"] = status.get()
 					df.loc[index,"close"] = close_.get()
 					df.loc[index,"open"] = open_.get()
 					df.loc[index,"last5"] = last5.get()
+					df.loc[index,"relv"] = relv.get()
 				else:
 					df.loc[index,"status"] = ""
 					df.loc[index,"close"] = 0
 					df.loc[index,"open"] = 0
 					df.loc[index,"last5"] = 0
-
+					df.loc[index,"relv"] = 0
 			statuts = df['status'].unique()
 
 			for i in statuts:
