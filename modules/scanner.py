@@ -729,7 +729,7 @@ class scanner(pannel):
 				
 					for j in range(len(self.nasdaq_width)):
 
-						if j ==0 or j==2 or j==4 or j==5:
+						if j ==0 or j==2 or j==4:
 							self.nasdaq[i][j]["text"] = info[j]
 
 

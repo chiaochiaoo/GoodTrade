@@ -46,8 +46,10 @@ def color_bind(val,label):
 	else:
 		val = val/3
 
-	label["background"] = hexcolor(val)
-
+	try:
+		label["background"] = hexcolor(val)
+	except:
+		label["background"] = "Default"
 def to_number(str):
 
 	try:
