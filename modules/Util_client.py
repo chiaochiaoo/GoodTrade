@@ -165,8 +165,10 @@ class util_client:
 						for symbol,d in dic.items():
 							#if len(d)-1 == len(self.data):
 							for key,item in d.items():
-								self.data[key][symbol].set(item)
-
+								if key!= "rel_volume":
+									self.data[key][symbol].set(item)
+								else:
+									self.data[key][symbol] = item[:] 
 							# for i in range(len(self.data)):
 							# 	self.data[i][symbol].set(d[i+1])
 

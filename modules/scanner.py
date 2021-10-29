@@ -584,10 +584,21 @@ class scanner(pannel):
 				# ["Rank","Symbol","Market","Price","Since","Been","SC%","SO%","L5R%","Status","Add"]
 
 				for j in range(len(self.nasdaq_width)):
-					if j ==0 or j==2 or j==4 or j==5:
+					if j ==0 or j==2 or j==4:
 						self.nasdaq[i].append(tk.Label(self.NT_scanner_frame ,text=info[j],width=self.nasdaq_width[j]))
 						self.nasdaq[i][j].grid(row=i+2, column=j,padx=0)
 
+					elif j == 5:
+						try:
+							var =  self.data.get_relv(symbol)
+						except:
+							var == None
+
+						if var != None:
+							self.nasdaq[i][j]["textvariable"] = var
+						else:
+							self.nasdaq[i][j]["text"] = "NA"
+							
 					elif j ==3:
 						try:
 							var =  self.data.get_symbol_price(symbol)
