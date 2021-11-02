@@ -10,6 +10,8 @@ from datetime import datetime
 from tkinter import *
 from modules.TNV_PMB import *
 from modules.TNV_OR import *
+from modules.TNV_TFM import *
+
 
 class fake_NT():
 
@@ -26,7 +28,7 @@ def ts_to_min(ts):
 
 class TNV_Scanner():
 
-	def __init__(self,root,NT,commlink):
+	def __init__(self,root,NT,commlink,data):
 
 		
 		self.root = root
@@ -35,11 +37,25 @@ class TNV_Scanner():
 
 		self.algo_commlink = commlink
 
+		self.data = data
 		#self.NT_update_time = tk.StringVar(value='Last updated')
 		#self.NT_update_time.set('Last updated')
 
 		self.NT_stat = ttk.Label(self.root, text="Last update: ")
-		self.NT_stat.place(x=10, y=10, height=25, width=200)
+		self.NT_stat.place(x=10, y=10, height=25, width=260)	
+
+
+		if data!=None:
+			self.socket = Label(self.root,textvariable=self.data.algo_socket,background="red",height=1,width=12)
+			self.connection =Label(self.root,textvariable=self.data.algo_manager_connected,background="red",height=1,width=14)
+
+			self.socket.place(x=250,y=10)
+			self.connection.place(x=350,y=10)
+
+			self.data.algo_socket.trace('w', lambda *_,vals=self.socket,val=self.data.algo_socket: self.color(vals,val))
+			self.data.algo_manager_connected.trace('w', lambda *_,vals=self.connection,val=self.data.algo_manager_connected: self.color(vals,val))
+
+
 
 		self.TNV_TAB = ttk.Notebook(self.root)
 		self.TNV_TAB.place(x=0,rely=0.05,relheight=1,width=640)
@@ -54,6 +70,10 @@ class TNV_Scanner():
 
 		self.spread_frame = tk.Canvas(self.TNV_TAB)
 
+
+
+		self.TFM_frame = tk.Canvas(self.TNV_TAB)
+
 		self.TNV_TAB.add(self.or_frame, text ='Open Reversal')
 
 		self.TNV_TAB.add(self.pmb_frame, text ='PMB')
@@ -67,6 +87,8 @@ class TNV_Scanner():
 		self.TNV_TAB.add(self.trending_frame, text ='Trending')
 
 		self.TNV_TAB.add(self.spread_frame, text ='Spread')
+
+		self.TNV_TAB.add(self.TFM_frame, text ='TradeForMe')
 
 		# self.breakout_frame = ttk.LabelFrame(self.root,text="Volatility Breakout")
 		# self.breakout_frame.place(x=0, rely=0.05, relheight=1, relwidth=0.95) 
@@ -94,7 +116,7 @@ class TNV_Scanner():
 		self.trending = ADX(self.trending_frame,NT)
 		self.pmb = Premarket_breakout(self.pmb_frame,NT,self)
 		self.spread = Spread(self.spread_frame,NT)
-
+		self.tfm = TFM(self.TFM_frame,self)
 		# item = pd.read_csv("test.csv",index_col=0)
 		# self.pmb.update_entry(item)
 		# self.near_high.update_entry(item)
@@ -105,6 +127,12 @@ class TNV_Scanner():
 	def send_algo(self,msg):
 		self.algo_commlink.send(msg)
 
+	def color(self,vals,val):
+
+		if val.get()[-4:]=="alse":
+			vals["background"] = "red"
+		elif val.get()[-4:]=="True":
+			vals["background"] = "#97FEA8"
 	def update_entry(self,data):
 		timestamp = data[1]
 		self.NT_stat["text"] = "Last update: "+timestamp
@@ -1037,7 +1065,7 @@ if __name__ == '__main__':
 	print(ratio_compute(0.8))
 	print(ratio_compute(1.2))
 
-	TNV_Scanner(root,fake_NT(),None)
+	TNV_Scanner(root,fake_NT(),None,None)
 
 	root.mainloop()
 

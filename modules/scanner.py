@@ -50,7 +50,7 @@ class scanner(pannel):
 
 		############## SACNNER ##############
 
-		self.TNVscanner = TNV_Scanner(self.tab1,self,algo_comm)
+		self.TNVscanner = TNV_Scanner(self.tab1,self,algo_comm,data)
 
 		############################### Nasdaq Trader ############################################
 
