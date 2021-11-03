@@ -37,12 +37,13 @@ def hexcolor(level):
 def color_bind(val,label):
 
 	val = val.get()
-
+	val = abs(val)
 	#get color code.
-	if val>3:
+	if val>3 or val<-3:
 		val = 1
-	elif val<0:
-		val = 0
+
+	# elif val<-1:
+	# 	val = abs(val)
 	else:
 		val = val/3
 
