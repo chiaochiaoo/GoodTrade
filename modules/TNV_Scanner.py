@@ -86,8 +86,8 @@ class TNV_Scanner():
 		# NH NL
 		self.oh_frame = tk.Canvas(self.TNV_TAB)
 		self.ol_frame = tk.Canvas(self.TNV_TAB)
-		self.TNV_TAB.add(self.oh_frame, text ='Near High')
-		self.TNV_TAB.add(self.ol_frame, text ='Near Low')
+		self.TNV_TAB.add(self.oh_frame, text ='Open High')
+		self.TNV_TAB.add(self.ol_frame, text ='Open Low')
 		self.oh = Open_high(self.oh_frame,NT)
 		self.ol = Open_low(self.ol_frame,NT)
 
