@@ -70,7 +70,7 @@ class TNV_Scanner():
 		self.TNV_TAB.add(self.pmb_frame, text ='PMB')
 		self.pmb = Premarket_breakout(self.pmb_frame,NT,self)
 
-		# OH OL
+		# NH NL
 		self.nh_frame = tk.Canvas(self.TNV_TAB)
 		self.nl_frame = tk.Canvas(self.TNV_TAB)
 		self.TNV_TAB.add(self.nh_frame, text ='Near High')
@@ -83,11 +83,19 @@ class TNV_Scanner():
 		self.TNV_TAB.add(self.vb_frame, text ='Just Break')
 		self.volatility_scanner = Just_break(self.vb_frame,NT)
 
+		# NH NL
+		self.oh_frame = tk.Canvas(self.TNV_TAB)
+		self.ol_frame = tk.Canvas(self.TNV_TAB)
+		self.TNV_TAB.add(self.oh_frame, text ='Near High')
+		self.TNV_TAB.add(self.ol_frame, text ='Near Low')
+		self.oh = Open_high(self.oh_frame,NT)
+		self.ol = Open_low(self.ol_frame,NT)
 
 		# RRVOL
 		self.rrvol_frame = tk.Canvas(self.TNV_TAB)
 		self.TNV_TAB.add(self.rrvol_frame, text ='RRVol')
 		self.rrvol = RRvol(self.rrvol_frame,NT)
+
 
 
 		# Trending 
@@ -151,8 +159,10 @@ class TNV_Scanner():
 
 			elif key =="oh":
 				self.oh.update_entry(item)
+			elif key =="ol":
+				self.ol.update_entry(item)
 
-				
+
 			elif key =="rrvol":
 				self.rrvol.update_entry(item)
 
