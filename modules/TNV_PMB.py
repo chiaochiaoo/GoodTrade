@@ -246,7 +246,7 @@ class Premarket_breakout():
 					rank = index
 					sec = row['sector']
 					sc = row['SC']
-					relv = row['rel vol']
+					relv = row['rrvol']
 					vol = row['volume']
 					ph = row['ph']
 					pl = row['pl']

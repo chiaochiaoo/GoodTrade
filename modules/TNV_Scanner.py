@@ -461,7 +461,7 @@ class Open_high():
 				#print(row)
 				rank = index
 				sec = row['sector']
-				relv = row['rel vol']
+				relv = row['rrvol']
 				near = row['rangescore']
 				high = row['high']
 
@@ -571,7 +571,7 @@ class Open_low():
 				#print(row)
 				rank = index
 				sec = row['sector']
-				relv = row['rel vol']
+				relv = row['rrvol']
 				near = row['rangescore']
 				high = row['high']
 
