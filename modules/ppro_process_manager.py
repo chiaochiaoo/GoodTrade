@@ -570,22 +570,31 @@ def load_historical_data(symbol,database):
 		# 	# 	database.send_request(symbol)
 		# 	d["requested_time"]+=1
 
-
 def evaluator(val,mean,std):
 
-	if val>mean:
 
-		if std!=0:
-			coefficient=(val-mean)/std
+	if mean!=0:
 
-			return round(1+coefficient,1)
-		else:
-			return 0
+		return round(val/mean,2)
+
 	else:
-		if mean!=0:
-			return round(val/mean,1)
-		else:
-			return 0
+
+		return 0 
+# def evaluator(val,mean,std):
+
+# 	if val>mean:
+
+# 		if std!=0:
+# 			coefficient=(val-mean)/std
+
+# 			return round(1+coefficient,1)
+# 		else:
+# 			return 0
+# 	else:
+# 		if mean!=0:
+# 			return round(val/mean,1)
+# 		else:
+# 			return 0
 
 def historical_eval(symbol):
 
