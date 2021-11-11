@@ -85,7 +85,7 @@ def flatten_symbol(symbol):
 def buy_market_order(symbol,share):
 
 
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Buy ARCX Market DAY&shares='+str(share)
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=EDGX Buy ROUC Market DAY&shares='+str(share)
 	sucess='buy market order success on'+symbol
 	failure="Error buy order on"+symbol
 
@@ -95,7 +95,7 @@ def buy_market_order(symbol,share):
 
 def sell_market_order(symbol,share):
 
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(share)
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=EDGX Sell->Short ROUC Market DAY&shares='+str(share)
 	sucess='sell market order success on'+symbol
 	failure="Error sell order on"+symbol
 
@@ -104,7 +104,7 @@ def sell_market_order(symbol,share):
 def buy_limit_order(symbol, price,share,wait=0):
 
 	price = round(float(price),2)
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Buy ARCX Limit DAY&shares='+str(share)
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit Visible DAY&shares='+str(share)
 	#r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit DAY BookOnly&shares='+str(share)
 	sucess='buy limit order success on'+symbol
 	failure="Error buy limit order on"+symbol
@@ -115,7 +115,7 @@ def buy_limit_order(symbol, price,share,wait=0):
 def sell_limit_order(symbol, price,share,wait=0):
 	price = round(float(price),2)
 
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Sell->Short ARCX Limit DAY&shares='+str(share)
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit Visible DAY='+str(share)
 	#r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit DAY BookOnly&shares='+str(share)
 	sucess='sell limit order success on'+symbol
 	failure="Error sell limit order on"+symbol
@@ -406,6 +406,13 @@ def cancel_stoporder(id_):
 
 	req = threading.Thread(target=ppro_request, args=(r,sucess,failure),daemon=True)
 	req.start()	
+
+
+
+
+request = 
+
+r = requests.post(request)
 
 
 # if __name__ == '__main__':  #TEST BLOCK
