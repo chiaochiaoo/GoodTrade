@@ -804,8 +804,7 @@ class EDGX_break_Purchase_trigger(AbstractTrigger):
 		self.pos = pos
 
 		self.entry = conditions[0][4]
-		self.break_price = self.symbol_data[self.entry]
-
+		
 		self.stop = stop
 		self.ppro_out =ppro_out
 		self.risk = risk 
@@ -828,13 +827,20 @@ class EDGX_break_Purchase_trigger(AbstractTrigger):
 			log_print("Trigger problem on purchase_trigger,conditions:",conditions)
 
 
-		self.share = self.shares_calculator()
-
-
-		self.deploy_stop_order()
+		#self.deploy_stop_order()
 	#add the actual stuff here.
 
 	def deploy_stop_order(self):
+
+		if self.pos!="":
+			self.tradingplan.expect_orders = self.pos
+			if self.trigger_count!= self.trigger_limit:
+				self.set_mind("Entry: "+str(self.trigger_count)+"/"+str(self.trigger_limit),DEFAULT)
+			else:
+				self.set_mind("Entry: Waiting for break",GREEN)
+
+		self.break_price = self.symbol.data[self.entry]
+		self.share = self.shares_calculator()
 
 		log_print("deploying stoporders ")
 		if self.pos == LONG:
@@ -852,19 +858,8 @@ class EDGX_break_Purchase_trigger(AbstractTrigger):
 			  2. DON"T OVERRIDE STOP VALUE.(ANCARTMANAGE WILL DO IT)
 		IF NOT, PROCEED AS USUAL. 
 		"""
-
-		share = self.shares_calculator()
-
-		self.entry_price = self.symbol_data[self.entry]
 		
-		log_print(self.symbol_name,"Trigger: ",self.pos,share,"stop :",self.stop_price)
-
-		if self.pos!="":
-			self.tradingplan.expect_orders = self.pos
-			if self.trigger_count!= self.trigger_limit:
-				self.set_mind("Entry: "+str(self.trigger_count)+"/"+str(self.trigger_limit),DEFAULT)
-			else:
-				self.set_mind("Entry: Complete",GREEN)
+		#log_print(self.symbol_name,"Trigger: ",self.pos,share,"stop :",self.stop_price)
 
 		#print()
 		if self.pos == LONG:
