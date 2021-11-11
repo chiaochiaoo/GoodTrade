@@ -1,7 +1,6 @@
 
 import time
 import pandas as pd 
-import json
 import requests
 import json
 import datetime
@@ -267,10 +266,7 @@ def fetch_data(symbol):
 			p = np.poly1d(np.polyfit(a*5, rel_vol, 10))
 	
 			new = [i for i in range(391)]
-			rel_vol = list(p(new).astype(int))
-
-
-
+			rel_vol = [int(a) for a in p(new)]  
 
 
 			first5_range=str(round(min(a),3))+"-"+str(round(max(a),3))
@@ -445,9 +441,11 @@ if __name__ == '__main__':
 	#print(database_handler(["OCGN"]))
 
 	
-	print(fetch_data("AMD"))
+	file = fetch_data("AMD")
+	print(file)
 
-
+	with open("test.txt", 'w') as outfile:
+		json.dump(file, outfile)
 
 # df['y'] = 0
 # df.loc[df['x'] < -2, 'y'] = 1
