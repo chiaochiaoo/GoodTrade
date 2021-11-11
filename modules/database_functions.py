@@ -267,7 +267,7 @@ def fetch_data(symbol):
 			p = np.poly1d(np.polyfit(a*5, rel_vol, 10))
 	
 			new = [i for i in range(391)]
-			rel_vol = p(new)
+			rel_vol = list(p(new).astype(int))
 
 
 
