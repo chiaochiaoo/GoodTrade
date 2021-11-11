@@ -181,6 +181,8 @@ REGISTER = "Register"
 STOPBUY = "StopBuy"
 STOPSELL= "StopSell"
 
+BREAKUPBUY = "Breakupbuy"
+BREAKDOWNSELL = "Breakdownsell"
 ADD ="add"
 MINUS="minus"
 

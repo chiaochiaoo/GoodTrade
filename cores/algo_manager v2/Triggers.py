@@ -798,12 +798,13 @@ class Break_any_Purchase_trigger(AbstractTrigger):
 class EDGX_break_Purchase_trigger(AbstractTrigger):
 	#Special type of trigger, overwrites action part. everything else is generic.
 	def __init__(self,conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out):
-		super().__init__(description,conditions,trigger_timer,trigger_limit)
+		super().__init__(description,conditions,0,1)
 
 		#log_print("purchase_trigger,",self.trigger_timer,self.trigger_limit)
 		self.pos = pos
 
 		self.entry = conditions[0][4]
+		self.break_price = self.symbol_data[self.entry]
 
 		self.stop = stop
 		self.ppro_out =ppro_out
@@ -812,6 +813,7 @@ class EDGX_break_Purchase_trigger(AbstractTrigger):
 
 		self.entry_text =""
 		self.trigger_text = ""
+
 
 		self.entry_price = 0
 		self.stop_price = 0
@@ -824,8 +826,22 @@ class EDGX_break_Purchase_trigger(AbstractTrigger):
 
 		if checker:
 			log_print("Trigger problem on purchase_trigger,conditions:",conditions)
+
+
+		self.share = self.shares_calculator()
+
+
+		self.deploy_stop_order()
 	#add the actual stuff here.
 
+	def deploy_stop_order(self):
+
+
+		if self.pos == LONG:
+			self.ppro_out.send([BREAKUPBUY,self.symbol_name,self.share,self.break_price])
+
+		else:
+			self.ppro_out.send([BREAKDOWNSELL,self.symbol_name,self.share,self.break_price])
 
 	def trigger_event(self):
 
@@ -862,18 +878,18 @@ class EDGX_break_Purchase_trigger(AbstractTrigger):
 			#self.tradingplan.expect_orders = True
 			#log_print("Trigger: Purchase: ",self.symbol_name,self.pos,share,"at",self.symbol.get_time())
 		
-			if share>0:
+			# if share>0:
 
-				spread = self.symbol_data[ASK]-self.symbol_data[BID]
+			# 	spread = self.symbol_data[ASK]-self.symbol_data[BID]
 
-				spread_risk = spread*share/self.risk
+			# 	spread_risk = spread*share/self.risk
 
-				if spread_risk < 0.15:
-					log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk)
-					self.ppro_out.send([IOCBUY,self.symbol_name,share,self.symbol_data[ASK]])
-				else:
-					log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk,"CANCEL ENTRY")
-					self.set_mind("Spread TOO HIGH",GREEN)
+			# 	if spread_risk < 0.15:
+			# 		log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk)
+			# 		self.ppro_out.send([IOCBUY,self.symbol_name,share,self.symbol_data[ASK]])
+			# 	else:
+			# 		log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk,"CANCEL ENTRY")
+			# 		self.set_mind("Spread TOO HIGH",GREEN)
 		elif self.pos ==SHORT:
 
 			self.tradingplan.data[STOP_LEVEL]=self.stop_price#self.symbol_data[self.stop]
@@ -882,17 +898,17 @@ class EDGX_break_Purchase_trigger(AbstractTrigger):
 			self.tradingplan.data[BREAKPRICE]=self.entry_price#self.symbol_data[self.stop]
 			#self.tradingplan.tkvars[BREAKPRICE].set(self.entry_price)
 
-			if share>0:
+			# if share>0:
 
-				spread = self.symbol_data[ASK]-self.symbol_data[BID]
-				spread_risk = spread*share/self.risk
+			# 	spread = self.symbol_data[ASK]-self.symbol_data[BID]
+			# 	spread_risk = spread*share/self.risk
 
-				if spread_risk < 0.15:
-					log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk)
-					self.ppro_out.send([IOCSELL,self.symbol_name,share,self.symbol_data[BID]])
-				else:
-					log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk,"CANCEL ENTRY")
-					self.set_mind("Spread TOO HIGH",GREEN)
+			# 	if spread_risk < 0.15:
+			# 		log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk)
+			# 		self.ppro_out.send([IOCSELL,self.symbol_name,share,self.symbol_data[BID]])
+			# 	else:
+			# 		log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk,"CANCEL ENTRY")
+			# 		self.set_mind("Spread TOO HIGH",GREEN)
 
 				
 		else:
@@ -903,69 +919,25 @@ class EDGX_break_Purchase_trigger(AbstractTrigger):
 
 	def shares_calculator(self):
 
-		if self.pos ==LONG:
-
-			#if this is the last run, set it to day low. (if day low is greater than current stop and lower than ask.)
-
-			#print(self.trigger_limit)
-
-			risk_per_share = abs(self.symbol_data[ASK]-self.symbol_data[self.stop])
-			self.stop_price = self.symbol_data[self.stop]
-
-
-			if self.trigger_count==self.trigger_limit and self.trigger_limit>1 and self.symbol_data[LOW]>self.symbol_data[self.stop] and self.symbol_data[LOW]!=0:
-
-				mid_ = round((self.symbol_data[LOW]+self.symbol_data[self.stop])/2,2)
-				risk_per_share = round(abs(self.symbol_data[ASK]-mid_),2)
-
-				log_print(self.symbol_name,"entry near completion, using day low as new stop,low:",self.symbol_data[LOW]," adjusted:",mid_," risk per share:",risk_per_share)
-				#self.stop_price = self.symbol_data[LOW]
-
-				if risk_per_share < self.symbol_data[ASK]*0.0012:
-					log_print(self.symbol_name,": stop too close:",round(risk_per_share,2)," adjusted to",str(round(self.symbol_data[ASK]*0.0012,2)))
-					risk_per_share = self.symbol_data[ASK]*0.0012
-
-					#overwrite the stop price here
-					self.stop_price = round(self.symbol_data[BID] - risk_per_share,2)
-
-				else:
-					self.stop_price = mid_
-
-		elif self.pos ==SHORT:
-			risk_per_share = abs(self.symbol_data[self.stop]-self.symbol_data[BID])
-			self.stop_price = self.symbol_data[self.stop]
-
-			if self.trigger_count==self.trigger_limit and self.trigger_limit>1 and self.symbol_data[HIGH]<self.symbol_data[self.stop] and self.symbol_data[HIGH]!=0:
-
-				mid_ = round((self.symbol_data[HIGH]+self.symbol_data[self.stop])/2,2)
-				risk_per_share = round(abs(mid_ -self.symbol_data[BID]),2)
-
-				log_print(self.symbol_name,"entry near completion, using day high as new stop. high:",self.symbol_data[HIGH],"adjusted",mid_," risk per share:",risk_per_share)
-				
-
-				if risk_per_share < self.symbol_data[ASK]*0.0012:
-					log_print(self.symbol_name,": stop too close:",round(risk_per_share,2)," adjusted to",str(round(self.symbol_data[ASK]*0.0012,2)))
-					risk_per_share = self.symbol_data[ASK]*0.0012
-					self.stop_price = round(self.symbol_data[ASK] + risk_per_share,2)
-				else:
-					self.stop_price = mid_
+		
+		risk_per_share = abs(self.symbol_data[RESISTENCE]-self.symbol_data[SUPPORT])
+		self.stop_price = self.symbol_data[self.stop]
 
 		if self.symbol_data[ASK]>100 and risk_per_share <0.2:
-			risk_per_share = 0.2
+			risk_per_share = 0.1
 
-		if self.symbol_data[ASK]<100 and self.symbol_data[ASK]>5 and risk_per_share <0.15:
-			risk_per_share = 0.15
+		if self.symbol_data[ASK]<100 and self.symbol_data[ASK]>5 and risk_per_share <0.05:
+			risk_per_share = 0.05
 
-		if self.symbol_data[ASK]<5 and risk_per_share <0.04:
-			risk_per_share = 0.04
+		if self.symbol_data[ASK]<5 and risk_per_share <0.03:
+			risk_per_share = 0.02
 
 		shares = int((self.risk)/risk_per_share)
 
 		if self.tradingplan.data[TARGET_SHARE]==0:
 			self.tradingplan.data[TARGET_SHARE]=shares
 
-		return int(shares/self.trigger_limit)
-
+		return shares
 
 
 class TwoToOneTriggerOLD(AbstractTrigger):

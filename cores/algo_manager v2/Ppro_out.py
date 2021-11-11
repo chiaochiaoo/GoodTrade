@@ -82,6 +82,31 @@ def flatten_symbol(symbol):
 	#req = threading.Thread(target=ppro_request, args=(r,sucess,failure,),daemon=True)
 	#req.start()
 
+
+
+def breakup_order(symbol,share,break_price):
+
+
+	limprice = round(break_price+0.05,2)
+	break_price = round(break_price,2)
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(limprice)+'&ordername=EDGX Buy ROUC StopLimit DAY&shares='+str(share)+'&stopprice='+str(break_price)
+	
+	sucess='buy market order success on'+symbol
+	failure="Error buy order on"+symbol
+
+	return r,sucess,failure
+
+def breakdown_order(symbol,share,break_price):
+
+	limprice = round(break_price-0.05,2)
+	break_price = round(break_price,2)
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(limprice)+'&ordername=EDGX Sell->Short ROUC StopLimit DAY&shares='+str(share)+'&stopprice='+str(break_price)
+	
+	sucess='buy market order success on'+symbol
+	failure="Error buy order on"+symbol
+
+	return r,sucess,failure
+
 def buy_market_order(symbol,share):
 
 
@@ -234,7 +259,7 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 				pipe_status.send("terminated")
 				log_print("ppro out shutdown successful")
 				termination = True
-			if type_ == BUY:
+			elif type_ == BUY:
 
 				symbol = d[1]
 				share = d[2]
@@ -248,6 +273,21 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 				share = d[2]
 				rationale = d[3]
 				request_str,sucess_str,failure_str=sell_market_order(symbol,share)
+
+			elif type_ ==BREAKUPBUY:
+				symbol = d[1]
+				share = d[2]
+				stop = d[3]
+
+				request_str,sucess_str,failure_str=breakup_order(symbol,share,stop)
+
+			elif type_ ==BREAKDOWNSELL:
+
+				symbol = d[1]
+				share = d[2]
+				stop = d[3]
+
+				request_str,sucess_str,failure_str=breakdown_order(symbol,share,stop)
 
 			elif type_ ==IOCBUY:
 				symbol = d[1]
