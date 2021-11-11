@@ -836,7 +836,7 @@ class EDGX_break_Purchase_trigger(AbstractTrigger):
 
 	def deploy_stop_order(self):
 
-
+		log_print("deploying stoporders ")
 		if self.pos == LONG:
 			self.ppro_out.send([BREAKUPBUY,self.symbol_name,self.share,self.break_price])
 
