@@ -31,7 +31,7 @@ global yahoo_same_time
 yahoo_same_time = 0
 
 global all_ts
-all_ts = np.array([570+i*5 for i in range(79)])
+all_ts = np.array([570+i for i in range(391)])
 
 TEST = False
 ##################################################################
