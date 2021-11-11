@@ -115,7 +115,7 @@ def buy_limit_order(symbol, price,share,wait=0):
 def sell_limit_order(symbol, price,share,wait=0):
 	price = round(float(price),2)
 
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit Visible DAY='+str(share)
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit Visible DAY&shares='+str(share)
 	#r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit DAY BookOnly&shares='+str(share)
 	sucess='sell limit order success on'+symbol
 	failure="Error sell limit order on"+symbol
