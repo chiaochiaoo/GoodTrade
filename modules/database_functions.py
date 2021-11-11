@@ -207,6 +207,7 @@ def fetch_data(symbol):
 
 		tod = datetime.date.today().strftime("%m/%d/%Y")
 
+		
 		if r!="":
 			a=[]#data.symbol_data_first5_dis[i]
 			b=[]#data.symbol_data_first5_vol_dis[i]
@@ -238,7 +239,7 @@ def fetch_data(symbol):
 						ts = timestamp(lst[1])
 
 						if date not in df.index:
-
+							#print(date)
 							df.loc[date] = [0 for i in range(len(stamps))]
 
 							accv = v
@@ -260,6 +261,17 @@ def fetch_data(symbol):
 
 
 			rel_vol = df.mean().tolist()
+
+
+			a = np.arange(79)
+			p = np.poly1d(np.polyfit(a*5, rel_vol, 10))
+	
+			new = [i for i in range(391)]
+			rel_vol = p(new)
+
+
+
+
 
 			first5_range=str(round(min(a),3))+"-"+str(round(max(a),3))
 			first5_vol_range=str(int(min(b)//1000))+"k-"+str(int(max(b)/1000))+"k"
@@ -433,7 +445,7 @@ if __name__ == '__main__':
 	#print(database_handler(["OCGN"]))
 
 	
-	print(fetch_data("QQQ"))
+	print(fetch_data("AMD"))
 
 
 
