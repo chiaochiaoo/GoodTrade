@@ -81,10 +81,10 @@ class Open_Reversal():
 		if risk>0:
 
 			if side =="UP":
-				info = ["New order",["BreakAny",symbol,support-0.02,resistence,risk,{},"deploy","TrendRider"]]
+				info = ["New order",["BreakAny",symbol,support-0.02,resistence,risk,{},"deploy","1:2 Exprmntl"]]
 				#print("sending",info)
 			else:
-				info = ["New order",["BreakAny",symbol,support,resistence+0.02,risk,{},"deploy","TrendRider"]]
+				info = ["New order",["BreakAny",symbol,support,resistence+0.02,risk,{},"deploy","1:2 Exprmntl"]]
 			self.tnv_scanner.send_algo(info)
 
 	def send_group_algos(self,lst):
@@ -107,11 +107,11 @@ class Open_Reversal():
 
 
 				if lst[i]["side"] =="UP":
-					order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"]-change,lst[i]["resistence"],risk,{},"deploy","TrendRider"])
+					order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"]-change,lst[i]["resistence"],risk,{},"deploy","1:2 Exprmntl"])
 
 					#print("sending",info)
 				else:
-					order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"]+change,risk,{},"deploy","TrendRider"])
+					order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"]+change,risk,{},"deploy","1:2 Exprmntl"])
 
 			self.tnv_scanner.send_algo(order)
 
