@@ -410,9 +410,9 @@ def cancel_stoporder(id_):
 
 
 
-request = 
+# request = 
 
-r = requests.post(request)
+# r = requests.post(request)
 
 
 # if __name__ == '__main__':  #TEST BLOCK
