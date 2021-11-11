@@ -193,7 +193,7 @@ class EntryStrategy(Strategy):
 """ENTRY PLAN"""
 class BreakUp(EntryStrategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry.
 	def __init__(self,timer,repeat,symbol,tradingplan):
-		super().__init__("Entry : Break up",symbol,tradingplan)
+		super().__init__("Entry : Break upp",symbol,tradingplan)
 
 		self.timer = timer
 		self.repeat = repeat
@@ -226,11 +226,15 @@ class BreakUp(EntryStrategy): #the parameters contains? dk. yet .  #Can make sin
 			# self.add_initial_triggers(self.cont_buyTrigger)
 			# self.restart()
 
+	def on_deploying(self):
 
+		super().on_deploying()
+
+		self.buyTrigger.deploy_stop_order()
 
 class BreakDown(EntryStrategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry.
 	def __init__(self,timer,repeat,symbol,tradingplan):
-		super().__init__("Entry : Break up",symbol,tradingplan)
+		super().__init__("Entry : Break downn",symbol,tradingplan)
 		self.timer = timer
 		self.repeat = repeat
 		#description,trigger_timer:int,trigger_limit=1
@@ -239,7 +243,13 @@ class BreakDown(EntryStrategy): #the parameters contains? dk. yet .  #Can make s
 
 		self.add_initial_triggers(self.sellTrigger)
 
+	def on_deploying(self):
 
+		super().on_deploying()
+
+		self.sellTrigger.deploy_stop_order()
+
+		
 	def on_redeploying(self):
 
 		if not self.sellTrigger.pre_deploying_check():
