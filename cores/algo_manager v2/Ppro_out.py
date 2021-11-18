@@ -126,10 +126,20 @@ def sell_market_order(symbol,share):
 
 	return r,sucess,failure
 
-def buy_limit_order(symbol, price,share,wait=0):
+def buy_limit_order(symbol, price,share,gateway=0):
 
 	price = round(float(price),2)
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit Visible DAY&shares='+str(share)
+
+	if gateway ==0:
+		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit Visible DAY&shares='+str(share)
+	elif gateway ==1:
+		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Buy ARCX Limit DAY&shares='+str(share)
+	elif gateway ==2:
+		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=BATS Buy Parallel-2D Limit DAY&shares='+str(share)
+	elif gateway ==3:
+		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=EDGA Buy EDGA Limit PostMarket DAY Regular'+str(share)
+	elif gateway ==4:
+		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=BATS Buy Parallel-2D Limit DAY&shares='+str(share)
 	#r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit DAY BookOnly&shares='+str(share)
 	sucess='buy limit order success on'+symbol
 	failure="Error buy limit order on"+symbol
@@ -137,11 +147,22 @@ def buy_limit_order(symbol, price,share,wait=0):
 	return r,sucess,failure
 
 
-def sell_limit_order(symbol, price,share,wait=0):
+def sell_limit_order(symbol, price,share,gateway=0):
 	price = round(float(price),2)
 
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit Visible DAY&shares='+str(share)
+	if gateway ==0:
+		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit Visible DAY&shares='+str(share)
 	#r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit DAY BookOnly&shares='+str(share)
+	elif gateway ==1:
+		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Sell->Short ARCX Limit DAY&shares='+str(share)
+	elif gateway ==2:
+		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=BATS Sell->Short Parallel-2D Limit DAY'+str(share)
+	elif gateway ==3:
+		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=EDGA Sell->Short EDGA Limit PostMarket DAY Regular'+str(share)
+	elif gateway ==4:
+		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=BATS Sell->Short Parallel-2D Limit DAY'+str(share)
+
+		
 	sucess='sell limit order success on'+symbol
 	failure="Error sell limit order on"+symbol
 
@@ -320,19 +341,19 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 				symbol = d[1]
 				price = round(d[2],2)
 				share = d[3]
-				wait = d[4]
+				gateway = d[4]
 				rationale = d[5]
-				request_str,sucess_str,failure_str=buy_limit_order(symbol,price,share,wait)
+				request_str,sucess_str,failure_str=buy_limit_order(symbol,price,share,gateway)
 
 			elif type_ == LIMITSELL:
 
 				symbol = d[1]
 				price = round(d[2],2)
 				share = d[3]
-				wait = d[4]
+				gateway = d[4]
 				rationale = d[5]
 
-				request_str,sucess_str,failure_str=sell_limit_order(symbol,price,share,wait)
+				request_str,sucess_str,failure_str=sell_limit_order(symbol,price,share,gateway)
 
 			elif type_ == CANCEL:
 
