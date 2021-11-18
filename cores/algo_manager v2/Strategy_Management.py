@@ -172,7 +172,8 @@ class OneToTWORiskReward(ManagementStrategy):
 			coefficient = -1
 
 		#add some delay in here, random seconds. 
-		wait = [0.5,1.1,1.3,1.4,1.6]
+		#wait = [0.5,1.1,1.3,1.4,1.6]
+		wait = [0,1,2,3,0]
 		c = 0
 		for key in sorted(orders.keys()):
 			if orders[key]>0:
@@ -851,7 +852,8 @@ class ExpectedMomentum(ManagementStrategy):
 			coefficient = -1
 
 		#add some delay in here, random seconds. 
-		wait = [0.5,1.1,1.3,1.4,1.6]
+		#wait = [0.5,1.1,1.3,1.4,1.6]
+		wait = [0,1,2,3,0]
 		c = 0
 		for key in sorted(orders.keys()):
 			if orders[key]>0:
