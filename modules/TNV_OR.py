@@ -255,11 +255,15 @@ class Open_Reversal():
 								self.entries[entry][9].grid()
 
 								if side == "UP":
-									support = row['low']
-									resistence = row['open']
+
+									resistence = row['price']
+									support = row['open'] - 0.5*(row['price']-row['open'])
+									
 								else:
-									support = row['open']
-									resistence = row['high']
+									
+									resistence = row['open'] + 0.5*(row['price']-row['open'])
+
+									support = row['price']
 
 								self.entries[entry][9]["command"]= lambda symbol=rank,support=support,side=side,resistence=resistence:self.send_algo(symbol,support,resistence,side)
 

@@ -695,12 +695,14 @@ class Break_any_Purchase_trigger(AbstractTrigger):
 
 				spread_risk = spread*share/self.risk
 
-				if spread_risk < 0.15:
-					log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk)
-					self.ppro_out.send([IOCBUY,self.symbol_name,share,self.symbol_data[ASK]])
-				else:
-					log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk,"CANCEL ENTRY")
-					self.set_mind("Spread TOO HIGH",GREEN)
+				log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk)
+				self.ppro_out.send([IOCBUY,self.symbol_name,share,self.symbol_data[ASK]])
+				# if spread_risk < 0.15:
+				# 	log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk)
+				# 	self.ppro_out.send([IOCBUY,self.symbol_name,share,self.symbol_data[ASK]])
+				# else:
+				# 	log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk,"CANCEL ENTRY")
+				# 	self.set_mind("Spread TOO HIGH",GREEN)
 		elif self.pos ==SHORT:
 
 			self.tradingplan.data[STOP_LEVEL]=self.stop_price#self.symbol_data[self.stop]
@@ -714,12 +716,13 @@ class Break_any_Purchase_trigger(AbstractTrigger):
 				spread = self.symbol_data[ASK]-self.symbol_data[BID]
 				spread_risk = spread*share/self.risk
 
-				if spread_risk < 0.15:
-					log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk)
-					self.ppro_out.send([IOCSELL,self.symbol_name,share,self.symbol_data[BID]])
-				else:
-					log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk,"CANCEL ENTRY")
-					self.set_mind("Spread TOO HIGH",GREEN)
+				log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk)
+				self.ppro_out.send([IOCSELL,self.symbol_name,share,self.symbol_data[BID]])
+				# if spread_risk < 0.15:
+
+				# else:
+				# 	log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk,"CANCEL ENTRY")
+				# 	self.set_mind("Spread TOO HIGH",GREEN)
 
 				
 		else:
