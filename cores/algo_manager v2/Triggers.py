@@ -1283,19 +1283,20 @@ class TwoToOneTrigger(AbstractTrigger):
 		if self.strategy.orders_level == 1:
 			
 			#75
-			new_stop = round((self.tradingplan.data[STOP_LEVEL]*3+self.tradingplan.data[AVERAGE_PRICE])/4,2)
-			self.bring_up_stop(new_stop)
+			pass
+			# new_stop = round((self.tradingplan.data[STOP_LEVEL]*3+self.tradingplan.data[AVERAGE_PRICE])/4,2)
+			# self.bring_up_stop(new_stop)
 
-			self.set_mind("75% risk",GREEN)
+			# self.set_mind("75% risk",GREEN)
 
 		if self.strategy.orders_level == 2:
 			
 			#BREAK EVEN
+			pass
+			# new_stop =round((self.tradingplan.data[STOP_LEVEL]*2+self.tradingplan.data[AVERAGE_PRICE])/3,2)
+			# self.bring_up_stop(new_stop)
 
-			new_stop =round((self.tradingplan.data[STOP_LEVEL]*2+self.tradingplan.data[AVERAGE_PRICE])/3,2)
-			self.bring_up_stop(new_stop)
-
-			self.set_mind("Half risk",GREEN)
+			# self.set_mind("Half risk",GREEN)
 
 		if self.strategy.orders_level == 3:
 			
