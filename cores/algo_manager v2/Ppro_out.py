@@ -138,8 +138,8 @@ def buy_limit_order(symbol, price,share,gateway=0):
 		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=BATS Buy Parallel-2D Limit DAY&shares='+str(share)
 	elif gateway ==3:
 		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=EDGA Buy EDGA Limit PostMarket DAY Regular'+str(share)
-	elif gateway ==4:
-		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=BATS Buy Parallel-2D Limit DAY&shares='+str(share)
+	else:
+		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit Visible DAY&shares='+str(share)
 	#r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit DAY BookOnly&shares='+str(share)
 	sucess='buy limit order success on'+symbol
 	failure="Error buy limit order on"+symbol
@@ -159,10 +159,10 @@ def sell_limit_order(symbol, price,share,gateway=0):
 		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=BATS Sell->Short Parallel-2D Limit DAY'+str(share)
 	elif gateway ==3:
 		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=EDGA Sell->Short EDGA Limit PostMarket DAY Regular'+str(share)
-	elif gateway ==4:
-		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=BATS Sell->Short Parallel-2D Limit DAY'+str(share)
+	else:
+		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit Visible DAY&shares='+str(share)
 
-		
+
 	sucess='sell limit order success on'+symbol
 	failure="Error sell limit order on"+symbol
 
