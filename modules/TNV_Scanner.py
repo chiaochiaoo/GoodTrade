@@ -395,9 +395,21 @@ class Open_high():
 		#[rank,sec,relv,near,high,so,sc]
 		self.total_len = len(self.labels)
 		self.root = root
+
+		self.algo_risk = tk.DoubleVar(value=10)
+		self.algo_activate = tk.BooleanVar(value=0)
+
 		self.recreate_labels(self.root)
 
+
+
 	def recreate_labels(self,frame):
+
+		self.algo_frame = ttk.LabelFrame(self.root,text="Algo setup")
+		self.algo_frame.place(x=0, rely=0, relheight=0.2, relwidth=1)
+
+		self.root = ttk.LabelFrame(self.root,text="")
+		self.root.place(x=0, rely=0.12, relheight=0.8, relwidth=1)
 
 		self.labels_position = {}
 		self.labels_position["Rank"]=0
@@ -431,7 +443,66 @@ class Open_high():
 			self.buttons.append(self.b)
 
 		self.l+=1
+
+		self.algo_pannel(self.algo_frame)
 		self.create_entry()
+
+	def algo_pannel(self,frame):
+
+		row = 1
+		col = 1
+		ttk.Label(frame, text="Algo:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(frame, variable=self.algo_activate).grid(sticky="w",column=col+1,row=row)
+
+		ttk.Label(frame, text="Risk:").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(frame, textvariable=self.algo_risk).grid(sticky="w",column=col+3,row=row)
+
+
+		row = 2
+		col = 1
+
+		self.hour = tk.IntVar(value=10)
+		self.minute = tk.IntVar(value=00)
+
+		ttk.Label(frame, text="Start:").grid(sticky="w",column=col,row=row)
+		ttk.Entry(frame, textvariable=self.hour).grid(sticky="w",column=col+1,row=row)
+
+		ttk.Label(frame, text=":").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(frame, textvariable=self.minute).grid(sticky="w",column=col+3,row=row)
+
+
+		self.rel_v = tk.DoubleVar(value=0)
+		self.re_score = tk.DoubleVar(value=0)
+
+
+		self.ehour = tk.IntVar(value=15)
+		self.eminute = tk.IntVar(value=00)
+		row = 3
+		col = 1
+		ttk.Label(frame, text="End").grid(sticky="w",column=col,row=row)
+		ttk.Entry(frame, textvariable=self.ehour).grid(sticky="w",column=col+1,row=row)
+
+		ttk.Label(frame, text=":").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(frame, textvariable=self.eminute).grid(sticky="w",column=col+3,row=row)
+
+		self.side_ = tk.StringVar(value='x')
+		self.listed_ = tk.BooleanVar(value=False)
+		
+		# row = 4
+		# col = 1
+
+
+		# ttk.Label(frame, text="Side:").grid(sticky="w",column=col,row=row)
+		# l={"Up","Down","Any","Any"}
+		# ttk.OptionMenu(frame, self.side_, *sorted(l)).grid(sticky="w",column=col+1,row=row)
+
+
+		# ttk.Label(frame, text="Listed?").grid(sticky="w",column=col+2,row=row)
+		# ttk.Checkbutton(frame, variable=self.listed_).grid(sticky="w",column=col+3,row=row)
+
+
+		algo_timer = self.hour.get()*60 + self.minute.get()
+		#print("algo time",algo_timer)
 
 	def create_entry(self):
 
