@@ -8,6 +8,13 @@ from datetime import datetime
 #from modules.pannel import *
 
 from tkinter import *
+
+
+# from TNV_PMB import *
+# from TNV_OR import *
+# from TNV_TFM import *
+
+
 from modules.TNV_PMB import *
 from modules.TNV_OR import *
 from modules.TNV_TFM import *
@@ -97,11 +104,10 @@ class TNV_Scanner():
 		self.rrvol = RRvol(self.rrvol_frame,NT)
 
 
-
-		# Trending 
-		# self.trending_frame = tk.Canvas(self.TNV_TAB)
-		# self.TNV_TAB.add(self.trending_frame, text ='Trending')
-		# self.trending = ADX(self.trending_frame,NT)
+ 
+		self.trending_frame = tk.Canvas(self.TNV_TAB)
+		self.TNV_TAB.add(self.trending_frame, text ='Trending')
+		self.trending = ADX(self.trending_frame,NT)
 
 		# Spread 
 		# self.spread_frame = tk.Canvas(self.TNV_TAB)
@@ -115,6 +121,7 @@ class TNV_Scanner():
 
 
 		# item = pd.read_csv("test.csv",index_col=0)
+		# self.trending.update_entry(item)
 		# self.pmb.update_entry(item)
 		# self.near_high.update_entry(item)
 		# self.near_low.update_entry(item)
@@ -148,8 +155,8 @@ class TNV_Scanner():
 			elif key =="near_high":
 				self.near_high.update_entry(item)
 
-			# elif key =="adx":
-			# 	self.trending.update_entry(item)
+			elif key =="trending":
+				self.trending.update_entry(item)
 
 			# elif key =="spread":
 			# 	self.spread.update_entry(item)
@@ -899,9 +906,9 @@ class ADX():
 		self.buttons = []
 		self.entries = []
 		self.l = 1
-		self.labels_width = [9,6,5,5,8,5,6,6,6,6,6,6,8,6]
+		self.labels_width = [9,6,12,5,8,5,6,6,6,6,6,6,8,6]
 		self.NT = NT
-		self.labels = ["Symbol","Sector","ADX","Rg.Score","Rel.V","SO%","SC%","listed","Add"]
+		self.labels = ["Symbol","Sector","TrendScore","Rg.Score","Rel.V","SO%","SC%","listed","Add"]
 		#[rank,sec,relv,near,high,so,sc]
 		self.total_len = len(self.labels)
 		self.root = root
@@ -966,15 +973,17 @@ class ADX():
 		#df.to_csv("tttt.csv")
 		entry = 0
 
+
+
 		if 1:
 			for index, row in df.iterrows():
 				#print(row)
 				rank = index
 				sec = row['sector']
-				relv = row['rel vol']
+				relv = row['rrvol']
 				near = row['rangescore']
 
-				adx = row['adx']
+				adx = str([row['ema9'],row['ema21'],row['ema45']])
 				so = row['SO']
 				sc = row['SC']
 
