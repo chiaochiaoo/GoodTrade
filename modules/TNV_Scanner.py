@@ -1183,7 +1183,7 @@ class Premarket_pick():
 				# for i in df.columns:
 				# 	if i not in keep:
 				# 		df.pop(i)
-				df.to_csv(self.file)
+				#df.to_csv(self.file)
 			except Exception as e:
 				print("TNV scanner construction Premarket_pick:",e)
 
@@ -1365,7 +1365,7 @@ class CoreysPick():
 		df = data
 
 
-		df.to_csv("open_break_out.csv")
+		#df.to_csv("open_break_out.csv")
 		entry = 0
 
 		try:
