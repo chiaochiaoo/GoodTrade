@@ -357,7 +357,7 @@ class TFM():
 				# for i in df.columns:
 				# 	if i not in keep:
 				# 		df.pop(i)
-				df.to_csv(self.file)
+				#df.to_csv(self.file)
 			# except Exception as e:
 			# 	print("TNV scanner construction open reversal:",e)
 
