@@ -146,7 +146,7 @@ class Open_Reversal():
 
 
 		self.ehour = tk.IntVar(value=10)
-		self.eminute = tk.IntVar(value=00)
+		self.eminute = tk.IntVar(value=30)
 		row = 3
 		col = 1
 		ttk.Label(frame, text="End").grid(sticky="w",column=col,row=row)
@@ -257,11 +257,11 @@ class Open_Reversal():
 								if side == "UP":
 
 									resistence = row['price']
-									support = row['open'] - 0.5*(row['price']-row['open'])
+									support = row['open'] + 0.5*abs(row['price']-row['open'])
 									
 								else:
 									
-									resistence = row['open'] + 0.5*(row['price']-row['open'])
+									resistence = row['open'] - 0.5*abs(row['price']-row['open'])
 
 									support = row['price']
 

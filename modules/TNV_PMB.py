@@ -154,7 +154,7 @@ class Premarket_breakout():
 		# col = 1
 
 		self.hour = tk.IntVar(value=9)
-		self.minute = tk.IntVar(value=10)
+		self.minute = tk.IntVar(value=24)
 
 		# ttk.Label(frame, text="Start:").grid(sticky="w",column=col,row=row)
 		# ttk.Entry(frame, textvariable=self.hour).grid(sticky="w",column=col+1,row=row)
@@ -168,7 +168,7 @@ class Premarket_breakout():
 
 
 		self.ehour = tk.IntVar(value=9)
-		self.eminute = tk.IntVar(value=28)
+		self.eminute = tk.IntVar(value=29)
 		# row = 3
 		# col = 1
 		# ttk.Label(frame, text="End").grid(sticky="w",column=col,row=row)
