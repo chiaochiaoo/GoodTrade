@@ -120,9 +120,9 @@ class TNV_Scanner():
 		# self.tfm = TFM(self.TFM_frame,self)
 
 
-		filtered_df = pd.read_csv("test.csv",index_col=0)
+		#filtered_df = pd.read_csv("test.csv",index_col=0)
 
-		self.filtering(filtered_df)
+		#self.filtering(filtered_df)
 
 		# self.trending.update_entry(item)
 		# self.pmb.update_entry(item)
