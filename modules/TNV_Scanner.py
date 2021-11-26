@@ -149,6 +149,8 @@ class TNV_Scanner():
 
 		filtered_df = data[0]
 
+		filtered_df.to_csv("tttttttt.csv")
+
 		pb =  filtered_df.loc[((filtered_df["SC"]>=1)|(filtered_df["SC"]<=-1))][:25]
 		
 		##################### NEAR LOW #############################
@@ -411,7 +413,7 @@ class Just_break():
 				#print(row)
 				rank = index
 				sec = row['sector']
-				relv = row['rel vol']
+				relv = row['rrvol']
 				side = row['just_break']
 
 				span = row['break_span']
@@ -814,7 +816,7 @@ class Near_high():
 				#print(row)
 				rank = index
 				sec = row['sector']
-				relv = row['rel vol']
+				relv = row['rrvol']
 				near = row['rangescore']
 				high = row['high']
 
@@ -924,7 +926,7 @@ class Near_low():
 				#print(row)
 				rank = index
 				sec = row['sector']
-				relv = row['rel vol']
+				relv = row['rrvol']
 				near = row['rangescore']
 				high = row['low']
 
@@ -1144,7 +1146,7 @@ class Premarket_pick():
 					#["Symbol","Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Ignore","Add"]
 					rank = index
 					vol = row['Avg VolumeSTR']
-					relv = row['rel vol']
+					relv = row['rrvol']
 					side = row['reversalside']
 					rscore = row['rangescore']
 					sc = row['SC']
@@ -1178,7 +1180,7 @@ class Premarket_pick():
 						self.entries[entry][i]["text"] = ""
 					entry+=1
 
-				# keep = ['Symbol', "Signal Time", 'rel vol', 'SC', 'reversalside','reversal_score','Signal Time',]
+				# keep = ['Symbol', "Signal Time", 'rrvol', 'SC', 'reversalside','reversal_score','Signal Time',]
 
 				# for i in df.columns:
 				# 	if i not in keep:
@@ -1263,7 +1265,7 @@ class Open_Break():
 				#print(row)
 				rank = index
 				vol = row['Avg VolumeSTR']
-				relv = row['rel vol']
+				relv = row['rrvol']
 				brscore = row['score2']
 				roc5 = row['5ROCP']
 				so = row['SO']
@@ -1373,7 +1375,7 @@ class CoreysPick():
 				#print(row)
 				rank = index
 				vol = row['Avg VolumeSTR']
-				relv = row['rel vol']
+				relv = row['rrvol']
 				brscore = row['score2']
 				roc5 = row['5ROCP']
 				so = row['SO']
