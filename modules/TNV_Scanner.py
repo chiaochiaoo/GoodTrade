@@ -154,11 +154,11 @@ class TNV_Scanner():
 		pb =  filtered_df.loc[((filtered_df["SC"]>=1)|(filtered_df["SC"]<=-1))][:25]
 		
 		##################### NEAR LOW #############################
-		at_high = filtered_df.loc[(filtered_df["rangescore"]<=0.1)][:25] #&&(filtered_df["last_break"])
+		at_low = filtered_df.loc[(filtered_df["rangescore"]<=0.1)][:25] #&&(filtered_df["last_break"])
 		#at_low.to_csv("at low.csv")
 
 		##################### NEAR HIGH #############################
-		at_low = filtered_df.loc[(filtered_df["rangescore"]>=0.9)][:25]
+		at_high = filtered_df.loc[(filtered_df["rangescore"]>=0.9)][:25]
 
 		##################### Just break #############################
 		just_break = filtered_df.loc[(filtered_df["just_break"]!="")&(filtered_df["break_span"]>=15)][:20]
