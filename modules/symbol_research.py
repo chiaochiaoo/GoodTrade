@@ -1,9 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from scipy import stats
+#from scipy import stats
 from matplotlib.dates import DateFormatter
-from scipy.stats import skew,kurtosis
+#from scipy.stats import skew,kurtosis
 import requests
 import tkinter as tk                     
 from tkinter import ttk 
