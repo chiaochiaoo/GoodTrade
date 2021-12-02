@@ -230,7 +230,7 @@ class BreakUp(EntryStrategy): #the parameters contains? dk. yet .  #Can make sin
 
 		super().on_deploying()
 
-		self.buyTrigger.deploy_stop_order()
+		#self.buyTrigger.deploy_stop_order()
 
 class BreakDown(EntryStrategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry.
 	def __init__(self,timer,repeat,symbol,tradingplan):
@@ -247,7 +247,7 @@ class BreakDown(EntryStrategy): #the parameters contains? dk. yet .  #Can make s
 
 		super().on_deploying()
 
-		self.sellTrigger.deploy_stop_order()
+		#self.sellTrigger.deploy_stop_order()
 
 		
 	def on_redeploying(self):

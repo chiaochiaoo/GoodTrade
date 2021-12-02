@@ -92,10 +92,10 @@ class Premarket_breakout():
 
 			if side =="UP":
 
-				info = ["New order",["BreakAny",symbol,support-change,resistence,risk,{},"Notdeploy","TrendRider"]]
+				info = ["New order",[" BreakUp",symbol,support-change,resistence,risk,{},"Notdeploy","TrendRider"]]
 				#print("sending",info)
 			else:
-				info = ["New order",["BreakAny",symbol,support,resistence+change,risk,{},"Notdeploy","TrendRider"]]
+				info = ["New order",[" BreakUp",symbol,support,resistence+change,risk,{},"Notdeploy","TrendRider"]]
 			self.tnv_scanner.send_algo(info)
 
 	# def send_group_algos(self,lst):
