@@ -199,7 +199,7 @@ class BreakUp(EntryStrategy): #the parameters contains? dk. yet .  #Can make sin
 		self.repeat = repeat
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
-		self.buyTrigger = EDGX_break_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
+		self.buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
 
 		self.add_initial_triggers(self.buyTrigger)
 
@@ -239,7 +239,7 @@ class BreakDown(EntryStrategy): #the parameters contains? dk. yet .  #Can make s
 		self.repeat = repeat
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
-		self.sellTrigger = EDGX_break_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
+		self.sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
 
 		self.add_initial_triggers(self.sellTrigger)
 
