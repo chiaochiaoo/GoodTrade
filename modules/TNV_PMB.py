@@ -135,7 +135,7 @@ class Premarket_breakout():
 		if risk>0:
 			for i in range(len(lst)):
 
-				order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"Notdeploy","TrendRider"])
+				order.append([" BreakUp",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"Notdeploy","TrendRider"])
 
 			self.tnv_scanner.send_algo(order)
 
