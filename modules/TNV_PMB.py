@@ -95,36 +95,10 @@ class Premarket_breakout():
 				info = ["New order",[" BreakUp",symbol,support-change,resistence,risk,{},"Notdeploy","TrendRider"]]
 				#print("sending",info)
 			else:
-				info = ["New order",[" BreakUp",symbol,support,resistence+change,risk,{},"Notdeploy","TrendRider"]]
+				info = ["New order",[" BreakDn",symbol,support,resistence+change,risk,{},"Notdeploy","TrendRider"]]
 			self.tnv_scanner.send_algo(info)
 
-	# def send_group_algos(self,lst):
 
-	# 	risk = self.algo_risk.get()
-
-	# 	#print("HELLO.",lst)
-	# 	order = ["New order"]
-	# 	if risk>0:
-	# 		for i in range(len(lst)):
-	# 			#print(lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"])
-
-	# 			change = 0.03
-			
-	# 			if lst[i]["support"]>10 and lst[i]["support"]<20:
-	# 				change = 0.05
-
-	# 			if lst[i]["support"] >20:
-	# 				change = 0.06
-
-
-	# 			if lst[i]["side"] =="UP":
-	# 				order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"]-change,lst[i]["resistence"],risk,{},"Notdeploy","TrendRider"])
-
-	# 				#print("sending",info)
-	# 			else:
-	# 				order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"]+change,risk,{},"Notdeploy","TrendRider"])
-
-	# 		self.tnv_scanner.send_algo(order)
 
 	def send_group_algos(self,lst):
 
@@ -135,7 +109,12 @@ class Premarket_breakout():
 		if risk>0:
 			for i in range(len(lst)):
 
-				order.append([" BreakUp",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"Notdeploy","TrendRider"])
+				if lst[i]["side"]=="UP":
+					order.append([" BreakUp",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"Notdeploy","TrendRider"])
+
+				elif lst[i]["side"]=="DOWN":
+					order.append([" BreakDn",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"Notdeploy","TrendRider"])
+
 
 			self.tnv_scanner.send_algo(order)
 
@@ -286,6 +265,7 @@ class Premarket_breakout():
 
 							self.entries[entry][9]["command"]= lambda symbol=rank,support=support,side=side,resistence=resistence:self.send_algo(symbol,support,resistence,side)
 
+
 							if self.algo_activate.get()==1 and ts>=algo_timer and ts<=end_timer:
 								if rank not in self.algo_placed:
 
@@ -302,17 +282,6 @@ class Premarket_breakout():
 
 									send_algo.append(order)
 
-									#print(rank,self.algo_placed)
-										
-							# if i == ts_location:
-							# 	self.entries[entry][i]["text"] = ts_to_min(lst[i])
-							# else:
-							# 	self.entries[entry][i]["text"] = lst[i]
-							# 	self.entries[entry][8].grid_remove() 
-							# 	#self.entries[entry][8].grid_remove() 
-							# 	#self.entries[entry][9].grid_forget()
-							# #self.entries[entry][8].grid() 
-						#add the button here?
 
 						entry+=1
 						if entry ==30:
@@ -334,5 +303,6 @@ class Premarket_breakout():
 			# 	print("TNV scanner construction open reversal:",e)
 
 			if len(send_algo)>0:
+
 				self.send_group_algos(send_algo)
 
