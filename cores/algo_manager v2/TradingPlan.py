@@ -605,6 +605,7 @@ class TradingPlan:
 		elif entry_plan == BREAKUP:
 			self.set_EntryStrategy(BreakUp(entrytimer,instant,self.symbol,self))
 		elif entry_plan == BREAKDOWN:
+			
 			self.set_EntryStrategy(BreakDown(entrytimer,instant,self.symbol,self))
 		elif entry_plan == BREAISH:
 			self.set_EntryStrategy(Bearish(entrytimer,instant,self.symbol,self))
