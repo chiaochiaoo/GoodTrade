@@ -151,7 +151,7 @@ class TNV_Scanner():
 
 		filtered_df.to_csv("tttttttt.csv")
 
-		pb =  filtered_df.loc[((filtered_df["SC"]>=1))][:20] #|(filtered_df["SC"]<=-1)
+		pb =  filtered_df.loc[((filtered_df["SC"]>=1)) |(filtered_df["SC"]<=-1)]
 		
 		##################### NEAR LOW #############################
 		at_low = filtered_df.loc[(filtered_df["rangescore"]<=0.1)][:25] #&&(filtered_df["last_break"])
