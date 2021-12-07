@@ -39,6 +39,16 @@ class Symbol:
 		self.tradingplan=None
 		self.init_data(support,resistence,stats)
 
+	def set_data(self,support,resistence,stats):
+		for key,value in stats.items():
+			self.data[key] = value
+
+		self.data[RESISTENCE] = resistence
+		self.data[SUPPORT] = support
+
+		# self.tkvars[RESISTENCE].set(resistence)
+		# self.tkvars[SUPPORT].set(support)
+
 	def init_data(self,support,resistence,stats):
 
 		for i in self.numeric_labels:

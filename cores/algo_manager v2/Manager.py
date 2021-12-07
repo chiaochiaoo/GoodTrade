@@ -275,7 +275,6 @@ class Manager:
 
 		try:
 			if symbol not in self.symbols:
-
 				if self.ui.algo_count_number.get()<50:
 					#print(symbol,self.ui.algo_count_number.get())
 					self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats)  #register in Symbol.
@@ -288,7 +287,6 @@ class Manager:
 					self.symbols.append(symbol)
 
 					#append it to, UI.
-
 					if len(data)>6:
 						status = data[6]
 						mana = data[7]
@@ -309,8 +307,24 @@ class Manager:
 					log_print("System at full capacity.")
 			else:
 				log_print("symbols already exists, modifying current parameter.")
+
+				if self.tradingplan[symbol].data[STATUS] == PENDING or self.tradingplan[symbol].data[STATUS] == DONE:
+
+
+					self.symbol_data[symbol].set_data(support,resistence,stats)
+					self.symbol_data[symbol].set_mind("Renewed",DEFAULT)
+
+					status = data[6]
+					mana = data[7]
+
+					self.tradingplan[symbol].set_data(risk,entryplan,INSTANT,mana,support,resistence)
+
+					if status =="deploy":
+						self.tradingplan[symbol].deploy(9600)
+
+
 		except Exception as e:
-			log_print("adding new tradingplan problem",data)
+			log_print("adding new tradingplan problem",e,data)
 			PrintException("adding new tradingplan problem")
 
 	def timer(self):

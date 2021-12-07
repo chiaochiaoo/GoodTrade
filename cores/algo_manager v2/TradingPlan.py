@@ -53,6 +53,28 @@ class TradingPlan:
 
 		self.init_data(risk,entry_plan,entry_type,manage_plan)
 
+
+	def set_data(self,risk,entry_plan,entry_type,manage_plan,support,resistence):
+		#default values.
+		self.tkvars[SELECTED].set(False)
+		self.tkvars[RELOAD].set(False)
+		self.data[RELOAD_TIMES]=self.default_reload
+		#Non String, Non Numeric Value
+
+		#Set some default value
+		self.data[ESTRISK] = risk
+		self.tkvars[ESTRISK].set(risk)
+		self.tkvars[RISK_RATIO].set(str(0)+"/"+str(self.data[ESTRISK]))
+
+		self.tkvars[ENTRYPLAN].set(entry_plan)
+		self.tkvars[ENTYPE].set(entry_type)
+		self.tkvars[MANAGEMENTPLAN].set(manage_plan)
+
+		self.data[STATUS] = PENDING
+		self.tkvars[STATUS].set(PENDING)
+
+		self.update_symbol_tkvar()
+
 	def init_data(self,risk,entry_plan,entry_type,manage_plan):
 
 
@@ -87,7 +109,7 @@ class TradingPlan:
 
 		self.tkvars[ENTRYPLAN].set(entry_plan)
 		self.tkvars[ENTYPE].set(entry_type)
-		self.tkvars[MANAGEMENTPLAN].set(FIBO)
+		self.tkvars[MANAGEMENTPLAN].set(manage_plan)
 
 		self.data[STATUS] = PENDING
 		self.tkvars[STATUS].set(PENDING)
@@ -409,6 +431,7 @@ class TradingPlan:
 
 	"""	UI related  """
 	def update_symbol_tkvar(self):
+		#print("updatem",elf.symbol.get_support(),elf.symbol.get_resistence())
 		self.tkvars[SUPPORT].set(self.symbol.get_support())
 		self.tkvars[RESISTENCE].set(self.symbol.get_resistence())
 
@@ -559,8 +582,10 @@ class TradingPlan:
 			self.manage_plan_decoder(manage_plan)
 
 			if self.AR_toggle_check():
-				log_print("Deploying:",self.symbol_name,self.entry_plan.get_name(),self.symbol.get_support(),self.symbol.get_resistence(),entry_type,entrytimer,self.management_plan.get_name(),"risk:",self.data[ESTRISK],"risk timer:",self.data[RISKTIMER],"reload:",self.data[RELOAD_TIMES],"rps",self.data[RISK_PER_SHARE])
-			
+				try:
+					log_print("Deploying:",self.symbol_name,self.entry_plan.get_name(),self.symbol.get_support(),self.symbol.get_resistence(),entry_type,entrytimer,self.management_plan.get_name(),"risk:",self.data[ESTRISK],"risk timer:",self.data[RISKTIMER],"reload:",self.data[RELOAD_TIMES],"rps",self.data[RISK_PER_SHARE])
+				except:
+					pass
 				self.start_tradingplan()
 
 			# except Exception as e:
