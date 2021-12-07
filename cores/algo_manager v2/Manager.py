@@ -290,7 +290,7 @@ class Manager:
 					if len(data)>6:
 						status = data[6]
 						mana = data[7]
-						self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,NONE,risk,self.pipe_ppro_out,0,TEST_MODE)
+						self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,mana,risk,self.pipe_ppro_out,0,TEST_MODE)
 
 						self.tradingplan[symbol].tkvars[MANAGEMENTPLAN].set(mana)
 						self.tradingplan[symbol].tkvars[ENTYPE].set(INSTANT)
@@ -300,7 +300,7 @@ class Manager:
 						if status =="deploy":
 							self.tradingplan[symbol].deploy(9600)
 					else:
-						self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,NONE,risk,self.pipe_ppro_out,1,TEST_MODE)
+						self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,ONETOTWORISKREWARD,risk,self.pipe_ppro_out,1,TEST_MODE)
 						self.ui.create_new_entry(self.tradingplan[symbol])
 
 				else:
@@ -312,15 +312,18 @@ class Manager:
 
 
 					self.symbol_data[symbol].set_data(support,resistence,stats)
-					self.symbol_data[symbol].set_mind("Renewed",DEFAULT)
+					self.symbol_data[symbol].set_mind("Updated",DEFAULT)
 
-					status = data[6]
-					mana = data[7]
+					if len(data)>6:
+						status = data[6]
+						mana = data[7]
 
-					self.tradingplan[symbol].set_data(risk,entryplan,INSTANT,mana,support,resistence)
+						self.tradingplan[symbol].set_data(risk,entryplan,INSTANT,mana,support,resistence)
 
-					if status =="deploy":
-						self.tradingplan[symbol].deploy(9600)
+						if status =="deploy":
+							self.tradingplan[symbol].deploy(9600)
+					else:
+						self.tradingplan[symbol].set_data(risk,entryplan,INSTANT,ONETOTWORISKREWARD,support,resistence)
 
 
 		except Exception as e:
@@ -1214,7 +1217,7 @@ if __name__ == '__main__':
 
 
 	root = tk.Tk()
-	root.title("GoodTrade Algo Manager v2 b12 Pampa")
+	root.title("GoodTrade Algo Manager v2 b13 Pampa")
 	root.geometry("1920x800")
 
 	manager=Manager(root,goodtrade_pipe,ppro_out,ppro_in,TEST)

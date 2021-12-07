@@ -710,6 +710,8 @@ class TradingPlan:
 			self.set_ManagementStrategy(TrendStrategy(self.symbol,self))
 
 		else:
+			#set default
+			log_print("Setting default plan")
 			self.set_ManagementStrategy(OneToTWORiskReward(self.symbol,self))
 
 	def set_EntryStrategy(self,entry_plan:Strategy):
