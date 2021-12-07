@@ -648,6 +648,7 @@ class TradingPlan:
 			self.set_EntryStrategy(FreeControl(entrytimer,instant,self.symbol,self))
 		else:
 			log_print("unkown plan")
+			self.set_EntryStrategy(BreakAny(entrytimer,instant,self.symbol,self))
 
 	def manage_plan_decoder(self,manage_plan):
 
@@ -707,6 +708,9 @@ class TradingPlan:
 
 		elif manage_plan == TRENDRIDER:
 			self.set_ManagementStrategy(TrendStrategy(self.symbol,self))
+
+		else:
+			self.set_ManagementStrategy(OneToTWORiskReward(self.symbol,self))
 
 	def set_EntryStrategy(self,entry_plan:Strategy):
 		self.entry_plan = entry_plan
