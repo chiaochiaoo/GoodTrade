@@ -100,7 +100,7 @@ class ADX():
 				relv = row['rrvol']
 				near = row['rangescore']
 
-				adx = str([row['ema9'],row['ema21'],row['ema45']])
+				adx = str([row['ema9time'],row['ema21time'],row['ema45time']])
 				so = row['SO']
 				sc = row['SC']
 
