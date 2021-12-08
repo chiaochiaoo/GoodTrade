@@ -10,15 +10,15 @@ from datetime import datetime
 from tkinter import *
 
 
-from TNV_PMB import *
-from TNV_OR import *
-from TNV_TFM import *
-from TNV_Trend import *
+# from TNV_PMB import *
+# from TNV_OR import *
+# from TNV_TFM import *
+# from TNV_Trend import *
 
-# from modules.TNV_PMB import *
-# from modules.TNV_OR import *
-# from modules.TNV_TFM import *
-# from modules.TNV_Trend import *
+from modules.TNV_PMB import *
+from modules.TNV_OR import *
+from modules.TNV_TFM import *
+from modules.TNV_Trend import *
 
 class fake_NT():
 
@@ -123,16 +123,11 @@ class TNV_Scanner():
 		# self.tfm = TFM(self.TFM_frame,self)
 
 
-		#filtered_df = pd.read_csv("test.csv",index_col=0)
+		# filtered_df = pd.read_csv("test.csv",index_col=0)
 
-		#self.filtering(filtered_df)
+		# self.update_entry([filtered_df,"test"])
 
-		# self.trending.update_entry(item)
-		# self.pmb.update_entry(item)
-		# self.near_high.update_entry(item)
-		# self.near_low.update_entry(item)
-		#self.open_reversal.update_entry(item)
-		#self.update_entry()
+
 
 	def send_algo(self,msg):
 		self.algo_commlink.send(msg)
@@ -634,11 +629,11 @@ class StandardScanner():
 class Open_high(StandardScanner):
 	def __init__(self,root,NT):
 
-		super().__init__(root,NT)
+		
 		self.labels_width = [9,6,5,8,5,5,6,6,6,6,6,6,8,6]
 		self.labels = ["Symbol","Sector","OH","Rel.V","Rg.Score","High","SO%","SC%","listed","Add"]
 		self.total_len = len(self.labels)
-
+		super().__init__(root,NT)
 	def update_entry(self,data):
 
 		df = data
@@ -688,11 +683,11 @@ class Open_high(StandardScanner):
 class Open_low(StandardScanner):
 	def __init__(self,root,NT):
 
-		super().__init__(root,NT)
+		
 		self.labels_width = [9,6,5,8,5,5,6,6,6,6,6,6,8,6]
 		self.labels = ["Symbol","Sector","OL","Rel.V","Rg.Score","High","SO%","SC%","listed","Add"]
 		self.total_len = len(self.labels)
-
+		super().__init__(root,NT)
 
 	def update_entry(self,data):
 
