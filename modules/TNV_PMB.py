@@ -99,7 +99,6 @@ class Premarket_breakout():
 			self.tnv_scanner.send_algo(info)
 
 
-
 	def send_group_algos(self,lst):
 
 		risk = self.algo_risk.get()

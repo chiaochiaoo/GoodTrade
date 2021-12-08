@@ -110,7 +110,7 @@ class TNV_Scanner():
  
 		self.trending_frame = tk.Canvas(self.TNV_TAB)
 		self.TNV_TAB.add(self.trending_frame, text ='Trending')
-		self.trending = ADX(self.trending_frame,NT)
+		self.trending = ADX(self.trending_frame,NT,self)
 
 		# Spread 
 		# self.spread_frame = tk.Canvas(self.TNV_TAB)
@@ -167,7 +167,7 @@ class TNV_Scanner():
 		openreverse = openreverse.sort_values(by=["reversal_timer"],ascending=False)[:20]
 		
 
-		trending =  filtered_df.loc[(filtered_df["ema21"]>=20)|(filtered_df["ema21"]<=-20)]
+		trending =  filtered_df.loc[(filtered_df["ema45time"]>=20)|(filtered_df["ema45time"]<=-20)]
 		trending =  trending.reindex(trending.ema45.abs().sort_values(ascending=False).index)[:20] #df.sort_values(by=["ema21"],ascending=False)
 
 		# OH , OL, RRVOL
@@ -634,6 +634,7 @@ class Open_high(StandardScanner):
 		self.labels = ["Symbol","Sector","OH","Rel.V","Rg.Score","High","SO%","SC%","listed","Add"]
 		self.total_len = len(self.labels)
 		super().__init__(root,NT)
+
 	def update_entry(self,data):
 
 		df = data
