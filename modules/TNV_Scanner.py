@@ -77,22 +77,25 @@ class TNV_Scanner():
 		self.TNV_TAB.add(self.pmb_frame, text ='PMB')
 		self.pmb = Premarket_breakout(self.pmb_frame,NT,self)
 
-		# NH NL
-		self.nh_frame = tk.Canvas(self.TNV_TAB)
-		self.nl_frame = tk.Canvas(self.TNV_TAB)
-		self.TNV_TAB.add(self.nh_frame, text ='Near High')
-		self.TNV_TAB.add(self.nl_frame, text ='Near Low')
-		self.near_high = Near_high(self.nh_frame,NT)
-		self.near_low = Near_low(self.nl_frame,NT)
 
-		# JB 
-		self.vb_frame = tk.Canvas(self.TNV_TAB)
-		self.TNV_TAB.add(self.vb_frame, text ='Just Break')
-		self.volatility_scanner = Just_break(self.vb_frame,NT)
+		# # NH NL
+		# self.nh_frame = tk.Canvas(self.TNV_TAB)
+		# self.nl_frame = tk.Canvas(self.TNV_TAB)
+		# self.TNV_TAB.add(self.nh_frame, text ='Near High')
+		# self.TNV_TAB.add(self.nl_frame, text ='Near Low')
+		# self.near_high = Near_high(self.nh_frame,NT)
+		# self.near_low = Near_low(self.nl_frame,NT)
+
+		# # JB 
+		# self.vb_frame = tk.Canvas(self.TNV_TAB)
+		# self.TNV_TAB.add(self.vb_frame, text ='Just Break')
+		# self.volatility_scanner = Just_break(self.vb_frame,NT)
 
 		# NH NL
 		self.oh_frame = tk.Canvas(self.TNV_TAB)
 		self.ol_frame = tk.Canvas(self.TNV_TAB)
+
+
 		self.TNV_TAB.add(self.oh_frame, text ='Open High')
 		self.TNV_TAB.add(self.ol_frame, text ='Open Low')
 		self.oh = Open_high(self.oh_frame,NT)
@@ -151,14 +154,14 @@ class TNV_Scanner():
 
 		filtered_df.to_csv("tttttttt.csv")
 
-		pb =  filtered_df.loc[((filtered_df["SC"]>=1)) |(filtered_df["SC"]<=-1)]
+		pb =  filtered_df.loc[((filtered_df["SC"]>=1)) |(filtered_df["SC"]<=-1)][:20]
 		
 		##################### NEAR LOW #############################
-		at_low = filtered_df.loc[(filtered_df["rangescore"]<=0.1)][:25] #&&(filtered_df["last_break"])
+		at_low = filtered_df.loc[(filtered_df["rangescore"]<=0.1)][:20] #&&(filtered_df["last_break"])
 		#at_low.to_csv("at low.csv")
 
 		##################### NEAR HIGH #############################
-		at_high = filtered_df.loc[(filtered_df["rangescore"]>=0.9)][:25]
+		at_high = filtered_df.loc[(filtered_df["rangescore"]>=0.9)][:20]
 
 		##################### Just break #############################
 		just_break = filtered_df.loc[(filtered_df["just_break"]!="")&(filtered_df["break_span"]>=15)][:20]
@@ -175,17 +178,19 @@ class TNV_Scanner():
 		# OH , OL, RRVOL
 
 		oh = filtered_df.loc[filtered_df["oh"]>0.5]
-		oh = oh.sort_values(by=["oh"],ascending=False)[:28]
+		oh = oh.sort_values(by=["oh"],ascending=False)[:20]
 
 		ol = filtered_df.loc[filtered_df["ol"]>0.5]
-		ol = ol.sort_values(by=["ol"],ascending=False)[:28]
+		ol = ol.sort_values(by=["ol"],ascending=False)[:20]
 		rrvol = filtered_df.sort_values(by=["rrvol"],ascending=False)[:20]
 
 
-		self.volatility_scanner.update_entry(just_break)
+		# self.volatility_scanner.update_entry(just_break)
+		# self.near_low.update_entry(at_low)
+		# self.near_high.update_entry(at_high)
+
+
 		self.open_reversal.update_entry(openreverse)
-		self.near_low.update_entry(at_low)
-		self.near_high.update_entry(at_high)
 		self.trending.update_entry(trending)
 		self.pmb.update_entry(pb)
 		self.oh.update_entry(oh)
