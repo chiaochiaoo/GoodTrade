@@ -265,10 +265,10 @@ class ADX(StandardScanner):
 			for i in range(len(lst)):
 
 				if lst[i]["side"]=="UP":
-					order.append([" BreakUp",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","TrendRider"])
+					order.append([" BreakUp",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","1:2 Exprmntl"])
 
 				elif lst[i]["side"]=="DOWN":
-					order.append([" BreakDn",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","TrendRider"])
+					order.append([" BreakDn",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","1:2 Exprmntl"])
 
 
 			self.tnv_scanner.send_algo(order)
