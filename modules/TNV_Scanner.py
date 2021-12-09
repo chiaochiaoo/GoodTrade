@@ -98,8 +98,8 @@ class TNV_Scanner():
 
 		self.TNV_TAB.add(self.oh_frame, text ='Open High')
 		self.TNV_TAB.add(self.ol_frame, text ='Open Low')
-		self.oh = Open_high(self.oh_frame,NT)
-		self.ol = Open_low(self.ol_frame,NT)
+		self.oh = Open_high(self.oh_frame,NT,self)
+		self.ol = Open_low(self.ol_frame,NT,self)
 
 		# RRVOL
 		self.rrvol_frame = tk.Canvas(self.TNV_TAB)
@@ -627,12 +627,13 @@ class StandardScanner():
 
 
 class Open_high(StandardScanner):
-	def __init__(self,root,NT):
+	def __init__(self,root,NT,tnv):
 
 		
 		self.labels_width = [9,6,5,8,5,5,6,6,6,6,6,6,8,6]
-		self.labels = ["Symbol","Sector","OH","Rel.V","Rg.Score","High","SO%","SC%","listed","Add"]
+		self.labels = ["Symbol","Sector","OH","Rel.V","E21T","E21C","SO%","SC%","listed","Add"]
 		self.total_len = len(self.labels)
+		self.tnv_scanner = tnv
 		super().__init__(root,NT)
 
 	def update_entry(self,data):
@@ -642,15 +643,27 @@ class Open_high(StandardScanner):
 
 		#df.to_csv("tttt.csv")
 		entry = 0
+		threshold = 25
 
+		now = datetime.now()
+		ts = now.hour*60+now.minute
+
+		algo_timer = self.hour.get()*60 + self.minute.get()
+		end_timer = self.ehour.get()*60 + self.eminute.get()
+
+		send_algo = []
 		if 1:
 			for index, row in df.iterrows():
 				#print(row)
 				rank = index
 				sec = row['sector']
 				relv = row['rrvol']
-				near = row['rangescore']
-				high = row['high']
+
+				# near = row['rangescore']
+				# high = row['high']
+
+				e21t = row['ema21time']
+				e21c = row['ema21change']
 
 				oh = row["oh"]
 				so = row['SO']
@@ -664,7 +677,7 @@ class Open_high(StandardScanner):
 				#print(self.NT.nasdaq_trader_symbols)
 				if 1: #score>0:	
 
-					lst = [rank,sec,oh,relv,near,high,so,sc,listed]
+					lst = [rank,sec,oh,relv,e21t,e21c,so,sc,listed]
 
 					for i in range(len(lst)):
 						self.entries[entry][i]["text"] = lst[i]
@@ -672,22 +685,72 @@ class Open_high(StandardScanner):
 					if entry ==50:
 						break
 
+					if self.algo_activate.get()==1 and ts>=algo_timer and ts<=end_timer:
+
+
+						send = False
+
+						order = {}
+						order["symbol"] = rank
+
+						
+
+						if row['ema21change']<=-25 and row['oh']>=1:
+
+							order["support"] = row['price']	
+							order["resistence"] = row['high']	
+							order["side"] = "DOWN"			
+							send=True
+
+						if row['ema45change']<=-50 and row['oh']>=0.8:
+
+
+							order["support"] = row['price']	
+							order["resistence"] = row['high']	
+							order["side"] = "DOWN"			
+							send=True				
+
+
+		
+						if send:
+							send_algo.append(order)
+
 			while entry<50:
 				#print("ok")
 				for i in range(self.total_len):
 					self.entries[entry][i]["text"] = ""
 				entry+=1
+
+		if len(send_algo)>0:
+			self.send_group_algos(send_algo)
 		# except Exception as e:
 		# 	print("TNV scanner construction near high:",e)
 
+	def send_group_algos(self,lst):
 
+		risk = self.algo_risk.get()
+
+		#print("HELLO.",lst)
+		order = ["New order"]
+		if risk>0:
+			for i in range(len(lst)):
+
+				if lst[i]["side"]=="UP":
+					order.append([" BreakUp",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","1:2 Exprmntl"])
+
+				elif lst[i]["side"]=="DOWN":
+					order.append([" BreakDn",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","1:2 Exprmntl"])
+
+
+			self.tnv_scanner.send_algo(order)
 class Open_low(StandardScanner):
-	def __init__(self,root,NT):
+	def __init__(self,root,NT,tnv):
 
 		
 		self.labels_width = [9,6,5,8,5,5,6,6,6,6,6,6,8,6]
-		self.labels = ["Symbol","Sector","OL","Rel.V","Rg.Score","High","SO%","SC%","listed","Add"]
+		self.labels = ["Symbol","Sector","OL","Rel.V","E21T","E21C","SO%","SC%","listed","Add"]
 		self.total_len = len(self.labels)
+		self.tnv_scanner = tnv
 		super().__init__(root,NT)
 
 	def update_entry(self,data):
@@ -701,14 +764,23 @@ class Open_low(StandardScanner):
 		#df.to_csv("tttt.csv")
 		entry = 0
 
+		now = datetime.now()
+		ts = now.hour*60+now.minute
+
+		algo_timer = self.hour.get()*60 + self.minute.get()
+		end_timer = self.ehour.get()*60 + self.eminute.get()
+		send_algo = []
 		if 1:
 			for index, row in df.iterrows():
 				#print(row)
 				rank = index
 				sec = row['sector']
 				relv = row['rrvol']
-				near = row['rangescore']
-				high = row['high']
+				# near = row['rangescore']
+				# high = row['high']
+
+				e21t = row['ema21time']
+				e21c = row['ema21change']
 
 				oh = row["ol"]
 				so = row['SO']
@@ -722,14 +794,45 @@ class Open_low(StandardScanner):
 				#print(self.NT.nasdaq_trader_symbols)
 				if 1: #score>0:	
 
-					lst = [rank,sec,oh,relv,near,high,so,sc,listed]
+					lst = [rank,sec,oh,relv,e21t,e21c,so,sc,listed]
 
 					for i in range(len(lst)):
 						self.entries[entry][i]["text"] = lst[i]
-					entry+=1
-					if entry ==50:
-						break
 
+
+					if self.algo_activate.get()==1 and ts>=algo_timer and ts<=end_timer:
+
+
+						send = False
+
+						order = {}
+						order["symbol"] = rank
+
+						
+
+						if row['ema21change']>=25 and row['ol']>=1:
+
+							order["support"] = row['low']	
+							order["resistence"] = row['price']	
+							order["side"] = "UP"			
+							send=True
+
+						if row['ema45change']>=50 and row['ol']>=0.8:
+
+
+							order["support"] = row['low']	
+							order["resistence"] = row['price']	
+							order["side"] = "UP"			
+							send=True				
+
+
+		
+						if send:
+							send_algo.append(order)
+
+				entry+=1
+				if entry ==50:
+					break
 			while entry<50:
 				#print("ok")
 				for i in range(self.total_len):
@@ -738,6 +841,23 @@ class Open_low(StandardScanner):
 		# except Exception as e:
 		# 	print("TNV scanner construction near high:",e)
 
+	def send_group_algos(self,lst):
+
+		risk = self.algo_risk.get()
+
+		#print("HELLO.",lst)
+		order = ["New order"]
+		if risk>0:
+			for i in range(len(lst)):
+
+				if lst[i]["side"]=="UP":
+					order.append([" BreakUp",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","1:2 Exprmntl"])
+
+				elif lst[i]["side"]=="DOWN":
+					order.append([" BreakDn",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","1:2 Exprmntl"])
+
+
+			self.tnv_scanner.send_algo(order)
 # class Open_low():
 # 	def __init__(self,root,NT):
 
