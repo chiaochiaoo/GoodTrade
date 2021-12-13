@@ -452,6 +452,8 @@ class StandardScanner():
 
 		self.buttons = []
 		self.entries = []
+		self.algo_placed = []
+		
 		self.l = 1
 
 		self.NT = NT
