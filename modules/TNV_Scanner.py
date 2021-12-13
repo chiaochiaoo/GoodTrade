@@ -685,21 +685,24 @@ class Open_high(StandardScanner):
 					if entry ==50:
 						break
 
-					if self.algo_activate.get()==1 and ts>=algo_timer and ts<=end_timer:
+					trade = rank+str(ts)
 
+					if trade not in self.algo_placed and self.algo_activate.get()==1 \
+					and ts>=algo_timer and ts<=end_timer:
+
+										
 
 						send = False
 
 						order = {}
 						order["symbol"] = rank
 
-						
-
 						if row['ema21change']<=-25 and row['oh']>=1:
 
 							order["support"] = row['price']	
 							order["resistence"] = row['high']	
-							order["side"] = "DOWN"			
+							order["side"] = "DOWN"	
+							self.algo_placed.append(trade)		
 							send=True
 
 						if row['ema45change']<=-50 and row['oh']>=0.8:
@@ -707,11 +710,11 @@ class Open_high(StandardScanner):
 
 							order["support"] = row['price']	
 							order["resistence"] = row['high']	
-							order["side"] = "DOWN"			
+							order["side"] = "DOWN"
+							self.algo_placed.append(trade)			
 							send=True				
 
 
-		
 						if send:
 							send_algo.append(order)
 
