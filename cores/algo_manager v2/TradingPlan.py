@@ -247,7 +247,7 @@ class TradingPlan:
 		
 		#log_print("TP processing:",self.symbol_name,price,shares,side)
 		if self.data[POSITION]=="": # 1. No position.
-			if self.expect_orders==side or self.management_plan.strategy_name=="ScalpaTron":
+			if self.expect_orders==side: # or self.management_plan.strategy_name=="ScalpaTron":
 				self.ppro_confirm_new_order(price,shares,side)
 			else:
 				log_print("TP processing: unexpected orders on",self.symbol_name)
