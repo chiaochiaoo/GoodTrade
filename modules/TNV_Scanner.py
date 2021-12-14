@@ -804,9 +804,9 @@ class Open_low(StandardScanner):
 					for i in range(len(lst)):
 						self.entries[entry][i]["text"] = lst[i]
 
+					trade = rank+str(ts)
 
-					if self.algo_activate.get()==1 and ts>=algo_timer and ts<=end_timer:
-
+					if trade not in self.algo_placed and self.algo_activate.get()==1 and ts>=algo_timer and ts<=end_timer:
 
 						send = False
 
@@ -821,7 +821,7 @@ class Open_low(StandardScanner):
 							order["resistence"] = row['price']	
 							order["side"] = "UP"			
 							send=True
-
+							self.algo_placed.append(trade)	
 						if row['ema45change']>=50 and row['ol']>=0.8:
 
 
@@ -829,7 +829,7 @@ class Open_low(StandardScanner):
 							order["resistence"] = row['price']	
 							order["side"] = "UP"			
 							send=True				
-
+							self.algo_placed.append(trade)	
 
 		
 						if send:
@@ -843,6 +843,10 @@ class Open_low(StandardScanner):
 				for i in range(self.total_len):
 					self.entries[entry][i]["text"] = ""
 				entry+=1
+
+
+		if len(send_algo)>0:
+			self.send_group_algos(send_algo)
 		# except Exception as e:
 		# 	print("TNV scanner construction near high:",e)
 
