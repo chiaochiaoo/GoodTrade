@@ -388,7 +388,8 @@ class Manager:
 			time.sleep(5)
 
 		try:
-			self.root.destroy()
+			self.flatten_all()
+			#self.root.destroy()
 		except Exception as e:
 			pass
 
