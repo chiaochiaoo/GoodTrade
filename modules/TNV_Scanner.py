@@ -10,15 +10,17 @@ from datetime import datetime
 from tkinter import *
 
 
-# from TNV_PMB import *
-# from TNV_OR import *
-# from TNV_TFM import *
-# from TNV_Trend import *
+from TNV_PMB import *
+#from TNV_OR import *
+from TNV_TFM import *
+#from TNV_Trend import *
+from TNV_StandardScanner import *
 
-from modules.TNV_PMB import *
-from modules.TNV_OR import *
-from modules.TNV_TFM import *
-from modules.TNV_Trend import *
+# from modules.TNV_PMB import *
+# from modules.TNV_OR import *
+# from modules.TNV_TFM import *
+# from modules.TNV_Trend import *
+# from modules.TNV_StandardScanner import *
 
 class fake_NT():
 
@@ -335,297 +337,177 @@ class RRvol():
 		# except Exception as e:
 		# 	print("TNV scanner construction near high:",e)
 
-class Just_break():
-	def __init__(self,root,NT):
+class Open_Reversal(StandardScanner):
+	def __init__(self,root,NT,tnv):
 
-		self.buttons = []
-		self.entries = []
-		self.l = 1
-		self.labels_width = [9,6,5,5,5,5,6,6,6,6,6,6,8,6]
-		self.NT = NT
-		self.labels = ["Symbol","Sector","Rel.V","Side","Been","SO%","SC%","Rg eval","Vol eval","listed","Add"]
-		self.root = root
+		self.labels_width = [9,6,5,7,7,5,6,6,6,6,6,6,8,6,6,6,6]
+		self.labels = ["Symbol","Sector","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Add","Algo"]
 		self.total_len = len(self.labels)
-		self.recreate_labels(self.root)
+		self.tnv_scanner = tnv
+		super().__init__(root,NT)
 
-	def recreate_labels(self,frame):
+		self.ts_location = 7
 
-		self.labels_position = {}
-		self.labels_position["Rank"]=0
-		self.labels_position["Symbol"]=1
-		self.labels_position["Market"]=2
-		self.labels_position["Price"]=3
-		self.labels_position["Since"]=4
-		self.labels_position["Been"]=5
-		self.labels_position["SC%"]=6
-		self.labels_position["SO%"]=7
-		self.labels_position["L5R%"]=8
-		self.labels_position["Status"]=9
-		self.labels_position["Add"]=10
+		self.hour.set(9)
+		self.minute.set(30)
+		self.ehour.set(10)
+		self.eminute.set(30)
 
-		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
+		#self.update_entry(pd.read_csv("tttt.csv",index_col=0))
 
-		self.status_code = {}
-		self.status_num = 0
 
-		for i in range(len(self.labels)): #Rows
-			self.b = tk.Button(self.root, text=self.labels[i],width=self.labels_width[i])#,command=self.rank
-			self.b.configure(activebackground="#f9f9f9")
-			self.b.configure(activeforeground="black")
-			self.b.configure(background="#d9d9d9")
-			self.b.configure(disabledforeground="#a3a3a3")
-			self.b.configure(relief="ridge")
-			self.b.configure(foreground="#000000")
-			self.b.configure(highlightbackground="#d9d9d9")
-			self.b.configure(highlightcolor="black")
-			self.b.grid(row=self.l, column=i)
-			self.buttons.append(self.b)
 
-		self.l+=1
-		self.create_entry()
+	def send_group_algos(self,lst):
 
-	def create_entry(self):
+		risk = self.algo_risk.get()
 
-		for k in range(0,50):
+		#print("HELLO.",lst)
+		order = ["New order"]
+		if risk>0:
+			for i in range(len(lst)):
+				#print(lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"])
 
-			self.entries.append([])
+				change = 0.03
+			
+				if lst[i]["support"]>10 and lst[i]["support"]<20:
+					change = 0.05
 
-			for i in range(len(self.labels)): #Rows
-				self.b = tk.Label(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
-				self.b.grid(row=self.l, column=i)
-				self.entries[k].append(self.b)
-			self.l+=1
+				if lst[i]["support"] >20:
+					change = 0.06
+
+
+				if lst[i]["side"] =="UP":
+					order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"]-change,lst[i]["resistence"],risk,{},"deploy","1:2 Exprmntl"])
+
+					#print("sending",info)
+				else:
+					order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"]+change,risk,{},"deploy","1:2 Exprmntl"])
+
+			self.tnv_scanner.send_algo(order)
+
 
 	def update_entry(self,data):
 
 		#at most 8.
 		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
 
-		df = data
-
-
-		#df.to_csv("tttt.csv")
-		entry = 0
-
-		try:
-			for index, row in df.iterrows():
-				#print(row)
-				rank = index
-				sec = row['sector']
-				relv = row['rrvol']
-				side = row['just_break']
-
-				span = row['break_span']
-				so = row['SO']
-				sc = row['SC']
-
-				tr =  row['tr_eval']
-				vol = row['vol_eval']
-
-				############ add since, and been to the thing #############
-				if rank in self.NT.nasdaq_trader_symbols_ranking:
-					listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
-				else:
-					listed = "No"
-				#print(self.NT.nasdaq_trader_symbols)
-				if 1: #score>0:	
-
-					lst = [rank,sec,relv,side,span,so,sc,tr,vol,listed]
-
-					for i in range(len(lst)):
-						self.entries[entry][i]["text"] = lst[i]
-					entry+=1
-					if entry ==50:
-						break
-
-			while entry<50:
-				#print("ok")
-				for i in range(self.total_len):
-					self.entries[entry][i]["text"] = ""
-				entry+=1
-		except Exception as e:
-			print("TNV scanner construction voli:",e)
-
-
-class StandardScanner():
-	def __init__(self,root,NT):
-
-		self.buttons = []
-		self.entries = []
-		self.algo_placed = []
+		now = datetime.now()
 		
-		self.l = 1
-
-		self.NT = NT
-
-
-		self.root = root
-
-		self.algo_risk = tk.DoubleVar(value=10)
-		self.algo_activate = tk.BooleanVar(value=0)
-
-		self.recreate_labels(self.root)
-
-
-	def recreate_labels(self,frame):
-
-		self.algo_frame = ttk.LabelFrame(self.root,text="Algo setup")
-		self.algo_frame.place(x=0, rely=0, relheight=0.2, relwidth=1)
-
-		self.root = ttk.LabelFrame(self.root,text="")
-		self.root.place(x=0, rely=0.12, relheight=0.8, relwidth=1)
-
-		self.labels_position = {}
-		self.labels_position["Rank"]=0
-		self.labels_position["Symbol"]=1
-		self.labels_position["Market"]=2
-		self.labels_position["Price"]=3
-		self.labels_position["Since"]=4
-		self.labels_position["Been"]=5
-		self.labels_position["SC%"]=6
-		self.labels_position["SO%"]=7
-		self.labels_position["L5R%"]=8
-		self.labels_position["Status"]=9
-		self.labels_position["Add"]=10
-
-		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
-
-		self.status_code = {}
-		self.status_num = 0
-
-		for i in range(len(self.labels)): #Rows
-			self.b = tk.Button(self.root, text=self.labels[i],width=self.labels_width[i])#,command=self.rank
-			self.b.configure(activebackground="#f9f9f9")
-			self.b.configure(activeforeground="black")
-			self.b.configure(background="#d9d9d9")
-			self.b.configure(disabledforeground="#a3a3a3")
-			self.b.configure(relief="ridge")
-			self.b.configure(foreground="#000000")
-			self.b.configure(highlightbackground="#d9d9d9")
-			self.b.configure(highlightcolor="black")
-			self.b.grid(row=self.l, column=i)
-			self.buttons.append(self.b)
-
-		self.l+=1
-
-		self.algo_pannel(self.algo_frame)
-		self.create_entry()
-
-	def algo_pannel(self,frame):
-
-		row = 1
-		col = 1
-		ttk.Label(frame, text="Algo:").grid(sticky="w",column=col,row=row)
-		ttk.Checkbutton(frame, variable=self.algo_activate).grid(sticky="w",column=col+1,row=row)
-
-		ttk.Label(frame, text="Risk:").grid(sticky="w",column=col+2,row=row)
-		ttk.Entry(frame, textvariable=self.algo_risk).grid(sticky="w",column=col+3,row=row)
-
-
-		row = 2
-		col = 1
-
-		self.hour = tk.IntVar(value=10)
-		self.minute = tk.IntVar(value=00)
-
-		ttk.Label(frame, text="Start:").grid(sticky="w",column=col,row=row)
-		ttk.Entry(frame, textvariable=self.hour).grid(sticky="w",column=col+1,row=row)
-
-		ttk.Label(frame, text=":").grid(sticky="w",column=col+2,row=row)
-		ttk.Entry(frame, textvariable=self.minute).grid(sticky="w",column=col+3,row=row)
-
-
-		self.rel_v = tk.DoubleVar(value=0)
-		self.re_score = tk.DoubleVar(value=0)
-
-
-		self.ehour = tk.IntVar(value=15)
-		self.eminute = tk.IntVar(value=00)
-		row = 3
-		col = 1
-		ttk.Label(frame, text="End").grid(sticky="w",column=col,row=row)
-		ttk.Entry(frame, textvariable=self.ehour).grid(sticky="w",column=col+1,row=row)
-
-		ttk.Label(frame, text=":").grid(sticky="w",column=col+2,row=row)
-		ttk.Entry(frame, textvariable=self.eminute).grid(sticky="w",column=col+3,row=row)
-
-		self.side_ = tk.StringVar(value='x')
-		self.listed_ = tk.BooleanVar(value=False)
+		ts = now.hour*60+now.minute
 		
-		# row = 4
-		# col = 1
-
-
-		# ttk.Label(frame, text="Side:").grid(sticky="w",column=col,row=row)
-		# l={"Up","Down","Any","Any"}
-		# ttk.OptionMenu(frame, self.side_, *sorted(l)).grid(sticky="w",column=col+1,row=row)
-
-
-		# ttk.Label(frame, text="Listed?").grid(sticky="w",column=col+2,row=row)
-		# ttk.Checkbutton(frame, variable=self.listed_).grid(sticky="w",column=col+3,row=row)
-
 		algo_timer = self.hour.get()*60 + self.minute.get()
-		#print("algo time",algo_timer)
 
-	def create_entry(self):
-
-		for k in range(0,50):
-
-			self.entries.append([])
-
-			for i in range(len(self.labels)): #Rows
-				self.b = tk.Label(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
-				self.b.grid(row=self.l, column=i)
-				self.entries[k].append(self.b)
-			self.l+=1
-
-	def update_entry(self,data):
-
-		#at most 8.
-		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
+		end_timer = self.ehour.get()*60 + self.eminute.get()
 
 		df = data
 
-
+		#timestamp = data[1]
+		#self.NT_stat["text"] = "Last update: "+timestamp
 		#df.to_csv("tttt.csv")
 		entry = 0
 
-		if 1:
-			for index, row in df.iterrows():
-				#print(row)
-				rank = index
-				sec = row['sector']
-				relv = row['rrvol']
-				near = row['rangescore']
-				high = row['high']
+		send_algo=[]
 
-				oh = row["oh"]
-				so = row['SO']
-				sc = row['SC']
+		if len(data)>1:
+			if 1:
+				for index, row in df.iterrows():
+					#print(row)
 
-				############ add since, and been to the thing #############
-				if rank in self.NT.nasdaq_trader_symbols_ranking:
-					listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
-				else:
-					listed = "No"
-				#print(self.NT.nasdaq_trader_symbols)
-				if 1: #score>0:	
+					#["Symbol","Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Ignore","Add"]
+					rank = index
+					vol = row['sector']
+					relv = row['rrvol']
+					side = row['reversalside']
+					rscore = row['reversal_score']
+					sc = row['SC']
 
-					lst = [rank,sec,oh,relv,near,high,so,sc,listed]
+					since = row['reversal_timer']
 
-					for i in range(len(lst)):
-						self.entries[entry][i]["text"] = lst[i]
+					row['Signal Time'] = since
+					############ add since, and been to the thing #############
+
+					if self.NT != None:
+						if rank in self.NT.nasdaq_trader_symbols_ranking:
+							listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
+						else:
+							listed = "No"
+					else:
+						listed = "No"
+					#print(self.NT.nasdaq_trader_symbols)
+					if 1: #score>0:	
+
+						lst = [rank,vol,relv,side,rscore,sc,listed,since]
+
+						ts_location = 7
+
+						for i in range(len(lst)):
+							
+							if lst[ts_location] >=ts and lst[ts_location]>=algo_timer and lst[ts_location]<=end_timer:
+								self.entries[entry][i]["background"] = "LIGHTGREEN"
+								self.entries[entry][9].grid()
+
+								if side == "UP":
+
+									resistence = row['price']
+									support = row['open'] #+ 0.5*abs(row['price']-row['open'])
+									
+								else:
+									
+									resistence = row['open'] #- 0.5*abs(row['price']-row['open'])
+
+									support = row['price']
+
+								self.entries[entry][9]["command"]= lambda symbol=rank,support=support,side=side,resistence=resistence:self.send_algo(symbol,support,resistence,side)
+
+								if self.algo_activate.get()==1:
+									if rank not in self.algo_placed:
+
+										#self.send_algo(rank,support,resistence,self.algo_risk)
+										self.algo_placed.append(rank)
+
+										order = {}
+
+										order["symbol"] = rank
+										order["support"] = support
+										order["resistence"] = resistence
+
+										order["side"] = side
+
+										send_algo.append(order)
+
+										#print(rank,self.algo_placed)
+										
+							if i == ts_location:
+								self.entries[entry][i]["text"] = ts_to_min(lst[i])
+							else:
+								self.entries[entry][i]["text"] = lst[i]
+								self.entries[entry][8].grid_remove() 
+								#self.entries[entry][8].grid_remove() 
+								#self.entries[entry][9].grid_forget()
+							#self.entries[entry][8].grid() 
+						#add the button here?
+
+						entry+=1
+						if entry ==30:
+							break
+
+				while entry<30:
+					#print("ok")
+					for i in range(10):
+						self.entries[entry][i]["text"] = ""
 					entry+=1
-					if entry ==50:
-						break
 
-			while entry<50:
-				#print("ok")
-				for i in range(self.total_len):
-					self.entries[entry][i]["text"] = ""
-				entry+=1
-		# except Exception as e:
-		# 	print("TNV scanner construction near high:",e)
+				# keep = ['Symbol', "Signal Time", 'rel vol', 'SC', 'reversalside','reversal_score','Signal Time',]
+
+				# for i in df.columns:
+				# 	if i not in keep:
+				# 		df.pop(i)
+				# df.to_csv(self.file)
+			# except Exception as e:
+			# 	print("TNV scanner construction open reversal:",e)
+
+			if len(send_algo)>0:
+				self.send_group_algos(send_algo)
 
 
 class Open_high(StandardScanner):
@@ -731,23 +613,7 @@ class Open_high(StandardScanner):
 		# except Exception as e:
 		# 	print("TNV scanner construction near high:",e)
 
-	def send_group_algos(self,lst):
 
-		risk = self.algo_risk.get()
-
-		#print("HELLO.",lst)
-		order = ["New order"]
-		if risk>0:
-			for i in range(len(lst)):
-
-				if lst[i]["side"]=="UP":
-					order.append([" BreakUp",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","TrendRider"])
-
-				elif lst[i]["side"]=="DOWN":
-					order.append([" BreakDn",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","TrendRider"])
-
-
-			self.tnv_scanner.send_algo(order)
 class Open_low(StandardScanner):
 	def __init__(self,root,NT,tnv):
 
@@ -850,6 +716,112 @@ class Open_low(StandardScanner):
 		# except Exception as e:
 		# 	print("TNV scanner construction near high:",e)
 
+
+
+class ADX(StandardScanner):
+	def __init__(self,root,NT,TNV):
+
+		
+		self.labels_width = [9,6,12,5,8,5,6,6,6,6,6,6,8,6]
+
+		self.labels = ["Symbol","Sector","TrendScore","Rg.Score","Rel.V","SO%","SC%","listed","Add"]
+		self.tnv_scanner = TNV
+		self.total_len = len(self.labels)
+		super().__init__(root,NT)
+
+	def update_entry(self,data):
+
+		#at most 8.
+		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
+
+		df = data
+
+
+		#df.to_csv("tttt.csv")
+		entry = 0
+
+
+		threshold = 25
+
+		now = datetime.now()
+		ts = now.hour*60+now.minute
+
+		algo_timer = self.hour.get()*60 + self.minute.get()
+		end_timer = self.ehour.get()*60 + self.eminute.get()
+
+		send_algo =[]
+		if 1:
+			for index, row in df.iterrows():
+				#print(row)
+				rank = index
+				sec = row['sector']
+				relv = row['rrvol']
+				near = row['rangescore']
+
+				adx = str([row['ema9time'],row['ema21time'],row['ema45time']])
+				so = row['SO']
+				sc = row['SC']
+
+				############ add since, and been to the thing #############
+				if rank in self.NT.nasdaq_trader_symbols_ranking:
+					listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
+				else:
+					listed = "No"
+				#print(self.NT.nasdaq_trader_symbols)
+				if 1: #score>0:	
+
+					lst = [rank,sec,adx,near,relv,so,sc,listed]
+
+					for i in range(len(lst)):
+						self.entries[entry][i]["text"] = lst[i]
+					entry+=1
+					if entry ==50:
+						break
+
+					if self.algo_activate.get()==1 and ts>=algo_timer and ts<=end_timer:
+						if rank not in self.algo_placed:
+
+							send = False
+
+							order = {}
+							order["symbol"] = rank
+
+							
+
+							if row['ema9time']==1 or row['ema21time']==1:
+
+								if row['ema45time']>=25:
+									order["support"] = round(row['ema45'],2)
+									order["resistence"] = row['price']	
+									order["side"] = "UP"			
+									send=True
+
+							if row['ema9time']==-1 or row['ema21time']==-1:
+
+								if row['ema45time']<=-25:
+
+									order["support"] = row['price']	
+									order["resistence"] =  round(row['ema45'],2)
+									order["side"] = "DOWN"
+									send=True							
+
+
+			
+							if send:
+								send_algo.append(order)
+
+			while entry<50:
+				#print("ok")
+				for i in range(self.total_len):
+					self.entries[entry][i]["text"] = ""
+				entry+=1
+
+			if len(send_algo)>0:
+				self.send_group_algos(send_algo)
+		# except Exception as e:
+		# 	print("TNV scanner construction near high:",e)
+	
+
 	def send_group_algos(self,lst):
 
 		risk = self.algo_risk.get()
@@ -860,809 +832,38 @@ class Open_low(StandardScanner):
 			for i in range(len(lst)):
 
 				if lst[i]["side"]=="UP":
-					order.append([" BreakUp",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","TrendRider"])
+					order.append([" BreakUp",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","1:2 Exprmntl"])
 
 				elif lst[i]["side"]=="DOWN":
-					order.append([" BreakDn",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","TrendRider"])
+					order.append([" BreakDn",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","1:2 Exprmntl"])
 
 
 			self.tnv_scanner.send_algo(order)
-# class Open_low():
-# 	def __init__(self,root,NT):
 
-# 		self.buttons = []
-# 		self.entries = []
-# 		self.l = 1
-		
-# 		self.NT = NT
-# 		self.labels_width = [9,6,5,8,5,5,6,6,6,6,6,6,8,6]
-# 		self.labels = ["Symbol","Sector","OL","Rel.V","Rg.Score","High","SO%","SC%","listed","Add"]
-# 		#[rank,sec,relv,near,high,so,sc]
-# 		self.total_len = len(self.labels)
-# 		self.root = root
 
-# 		self.algo_risk = tk.DoubleVar(value=10)
-# 		self.algo_activate = tk.BooleanVar(value=0)
+	# def send_algo(self,symbol,support,resistence,side):
 
-# 		self.recreate_labels(self.root)
+	# 	print("sending",symbol,support,resistence,side)
+	# 	#self.entries[entry][8]["command"]= lambda symbol=rank,side=side,open_=row['open'],stop_=rscore,risk_=self.algo_risk:self.send_algo(self,symbol,side,open_,stop_,risk_)
+	# 	risk = self.algo_risk.get()
 
-# 	def recreate_labels(self,frame):
+	# 	if risk>0:
 
-# 		self.algo_frame = ttk.LabelFrame(self.root,text="Algo setup")
-# 		self.algo_frame.place(x=0, rely=0, relheight=0.2, relwidth=1)
+	# 		# change = 0.03
+			
+	# 		# if support>10 and support<20:
+	# 		# 	change = 0.06
 
-# 		self.root = ttk.LabelFrame(self.root,text="")
-# 		self.root.place(x=0, rely=0.12, relheight=0.8, relwidth=1)
+	# 		# if support >20:
+	# 		# 	change = 0.08
 
-# 		self.labels_position = {}
-# 		self.labels_position["Rank"]=0
-# 		self.labels_position["Symbol"]=1
-# 		self.labels_position["Market"]=2
-# 		self.labels_position["Price"]=3
-# 		self.labels_position["Since"]=4
-# 		self.labels_position["Been"]=5
-# 		self.labels_position["SC%"]=6
-# 		self.labels_position["SO%"]=7
-# 		self.labels_position["L5R%"]=8
-# 		self.labels_position["Status"]=9
-# 		self.labels_position["Add"]=10
+	# 		if side =="UP":
+	# 			info = ["New order",[" BreakUp",symbol,support,resistence,risk,{},"deploy","TrendRider"]]
+	# 			#print("sending",info)
+	# 		else:
+	# 			info = ["New order",[" BreakDn",symbol,support,resistence,risk,{},"deploy","TrendRider"]]
+	# 		self.tnv_scanner.send_algo(info)
 
-# 		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
-
-# 		self.status_code = {}
-# 		self.status_num = 0
-
-# 		for i in range(len(self.labels)): #Rows
-# 			self.b = tk.Button(self.root, text=self.labels[i],width=self.labels_width[i])#,command=self.rank
-# 			self.b.configure(activebackground="#f9f9f9")
-# 			self.b.configure(activeforeground="black")
-# 			self.b.configure(background="#d9d9d9")
-# 			self.b.configure(disabledforeground="#a3a3a3")
-# 			self.b.configure(relief="ridge")
-# 			self.b.configure(foreground="#000000")
-# 			self.b.configure(highlightbackground="#d9d9d9")
-# 			self.b.configure(highlightcolor="black")
-# 			self.b.grid(row=self.l, column=i)
-# 			self.buttons.append(self.b)
-
-# 		self.l+=1
-# 		self.create_entry()
-
-# 		self.algo_pannel(self.algo_frame)
-
-# 	def algo_pannel(self,frame):
-
-# 		row = 1
-# 		col = 1
-# 		ttk.Label(frame, text="Algo:").grid(sticky="w",column=col,row=row)
-# 		ttk.Checkbutton(frame, variable=self.algo_activate).grid(sticky="w",column=col+1,row=row)
-
-# 		ttk.Label(frame, text="Risk:").grid(sticky="w",column=col+2,row=row)
-# 		ttk.Entry(frame, textvariable=self.algo_risk).grid(sticky="w",column=col+3,row=row)
-
-
-# 		row = 2
-# 		col = 1
-
-# 		self.hour = tk.IntVar(value=10)
-# 		self.minute = tk.IntVar(value=00)
-
-# 		ttk.Label(frame, text="Start:").grid(sticky="w",column=col,row=row)
-# 		ttk.Entry(frame, textvariable=self.hour).grid(sticky="w",column=col+1,row=row)
-
-# 		ttk.Label(frame, text=":").grid(sticky="w",column=col+2,row=row)
-# 		ttk.Entry(frame, textvariable=self.minute).grid(sticky="w",column=col+3,row=row)
-
-
-# 		self.rel_v = tk.DoubleVar(value=0)
-# 		self.re_score = tk.DoubleVar(value=0)
-
-
-# 		self.ehour = tk.IntVar(value=15)
-# 		self.eminute = tk.IntVar(value=00)
-# 		row = 3
-# 		col = 1
-# 		ttk.Label(frame, text="End").grid(sticky="w",column=col,row=row)
-# 		ttk.Entry(frame, textvariable=self.ehour).grid(sticky="w",column=col+1,row=row)
-
-# 		ttk.Label(frame, text=":").grid(sticky="w",column=col+2,row=row)
-# 		ttk.Entry(frame, textvariable=self.eminute).grid(sticky="w",column=col+3,row=row)
-
-# 		self.side_ = tk.StringVar(value='x')
-# 		self.listed_ = tk.BooleanVar(value=False)
-		
-# 		# row = 4
-# 		# col = 1
-
-
-# 		# ttk.Label(frame, text="Side:").grid(sticky="w",column=col,row=row)
-# 		# l={"Up","Down","Any","Any"}
-# 		# ttk.OptionMenu(frame, self.side_, *sorted(l)).grid(sticky="w",column=col+1,row=row)
-
-
-# 		# ttk.Label(frame, text="Listed?").grid(sticky="w",column=col+2,row=row)
-# 		# ttk.Checkbutton(frame, variable=self.listed_).grid(sticky="w",column=col+3,row=row)
-
-# 		algo_timer = self.hour.get()*60 + self.minute.get()
-# 		#print("algo time",algo_timer)
-# 	def create_entry(self):
-
-# 		for k in range(0,50):
-
-# 			self.entries.append([])
-
-# 			for i in range(len(self.labels)): #Rows
-# 				self.b = tk.Label(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
-# 				self.b.grid(row=self.l, column=i)
-# 				self.entries[k].append(self.b)
-# 			self.l+=1
-
-
-class Near_high():
-	def __init__(self,root,NT):
-
-		self.buttons = []
-		self.entries = []
-		self.l = 1
-		self.labels_width = [9,6,5,8,5,5,6,6,6,6,6,6,8,6]
-		self.NT = NT
-		self.labels = ["Symbol","Sector","Rel.V","Rg.Score","High","SO%","SC%","listed","Add"]
-		#[rank,sec,relv,near,high,so,sc]
-		self.total_len = len(self.labels)
-		self.root = root
-		self.recreate_labels(self.root)
-
-	def recreate_labels(self,frame):
-
-		self.labels_position = {}
-		self.labels_position["Rank"]=0
-		self.labels_position["Symbol"]=1
-		self.labels_position["Market"]=2
-		self.labels_position["Price"]=3
-		self.labels_position["Since"]=4
-		self.labels_position["Been"]=5
-		self.labels_position["SC%"]=6
-		self.labels_position["SO%"]=7
-		self.labels_position["L5R%"]=8
-		self.labels_position["Status"]=9
-		self.labels_position["Add"]=10
-
-		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
-
-		self.status_code = {}
-		self.status_num = 0
-
-		for i in range(len(self.labels)): #Rows
-			self.b = tk.Button(self.root, text=self.labels[i],width=self.labels_width[i])#,command=self.rank
-			self.b.configure(activebackground="#f9f9f9")
-			self.b.configure(activeforeground="black")
-			self.b.configure(background="#d9d9d9")
-			self.b.configure(disabledforeground="#a3a3a3")
-			self.b.configure(relief="ridge")
-			self.b.configure(foreground="#000000")
-			self.b.configure(highlightbackground="#d9d9d9")
-			self.b.configure(highlightcolor="black")
-			self.b.grid(row=self.l, column=i)
-			self.buttons.append(self.b)
-
-		self.l+=1
-		self.create_entry()
-
-	def create_entry(self):
-
-		for k in range(0,50):
-
-			self.entries.append([])
-
-			for i in range(len(self.labels)): #Rows
-				self.b = tk.Label(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
-				self.b.grid(row=self.l, column=i)
-				self.entries[k].append(self.b)
-			self.l+=1
-
-	def update_entry(self,data):
-
-		#at most 8.
-		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
-
-		df = data
-
-
-		#df.to_csv("tttt.csv")
-		entry = 0
-
-		if 1:
-			for index, row in df.iterrows():
-				#print(row)
-				rank = index
-				sec = row['sector']
-				relv = row['rrvol']
-				near = row['rangescore']
-				high = row['high']
-
-				so = row['SO']
-				sc = row['SC']
-
-				############ add since, and been to the thing #############
-				if rank in self.NT.nasdaq_trader_symbols_ranking:
-					listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
-				else:
-					listed = "No"
-				#print(self.NT.nasdaq_trader_symbols)
-				if 1: #score>0:	
-
-					lst = [rank,sec,relv,near,high,so,sc,listed]
-
-					for i in range(len(lst)):
-						self.entries[entry][i]["text"] = lst[i]
-					entry+=1
-					if entry ==50:
-						break
-
-			while entry<50:
-				#print("ok")
-				for i in range(self.total_len):
-					self.entries[entry][i]["text"] = ""
-				entry+=1
-		# except Exception as e:
-		# 	print("TNV scanner construction near high:",e)
-
-class Near_low():
-	def __init__(self,root,NT):
-
-		self.buttons = []
-		self.entries = []
-		self.l = 1
-		self.labels_width = [9,6,5,8,5,5,6,6,6,6,6,6,8,6]
-		self.NT = NT
-		self.labels = ["Symbol","Sector","Rel.V","Rg.Score","Low","SO%","SC%","listed","Add"]
-		#[rank,sec,relv,near,high,so,sc]
-		self.root = root
-
-		self.total_len = len(self.labels)
-		self.recreate_labels(self.root)
-
-	def recreate_labels(self,frame):
-
-		self.labels_position = {}
-		self.labels_position["Rank"]=0
-		self.labels_position["Symbol"]=1
-		self.labels_position["Market"]=2
-		self.labels_position["Price"]=3
-		self.labels_position["Since"]=4
-		self.labels_position["Been"]=5
-		self.labels_position["SC%"]=6
-		self.labels_position["SO%"]=7
-		self.labels_position["L5R%"]=8
-		self.labels_position["Status"]=9
-		self.labels_position["Add"]=10
-
-		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
-
-		self.status_code = {}
-		self.status_num = 0
-
-		for i in range(len(self.labels)): #Rows
-			self.b = tk.Button(self.root, text=self.labels[i],width=self.labels_width[i])#,command=self.rank
-			self.b.configure(activebackground="#f9f9f9")
-			self.b.configure(activeforeground="black")
-			self.b.configure(background="#d9d9d9")
-			self.b.configure(disabledforeground="#a3a3a3")
-			self.b.configure(relief="ridge")
-			self.b.configure(foreground="#000000")
-			self.b.configure(highlightbackground="#d9d9d9")
-			self.b.configure(highlightcolor="black")
-			self.b.grid(row=self.l, column=i)
-			self.buttons.append(self.b)
-
-		self.l+=1
-		self.create_entry()
-
-	def create_entry(self):
-
-		for k in range(0,50):
-
-			self.entries.append([])
-
-			for i in range(len(self.labels)): #Rows
-				self.b = tk.Label(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
-				self.b.grid(row=self.l, column=i)
-				self.entries[k].append(self.b)
-			self.l+=1
-
-	def update_entry(self,data):
-
-		#at most 8.
-		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
-
-		df = data
-
-
-		#df.to_csv("tttt.csv")
-		entry = 0
-
-		try:
-			for index, row in df.iterrows():
-				#print(row)
-				rank = index
-				sec = row['sector']
-				relv = row['rrvol']
-				near = row['rangescore']
-				high = row['low']
-
-				so = row['SO']
-				sc = row['SC']
-
-				############ add since, and been to the thing #############
-				if rank in self.NT.nasdaq_trader_symbols_ranking:
-					listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
-				else:
-					listed = "No"
-				#print(self.NT.nasdaq_trader_symbols)
-				if 1: #score>0:	
-
-					lst = [rank,sec,relv,near,high,so,sc,listed]
-
-					for i in range(len(lst)):
-						self.entries[entry][i]["text"] = lst[i]
-					entry+=1
-					if entry ==50:
-						break
-
-			while entry<50:
-				#print("ok")
-				for i in range(self.total_len):
-					self.entries[entry][i]["text"] = ""
-				entry+=1
-		except Exception as e:
-			print("TNV scanner construction near low:",e)
-
-class Spread():
-	def __init__(self,root,NT):
-
-		self.buttons = []
-		self.entries = []
-		self.l = 1
-		self.labels_width = [9,8,4,4,4,8,6,8,6,6,6,6,8,6]
-		self.NT = NT
-		self.labels = ["Pairs","CurSpread","Cur σ","PC σ","OP σ","Last5m σ","Ratio","R.Stability","Add"]
-		#[rank,sec,relv,near,high,so,sc]
-		self.total_len = len(self.labels)
-		self.root = root
-		self.recreate_labels(self.root)
-
-	def recreate_labels(self,frame):
-
-		self.labels_position = {}
-		self.labels_position["Rank"]=0
-		self.labels_position["Symbol"]=1
-		self.labels_position["Market"]=2
-		self.labels_position["Price"]=3
-		self.labels_position["Since"]=4
-		self.labels_position["Been"]=5
-		self.labels_position["SC%"]=6
-		self.labels_position["SO%"]=7
-		self.labels_position["L5R%"]=8
-		self.labels_position["Status"]=9
-		self.labels_position["Add"]=10
-
-		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
-
-		self.status_code = {}
-		self.status_num = 0
-
-		for i in range(len(self.labels)): #Rows
-			self.b = tk.Button(self.root, text=self.labels[i],width=self.labels_width[i])#,command=self.rank
-			self.b.configure(activebackground="#f9f9f9")
-			self.b.configure(activeforeground="black")
-			self.b.configure(background="#d9d9d9")
-			self.b.configure(disabledforeground="#a3a3a3")
-			self.b.configure(relief="ridge")
-			self.b.configure(foreground="#000000")
-			self.b.configure(highlightbackground="#d9d9d9")
-			self.b.configure(highlightcolor="black")
-			self.b.grid(row=self.l, column=i)
-			self.buttons.append(self.b)
-
-		self.l+=1
-		self.create_entry()
-
-	def create_entry(self):
-
-		for k in range(0,50):
-
-			self.entries.append([])
-
-			for i in range(len(self.labels)): #Rows
-				self.b = tk.Label(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
-				self.b.grid(row=self.l, column=i)
-				self.entries[k].append(self.b)
-			self.l+=1
-
-	def update_entry(self,data):
-
-		#at most 8.
-		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
-		# Index(['symbol1', 'symbol2', 'current_spread', 'date', 'ratio_mean',
-		#        'ratio_stability', 'outlier', 'neg_tail997', 'pos_tail997',
-		#        'neg_tail990', 'pos_tail990', 'neg_tail970', 'pos_tail970',
-		#        'coefficient', 'intercept', 'std', 'pe', 'pr', 'avgr', 'stdr',
-		#        'quality', 'current_sigma'],
-		df = data
-
-
-		#df.to_csv("tttt.csv")
-		entry = 0
-
-		if 1:
-			for index, row in df.iterrows():
-				#print(row)
-				#["Pairs","CurSpread","Cur σ","PC σ","OP σ","DayMax σ","DayLow σ","Ratio","R.Stability","Add"]
-				#"current_sigma","close_sigma","open_sigma","max_sigma","min_sigma","last5_sigma"
-				rank = index
-				spread = round(row['current_spread'],2)
-				sig = round(row['current_sigma'],2)
-
-				pcsig = round(row['close_sigma'],2)
-				opsig = round(row['open_sigma'],2)
-
-				last5 = round(row['last5_sigma'],2)
-
-				ratio = ratio_compute(row['coefficient'])
-				ratio_stability = str(round((1-row['ratio_stability'])*100))+"%"
-
-
-				#print(self.NT.nasdaq_trader_symbols)
-				if 1: #score>0:	
-
-					lst = [rank,spread,sig,pcsig,opsig,last5,ratio,ratio_stability]
-
-					for i in range(len(lst)):
-						self.entries[entry][i]["text"] = lst[i]
-					entry+=1
-					if entry ==50:
-						break
-
-			while entry<50:
-				#print("ok")
-				for i in range(self.total_len):
-					self.entries[entry][i]["text"] = ""
-				entry+=1
-		# except Exception as e:
-		# 	print("TNV scanner construction near high:",e)
-
-class Premarket_pick():
-	def __init__(self,root,NT):
-		self.buttons = []
-		self.entries = []
-		self.l = 1
-		self.NT = NT
-		self.labels_width = [9,6,5,7,7,7,7,7,6,6,6,6,8,6]
-		self.labels = ["Symbol","A.Vol","Rel.V","RR.ratio","Ex.Mmtm","Rg.SCORE","SC%","Listed","Add"]
-		self.root = root
-		self.recreate_labels(self.root)
-
-		self.file = "signals/premarket_pick_"+datetime.now().strftime("%m-%d")+".csv"
-
-		#self.update_entry([pd.read_csv("test2.csv",index_col=0)])
-
-	def recreate_labels(self,frame):
-
-		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
-
-		self.status_code = {}
-		self.status_num = 0
-
-		for i in range(len(self.labels)): #Rows
-			self.b = tk.Button(self.root, text=self.labels[i],width=self.labels_width[i])#,command=self.rank
-			self.b.configure(activebackground="#f9f9f9")
-			self.b.configure(activeforeground="black")
-			self.b.configure(background="#d9d9d9")
-			self.b.configure(disabledforeground="#a3a3a3")
-			self.b.configure(relief="ridge")
-			self.b.configure(foreground="#000000")
-			self.b.configure(highlightbackground="#d9d9d9")
-			self.b.configure(highlightcolor="black")
-			self.b.grid(row=self.l, column=i)
-			self.buttons.append(self.b)
-
-		self.l+=1
-		self.create_entry()
-
-	def create_entry(self):
-
-		for k in range(0,50):
-
-			self.entries.append([])
-
-			for i in range(len(self.labels)): #Rows
-				self.b = tk.Label(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
-				self.b.grid(row=self.l, column=i)
-				self.entries[k].append(self.b)
-			self.l+=1
-
-	def update_entry(self,data):
-
-		#at most 8.
-		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
-
-		df = data
-		#timestamp = data[1]
-
-		#self.NT_stat["text"] = "Last update: "+timestamp
-
-		#df.to_csv("tttt.csv")
-		entry = 0
-
-		if len(data)>1:
-			try:
-				for index, row in df.iterrows():
-					#print(row)
-
-					#["Symbol","Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Ignore","Add"]
-					rank = index
-					vol = row['Avg VolumeSTR']
-					relv = row['rrvol']
-					side = row['reversalside']
-					rscore = row['rangescore']
-					sc = row['SC']
-
-					since = ts_to_min(row['reversal_timer'])
-
-					row['Signal Time'] = since
-					############ add since, and been to the thing #############
-
-					if self.NT != None:
-						if rank in self.NT.nasdaq_trader_symbols_ranking:
-							listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
-						else:
-							listed = "No"
-					else:
-						listed = "No"
-					#print(self.NT.nasdaq_trader_symbols)
-					if 1: #score>0:	
-
-						lst = [rank,vol,relv,side,rscore,sc,listed,since]
-
-						for i in range(len(lst)):
-							self.entries[entry][i]["text"] = lst[i]
-						entry+=1
-						if entry ==50:
-							break
-
-				while entry<50:
-					#print("ok")
-					for i in range(10):
-						self.entries[entry][i]["text"] = ""
-					entry+=1
-
-				# keep = ['Symbol', "Signal Time", 'rrvol', 'SC', 'reversalside','reversal_score','Signal Time',]
-
-				# for i in df.columns:
-				# 	if i not in keep:
-				# 		df.pop(i)
-				#df.to_csv(self.file)
-			except Exception as e:
-				print("TNV scanner construction Premarket_pick:",e)
-
-class Open_Break():
-	def __init__(self,root,NT):
-		self.buttons = []
-		self.entries = []
-		self.l = 1
-		self.NT = NT
-		self.labels_width = [9,6,5,7,5,5,6,6,6,6,8,6]
-		self.labels = ["Symbol","A.Vol","Rel.V","Br.SCORE","5M","SO%","SC%","Listed","Since","Last","Ignore","Add"]
-		self.file = "signals/open_break_"+datetime.now().strftime("%m-%d")+".csv"
-		self.root = root
-		self.recreate_labels(self.root)
-
-	def recreate_labels(self,frame):
-
-		self.labels_position = {}
-		self.labels_position["Rank"]=0
-		self.labels_position["Symbol"]=1
-		self.labels_position["Market"]=2
-		self.labels_position["Price"]=3
-		self.labels_position["Since"]=4
-		self.labels_position["Been"]=5
-		self.labels_position["SC%"]=6
-		self.labels_position["SO%"]=7
-		self.labels_position["L5R%"]=8
-		self.labels_position["Status"]=9
-		self.labels_position["Add"]=10
-
-		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
-
-		self.status_code = {}
-		self.status_num = 0
-
-		for i in range(len(self.labels)): #Rows
-			self.b = tk.Button(self.root, text=self.labels[i],width=self.labels_width[i])#,command=self.rank
-			self.b.configure(activebackground="#f9f9f9")
-			self.b.configure(activeforeground="black")
-			self.b.configure(background="#d9d9d9")
-			self.b.configure(disabledforeground="#a3a3a3")
-			self.b.configure(relief="ridge")
-			self.b.configure(foreground="#000000")
-			self.b.configure(highlightbackground="#d9d9d9")
-			self.b.configure(highlightcolor="black")
-			self.b.grid(row=self.l, column=i)
-			self.buttons.append(self.b)
-
-		self.l+=1
-		self.create_entry()
-
-	def create_entry(self):
-
-		for k in range(0,50):
-
-			self.entries.append([])
-
-			for i in range(len(self.labels)): #Rows
-				self.b = tk.Label(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
-				self.b.grid(row=self.l, column=i)
-				self.entries[k].append(self.b)
-			self.l+=1
-
-	def update_entry(self,data):
-
-		#at most 8.
-
-		#["Symbol","A.Vol","Rel.V","Br.SCORE","5M","SO%","SC%","Listed","Since","Last","Ignore","Add"]
-		df = data
-
-
-		#df.to_csv("open_break_out.csv")
-		entry = 0
-
-		try:
-			for index, row in df.iterrows():
-				#print(row)
-				rank = index
-				vol = row['Avg VolumeSTR']
-				relv = row['rrvol']
-				brscore = row['score2']
-				roc5 = row['5ROCP']
-				so = row['SO']
-				sc = row['SC']
-				since = ts_to_min(row['since'])
-				last = row['last']
-
-				############ add since, and been to the thing #############
-				if rank in self.NT.nasdaq_trader_symbols_ranking:
-					listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
-				else:
-					listed = "No"
-				#print(self.NT.nasdaq_trader_symbols)
-				if 1: #score>0:	
-
-					lst = [rank,vol,relv,brscore,roc5,so,sc,listed,since,last]
-
-					for i in range(len(lst)):
-						self.entries[entry][i]["text"] = lst[i]
-					entry+=1
-					if entry ==50:
-						break
-
-			while entry<50:
-				#print("ok")
-				for i in range(10):
-					self.entries[entry][i]["text"] = ""
-				entry+=1
-
-		except Exception as e:
-			print("TNV scanner construction open break:",e)
-
-class CoreysPick():
-	def __init__(self,root,NT):
-		self.buttons = []
-		self.entries = []
-		self.l = 1
-		self.NT = NT
-		self.labels_width = [9,6,5,7,5,5,6,6,6,6,8,6]
-		self.labels = ["Symbol","A.Vol","Rel.V","Br.SCORE","5M","SO%","SC%","Listed","Since","Last","Ignore","Add"]
-		self.file = "signals/Coreypick"+datetime.now().strftime("%m-%d")+".csv"
-		self.root = root
-		self.recreate_labels(self.root)
-
-	def recreate_labels(self,frame):
-
-		self.labels_position = {}
-		self.labels_position["Rank"]=0
-		self.labels_position["Symbol"]=1
-		self.labels_position["Market"]=2
-		self.labels_position["Price"]=3
-		self.labels_position["Since"]=4
-		self.labels_position["Been"]=5
-		self.labels_position["SC%"]=6
-		self.labels_position["SO%"]=7
-		self.labels_position["L5R%"]=8
-		self.labels_position["Status"]=9
-		self.labels_position["Add"]=10
-
-		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
-
-		self.status_code = {}
-		self.status_num = 0
-
-		for i in range(len(self.labels)): #Rows
-			self.b = tk.Button(self.root, text=self.labels[i],width=self.labels_width[i])#,command=self.rank
-			self.b.configure(activebackground="#f9f9f9")
-			self.b.configure(activeforeground="black")
-			self.b.configure(background="#d9d9d9")
-			self.b.configure(disabledforeground="#a3a3a3")
-			self.b.configure(relief="ridge")
-			self.b.configure(foreground="#000000")
-			self.b.configure(highlightbackground="#d9d9d9")
-			self.b.configure(highlightcolor="black")
-			self.b.grid(row=self.l, column=i)
-			self.buttons.append(self.b)
-
-		self.l+=1
-		self.create_entry()
-
-	def create_entry(self):
-
-		for k in range(0,50):
-
-			self.entries.append([])
-
-			for i in range(len(self.labels)): #Rows
-				self.b = tk.Label(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
-				self.b.grid(row=self.l, column=i)
-				self.entries[k].append(self.b)
-			self.l+=1
-
-
-	def update_entry(self,data):
-
-		#at most 8.
-
-		#["Symbol","A.Vol","Rel.V","Br.SCORE","5M","SO%","SC%","Listed","Since","Last","Ignore","Add"]
-		df = data
-
-
-		#df.to_csv("open_break_out.csv")
-		entry = 0
-
-		try:
-			for index, row in df.iterrows():
-				#print(row)
-				rank = index
-				vol = row['Avg VolumeSTR']
-				relv = row['rrvol']
-				brscore = row['score2']
-				roc5 = row['5ROCP']
-				so = row['SO']
-				sc = row['SC']
-				since = row['since']
-				last = row['last']
-
-				############ add since, and been to the thing #############
-				if rank in self.NT.nasdaq_trader_symbols_ranking:
-					listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
-				else:
-					listed = "No"
-				#print(self.NT.nasdaq_trader_symbols)
-				if 1: #score>0:	
-
-					lst = [rank,vol,relv,brscore,roc5,so,sc,listed,since,last]
-
-					for i in range(len(lst)):
-						self.entries[entry][i]["text"] = lst[i]
-					entry+=1
-					if entry ==50:
-						break
-
-			while entry<50:
-				#print("ok")
-				for i in range(10):
-					self.entries[entry][i]["text"] = ""
-				entry+=1
-
-		except Exception as e:
-			print("TNV scanner construction open break:",e)
 
 def ratio_compute(n):
 
