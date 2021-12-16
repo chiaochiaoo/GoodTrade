@@ -10,18 +10,19 @@ from datetime import datetime
 from tkinter import *
 
 
-from TNV_PMB import *
-#from TNV_OR import *
-from TNV_TFM import *
+# from TNV_PMB import *
+# from TNV_TFM import *
+# from TNV_StandardScanner import *
+
 #from TNV_Trend import *
-from TNV_StandardScanner import *
+#from TNV_OR import *
 
-# from modules.TNV_PMB import *
+from modules.TNV_PMB import *
+from modules.TNV_TFM import *
+from modules.TNV_StandardScanner import *
+
 # from modules.TNV_OR import *
-# from modules.TNV_TFM import *
 # from modules.TNV_Trend import *
-# from modules.TNV_StandardScanner import *
-
 class fake_NT():
 
 	def __init__(self):
@@ -715,7 +716,6 @@ class Open_low(StandardScanner):
 			self.send_group_algos(send_algo)
 		# except Exception as e:
 		# 	print("TNV scanner construction near high:",e)
-
 
 
 class ADX(StandardScanner):
