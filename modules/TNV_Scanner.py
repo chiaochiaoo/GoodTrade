@@ -702,7 +702,7 @@ class Open_high(StandardScanner):
 						if row['ema21change']<=-25 and row['oh']>=1:
 
 							order["support"] = row['price']	
-							order["resistence"] = row['high']	
+							order["resistence"] = row['high']+0.03
 							order["side"] = "DOWN"	
 							self.algo_placed.append(trade)		
 							send=True
@@ -711,7 +711,7 @@ class Open_high(StandardScanner):
 
 
 							order["support"] = row['price']	
-							order["resistence"] = row['high']	
+							order["resistence"] = row['high']+0.03
 							order["side"] = "DOWN"
 							self.algo_placed.append(trade)			
 							send=True				
@@ -741,10 +741,10 @@ class Open_high(StandardScanner):
 			for i in range(len(lst)):
 
 				if lst[i]["side"]=="UP":
-					order.append([" BreakUp",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","1:2 Exprmntl"])
+					order.append([" BreakUp",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","TrendRider"])
 
 				elif lst[i]["side"]=="DOWN":
-					order.append([" BreakDn",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","1:2 Exprmntl"])
+					order.append([" BreakDn",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","TrendRider"])
 
 
 			self.tnv_scanner.send_algo(order)
@@ -813,11 +813,11 @@ class Open_low(StandardScanner):
 						order = {}
 						order["symbol"] = rank
 
-						
+					
 
 						if row['ema21change']>=25 and row['ol']>=1:
 
-							order["support"] = row['low']	
+							order["support"] = row['low'] -0.03	
 							order["resistence"] = row['price']	
 							order["side"] = "UP"			
 							send=True
@@ -825,7 +825,7 @@ class Open_low(StandardScanner):
 						if row['ema45change']>=50 and row['ol']>=0.8:
 
 
-							order["support"] = row['low']	
+							order["support"] = row['low']- 0.03
 							order["resistence"] = row['price']	
 							order["side"] = "UP"			
 							send=True				
@@ -860,10 +860,10 @@ class Open_low(StandardScanner):
 			for i in range(len(lst)):
 
 				if lst[i]["side"]=="UP":
-					order.append([" BreakUp",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","1:2 Exprmntl"])
+					order.append([" BreakUp",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","TrendRider"])
 
 				elif lst[i]["side"]=="DOWN":
-					order.append([" BreakDn",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","1:2 Exprmntl"])
+					order.append([" BreakDn",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy","TrendRider"])
 
 
 			self.tnv_scanner.send_algo(order)
