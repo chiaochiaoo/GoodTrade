@@ -458,7 +458,7 @@ class Open_Reversal(StandardScanner):
 
 									support = row['price']
 
-								self.entries[entry][9]["command"]= lambda symbol=rank,support=support,side=side,resistence=resistence:self.send_algo(symbol,support,resistence,side)
+								#self.entries[entry][9]["command"]= lambda symbol=rank,support=support,side=side,resistence=resistence:self.send_algo(symbol,support,resistence,side)
 
 								if self.algo_activate.get()==1:
 									if rank not in self.algo_placed:
