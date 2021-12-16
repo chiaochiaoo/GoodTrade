@@ -349,10 +349,10 @@ class Open_Reversal(StandardScanner):
 
 		self.ts_location = 7
 
-		self.hour.set(9)
-		self.minute.set(30)
-		self.ehour.set(10)
-		self.eminute.set(30)
+		# self.hour.set(9)
+		# self.minute.set(30)
+		# self.ehour.set(10)
+		# self.eminute.set(30)
 
 		#self.update_entry(pd.read_csv("tttt.csv",index_col=0))
 
@@ -397,8 +397,8 @@ class Open_Reversal(StandardScanner):
 		ts = now.hour*60+now.minute
 		
 		algo_timer = self.hour.get()*60 + self.minute.get()
-
 		end_timer = self.ehour.get()*60 + self.eminute.get()
+
 
 		df = data
 

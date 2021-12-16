@@ -36,12 +36,12 @@ class StandardScanner():
 
 		self.management = tk.StringVar(value="1:2 Exprmntl")
 
-		self.hour = tk.IntVar(value=10)
-		self.minute = tk.IntVar(value=00)
+		self.hour = tk.IntVar(value=9)
+		self.minute = tk.IntVar(value=30)
 		self.ehour = tk.IntVar(value=15)
 		self.eminute = tk.IntVar(value=00)
 
-		
+
 		self.recreate_labels(self.root)
 
 	def recreate_labels(self,frame):
