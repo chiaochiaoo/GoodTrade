@@ -221,7 +221,6 @@ class OneToTWORiskReward(ManagementStrategy):
 			
 		self.total_orders = total_orders
 
-
 class FibonacciOnly(ManagementStrategy):
 
 	def __init__(self,symbol,tradingplan):
@@ -1044,15 +1043,17 @@ class TrendStrategy(ManagementStrategy):
 		self.initialized = False
 		
 
-class HoldTilClose(ManagementStrategy):
+class FullManual(ManagementStrategy):
 
 	def __init__(self,symbol,tradingplan):
 
-		super().__init__("Management: HOLD TIL CLOSE",symbol,tradingplan)
+		self.supress_warning = True
 
-		self.manaTrigger = HoldTilCloseManager("HTC trigger",self)
+		super().__init__("Management: FullManual",symbol,tradingplan)
 
-		self.add_initial_triggers(self.manaTrigger)
+		#self.manaTrigger = HoldTilCloseManager("FullManual",self)
+
+		#self.add_initial_triggers(self.manaTrigger)
 
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
@@ -1092,8 +1093,8 @@ class HoldTilClose(ManagementStrategy):
 
 			self.symbol.data[TRADE_TIMESTAMP] = 55800#self.symbol.data[TIMESTAMP]+300
 
-			super().on_start()
-			log_print(self.symbol_name,"HTC starting")
+			#super().on_start()
+			log_print(self.symbol_name,"FullManual starting")
 
 			
 			self.tradingplan.current_price_level = 1
@@ -1109,11 +1110,93 @@ class HoldTilClose(ManagementStrategy):
 		self.shares_loaded = False
 		self.tradingplan.current_price_level = 1
 		self.orders_level = 1
-		super().on_deploying()
+		#super().on_deploying()
 
 	def reset(self):
 		self.initialized = False
 
+
+class SemiManual(ManagementStrategy):
+
+	def __init__(self,symbol,tradingplan):
+
+		super().__init__("Management: SemiManual",symbol,tradingplan)
+
+		self.supress_warning = True
+
+		self.manaTrigger = SemiManualManager("SemiManual Trigger",self)
+
+		self.add_initial_triggers(self.manaTrigger)
+
+		#description,trigger_timer:int,trigger_limit=1
+		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
+		###upon activating, reset all parameters. 
+		self.total_orders = None
+		self.risk_per_share = 0
+
+		self.initialized = False
+
+		self.orders_level = 1
+
+		self.price = self.tradingplan.data[BREAKPRICE]
+		self.stop = self.tradingplan.data[STOP_LEVEL]
+
+
+	def on_loading_up(self): #call this whenever the break at price changes. Onl
+		#print("loading up:",self.initialized)
+		if not self.initialized:
+			log_print("LOADING UP!!!!","init:",self.initialized,self.management_start)
+			self.price = self.tradingplan.data[AVERAGE_PRICE]
+			self.stop = self.tradingplan.data[STOP_LEVEL]
+
+			coefficient = 1
+
+			self.tradingplan.tkvars[AUTOMANAGE].set(True)
+
+			self.shares_loaded = True
+
+			gap = abs(self.price-self.stop)/2
+
+			if self.tradingplan.data[POSITION] ==LONG:
+				self.tradingplan.data[TRIGGER_PRICE_1] = self.price+gap
+				self.tradingplan.data[TRIGGER_PRICE_2] = self.price+gap*2
+			elif self.tradingplan.data[POSITION] ==SHORT:
+				self.tradingplan.data[TRIGGER_PRICE_1] = self.price-gap
+				self.tradingplan.data[TRIGGER_PRICE_2] = self.price-gap*2
+			
+
+			print("checking price at ",self.tradingplan.data[TRIGGER_PRICE_1])
+			# toss out half of the orders here. Don't because may not have enough shares.
+
+			#shouldn't start here. because, sometime multiple entry is required. 7/10
+			#No. This is a mechanism that works for INSTANT. if already started, but not intialized. restart the whole thing.
+
+			if self.initialized == False and self.management_start==True:
+				self.on_start()
+
+	def on_start(self):
+
+		if self.shares_loaded: 
+
+			super().on_start()
+			log_print(self.symbol_name,"SemiManual starting")
+
+			self.initialized = True
+
+		else:
+			self.management_start=True
+
+
+	def on_deploying(self): #refresh it when reusing.
+		#print("ON DEPLOYING")
+		self.initialized = False
+		self.shares_loaded = False
+
+		self.orders_level = 1
+		super().on_deploying()
+
+	def reset(self):
+		self.initialized = False
 
 class ScalpaTron(ManagementStrategy):
 

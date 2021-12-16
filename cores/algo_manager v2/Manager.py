@@ -983,8 +983,6 @@ class Tester:
 		self.sec+=1
 		#print(self.sec)
 
-		
-
 		if self.price_stay:
 			if self.price_flip:
 				self.price.set(round(self.price.get()+0.01,2))
@@ -994,8 +992,8 @@ class Tester:
 				self.price_flip = True
 			#print("hello")
 
-		self.bid = round(float(self.price.get()-0.21),2)
-		self.ask = round(float(self.price.get()+0.11),2)
+		self.bid = round(float(self.price.get()-0.02),2)
+		self.ask = round(float(self.price.get()+0.02),2)
 
 		# data["symbol"]= "SPY.AM"
 		# data["bid"]= round(float(self.price.get()-0.01),2)

@@ -1441,6 +1441,60 @@ class TrendEMAManager(AbstractTrigger):
 		#log_print(self.symbol_name,"EMA recalibrate:",self.tradingplan.data[STOP_LEVEL])
 
 
+#SemiManualManager
+
+class SemiManualManager(AbstractTrigger):
+	#Special type of trigger, overwrites action part. everything else is generic.
+	def __init__(self,description,strategy):
+		super().__init__(description,None,trigger_timer=0,trigger_limit=1)
+
+		self.strategy =strategy
+		self.conditions = [] 
+
+		self.second_oders = {}
+		self.third_orders = {}
+
+	def set_orders(self,second,third):
+		self.second_oders = second
+		self.third_orders = third
+
+	def check_conditions(self):
+
+		#print("chekcing",self.tradingplan.data[TRIGGER_PRICE_1])
+		level = TRIGGER_PRICE_1
+
+		if self.tradingplan.data[POSITION] == LONG:
+			self.conditions = [[SYMBOL_DATA,ASK,">",TP_DATA,level]]
+		elif self.tradingplan.data[POSITION] == SHORT:
+			self.conditions = [[SYMBOL_DATA,BID,"<",TP_DATA,level]]
+
+		#if self.tradingplan.data[POSITION]!="" and self.tradingplan.data[CURRENT_SHARE]>0:
+
+		if self.tradingplan.data[POSITION]!="":
+			return(super().check_conditions())
+
+		#add the actual stuff here.
+
+
+
+	def trigger_event(self):
+
+		if self.strategy.orders_level == 1:
+			action = ""
+			if self.tradingplan.data[POSITION] ==LONG:
+				action = LIMITSELL
+			elif self.tradingplan.data[POSITION] ==SHORT:
+				action = LIMITBUY
+
+			#print(action,self.tradingplan.data[CURRENT_SHARE]//2," shares",self.tradingplan.data[TRIGGER_PRICE_2])
+			self.ppro_out.send([action,self.symbol_name,self.tradingplan.data[TRIGGER_PRICE_2],self.tradingplan.data[CURRENT_SHARE]//2,0,"Exit price "])
+			self.strategy.orders_level+=1
+		# new_stop =round(self.tradingplan.data[TRIGGER_PRICE_6],2)
+		# self.bring_up_stop(new_stop)
+		# log_print(self.symbol_name," Hit price target", self.tradingplan.current_price_level,"New Stop:",self.tradingplan.data[STOP_LEVEL])
+
+
+
 
 
 class HoldTilCloseManager(AbstractTrigger):
@@ -1454,17 +1508,9 @@ class HoldTilCloseManager(AbstractTrigger):
 		self.conditions = [[SYMBOL_DATA,TIMESTAMP,">",SYMBOL_DATA,TRADE_TIMESTAMP]]
 		if self.tradingplan.data[POSITION]!="":
 			return(super().check_conditions())
-	"""
-	Do three things.
-	1. Reset tradingplan Fibo level.
-	2. Recalculate the Fibo levels. (Break price - current max.)
-	3. Bring up the new FIB max.
-	"""
-	def trigger_event(self):
-		#1. reset level.
-		#self.tradingplan.data[CURRENT_FIB_LEVEL] == 1:
 
-		#self.symbol.data[CUSTOM] = self.symbol.data[EMACOUNT]
+	def trigger_event(self):
+
 
 		if self.tradingplan.data[POSITION] == LONG:
 
@@ -1483,44 +1529,13 @@ class HoldTilCloseManager(AbstractTrigger):
 
 		self.tradingplan.adjusting_risk()
 		self.tradingplan.update_displays()
+
 		log_print(self.symbol_name,"HTC finished",self.tradingplan.data[STOP_LEVEL])
 
 
 
 
 
-
-
-
-
-#### Purchase Trigger AC backup
-		# if self.tradingplan.tkvars[MANAGEMENTPLAN].get() == ANCARTMETHOD:
-
-		# 	share = int(self.tradingplan.data[TARGET_SHARE]/self.trigger_limit)
-
-		# 	if self.pos!="":
-		# 		self.tradingplan.expect_orders = self.pos
-		# 		if self.trigger_count!= self.trigger_limit:
-		# 			self.set_mind("Entry: "+str(self.trigger_count)+"/"+str(self.trigger_limit),DEFAULT)
-		# 		else:
-		# 			self.set_mind("Entry: Complete",GREEN)
-		# 	if self.pos == LONG:
-
-		# 		self.tradingplan.data[STOP_LEVEL]= round(self.symbol_data[BID]-self.tradingplan.data[RISK_PER_SHARE],2)
-		# 		self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[STOP_LEVEL])
-		# 		if share>0:
-		# 			self.ppro_out.send(["Buy",self.symbol_name,share,self.description])
-		# 	elif self.pos ==SHORT:
-
-		# 		self.tradingplan.data[STOP_LEVEL]= round(self.symbol_data[ASK]+self.tradingplan.data[RISK_PER_SHARE],2)
-		# 		self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[STOP_LEVEL])
-
-		# 		if share>0:
-		# 			self.ppro_out.send(["Sell",self.symbol_name,share,self.description])
-		# 	else:
-		# 		log_print("unidentified side. ")
-
-		# else:
 
 class ANCART_trigger(AbstractTrigger):
 	#Special type of trigger, overwrites action part. everything else is generic.
@@ -1733,7 +1748,6 @@ class Three_price_trigger(AbstractTrigger):
 		self.set_mind("Covered No."+str(self.tradingplan.current_price_level)+" lot.",GREEN)
 		self.tradingplan.current_price_level+=1
 		self.tradingplan.update_displays()
-
 
 
 

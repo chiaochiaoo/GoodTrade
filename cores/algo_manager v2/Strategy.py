@@ -34,6 +34,7 @@ class Strategy:
 	"""
 	def __init__(self,name,symbol:Symbol,tradingplan):
 
+		self.supress_warning = False
 		self.strategy_name = name
 		self.current_triggers = set()
 		self.initial_triggers = set()
@@ -99,7 +100,9 @@ class Strategy:
 					self.on_finish()
 
 		else:
-			log_print(self.strategy_name,": nothing to trigger.")
+
+			if not self.supress_warning:
+				log_print(self.strategy_name,": nothing to trigger.")
 
 	def on_finish(self):
 		self.tradingplan.on_finish(self)	

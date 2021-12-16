@@ -644,6 +644,7 @@ class TradingPlan:
 			self.set_EntryStrategy(Fadeany(entrytimer,instant,self.symbol,self))
 		elif entry_plan == BREAKFIRST:
 			self.set_EntryStrategy(BreakFirst(entrytimer,instant,self.symbol,self))
+
 		elif entry_plan == FREECONTROL:
 			self.set_EntryStrategy(FreeControl(entrytimer,instant,self.symbol,self))
 		else:
@@ -698,8 +699,11 @@ class TradingPlan:
 				log_print(self.symbol_name,"EM:",em,"SUP:",sup,"RES:",res,"RPS:",l,"RRR:",rrr, "RRR to low, using Fib instd.")
 				self.tkvars[MANAGEMENTPLAN].set(FIBO)
 				self.set_ManagementStrategy(FibonacciOnly(self.symbol,self))
-		elif manage_plan == HOLDTILCLOSE:
-			self.set_ManagementStrategy(HoldTilClose(self.symbol,self))
+		elif manage_plan == FULLMANUAL:
+			self.set_ManagementStrategy(FullManual(self.symbol,self))
+		elif manage_plan == SEMIMANUAL:
+			self.set_ManagementStrategy(SemiManual(self.symbol,self))
+
 		elif manage_plan == SCALPATRON:
 			self.set_ManagementStrategy(ScalpaTron(self.symbol,self))
 
