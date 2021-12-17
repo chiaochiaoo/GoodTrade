@@ -126,9 +126,9 @@ class TNV_Scanner():
 		# self.tfm = TFM(self.TFM_frame,self)
 
 
-		# filtered_df = pd.read_csv("test.csv",index_col=0)
+		filtered_df = pd.read_csv("test.csv",index_col=0)
 
-		# self.update_entry([filtered_df,"test"])
+		self.update_entry([filtered_df,"test"])
 
 
 
@@ -175,11 +175,17 @@ class TNV_Scanner():
 
 		# OH , OL, RRVOL
 
-		oh = filtered_df.loc[filtered_df["oh"]>0.5]
-		oh = oh.sort_values(by=["oh"],ascending=False)[:20]
+		#oh = filtered_df.loc[(filtered_df["oh"]>0.5)]
+		#oh = filtered_df.loc[(filtered_df["ema21change"]<-20)]
+		#oh = filtered_df.loc[(filtered_df["oh"]>0.5)].sort_values(by=["oh"],ascending=False)[:20]
 
-		ol = filtered_df.loc[filtered_df["ol"]>0.5]
-		ol = ol.sort_values(by=["ol"],ascending=False)[:20]
+		oh = pd.concat([filtered_df.loc[(filtered_df["ema21change"]<-20)],filtered_df.loc[(filtered_df["oh"]>0.5)&(filtered_df["ema21change"]>-20)].sort_values(by=["oh"],ascending=False)[:20]])
+
+		#ol = filtered_df.loc[(filtered_df["ema21change"]>20)]
+		# ol = filtered_df.loc[filtered_df["ol"]>0.5]
+		# ol = ol.sort_values(by=["ol"],ascending=False)[:20]
+		ol = pd.concat([filtered_df.loc[(filtered_df["ema21change"]>20)],filtered_df.loc[(filtered_df["ol"]>0.5)&(filtered_df["ema21change"]<20)].sort_values(by=["ol"],ascending=False)[:20]])
+
 		rrvol = filtered_df.sort_values(by=["rrvol"],ascending=False)[:20]
 
 
@@ -364,7 +370,7 @@ class Open_Reversal(StandardScanner):
 
 		#print("HELLO.",lst)
 		order = ["New order"]
-		
+
 		management = self.management.get()
 		if risk>0:
 			for i in range(len(lst)):
