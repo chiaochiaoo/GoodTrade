@@ -14,10 +14,6 @@ TRADE_TIMESTAMP = "TRADE_timestamp"
 PREMARKETHIGH="phigh"
 PREMARKETLOW="plow"
 
-
-
-
-
 #STATS
 ATR ='ATR'
 OHAVG='OHavg'
@@ -155,6 +151,10 @@ SMARTTRAIL =  "SmartTrail"
 ANCARTMETHOD =  "AC METHOD"
 ONETOTWORISKREWARD = "1:2 Exprmntl"
 HOLDTILCLOSE = "HTC"
+
+FULLMANUAL = "FullManual"
+SEMIMANUAL = "SemiManual"
+
 FIBONO = "FibAdjstd"
 FIBO = "Fib only"
 EMASTRAT =  "EMA strategy"
