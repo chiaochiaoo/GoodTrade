@@ -126,9 +126,9 @@ class TNV_Scanner():
 		# self.tfm = TFM(self.TFM_frame,self)
 
 
-		filtered_df = pd.read_csv("test.csv",index_col=0)
+		# filtered_df = pd.read_csv("test.csv",index_col=0)
 
-		self.update_entry([filtered_df,"test"])
+		# self.update_entry([filtered_df,"test"])
 
 
 
