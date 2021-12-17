@@ -364,6 +364,8 @@ class Open_Reversal(StandardScanner):
 
 		#print("HELLO.",lst)
 		order = ["New order"]
+		
+		management = self.management.get()
 		if risk>0:
 			for i in range(len(lst)):
 				#print(lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"])
@@ -378,11 +380,11 @@ class Open_Reversal(StandardScanner):
 
 
 				if lst[i]["side"] =="UP":
-					order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"]-change,lst[i]["resistence"],risk,{},"deploy","1:2 Exprmntl"])
+					order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"]-change,lst[i]["resistence"],risk,{},"deploy",management])
 
 					#print("sending",info)
 				else:
-					order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"]+change,risk,{},"deploy","1:2 Exprmntl"])
+					order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"]+change,risk,{},"deploy",management])
 
 			self.tnv_scanner.send_algo(order)
 
