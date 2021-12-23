@@ -180,12 +180,12 @@ class TNV_Scanner():
 		#oh = filtered_df.loc[(filtered_df["oh"]>0.5)].sort_values(by=["oh"],ascending=False)[:20]
 
 		oh = pd.concat([filtered_df.loc[(filtered_df["ema21change"]<-20)&(filtered_df["oh"]>0.7)],filtered_df.loc[(filtered_df["oh"]>0.5)&(filtered_df["ema21change"]>-20)].sort_values(by=["oh"],ascending=False)[:20]])
-		oh = oh.loc[oh["Market Cap"]<5]
+		#oh = oh.loc[oh["Market Cap"]<5]
 		#ol = filtered_df.loc[(filtered_df["ema21change"]>20)]
 		# ol = filtered_df.loc[filtered_df["ol"]>0.5]
 		# ol = ol.sort_values(by=["ol"],ascending=False)[:20]
 		ol = pd.concat([filtered_df.loc[(filtered_df["ema21change"]>20)&(filtered_df["ol"]>0.7)],filtered_df.loc[(filtered_df["ol"]>0.5)&(filtered_df["ema21change"]<20)].sort_values(by=["ol"],ascending=False)[:20]])
-		ol = ol.loc[ol["Market Cap"]<5]
+		#ol = ol.loc[ol["Market Cap"]<5]
 		rrvol = filtered_df.sort_values(by=["rrvol"],ascending=False)[:20]
 
 
