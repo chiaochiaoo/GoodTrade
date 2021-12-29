@@ -361,7 +361,7 @@ class Manager:
 		self.ui.algo_timer_string.set("Deployed")
 		self.deploy_all()
 
-		timestamp = 965
+		timestamp = 955
 		while True:
 
 			now = datetime.now()
