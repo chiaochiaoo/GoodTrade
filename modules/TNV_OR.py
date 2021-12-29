@@ -258,11 +258,11 @@ class Open_Reversal():
 								if side == "UP":
 
 									resistence = row['price']
-									support = row['open'] #+ 0.5*abs(row['price']-row['open'])
+									support = row['low'] #+ 0.5*abs(row['price']-row['open'])
 									
 								else:
 									
-									resistence = row['open'] #- 0.5*abs(row['price']-row['open'])
+									resistence = row['high'] #- 0.5*abs(row['price']-row['open'])
 
 									support = row['price']
 
