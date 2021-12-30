@@ -262,11 +262,10 @@ def fetch_data(symbol):
 			rel_vol = df.mean().tolist()
 
 
-			a = np.arange(79)
-			p = np.poly1d(np.polyfit(a*5, rel_vol, 10))
+			p = np.poly1d(np.polyfit(np.arange(79)*5, rel_vol, 10))
 	
 			new = [i for i in range(391)]
-			rel_vol = [int(a) for a in p(new)]  
+			rel_vol = [int(t) for t in p(new)]  
 
 
 			first5_range=str(round(min(a),3))+"-"+str(round(max(a),3))
