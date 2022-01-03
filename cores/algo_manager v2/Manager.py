@@ -377,6 +377,7 @@ class Manager:
 				self.ui.algo_timer_close_string.set(str(minute)+" minutes")
 			if remain<0:
 				log_print("Trigger")
+				self.flatten_all()
 				break
 
 			## UPPDAtes
@@ -388,7 +389,8 @@ class Manager:
 			time.sleep(5)
 
 		try:
-			self.flatten_all()
+			log_print("Algo manager complete")
+			#self.flatten_all()
 			#self.root.destroy()
 		except Exception as e:
 			pass
