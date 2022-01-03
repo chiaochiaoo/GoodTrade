@@ -223,8 +223,8 @@ class util_client:
 def algo_server(ulti_response):
 
 	k=""
+	counter = 0
 	while True:
-
 
 		try:
 			HOST = '10.29.10.133'  # The server's hostname or IP address
@@ -233,6 +233,7 @@ def algo_server(ulti_response):
 			print("Trying to connect to the Algo server")
 			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			connected = False
+
 			while not connected:
 				try:
 					s.connect((HOST, PORT))
@@ -243,6 +244,7 @@ def algo_server(ulti_response):
 					time.sleep(5)
 
 			connection = True
+			s.setblocking(0)
 
 			print("Algo server Connection Successful")
 
@@ -258,7 +260,7 @@ def algo_server(ulti_response):
 						connection = False
 						break
 
-					ready = select.select([s], [], [],10)
+					ready = select.select([s], [], [],1)
 					if ready[0]:
 						data = []
 						while True:
@@ -277,16 +279,21 @@ def algo_server(ulti_response):
 									break
 								except:
 									pass
-						#print("received:",k)
+
+						#problem. when a dead package is received, it will destroy the system.
 						time_ = datetime.now().strftime("%H:%M:%S : ") 
 
 						print(time_,"Algo update")
 
 						ulti_response.send(k)
+
 					else:
 
-						time_ = datetime.now().strftime("%H:%M:%S : ") 
-						print(time_,"No algo update")
+						counter+=1
+
+						if counter%10==0:
+							time_ = datetime.now().strftime("%H:%M:%S : ") 
+							print(time_,"No algo update")
 
 
 					#ulti_response.send(["Util init"])
@@ -294,6 +301,7 @@ def algo_server(ulti_response):
 		except Exception as e:
 
 			print("algo server error",e)
+
 def util_comms(ulti_response): #connects to server for db, nt, and finviz. 
 
 	k=""
@@ -308,6 +316,8 @@ def util_comms(ulti_response): #connects to server for db, nt, and finviz.
 		connected = False
 
 		reg_list = ["Database Request"]
+
+
 		while not connected:
 			try:
 				s.connect((HOST, PORT))
