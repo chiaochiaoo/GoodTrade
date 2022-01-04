@@ -152,8 +152,12 @@ class TNV_Scanner():
 
 		#filtered_df.to_csv("tttttttt.csv")
 
-		pb =  filtered_df.loc[((filtered_df["SC"]>=1)) |(filtered_df["SC"]<=-1)][:25]
+		pb =  filtered_df.loc[((filtered_df["SC"]>=1)) |(filtered_df["SC"]<=-1)][:30]
 		
+		### PRIORITIZE THE SPY500 ###
+		### THEN THE LIST ####
+
+
 		##################### NEAR LOW #############################
 		at_low = filtered_df.loc[(filtered_df["rangescore"]<=0.1)][:20] #&&(filtered_df["last_break"])
 		#at_low.to_csv("at low.csv")
@@ -179,12 +183,12 @@ class TNV_Scanner():
 		#oh = filtered_df.loc[(filtered_df["ema21change"]<-20)]
 		#oh = filtered_df.loc[(filtered_df["oh"]>0.5)].sort_values(by=["oh"],ascending=False)[:20]
 
-		oh = pd.concat([filtered_df.loc[(filtered_df["ema21change"]<-20)&(filtered_df["oh"]>0.7)],filtered_df.loc[(filtered_df["oh"]>0.5)&(filtered_df["ema21change"]>-20)].sort_values(by=["oh"],ascending=False)[:20]])
+		oh = pd.concat([filtered_df.loc[(filtered_df["ema21change"]<-20)&(filtered_df["oh"]>0.7)],filtered_df.loc[(filtered_df["oh"]>0.5)&(filtered_df["ema21change"]>-20)].sort_values(by=["oh"],ascending=False)[:30]])
 		#oh = oh.loc[oh["Market Cap"]<5]
 		#ol = filtered_df.loc[(filtered_df["ema21change"]>20)]
 		# ol = filtered_df.loc[filtered_df["ol"]>0.5]
 		# ol = ol.sort_values(by=["ol"],ascending=False)[:20]
-		ol = pd.concat([filtered_df.loc[(filtered_df["ema21change"]>20)&(filtered_df["ol"]>0.7)],filtered_df.loc[(filtered_df["ol"]>0.5)&(filtered_df["ema21change"]<20)].sort_values(by=["ol"],ascending=False)[:20]])
+		ol = pd.concat([filtered_df.loc[(filtered_df["ema21change"]>20)&(filtered_df["ol"]>0.7)],filtered_df.loc[(filtered_df["ol"]>0.5)&(filtered_df["ema21change"]<20)].sort_values(by=["ol"],ascending=False)[:30]])
 		#ol = ol.loc[ol["Market Cap"]<5]
 		rrvol = filtered_df.sort_values(by=["rrvol"],ascending=False)[:20]
 
@@ -300,6 +304,7 @@ class RRvol():
 				self.b.grid(row=self.l, column=i)
 				self.entries[k].append(self.b)
 			self.l+=1
+
 
 	def update_entry(self,data):
 
