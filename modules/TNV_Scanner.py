@@ -595,7 +595,7 @@ class Open_high(StandardScanner):
 						order = {}
 						order["symbol"] = rank
 
-						if row['ema21change']<=-25 and row['oh']>=1:
+						if row['ema45change']<=-25 and row['oh']>=1:
 
 							order["support"] = row['price']	
 							order["resistence"] = row['high']+0.03
@@ -695,7 +695,7 @@ class Open_low(StandardScanner):
 
 					
 
-						if row['ema21change']>=25 and row['ol']>=1:
+						if row['ema45change']>=25 and row['ol']>=1:
 
 							order["support"] = row['low'] -0.03	
 							order["resistence"] = row['price']	
