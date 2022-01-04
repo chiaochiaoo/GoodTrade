@@ -426,8 +426,8 @@ class BreakFirst(EntryStrategy):
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 		self.timer = timer
 		self.repeat = repeat
-		self.buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
-		self.sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
+		self.buyTrigger = Break_any_Passive_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
+		self.sellTrigger = Break_any_Passive_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
 
 		self.add_initial_triggers(self.buyTrigger)
 		self.add_initial_triggers(self.sellTrigger)
