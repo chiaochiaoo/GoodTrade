@@ -711,6 +711,8 @@ def historical_eval2(symbol):
 			d[first_5_vol_alert] =0
 		d[first_5_vol_eval] =str(d[first_5_vol_alert])
 		
+
+		
 		try:
 			d[normal_5_alert] = round((d["last_5_range"]-d[normal_5_val])/d[normal_5_std],1)
 		except:

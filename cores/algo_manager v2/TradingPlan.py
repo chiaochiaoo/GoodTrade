@@ -46,6 +46,12 @@ class TradingPlan:
 		self.current_price_level = 0
 		self.price_levels = {}
 
+		self.passive_in_process = False
+		self.passive_position = ""
+		self.passive_current_shares = 0
+		self.passive_init_shares = 0
+		self.passive_remaining_shares = 0
+
 		self.numeric_labels = [ACTRISK,ESTRISK,CUR_PROFIT_LEVEL,CURRENT_SHARE,TARGET_SHARE,INPUT_TARGET_SHARE,AVERAGE_PRICE,LAST_AVERAGE_PRICE,RISK_PER_SHARE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3,FLATTENTIMER,BREAKPRICE,RISKTIMER,FIBCURRENT_MAX,FIBLEVEL1,FIBLEVEL2,FIBLEVEL3,FIBLEVEL4,EXIT,RELOAD_TIMES]
 		self.string_labels = [MIND,STATUS,POSITION,RISK_RATIO,SIZE_IN,ENTRYPLAN,ENTYPE,MANAGEMENTPLAN]
 
@@ -116,6 +122,111 @@ class TradingPlan:
 
 		# self.entry_plan_decoder(entry_plan,entry_type)
 		# self.manage_plan_decoder(manage_plan)
+
+
+
+	""" PASSIVE ENTRY/EXIT """
+
+	def passive_initialization(self,side,target_shares):
+
+		if not self.passive_in_process:
+
+			self.passive_position = side
+			self.passive_current_shares = self.data[CURRENT_SHARE]
+			self.passive_init_shares = self.data[CURRENT_SHARE]
+			self.passive_remaining_shares = target_shares
+
+			done = threading.Thread(target=self.passive_process,daemon=True)
+			done.start()
+		else:
+			logprint("already passive in progress")
+
+
+	def passive_orders(self):
+
+
+		#step 1, cancel existing orders
+		self.ppro_out.send([CANCEL,self.symbol_name])
+		#step 2, placing around current.
+		time.sleep(0.2)
+
+
+		if self.passive_position == LONG :
+
+			price = self.symbol.get_ask()
+
+
+			if price<=10:
+				self.ppro_out.send([PASSIVEBUY,self.symbol_name,self.passive_remaining_shares,price])
+			else:
+
+				if self.passive_remaining_shares<2:
+					self.ppro_out.send([PASSIVEBUY,self.symbol_name,self.passive_remaining_shares,price])
+				else:
+
+					share = self.passive_remaining_shares//3
+					sharer = self.passive_remaining_shares- 2*share
+					self.ppro_out.send([PASSIVEBUY,self.symbol_name,share,price])
+					self.ppro_out.send([PASSIVEBUY,self.symbol_name,share,price-0.01])
+					self.ppro_out.send([PASSIVEBUY,self.symbol_name,sharer,price-0.02])
+
+
+		elif self.passive_position == SHORT:
+
+			price = self.symbol.get_bid()
+
+			if price<=10:
+				self.ppro_out.send([PASSIVESELL,self.symbol_name,self.passive_remaining_shares,price])
+			else:
+
+				if self.passive_remaining_shares<2:
+					self.ppro_out.send([PASSIVESELL,self.symbol_name,self.passive_remaining_shares,price])
+				else:
+
+					share = self.passive_remaining_shares//3
+					sharer = self.passive_remaining_shares- 2*share
+					self.ppro_out.send([PASSIVESELL,self.symbol_name,share,price])
+					self.ppro_out.send([PASSIVESELL,self.symbol_name,share,price+0.01])
+					self.ppro_out.send([PASSIVESELL,self.symbol_name,sharer,price+0.02])
+
+					
+	def passive_process(self):
+
+		fullfilled = 0
+		timecount = 0
+
+
+		while timecount<120:
+
+			#update current.
+
+			#what's in stock
+			self.passive_current_shares = self.data[CURRENT_SHARE] 
+
+			#what just gained. 
+			self.passive_remaining_shares -= self.passive_current_shares - self.passive_init_shares
+
+			if self.passive_remaining_shares<=0:
+				logprint(self.symbol_name," passive fill completed")
+				break
+
+			self.passive_orders()
+				
+			#ORDER SENDING MOUDULE. 
+
+
+			
+			time.sleep(2)
+			timecount+=2
+
+
+		#clean. 
+		
+		self.passive_position = ""
+		self.passive_current_shares = 0
+		self.passive_init_shares = 0
+		self.passive_remaining_shares = 0
+		self.passive_in_process = False
 
 	""" PPRO SECTION """
 

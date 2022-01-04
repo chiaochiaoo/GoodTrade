@@ -693,8 +693,6 @@ class Open_low(StandardScanner):
 						order = {}
 						order["symbol"] = rank
 
-					
-
 						if row['ema45change']>=25 and row['ol']>=1:
 
 							order["support"] = row['low'] -0.03	

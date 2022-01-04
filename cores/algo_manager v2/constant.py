@@ -170,6 +170,14 @@ BUY = "Buy"
 SELL = "Sell"
 FLATTEN = "Flatten"
 
+
+PASSIVELONG = "PASSIVELONG"
+PASSIVESHORT = "PASSIVESHORT"
+
+
+PASSIVEBUY = "Passivebuy"
+PASSIVESELL = "Passivesell"
+
 IOCBUY = "IoCBuy"
 IOCSELL = "IoCSell"
 

@@ -168,6 +168,24 @@ def sell_limit_order(symbol, price,share,gateway=0):
 
 	return r,sucess,failure
 
+def passive_buy(symbol	,share,price):
+
+	price = round(float(price),2)
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit Visible DAY PostOnly&shares='+str(share)
+	sucess='passive buy limit order success on'+symbol
+	failure="Error passive buy limit order on"+symbol
+
+	return r,sucess,failure
+
+def passive_sell(symbol	,share,price):
+
+	price = round(float(price),2)
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit Visible DAY PostOnly&shares='+str(share)
+
+	sucess='passive sell limit order success on'+symbol
+	failure="Error passive sell limit order on"+symbol
+
+	return r,sucess,failure
 
 def buy_aggressive_limit_order(symbol,share,ask):
 
@@ -294,6 +312,22 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 				share = d[2]
 				rationale = d[3]
 				request_str,sucess_str,failure_str=sell_market_order(symbol,share)
+
+			elif type_ == PASSIVEBUY:
+
+				symbol = d[1]
+				share = d[2]
+				ask = d[3]
+
+				request_str,sucess_str,failure_str=passive_buy(symbol,share,ask)
+
+			elif type_ == PASSIVESELL:
+
+				symbol = d[1]
+				share = d[2]
+				bid = d[3]
+
+				request_str,sucess_str,failure_str=passive_sell(symbol,share,bid)
 
 			elif type_ ==BREAKUPBUY:
 				symbol = d[1]
