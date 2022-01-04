@@ -149,9 +149,9 @@ class TradingPlan:
 		if self.passive_position == LONG :
 
 			price = self.symbol.get_ask()
-			self.passive_price = price
+			
 
-			if price >= self.passive_price+0.02:
+			if price >= self.passive_price+0.02 or self.passive_price==0:
 
 				#step 1, cancel existing orders
 				self.ppro_out.send([CANCEL,self.symbol_name])
@@ -172,13 +172,13 @@ class TradingPlan:
 						self.ppro_out.send([PASSIVEBUY,self.symbol_name,share,price-0.01])
 						self.ppro_out.send([PASSIVEBUY,self.symbol_name,sharer,price-0.02])
 
-
+			self.passive_price = price			
 		elif self.passive_position == SHORT:
 
 			price = self.symbol.get_bid()
 			self.passive_price = price
 
-			if price <= self.passive_price -0.02:
+			if price <= self.passive_price -0.02 or self.passive_price==0:
 
 				#step 1, cancel existing orders
 				self.ppro_out.send([CANCEL,self.symbol_name])
@@ -200,7 +200,7 @@ class TradingPlan:
 						self.ppro_out.send([PASSIVESELL,self.symbol_name,share,price+0.01])
 						self.ppro_out.send([PASSIVESELL,self.symbol_name,sharer,price+0.02])
 
-
+			self.passive_price = price
 	#if the price is 2C away. chase it.
 	#if the price is unchanged, do nothing. 
 	def passive_process(self):
@@ -243,6 +243,7 @@ class TradingPlan:
 		self.passive_init_shares = 0
 		self.passive_remaining_shares = 0
 		self.passive_in_process = False
+		self.passive_price = 0
 
 	""" PPRO SECTION """
 
