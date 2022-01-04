@@ -153,7 +153,7 @@ class TradingPlan:
 
 		if self.passive_position == LONG :
 
-			price = self.symbol.get_ask()
+			price = self.symbol.get_bid()
 			
 			log_print(price,"last price",self.passive_price)
 			if price >= self.passive_price+0.02 or self.passive_price==0:
@@ -180,7 +180,7 @@ class TradingPlan:
 			self.passive_price = price			
 		elif self.passive_position == SHORT:
 
-			price = self.symbol.get_bid()
+			price = self.symbol.get_ask()
 
 			log_print(price,"last price",self.passive_price)
 			if price <= self.passive_price -0.02 or self.passive_price==0:
