@@ -161,7 +161,7 @@ class TradingPlan:
 				#step 1, cancel existing orders
 				self.ppro_out.send([CANCEL,self.symbol_name])
 				#step 2, placing around current.
-				time.sleep(0.1)
+				time.sleep(0.2)
 
 				if price<=10:
 					self.ppro_out.send([PASSIVEBUY,self.symbol_name,self.passive_remaining_shares,price])
@@ -188,7 +188,7 @@ class TradingPlan:
 				#step 1, cancel existing orders
 				self.ppro_out.send([CANCEL,self.symbol_name])
 				#step 2, placing around current.
-				time.sleep(0.1)
+				time.sleep(0.2)
 
 
 				if price<=10:
@@ -227,7 +227,7 @@ class TradingPlan:
 			#what just gained. 
 			self.passive_remaining_shares = (self.passive_target_shares - self.passive_current_shares)
 
-			if self.passive_remaining_shares<=0:
+			if self.passive_remaining_shares<=0 or self.flatten_order==True:
 				log_print(self.symbol_name," passive fill completed")
 				break
 
@@ -236,7 +236,7 @@ class TradingPlan:
 			#ORDER SENDING MOUDULE. 
 
 			
-			time.sleep(2)
+			time.sleep(2.5)
 			timecount+=2
 
 
