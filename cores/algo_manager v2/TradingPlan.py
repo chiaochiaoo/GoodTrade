@@ -139,7 +139,7 @@ class TradingPlan:
 			done = threading.Thread(target=self.passive_process,daemon=True)
 			done.start()
 		else:
-			logprint("already passive in progress")
+			log_print("already passive in progress")
 
 
 	def passive_orders(self):
@@ -207,7 +207,7 @@ class TradingPlan:
 			self.passive_remaining_shares -= self.passive_current_shares - self.passive_init_shares
 
 			if self.passive_remaining_shares<=0:
-				logprint(self.symbol_name," passive fill completed")
+				log_print(self.symbol_name," passive fill completed")
 				break
 
 			self.passive_orders()
