@@ -126,6 +126,10 @@ class TradingPlan:
 
 
 
+
+	""" PASSSIVE ENTRY/EXIT OVER A PERIOD AMONT OF TIME """
+
+
 	""" PASSIVE ENTRY/EXIT """
 
 	def passive_initialization(self,side,target_shares):
@@ -146,17 +150,18 @@ class TradingPlan:
 	def passive_orders(self):
 
 
+
 		if self.passive_position == LONG :
 
 			price = self.symbol.get_ask()
 			
-
+			log_print(price,"last price",self.passive_price)
 			if price >= self.passive_price+0.02 or self.passive_price==0:
 
 				#step 1, cancel existing orders
 				self.ppro_out.send([CANCEL,self.symbol_name])
 				#step 2, placing around current.
-				time.sleep(0.2)
+				time.sleep(0.1)
 
 				if price<=10:
 					self.ppro_out.send([PASSIVEBUY,self.symbol_name,self.passive_remaining_shares,price])
@@ -176,14 +181,14 @@ class TradingPlan:
 		elif self.passive_position == SHORT:
 
 			price = self.symbol.get_bid()
-			self.passive_price = price
 
+			log_print(price,"last price",self.passive_price)
 			if price <= self.passive_price -0.02 or self.passive_price==0:
 
 				#step 1, cancel existing orders
 				self.ppro_out.send([CANCEL,self.symbol_name])
 				#step 2, placing around current.
-				time.sleep(0.2)
+				time.sleep(0.1)
 
 
 				if price<=10:
@@ -229,7 +234,6 @@ class TradingPlan:
 			self.passive_orders()
 				
 			#ORDER SENDING MOUDULE. 
-
 
 			
 			time.sleep(2)
