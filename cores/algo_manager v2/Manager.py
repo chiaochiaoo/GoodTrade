@@ -704,11 +704,12 @@ class Manager:
 		for d in self.tradingplan.values():
 			d.flatten_cmd()
 
-	def trades_aggregation(self,side,action,percent,positive_pnl):
+	def trades_aggregation(self,side,action,percent,positive_pnl,passive):
 
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second
 
+		passive = passive.get()
 		diff =  ts -self.manage_lock
 		if diff>5:
 
@@ -1219,7 +1220,7 @@ if __name__ == '__main__':
 
 	root = tk.Tk()
 	root.title("GoodTrade Algo Manager v2 b15 Pampa - Passive Management Upgrade")
-	root.geometry("1920x800")
+	root.geometry("1920x1000")
 
 	manager=Manager(root,goodtrade_pipe,ppro_out,ppro_in,TEST)
 	print(len(sys.argv))
