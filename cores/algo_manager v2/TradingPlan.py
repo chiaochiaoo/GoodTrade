@@ -187,7 +187,7 @@ class TradingPlan:
 
 			price = self.symbol.get_ask()
 
-			log_print(price,"last price",self.passive_price)
+			#log_print(price,"last price",self.passive_price)
 			if price <= self.passive_price -0.01*k or self.passive_price==0:
 
 				#step 1, cancel existing orders
