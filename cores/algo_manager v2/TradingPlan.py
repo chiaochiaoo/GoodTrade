@@ -160,7 +160,7 @@ class TradingPlan:
 
 			price = self.symbol.get_bid()
 			
-			log_print(price,"last price",self.passive_price)
+			#log_print(price,"last price",self.passive_price)
 			if price >= self.passive_price+0.01*k or self.passive_price==0:
 
 				#step 1, cancel existing orders
@@ -225,7 +225,7 @@ class TradingPlan:
 			#update current.
 
 			#what's in stock
-			log_print(self.symbol_name," Remaining:",self.passive_remaining_shares)
+			#log_print(self.symbol_name," Remaining:",self.passive_remaining_shares)
 
 			self.passive_current_shares = self.data[CURRENT_SHARE] 
 
