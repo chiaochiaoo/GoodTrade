@@ -152,8 +152,30 @@ class TNV_Scanner():
 
 		#filtered_df.to_csv("tttttttt.csv")
 
-		pb =  filtered_df.loc[((filtered_df["SC"]>=1)) |(filtered_df["SC"]<=-1)][:30]
-		
+		pb1 =  filtered_df.loc[(filtered_df["SC"]>=1)&(filtered_df["Market Cap"]<=4)]
+		pb2 = filtered_df.loc[(filtered_df["SC"]<=-1)&(filtered_df["Market Cap"]<=4)]
+		pb3 = filtered_df.loc[((filtered_df["SC"]<=5)|(filtered_df["SC"]>=5))&(filtered_df["Market Cap"]==5)][:10]
+
+		if len(pb1)+len(pb2)>25:
+
+			#trim pb1 , pb2.
+			pb = pd.concat([pb1,pb2])
+			pb = pb.reindex(pb.SC.abs().sort_values(ascending=False).index)[:25]
+
+
+		else:
+			pb = pd.concat([pb1,pb2])
+			#just add pb3.
+
+		# pb1 = pb1.sort_values(by=["SC"],ascending=False)[:15]
+		# pb2 = pb2.sort_values(by=["SC"],ascending=True)[:15]
+
+		pb = pd.concat([pb,pb3])
+
+		pb = pb.reindex(pb.SC.abs().sort_values(ascending=False).index)[:30]
+
+
+
 		### PRIORITIZE THE SPY500 ###
 		### THEN THE LIST ####
 
