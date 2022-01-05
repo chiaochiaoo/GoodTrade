@@ -1488,6 +1488,7 @@ class TwoToOneTrigger(AbstractTrigger):
 			# self.bring_up_stop(new_stop)
 
 			# self.set_mind("75% risk",GREEN)
+			self.strategy.deploy_n_batch_torpedoes(3)
 
 		if self.strategy.orders_level == 2:
 			

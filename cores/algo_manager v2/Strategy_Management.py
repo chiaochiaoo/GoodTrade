@@ -137,7 +137,7 @@ class OneToTWORiskReward(ManagementStrategy):
 			self.orders_level = 1
 			first_lot,second_lot,third_lot = self.shares_calculator(self.tradingplan.data[TARGET_SHARE])
 			self.orders_organizer(first_lot,second_lot,third_lot)
-			self.deploy_n_batch_torpedoes(3)
+			#self.deploy_n_batch_torpedoes(3)
 			self.initialized == True
 		else:
 			self.management_start=True
@@ -185,7 +185,7 @@ class OneToTWORiskReward(ManagementStrategy):
 	def orders_organizer(self,first,second,third):
 
 		### Arange this way to distribute it around the key areas. 
-		first_lot  =  [0.5,1.0,0.4,0.9,0.6,1.1,0.7,1.2,0.3,0.8]
+		first_lot  =  [0.5,1.0,0.4,0.9,0.6,1.1,0.7,1.2,0.35,0.8]
 		second_lot =  [1.5,2.0,1.4,1.9,1.6,2.1,1.7,2.2,1.3,1.8]
 		third_lot  =  [2.5,3.0,2.4,2.9,2.6,3.1,2.7,3.2,2.3,2.8]
 
