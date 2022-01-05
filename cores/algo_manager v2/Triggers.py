@@ -879,7 +879,7 @@ class Break_any_Passive_trigger(AbstractTrigger):
 				log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk)
 
 
-				if share<2:
+				if share<5:
 					self.ppro_out.send([IOCBUY,self.symbol_name,share,self.symbol_data[ASK]])
 				else:
 
@@ -910,7 +910,7 @@ class Break_any_Passive_trigger(AbstractTrigger):
 
 				#self.tradingplan.passive_initialization(SHORT,share)
 
-				if share<2:
+				if share<5:
 					self.ppro_out.send([IOCSELL,self.symbol_name,share,self.symbol_data[BID]])
 				else:
 
