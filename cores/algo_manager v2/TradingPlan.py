@@ -241,8 +241,8 @@ class TradingPlan:
 			#ORDER SENDING MOUDULE. 
 
 			
-			time.sleep(2.5)
-			timecount+=2
+			time.sleep(5)
+			timecount+=5
 
 
 		#clean. 
