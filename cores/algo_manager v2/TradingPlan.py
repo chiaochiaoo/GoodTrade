@@ -150,13 +150,18 @@ class TradingPlan:
 	def passive_orders(self):
 
 
+		coefficient = 0.01
+
+		k = self.symbol.get_bid()//100
+
+		if k==0: k = 1
 
 		if self.passive_position == LONG :
 
 			price = self.symbol.get_bid()
 			
 			log_print(price,"last price",self.passive_price)
-			if price >= self.passive_price+0.02 or self.passive_price==0:
+			if price >= self.passive_price+0.01*k or self.passive_price==0:
 
 				#step 1, cancel existing orders
 				self.ppro_out.send([CANCEL,self.symbol_name])
@@ -174,8 +179,8 @@ class TradingPlan:
 						share = self.passive_remaining_shares//3
 						sharer = self.passive_remaining_shares- 2*share
 						self.ppro_out.send([PASSIVEBUY,self.symbol_name,share,price])
-						self.ppro_out.send([PASSIVEBUY,self.symbol_name,share,price-0.01])
-						self.ppro_out.send([PASSIVEBUY,self.symbol_name,sharer,price-0.02])
+						self.ppro_out.send([PASSIVEBUY,self.symbol_name,share,price-0.01*k])
+						self.ppro_out.send([PASSIVEBUY,self.symbol_name,sharer,price-0.01*2*k])
 
 			self.passive_price = price			
 		elif self.passive_position == SHORT:
@@ -183,7 +188,7 @@ class TradingPlan:
 			price = self.symbol.get_ask()
 
 			log_print(price,"last price",self.passive_price)
-			if price <= self.passive_price -0.02 or self.passive_price==0:
+			if price <= self.passive_price -0.01*k or self.passive_price==0:
 
 				#step 1, cancel existing orders
 				self.ppro_out.send([CANCEL,self.symbol_name])
@@ -202,8 +207,8 @@ class TradingPlan:
 						share = self.passive_remaining_shares//3
 						sharer = self.passive_remaining_shares- 2*share
 						self.ppro_out.send([PASSIVESELL,self.symbol_name,share,price])
-						self.ppro_out.send([PASSIVESELL,self.symbol_name,share,price+0.01])
-						self.ppro_out.send([PASSIVESELL,self.symbol_name,sharer,price+0.02])
+						self.ppro_out.send([PASSIVESELL,self.symbol_name,share,price+0.01*k])
+						self.ppro_out.send([PASSIVESELL,self.symbol_name,sharer,price+0.01*2*k])
 
 			self.passive_price = price
 	#if the price is 2C away. chase it.
