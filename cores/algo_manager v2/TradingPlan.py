@@ -134,6 +134,8 @@ class TradingPlan:
 
 	def passive_initialization(self,side,target_shares):
 
+
+
 		if not self.passive_in_process:
 
 			self.passive_position = side
@@ -141,6 +143,7 @@ class TradingPlan:
 			self.passive_target_shares = self.data[CURRENT_SHARE] + target_shares
 			self.passive_remaining_shares = target_shares
 
+			log_print(self.symbol_name," passive order received, target shares:",target_shares,self.passive_target_shares)
 			done = threading.Thread(target=self.passive_process,daemon=True)
 			done.start()
 		else:
