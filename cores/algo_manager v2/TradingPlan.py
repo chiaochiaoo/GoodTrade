@@ -132,6 +132,8 @@ class TradingPlan:
 
 	""" PASSIVE ENTRY/EXIT """
 
+
+
 	def passive_initialization(self,side,target_shares):
 
 
@@ -159,7 +161,7 @@ class TradingPlan:
 
 		if k==0: k = 1
 
-		if self.passive_position == LONG :
+		if self.passive_position == BUY :
 
 			price = self.symbol.get_bid()
 			
@@ -186,7 +188,7 @@ class TradingPlan:
 						self.ppro_out.send([PASSIVEBUY,self.symbol_name,sharer,price-0.01*2*k])
 
 			self.passive_price = price			
-		elif self.passive_position == SHORT:
+		elif self.passive_position == SELL:
 
 			price = self.symbol.get_ask()
 
@@ -511,7 +513,7 @@ class TradingPlan:
 
 	""" Trade management """
 
-	def manage_trades(self,side,action,percentage):
+	def manage_trades(self,side,action,percentage,passive):
 
 		process = False
 		if side!=None:
@@ -539,7 +541,11 @@ class TradingPlan:
 
 			description = "Trades aggregation"
 			if pproaction!="":
-				self.ppro_out.send([pproaction,self.symbol_name,shares,description])
+
+				if passive:
+					self.passive_initialization(pproaction,shares)
+				else:
+					self.ppro_out.send([pproaction,self.symbol_name,shares,description])
 
 	""" risk related ## """
 

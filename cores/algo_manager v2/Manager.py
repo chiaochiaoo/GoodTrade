@@ -718,9 +718,11 @@ class Manager:
 				if positive_pnl==True:
 					if d.data[UNREAL] >0:
 						print(d.data[UNREAL])
-						d.manage_trades(side,action,percent)
+
+						d.manage_trades(side,action,percent,passive)
 				else:
-					d.manage_trades(side,action,percent)
+
+					d.manage_trades(side,action,percent,passive)
 
 			self.manage_lock = ts
 		log_print("Trades aggregation under cooldown:",diff)
