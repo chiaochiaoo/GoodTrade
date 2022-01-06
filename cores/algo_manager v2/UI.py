@@ -401,9 +401,9 @@ class UI(pannel):
 		ttk.Checkbutton(self.cmd, variable=self.passive_aggregation).grid(sticky="w",column=2,row=row)
 
 
-		row+=1
-		ttk.Button(self.cmd, text="P-Flatten LONGS",command= lambda action=MINUS,percent=1:self.manager.trades_aggregation(LONG,action,percent,True,self.passive_aggregation)).grid(sticky="w",column=1,row=row)
-		ttk.Button(self.cmd, text="P-Flatten SHORTS",command= lambda action=MINUS,percent=1:self.manager.trades_aggregation(SHORTS,action,percent,False,self.passive_aggregation)).grid(sticky="w",column=2,row=row)
+		# row+=1
+		# ttk.Button(self.cmd, text="P-Flatten LONGS",command= lambda action=MINUS,percent=1:self.manager.trades_aggregation(LONG,action,percent,True,self.passive_aggregation)).grid(sticky="w",column=1,row=row)
+		# ttk.Button(self.cmd, text="P-Flatten SHORTS",command= lambda action=MINUS,percent=1:self.manager.trades_aggregation(SHORT,action,percent,False,self.passive_aggregation)).grid(sticky="w",column=2,row=row)
 
 		row+=1
 		ttk.Label(self.cmd, text="All Active Winnings:").grid(sticky="w",column=1,row=row)
