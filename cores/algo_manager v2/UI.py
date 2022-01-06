@@ -392,20 +392,18 @@ class UI(pannel):
 		self.algo_cancel = ttk.Button(self.cmd, text="Import Algos",command=self.manager.import_algos)
 		self.algo_cancel.grid(sticky="w",column=2,row=4)
 
-
-
-
-		
-
 		row=5
-
-
 
 		ttk.Label(self.cmd, text=" ").grid(sticky="w",column=1,row=row)
 		row+=1
 
 		ttk.Label(self.cmd, text="Passive Fills:").grid(sticky="w",column=1,row=row)
-		ttk.Checkbutton(self.cmd, variable=self.passive_aggregation).grid(sticky="w",column=2,row=row)
+		ttk.Checkbutton(self.cmd, variable=self.passive_aggregation).grid(sticky="w",column=1,row=row)
+
+
+		row+=1
+		ttk.Button(self.cmd, text="Passive Flatten",command= lambda action=MINUS,percent=1:self.manager.trades_aggregation(None,action,percent,True,self.passive_aggregation)).grid(sticky="w",column=2,row=row)
+
 		row+=1
 		ttk.Label(self.cmd, text="All Active Winnings:").grid(sticky="w",column=1,row=row)
 
