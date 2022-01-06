@@ -711,7 +711,7 @@ class Manager:
 
 		passive = passive.get()
 		diff =  ts -self.manage_lock
-		if diff>5:
+		if diff>2:
 
 			log_print("All",side," ",action," ",percent*100,"%")
 			for d in self.tradingplan.values():
@@ -719,6 +719,7 @@ class Manager:
 					if d.data[UNREAL] >0:
 						print(d.data[UNREAL])
 
+						#side = d.data[POSITION]
 						d.manage_trades(side,action,percent,passive)
 				else:
 
