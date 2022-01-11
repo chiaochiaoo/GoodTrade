@@ -144,8 +144,11 @@ class TNV_Scanner():
 
 	def update_entry(self,data):
 
-		print("package arrived at TNVscanner,",timestamp)
+		
+
 		timestamp = data[1]
+
+		print("package arrived at TNVscanner,",timestamp)
 		self.NT_stat["text"] = "Last update: "+timestamp
 
 
