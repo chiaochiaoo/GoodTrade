@@ -131,7 +131,6 @@ class TNV_Scanner():
 		# self.update_entry([filtered_df,"test"])
 
 
-
 	def send_algo(self,msg):
 		self.algo_commlink.send(msg)
 
@@ -145,8 +144,10 @@ class TNV_Scanner():
 
 	def update_entry(self,data):
 
+		print("package arrived at TNVscanner,",timestamp)
 		timestamp = data[1]
 		self.NT_stat["text"] = "Last update: "+timestamp
+
 
 		filtered_df = data[0]
 
@@ -215,7 +216,6 @@ class TNV_Scanner():
 		ol = pd.concat([filtered_df.loc[(filtered_df["ema21change"]>20)&(filtered_df["ol"]>0.7)],filtered_df.loc[(filtered_df["ol"]>0.5)&(filtered_df["ema21change"]<20)].sort_values(by=["ol"],ascending=False)[:30]])
 		#ol = ol.loc[ol["Market Cap"]<5]
 		rrvol = filtered_df.sort_values(by=["rrvol"],ascending=False)[:20]
-
 
 		# self.volatility_scanner.update_entry(just_break)
 		# self.near_low.update_entry(at_low)
