@@ -7,7 +7,7 @@ from Util_functions import *
 import tkinter as tkvars
 import time
 import threading
-
+import random
 # MAY THE MACHINE GOD BLESS THY AIM
 
 class TradingPlan:
@@ -245,9 +245,9 @@ class TradingPlan:
 				
 			#ORDER SENDING MOUDULE. 
 
-			
-			time.sleep(5)
-			timecount+=5
+			wait =random.randrange(5,11)
+			time.sleep(wait)
+			timecount+=wait
 
 
 		#clean. 
@@ -897,6 +897,7 @@ class TradingPlan:
 	def management_strategy_done(self):
 
 		pass
+
 
 # if __name__ == '__main__':
 
