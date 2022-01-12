@@ -31,7 +31,7 @@ class StandardScanner():
 
 		self.root = root
 
-		self.algo_risk = tk.DoubleVar(value=10)
+		self.algo_risk = tk.DoubleVar(value=5)
 		self.algo_activate = tk.BooleanVar(value=0)
 
 		self.management = tk.StringVar(value="1:2 Exprmntl")
