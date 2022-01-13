@@ -572,7 +572,11 @@ class TradingPlan:
 			if pproaction!="":
 
 				if passive:
-					self.passive_initialization(pproaction,shares)
+
+					if percentage ==1:
+						self.passive_initialization(pproaction,shares,final_target=0)
+					else:
+						self.passive_initialization(pproaction,shares)
 				else:
 					self.ppro_out.send([pproaction,self.symbol_name,shares,description])
 
