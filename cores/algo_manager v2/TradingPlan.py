@@ -48,6 +48,7 @@ class TradingPlan:
 
 		self.passive_in_process = False
 		self.passive_position = ""
+		self.passive_action = ""
 		self.passive_current_shares = 0
 		self.passive_init_shares = 0
 		self.passive_remaining_shares = 0
@@ -140,6 +141,7 @@ class TradingPlan:
 		if not self.passive_in_process:
 
 			self.passive_position = side
+			self.passive_action = ""
 			self.passive_current_shares = self.data[CURRENT_SHARE] 
 			
 			#self.data[POSITION]
@@ -148,13 +150,18 @@ class TradingPlan:
 
 				if (self.data[POSITION]==LONG and side ==BUY) or  (self.data[POSITION]==SHORT and side ==SELL):
 					self.passive_target_shares = self.data[CURRENT_SHARE] + target_shares 
+					self.passive_remaining_shares = target_shares
+					self.passive_action = ADD
 				else:
 					self.passive_target_shares = self.data[CURRENT_SHARE] - target_shares  
+					self.passive_remaining_shares = -target_shares
+					self.passive_action = MINUS
 			#when no positions
 			else: 
 				self.passive_target_shares = final_target
+				self.passive_action = ADD
 				
-			self.passive_remaining_shares = target_shares
+			
 
 			log_print(self.symbol_name," passive order received, target shares:",target_shares,self.passive_target_shares)
 			done = threading.Thread(target=self.passive_process,daemon=True)
@@ -246,10 +253,17 @@ class TradingPlan:
 			self.passive_current_shares = self.data[CURRENT_SHARE] 
 
 			#what just gained. 
-			self.passive_remaining_shares = (self.passive_target_shares - self.passive_current_shares)
 
-			if self.passive_remaining_shares<=0 or self.flatten_order==True:
+			self.passive_remaining_shares = abs(self.passive_target_shares - self.passive_current_shares)
+
+
+			if self.passive_action==ADD and self.data[CURRENT_SHARE] >= self.passive_target_shares:
 				log_print(self.symbol_name," passive fill completed")
+				break
+			if self.passive_action==MINUS and self.data[CURRENT_SHARE] <= self.passive_target_shares:
+				log_print(self.symbol_name," passive fill completed")
+				break
+			if self.flatten_order==True:
 				break
 
 			self.passive_orders()
