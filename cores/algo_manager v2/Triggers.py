@@ -884,8 +884,9 @@ class Break_any_Passive_trigger(AbstractTrigger):
 				else:
 
 					quarter = share//4
+					self.tradingplan.passive_initialization(BUY,share-quarter,final_target=share)
 					self.ppro_out.send([IOCBUY,self.symbol_name,quarter,self.symbol_data[ASK]])
-					self.tradingplan.passive_initialization(BUY,share-quarter)
+					
 				#self.ppro_out.send([IOCBUY,self.symbol_name,share,self.symbol_data[ASK]])
 				# if spread_risk < 0.15:
 				# 	log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk)
@@ -915,8 +916,9 @@ class Break_any_Passive_trigger(AbstractTrigger):
 				else:
 
 					quarter = share//4
+					self.tradingplan.passive_initialization(SELL,share-quarter,final_target=share)
 					self.ppro_out.send([IOCSELL,self.symbol_name,quarter,self.symbol_data[BID]])
-					self.tradingplan.passive_initialization(SELL,share-quarter)
+					
 
 				#self.ppro_out.send([IOCSELL,self.symbol_name,share,self.symbol_data[BID]])
 				# if spread_risk < 0.15:

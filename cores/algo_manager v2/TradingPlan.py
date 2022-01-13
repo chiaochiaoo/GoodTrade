@@ -134,15 +134,21 @@ class TradingPlan:
 
 
 
-	def passive_initialization(self,side,target_shares):
+	def passive_initialization(self,side,target_shares,final_target=0):
 
 
 
 		if not self.passive_in_process:
 
 			self.passive_position = side
-			self.passive_current_shares = self.data[CURRENT_SHARE]
-			self.passive_target_shares = self.data[CURRENT_SHARE] + target_shares
+			self.passive_current_shares = self.data[CURRENT_SHARE] 
+			
+
+			if final_target ==0:
+				self.passive_target_shares = self.data[CURRENT_SHARE] + target_shares 
+			else:
+				self.passive_target_shares = final_target
+				
 			self.passive_remaining_shares = target_shares
 
 			log_print(self.symbol_name," passive order received, target shares:",target_shares,self.passive_target_shares)
@@ -177,7 +183,7 @@ class TradingPlan:
 					self.ppro_out.send([PASSIVEBUY,self.symbol_name,self.passive_remaining_shares,price])
 				else:
 
-					if self.passive_remaining_shares<2:
+					if self.passive_remaining_shares<=2:
 						self.ppro_out.send([PASSIVEBUY,self.symbol_name,self.passive_remaining_shares,price])
 					else:
 
@@ -205,7 +211,7 @@ class TradingPlan:
 					self.ppro_out.send([PASSIVESELL,self.symbol_name,self.passive_remaining_shares,price])
 				else:
 
-					if self.passive_remaining_shares<2:
+					if self.passive_remaining_shares<=2:
 						self.ppro_out.send([PASSIVESELL,self.symbol_name,self.passive_remaining_shares,price])
 					else:
 
