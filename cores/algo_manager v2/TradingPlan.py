@@ -146,7 +146,7 @@ class TradingPlan:
 
 			if final_target ==0:
 
-				if self.data[POSITION]==side:
+				if (self.data[POSITION]==LONG and side ==BUY) or  (self.data[POSITION]==SHORT and side ==SELL):
 					self.passive_target_shares = self.data[CURRENT_SHARE] + target_shares 
 				else:
 					self.passive_target_shares = self.data[CURRENT_SHARE] - target_shares  
