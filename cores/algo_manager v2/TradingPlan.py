@@ -135,7 +135,7 @@ class TradingPlan:
 
 
 
-	def passive_initialization(self,side,target_shares,final_target=0):
+	def passive_initialization(self,side,target_shares,final_target=-1):
 
 
 		if not self.passive_in_process:
@@ -146,20 +146,24 @@ class TradingPlan:
 			
 			#self.data[POSITION]
 
-			if final_target ==0:
+			if final_target ==-1:
 
 				if (self.data[POSITION]==LONG and side ==BUY) or  (self.data[POSITION]==SHORT and side ==SELL):
 					self.passive_target_shares = self.data[CURRENT_SHARE] + target_shares 
-					self.passive_remaining_shares = target_shares
+
 					self.passive_action = ADD
 				else:
 					self.passive_target_shares = self.data[CURRENT_SHARE] - target_shares  
-					self.passive_remaining_shares = -target_shares
+
 					self.passive_action = MINUS
 			#when no positions
 			else: 
+
 				self.passive_target_shares = final_target
 				self.passive_action = ADD
+
+				if final_target ==0:
+					self.passive_action = MINUS
 				
 			
 
