@@ -243,7 +243,9 @@ class AbstractTrigger:
 		self.reactivate()
 		self.reset()
 
+
 #self,subject1,type_,subject2,trigger_timer:int,description,trigger_limit=1
+
 
 class Purchase_trigger(AbstractTrigger):
 	#Special type of trigger, overwrites action part. everything else is generic.
@@ -621,7 +623,6 @@ class WideStop_trigger(AbstractTrigger):
 
 		return int(shares/self.trigger_limit)
 
-
 class Break_any_Purchase_trigger(AbstractTrigger):
 	#Special type of trigger, overwrites action part. everything else is generic.
 	def __init__(self,conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out):
@@ -800,9 +801,6 @@ class Break_any_Purchase_trigger(AbstractTrigger):
 
 		return int(shares/self.trigger_limit)
 
-
-
-
 class Break_any_Passive_trigger(AbstractTrigger):
 	#Special type of trigger, overwrites action part. everything else is generic.
 	def __init__(self,conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out):
@@ -879,11 +877,11 @@ class Break_any_Passive_trigger(AbstractTrigger):
 				log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk)
 
 
-				if share<5:
+				if share<=5:
 					self.ppro_out.send([IOCBUY,self.symbol_name,share,self.symbol_data[ASK]])
 				else:
 
-					quarter = share//4
+					quarter = share//5
 					self.tradingplan.passive_initialization(BUY,share-quarter,final_target=share)
 					self.ppro_out.send([IOCBUY,self.symbol_name,quarter,self.symbol_data[ASK]])
 					
@@ -911,11 +909,11 @@ class Break_any_Passive_trigger(AbstractTrigger):
 
 				#self.tradingplan.passive_initialization(SHORT,share)
 
-				if share<5:
+				if share<=5:
 					self.ppro_out.send([IOCSELL,self.symbol_name,share,self.symbol_data[BID]])
 				else:
 
-					quarter = share//4
+					quarter = share//5
 					self.tradingplan.passive_initialization(SELL,share-quarter,final_target=share)
 					self.ppro_out.send([IOCSELL,self.symbol_name,quarter,self.symbol_data[BID]])
 					
@@ -1163,7 +1161,9 @@ class TwoToOneTriggerOLD(AbstractTrigger):
 		#if self.tradingplan.data[POSITION]!="" and self.tradingplan.data[CURRENT_SHARE]>0:
 		if self.tradingplan.data[POSITION]!="":
 			return(super().check_conditions())
+
 	#add the actual stuff here.
+
 	def trigger_event(self):
 
 		share = min(self.tradingplan.data[TARGET_SHARE]//4,self.tradingplan.data[CURRENT_SHARE])
