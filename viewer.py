@@ -411,11 +411,7 @@ if __name__ == '__main__':
 
 	multiprocessing.freeze_support()
 
-
-
-
 	### scanner pannel needs the manager. 
-
 	
 	# auth = multiprocessing.Process(name="Authentica",target=authentication, args=(authen_comm,),daemon=True)
 	# auth.daemon=True
@@ -452,7 +448,7 @@ if __name__ == '__main__':
 
 
 	root = tk.Tk() 
-	root.title("GoodTrade v516") 
+	root.title("GoodTrade v517") 
 	root.geometry("1800x900")
 	root.minsize(1500, 600)
 	root.maxsize(3000, 1500)
