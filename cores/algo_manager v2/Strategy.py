@@ -361,7 +361,7 @@ class TargetLong(EntryStrategy): #the parameters contains? dk. yet .  #Can make 
 		#self.buyTrigger.deploy_stop_order()
 
 class TargetShort(EntryStrategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry.
-	def __init__(self,,symbol,tradingplan):
+	def __init__(self,symbol,tradingplan):
 		super().__init__("Entry : Target Short",symbol,tradingplan)
 		# self.timer = timer
 		# self.repeat = repeat
