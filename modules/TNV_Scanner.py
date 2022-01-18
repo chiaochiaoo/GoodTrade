@@ -36,6 +36,8 @@ def ts_to_min(ts):
 
 	return str(m)+":"+str(s)
 
+
+
 class TNV_Scanner():
 
 	def __init__(self,root,NT,commlink,data):
@@ -148,6 +150,12 @@ class TNV_Scanner():
 
 		timestamp = data[1]
 
+		ts= timestamp[:5]
+		m,s=ts.split(":")
+		m=int(m)
+		s=int(s)
+		ts=m*60+s
+		#ts = timestamp[:]
 		print("package arrived at TNVscanner,",timestamp)
 		self.NT_stat["text"] = "Last update: "+timestamp
 
@@ -156,30 +164,37 @@ class TNV_Scanner():
 
 		#filtered_df.to_csv("tttttttt.csv")
 
-		pb1 =  filtered_df.loc[(filtered_df["SC"]>=1)&(filtered_df["Market Cap"]<=4)]
-		pb2 = filtered_df.loc[(filtered_df["SC"]<=-1)&(filtered_df["Market Cap"]<=4)]
-		
+		#print("Current ts:",ts)
+		if ts<570:
+			pb1 =  filtered_df.loc[(filtered_df["SC"]>=1)&(filtered_df["Market Cap"]<=4)]
+			pb2 = filtered_df.loc[(filtered_df["SC"]<=-1)&(filtered_df["Market Cap"]<=4)]
+			
 
-		if len(pb1)+len(pb2)>25:
+			if len(pb1)+len(pb2)>25:
 
-			#trim pb1 , pb2.
-			pb = pd.concat([pb1,pb2])
-			pb = pb.reindex(pb.SC.abs().sort_values(ascending=False).index)[:30]
-			#print(pb)
+				#trim pb1 , pb2.
+				pb = pd.concat([pb1,pb2])
+				pb = pb.reindex(pb.SC.abs().sort_values(ascending=False).index)[:30]
+				#print(pb)
 
+
+			else:
+				pb = pd.concat([pb1,pb2])
+				#just add pb3.
+
+			# pb1 = pb1.sort_values(by=["SC"],ascending=False)[:15]
+			# pb2 = pb2.sort_values(by=["SC"],ascending=True)[:15]
+
+			pb3 = filtered_df.loc[((filtered_df["SC"]<=-5)|(filtered_df["SC"]>=5))&(filtered_df["Market Cap"]==5)][:10]
+			pb = pd.concat([pb,pb3])
+
+			pb = pb.reindex(pb.SC.abs().sort_values(ascending=False).index)[:35]
 
 		else:
-			pb = pd.concat([pb1,pb2])
-			#just add pb3.
 
-		# pb1 = pb1.sort_values(by=["SC"],ascending=False)[:15]
-		# pb2 = pb2.sort_values(by=["SC"],ascending=True)[:15]
 
-		pb3 = filtered_df.loc[((filtered_df["SC"]<=-5)|(filtered_df["SC"]>=5))&(filtered_df["Market Cap"]==5)][:10]
-		pb = pd.concat([pb,pb3])
-
-		pb = pb.reindex(pb.SC.abs().sort_values(ascending=False).index)[:35]
-
+			pb = filtered_df.loc[(filtered_df["f5r"]>=1)&(filtered_df["Market Cap"]<=4)]
+			pb = pb.sort_values(by=["f5r"],ascending=False)[:20]
 
 
 		### PRIORITIZE THE SPY500 ###
@@ -224,10 +239,14 @@ class TNV_Scanner():
 		# self.near_low.update_entry(at_low)
 		# self.near_high.update_entry(at_high)
 
+		if ts<570:
+			self.pmb.update_entry(pb)
+		else:
+			self.pmb.update_entry2(pb)
 
 		self.open_reversal.update_entry(openreverse)
 		self.trending.update_entry(trending)
-		self.pmb.update_entry(pb)
+		
 		self.oh.update_entry(oh)
 		self.ol.update_entry(ol)
 		self.rrvol.update_entry(rrvol)

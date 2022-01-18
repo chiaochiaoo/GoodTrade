@@ -36,6 +36,9 @@ class Premarket_breakout():
 		self.root = root
 		self.recreate_labels(self.root)
 
+
+		self.toggle  = True
+
 		self.file = "signals/open_resersal_"+datetime.now().strftime("%m-%d")+".csv"
 
 		#self.update_entry(pd.read_csv("tttt.csv",index_col=0))
@@ -280,6 +283,128 @@ class Premarket_breakout():
 									order["side"] = side
 
 									send_algo.append(order)
+
+
+						entry+=1
+						if entry ==30:
+							break
+
+				while entry<30:
+					#print("ok")
+					for i in range(10):
+						self.entries[entry][i]["text"] = ""
+					entry+=1
+
+				# keep = ['Symbol', "Signal Time", 'rel vol', 'SC', 'reversalside','reversal_score','Signal Time',]
+
+				# for i in df.columns:
+				# 	if i not in keep:
+				# 		df.pop(i)
+				#df.to_csv(self.file)
+			# except Exception as e:
+			# 	print("TNV scanner construction open reversal:",e)
+
+			if len(send_algo)>0:
+
+				self.send_group_algos(send_algo)
+
+	def update_entry2(self,data):
+
+		#at most 8.
+		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
+
+		if self.toggle:
+			self.labels = ["Symbol","Sector","F5E","F5VE","Rel.V","SC","SO","Prange","Listed","Toggle","Add"]
+
+			for i in range(len(self.buttons)):
+				self.buttons[i]["text"] = self.labels[i]
+
+			self.toggle  = False
+
+
+		now = datetime.now()
+		ts = now.hour*60+now.minute
+		
+		algo_timer = self.hour.get()*60 + self.minute.get()
+
+		end_timer = self.ehour.get()*60 + self.eminute.get()
+
+		df = data
+
+		#timestamp = data[1]
+		#self.NT_stat["text"] = "Last update: "+timestamp
+		#df.to_csv("tttt.csv")
+		entry = 0
+
+		send_algo=[]
+
+		if len(data)>1:
+			if 1:
+				for index, row in df.iterrows():
+					#print(row)
+
+					#["Symbol","Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Ignore","Add"]
+					#["Symbol","Sector","F5E","F5VE","Rel.V","SC","SO","Prange","Listed","Toggle","Add"]
+					rank = index
+					sec = row['sector']
+					f5r = row['f5r']
+					f5v = row['f5v']
+					relv = row['rrvol']
+					
+					sc = row['SC']
+					so = row['SO']
+					pr = row['prange']
+
+					############ add since, and been to the thing #############
+
+					if self.NT != None:
+						if rank in self.NT.nasdaq_trader_symbols_ranking:
+							listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
+						else:
+							listed = "No"
+					else:
+						listed = "No"
+					#print(self.NT.nasdaq_trader_symbols)
+					if 1: #score>0:	
+
+						lst = [rank,sec,f5r,f5v,relv,sc,so,pr,listed]
+
+						ts_location = 7
+
+						for i in range(len(lst)):
+							self.entries[entry][i]["text"] = lst[i]
+
+							#self.entries[entry][9].grid_remove() 	
+
+							# if lst[ts_location] >=ts and lst[ts_location]>=algo_timer and lst[ts_location]<=end_timer:
+							# 	self.entries[entry][i]["background"] = "LIGHTGREEN"
+							# 	self.entries[entry][8].grid()
+
+							if sc>0:
+								side = "UP"
+							else:
+								side = "DOWN"
+							support = row['pl']
+							resistence = row['ph']
+
+							#self.entries[entry][9]["command"]= lambda symbol=rank,support=support,side=side,resistence=resistence:self.send_algo(symbol,support,resistence,side)
+
+
+							# if self.algo_activate.get()==1 and ts>=algo_timer and ts<=end_timer:
+							# 	if rank not in self.algo_placed:
+
+							# 		#self.send_algo(rank,support,resistence,self.algo_risk)
+							# 		self.algo_placed.append(rank)
+
+							# 		order = {}
+
+							# 		order["symbol"] = rank
+							# 		order["support"] = support
+							# 		order["resistence"] = resistence
+
+							# 		order["side"] = side
+
+							# 		send_algo.append(order)
 
 
 						entry+=1
