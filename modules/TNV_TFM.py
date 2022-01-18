@@ -32,7 +32,7 @@ class TFM():
 
 		self.side_options = ("Long", "Short")
 		self.type_options = ("Rightaway","Target")
-		self.management_options = ("1:2","1:N","Fib Only","SemiManual","FullManual")
+		self.management_options = ("1:2 Exprmntl","Fib Only","SemiManual","FullManual")
 
 		self.algo_placed = []
 		self.ts_location = 7
@@ -160,53 +160,59 @@ class TFM():
 
 		#check, symbol, risk. type. timing / price, 
 
-		symbol = self.symbol.get().upper()
-		side = self.side.get()
-		risk = self.algo_risk.get()
+		try:
+			symbol = self.symbol.get().upper()
+			side = self.side.get()
+			risk = self.algo_risk.get()
 
-		type_ = self.type.get()
-		stop = self.stop.get()
-		triggerprice = self.limit_price.get()
-		management = self.management_type.get()
-		entryplan = ""
+			type_ = self.type.get()
+			stop = self.stop.get()
+			
+			management = self.management_type.get()
+			entryplan = ""
 
-		support = 0
-		resistence = 0
+			support = 0
+			resistence = 0
 
-		if type_=="Rightaway":
-			if side == "Long":
-				entryplan= "Instant Long"
-				support = stop
-			elif side =="Short":
-				entryplan= "Instant Short"
-				resistence = stop
-		else:
-			if side == "Long":
-				entryplan= "Target Long"
-				resistence = triggerprice
-				support = stop
-			elif side =="Short":
-				entryplan= "Target Short"
-				resistence = stop
-				support = triggerprice
+			if type_=="Rightaway":
+				if side == "Long":
+					entryplan= "Instant Long"
+					support = stop
+				elif side =="Short":
+					entryplan= "Instant Short"
+					resistence = stop
+			else:
+				triggerprice = self.limit_price.get()
 
-		check = [symbol,side,risk,type_,stop,management]
+				if side == "Long":
+					entryplan= "Target Long"
+					resistence = triggerprice
+					support = stop
+				elif side =="Short":
+					entryplan= "Target Short"
+					resistence = stop
+					support = triggerprice
 
-		for i in check:
-			if i =="" or i==0:
+			check = [symbol,side,risk,type_,stop,management]
 
-				self.status["text"]="error"
-		#self.entries[entry][8]["command"]= lambda symbol=rank,side=side,open_=row['open'],stop_=rscore,risk_=self.algo_risk:self.send_algo(self,symbol,side,open_,stop_,risk_)
-		
+			for i in check:
+				if i =="" or i==0:
 
-		#["New order",[" BreakUp",symbol,support-change,resistence,risk,{},"Notdeploy","TrendRider"]]
-		if risk>0:
+					self.status["text"]="error"
+			#self.entries[entry][8]["command"]= lambda symbol=rank,side=side,open_=row['open'],stop_=rscore,risk_=self.algo_risk:self.send_algo(self,symbol,side,open_,stop_,risk_)
+			
 
-			info = ["New order",[entryplan,symbol,support,resistence,risk,{},"deploy",management]]
+			#["New order",[" BreakUp",symbol,support-change,resistence,risk,{},"Notdeploy","TrendRider"]]
+			if risk>0:
 
-			self.tnv_scanner.send_algo(info)
+				info = ["New order",[entryplan,symbol,support,resistence,risk,{},"deploy",management]]
 
+				self.tnv_scanner.send_algo(info)
 
+				self.status["text"]="Status: Algo placed"
+		except Exception as e:
+			print(e)
+			self.status["text"]="Status: error"
 
 	def create_entry(self):
 
