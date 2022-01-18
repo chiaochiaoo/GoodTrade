@@ -123,9 +123,9 @@ class TNV_Scanner():
 		# self.spread = Spread(self.spread_frame,NT)
 
 		# # TFM
-		# self.TFM_frame = tk.Canvas(self.TNV_TAB)
-		# self.TNV_TAB.add(self.TFM_frame, text ='TradeForMe')
-		# self.tfm = TFM(self.TFM_frame,self)
+		self.TFM_frame = tk.Canvas(self.TNV_TAB)
+		self.TNV_TAB.add(self.TFM_frame, text ='TradeForMe')
+		self.tfm = TFM(self.TFM_frame,self)
 
 
 		# filtered_df = pd.read_csv("test.csv",index_col=0)
