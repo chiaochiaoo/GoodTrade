@@ -278,40 +278,115 @@ class BreakDown(EntryStrategy): #the parameters contains? dk. yet .  #Can make s
 # 			# self.set_initial_trigger(self.transitional_trigger)
 # 			# self.add_initial_triggers(self.cont_sellTrigger)
 			
-# #class BreakUpEDGX(EntryStrategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry.
-# 	def __init__(self,timer,repeat,symbol,tradingplan):
-# 		super().__init__("Entry : Break up",symbol,tradingplan)
 
-# 		self.timer = timer
-# 		self.repeat = repeat
-# 		#description,trigger_timer:int,trigger_limit=1
-# 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
-# 		self.buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
+class InstantLong(EntryStrategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry.
+	def __init__(self,timer,repeat,symbol,tradingplan):
+		super().__init__("Entry : Break up",symbol,tradingplan)
 
-# 		self.add_initial_triggers(self.buyTrigger)
+		self.timer = timer
+		self.repeat = repeat
 
-# 	def on_redeploying(self):
+		self.buyTrigger = Break_any_Passive_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,BID]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
+		#Break_any_Passive_trigger
+		#Break_any_Purchase_trigger
+		self.add_initial_triggers(self.buyTrigger)
 
-# 		if not self.buyTrigger.pre_deploying_check():
-# 			self.buyTrigger.total_reset()
-# 			self.restart()
-# 		else:
+	def on_redeploying(self):
 
-# 			self.tradingplan.mark_algo_status(DONE)
-# 			# self.transitional_trigger = AbstractTrigger("transition to below pH.",[[SYMBOL_DATA,BID,"<",SYMBOL_DATA,RESISTENCE]],0,1,"REACTIVATE")
-# 			# self.buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",self.timer,self.repeat,LONG,self.ppro_out)
-# 			# self.transitional_trigger.add_next_trigger(self.buyTrigger)
+		if not self.buyTrigger.pre_deploying_check():
+			self.buyTrigger.total_reset()
+			self.restart()
+		else:
 
-# 			# ###Where continuation trigger goes.#####
-# 			# self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
-# 			# self.symbol.data[ENTRY] = self.symbol.data[HIGH]
+			self.tradingplan.mark_algo_status(DONE)
 
-# 			# self.cont_buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"Break Up contituation",0,1,LONG,self.ppro_out)
-# 			# log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),0,1)
+	def on_deploying(self):
 
-# 			# self.set_initial_trigger(self.transitional_trigger)
-# 			# self.add_initial_triggers(self.cont_buyTrigger)
-# 			# self.restart()
+		super().on_deploying()
+
+		#self.buyTrigger.deploy_stop_order()
+
+class InstantShort(EntryStrategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry.
+	def __init__(self,timer,repeat,symbol,tradingplan):
+		super().__init__("Entry : Break downn",symbol,tradingplan)
+		self.timer = timer
+		self.repeat = repeat
+		#description,trigger_timer:int,trigger_limit=1
+		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
+		#print("breakdown!!!!")
+		self.sellTrigger = Break_any_Passive_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,ASK]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
+
+		self.add_initial_triggers(self.sellTrigger)
+
+	def on_deploying(self):
+
+		super().on_deploying()
+
+		#self.sellTrigger.deploy_stop_order()
+
+		
+	def on_redeploying(self):
+
+		if not self.sellTrigger.pre_deploying_check():
+			self.sellTrigger.total_reset()
+			self.restart()
+		else:
+
+			self.tradingplan.mark_algo_status(DONE)
+class TargetLong(EntryStrategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry.
+	def __init__(self,timer,repeat,symbol,tradingplan):
+		super().__init__("Entry : Break up",symbol,tradingplan)
+
+		self.timer = timer
+		self.repeat = repeat
+
+		self.buyTrigger = Break_any_Passive_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,BID]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
+		#Break_any_Passive_trigger
+		#Break_any_Purchase_trigger
+		self.add_initial_triggers(self.buyTrigger)
+
+	def on_redeploying(self):
+
+		if not self.buyTrigger.pre_deploying_check():
+			self.buyTrigger.total_reset()
+			self.restart()
+		else:
+
+			self.tradingplan.mark_algo_status(DONE)
+
+	def on_deploying(self):
+
+		super().on_deploying()
+
+		#self.buyTrigger.deploy_stop_order()
+
+class TargetShort(EntryStrategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry.
+	def __init__(self,timer,repeat,symbol,tradingplan):
+		super().__init__("Entry : Break downn",symbol,tradingplan)
+		self.timer = timer
+		self.repeat = repeat
+		#description,trigger_timer:int,trigger_limit=1
+		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
+		#print("breakdown!!!!")
+		self.sellTrigger = Break_any_Passive_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,ASK]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
+
+		self.add_initial_triggers(self.sellTrigger)
+
+	def on_deploying(self):
+
+		super().on_deploying()
+
+		#self.sellTrigger.deploy_stop_order()
+
+		
+	def on_redeploying(self):
+
+		if not self.sellTrigger.pre_deploying_check():
+			self.sellTrigger.total_reset()
+			self.restart()
+		else:
+
+			self.tradingplan.mark_algo_status(DONE)
 
 
 

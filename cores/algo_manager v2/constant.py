@@ -155,6 +155,11 @@ HOLDTILCLOSE = "HTC"
 FULLMANUAL = "FullManual"
 SEMIMANUAL = "SemiManual"
 
+INSTANTLONG = "Instant Long"
+INSTANTSHORT = "Instant Short"
+TARGETLONG = "Target Long"
+TARGETSHORT = "Target Short"
+
 FIBONO = "FibAdjstd"
 FIBO = "Fib only"
 EMASTRAT =  "EMA strategy"

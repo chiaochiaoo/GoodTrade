@@ -826,6 +826,16 @@ class TradingPlan:
 
 		elif entry_plan == FREECONTROL:
 			self.set_EntryStrategy(FreeControl(entrytimer,instant,self.symbol,self))
+		elif entry_plan == INSTANTLONG:
+			self.set_EntryStrategy(InstantLong(self.symbol,self))
+		elif entry_plan == INSTANTSHORT:
+			self.set_EntryStrategy(InstantShort(self.symbol,self))
+		elif entry_plan == TARGETLONG:
+			self.set_EntryStrategy(TargetLong(self.symbol,self))
+		elif entry_plan == TARGETSHORT:
+			self.set_EntryStrategy(TargetShort(self.symbol,self))
+
+
 		else:
 			log_print("unkown plan")
 			self.set_EntryStrategy(BreakAny(entrytimer,instant,self.symbol,self))
