@@ -27,16 +27,20 @@ class TFM():
 
 		self.symbol = tk.StringVar()
 		self.algo_risk = tk.DoubleVar(value=10)
-		self.algo_activate = tk.BooleanVar(value=0)
 
+		self.file = "signals/open_resersal_"+datetime.now().strftime("%m-%d")+".csv"
+
+		self.side_options = ("Long", "Short")
+		self.type_options = ("Rightaway","Target")
+		self.management_options = ("1:2","1:N","Fib Only","SemiManual","FullManual")
 
 		self.algo_placed = []
 		self.ts_location = 7
 		self.root = root
 		self.recreate_labels(self.root)
 
-		self.file = "signals/open_resersal_"+datetime.now().strftime("%m-%d")+".csv"
 
+		
 		#self.update_entry(pd.read_csv("tttt.csv",index_col=0))
 
 	def recreate_labels(self,frame):
@@ -89,12 +93,9 @@ class TFM():
 
 		self.limit_price = tk.DoubleVar()
 
-		self.side_options = ("Long", "Short")
-		self.type_options = ("Aggresive","Passive","Limit")
-
 
 		self.side.set("Long")
-		self.type.set("Aggresive")
+		self.type.set("Rightaway")
 
 
 		row = 2
@@ -132,16 +133,7 @@ class TFM():
 
 
 		self.stop = tk.DoubleVar()
-
-	
 		self.management_type = tk.StringVar()
-
-	
-		self.management_options = ("1:2","1:N","Fib Only")
-
-
-		self.side.set("Long")
-		self.type.set("Aggresive")
 
 
 		row = 2
@@ -154,74 +146,65 @@ class TFM():
 		ttk.Label(frame, text="Management Type:").grid(sticky="w",column=col,row=row,padx=10)
 		ttk.OptionMenu(frame, self.management_type,self.management_options[0],*self.management_options).grid(sticky="w",column=col,row=row+1,padx=10)
 
-		col += 1
-		ttk.Label(frame, text="Tgt Price (If applicable):").grid(sticky="w",column=col,row=row,padx=10)
-		ttk.Entry(frame, textvariable=self.limit_price).grid(sticky="w",column=col,row=row+1,padx=10)
-
-
-
-
-		# row = 4
-		# col = 1
-
-		# ttk.Label(frame, text="Side:").grid(sticky="w",column=col,row=row)
-		# l={"Up","Down","Any","Any"}
-		# ttk.OptionMenu(frame, self.side_, *sorted(l)).grid(sticky="w",column=col+1,row=row)
-
-
-		# ttk.Label(frame, text="Listed?").grid(sticky="w",column=col+2,row=row)
-		# ttk.Checkbutton(frame, variable=self.listed_).grid(sticky="w",column=col+3,row=row)
-
-		#print("algo time",algo_timer)
 
 
 	def confirmation_pannel(self,frame):
 
+		self.status = ttk.Label(frame, text="Status:")
+		self.status.grid(sticky="w",column=2,row=1,padx=10)
 
-		tk.Button(frame, text="Place",width=15).grid(padx=200,pady=15,row=1, column=1)#,command=self.rank
+		tk.Button(frame, text="Place",width=15,command=self.send_algo).grid(padx=50,pady=15,row=1, column=1)#,command=self.rank
 
-	def send_algo(self,symbol,support,resistence,side):
+	def send_algo(self):
 
+
+		#check, symbol, risk. type. timing / price, 
+
+		symbol = self.symbol.get().upper()
+		side = self.side.get()
+		risk = self.algo_risk.get()
+
+		type_ = self.type.get()
+		stop = self.stop.get()
+		triggerprice = self.limit_price.get()
+		management = self.management_type.get()
+		entryplan = ""
+
+		support = 0
+		resistence = 0
+
+		if type_=="Rightaway":
+			if side == "Long":
+				entryplan= "Instant Long"
+				support = stop
+			elif side =="Short":
+				entryplan= "Instant Short"
+				resistence = stop
+		else:
+			if side == "Long":
+				entryplan= "Target Long"
+				resistence = triggerprice
+				support = stop
+			elif side =="Short":
+				entryplan= "Target Short"
+				resistence = stop
+				support = triggerprice
+
+		check = [symbol,side,risk,type_,stop,management]
+
+		for i in check:
+			if i =="" or i==0:
+
+				self.status["text"]="error"
 		#self.entries[entry][8]["command"]= lambda symbol=rank,side=side,open_=row['open'],stop_=rscore,risk_=self.algo_risk:self.send_algo(self,symbol,side,open_,stop_,risk_)
-		risk = self.algo_risk.get()
+		
 
+		#["New order",[" BreakUp",symbol,support-change,resistence,risk,{},"Notdeploy","TrendRider"]]
 		if risk>0:
 
-			if side =="UP":
-				info = ["New order",["BreakAny",symbol,support-0.02,resistence,risk,{},"deploy","TrendRider"]]
-				#print("sending",info)
-			else:
-				info = ["New order",["BreakAny",symbol,support,resistence+0.02,risk,{},"deploy","TrendRider"]]
+			info = ["New order",[entryplan,symbol,support,resistence,risk,{},"deploy",management]]
+
 			self.tnv_scanner.send_algo(info)
-
-	def send_group_algos(self,lst):
-
-		risk = self.algo_risk.get()
-
-		#print("HELLO.",lst)
-		order = ["New order"]
-		if risk>0:
-			for i in range(len(lst)):
-				#print(lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"])
-
-				change = 0.03
-			
-				if lst[i]["support"]>10 and lst[i]["support"]<20:
-					change = 0.05
-
-				if lst[i]["support"] >20:
-					change = 0.06
-
-
-				if lst[i]["side"] =="UP":
-					order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"]-change,lst[i]["resistence"],risk,{},"deploy","TrendRider"])
-
-					#print("sending",info)
-				else:
-					order.append(["BreakAny",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"]+change,risk,{},"deploy","TrendRider"])
-
-			self.tnv_scanner.send_algo(order)
-
 
 
 
