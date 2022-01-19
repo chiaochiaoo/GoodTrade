@@ -199,15 +199,17 @@ class TradingPlan:
 					self.ppro_out.send([PASSIVEBUY,self.symbol_name,self.passive_remaining_shares,price])
 				else:
 
-					if self.passive_remaining_shares<=2:
+					if self.passive_remaining_shares<=4:
 						self.ppro_out.send([PASSIVEBUY,self.symbol_name,self.passive_remaining_shares,price])
 					else:
 
-						share = self.passive_remaining_shares//3
-						sharer = self.passive_remaining_shares- 2*share
-						self.ppro_out.send([PASSIVEBUY,self.symbol_name,share,price])
+						# share = self.passive_remaining_shares//3
+						# sharer = self.passive_remaining_shares- 2*share
+
+						share = self.passive_remaining_shares//2
+						#self.ppro_out.send([PASSIVEBUY,self.symbol_name,share,price])
 						self.ppro_out.send([PASSIVEBUY,self.symbol_name,share,price-0.01*k])
-						self.ppro_out.send([PASSIVEBUY,self.symbol_name,sharer,price-0.01*2*k])
+						#self.ppro_out.send([PASSIVEBUY,self.symbol_name,sharer,price-0.01*2*k])
 
 			self.passive_price = price			
 		elif self.passive_position == SELL:
