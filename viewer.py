@@ -450,7 +450,7 @@ if __name__ == '__main__':
 
 
 	root = tk.Tk() 
-	root.title("GoodTrade v519") 
+	root.title("GoodTrade v520") 
 	root.geometry("1800x900")
 	root.minsize(1500, 600)
 	root.maxsize(3000, 1500)
@@ -460,7 +460,7 @@ if __name__ == '__main__':
 	
 	utility = multiprocessing.Process(target=utils, args=(algo_manager_receive_comm,util_response),daemon=True)
 	utility.daemon=True
-
+	#utility.name = "utility"
 	# receiver = multiprocessing.Process(target=algo_server,args=(util_response,),daemon=True)
 	# receiver.daemon=True
 
