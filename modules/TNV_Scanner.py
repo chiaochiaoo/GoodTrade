@@ -57,6 +57,7 @@ class TNV_Scanner():
 		self.NT_stat.place(x=10, y=10, height=25, width=260)	
 
 
+		self.current_ts = 0
 		if data!=None:
 			self.socket = Label(self.root,textvariable=self.data.algo_socket,background="red",height=1,width=12)
 			self.connection =Label(self.root,textvariable=self.data.algo_manager_connected,background="red",height=1,width=14)
@@ -146,7 +147,9 @@ class TNV_Scanner():
 
 	def update_entry(self,data):
 
+		now = datetime.now()
 		
+		system_ts = now.hour*60+now.minute -1
 
 		timestamp = data[1]
 
@@ -155,102 +158,113 @@ class TNV_Scanner():
 		m=int(m)
 		s=int(s)
 		ts=m*60+s
+
 		#ts = timestamp[:]
-		print("package arrived at TNVscanner,",timestamp)
-		self.NT_stat["text"] = "Last update: "+timestamp
+
+		print("package arrived at TNVscanner,",timestamp,"system time:",system_ts)
 
 
-		filtered_df = data[0]
+		#if it is not from the current minute or two, reject. 
+		# if the package is old. skip.
+		if ts >=system_ts and timestamp!= self.current_ts:
 
-		#filtered_df.to_csv("tttttttt.csv")
+			self.current_ts = timestamp
+			self.NT_stat["text"] = "Last update: "+timestamp
 
-		#print("Current ts:",ts)
-		if ts<570:
-			pb1 =  filtered_df.loc[(filtered_df["SC"]>=1)&(filtered_df["Market Cap"]<=4)]
-			pb2 = filtered_df.loc[(filtered_df["SC"]<=-1)&(filtered_df["Market Cap"]<=4)]
-			
 
-			if len(pb1)+len(pb2)>25:
+			filtered_df = data[0]
 
-				#trim pb1 , pb2.
-				pb = pd.concat([pb1,pb2])
-				pb = pb.reindex(pb.SC.abs().sort_values(ascending=False).index)[:30]
-				#print(pb)
+			#filtered_df.to_csv("tttttttt.csv")
 
+			#print("Current ts:",ts)
+			if ts<570:
+				pb1 =  filtered_df.loc[(filtered_df["SC"]>=1)&(filtered_df["Market Cap"]<=4)]
+				pb2 = filtered_df.loc[(filtered_df["SC"]<=-1)&(filtered_df["Market Cap"]<=4)]
+				
+
+				if len(pb1)+len(pb2)>25:
+
+					#trim pb1 , pb2.
+					pb = pd.concat([pb1,pb2])
+					pb = pb.reindex(pb.SC.abs().sort_values(ascending=False).index)[:30]
+					#print(pb)
+
+
+				else:
+					pb = pd.concat([pb1,pb2])
+					#just add pb3.
+
+				# pb1 = pb1.sort_values(by=["SC"],ascending=False)[:15]
+				# pb2 = pb2.sort_values(by=["SC"],ascending=True)[:15]
+
+				pb3 = filtered_df.loc[((filtered_df["SC"]<=-5)|(filtered_df["SC"]>=5))&(filtered_df["Market Cap"]==5)&(filtered_df["price"]>=5)][:10]
+				pb = pd.concat([pb,pb3])
+
+				pb = pb.reindex(pb.SC.abs().sort_values(ascending=False).index)[:35]
 
 			else:
-				pb = pd.concat([pb1,pb2])
-				#just add pb3.
 
-			# pb1 = pb1.sort_values(by=["SC"],ascending=False)[:15]
-			# pb2 = pb2.sort_values(by=["SC"],ascending=True)[:15]
 
-			pb3 = filtered_df.loc[((filtered_df["SC"]<=-5)|(filtered_df["SC"]>=5))&(filtered_df["Market Cap"]==5)&(filtered_df["price"]>=5)][:10]
-			pb = pd.concat([pb,pb3])
+				pb = filtered_df.loc[(filtered_df["f5r"]>=1)&(filtered_df["Market Cap"]<=4)]
+				pb = pb.sort_values(by=["f5r"],ascending=False)[:20]
 
-			pb = pb.reindex(pb.SC.abs().sort_values(ascending=False).index)[:35]
+
+			### PRIORITIZE THE SPY500 ###
+			### THEN THE LIST ####
+
+
+			##################### NEAR LOW #############################
+			at_low = filtered_df.loc[(filtered_df["rangescore"]<=0.1)][:20] #&&(filtered_df["last_break"])
+			#at_low.to_csv("at low.csv")
+
+			##################### NEAR HIGH #############################
+			at_high = filtered_df.loc[(filtered_df["rangescore"]>=0.9)][:20]
+
+			##################### Just break #############################
+			just_break = filtered_df.loc[(filtered_df["just_break"]!="")&(filtered_df["break_span"]>=15)][:20]
+
+
+			#reversalside is not null. shall not be nullified. only take the first reversal. 
+			openreverse = filtered_df.loc[(filtered_df["reversal"]==True)&(filtered_df["Market Cap"]>0)&(filtered_df["reversalside"]!="")]
+			openreverse = openreverse.sort_values(by=["reversal_timer"],ascending=False)[:20]
+			
+
+			trending =  filtered_df.loc[(filtered_df["ema45time"]>=20)|(filtered_df["ema45time"]<=-20)]
+			trending =  trending.reindex(trending.ema45.abs().sort_values(ascending=False).index)[:20] #df.sort_values(by=["ema21"],ascending=False)
+
+			# OH , OL, RRVOL
+
+			#oh = filtered_df.loc[(filtered_df["oh"]>0.5)]
+			#oh = filtered_df.loc[(filtered_df["ema21change"]<-20)]
+			#oh = filtered_df.loc[(filtered_df["oh"]>0.5)].sort_values(by=["oh"],ascending=False)[:20]
+
+			oh = pd.concat([filtered_df.loc[(filtered_df["ema21change"]<-20)&(filtered_df["oh"]>0.7)],filtered_df.loc[(filtered_df["oh"]>0.5)&(filtered_df["ema21change"]>-20)].sort_values(by=["oh"],ascending=False)[:30]])
+			#oh = oh.loc[oh["Market Cap"]<5]
+			#ol = filtered_df.loc[(filtered_df["ema21change"]>20)]
+			# ol = filtered_df.loc[filtered_df["ol"]>0.5]
+			# ol = ol.sort_values(by=["ol"],ascending=False)[:20]
+			ol = pd.concat([filtered_df.loc[(filtered_df["ema21change"]>20)&(filtered_df["ol"]>0.7)],filtered_df.loc[(filtered_df["ol"]>0.5)&(filtered_df["ema21change"]<20)].sort_values(by=["ol"],ascending=False)[:30]])
+			#ol = ol.loc[ol["Market Cap"]<5]
+			rrvol = filtered_df.sort_values(by=["rrvol"],ascending=False)[:20]
+
+			# self.volatility_scanner.update_entry(just_break)
+			# self.near_low.update_entry(at_low)
+			# self.near_high.update_entry(at_high)
+
+			if ts<570:
+				self.pmb.update_entry(pb)
+			else:
+				self.pmb.update_entry2(pb)
+
+			self.open_reversal.update_entry(openreverse)
+			self.trending.update_entry(trending)
+			
+			self.oh.update_entry(oh)
+			self.ol.update_entry(ol)
+			self.rrvol.update_entry(rrvol)
 
 		else:
-
-
-			pb = filtered_df.loc[(filtered_df["f5r"]>=1)&(filtered_df["Market Cap"]<=4)]
-			pb = pb.sort_values(by=["f5r"],ascending=False)[:20]
-
-
-		### PRIORITIZE THE SPY500 ###
-		### THEN THE LIST ####
-
-
-		##################### NEAR LOW #############################
-		at_low = filtered_df.loc[(filtered_df["rangescore"]<=0.1)][:20] #&&(filtered_df["last_break"])
-		#at_low.to_csv("at low.csv")
-
-		##################### NEAR HIGH #############################
-		at_high = filtered_df.loc[(filtered_df["rangescore"]>=0.9)][:20]
-
-		##################### Just break #############################
-		just_break = filtered_df.loc[(filtered_df["just_break"]!="")&(filtered_df["break_span"]>=15)][:20]
-
-
-		#reversalside is not null. shall not be nullified. only take the first reversal. 
-		openreverse = filtered_df.loc[(filtered_df["reversal"]==True)&(filtered_df["Market Cap"]>0)&(filtered_df["reversalside"]!="")]
-		openreverse = openreverse.sort_values(by=["reversal_timer"],ascending=False)[:20]
-		
-
-		trending =  filtered_df.loc[(filtered_df["ema45time"]>=20)|(filtered_df["ema45time"]<=-20)]
-		trending =  trending.reindex(trending.ema45.abs().sort_values(ascending=False).index)[:20] #df.sort_values(by=["ema21"],ascending=False)
-
-		# OH , OL, RRVOL
-
-		#oh = filtered_df.loc[(filtered_df["oh"]>0.5)]
-		#oh = filtered_df.loc[(filtered_df["ema21change"]<-20)]
-		#oh = filtered_df.loc[(filtered_df["oh"]>0.5)].sort_values(by=["oh"],ascending=False)[:20]
-
-		oh = pd.concat([filtered_df.loc[(filtered_df["ema21change"]<-20)&(filtered_df["oh"]>0.7)],filtered_df.loc[(filtered_df["oh"]>0.5)&(filtered_df["ema21change"]>-20)].sort_values(by=["oh"],ascending=False)[:30]])
-		#oh = oh.loc[oh["Market Cap"]<5]
-		#ol = filtered_df.loc[(filtered_df["ema21change"]>20)]
-		# ol = filtered_df.loc[filtered_df["ol"]>0.5]
-		# ol = ol.sort_values(by=["ol"],ascending=False)[:20]
-		ol = pd.concat([filtered_df.loc[(filtered_df["ema21change"]>20)&(filtered_df["ol"]>0.7)],filtered_df.loc[(filtered_df["ol"]>0.5)&(filtered_df["ema21change"]<20)].sort_values(by=["ol"],ascending=False)[:30]])
-		#ol = ol.loc[ol["Market Cap"]<5]
-		rrvol = filtered_df.sort_values(by=["rrvol"],ascending=False)[:20]
-
-		# self.volatility_scanner.update_entry(just_break)
-		# self.near_low.update_entry(at_low)
-		# self.near_high.update_entry(at_high)
-
-		if ts<570:
-			self.pmb.update_entry(pb)
-		else:
-			self.pmb.update_entry2(pb)
-
-		self.open_reversal.update_entry(openreverse)
-		self.trending.update_entry(trending)
-		
-		self.oh.update_entry(oh)
-		self.ol.update_entry(ol)
-		self.rrvol.update_entry(rrvol)
-
+			print("receiving old package.")
 
 	# def update_entry(self,data):
 	# 	timestamp = data[1]
