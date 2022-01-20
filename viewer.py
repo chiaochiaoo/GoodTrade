@@ -450,7 +450,7 @@ if __name__ == '__main__':
 
 
 	root = tk.Tk() 
-	root.title("GoodTrade v517") 
+	root.title("GoodTrade v518") 
 	root.geometry("1800x900")
 	root.minsize(1500, 600)
 	root.maxsize(3000, 1500)
@@ -483,7 +483,7 @@ if __name__ == '__main__':
 	
 
 	utility.start()
-	
+
 	receiver.start()
 
 	root.mainloop()
