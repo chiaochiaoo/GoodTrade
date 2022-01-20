@@ -149,7 +149,7 @@ class TNV_Scanner():
 
 		now = datetime.now()
 		
-		system_ts = now.hour*60+now.minute -1
+		system_ts = now.hour*60+now.minute 
 
 		timestamp = data[1]
 
