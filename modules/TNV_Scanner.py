@@ -185,7 +185,7 @@ class TNV_Scanner():
 			# pb1 = pb1.sort_values(by=["SC"],ascending=False)[:15]
 			# pb2 = pb2.sort_values(by=["SC"],ascending=True)[:15]
 
-			pb3 = filtered_df.loc[((filtered_df["SC"]<=-5)|(filtered_df["SC"]>=5))&(filtered_df["Market Cap"]==5)][:10]
+			pb3 = filtered_df.loc[((filtered_df["SC"]<=-5)|(filtered_df["SC"]>=5))&(filtered_df["Market Cap"]==5)&(filtered_df["price"]>=5)][:10]
 			pb = pd.concat([pb,pb3])
 
 			pb = pb.reindex(pb.SC.abs().sort_values(ascending=False).index)[:35]
