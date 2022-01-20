@@ -263,6 +263,7 @@ class TNV_Scanner():
 			self.ol.update_entry(ol)
 			self.rrvol.update_entry(rrvol)
 
+			print("package at TNVscanner fully processed,",timestamp)
 		else:
 			print("receiving old package.")
 
