@@ -87,38 +87,40 @@ def algo_manager_commlink(pipe,util_pipe):
 		Connection = True
 
 		order_list = ["New order"]
+
+		count=0
 		while Connection:
 			try:
 				#if something comes from pipe.
-				if pipe.poll(0):
-					data = pipe.recv()
-					#print(data)
+				#if pipe.poll(0):
+				data = pipe.recv()
+				#print(data)
 
-					if data[0] == "Orders Request add":
+				if data[0] == "Orders Request add":
+					order_list.extend(data[1:])
+				elif data[0] == "Orders Request finish":
+
+					if len(data)>1:
 						order_list.extend(data[1:])
-					elif data[0] == "Orders Request finish":
 
-						if len(data)>1:
-							order_list.extend(data[1:])
-
-						#print(order_list)
-						data=pickle.dumps(order_list)
-						try:
-							print(order_list)
-							conn.sendall(data)
-							order_list = ["New order"]
-						except Exception as e:
-							print(e)
-							Connection=False
-							break
-					elif data[0] == "New order":
-						data=pickle.dumps(data)
-						try:
-							conn.sendall(data)
-						except Exception as e:
-							print(e)
-							Connection=False
-							break
+					#print(order_list)
+					data=pickle.dumps(order_list)
+					try:
+						print(order_list)
+						conn.sendall(data)
+						order_list = ["New order"]
+					except Exception as e:
+						print(e)
+						Connection=False
+						break
+				elif data[0] == "New order":
+					data=pickle.dumps(data)
+					try:
+						conn.sendall(data)
+					except Exception as e:
+						print(e)
+						Connection=False
+						break
 				#if client sends something 
 				#print(2)
 				if Connection:
@@ -154,7 +156,10 @@ def algo_manager_commlink(pipe,util_pipe):
 					except Exception as e:
 						print(e)
 						Connection= False
-				#print("running")
+
+
+				count+=1
+				#print(count)
 				#print(3)
 			except Exception as e:
 				print(e)
