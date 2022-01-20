@@ -248,16 +248,17 @@ def algo_manager_voxcom3(pipe):
 						except:
 							pass
 				#k is the confirmation from client. send it back to pipe.
-				if k!=None:
-					placed = []
+				if k!=None 
+					if k!="chekcing":
+						placed = []
 
-					pipe.send(["pkg",k[1:]])
-					for i in k[1:]:
-						log_print("placed:",i[1])
-						placed.append(i[1])
-					#log_print("placed:",k[1][1])
-					
-					s.send(pickle.dumps(["Algo placed",placed]))
+						pipe.send(["pkg",k[1:]])
+						for i in k[1:]:
+							log_print("placed:",i[1])
+							placed.append(i[1])
+						#log_print("placed:",k[1][1])
+						
+						s.send(pickle.dumps(["Algo placed",placed]))
 
 				# if pipe.poll(0):
 				# 	data = pipe.recv()

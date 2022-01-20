@@ -94,7 +94,7 @@ def algo_manager_commlink(pipe,util_pipe):
 				#if something comes from pipe.
 
 				nosend = True
-				if pipe.poll(5):
+				if pipe.poll(15):
 					data = pipe.recv()
 					#print(data)
 
@@ -164,7 +164,7 @@ def algo_manager_commlink(pipe,util_pipe):
 							Connection= False
 
 				if nosend:
-					conn.sendall(pickle.dumps(["checking"]))
+					conn.sendall(pickle.dumps("checking"))
 				count+=1
 				print("algo comm check:",count)
 				#print(3)
