@@ -249,7 +249,7 @@ def algo_manager_voxcom3(pipe):
 							pass
 				#k is the confirmation from client. send it back to pipe.
 				if k!=None:
-					if k!=["chekcing"]:
+					if k!=['checking']:
 						placed = []
 
 						pipe.send(["pkg",k[1:]])
