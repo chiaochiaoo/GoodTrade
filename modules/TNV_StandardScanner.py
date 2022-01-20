@@ -38,7 +38,7 @@ class StandardScanner():
 
 		self.hour = tk.IntVar(value=9)
 		self.minute = tk.IntVar(value=30)
-		self.ehour = tk.IntVar(value=15)
+		self.ehour = tk.IntVar(value=14)
 		self.eminute = tk.IntVar(value=00)
 
 
