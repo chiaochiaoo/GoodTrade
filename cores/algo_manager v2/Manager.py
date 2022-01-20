@@ -67,6 +67,7 @@ def algo_manager_voxcom(pipe):
 			pipe.send(["msg","Connected"])
 			k = None
 
+			count = 0
 			while connection:
 
 				#from the socket
@@ -121,7 +122,8 @@ def algo_manager_voxcom(pipe):
 				# 	except:
 				# 		pass
 
-
+				count+=1
+				print(count)
 			log_print("Main disconnected")
 			pipe.send(["msg","Main disconnected"])
 		except Exception as e:
@@ -185,6 +187,106 @@ def algo_manager_voxcom2(pipe):
 		except Exception as e:
 			pipe.send(["msg",e])
 			log_print(e)
+
+
+
+def algo_manager_voxcom3(pipe):
+
+	#tries to establish commuc
+
+
+	while True:
+
+		HOST = 'localhost'  # The server's hostname or IP address
+		#PORT = 65491       # The port used by the server
+
+		try:
+			log_print("Trying to connect to the main application")
+			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			connected = False
+
+			while not connected:
+				try:
+					with open('../commlink.json') as json_file:
+						port_file = json.load(json_file)
+
+					if datetime.now().strftime("%m%d") not in port_file:
+						time.sleep(1)
+					else:
+						PORT = port_file[datetime.now().strftime("%m%d")]
+						s.connect((HOST, PORT))
+						connected = True
+
+					s.setblocking(1)
+				except Exception as e:
+					pipe.send(["msg","Disconnected"])
+					log_print("Cannot connected. Try again in 2 seconds.",e)
+					time.sleep(2)
+
+			connection = True
+			pipe.send(["msg","Connected"])
+			k = None
+
+			count = 0
+			while connection:
+
+				#from the socket
+				data = []
+				while True:
+					try:
+						part = s.recv(2048)
+					except:
+						connection = False
+						break
+					#if not part: break
+					data.append(part)
+					if len(part) < 2048:
+						#try to assemble it, if successful.jump. else, get more. 
+						try:
+							k = pickle.loads(b"".join(data))
+							break
+						except:
+							pass
+				#k is the confirmation from client. send it back to pipe.
+				if k!=None:
+					placed = []
+
+					pipe.send(["pkg",k[1:]])
+					for i in k[1:]:
+						log_print("placed:",i[1])
+						placed.append(i[1])
+					#log_print("placed:",k[1][1])
+					
+					s.send(pickle.dumps(["Algo placed",placed]))
+
+				# if pipe.poll(0):
+				# 	data = pipe.recv()
+				# 	if data == "Termination":
+				# 		s.send(pickle.dumps(["Termination"]))
+				# 		print("Terminate!")
+
+				# 	part = s.recv(2048)
+				# except:
+				# 	connection = False
+				# 	break
+				# #if not part: break
+				# data.append(part)
+				# if len(part) < 2048:
+				# 	#try to assemble it, if successful.jump. else, get more. 
+				# 	try:
+				# 		k = pickle.loads(b"".join(data))
+				# 		break
+				# 	except:
+				# 		pass
+
+				count+=1
+				print("algo place counts",count)
+			log_print("Main disconnected")
+			pipe.send(["msg","Main disconnected"])
+		except Exception as e:
+			pipe.send(["msg",e])
+			log_print(e)
+
 
 def logging(pipe):
 
@@ -1205,7 +1307,7 @@ if __name__ == '__main__':
 
 	goodtrade_pipe, receive_pipe = multiprocessing.Pipe()
 
-	algo_voxcom = multiprocessing.Process(target=algo_manager_voxcom, args=(receive_pipe,),daemon=True)
+	algo_voxcom = multiprocessing.Process(target=algo_manager_voxcom3, args=(receive_pipe,),daemon=True)
 	algo_voxcom.daemon=True
 
 
