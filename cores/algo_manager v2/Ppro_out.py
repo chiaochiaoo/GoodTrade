@@ -174,7 +174,7 @@ def passive_buy(symbol	,share,price):
 
 	# BATS Buy BATSPostOnly Limit DAY
 	# MEMX Buy MEMX Limit Visible DAY PostOnly
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=BATS Buy BATSPostOnly Limit DAY&shares='+str(share)
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit Visible DAY PostOnly&shares='+str(share)
 	sucess='passive buy limit order success on'+symbol
 	failure="Error passive buy limit order on"+symbol
 
@@ -186,7 +186,7 @@ def passive_sell(symbol	,share,price):
 
 	# MEMX Sell->Short MEMX Limit Visible DAY PostOnly
 	# BATS Sell->Short BATSPostOnly Limit DAY
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=BATS Sell->Short BATSPostOnly Limit DAY&shares='+str(share)
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit Visible DAY PostOnly&shares='+str(share)
 
 	sucess='passive sell limit order success on'+symbol
 	failure="Error passive sell limit order on"+symbol
