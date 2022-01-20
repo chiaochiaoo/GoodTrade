@@ -92,74 +92,81 @@ def algo_manager_commlink(pipe,util_pipe):
 		while Connection:
 			try:
 				#if something comes from pipe.
-				#if pipe.poll(0):
-				data = pipe.recv()
-				#print(data)
 
-				if data[0] == "Orders Request add":
-					order_list.extend(data[1:])
-				elif data[0] == "Orders Request finish":
+				nosend = True
+				if pipe.poll(5):
+					data = pipe.recv()
+					#print(data)
 
-					if len(data)>1:
+					if data[0] == "Orders Request add":
 						order_list.extend(data[1:])
+					elif data[0] == "Orders Request finish":
 
-					#print(order_list)
-					data=pickle.dumps(order_list)
-					try:
-						print(order_list)
-						conn.sendall(data)
-						order_list = ["New order"]
-					except Exception as e:
-						print(e)
-						Connection=False
-						break
-				elif data[0] == "New order":
-					data=pickle.dumps(data)
-					try:
-						conn.sendall(data)
-					except Exception as e:
-						print(e)
-						Connection=False
-						break
-				#if client sends something 
-				#print(2)
-				if Connection:
-					
-					try:
-						ready = select.select([conn], [], [], 0)
+						if len(data)>1:
+							order_list.extend(data[1:])
+
+						#print(order_list)
+						data=pickle.dumps(order_list)
+						try:
+							print(order_list)
+							conn.sendall(data)
+							nosend=False
+							order_list = ["New order"]
+						except Exception as e:
+							print(e)
+							Connection=False
+							break
+					elif data[0] == "New order":
+						data=pickle.dumps(data)
+						try:
+							conn.sendall(data)
+							nosend=False
+						except Exception as e:
+							print(e)
+							Connection=False
+							break
+
+
+					#if client sends something 
+					#print(2)
+					if Connection:
 						
-						if ready[0]:
-							data = []
-							while True:
-								try:
-									part = conn.recv(2048)
-								except:
-									connection = False
-									break
-								#if not part: break
-								data.append(part)
-								if len(part) < 2048:
-									#try to assemble it, if successful.jump. else, get more. 
+						try:
+							ready = select.select([conn], [], [], 0)
+							
+							if ready[0]:
+								data = []
+								while True:
 									try:
-										k = pickle.loads(b"".join(data))
-										break
+										part = conn.recv(2048)
 									except:
-										pass
-							#k is the confirmation from client. send it back to pipe.
+										connection = False
+										break
+									#if not part: break
+									data.append(part)
+									if len(part) < 2048:
+										#try to assemble it, if successful.jump. else, get more. 
+										try:
+											k = pickle.loads(b"".join(data))
+											break
+										except:
+											pass
+								#k is the confirmation from client. send it back to pipe.
 
 
-							print("algo_manager_comms:",pickle.loads(b"".join(data)))
-							if k[0] == "Termination":
-								util_pipe.send(["Termination"])
-								break
-							util_pipe.send(pickle.loads(b"".join(data)))
-					except Exception as e:
-						print(e)
-						Connection= False
+								print("algo_manager_comms:",pickle.loads(b"".join(data)))
+								if k[0] == "Termination":
+									util_pipe.send(["Termination"])
+									break
+								util_pipe.send(pickle.loads(b"".join(data)))
+						except Exception as e:
+							print(e)
+							Connection= False
 
-
+				if nosend:
+					conn.sendall(pickle.dumps(["checking"]))
 				count+=1
-				#print(count)
+				print("algo comm check:",count)
 				#print(3)
 			except Exception as e:
 				print(e)
