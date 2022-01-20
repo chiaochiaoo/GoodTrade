@@ -161,7 +161,7 @@ class TNV_Scanner():
 
 		#ts = timestamp[:]
 
-		print("package arrived at TNVscanner,",timestamp,"system time:",system_ts)
+		print("package arrived at TNVscanner,",timestamp,"system time:",system_ts+1)
 
 
 		#if it is not from the current minute or two, reject. 
