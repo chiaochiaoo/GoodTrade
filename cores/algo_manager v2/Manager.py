@@ -281,7 +281,7 @@ def algo_manager_voxcom3(pipe):
 				# 		pass
 
 				count+=1
-				print("algo place counts",count)
+				#print("algo place counts",count)
 			log_print("Main disconnected")
 			pipe.send(["msg","Main disconnected"])
 		except Exception as e:
