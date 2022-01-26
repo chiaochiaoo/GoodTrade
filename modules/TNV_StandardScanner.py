@@ -41,6 +41,8 @@ class StandardScanner():
 		self.ehour = tk.IntVar(value=14)
 		self.eminute = tk.IntVar(value=00)
 
+		self.rel_v = tk.DoubleVar(value=0)
+		self.re_score = tk.DoubleVar(value=0)
 
 		self.recreate_labels(self.root)
 
@@ -111,11 +113,7 @@ class StandardScanner():
 
 		ttk.Label(frame, text=":").grid(sticky="w",column=col+2,row=row)
 		ttk.Entry(frame, textvariable=self.minute).grid(sticky="w",column=col+3,row=row)
-
-
-		self.rel_v = tk.DoubleVar(value=0)
-		self.re_score = tk.DoubleVar(value=0)
-
+		
 
 
 		row = 3

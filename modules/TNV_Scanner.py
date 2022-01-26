@@ -14,12 +14,15 @@ from tkinter import *
 # from TNV_TFM import *
 # from TNV_StandardScanner import *
 
+
 #from TNV_Trend import *
 #from TNV_OR import *
+
 
 from modules.TNV_PMB import *
 from modules.TNV_TFM import *
 from modules.TNV_StandardScanner import *
+
 
 # from modules.TNV_OR import *
 # from modules.TNV_Trend import *
@@ -174,39 +177,38 @@ class TNV_Scanner():
 
 			filtered_df = data[0]
 
-			#filtered_df.to_csv("tttttttt.csv")
 
 			#print("Current ts:",ts)
-			if ts<570:
-				pb1 =  filtered_df.loc[(filtered_df["SC"]>=1)&(filtered_df["Market Cap"]<=4)]
-				pb2 = filtered_df.loc[(filtered_df["SC"]<=-1)&(filtered_df["Market Cap"]<=4)]
-				
 
-				if len(pb1)+len(pb2)>25:
+			#PB 
+			#if ts<570:
+			pb1 =  filtered_df.loc[(filtered_df["SC"]>=1)&(filtered_df["Market Cap"]<=4)]
+			pb2 = filtered_df.loc[(filtered_df["SC"]<=-1)&(filtered_df["Market Cap"]<=4)]
+			
 
-					#trim pb1 , pb2.
-					pb = pd.concat([pb1,pb2])
-					pb = pb.reindex(pb.SC.abs().sort_values(ascending=False).index)[:30]
-					#print(pb)
+			if len(pb1)+len(pb2)>25:
 
+				#trim pb1 , pb2.
+				pb = pd.concat([pb1,pb2])
+				pb = pb.reindex(pb.SC.abs().sort_values(ascending=False).index)[:30]
+				#print(pb)
 
-				else:
-					pb = pd.concat([pb1,pb2])
-					#just add pb3.
-
-				# pb1 = pb1.sort_values(by=["SC"],ascending=False)[:15]
-				# pb2 = pb2.sort_values(by=["SC"],ascending=True)[:15]
-
-				pb3 = filtered_df.loc[((filtered_df["SC"]<=-5)|(filtered_df["SC"]>=5))&(filtered_df["Market Cap"]==5)&(filtered_df["price"]>=5)][:10]
-				pb = pd.concat([pb,pb3])
-
-				pb = pb.reindex(pb.SC.abs().sort_values(ascending=False).index)[:35]
 
 			else:
+				pb = pd.concat([pb1,pb2])
+				#just add pb3.
 
+			# pb1 = pb1.sort_values(by=["SC"],ascending=False)[:15]
+			# pb2 = pb2.sort_values(by=["SC"],ascending=True)[:15]
 
-				pb = filtered_df.loc[(filtered_df["f5r"]>=1)&(filtered_df["Market Cap"]<=4)]
-				pb = pb.sort_values(by=["f5r"],ascending=False)[:20]
+			pb3 = filtered_df.loc[((filtered_df["SC"]<=-5)|(filtered_df["SC"]>=5))&(filtered_df["Market Cap"]==5)&(filtered_df["price"]>=5)][:10]
+			pb = pd.concat([pb,pb3])
+
+			pb = pb.reindex(pb.SC.abs().sort_values(ascending=False).index)[:35]
+
+			# else:
+			# 	pb = filtered_df.loc[(filtered_df["f5r"]>=1)&(filtered_df["Market Cap"]<=4)]
+			# 	pb = pb.sort_values(by=["f5r"],ascending=False)[:20]
 
 
 			### PRIORITIZE THE SPY500 ###

@@ -28,12 +28,29 @@ class Premarket_breakout():
 		self.labels_width = [9,5,5,5,7,5,5,5,5,5,5,5,8,6,6,6,6]
 		self.labels = ["Symbol","Sector","SC%","Rel.V","Vol","PH","PL","Prange","Listed","Toggle","Add"]
 
+		self.management = tk.StringVar(value="1:2 Exprmntl")
+
 		self.algo_risk = tk.DoubleVar(value=10)
 		self.algo_activate = tk.BooleanVar(value=0)
+
+		self.fade = tk.BooleanVar(value=0)
+
 
 		self.algo_placed = []
 		self.ts_location = 7
 		self.root = root
+
+
+		self.hour = tk.IntVar(value=9)
+		self.minute = tk.IntVar(value=27)
+
+		self.ehour = tk.IntVar(value=10)
+		self.eminute = tk.IntVar(value=30)
+
+		self.rel_v = tk.DoubleVar(value=0)
+		self.re_score = tk.DoubleVar(value=0)
+
+
 		self.recreate_labels(self.root)
 
 
@@ -46,15 +63,14 @@ class Premarket_breakout():
 	def recreate_labels(self,frame):
 
 		self.algo_frame = ttk.LabelFrame(self.root,text="Algo setup")
-		self.algo_frame.place(x=0, rely=0, relheight=0.06, relwidth=1)
+		self.algo_frame.place(x=0, rely=0, relheight=0.2, relwidth=1)
 
 		self.root = ttk.LabelFrame(self.root,text="")
-		self.root.place(x=0, rely=0.12, relheight=0.94, relwidth=1)
+		self.root.place(x=0, rely=0.12, relheight=0.8, relwidth=1)
 
 		self.algo_pannel(self.algo_frame)
 				# self.breakout_frame = ttk.LabelFrame(self.root,text="Volatility Breakout")
 		# self.breakout_frame.place(x=0, rely=0.05, relheight=1, relwidth=0.95)
-
 
 		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
 
@@ -130,26 +146,37 @@ class Premarket_breakout():
 		ttk.Label(frame, text="Risk:").grid(sticky="w",column=col+2,row=row)
 		ttk.Entry(frame, textvariable=self.algo_risk).grid(sticky="w",column=col+3,row=row)
 
+		ttk.Label(frame, text="Management:").grid(sticky="w",column=col+4,row=row)
+		ttk.OptionMenu(frame, self.management,*("","1:2 Exprmntl","FullManual","SemiManual","TrendRider")).grid(sticky="w",column=col+5,row=row)
 
-		# row = 2
+		row = 2
+		col = 1
+
+
+		ttk.Label(frame, text="Deploy at:").grid(sticky="w",column=col,row=row)
+		ttk.Entry(frame, textvariable=self.hour).grid(sticky="w",column=col+1,row=row)
+
+		ttk.Label(frame, text=":").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(frame, textvariable=self.minute).grid(sticky="w",column=col+3,row=row)
+
+
+		
+		row = 2
+		col = 5
+		ttk.Label(frame, text="Fade?:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(frame, variable=self.fade).grid(sticky="w",column=col+1,row=row)
+
+
+		# row = 3
 		# col = 1
-
-		self.hour = tk.IntVar(value=9)
-		self.minute = tk.IntVar(value=24)
-
-		# ttk.Label(frame, text="Start:").grid(sticky="w",column=col,row=row)
-		# ttk.Entry(frame, textvariable=self.hour).grid(sticky="w",column=col+1,row=row)
+		# ttk.Label(frame, text="End").grid(sticky="w",column=col,row=row)
+		# ttk.Entry(frame, textvariable=self.ehour).grid(sticky="w",column=col+1,row=row)
 
 		# ttk.Label(frame, text=":").grid(sticky="w",column=col+2,row=row)
-		# ttk.Entry(frame, textvariable=self.minute).grid(sticky="w",column=col+3,row=row)
+		# ttk.Entry(frame, textvariable=self.eminute).grid(sticky="w",column=col+3,row=row)
 
 
-		# self.rel_v = tk.DoubleVar(value=0)
-		# self.re_score = tk.DoubleVar(value=0)
 
-
-		self.ehour = tk.IntVar(value=9)
-		self.eminute = tk.IntVar(value=29)
 		# row = 3
 		# col = 1
 		# ttk.Label(frame, text="End").grid(sticky="w",column=col,row=row)
