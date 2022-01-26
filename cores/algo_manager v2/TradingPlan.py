@@ -54,6 +54,8 @@ class TradingPlan:
 		self.passive_remaining_shares = 0
 		self.passive_price = 0
 
+		self.passive_boundary = 0
+
 		self.numeric_labels = [ACTRISK,ESTRISK,CUR_PROFIT_LEVEL,CURRENT_SHARE,TARGET_SHARE,INPUT_TARGET_SHARE,AVERAGE_PRICE,LAST_AVERAGE_PRICE,RISK_PER_SHARE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3,FLATTENTIMER,BREAKPRICE,RISKTIMER,FIBCURRENT_MAX,FIBLEVEL1,FIBLEVEL2,FIBLEVEL3,FIBLEVEL4,EXIT,RELOAD_TIMES]
 		self.string_labels = [MIND,STATUS,POSITION,RISK_RATIO,SIZE_IN,ENTRYPLAN,ENTYPE,MANAGEMENTPLAN]
 
@@ -181,6 +183,9 @@ class TradingPlan:
 
 		k = self.symbol.get_bid()//100
 
+		gap = (self.symbol.get_ask() -self.symbol.get_bid())
+		midpoint = round((self.symbol.get_ask() +self.symbol.get_bid())/2,2)
+
 		if k==0: k = 1
 
 		if self.passive_position == BUY :
@@ -207,8 +212,21 @@ class TradingPlan:
 						# sharer = self.passive_remaining_shares- 2*share
 
 						share = self.passive_remaining_shares//2
+						remaning = self.passive_remaining_shares-share
 						#self.ppro_out.send([PASSIVEBUY,self.symbol_name,share,price])
-						self.ppro_out.send([PASSIVEBUY,self.symbol_name,share,price-0.01*k])
+
+						# when big gap, one order on bid, one order on midpoint. 
+						if gap>=0.05:
+							self.ppro_out.send([PASSIVEBUY,self.symbol_name, remaning,price])
+							self.ppro_out.send([PASSIVEBUY,self.symbol_name,share,midpoint])
+							#price-0.01*k
+						# when tight spread. just one on bid. 
+						elif gap<=0.01:
+							self.ppro_out.send([PASSIVEBUY,self.symbol_name,self.passive_remaining_shares,price])
+						else:
+							self.ppro_out.send([PASSIVEBUY,self.symbol_name, remaning,price])
+							self.ppro_out.send([PASSIVEBUY,self.symbol_name,share,round(price+0.01,2)])
+
 						#self.ppro_out.send([PASSIVEBUY,self.symbol_name,sharer,price-0.01*2*k])
 
 			self.passive_price = price			
@@ -229,15 +247,24 @@ class TradingPlan:
 					self.ppro_out.send([PASSIVESELL,self.symbol_name,self.passive_remaining_shares,price])
 				else:
 
-					if self.passive_remaining_shares<=2:
+					if self.passive_remaining_shares<=4:
 						self.ppro_out.send([PASSIVESELL,self.symbol_name,self.passive_remaining_shares,price])
 					else:
 
-						share = self.passive_remaining_shares//3
-						sharer = self.passive_remaining_shares- 2*share
-						self.ppro_out.send([PASSIVESELL,self.symbol_name,share,price])
-						self.ppro_out.send([PASSIVESELL,self.symbol_name,share,price+0.01*k])
-						self.ppro_out.send([PASSIVESELL,self.symbol_name,sharer,price+0.01*2*k])
+						share = self.passive_remaining_shares//2
+						remaning = self.passive_remaining_shares-share
+
+						if gap>=0.05:
+							self.ppro_out.send([PASSIVESELL,self.symbol_name, remaning,price])
+							self.ppro_out.send([PASSIVESELL,self.symbol_name,share,midpoint])
+							#price-0.01*k
+						# when tight spread. just one on bid. 
+						elif gap<=0.01:
+							self.ppro_out.send([PASSIVESELL,self.symbol_name,self.passive_remaining_shares,price])
+						else:
+							self.ppro_out.send([PASSIVESELL,self.symbol_name, remaning,price])
+							self.ppro_out.send([PASSIVESELL,self.symbol_name,share,round(price-0.01,2)])
+
 
 			self.passive_price = price
 	#if the price is 2C away. chase it.
