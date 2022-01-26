@@ -378,7 +378,7 @@ class Manager:
 
 		try:
 			if symbol not in self.symbols:
-				if self.ui.algo_count_number.get()<50:
+				if self.ui.algo_count_number.get()<60:
 					#print(symbol,self.ui.algo_count_number.get())
 					self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats)  #register in Symbol.
 
