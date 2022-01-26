@@ -253,10 +253,12 @@ class TNV_Scanner():
 			# self.near_low.update_entry(at_low)
 			# self.near_high.update_entry(at_high)
 
-			if ts<570:
-				self.pmb.update_entry(pb)
-			else:
-				self.pmb.update_entry2(pb)
+			# if ts<570:
+				
+			# else:
+			# 	self.pmb.update_entry2(pb)
+
+			self.pmb.update_entry(pb)
 
 			self.open_reversal.update_entry(openreverse)
 			self.trending.update_entry(trending)
