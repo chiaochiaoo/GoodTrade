@@ -590,7 +590,7 @@ class Open_high(StandardScanner):
 
 		
 		self.labels_width = [9,6,5,8,5,5,6,6,6,6,6,6,8,6]
-		self.labels = ["Symbol","Sector","OH","Rel.V","E21T","E21C","SO%","SC%","listed","Add"]
+		self.labels = ["Symbol","Sector","OH","Rel.V","E45T","E45C","SO%","SC%","listed","Add"]
 		self.total_len = len(self.labels)
 		self.tnv_scanner = tnv
 		super().__init__(root,NT)
@@ -621,8 +621,8 @@ class Open_high(StandardScanner):
 				# near = row['rangescore']
 				# high = row['high']
 
-				e21t = row['ema21time']
-				e21c = row['ema21change']
+				e21t = row['ema45time']
+				e21c = row['ema45change']
 
 				oh = row["oh"]
 				so = row['SO']
@@ -694,7 +694,7 @@ class Open_low(StandardScanner):
 
 		
 		self.labels_width = [9,6,5,8,5,5,6,6,6,6,6,6,8,6]
-		self.labels = ["Symbol","Sector","OL","Rel.V","E21T","E21C","SO%","SC%","listed","Add"]
+		self.labels = ["Symbol","Sector","OL","Rel.V","E45T","E45C","SO%","SC%","listed","Add"]
 		self.total_len = len(self.labels)
 		self.tnv_scanner = tnv
 		super().__init__(root,NT)
@@ -725,8 +725,8 @@ class Open_low(StandardScanner):
 				# near = row['rangescore']
 				# high = row['high']
 
-				e21t = row['ema21time']
-				e21c = row['ema21change']
+				e21t = row['ema45time']
+				e21c = row['ema45change']
 
 				oh = row["ol"]
 				so = row['SO']
