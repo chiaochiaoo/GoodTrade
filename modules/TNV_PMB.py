@@ -128,10 +128,10 @@ class Premarket_breakout():
 			for i in range(len(lst)):
 
 				if lst[i]["side"]=="UP":
-					order.append([" BreakUp",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"Notdeploy",management])
+					order.append([" BreakUp",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy",management])
 
 				elif lst[i]["side"]=="DOWN":
-					order.append([" BreakDn",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"Notdeploy",management])
+					order.append([" BreakDn",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy",management])
 
 
 			self.tnv_scanner.send_algo(order)
