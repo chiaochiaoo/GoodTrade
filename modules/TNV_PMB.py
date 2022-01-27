@@ -226,8 +226,8 @@ class Premarket_breakout():
 			self.l+=1
 
 
-	def deploy_now(self):
-		
+	#def deploy_now(self):
+
 	def update_entry(self,data):
 
 		#at most 8.
