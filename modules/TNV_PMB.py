@@ -111,10 +111,10 @@ class Premarket_breakout():
 
 			if side =="UP":
 
-				info = ["New order",[" BreakUp",symbol,support-change,resistence,risk,{},"Notdeploy","TrendRider"]]
+				info = ["New order",[" BreakUp",symbol,support-change,resistence,risk,{},"deploy","TrendRider"]]
 				#print("sending",info)
 			else:
-				info = ["New order",[" BreakDn",symbol,support,resistence+change,risk,{},"Notdeploy","TrendRider"]]
+				info = ["New order",[" BreakDn",symbol,support,resistence+change,risk,{},"deploy","TrendRider"]]
 			self.tnv_scanner.send_algo(info)
 
 
@@ -167,8 +167,9 @@ class Premarket_breakout():
 		ttk.Checkbutton(frame, variable=self.fade).grid(sticky="w",column=col+1,row=row)
 
 
-		# row = 3
-		# col = 1
+		row = 3
+		col = 1
+		ttk.Button(frame,text="Deploy now",command=self.rank).grid(sticky="w",column=col,row=row)
 		# ttk.Label(frame, text="End").grid(sticky="w",column=col,row=row)
 		# ttk.Entry(frame, textvariable=self.ehour).grid(sticky="w",column=col+1,row=row)
 
@@ -224,6 +225,9 @@ class Premarket_breakout():
 				# 	self.b.grid_remove()
 			self.l+=1
 
+
+	def deploy_now(self):
+		
 	def update_entry(self,data):
 
 		#at most 8.
