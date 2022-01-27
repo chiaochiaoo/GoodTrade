@@ -167,9 +167,9 @@ class Premarket_breakout():
 		ttk.Checkbutton(frame, variable=self.fade).grid(sticky="w",column=col+1,row=row)
 
 
-		row = 3
-		col = 1
-		ttk.Button(frame,text="Deploy now",command=self.rank).grid(sticky="w",column=col,row=row)
+		# row = 3
+		# col = 1
+		# ttk.Button(frame,text="Deploy now",command=self.rank).grid(sticky="w",column=col,row=row)
 		# ttk.Label(frame, text="End").grid(sticky="w",column=col,row=row)
 		# ttk.Entry(frame, textvariable=self.ehour).grid(sticky="w",column=col+1,row=row)
 
