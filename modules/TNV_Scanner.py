@@ -182,8 +182,8 @@ class TNV_Scanner():
 
 			#PB 
 			#if ts<570:
-			pb1 =  filtered_df.loc[(filtered_df["SC"]>=1)&(filtered_df["Market Cap"]<=4)]
-			pb2 = filtered_df.loc[(filtered_df["SC"]<=-1)&(filtered_df["Market Cap"]<=4)]
+			pb1 =  filtered_df.loc[(filtered_df["SC"]>=1)&(filtered_df["Market Cap"]<=4)&(filtered_df["price"]<=filtered_df["ph"])&(filtered_df["price"]>=filtered_df["pl"])]
+			pb2 = filtered_df.loc[(filtered_df["SC"]<=-1)&(filtered_df["Market Cap"]<=4)&(filtered_df["price"]<=filtered_df["ph"])&(filtered_df["price"]>=filtered_df["pl"])]
 			
 
 			if len(pb1)+len(pb2)>25:
@@ -201,7 +201,8 @@ class TNV_Scanner():
 			# pb1 = pb1.sort_values(by=["SC"],ascending=False)[:15]
 			# pb2 = pb2.sort_values(by=["SC"],ascending=True)[:15]
 
-			pb3 = filtered_df.loc[((filtered_df["SC"]<=-5)|(filtered_df["SC"]>=5))&(filtered_df["Market Cap"]==5)&(filtered_df["price"]>=5)][:10]
+
+			pb3 = filtered_df.loc[((filtered_df["SC"]<=-5)|(filtered_df["SC"]>=5))&(filtered_df["Market Cap"]==5)&(filtered_df["price"]>=5)&(filtered_df["price"]<=filtered_df["ph"])&(filtered_df["price"]>=filtered_df["pl"])][:10]
 			pb = pd.concat([pb,pb3])
 
 			pb = pb.reindex(pb.SC.abs().sort_values(ascending=False).index)[:35]
