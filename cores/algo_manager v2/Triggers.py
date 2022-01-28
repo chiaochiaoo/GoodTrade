@@ -1506,14 +1506,14 @@ class TwoToOneTrigger(AbstractTrigger):
 			#BREAK EVEN
 
 			new_stop =round(self.tradingplan.data[AVERAGE_PRICE],2)
-			#self.bring_up_stop(new_stop)
+			self.bring_up_stop(new_stop)
 
 			self.set_mind("Break even",GREEN)
 
 		if self.strategy.orders_level == 4:
 
 			new_stop =round(self.tradingplan.data[AVERAGE_PRICE],2)
-			#self.bring_up_stop(new_stop)
+			self.bring_up_stop(new_stop)
 
 			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
 			self.tradingplan.current_price_level = 2
@@ -1523,7 +1523,7 @@ class TwoToOneTrigger(AbstractTrigger):
 			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
 
 			new_stop =round(self.tradingplan.data[TRIGGER_PRICE_3],2)
-			#self.bring_up_stop(new_stop)
+			self.bring_up_stop(new_stop)
 			
 		if self.strategy.orders_level == 6:
 			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
