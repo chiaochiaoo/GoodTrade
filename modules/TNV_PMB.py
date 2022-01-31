@@ -44,8 +44,8 @@ class Premarket_breakout():
 		self.hour = tk.IntVar(value=9)
 		self.minute = tk.IntVar(value=27)
 
-		self.ehour = tk.IntVar(value=10)
-		self.eminute = tk.IntVar(value=00)
+		self.ehour = tk.IntVar(value=9)
+		self.eminute = tk.IntVar(value=40)
 
 		self.rel_v = tk.DoubleVar(value=0)
 		self.re_score = tk.DoubleVar(value=0)
