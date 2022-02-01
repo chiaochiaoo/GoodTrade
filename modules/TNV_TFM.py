@@ -32,7 +32,7 @@ class TFM():
 
 		self.side_options = ("Long", "Short")
 		self.type_options = ("Rightaway","Target")
-		self.management_options = ("1:2 Exprmntl","Fib Only","SemiManual","FullManual")
+		self.management_options = ("1:2 Exprmntl","1:2 Wide","Fib Only","SemiManual","FullManual")
 
 		self.algo_placed = []
 		self.ts_location = 7
