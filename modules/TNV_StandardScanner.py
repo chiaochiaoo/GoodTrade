@@ -34,7 +34,7 @@ class StandardScanner():
 		self.algo_risk = tk.DoubleVar(value=5)
 		self.algo_activate = tk.BooleanVar(value=0)
 
-		self.management = tk.StringVar(value="1:2 Exprmntl")
+		self.management = tk.StringVar(value="1:2 Wide")
 
 		self.hour = tk.IntVar(value=9)
 		self.minute = tk.IntVar(value=30)
@@ -102,7 +102,7 @@ class StandardScanner():
 		ttk.Entry(frame, textvariable=self.algo_risk).grid(sticky="w",column=col+3,row=row)
 
 		ttk.Label(frame, text="Management:").grid(sticky="w",column=col+4,row=row)
-		ttk.OptionMenu(frame, self.management,*("","1:2 Exprmntl","FullManual","SemiManual","TrendRider")).grid(sticky="w",column=col+5,row=row)
+		ttk.OptionMenu(frame, self.management,*("","1:2 Exprmntl","1:2 Wide","FullManual","SemiManual","TrendRider")).grid(sticky="w",column=col+5,row=row)
 
 		row = 2
 		col = 1
