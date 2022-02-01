@@ -156,8 +156,8 @@ def fetch_data(symbol):
 			lst=line.split(",")
 			range_.append(float(lst[H])-float(lst[L]))
 
-			oh = float(lst[H])-float(lst[O])
-			ol = float(lst[O])-float(lst[L])
+			oh = np.log(float(lst[H]))-np.log(float(lst[O]))
+			ol = np.log(float(lst[O]))-np.log(float(lst[L]))
 			if oh>ol:
 				openhigh_.append(oh)
 			else:
@@ -176,6 +176,8 @@ def fetch_data(symbol):
 
 			prev_close = float(lst[C])
 
+		openhigh_ = np.array(openhigh_)*prev_close
+		openlow_ = np.array(openlow_)*prev_close
 		openhigh_range=str(round(min(openhigh_),3))+"-"+str(round(max(openhigh_),3))
 		openlow_range=str(round(min(openlow_),3))+"-"+str(round(max(openlow_),3))
 		range_range=str(round(min(range_),3))+"-"+str(round(max(range_),3))
