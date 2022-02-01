@@ -227,7 +227,7 @@ def algo_server(ulti_response):
 	while True:
 
 		try:
-			HOST = '10.29.10.133'  # The server's hostname or IP address
+			HOST = '10.29.10.132'  # The server's hostname or IP address
 			PORT = 65425       # The port used by the server
 
 			print("Trying to connect to the Algo server")
