@@ -150,6 +150,7 @@ THREE_TARGETS = "Three tgts "
 SMARTTRAIL =  "SmartTrail"
 ANCARTMETHOD =  "AC METHOD"
 ONETOTWORISKREWARD = "1:2 Exprmntl"
+ONETOTWOWIDE = "1:2 Wide"
 HOLDTILCLOSE = "HTC"
 
 FULLMANUAL = "FullManual"
@@ -213,7 +214,7 @@ STRONGRED = "#FC433D"
 DEEPGREEN = "#059a12"
 
 
-			
+print("12:42:53"[6:8])
 	# def deploy_orders(self,orders):
 
 	# 	coefficient = 1

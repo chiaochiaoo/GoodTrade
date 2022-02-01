@@ -883,6 +883,9 @@ class TradingPlan:
 		elif manage_plan == ONETOTWORISKREWARD:
 			self.set_ManagementStrategy(OneToTWORiskReward(self.symbol,self))
 
+		elif manage_plan == ONETOTWOWIDE:
+			self.set_ManagementStrategy(OneToTwoWideStop(self.symbol,self))
+
 		elif manage_plan == ONETOTWORISKREWARDOLD:
 			self.set_ManagementStrategy(OneToTWORiskReward_OLD(self.symbol,self))
 		elif manage_plan == FIBO:
