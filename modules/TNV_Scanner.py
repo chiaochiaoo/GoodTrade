@@ -164,7 +164,7 @@ class TNV_Scanner():
 
 		#ts = timestamp[:]
 
-		print("package arrived at TNVscanner,",timestamp,"system time:",system_ts+1)
+		#print("package arrived at TNVscanner,",timestamp,"system time:",system_ts+1)
 
 
 		#if it is not from the current minute or two, reject. 
@@ -268,7 +268,7 @@ class TNV_Scanner():
 			self.ol.update_entry(ol)
 			self.rrvol.update_entry(rrvol)
 
-			print("package at TNVscanner fully processed,",timestamp)
+			#print("package at TNVscanner fully processed,",timestamp)
 		else:
 			print("receiving old package.")
 
