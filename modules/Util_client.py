@@ -224,6 +224,9 @@ def algo_server(ulti_response):
 
 	k=""
 	counter = 0
+
+	ts = 0
+
 	while True:
 
 		try:
@@ -254,11 +257,14 @@ def algo_server(ulti_response):
 				data = []
 				while True:
 
-					try:
-						s.sendall("requesting update".encode())
-					except:
-						connection = False
-						break
+					now  = datetime.now()
+
+					if now.hour*3600+now.minute *60+now.second - ts>10:
+						try:
+							s.sendall("requesting update".encode())
+						except:
+							connection = False
+							break
 
 					ready = select.select([s], [], [],10)
 					if ready[0]:
@@ -282,8 +288,10 @@ def algo_server(ulti_response):
 
 						#problem. when a dead package is received, it will destroy the system.
 
-						print(datetime.now().strftime("%H:%M:%S : ") ,"Algo update")
+						print(datetime.now().strftime("%H:%M:%S : ") ,"Algo update, package ts:",k[1][1])
 
+						now  = datetime.now()
+						ts = now.hour*3600+now.minute *60+now.second
 						ulti_response.send(k)
 
 					else:
