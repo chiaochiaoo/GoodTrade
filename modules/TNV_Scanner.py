@@ -169,7 +169,9 @@ class TNV_Scanner():
 
 		#if it is not from the current minute or two, reject. 
 		# if the package is old. skip.
-		if ts >=system_ts and timestamp!= self.current_ts:
+		#if ts >=system_ts and timestamp!= self.current_ts:
+
+		if 1:
 
 			self.current_ts = timestamp
 			self.NT_stat["text"] = "Last update: "+timestamp
