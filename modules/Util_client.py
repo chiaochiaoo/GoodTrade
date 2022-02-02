@@ -255,12 +255,12 @@ def algo_server(ulti_response):
 				while True:
 
 					try:
-						s.sendall(pickle.dumps(['connection check']))
+						s.sendall("requesting update".encode())
 					except:
 						connection = False
 						break
 
-					ready = select.select([s], [], [],1)
+					ready = select.select([s], [], [],10)
 					if ready[0]:
 						data = []
 						while True:
@@ -281,19 +281,15 @@ def algo_server(ulti_response):
 									pass
 
 						#problem. when a dead package is received, it will destroy the system.
-						time_ = datetime.now().strftime("%H:%M:%S : ") 
 
-						print(time_,"Algo update")
+						print(datetime.now().strftime("%H:%M:%S : ") ,"Algo update")
 
 						ulti_response.send(k)
 
 					else:
 
 						counter+=1
-
-						if counter%10==0:
-							time_ = datetime.now().strftime("%H:%M:%S : ") 
-							print(time_,"No algo update")
+						print( datetime.now().strftime("%H:%M:%S : ") ,"No algo update")
 
 
 					#ulti_response.send(["Util init"])
@@ -395,73 +391,6 @@ def util_comms(ulti_response): #connects to server for db, nt, and finviz.
 
 if __name__ == '__main__':
 
-	while True:
 
-		HOST = '10.29.10.132'  # The server's hostname or IP address
-		PORT = 65424       # The port used by the server
-
-
-		print("Trying to connect to the Util server")
-		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		connected = False
-
-		reg_list = ["Database Request"]
-		while not connected:
-			try:
-				s.connect((HOST, PORT))
-				connected = True
-			except:
-				#pipe.send(["msg","Cannot connected. Try again in 2 seconds."])
-				print("Cannot connect Util server. Try again in 2 seconds.")
-				time.sleep(2)
-
-		connection = True
-		s.setblocking(0)
-		print("Util server Connection Successful")
-		#ulti_response.send(["Util init"])
-		while connection:
-			print("Util server: taking data")
-			while True:
-
-				try:
-					s.send(b'alive check')
-				except:
-					connection = False
-					print("server disconection detected")
-					break
-
-				# ready = select.select([s], [], [], 1)
-				# if ready[0]:
-				# 	data = []
-				# 	while True:
-
-				# 		try:
-				# 			part = s.recv(2048)
-				# 		except:
-				# 			connection = False
-				# 			break
-
-				# 		data.append(part)
-				# 		if len(part) < 2048:
-							
-				# 			try:
-				# 				k = pickle.loads(b"".join(data))
-				# 				break
-				# 			except:
-				# 				pass
-				# 			print("received:",k)
-				# 	#ulti_response.send(k)
-
-				try:
-					s.send(pickle.dumps(["Database Request","PTON.NQ"]))
-					print("send")
-				except Exception as e:
-					print(e)
-					connection = False
-					break
-				time.sleep(1)
-				#ulti_response.send(["Util init"])
-		print("Server disconnected")
-
-
+	algo_server(None)
 
