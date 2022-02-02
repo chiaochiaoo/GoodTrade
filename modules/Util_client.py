@@ -134,7 +134,7 @@ class util_client:
 			try:
 				if len(d)>0:
 
-					print(d[0])
+					#print(d[0])
 					######### SCANNER PART ############
 					# if d[0]=="Database Request":
 					# 	print("send: ",d)
