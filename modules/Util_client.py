@@ -227,7 +227,12 @@ def algo_server(ulti_response):
 
 	ts = 0
 
+
+	reception = 0
+
+
 	while True:
+
 
 		try:
 			HOST = '10.29.10.132'  # The server's hostname or IP address
@@ -247,7 +252,7 @@ def algo_server(ulti_response):
 					time.sleep(5)
 
 			connection = True
-			s.setblocking(0)
+			#s.setblocking(0)
 
 			print("Algo server Connection Successful")
 
@@ -261,7 +266,7 @@ def algo_server(ulti_response):
 
 					if now.hour*3600+now.minute *60+now.second - ts>10:
 						try:
-							s.sendall("requesting update".encode())
+							s.sendall("algo requesting update".encode())
 						except:
 							connection = False
 							break
@@ -300,7 +305,7 @@ def algo_server(ulti_response):
 						print( datetime.now().strftime("%H:%M:%S : ") ,"No algo update")
 
 
-					time.sleep(1)
+					
 					#ulti_response.send(["Util init"])
 			print("Algo Server disconnected")
 		except Exception as e:
