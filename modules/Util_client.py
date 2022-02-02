@@ -227,7 +227,7 @@ def algo_server(ulti_response):
 
 	ts = 0
 
-
+	package_ts = 0
 	reception = 0
 
 
@@ -257,52 +257,49 @@ def algo_server(ulti_response):
 			print("Algo server Connection Successful")
 
 			while connection:
-				print("Algo server: taking data")
 
-				data = []
-				while True:
+				now  = datetime.now()
 
-					now  = datetime.now()
+				if now.hour*3600+now.minute *60+now.second - ts>10:
+					try:
+						s.sendall("algo requesting update".encode())
+					except:
+						connection = False
+						break
 
-					if now.hour*3600+now.minute *60+now.second - ts>10:
+				ready = select.select([s], [], [],10)
+				if ready[0]:
+					data = []
+					while True:
+
 						try:
-							s.sendall("algo requesting update".encode())
+							part = s.recv(2048)
 						except:
 							connection = False
 							break
 
-					ready = select.select([s], [], [],10)
-					if ready[0]:
-						data = []
-						while True:
-
+						data.append(part)
+						if len(part) < 2048:
+							
 							try:
-								part = s.recv(2048)
-							except:
-								connection = False
+								k = pickle.loads(b"".join(data))
 								break
+							except:
+								pass
 
-							data.append(part)
-							if len(part) < 2048:
-								
-								try:
-									k = pickle.loads(b"".join(data))
-									break
-								except:
-									pass
+					#problem. when a dead package is received, it will destroy the system.
 
-						#problem. when a dead package is received, it will destroy the system.
+					print(datetime.now().strftime("%H:%M:%S : ") ,"Algo update, package ts:",k[1][1])
 
-						print(datetime.now().strftime("%H:%M:%S : ") ,"Algo update, package ts:",k[1][1])
+					now  = datetime.now()
+					ts = now.hour*3600+now.minute *60+now.second
+					package_ts = k[1][2]
+					ulti_response.send(k)
 
-						now  = datetime.now()
-						ts = now.hour*3600+now.minute *60+now.second
-						ulti_response.send(k)
+				else:
 
-					else:
-
-						counter+=1
-						print( datetime.now().strftime("%H:%M:%S : ") ,"No algo update")
+					counter+=1
+					print( datetime.now().strftime("%H:%M:%S : ") ,"No algo update")
 
 
 					
