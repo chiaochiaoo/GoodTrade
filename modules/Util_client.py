@@ -228,7 +228,7 @@ def algo_server(ulti_response):
 	ts = 0
 
 	package_ts = 0
-	reception = 0
+	package_reception = 0
 
 
 	while True:
@@ -293,13 +293,24 @@ def algo_server(ulti_response):
 					print(now.strftime("%H:%M:%S : ") ,"Algo update, package ts:",k[1][1])
 
 					ts = now.hour*3600+now.minute *60+now.second
-					package_ts = k[1][2]
-					ulti_response.send(k)
 
-				else:
+					if package_ts != k[1][2]:
+						package_ts = k[1][2]
+						package_reception = 0
 
-					counter+=1
-					print( datetime.now().strftime("%H:%M:%S : ") ,"No algo update")
+						ulti_response.send(k)
+					else:
+						package_reception+=1
+
+						print(now.strftime("%H:%M:%S : ") ,"older package received:",k[1][1])
+
+						if package_reception>5:
+							break
+
+				# else:
+
+				# 	counter+=1
+				# 	print( datetime.now().strftime("%H:%M:%S : ") ,"No algo update")
 
 
 					
