@@ -562,7 +562,7 @@ def load_historical_data(symbol,database):
 				d[key] = item 
 
 			d["historical_data_loaded"] = True
-			print(symbol,"loaded successful")
+			#print(symbol,"loaded successful")
 		# else:
 			
 		# 	if d["requested_time"]<5:
