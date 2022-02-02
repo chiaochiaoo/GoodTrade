@@ -300,6 +300,7 @@ def algo_server(ulti_response):
 						print( datetime.now().strftime("%H:%M:%S : ") ,"No algo update")
 
 
+					time.sleep(1)
 					#ulti_response.send(["Util init"])
 			print("Algo Server disconnected")
 		except Exception as e:
