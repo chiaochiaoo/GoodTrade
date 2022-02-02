@@ -263,6 +263,7 @@ def algo_server(ulti_response):
 				if now.hour*3600+now.minute *60+now.second - ts>10:
 					try:
 						s.sendall("algo requesting update".encode())
+						print(now.strftime("%H:%M:%S : ") ,"Algo requesting update:")
 					except:
 						connection = False
 						break
@@ -289,9 +290,8 @@ def algo_server(ulti_response):
 
 					#problem. when a dead package is received, it will destroy the system.
 
-					print(datetime.now().strftime("%H:%M:%S : ") ,"Algo update, package ts:",k[1][1])
+					print(now.strftime("%H:%M:%S : ") ,"Algo update, package ts:",k[1][1])
 
-					now  = datetime.now()
 					ts = now.hour*3600+now.minute *60+now.second
 					package_ts = k[1][2]
 					ulti_response.send(k)
