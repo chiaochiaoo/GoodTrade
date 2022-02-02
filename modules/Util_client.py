@@ -62,7 +62,7 @@ class util_client:
 		file = "data/"+symbol[:-3]+"_"+self.today+".txt"
 
 		if os.path.isfile(file):
-			print(symbol,"already exisit, loading local copy instd.")
+			#print(symbol,"already exisit, loading local copy instd.")
 			with open(file) as json_file:
 				d = json.load(json_file)
 
@@ -88,7 +88,7 @@ class util_client:
 			file = "data/"+symbol[:-3]+"_"+self.today+".txt"
 
 			if os.path.isfile(file):
-				print(symbol,"already exisit, loading local copy instd.")
+				#print(symbol,"already exisit, loading local copy instd.")
 				with open(file) as json_file:
 					d = json.load(json_file)
 
@@ -110,7 +110,7 @@ class util_client:
 		file = "data/"+symbol+"_"+self.today+".txt"
 
 		if os.path.isfile(file):
-			print(symbol,"already exisit, loading local copy instd.")
+			#print(symbol,"already exisit, loading local copy instd.")
 			with open(file) as json_file:
 				d = json.load(json_file)
 
