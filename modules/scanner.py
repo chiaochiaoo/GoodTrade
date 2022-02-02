@@ -370,7 +370,7 @@ class scanner(pannel):
 
 			self.change_sorting_order("status")
 
-		print(self.status_code)
+		#print(self.status_code)
 
 	def close_button(self):
 		if self.close_sort==True:
@@ -697,7 +697,7 @@ class scanner(pannel):
 		self.nasdaq_trader_created = True
 		self.rebind(self.NT_scanner_canvas,self.NT_scanner_frame)
 
-		print("pannel created")
+		#print("pannel created")
 
 	def add_nasdaq_labels_update(self):
 
@@ -820,7 +820,7 @@ class scanner(pannel):
 							self.nasdaq_trader_symbols_ranking[symbol] = rank
 							self.nasdaq_trader_symbols.append(symbol)
 							self.nasdaq[i][j]["command"] = lambda k=symbol: self.tickers_manager.add_symbol_reg_list(k)
-			print("pannel updated")
+			#print("pannel updated")
 	#This is where every update comes in. 
 
 
@@ -869,7 +869,7 @@ class scanner(pannel):
 
 	def add_nasdaq_labels(self,data):
 
-		print("receive new data")
+		#print("receive new data")
 
 		now = datetime.now()
 		ts = now.hour*60 + now.minute
