@@ -398,8 +398,8 @@ def utils(algo_manager_receive_comm,util_response):
 		algo_comm = threading.Thread(target=algo_manager_commlink,args=(algo_manager_receive_comm,util_response,),daemon=True)
 		algo_comm.start()
 
-		receiver = threading.Thread(target=algo_server,args=(util_response,),daemon=True)
-		receiver.start()
+		# receiver = threading.Thread(target=algo_server,args=(util_response,),daemon=True)
+		# receiver.start()
 
 		db = threading.Thread(target=database_service,args=(util_response,),daemon=True)
 		db.start()
@@ -450,7 +450,7 @@ if __name__ == '__main__':
 
 
 	root = tk.Tk() 
-	root.title("GoodTrade v523") 
+	root.title("GoodTrade v524") 
 	root.geometry("1800x900")
 	root.minsize(1500, 600)
 	root.maxsize(3000, 1500)
@@ -464,6 +464,9 @@ if __name__ == '__main__':
 	# receiver = multiprocessing.Process(target=algo_server,args=(util_response,),daemon=True)
 	# receiver.daemon=True
 
+	algo_connection = multiprocessing.Process(target=algo_server, args=(util_response,),daemon=True)
+	algo_connection.daemon=True
+	
 
 	root.protocol("WM_DELETE_WINDOW", on_closing)
 
@@ -474,6 +477,9 @@ if __name__ == '__main__':
 	process_ppro.daemon=True
 	process_ppro.start()
 	ppro = ppro_process_manager(request_pipe)
+
+
+
 	
 	view = viewer(root,util_process,ppro,algo_manager_process_comm,authen_clientside_comm,util_request)
 	
@@ -483,7 +489,7 @@ if __name__ == '__main__':
 	
 
 	utility.start()
-
+	algo_connection.start()
 
 
 	root.mainloop()

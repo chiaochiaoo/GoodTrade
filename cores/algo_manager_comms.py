@@ -166,7 +166,9 @@ def algo_manager_commlink(pipe,util_pipe):
 				if nosend:
 					conn.sendall(pickle.dumps(["checking"]))
 				count+=1
-				print("algo comm check:",count)
+				
+				now  = datetime.now()
+				print(now.strftime("%H:%M:%S : "),"algo comm check:",count)
 				#print(3)
 			except Exception as e:
 				print(e)
