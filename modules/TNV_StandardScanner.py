@@ -35,6 +35,7 @@ class StandardScanner():
 		self.algo_activate = tk.BooleanVar(value=0)
 
 		self.management = tk.StringVar(value="1:2 Wide")
+		self.fade = tk.BooleanVar(value=0)
 
 		self.hour = tk.IntVar(value=9)
 		self.minute = tk.IntVar(value=30)
@@ -127,6 +128,10 @@ class StandardScanner():
 		self.side_ = tk.StringVar(value='x')
 		self.listed_ = tk.BooleanVar(value=False)
 		
+		row = 2
+		col = 5
+		ttk.Label(frame, text="Fade?:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(frame, variable=self.fade).grid(sticky="w",column=col+1,row=row)
 		# row = 4
 		# col = 1
 
