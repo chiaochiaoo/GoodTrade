@@ -39,8 +39,6 @@ def ts_to_min(ts):
 
 	return str(m)+":"+str(s)
 
-
-
 class TNV_Scanner():
 
 	def __init__(self,root,NT,commlink,data):
@@ -591,11 +589,9 @@ class Open_Reversal(StandardScanner):
 			if len(send_algo)>0:
 				self.send_group_algos(send_algo)
 
-
 class Open_high(StandardScanner):
 	def __init__(self,root,NT,tnv):
 
-		
 		self.labels_width = [9,6,5,8,5,5,6,6,6,6,6,6,8,6]
 		self.labels = ["Symbol","Sector","OH","Rel.V","E45T","E45C","SO%","SC%","listed","Add"]
 		self.total_len = len(self.labels)
@@ -617,6 +613,7 @@ class Open_high(StandardScanner):
 		algo_timer = self.hour.get()*60 + self.minute.get()
 		end_timer = self.ehour.get()*60 + self.eminute.get()
 
+		#print("fade:",self.fade.get())
 		send_algo = []
 		if 1:
 			for index, row in df.iterrows():
@@ -659,24 +656,34 @@ class Open_high(StandardScanner):
 										
 
 						send = False
-
+						fade = self.fade.get()
 						order = {}
 						order["symbol"] = rank
 
 						if row['ema45change']<=-25 and row['oh']>=1:
 
-							order["support"] = row['price']	
-							order["resistence"] = row['high']+0.03
-							order["side"] = "DOWN"	
+
+							if fade==True:
+								order["support"] = row['price']	- (row['high']-row['price'])
+								order["resistence"] = row['price']
+								order["side"] = "UP"	
+							else:
+								order["support"] = row['price']	 
+								order["resistence"] = row['high']+0.03
+								order["side"] = "DOWN"	
 							self.algo_placed.append(trade)		
 							send=True
 
-						if row['ema45change']<=-50 and row['oh']>=0.8:
+						if row['ema45change']<=-50 and row['oh']>=1:
 
-
-							order["support"] = row['price']	
-							order["resistence"] = row['high']+0.03
-							order["side"] = "DOWN"
+							if fade==True:
+								order["support"] = row['price']	- (row['high']-row['price'])
+								order["resistence"] = row['price']
+								order["side"] = "UP"	
+							else:
+								order["support"] = row['price']	
+								order["resistence"] = row['high']+0.03
+								order["side"] = "DOWN"
 							self.algo_placed.append(trade)			
 							send=True				
 
@@ -694,7 +701,6 @@ class Open_high(StandardScanner):
 			self.send_group_algos(send_algo)
 		# except Exception as e:
 		# 	print("TNV scanner construction near high:",e)
-
 
 class Open_low(StandardScanner):
 	def __init__(self,root,NT,tnv):
@@ -760,15 +766,20 @@ class Open_low(StandardScanner):
 
 						order = {}
 						order["symbol"] = rank
-
+						fade = self.fade.get()
 						if row['ema45change']>=25 and row['ol']>=1:
 
-							order["support"] = row['low'] -0.03	
-							order["resistence"] = row['price']	
-							order["side"] = "UP"			
+							if fade==1:
+								order["support"] =  row['price']	 
+								order["resistence"] = row['price'] + (row['price']-row['low'])
+								order["side"] = "DOWN"
+							else:	
+								order["support"] = row['low'] -0.03	
+								order["resistence"] = row['price']	
+								order["side"] = "UP"			
 							send=True
 							self.algo_placed.append(trade)	
-						if row['ema45change']>=50 and row['ol']>=0.8:
+						if row['ema45change']>=50 and row['ol']>=1:
 
 
 							order["support"] = row['low']- 0.03
@@ -795,7 +806,6 @@ class Open_low(StandardScanner):
 			self.send_group_algos(send_algo)
 		# except Exception as e:
 		# 	print("TNV scanner construction near high:",e)
-
 
 class ADX(StandardScanner):
 	def __init__(self,root,NT,TNV):
@@ -942,7 +952,6 @@ class ADX(StandardScanner):
 	# 		else:
 	# 			info = ["New order",[" BreakDn",symbol,support,resistence,risk,{},"deploy","TrendRider"]]
 	# 		self.tnv_scanner.send_algo(info)
-
 
 def ratio_compute(n):
 
