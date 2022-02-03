@@ -100,16 +100,17 @@ def database_handler(symbols):
 					success = True
 			except Exception as e:
 				fail +=1
-				print("fetching failure..retrying.",e,symbol)
+				#print("fetching failure..retrying.",e,symbol)
 				time.sleep(4)
 				if fail >=15:
 					break
 			if success:
-				print(i,"download success")
+				#print(i,"download success")
 				with open(file, 'w') as outfile:
 					json.dump(data, outfile)
 			else:
-				print(i,"download failed")
+				pass
+				#print(i,"download failed")
 
 	return total
 
