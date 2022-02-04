@@ -120,6 +120,13 @@ class Premarket_breakout():
 
 	def send_group_algos(self,lst):
 
+		now = datetime.now()
+		ts = now.hour*60+now.minute
+
+		status=""
+		if ts>=570:
+			status = "deploy"
+
 		risk = self.algo_risk.get()
 		management = self.management.get()
 		#print("HELLO.",lst)
@@ -128,10 +135,10 @@ class Premarket_breakout():
 			for i in range(len(lst)):
 
 				if lst[i]["side"]=="UP":
-					order.append([" BreakUp",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy",management])
+					order.append([" BreakUp",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},status,management])
 
 				elif lst[i]["side"]=="DOWN":
-					order.append([" BreakDn",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy",management])
+					order.append([" BreakDn",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},status,management])
 
 
 			self.tnv_scanner.send_algo(order)
