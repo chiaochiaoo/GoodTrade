@@ -6,6 +6,9 @@ import json
 from datetime import datetime
 from datetime import date
 import os.path
+
+
+
 from modules.Symbol_data_manager import *
 from modules.ppro_process_manager_client import *
 
@@ -117,6 +120,28 @@ def round_up(i):
 		return round(i,2)
 
 
+
+def get_min(ts):
+    
+    h,m = ts.split(":")
+    
+    return int(h)*60+int(m)
+
+def get_ts(m):
+    h = m//60
+    if h <10:
+        h = "0" + str(h)
+    else:
+        h = str(h)
+    m = m%60
+    if m <10:
+        m = "0" + str(m)
+    else:
+        m = str(m)        
+    
+    return str(h) + ":"+str(m)
+
+
 def fetch_yahoo(symbol):
 
 	url = "https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-chart"
@@ -192,6 +217,70 @@ def fetch_yahoo(symbol):
 
 	return high,low,m_high,m_low,f5,f5v
 
+
+def fetch_yahoo_pair(symbol1,symbol2):
+
+    url = "https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-chart"
+
+    querystring1 = {"region":"US","interval":"1m","symbol":symbol1,"range":"1d"}
+    querystring2 = {"region":"US","interval":"1m","symbol":symbol2,"range":"1d"}
+    
+    headers = {
+        'x-rapidapi-host': "apidojo-yahoo-finance-v1.p.rapidapi.com",
+        'x-rapidapi-key': "0da8e9b784msh9001cc4bfc4e7e7p1c6d94jsna54c1aa52dbf"
+        }
+
+    response1 = requests.request("GET", url, headers=headers, params=querystring1)
+    response2 = requests.request("GET", url, headers=headers, params=querystring2)
+    res1 = json.loads(response1.text)
+    res2 = json.loads(response2.text)
+    #print(res)
+    
+    ts1 =[]
+
+    for i in res1['chart']['result'][0]['timestamp']:
+        ts1.append(datetime.fromtimestamp(i).strftime('%H:%M'))
+
+    ts2 =[]
+
+    for i in res2['chart']['result'][0]['timestamp']:
+        ts2.append(datetime.fromtimestamp(i).strftime('%H:%M'))     
+    
+    ts = list(set(ts1) & set(ts2))
+    
+    ts = sorted([get_min(i) for i in ts])
+
+    #if it has 09:30. 
+    high,low = 0,0
+
+    
+    if 570 in ts:
+
+        start1 = ts1.index(get_ts(570))
+        start2 = ts2.index(get_ts(570))
+
+        open_1 = np.log(res1['chart']['result'][0]['indicators']['quote'][0]["open"][start1])
+        open_2 = np.log(res2['chart']['result'][0]['indicators']['quote'][0]["open"][start2])
+
+        idx = np.where((np.array(ts)>570)&(np.array(ts)<900))[0]
+        #print(np.array(ts)[idx])
+        for i in idx:
+            
+            #print(ts1.index(get_ts(ts[i])),ts2.index(get_ts(ts[i])))
+            try:
+                l1 = np.log(res1['chart']['result'][0]['indicators']['quote'][0]["open"][ts1.index(get_ts(ts[i]))]) - open_1
+                l2 = np.log(res2['chart']['result'][0]['indicators']['quote'][0]["open"][ts2.index(get_ts(ts[i]))]) - open_2
+
+                spread = (l1-l2)*100
+
+                if spread>high:
+                    high = spread
+                if spread<low:
+                    low = spread
+            except:
+                pass
+
+    return high,low#high,low,m_high,m_low,f5,f5v
 
 # secondary sources.
 
@@ -338,7 +427,9 @@ def multi_processing_price(pipe_receive,database):
 					if "/" in i:
 						symbol1,symbol2 = i.split("/")
 
-						init_pair(i, symbol1, symbol2)
+	
+						pa = threading.Thread(target=init_pair,args=(i, symbol1, symbol2,), daemon=True)
+						pa.start()	
 
 						reg = threading.Thread(target=register,args=(symbol1,), daemon=True)
 						reg.start()						
@@ -422,6 +513,12 @@ def init_pair(pairs,symbol1,symbol2):
 	global pairindex
 	global pairdata
 
+
+	now = datetime.now()
+
+	ts = now.hour*60 + now.minute
+
+
 	if symbol1 not in pairindex:
 		pairindex[symbol1] = [pairs]
 	else:
@@ -437,11 +534,18 @@ def init_pair(pairs,symbol1,symbol2):
 		pairdata[pairs]["symbol1"] = symbol1
 		pairdata[pairs]["symbol2"] = symbol2
 
+
 	pairdata[pairs][symbol_update_time] = 0
 	pairdata[pairs]["send_timestamp"] = 0
 	pairdata[pairs][symbol_price] = 0
 	pairdata[pairs][symbol_price_openhigh] = 0
 	pairdata[pairs][symbol_price_openlow] = 0
+
+	if ts>570:
+		high,low= fetch_yahoo_pair(symbol1[:-3], symbol2[:-3])
+		pairdata[pairs][symbol_price_openhigh] = round(high,2)
+		pairdata[pairs][symbol_price_openlow] = round(low,2)
+
 
 	pairdata[pairs]["historical_data_loaded"] = False
 	pairdata[pairs][open_high_range] = 0
