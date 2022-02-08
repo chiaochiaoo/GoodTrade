@@ -641,7 +641,7 @@ class alert_map(pannel):
 		i = symbol
 
 		#			self.data.rel_val_eval[symbol],\
-		info = [i,\
+		info = [self.data.symbol_name[symbol],\
 			self.data.symbol_status[symbol],\
 			self.data.rel_v_eval[symbol],\
 			self.data.alert_prev_val[symbol],\
@@ -749,7 +749,7 @@ class highlow(alert):
 
 		#cur, mean, std. symbol, time. 
 		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type,alert_val]
-		labels = [symbol,status,cur_range,cur_high,cur_low,hist_avg,hist_std,hist_range,eva]
+		labels = [self.data.symbol_name[symbol],status,cur_range,cur_high,cur_low,hist_avg,hist_std,hist_range,eva]
 
 
 		alert_positions = [alert_position]
@@ -806,7 +806,7 @@ class openhigh(alert):
 
 		#cur, mean, std. symbol, time. 
 		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type,alert_val,open_now]
-		labels = [symbol,status,cur_range,cur_open,cur_high,hist_avg,hist_std,hist_range,eva]
+		labels = [self.data.symbol_name[symbol],status,cur_range,cur_open,cur_high,hist_avg,hist_std,hist_range,eva]
 
 
 		alert_positions = [alert_position]
@@ -939,7 +939,7 @@ class openlow(alert):
 
 		#cur, mean, std. symbol, time. 
 		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type,alert_val,open_now]
-		labels = [symbol,status,cur_range,cur_open,cur_low,hist_avg,hist_std,hist_range,eva]
+		labels = [self.data.symbol_name[symbol],status,cur_range,cur_open,cur_low,hist_avg,hist_std,hist_range,eva]
 
 
 		#any alert will need a threshold. deviation. std. 
@@ -1065,7 +1065,7 @@ class open_now(alert):
 
 		#cur, mean, std. symbol, time. 
 		alertvals= [symbol,time,cur_range,hist_avg,hist_std,alert_type]
-		labels = [symbol,status,cur_range,cur_open,cur_low,hist_avg,hist_std,hist_range,eva]
+		labels = [self.data.symbol_name[symbol],status,cur_range,cur_open,cur_low,hist_avg,hist_std,hist_range,eva]
 
 
 		#any alert will need a threshold. deviation. std. 
@@ -1176,7 +1176,7 @@ class firstfive(alert):
 		alert_val2 = self.data.alert_openning_vol_val[symbol]
 
 
-		labels = [symbol,status,cur_range,hist_avg,hist_std,hist_range,cur_vol,hist_v_avg,hist_v_std,hist_v_range,eva,eva2]
+		labels = [self.data.symbol_name[symbol],status,cur_range,hist_avg,hist_std,hist_range,cur_vol,hist_v_avg,hist_v_std,hist_v_range,eva,eva2]
 
 		value_position = 2
 		alert_position = 10

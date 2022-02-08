@@ -16,6 +16,12 @@ reg_count = 0
 global lock
 lock = {}
 
+global pairdata
+pairdata ={}
+
+global pairindex
+pairindex = {}
+
 global black_list
 global reg_list
 global data
@@ -252,10 +258,11 @@ def deregister(symbol):
 	r= requests.get(p)
 	reg_count-=1
 	#print(symbol,"deregister","total:",reg_count)
-	reg_list.remove(symbol)
+	try:
+		reg_list.remove(symbol)
 
-	# except Exception as e:
-	# 	print("Dereg",symbol,e)
+	except Exception as e:
+	 	print("Dereg",symbol,e)
 
 def thread_waiting_mechanism():
 	#print(threading.active_count())
@@ -269,7 +276,10 @@ def multi_processing_price(pipe_receive,database):
 	global reg_list
 	global connection_error
 
-	try:
+	global pairdata
+	global pairindex
+
+	if 1:
 
 		k = 0
 
@@ -322,21 +332,34 @@ def multi_processing_price(pipe_receive,database):
 			for i in reg:
 				if i not in black_list:
 					thread_waiting_mechanism()
-					reg = threading.Thread(target=register,args=(i,), daemon=True)
-					reg.start()
+
+					#deal with composite symbols. 
+
+					if "/" in i:
+						symbol1,symbol2 = i.split("/")
+
+						init_pair(i, symbol1, symbol2)
+
+						reg = threading.Thread(target=register,args=(symbol1,), daemon=True)
+						reg.start()						
+						reg2 = threading.Thread(target=register,args=(symbol2,), daemon=True)
+						reg2.start()		
+					else:
+						reg = threading.Thread(target=register,args=(i,), daemon=True)
+						reg.start()
 
 			for i in dereg:
 				thread_waiting_mechanism()
 				dereg = threading.Thread(target=deregister,args=(i,), daemon=True)
 				dereg.start()
 
-			for i in long_:
-				l = threading.Thread(target=buy_market_order,args=(i,10), daemon=True)
-				l.start()
+			# for i in long_:
+			# 	l = threading.Thread(target=buy_market_order,args=(i,10), daemon=True)
+			# 	l.start()
 
-			for i in short_:
-				s = threading.Thread(target=sell_market_order,args=(i,10), daemon=True)
-				s.start()
+			# for i in short_:
+			# 	s = threading.Thread(target=sell_market_order,args=(i,10), daemon=True)
+			# 	s.start()
 
 			#try to register again the ones that have ppro errors. 
 			#bulk cmds. get updates on these symbols. on finish, send it back to client. 
@@ -354,11 +377,11 @@ def multi_processing_price(pipe_receive,database):
 			k+=1
 			time.sleep(1)
 
-			
-
-
 			#send each dictionary. 
 			#pipe_receive.send(data)
+
+	try:
+		pass
 	except Exception as e:
 		print("error:",e)
 		#pipe_receive.send(["message",e])
@@ -393,6 +416,137 @@ def timestamp_seconds(s):
 #IF STILL THE SAME TIME, TRY TO reregister?
 
 #call the thing at 9:30 and start from there. 
+
+def init_pair(pairs,symbol1,symbol2):
+
+	global pairindex
+	global pairdata
+
+	if symbol1 not in pairindex:
+		pairindex[symbol1] = [pairs]
+	else:
+		pairindex[symbol1].append(pairs)
+
+	if symbol2 not in pairindex:
+		pairindex[symbol2] = [pairs]
+	else:
+		pairindex[symbol2].append(pairs)
+
+	if pairs not in pairdata:
+		pairdata[pairs] = {}
+		pairdata[pairs]["symbol1"] = symbol1
+		pairdata[pairs]["symbol2"] = symbol2
+
+	pairdata[pairs][symbol_update_time] = 0
+	pairdata[pairs]["send_timestamp"] = 0
+	pairdata[pairs][symbol_price] = 0
+	pairdata[pairs][symbol_price_openhigh] = 0
+	pairdata[pairs][symbol_price_openlow] = 0
+
+	pairdata[pairs]["historical_data_loaded"] = False
+	pairdata[pairs][open_high_range] = 0
+	pairdata[pairs][open_high_val] = 0
+	pairdata[pairs][open_high_std]= 0
+
+	pairdata[pairs][open_low_range] = 0
+	pairdata[pairs][open_low_val] = 0
+	pairdata[pairs][open_low_std] = 0
+
+	pairdata[pairs][first_5_range] = 0
+	pairdata[pairs][first_5_val] = 0
+	pairdata[pairs][first_5_std] = 0
+
+	pairdata[pairs][open_high_eval_alert] = 0
+	pairdata[pairs][open_high_eval_value] = "0"
+
+	pairdata[pairs][open_low_eval_alert] = 0
+	pairdata[pairs][open_low_eval_value] = "0"
+
+	pairdata[pairs][high_low_alert] = 0
+	pairdata[pairs][high_low_eval] = "0"
+
+	pairdata[pairs][first_5_eval] = "0"
+	pairdata[pairs][first_5_alert] = 0
+
+
+def pair_update(pair,pipe,ts,timestamp):
+
+	#global pairindex
+	global pairdata
+	global data
+
+	p = pairdata[pair]
+
+
+	if p["symbol1"] in data and p["symbol2"] in data:
+
+		s1=data[p["symbol1"]]
+		s2=data[p["symbol2"]]
+
+		p[symbol_update_time] = timestamp
+
+		p[symbol_price] = round(s1["log_return"] - s2["log_return"],2)
+
+		if p[symbol_price] > p[symbol_price_openhigh]:
+			p[symbol_price_openhigh] = p[symbol_price]
+
+		if p[symbol_price] < p[symbol_price_openlow]:
+			p[symbol_price_openlow] = p[symbol_price]
+
+		if p["historical_data_loaded"] == False:
+			file = "data/"+pair.replace("/","_")+"_"+date.today().strftime("%m%d")+".txt"
+
+			if os.path.isfile(file):
+				print(pair,"process loading from db.")
+				with open(file) as json_file:
+					da = json.load(json_file)
+				#print(da)
+				for key,item in da.items():
+					p[key] = item 
+
+				p["historical_data_loaded"] = True
+
+		else:
+			if p[symbol_price]>0:
+				p[open_high_eval_alert] = evaluator(p[symbol_price],p[open_high_val],p[open_high_std])
+
+				p[open_high_eval_value] = "Cur:"+str(p[open_high_eval_alert])+","+"Max:"+str(evaluator(p[symbol_price_openhigh],p[open_high_val],p[open_high_std]))
+
+				p[open_low_eval_alert] =  0
+				p[open_low_eval_value] = "Cur:"+str(p[open_low_eval_alert])+","+"Max:"+str(evaluator(p[symbol_price_openlow],p[open_low_val],p[open_low_std]))
+			else:
+				p[open_high_eval_alert] = 0
+				p[open_high_eval_value] = "Cur:"+str(p[open_high_eval_alert])+","+"Max:"+str(evaluator(p[symbol_price_openhigh],p[open_high_val],p[open_high_std]))
+
+				p[open_low_eval_alert] =  evaluator(-p[symbol_price],p[open_low_val],p[open_low_std])
+				p[open_low_eval_value] = "Cur:"+str(p[open_low_eval_alert])+","+"Max:"+str(evaluator(p[symbol_price_openlow],p[open_low_val],p[open_low_std]))
+
+
+		if p["send_timestamp"]!=ts:
+			p["send_timestamp"]=ts
+
+			update_list = {}
+
+
+			update_list[symbol_price] = p[symbol_price]
+			update_list[symbol_price_openhigh] = p[symbol_price_openhigh]
+			update_list[symbol_price_openlow] = p[symbol_price_openlow]
+
+			update_list[symbol_update_time] = p[symbol_update_time]
+
+			update_list[open_high_eval_alert] = p[open_high_eval_alert] 
+			update_list[open_high_eval_value] = p[open_high_eval_value]
+
+			update_list[open_low_eval_alert] = p[open_low_eval_alert] 
+			update_list[open_low_eval_value] = p[open_low_eval_value] 
+
+
+			pipe.send(["Connected",pair,update_list])
+
+	else:
+		print(p["symbol1"],p["symbol2"],"not ready yet")
+		pipe.send(["NotFound",pair,{}])
+
 
 #this high low is from ppro.
 def init(symbol,price,ppro_high,ppro_low,timestamp):
@@ -446,6 +600,7 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 	#print(symbol,d["phigh"],d["plow"],d["high"],d["low"])
 
 	d["price"]=price
+
 	d["timestamp"] =0
 	d["send_timestamp"] = 0
 	d["time"] = ""
@@ -467,7 +622,7 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 
 	d["open_current_range"] = 0
 	d["open_percentage"] = 0
-
+	d["log_return"] = 0
 	d["volume"] = 0
 	#only after open
 	d["open"] = 0
@@ -546,6 +701,8 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 	d[prev_alert] = 0
 
 	d[rel_v_eval] = 0
+
+
 def load_historical_data(symbol,database):
 	global data
 	d = data[symbol]
@@ -739,6 +896,8 @@ def process_and_send(lst,pipe,database):
 
 	global data
 
+	global pairindex
+
 	if symbol not in data:
 		init(symbol,price,high,low,timestamp)
 
@@ -795,6 +954,8 @@ def process_and_send(lst,pipe,database):
 		if open_!=0:
 			d["open_current_range"] = round((price-open_),2)
 			d["open_percentage"] =  round(((price-open_)*100/open_),2)
+
+			d["log_return"] = round((np.log(price) - np.log(open_))*100,2)
 		else:
 			d["open_percentage"] = 0
 			d["open_current_range"] = 0
@@ -908,6 +1069,9 @@ def process_and_send(lst,pipe,database):
 	#### Historical Eval ####
 	load_historical_data(symbol,database)
 	historical_eval(symbol)
+
+
+
 	update_list={}
 
 	send_list={}
@@ -987,8 +1151,9 @@ def process_and_send(lst,pipe,database):
 		pipe.send([status,symbol,send_list])
 	
 
-
-
+	if symbol in pairindex:
+		for pair in pairindex[symbol]:
+			pair_update(pair,pipe,timestamp,time)
 	# pipe.send([status,symbol,price,time,timestamp,d["high"],d["low"],d["phigh"],d["plow"],\
 	# 	d["range"],d["last_5_range"],d["vol"],d["open"],d["oh"],d["ol"],d["open_current_range"],
 	# 	d["f5r"],d["f5v"],d["prev_close"],d["prev_close_gap"],d["prev_close_percentage"],d["open_percentage"],d["last_5_range_percentage"],d["status"]])
@@ -1041,7 +1206,7 @@ def getinfo(symbol,pipe,database):
 	if not connection_error:
 
 		if not lock[symbol]:
-			try:
+			if 1:
 				lock[symbol] = True
 				p="http://localhost:8080/GetLv1?symbol="+symbol
 				r= requests.get(p,timeout=2)
@@ -1080,15 +1245,26 @@ def getinfo(symbol,pipe,database):
 					#print(time,Bidprice,Askprice,open_,high,low,vol,price)
 					ts = timestamp(time[:5])
 
-					try:
+					
+					if 1:
 						process_and_send(["Connected",symbol,time,ts,price,high,low,open_,vol,prev_close],pipe,database)
+						
+					try:
+						pass
 					except Exception as e:
-						print("PPro Process error",e)
+
+						exc_type, exc_obj, exc_tb = sys.exc_info()
+						fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+						print("PPro Process error:",e,exc_type, fname, exc_tb.tb_lineno)
 						lock[symbol] = False
 			#pipe.send(output)
 
+			try:
+				pass
 			except Exception as e:
-				print("Get info error:",e)
+				exc_type, exc_obj, exc_tb = sys.exc_info()
+				fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+				print("Get info error:",e,exc_type, fname, exc_tb.tb_lineno)
 				connection_error = True
 				pipe.send(["Ppro Error",symbol])
 				lock[symbol] = False

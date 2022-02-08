@@ -706,7 +706,7 @@ class scanner(pannel):
 		i = 0
 
 		self.update_pd()
-
+		df.to_csv("nasdaq_trader.csv")
 		if self.nasdaq_trader_created==True:
 
 

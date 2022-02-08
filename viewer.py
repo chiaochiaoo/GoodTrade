@@ -257,7 +257,8 @@ class ticker_manager(pannel):
 		i = symbol
 		l = self.label_count
 		#["Ticker","Status","Last update","Price","Status","Last Alert","Last Alert time","Remove"]
-		info = [symbol,\
+		
+		info = [self.data.symbol_name[symbol],\
 				self.data.symbol_status[symbol],\
 				self.data.symbol_update_time[symbol],\
 				self.data.symbol_price[symbol],\

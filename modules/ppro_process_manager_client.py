@@ -92,55 +92,56 @@ class ppro_process_manager:
 					#print("receive",symbol)
 					#self.data_list[0][symbol].set(status)
 
-					self.data_list[symbol_status][symbol].set(status)
+					if symbol in self.symbols:
+						self.data_list[symbol_status][symbol].set(status)
 
-					#	pipe.send([status,symbol,price,time,timestamp,
-					#   d["high"],d["low"],\d["range"],d["last_5_range"],
-					#   d["vol"],d["open"],d["oh"],d["ol"],d["f5r"],d["f5v"]])
+						#	pipe.send([status,symbol,price,time,timestamp,
+						#   d["high"],d["low"],\d["range"],d["last_5_range"],
+						#   d["vol"],d["open"],d["oh"],d["ol"],d["f5r"],d["f5v"]])
 
-					if status == "Connected" or status =="Lagged":
-						#print(data)
+						if status == "Connected" or status =="Lagged":
+							#print(data)
 
-						for key,item in data.items():
-							self.data_list[key][symbol].set(item)
-						#print(d)
-						#if len(d)-1 == len(self.data_list):
+							for key,item in data.items():
+								self.data_list[key][symbol].set(item)
+							#print(d)
+							#if len(d)-1 == len(self.data_list):
 
-						if 'symbol_price_premarket_high' in data:
-							self.resistance[symbol].set(data['symbol_price_premarket_high'])
-						if  'symbol_price_premarket_low' in data:
-							self.supoort[symbol].set(data['symbol_price_premarket_low'])
+							if 'symbol_price_premarket_high' in data:
+								self.resistance[symbol].set(data['symbol_price_premarket_high'])
+							if  'symbol_price_premarket_low' in data:
+								self.supoort[symbol].set(data['symbol_price_premarket_low'])
 
-							# for i in range(1,len(self.data_list)):
-							# 	#print(self.data_list[i][symbol].get())
-							# 	self.data_list[i][symbol].set(d[i+1])
-								# if self.data_list[i][symbol].get() != d[i+1]:
-								#  	self.data_list[i][symbol].set(d[i+1])
+								# for i in range(1,len(self.data_list)):
+								# 	#print(self.data_list[i][symbol].get())
+								# 	self.data_list[i][symbol].set(d[i+1])
+									# if self.data_list[i][symbol].get() != d[i+1]:
+									#  	self.data_list[i][symbol].set(d[i+1])
 
-							# if self.auto_support_resistance[symbol].get() == 1:
-							# 	#timestamp = d[4]
-							# 	if 'symbol_price_premarket_high' in data:
-							# 		high = data['symbol_price_premarket_high']
+								# if self.auto_support_resistance[symbol].get() == 1:
+								# 	#timestamp = d[4]
+								# 	if 'symbol_price_premarket_high' in data:
+								# 		high = data['symbol_price_premarket_high']
 
-							# 	if  'symbol_price_premarket_low' in data:
-							# 		low = data['symbol_price_premarket_low']
+								# 	if  'symbol_price_premarket_low' in data:
+								# 		low = data['symbol_price_premarket_low']
 
-							# 	#need to check if its the same as previous set. if not, that means it's manually changed. 
-							# 	#if timestamp < 570:
+								# 	#need to check if its the same as previous set. if not, that means it's manually changed. 
+								# 	#if timestamp < 570:
 
-							# 	if symbol in temp:
-							# 		cur = (self.resistance[symbol].get(),self.supoort[symbol].get())
-							# 		if cur != temp[symbol]:
-							# 			self.auto_support_resistance[symbol].set(0)
-							# 		else:
-							# 			temp[symbol] = (high,low)
+								# 	if symbol in temp:
+								# 		cur = (self.resistance[symbol].get(),self.supoort[symbol].get())
+								# 		if cur != temp[symbol]:
+								# 			self.auto_support_resistance[symbol].set(0)
+								# 		else:
+								# 			temp[symbol] = (high,low)
 
-							# 			self.resistance[symbol].set(high)
-							# 			self.supoort[symbol].set(low)
-							# 	else:
-							# 		temp[symbol] = (high,low)
-							# 		self.resistance[symbol].set(high)
-							# 		self.supoort[symbol].set(low)
+								# 			self.resistance[symbol].set(high)
+								# 			self.supoort[symbol].set(low)
+								# 	else:
+								# 		temp[symbol] = (high,low)
+								# 		self.resistance[symbol].set(high)
+								# 		self.supoort[symbol].set(low)
 			except Exception as e:
 				print("ppro hiccup ",e)
 

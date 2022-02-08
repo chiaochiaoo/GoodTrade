@@ -6,8 +6,6 @@ import threading
 import time
 import requests
 
-
-
 symbol_status = "symbol_status"
 symbol_price = "symbol_price"
 symbol_update_time = "symbol_update_time"
@@ -32,10 +30,8 @@ symbol_percentage_since_open = "symbol_percentage_since_open"
 symbol_percentage_last_5 = "symbol_percentage_last_5"
 symbol_position_status = "symbol_position_status"
 
-
 rel_v = "rel_volume"
 rel_v_eval = "rel_volume_evaluation"
-
 
 open_high_eval_alert = "open_high_eval_alert"
 open_high_eval_value = "open_high_eval_value"
@@ -117,6 +113,7 @@ class Symbol_data_manager:
 		#These filed need to be initilized. 
 
 		self.symbol_init =[]
+		self.symbol_name = {}
 		#system
 
 		self.ppro = None
@@ -150,8 +147,6 @@ class Symbol_data_manager:
 		self.symbol_price_prevclose = {}
 		self.symbol_price_prevclose_to_now= {}
 
-
-
 		self.rel_v = {}
 		self.rel_v_eval = {}
 		### Update these upon new ticks 
@@ -174,8 +169,6 @@ class Symbol_data_manager:
 		self.symbol_update_time = {}
 
 		#data
-
-
 		self.symbol_data_openhigh_range = {}
 		self.symbol_data_openlow_range = {}
 		self.symbol_data_range_range = {}
@@ -203,7 +196,6 @@ class Symbol_data_manager:
 
 		self.symbol_data_first5_dis = {}
 		self.symbol_data_first5_vol_dis = {}
-
 
 		self.symbol_data_normal5_range = {}
 		self.symbol_data_normal5_vol_range = {}
@@ -275,8 +267,6 @@ class Symbol_data_manager:
 		self.symbol_percentage_since_close = {}
 		self.symbol_percentage_since_open = {}
 		self.symbol_percentage_last_5 = {}
-
-
 
 		#mark this when a symbol datastructure is completely loaded. 
 
@@ -492,6 +482,7 @@ class Symbol_data_manager:
 			print("Cannot find symbol",symbol)
 			return None	
 		
+
 	def get_last_5_range_percentage(self,symbol):
 		if symbol in self.symbol_init:
 			return self.symbol_percentage_last_5[symbol]
@@ -499,14 +490,24 @@ class Symbol_data_manager:
 			print("Cannot find symbol",symbol)
 			return None		
 
+
 	def set_ppro_manager(self,ppro):
 		self.ppro = ppro
+
 
 	def set_database_manager(self,database):
 		self.database = database
 
+
 	def init_symbol(self,i):
 
+		if "/" in i:
+			symbol1,symbol2 = i.split("/")
+			self.symbol_name[i] = symbol1[:-3]+"/"+symbol2[:-3]
+
+		else:
+			self.symbol_name[i]= i
+		#print("adding",i,"name",self.symbol_name[i])
 		#system
 		self.auto_support_resistance[i] = IntVar()
 		self.auto_trade[i] = IntVar()
@@ -755,6 +756,8 @@ class Symbol_data_manager:
 
 	def get_count(self):
 		return len(self.symbols)
+
+
 
 
 

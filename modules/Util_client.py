@@ -59,10 +59,14 @@ class util_client:
 
 	def check_if_file_exist(self,symbol):
 
-		file = "data/"+symbol[:-3]+"_"+self.today+".txt"
+		if "/" in symbol:
+			x = symbol.replace("/","_")
+			file = "data/"+x+"_"+self.today+".txt"
+		else:
+			file = "data/"+symbol[:-3]+"_"+self.today+".txt"
 
 		if os.path.isfile(file):
-			#print(symbol,"already exisit, loading local copy instd.")
+			print(symbol,"already exisit, loading local copy instd.")
 			with open(file) as json_file:
 				d = json.load(json_file)
 
@@ -85,10 +89,13 @@ class util_client:
 
 		no = ["Database Request"]
 		for symbol in symbols:
-			file = "data/"+symbol[:-3]+"_"+self.today+".txt"
-
+			if "/" in symbol:
+				x = symbol.replace("/","_")
+				file = "data/"+x+"_"+self.today+".txt"
+			else:
+				file = "data/"+symbol[:-3]+"_"+self.today+".txt"
 			if os.path.isfile(file):
-				#print(symbol,"already exisit, loading local copy instd.")
+				print(symbol,"already exisit, loading local copy instd.")
 				with open(file) as json_file:
 					d = json.load(json_file)
 
@@ -107,7 +114,13 @@ class util_client:
 
 	def send_request(self,symbol):
 
-		file = "data/"+symbol+"_"+self.today+".txt"
+		if "/" in symbol:
+			x = symbol.replace("/","_")
+			file = "data/"+x+"_"+self.today+".txt"
+		else:
+			file = "data/"+symbol[:-3]+"_"+self.today+".txt"
+
+		#file = "data/"+symbol+"_"+self.today+".txt"
 
 		if os.path.isfile(file):
 			#print(symbol,"already exisit, loading local copy instd.")
@@ -161,10 +174,12 @@ class util_client:
 					elif d[0] =="Database Response":
 
 						dic = d[1]
-						#print(dic)
-						for symbol,d in dic.items():
+						print("keys keys keys",dic.keys())
+
+						for symbol,da in dic.items():
 							#if len(d)-1 == len(self.data):
-							for key,item in d.items():
+							#print("setting",symbol)
+							for key,item in da.items():
 								if key!= "rel_volume":
 									self.data[key][symbol].set(item)
 								else:
