@@ -824,8 +824,13 @@ def load_historical_data(symbol,database):
 			with open(file) as json_file:
 				da = json.load(json_file)
 			#print(da)
-			for key,item in da.items():
-				d[key] = item 
+
+			try:
+				for key,item in da.items():
+					d[key] = item 
+
+			except Exception as e:
+				print(e)
 
 			d["historical_data_loaded"] = True
 			#print(symbol,"loaded successful")
