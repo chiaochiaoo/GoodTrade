@@ -159,210 +159,214 @@ def fetch_data(symbol):
 	postbody = "http://api.kibot.com/?action=history&symbol="+symbol+"&interval=daily&period=45&regularsession=1" +l(v)
 	r= request(postbody, symbol)
 
-	if r=="":
+	try:
+		if r=="":
 
-		return [symbol]
+			return [symbol]
 
-	else:
-		O,H,L,C,V =1,2,3,4,5
+		else:
+			O,H,L,C,V =1,2,3,4,5
 
-		range_=[] #data.symbol_data_openhigh_dis[i]
-		openhigh_=[] #data.symbol_data_openlow_dis[i]
-		openlow_=[] #data.symbol_data_range_dis[i]
+			range_=[] #data.symbol_data_openhigh_dis[i]
+			openhigh_=[] #data.symbol_data_openlow_dis[i]
+			openlow_=[] #data.symbol_data_range_dis[i]
 
-		EM = []
-		ATR = []
-		previous_close = []
+			EM = []
+			ATR = []
+			previous_close = []
 
-		#d = r.splitlines()[-14:]
+			#d = r.splitlines()[-14:]
 
-		prev_close = 0
+			prev_close = 0
 
-		for line in r.splitlines():
-			lst=line.split(",")
-			EM.append(max(float(lst[H])-float(lst[O]),float(lst[O])-float(lst[L])))
+			for line in r.splitlines():
+				lst=line.split(",")
+				EM.append(max(float(lst[H])-float(lst[O]),float(lst[O])-float(lst[L])))
 
-		for line in r.splitlines()[-14:]:
-			lst=line.split(",")
-			range_.append(float(lst[H])-float(lst[L]))
+			for line in r.splitlines()[-14:]:
+				lst=line.split(",")
+				range_.append(float(lst[H])-float(lst[L]))
 
-			oh = np.log(float(lst[H]))-np.log(float(lst[O]))
-			ol = np.log(float(lst[O]))-np.log(float(lst[L]))
-			if oh>ol:
-				openhigh_.append(oh)
-			else:
-				openlow_.append(ol)
-			###ATR
-
-			if prev_close!=0:
-				gap = round(float(lst[O])-prev_close,2)
-				previous_close.append(gap)
-
-				ra =  float(lst[H])-float(lst[L])
-				o =  abs(float(lst[H])-prev_close)
-				c =  abs(float(lst[L])-prev_close)
-				tr = max(ra,o,c)
-				ATR.append(tr)
-
-			prev_close = float(lst[C])
-
-		openhigh_ = np.array(openhigh_)*prev_close
-		openlow_ = np.array(openlow_)*prev_close
-		openhigh_range=str(round(min(openhigh_),3))+"-"+str(round(max(openhigh_),3))
-		openlow_range=str(round(min(openlow_),3))+"-"+str(round(max(openlow_),3))
-		range_range=str(round(min(range_),3))+"-"+str(round(max(range_),3))
-		prev_close_range_= str(round(min(previous_close),3))+" - "+str(round(max(previous_close),3))
-
-		openhigh_val=round(np.mean(openhigh_),3)
-		openlow_val=round(np.mean(openlow_),3)
-		range_val=round(np.mean(range_),3)
-		prev_close_val_ = round(np.mean(np.abs(previous_close)),3)
-
-		openhigh_std=round(np.std(openhigh_),3)
-		openlow_std=round(np.std(openlow_),3)
-		range_std=round(np.std(range_),3)
-		prev_close_std_ = round(np.std(np.abs(previous_close)),3)
-
-		ATR = np.mean(ATR)
-		ATR = round(ATR,2)
-
-
-		expected_m = round(EMA(EM,7)[-2],2)
-
-
-		###ADD the first 5 here. seperate them later.
-
-		postbody = "http://api.kibot.com/?action=history&symbol="+symbol+"&interval=5&period=14&regularsession=0" +l(v)
-	
-		r= request(postbody, symbol)
-
-		tod = datetime.date.today().strftime("%m/%d/%Y")
-
-		try:
-			if r!="":
-				a=[]#data.symbol_data_first5_dis[i]
-				b=[]#data.symbol_data_first5_vol_dis[i]
-
-				c=[]#data.symbol_data_normal5_dis[i]
-				d=[]#data.symbol_data_normal5_vol_dis[i]
-
-				stamps = np.array([570+i*5 for i in range(79)])
-				df = pd.DataFrame(columns = stamps)
-
-				if r[:3]=="402":
-					print("Not authorize to",symbol)
-					a=[0]#data.symbol_data_first5_dis[i]
-					b=[0]#data.symbol_data_first5_vol_dis[i]
-
-					c=[0]#data.symbol_data_normal5_dis[i]
-					d=[0]#data.symbol_data_normal5_vol_dis[i]
-
-
+				oh = np.log(float(lst[H]))-np.log(float(lst[O]))
+				ol = np.log(float(lst[O]))-np.log(float(lst[L]))
+				if oh>ol:
+					openhigh_.append(oh)
 				else:
-					for line in r.splitlines():
-						
-						lst=line.split(",")
-						v = int(lst[6])
-						date = lst[0]
+					openlow_.append(ol)
+				###ATR
 
-						if date!=tod:
+				if prev_close!=0:
+					gap = round(float(lst[O])-prev_close,2)
+					previous_close.append(gap)
 
-							ts = timestamp(lst[1])
+					ra =  float(lst[H])-float(lst[L])
+					o =  abs(float(lst[H])-prev_close)
+					c =  abs(float(lst[L])-prev_close)
+					tr = max(ra,o,c)
+					ATR.append(tr)
 
-							if date not in df.index:
-								#print(date)
-								df.loc[date] = [0 for i in range(len(stamps))]
+				prev_close = float(lst[C])
 
-								accv = v
-							else:
-								accv +=v 
+			openhigh_ = np.array(openhigh_)*prev_close
+			openlow_ = np.array(openlow_)*prev_close
+			openhigh_range=str(round(min(openhigh_),3))+"-"+str(round(max(openhigh_),3))
+			openlow_range=str(round(min(openlow_),3))+"-"+str(round(max(openlow_),3))
+			range_range=str(round(min(range_),3))+"-"+str(round(max(range_),3))
+			prev_close_range_= str(round(min(previous_close),3))+" - "+str(round(max(previous_close),3))
 
-							if ts>= 570 and ts<=961:
+			openhigh_val=round(np.mean(openhigh_),3)
+			openlow_val=round(np.mean(openlow_),3)
+			range_val=round(np.mean(range_),3)
+			prev_close_val_ = round(np.mean(np.abs(previous_close)),3)
 
-								df.loc[date,ts] = accv
+			openhigh_std=round(np.std(openhigh_),3)
+			openlow_std=round(np.std(openlow_),3)
+			range_std=round(np.std(range_),3)
+			prev_close_std_ = round(np.std(np.abs(previous_close)),3)
 
-								r = round(float(lst[3])-float(lst[4]),3)
-								
-								if lst[1]=='09:30':
-									a.append(r)
-									b.append(v)
-								c.append(r)
-								d.append(v)
-
-
-
-				rel_vol = df.mean().tolist()
+			ATR = np.mean(ATR)
+			ATR = round(ATR,2)
 
 
-				p = np.poly1d(np.polyfit(np.arange(79)*5, rel_vol, 10))
+			expected_m = round(EMA(EM,7)[-2],2)
+
+
+			###ADD the first 5 here. seperate them later.
+
+			postbody = "http://api.kibot.com/?action=history&symbol="+symbol+"&interval=5&period=14&regularsession=0" +l(v)
 		
-				new = [i for i in range(391)]
-				rel_vol = [int(t) for t in p(new)]  
+			r= request(postbody, symbol)
+
+			tod = datetime.date.today().strftime("%m/%d/%Y")
+
+			try:
+				if r!="":
+					a=[]#data.symbol_data_first5_dis[i]
+					b=[]#data.symbol_data_first5_vol_dis[i]
+
+					c=[]#data.symbol_data_normal5_dis[i]
+					d=[]#data.symbol_data_normal5_vol_dis[i]
+
+					stamps = np.array([570+i*5 for i in range(79)])
+					df = pd.DataFrame(columns = stamps)
+
+					if r[:3]=="402":
+						print("Not authorize to",symbol)
+						a=[0]#data.symbol_data_first5_dis[i]
+						b=[0]#data.symbol_data_first5_vol_dis[i]
+
+						c=[0]#data.symbol_data_normal5_dis[i]
+						d=[0]#data.symbol_data_normal5_vol_dis[i]
 
 
-				first5_range=str(round(min(a),3))+"-"+str(round(max(a),3))
-				first5_vol_range=str(int(min(b)//1000))+"k-"+str(int(max(b)/1000))+"k"
+					else:
+						for line in r.splitlines():
+							
+							lst=line.split(",")
+							v = int(lst[6])
+							date = lst[0]
 
-				first5_val=round(np.mean(a),3)
-				first5_vol_val=int(np.mean(b)/1000)
+							if date!=tod:
 
-				first5_std=round(np.std(a),3)
-				first5_vol_std=int(np.std(b)/1000)
+								ts = timestamp(lst[1])
 
-				#######
-				normal5_range=str(round(min(c),3))+"-"+str(round(max(c),3))
-				normal5_vol_range=str(int(min(d)//1000))+"k-"+str(int(max(d)/1000))+"k"
+								if date not in df.index:
+									#print(date)
+									df.loc[date] = [0 for i in range(len(stamps))]
 
-				normal5_val=round(np.mean(c),3)
-				normal5_vol_val=int(np.mean(d)/1000)
+									accv = v
+								else:
+									accv +=v 
 
-				normal5_std=round(np.std(c),3)
-				normal5_vol_std=int(np.std(d)/1000)
+								if ts>= 570 and ts<=961:
 
-				#data_list[symbol] = symbol
-				data_list = {}
+									df.loc[date,ts] = accv
 
-				data_list[rel_v] = rel_vol
-				data_list[open_high_range] = openhigh_range
-				data_list[open_high_val] = openhigh_val
-				data_list[open_high_std]= openhigh_std
+									r = round(float(lst[3])-float(lst[4]),3)
+									
+									if lst[1]=='09:30':
+										a.append(r)
+										b.append(v)
+									c.append(r)
+									d.append(v)
 
-				data_list[open_low_range] = openlow_range
-				data_list[open_low_val] = openlow_val
-				data_list[open_low_std] = openlow_std
 
-				data_list[high_low_range] = range_range
-				data_list[high_low_val] = range_val
-				data_list[high_low_std] = range_std
 
-				data_list[first_5_range] = first5_range
-				data_list[first_5_val] = first5_val
-				data_list[first_5_std] = first5_std
+					rel_vol = df.mean().tolist()
 
-				data_list[first_5_vol_range] = first5_vol_range
-				data_list[first_5_vol_val] = first5_vol_val
-				data_list[first_5_vol_std] = first5_vol_std
 
-				data_list[normal_5_range] = normal5_range
-				data_list[normal_5_val] = normal5_val
-				data_list[normal_5_std] = normal5_std
+					p = np.poly1d(np.polyfit(np.arange(79)*5, rel_vol, 10))
+			
+					new = [i for i in range(391)]
+					rel_vol = [int(t) for t in p(new)]  
 
-				data_list[normal_5_vol_range] = normal5_vol_range
-				data_list[normal_5_vol_val] = normal5_vol_val
-				data_list[normal_5_vol_std] = normal5_vol_std
 
-				data_list[prev_close_range] = prev_close_range_
-				data_list[prev_close_val] = prev_close_val_
-				data_list[prev_close_std] = prev_close_std_
+					first5_range=str(round(min(a),3))+"-"+str(round(max(a),3))
+					first5_vol_range=str(int(min(b)//1000))+"k-"+str(int(max(b)/1000))+"k"
 
-				data_list[symbol_data_ATR] =ATR
+					first5_val=round(np.mean(a),3)
+					first5_vol_val=int(np.mean(b)/1000)
 
-				data_list[expected_momentum] = expected_m
+					first5_std=round(np.std(a),3)
+					first5_vol_std=int(np.std(b)/1000)
 
-				return data_list
+					#######
+					normal5_range=str(round(min(c),3))+"-"+str(round(max(c),3))
+					normal5_vol_range=str(int(min(d)//1000))+"k-"+str(int(max(d)/1000))+"k"
 
-		except Exception as e:
-			print(e)
+					normal5_val=round(np.mean(c),3)
+					normal5_vol_val=int(np.mean(d)/1000)
+
+					normal5_std=round(np.std(c),3)
+					normal5_vol_std=int(np.std(d)/1000)
+
+					#data_list[symbol] = symbol
+					data_list = {}
+
+					data_list[rel_v] = rel_vol
+					data_list[open_high_range] = openhigh_range
+					data_list[open_high_val] = openhigh_val
+					data_list[open_high_std]= openhigh_std
+
+					data_list[open_low_range] = openlow_range
+					data_list[open_low_val] = openlow_val
+					data_list[open_low_std] = openlow_std
+
+					data_list[high_low_range] = range_range
+					data_list[high_low_val] = range_val
+					data_list[high_low_std] = range_std
+
+					data_list[first_5_range] = first5_range
+					data_list[first_5_val] = first5_val
+					data_list[first_5_std] = first5_std
+
+					data_list[first_5_vol_range] = first5_vol_range
+					data_list[first_5_vol_val] = first5_vol_val
+					data_list[first_5_vol_std] = first5_vol_std
+
+					data_list[normal_5_range] = normal5_range
+					data_list[normal_5_val] = normal5_val
+					data_list[normal_5_std] = normal5_std
+
+					data_list[normal_5_vol_range] = normal5_vol_range
+					data_list[normal_5_vol_val] = normal5_vol_val
+					data_list[normal_5_vol_std] = normal5_vol_std
+
+					data_list[prev_close_range] = prev_close_range_
+					data_list[prev_close_val] = prev_close_val_
+					data_list[prev_close_std] = prev_close_std_
+
+					data_list[symbol_data_ATR] =ATR
+
+					data_list[expected_momentum] = expected_m
+
+					return data_list
+
+			except Exception as e:
+				print(e)
+	except Exception as e:
+
+		print(e,symbol)
 # def fetch_data(lst,conn):
 # 	d = database_handler(lst)
 # 	data = pickle.dumps(["Database Response",d])
