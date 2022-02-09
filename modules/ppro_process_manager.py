@@ -652,6 +652,7 @@ def pair_update(pair,pipe,ts,timestamp):
 				update_list[open_low_eval_alert] = p[open_low_eval_alert] 
 				update_list[open_low_eval_value] = p[open_low_eval_value] 
 
+				update_list[first_5_min_range] = p["firstfive"]
 				update_list[first_5_alert] = p[first_5_alert] 
 				update_list[first_5_eval] = p[first_5_eval] 
 
@@ -1109,7 +1110,7 @@ def process_and_send(lst,pipe,database):
 	index = min(len(d["vols"]), 5)
 	d["vol"] = round((d["vols"][-1] - d["vols"][-index])/1000,2)
 
-	if timestamp>569 and timestamp <=590:
+	if timestamp>569 and timestamp <=595:
 		d["f5r"] = d["last_5_range"]
 		d["f5v"] = d["vol"]
 		d["log_return_first5"] = np.log(open_) - np.log(price)
