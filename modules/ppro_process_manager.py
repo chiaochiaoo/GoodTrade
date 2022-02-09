@@ -587,66 +587,71 @@ def pair_update(pair,pipe,ts,timestamp):
 		s1=data[p["symbol1"]]
 		s2=data[p["symbol2"]]
 
-		p[symbol_update_time] = timestamp
+		try:
+			p[symbol_update_time] = timestamp
 
-		p[symbol_price] = round(s1["log_return"] - s2["log_return"],2)
+			p[symbol_price] = round(s1["log_return"] - s2["log_return"],2)
 
-		if p[symbol_price] > p[symbol_price_openhigh]:
-			p[symbol_price_openhigh] = p[symbol_price]
+			if p[symbol_price] > p[symbol_price_openhigh]:
+				p[symbol_price_openhigh] = p[symbol_price]
 
-		if p[symbol_price] < p[symbol_price_openlow]:
-			p[symbol_price_openlow] = p[symbol_price]
+			if p[symbol_price] < p[symbol_price_openlow]:
+				p[symbol_price_openlow] = p[symbol_price]
 
-		if p["historical_data_loaded"] == False:
-			file = "data/"+pair.replace("/","_")+"_"+date.today().strftime("%m%d")+".txt"
+			if p["historical_data_loaded"] == False:
+				file = "data/"+pair.replace("/","_")+"_"+date.today().strftime("%m%d")+".txt"
 
-			if os.path.isfile(file):
-				print(pair,"process loading from db.")
-				with open(file) as json_file:
-					da = json.load(json_file)
-				#print(da)
-				for key,item in da.items():
-					p[key] = item 
+				if os.path.isfile(file):
+					print(pair,"process loading from db.")
+					with open(file) as json_file:
+						da = json.load(json_file)
+					#print(da)
+					for key,item in da.items():
+						p[key] = item 
 
-				p["historical_data_loaded"] = True
+					p["historical_data_loaded"] = True
 
-		else:
-			if p[symbol_price]>0:
-				p[open_high_eval_alert] = evaluator(p[symbol_price],p[open_high_val],p[open_high_std])
-
-				p[open_high_eval_value] = "Cur:"+str(p[open_high_eval_alert])+","+"Max:"+str(evaluator(p[symbol_price_openhigh],p[open_high_val],p[open_high_std]))
-
-				p[open_low_eval_alert] =  0
-				p[open_low_eval_value] = "Cur:"+str(p[open_low_eval_alert])+","+"Max:"+str(evaluator(p[symbol_price_openlow],p[open_low_val],p[open_low_std]))
 			else:
-				p[open_high_eval_alert] = 0
-				p[open_high_eval_value] = "Cur:"+str(p[open_high_eval_alert])+","+"Max:"+str(evaluator(p[symbol_price_openhigh],p[open_high_val],p[open_high_std]))
+				if p[symbol_price]>0:
+					p[open_high_eval_alert] = evaluator(p[symbol_price],p[open_high_val],p[open_high_std])
 
-				p[open_low_eval_alert] =  evaluator(-p[symbol_price],p[open_low_val],p[open_low_std])
-				p[open_low_eval_value] = "Cur:"+str(p[open_low_eval_alert])+","+"Max:"+str(evaluator(p[symbol_price_openlow],p[open_low_val],p[open_low_std]))
+					p[open_high_eval_value] = "Cur:"+str(p[open_high_eval_alert])+","+"Max:"+str(evaluator(p[symbol_price_openhigh],p[open_high_val],p[open_high_std]))
 
+					p[open_low_eval_alert] =  0
+					p[open_low_eval_value] = "Cur:"+str(p[open_low_eval_alert])+","+"Max:"+str(evaluator(p[symbol_price_openlow],p[open_low_val],p[open_low_std]))
+				else:
+					p[open_high_eval_alert] = 0
+					p[open_high_eval_value] = "Cur:"+str(p[open_high_eval_alert])+","+"Max:"+str(evaluator(p[symbol_price_openhigh],p[open_high_val],p[open_high_std]))
 
-		if p["send_timestamp"]!=ts:
-			p["send_timestamp"]=ts
-
-			update_list = {}
-
-
-			update_list[symbol_price] = p[symbol_price]
-			update_list[symbol_price_openhigh] = p[symbol_price_openhigh]
-			update_list[symbol_price_openlow] = p[symbol_price_openlow]
-
-			update_list[symbol_update_time] = p[symbol_update_time]
-
-			update_list[open_high_eval_alert] = p[open_high_eval_alert] 
-			update_list[open_high_eval_value] = p[open_high_eval_value]
-
-			update_list[open_low_eval_alert] = p[open_low_eval_alert] 
-			update_list[open_low_eval_value] = p[open_low_eval_value] 
+					p[open_low_eval_alert] =  evaluator(-p[symbol_price],p[open_low_val],p[open_low_std])
+					p[open_low_eval_value] = "Cur:"+str(p[open_low_eval_alert])+","+"Max:"+str(evaluator(p[symbol_price_openlow],p[open_low_val],p[open_low_std]))
 
 
-			pipe.send(["Connected",pair,update_list])
+			if p["send_timestamp"]!=ts:
+				p["send_timestamp"]=ts
 
+				update_list = {}
+
+
+				update_list[symbol_price] = p[symbol_price]
+				update_list[symbol_price_openhigh] = p[symbol_price_openhigh]
+				update_list[symbol_price_openlow] = p[symbol_price_openlow]
+
+				update_list[symbol_update_time] = p[symbol_update_time]
+
+				update_list[open_high_eval_alert] = p[open_high_eval_alert] 
+				update_list[open_high_eval_value] = p[open_high_eval_value]
+
+				update_list[open_low_eval_alert] = p[open_low_eval_alert] 
+				update_list[open_low_eval_value] = p[open_low_eval_value] 
+
+
+				pipe.send(["Connected",pair,update_list])
+		except Exception as e:
+			exc_type, exc_obj, exc_tb = sys.exc_info()
+			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+			print("Pair updating:",e,exc_type, fname, exc_tb.tb_lineno)
+			lock[symbol] = False
 	else:
 		print(p["symbol1"],p["symbol2"],"not ready yet")
 		pipe.send(["NotFound",pair,{}])
