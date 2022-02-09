@@ -632,7 +632,6 @@ def pair_update(pair,pipe,ts,timestamp):
 
 
 				p[first_5_alert] = evaluator(p["firstfive"],p[first_5_val],p[first_5_std]) 
-
 				p[first_5_eval] = str(p[first_5_alert])
 
 			if p["send_timestamp"]!=ts:
@@ -653,12 +652,14 @@ def pair_update(pair,pipe,ts,timestamp):
 				update_list[open_low_eval_alert] = p[open_low_eval_alert] 
 				update_list[open_low_eval_value] = p[open_low_eval_value] 
 
+				update_list[first_5_alert] = p[first_5_alert] 
+				update_list[first_5_eval] = p[first_5_eval] 
 
 				pipe.send(["Connected",pair,update_list])
 		except Exception as e:
 			exc_type, exc_obj, exc_tb = sys.exc_info()
 			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-			print("Pair updating:",e,exc_type, fname, exc_tb.tb_lineno)
+			print("Pair updating:",pair,e,exc_type, fname, exc_tb.tb_lineno)
 	else:
 		print(p["symbol1"],p["symbol2"],"not ready yet")
 		pipe.send(["NotFound",pair,{}])
@@ -1108,7 +1109,7 @@ def process_and_send(lst,pipe,database):
 	index = min(len(d["vols"]), 5)
 	d["vol"] = round((d["vols"][-1] - d["vols"][-index])/1000,2)
 
-	if timestamp>569 and timestamp <=580:
+	if timestamp>569 and timestamp <=590:
 		d["f5r"] = d["last_5_range"]
 		d["f5v"] = d["vol"]
 		d["log_return_first5"] = np.log(open_) - np.log(price)
