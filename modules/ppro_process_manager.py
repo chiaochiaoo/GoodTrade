@@ -600,7 +600,7 @@ def pair_update(pair,pipe,ts,timestamp):
 			if p[symbol_price] < p[symbol_price_openlow]:
 				p[symbol_price_openlow] = p[symbol_price]
 
-			p["firstfive"] = s1["log_return_first5"] - s2["log_return_first5"]
+			p["firstfive"] = round(s1["log_return_first5"] - s2["log_return_first5"],2)
 
 			if p["historical_data_loaded"] == False:
 				file = "data/"+pair.replace("/","_")+"_"+date.today().strftime("%m%d")+".txt"
@@ -1110,10 +1110,10 @@ def process_and_send(lst,pipe,database):
 	index = min(len(d["vols"]), 5)
 	d["vol"] = round((d["vols"][-1] - d["vols"][-index])/1000,2)
 
-	if timestamp>569 and timestamp <=595:
+	if timestamp>569 and timestamp <=575:
 		d["f5r"] = d["last_5_range"]
 		d["f5v"] = d["vol"]
-		d["log_return_first5"] = np.log(open_) - np.log(price)
+		d["log_return_first5"] = (np.log(open_) - np.log(price))*100
 
 	#check if the data is lagged. Premarket. Real. Aftermarket.
 	register_again = False
