@@ -659,7 +659,6 @@ def pair_update(pair,pipe,ts,timestamp):
 			exc_type, exc_obj, exc_tb = sys.exc_info()
 			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 			print("Pair updating:",e,exc_type, fname, exc_tb.tb_lineno)
-			lock[symbol] = False
 	else:
 		print(p["symbol1"],p["symbol2"],"not ready yet")
 		pipe.send(["NotFound",pair,{}])
