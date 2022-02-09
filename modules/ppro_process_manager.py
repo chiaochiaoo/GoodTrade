@@ -541,6 +541,8 @@ def init_pair(pairs,symbol1,symbol2):
 	pairdata[pairs][symbol_price_openhigh] = 0
 	pairdata[pairs][symbol_price_openlow] = 0
 
+	pairdata[pairs]["firstfive"] = 0
+
 	if ts>570:
 		high,low= fetch_yahoo_pair(symbol1[:-3], symbol2[:-3])
 		pairdata[pairs][symbol_price_openhigh] = round(high,2)
@@ -598,6 +600,8 @@ def pair_update(pair,pipe,ts,timestamp):
 			if p[symbol_price] < p[symbol_price_openlow]:
 				p[symbol_price_openlow] = p[symbol_price]
 
+			p["firstfive"] = s1["log_return_first5"] - s2["log_return_first5"]
+
 			if p["historical_data_loaded"] == False:
 				file = "data/"+pair.replace("/","_")+"_"+date.today().strftime("%m%d")+".txt"
 
@@ -626,6 +630,10 @@ def pair_update(pair,pipe,ts,timestamp):
 					p[open_low_eval_alert] =  evaluator(-p[symbol_price],p[open_low_val],p[open_low_std])
 					p[open_low_eval_value] = "Cur:"+str(p[open_low_eval_alert])+","+"Max:"+str(evaluator(p[symbol_price_openlow],p[open_low_val],p[open_low_std]))
 
+
+				p[first_5_alert] = evaluator(p["firstfive"],p[first_5_val],p[first_5_std]) 
+
+				p[first_5_eval] = str(p[first_5_alert])
 
 			if p["send_timestamp"]!=ts:
 				p["send_timestamp"]=ts
@@ -732,6 +740,7 @@ def init(symbol,price,ppro_high,ppro_low,timestamp):
 	d["open_current_range"] = 0
 	d["open_percentage"] = 0
 	d["log_return"] = 0
+	d["log_return_first5"] = 0
 	d["volume"] = 0
 	#only after open
 	d["open"] = 0
@@ -1100,10 +1109,10 @@ def process_and_send(lst,pipe,database):
 	index = min(len(d["vols"]), 5)
 	d["vol"] = round((d["vols"][-1] - d["vols"][-index])/1000,2)
 
-	if timestamp>569 and timestamp <575:
+	if timestamp>569 and timestamp <=580:
 		d["f5r"] = d["last_5_range"]
 		d["f5v"] = d["vol"]
-
+		d["log_return_first5"] = np.log(open_) - np.log(price)
 
 	#check if the data is lagged. Premarket. Real. Aftermarket.
 	register_again = False
