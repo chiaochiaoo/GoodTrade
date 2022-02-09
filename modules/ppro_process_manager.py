@@ -544,10 +544,13 @@ def init_pair(pairs,symbol1,symbol2):
 	pairdata[pairs]["firstfive"] = 0
 
 	if ts>570:
-		high,low= fetch_yahoo_pair(symbol1[:-3], symbol2[:-3])
-		pairdata[pairs][symbol_price_openhigh] = round(high,2)
-		pairdata[pairs][symbol_price_openlow] = round(low,2)
 
+		try:
+			high,low= fetch_yahoo_pair(symbol1[:-3], symbol2[:-3])
+			pairdata[pairs][symbol_price_openhigh] = round(high,2)
+			pairdata[pairs][symbol_price_openlow] = round(low,2)
+		except Exception as e:
+			print(pairs,"yahoo fetching")
 
 	pairdata[pairs]["historical_data_loaded"] = False
 	pairdata[pairs][open_high_range] = 0
