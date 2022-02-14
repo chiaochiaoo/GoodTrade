@@ -636,7 +636,7 @@ def pair_update(pair,pipe,ts,timestamp):
 
 
 			if p["ratio_calculated"]!=True and s1["price"]!=0 and s2["price"]!=0:
-				p["ratio"]=ratio_compute(s1["price"], s2["price"])
+				p["ratio"] = str(ratio_compute(s1["price"], s2["price"]))
 
 
 			p["firstfive"] = round(s1["log_return_first5"] - s2["log_return_first5"],2)
