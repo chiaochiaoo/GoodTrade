@@ -574,6 +574,8 @@ def init_pair(pairs,symbol1,symbol2):
 
 	pairdata[pairs]["ratio"] = 0
 
+	pairdata[pairs]["lastupdate"] = 0
+
 	if ts>570:
 
 		try:
@@ -635,9 +637,9 @@ def pair_update(pair,pipe,ts,timestamp):
 				p[symbol_price_openlow] = p[symbol_price]
 
 
-			if p["ratio_calculated"]!=True and s1["price"]!=0 and s2["price"]!=0:
+			if  s1["price"]!=0 and s2["price"]!=0 and ts>p["lastupdate"]+10:
 				p["ratio"] = str(ratio_compute(s1["price"], s2["price"]))
-
+				p["lastupdate"] = ts
 
 			p["firstfive"] = round(s1["log_return_first5"] - s2["log_return_first5"],2)
 
