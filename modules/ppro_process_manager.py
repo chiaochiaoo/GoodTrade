@@ -120,6 +120,30 @@ def round_up(i):
 		return round(i,2)
 
 
+def ratio_compute(a,b):
+	a_=[]
+	b_=[]
+	turn = 0
+	while True:
+		if turn==0:
+			a_.append(a)
+			#print(a_)
+		else:
+			b_.append(b)
+			#print(b_)
+
+		#check differentce. who's losing, who's turn is it.
+		ratio = (b*len(b_))/(a*len(a_))
+		#print(ratio)
+		if ratio>0.998 and ratio<1.002:
+			break
+		else:
+			if ratio>1:
+				turn=0
+			else:
+				turn=1
+
+	return (len(a_),len(b_))
 
 def get_min(ts):
     
@@ -535,6 +559,8 @@ def init_pair(pairs,symbol1,symbol2):
 		pairdata[pairs]["symbol2"] = symbol2
 
 
+
+
 	pairdata[pairs][symbol_update_time] = 0
 	pairdata[pairs]["send_timestamp"] = 0
 	pairdata[pairs][symbol_price] = 0
@@ -542,6 +568,11 @@ def init_pair(pairs,symbol1,symbol2):
 	pairdata[pairs][symbol_price_openlow] = 0
 
 	pairdata[pairs]["firstfive"] = 0
+
+
+	pairdata[pairs]["ratio_calculated"] = False
+
+	pairdata[pairs]["ratio"] = 0
 
 	if ts>570:
 
@@ -603,6 +634,11 @@ def pair_update(pair,pipe,ts,timestamp):
 			if p[symbol_price] < p[symbol_price_openlow]:
 				p[symbol_price_openlow] = p[symbol_price]
 
+
+			if p["ratio_calculated"]!=True and s1["price"]!=0 and s2["price"]!=0:
+				p["ratio"]=ratio_compute(s1["price"], s2["price"])
+
+
 			p["firstfive"] = round(s1["log_return_first5"] - s2["log_return_first5"],2)
 
 			if p["historical_data_loaded"] == False:
@@ -658,6 +694,8 @@ def pair_update(pair,pipe,ts,timestamp):
 				update_list[first_5_min_range] = p["firstfive"]
 				update_list[first_5_alert] = p[first_5_alert] 
 				update_list[first_5_eval] = p[first_5_eval] 
+
+				update_list[symbol_position_status] = p["ratio"]
 
 				pipe.send(["Connected",pair,update_list])
 		except Exception as e:
