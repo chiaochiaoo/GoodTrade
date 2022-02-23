@@ -205,8 +205,23 @@ class TFM():
 			#["New order",[" BreakUp",symbol,support-change,resistence,risk,{},"Notdeploy","TrendRider"]]
 			if risk>0:
 
-				info = ["New order",[entryplan,symbol,support,resistence,risk,{},"deploy",management]]
+				new_order = {}
 
+				new_order["algo_name"]= "Manual Trade"
+				new_order["entry_type"] = entryplan
+				new_order["symbol"] = symbol
+				new_order["side"] = side
+				new_order["support"] = support
+				new_order["resistence"] = resistence
+				new_order["immediate_deployment"]= True
+				new_order["management"] = management 
+				new_order["risk"] = risk
+				new_order["statistics"] = {}
+
+
+				info = ["New order",new_order]
+
+				#[entryplan,symbol,support,resistence,risk,{},"deploy",management]
 				self.tnv_scanner.send_algo(info)
 
 				self.status["text"]="Status: Algo placed"
@@ -234,124 +249,6 @@ class TFM():
 					self.b.grid_remove()
 			self.l+=1
 
-	def update_entry(self,data):
-
-		#at most 8.
-		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
-
-		now = datetime.now()
-		
-		ts = now.hour*60+now.minute
-		
-		algo_timer = self.hour.get()*60 + self.minute.get()
-
-		end_timer = self.ehour.get()*60 + self.eminute.get()
-
-		df = data
-
-		#timestamp = data[1]
-		#self.NT_stat["text"] = "Last update: "+timestamp
-		#df.to_csv("tttt.csv")
-		entry = 0
-
-		send_algo=[]
-
-		if len(data)>1:
-			if 1:
-				for index, row in df.iterrows():
-					#print(row)
-
-					#["Symbol","Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Ignore","Add"]
-					rank = index
-					vol = row['sector']
-					relv = row['rel vol']
-					side = row['reversalside']
-					rscore = row['reversal_score']
-					sc = row['SC']
-
-					since = row['reversal_timer']
-
-					row['Signal Time'] = since
-					############ add since, and been to the thing #############
-
-					if self.NT != None:
-						if rank in self.NT.nasdaq_trader_symbols_ranking:
-							listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
-						else:
-							listed = "No"
-					else:
-						listed = "No"
-					#print(self.NT.nasdaq_trader_symbols)
-					if 1: #score>0:	
-
-						lst = [rank,vol,relv,side,rscore,sc,listed,since]
-
-						ts_location = 7
-
-						for i in range(len(lst)):
-							
-							if lst[ts_location] >=ts and lst[ts_location]>=algo_timer and lst[ts_location]<=end_timer:
-								self.entries[entry][i]["background"] = "LIGHTGREEN"
-								self.entries[entry][9].grid()
-
-								if side == "UP":
-									support = row['low']
-									resistence = row['open']
-								else:
-									support = row['open']
-									resistence = row['high']
-
-								self.entries[entry][9]["command"]= lambda symbol=rank,support=support,side=side,resistence=resistence:self.send_algo(symbol,support,resistence,side)
-
-								if self.algo_activate.get()==1:
-									if rank not in self.algo_placed:
-
-										#self.send_algo(rank,support,resistence,self.algo_risk)
-										self.algo_placed.append(rank)
-
-										order = {}
-
-										order["symbol"] = rank
-										order["support"] = support
-										order["resistence"] = resistence
-
-										order["side"] = side
-
-										send_algo.append(order)
-
-										#print(rank,self.algo_placed)
-										
-							if i == ts_location:
-								self.entries[entry][i]["text"] = ts_to_min(lst[i])
-							else:
-								self.entries[entry][i]["text"] = lst[i]
-								self.entries[entry][8].grid_remove() 
-								#self.entries[entry][8].grid_remove() 
-								#self.entries[entry][9].grid_forget()
-							#self.entries[entry][8].grid() 
-						#add the button here?
-
-						entry+=1
-						if entry ==30:
-							break
-
-				while entry<30:
-					#print("ok")
-					for i in range(10):
-						self.entries[entry][i]["text"] = ""
-					entry+=1
-
-				# keep = ['Symbol', "Signal Time", 'rel vol', 'SC', 'reversalside','reversal_score','Signal Time',]
-
-				# for i in df.columns:
-				# 	if i not in keep:
-				# 		df.pop(i)
-				#df.to_csv(self.file)
-			# except Exception as e:
-			# 	print("TNV scanner construction open reversal:",e)
-
-			if len(send_algo)>0:
-				self.send_group_algos(send_algo)
 
 
 if __name__ == '__main__':

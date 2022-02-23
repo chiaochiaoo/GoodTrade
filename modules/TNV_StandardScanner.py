@@ -19,11 +19,13 @@ def ts_to_min(ts):
 
 
 class StandardScanner():
-	def __init__(self,root,NT):
+	def __init__(self,root,NT,algo_name=""):
 
 		self.buttons = []
 		self.entries = []
 		self.algo_placed = []
+
+		self.algo_name = ""
 		
 		self.l = 1
 
@@ -218,10 +220,41 @@ class StandardScanner():
 			for i in range(len(lst)):
 
 				if lst[i]["side"]=="UP":
-					order.append([" BreakUp",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy",management])
+
+
+					new_order = {}
+
+					new_order["algo_name"]= self.algo_name
+					new_order["entry_type"] = " BreakUp"
+					new_order["symbol"] = lst[i]["symbol"]
+					new_order["side"] = "Long"
+					new_order["support"] = lst[i]["support"]
+					new_order["resistence"] = lst[i]["resistence"]
+					new_order["immediate_deployment"]= True
+					new_order["management"] = management 
+					new_order["risk"] = risk
+					new_order["statistics"] = {}
+
+					
+					order.append(new_order)
 
 				elif lst[i]["side"]=="DOWN":
-					order.append([" BreakDn",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy",management])
+
+
+					new_order["algo_name"]= self.algo_name
+					new_order["entry_type"] = " BreakDn"
+					new_order["symbol"] = lst[i]["symbol"]
+					new_order["side"] = "Short"
+					new_order["support"] = lst[i]["support"]
+					new_order["resistence"] = lst[i]["resistence"]
+					new_order["immediate_deployment"]= True
+					new_order["management"] = management 
+					new_order["risk"] = risk
+					new_order["statistics"] = {}
+
+
+					order.append(new_order)
+					#order.append([" BreakDn",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},"deploy",management])
 
 
 			self.tnv_scanner.send_algo(order)

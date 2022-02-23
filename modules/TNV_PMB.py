@@ -20,6 +20,7 @@ def ts_to_min(ts):
 class Premarket_breakout():
 	def __init__(self,root,NT,TNV_scanner):
 
+		self.algo_name = "premarket breakout"
 		self.tnv_scanner = TNV_scanner
 		self.buttons = []
 		self.entries = []
@@ -111,10 +112,38 @@ class Premarket_breakout():
 
 			if side =="UP":
 
-				info = ["New order",[" BreakUp",symbol,support-change,resistence,risk,{},"deploy","TrendRider"]]
+
+				new_order = {}
+
+				new_order["algo_name"]= self.algo_name
+				new_order["entry_type"] = " BreakUp"
+				new_order["symbol"] = symbol#lst[i]["symbol"]
+				new_order["side"] = "Long"
+				new_order["support"] = support -change#lst[i]["support"]
+				new_order["resistence"] = resistence #lst[i]["resistence"]
+				new_order["immediate_deployment"]= deployment
+				new_order["management"] = management 
+				new_order["risk"] = risk
+				new_order["statistics"] = {}
+
+				info = ["New order",new_order]
 				#print("sending",info)
 			else:
-				info = ["New order",[" BreakDn",symbol,support,resistence+change,risk,{},"deploy","TrendRider"]]
+
+				new_order = {}
+				new_order["algo_name"]= self.algo_name
+				new_order["entry_type"] = " BreakDn"
+				new_order["symbol"] = symbol
+				new_order["side"] = "Short"
+				new_order["support"] = support
+				new_order["resistence"] = resistence + change
+				new_order["immediate_deployment"]= deployment
+				new_order["management"] = management 
+				new_order["risk"] = risk
+				new_order["statistics"] = {}
+
+				info = ["New order",new_order]
+
 			self.tnv_scanner.send_algo(info)
 
 
@@ -123,9 +152,11 @@ class Premarket_breakout():
 		now = datetime.now()
 		ts = now.hour*60+now.minute
 
-		status=""
+		deployment=True
 		if ts>=570:
-			status = "deploy"
+			deployment = True
+		else:
+			deployment = False
 
 		risk = self.algo_risk.get()
 		management = self.management.get()
@@ -135,10 +166,41 @@ class Premarket_breakout():
 			for i in range(len(lst)):
 
 				if lst[i]["side"]=="UP":
-					order.append([" BreakUp",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},status,management])
+
+					new_order = {}
+
+					new_order["algo_name"]= self.algo_name
+					new_order["entry_type"] = " BreakUp"
+					new_order["symbol"] = lst[i]["symbol"]
+					new_order["side"] = "Long"
+					new_order["support"] = lst[i]["support"]
+					new_order["resistence"] = lst[i]["resistence"]
+					new_order["immediate_deployment"]= deployment
+					new_order["management"] = management 
+					new_order["risk"] = risk
+					new_order["statistics"] = {}
+
+					order.append(new_order)
+					#order.append([" BreakUp",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},status,management])
 
 				elif lst[i]["side"]=="DOWN":
-					order.append([" BreakDn",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},status,management])
+
+					new_order = {}
+
+					new_order["algo_name"]= self.algo_name
+					new_order["entry_type"] = " BreakDn"
+					new_order["symbol"] = lst[i]["symbol"]
+					new_order["side"] = "Short"
+					new_order["support"] = lst[i]["support"]
+					new_order["resistence"] = lst[i]["resistence"]
+					new_order["immediate_deployment"]= deployment
+					new_order["management"] = management 
+					new_order["risk"] = risk
+					new_order["statistics"] = {}
+
+
+					order.append(new_order)
+					#order.append([" BreakDn",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},status,management])
 
 
 			self.tnv_scanner.send_algo(order)

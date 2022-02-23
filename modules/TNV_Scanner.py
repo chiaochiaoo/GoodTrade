@@ -596,7 +596,7 @@ class Open_high(StandardScanner):
 		self.labels = ["Symbol","Sector","OH","Rel.V","E45T","E45C","SO%","SC%","listed","Add"]
 		self.total_len = len(self.labels)
 		self.tnv_scanner = tnv
-		super().__init__(root,NT)
+		super().__init__(root,NT,"Open_High")
 
 	def update_entry(self,data):
 
@@ -710,7 +710,7 @@ class Open_low(StandardScanner):
 		self.labels = ["Symbol","Sector","OL","Rel.V","E45T","E45C","SO%","SC%","listed","Add"]
 		self.total_len = len(self.labels)
 		self.tnv_scanner = tnv
-		super().__init__(root,NT)
+		super().__init__(root,NT,"Open_Low")
 
 	def update_entry(self,data):
 

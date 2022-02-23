@@ -369,12 +369,28 @@ class Manager:
 
 		#['Any level', 'TEST.AM', 1.0, 2.0, 5.0, {'ATR': 3.6, 'OHavg': 1.551, 'OHstd': 1.556, 'OLavg': 1.623, 'OLstd': 1.445}]
 
-		entryplan = data[0]
-		symbol = data[1]
-		support = data[2]
-		resistence =  data[3]
-		risk = data[4]
-		stats = data[5]
+		# new_order["algo_name"]= "Manual Trade"
+		# new_order["entry_type"] = entryplan
+		# new_order["symbol"] = symbol
+		# new_order["side"] = side
+		# new_order["support"] = support
+		# new_order["resistence"] = resistence
+		# new_order["immediate_deployment"]= True
+		# new_order["management"] = management 
+		# new_order["risk"] = risk
+		# new_order["statistics"] = {}
+
+
+		algo_name =  data["algo_name"]
+		entryplan = data["entry_type"]
+		symbol = data["symbol"] 
+		support = data["support"]
+		resistence =  data["resistence"]
+		risk = data["risk"]
+		stats = data["statistics"]
+		status = data["immediate_deployment"]
+		mana = data["management"]
+
 
 		try:
 			if symbol not in self.symbols:
@@ -390,22 +406,14 @@ class Manager:
 					self.symbols.append(symbol)
 
 					#append it to, UI.
-					if len(data)>6:
-						status = data[6]
-						mana = data[7]
-						self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,mana,risk,self.pipe_ppro_out,0,TEST_MODE)
 
-						self.tradingplan[symbol].tkvars[MANAGEMENTPLAN].set(mana)
-						self.tradingplan[symbol].tkvars[ENTYPE].set(INSTANT)
+					#######################################################################
 
-						self.ui.create_new_entry(self.tradingplan[symbol])
+					self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,mana,risk,self.pipe_ppro_out,0,TEST_MODE)
+					self.ui.create_new_entry(self.tradingplan[symbol])
 
-						if status =="deploy":
-							self.tradingplan[symbol].deploy(9600)
-					else:
-						self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,ONETOTWORISKREWARD,risk,self.pipe_ppro_out,1,TEST_MODE)
-						self.ui.create_new_entry(self.tradingplan[symbol])
-
+					if status == True:
+						self.tradingplan[symbol].deploy(9600)
 				else:
 					log_print("System at full capacity.")
 			else:
@@ -423,7 +431,7 @@ class Manager:
 
 						self.tradingplan[symbol].set_data(risk,entryplan,INSTANT,mana,support,resistence)
 
-						if status =="deploy":
+						if status ==True:
 							self.tradingplan[symbol].deploy(9600)
 					else:
 						self.tradingplan[symbol].set_data(risk,entryplan,INSTANT,ONETOTWORISKREWARD,support,resistence)
