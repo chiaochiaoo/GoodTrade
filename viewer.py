@@ -89,9 +89,9 @@ class viewer:
 		self.tabControl.add(self.tab2, text ='Extreme Range') 
 		self.tabControl.add(self.tab3, text ='Extreme Volume') 
 		self.tabControl.add(self.tab4, text ='First five minutes')
-		self.tabControl.add(self.tab9, text ='Premarket Breakout')
+		# self.tabControl.add(self.tab9, text ='Premarket Breakout')
 
-		self.tabControl.add(self.tab12,text='Pair Trader')
+		# self.tabControl.add(self.tab12,text='Pair Trader')
 
 		self.tabControl.pack(expand = 1, fill ="both") 
 
@@ -110,14 +110,15 @@ class viewer:
 
 		self.pv = prevclose(self.tab10,self.data,)
 
-		self.br = breakout(self.tab9,self.data,algo_comm)#algo_comm #,algo_comm
+		#self.br = breakout(self.tab9,self.data,algo_comm)#algo_comm #,algo_comm
+
 		self.am = alert_map(self.tab11,self.data)
 		#alerts  =[self.open_high_pannel]
-		alerts = [self.high_low_pannel,self.open_high_pannel,self.open_low_pannel,self.first_5,self.er,self.ev,self.br,self.pv,self.am]
+		alerts = [self.high_low_pannel,self.open_high_pannel,self.open_low_pannel,self.first_5,self.er,self.ev,self.pv,self.am]
 
 		self.tm = ticker_manager(self.tab1,self.data,alerts,authen_comm)
 		
-		self.pair =  spread_trader(self.tab12,self.data)
+		#self.pair =  spread_trader(self.tab12,self.data)
 
 		self.scanner_pannel = scanner(root,self.tm,util_process,self.data,util_request,algo_comm)
 
