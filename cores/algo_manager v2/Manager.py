@@ -16,9 +16,10 @@ import time
 import multiprocessing
 import requests
 import select
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 import os
+
 #May this class bless by the Deus Mechanicus.
 
 try:
@@ -29,7 +30,9 @@ f.close()
 
 
 
+
 TEST = True
+
 def algo_manager_voxcom(pipe):
 
 	#tries to establish commuc
@@ -351,6 +354,13 @@ class Manager:
 		self.u_losing_min = 0
 		self.u_losing_max = 0
 
+		now = datetime.now()
+		monday = now - timedelta(days = now.weekday())
+		self.file = "../../algo_records/"+monday.strftime("%Y_%m_%d")+".csv"
+
+
+		self.init_record_writer()
+
 		good = threading.Thread(target=self.goodtrade_in, daemon=True)
 		good.start()
 		
@@ -365,6 +375,46 @@ class Manager:
 		self.pipe_ppro_out.send(["Register","QQQ.NQ"])
 
 	#data part, UI part
+
+	def init_record_writer(self):
+
+		try:
+			self.f = open(self.file, "r")
+		except:
+			self.f = open(self.file, "w")
+			self.recordwriter = csv.writer(self.f,lineterminator = '\n')
+			self.recordwriter.writerow(['DATE', 'TIME','ALGO','SYMBOL','POSITION','RISK','REALIZED'])
+
+		self.f.close()
+		log_print(("record file start"))
+
+
+	def new_record(self,tradingplan):
+
+		try:
+			self.f = open(self.file, "a")
+			self.recordwriter = csv.writer(self.f,lineterminator = '\n')
+
+			now = datetime.now()
+			DATE = now.strftime("%Y-%m-%d")
+			TIME = now.strftime("%H:%M:%S")
+
+
+			ALGO = tradingplan.algo_name
+			SYMBOL = tradingplan.symbol_name
+			SIDE = tradingplan.tkvars[POSITION].get()
+			RISK = tradingplan.data[ESTRISK]
+			real = tradingplan.data[REALIZED]
+
+			self.recordwriter.writerow([DATE, TIME,ALGO,SYMBOL,SIDE,RISK,real])
+			self.f.close()
+		except:
+
+
+			log_print("writing record failure for",tradingplan.symbol_name)
+
+
+
 	def add_new_tradingplan(self,data,TEST_MODE):
 
 		#['Any level', 'TEST.AM', 1.0, 2.0, 5.0, {'ATR': 3.6, 'OHavg': 1.551, 'OHstd': 1.556, 'OLavg': 1.623, 'OLstd': 1.445}]
@@ -409,7 +459,7 @@ class Manager:
 
 					#######################################################################
 
-					self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,mana,risk,self.pipe_ppro_out,0,TEST_MODE)
+					self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,mana,risk,self.pipe_ppro_out,0,TEST_MODE,algo_name,self)
 					self.ui.create_new_entry(self.tradingplan[symbol])
 
 					if status == True:
@@ -931,7 +981,23 @@ class Tester:
 
 		tk.Button(self.root ,text="add 1 share",command=self.add1).grid(column=1,row=7)	
 		tk.Button(self.root ,text="sub 1 share",command=self.sub1).grid(column=2,row=7)	
-		self.gt.send(["pkg",[[BREAKFIRST, 'SPY.AM', 412, 413, 50.0, {'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441,"expected_momentum":2}]]])
+
+
+
+		dic = {}
+
+		dic["algo_name"] = 'TEST'
+		dic["entry_type"] =BREAKFIRST
+		dic["symbol"] ='SPY.AM'
+		dic["support"] =412
+		dic["resistence"] =413
+		dic["risk"] =50.0
+		dic["statistics"] ={'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441,"expected_momentum":2}
+		dic["immediate_deployment"] = False
+		dic["management"] = ONETOTWORISKREWARD
+
+
+		self.gt.send(["pkg",[dic]])
 
 		time.sleep(1)
 		wish_granter = threading.Thread(target=self.wish, daemon=True)

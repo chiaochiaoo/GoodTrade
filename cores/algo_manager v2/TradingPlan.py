@@ -12,9 +12,11 @@ import random
 
 class TradingPlan:
 
-	def __init__(self,symbol:Symbol,entry_plan=None,entry_type=None,manage_plan=None,risk=None,ppro_out=None,default_reload=0,TEST_MODE=False):
+	def __init__(self,symbol:Symbol,entry_plan=None,entry_type=None,manage_plan=None,risk=None,ppro_out=None,default_reload=0,TEST_MODE=False,algo_name="",Manager=None):
 
 		self.symbol = symbol
+
+		self.manager = Manager
 
 		self.symbol.set_tradingplan(self)
 		self.symbol_name = symbol.get_name()
@@ -26,6 +28,7 @@ class TradingPlan:
 		self.entry_plan = None
 		self.entry_type = None
 		self.management_plan = None
+		self.algo_name = algo_name
 
 		self.default_reload = default_reload
 
@@ -531,8 +534,13 @@ class TradingPlan:
 
 		if self.data[CURRENT_SHARE] <= 0:
 
+
+			self.manager.new_record(self)
+
 			self.clear_trade()
 			log_print(self.symbol_name,"Trade completed."," this trade:",self.data[REALIZED]," total:",self.data[TOTAL_REALIZED])
+
+
 
 	def clear_trade(self):
 

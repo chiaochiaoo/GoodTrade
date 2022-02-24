@@ -2,7 +2,7 @@ from datetime import datetime
 
 import linecache
 import sys
-
+	
 def PrintException(info):
     exc_type, exc_obj, tb = sys.exc_info()
     f = tb.tb_frame
@@ -32,6 +32,7 @@ def log_print(*args):
 			print(time_,*args)
 	except Exception as e:
 		print(*args,e,"failed to write")
+
 
 
 def hexcolor_green_to_red(level):
