@@ -258,8 +258,8 @@ def algo_server_shell(util_response):
 
 
 		while q.qsize()>0:
-			ts = q.get()
-		print("supervising ts:",cur_ts,"package ts ",ts)
+			ts = q.get(timeout=30)
+			print("supervising:",ts)
 
 		if ts <= cur_ts -2:
 			print("Server lagging detected. Restarting connection. ")
