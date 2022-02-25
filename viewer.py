@@ -466,7 +466,7 @@ if __name__ == '__main__':
 	# receiver = multiprocessing.Process(target=algo_server,args=(util_response,),daemon=True)
 	# receiver.daemon=True
 
-	algo_connection = multiprocessing.Process(target=algo_server, args=(util_response,),daemon=True)
+	algo_connection = multiprocessing.Process(target=algo_server_shell, args=(util_response,),daemon=True)
 	algo_connection.daemon=True
 	
 
