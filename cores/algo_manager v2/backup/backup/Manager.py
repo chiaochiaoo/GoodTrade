@@ -447,19 +447,16 @@ class Manager:
 				if self.ui.algo_count_number.get()<5:
 					#print(symbol,self.ui.algo_count_number.get())
 					self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats)  #register in Symbol.
-
 					self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
+
 					#self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INCREMENTAL2,NONE,risk,self.pipe_ppro_out,TEST_MODE)
-
-					#register in ppro
 					#self.pipe_ppro_out.send(["Register",symbol])
-
 
 					self.symbols.append(symbol)
 
-					#append it to, UI.
-
 					#######################################################################
+
+					# question.. .where do i find extra place for the UI? ! oh. overrite a current one then. 
 
 					self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,mana,risk,self.pipe_ppro_out,0,TEST_MODE,algo_name,self)
 					self.ui.create_new_entry(self.tradingplan[symbol])
@@ -479,14 +476,11 @@ class Manager:
 					self.symbol_data[symbol].set_data(support,resistence,stats)
 					self.symbol_data[symbol].set_mind("Updated",DEFAULT)
 
-					if len(data)>6:
-						status = data[6]
-						mana = data[7]
 
-						self.tradingplan[symbol].set_data(risk,entryplan,INSTANT,mana,support,resistence)
+					self.tradingplan[symbol].set_data(risk,entryplan,INSTANT,mana,support,resistence)
 
-						if status ==True:
-							self.tradingplan[symbol].deploy(9600)
+					if status ==True:
+						self.tradingplan[symbol].deploy(9600)
 					else:
 						self.tradingplan[symbol].set_data(risk,entryplan,INSTANT,ONETOTWORISKREWARD,support,resistence)
 
