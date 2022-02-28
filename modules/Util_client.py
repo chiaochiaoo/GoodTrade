@@ -1,4 +1,4 @@
-import threading
+import threading,queue
 import multiprocessing
 import time
 import re
@@ -235,7 +235,45 @@ class util_client:
 
 # 	util_comms(ulti_response)
 
-def algo_server(ulti_response):
+
+
+def algo_server_shell(util_response):
+
+	now  = datetime.now()
+	ts = now.hour*60 +now.minute
+
+	#if receiving ts is lagging by more than 2 minutes. disconnect and restart. 
+
+	q = queue.Queue()
+
+	algo_connection = threading.Thread(target=algo_server, args=(util_response,q),daemon=True)
+	algo_connection.start()
+
+	
+
+	while True:
+
+		now  = datetime.now()
+		cur_ts = now.hour*60 +now.minute
+
+
+		while q.qsize()>0:
+			ts = q.get(timeout=30)
+		print("system ts:",cur_ts,"package ts ",ts)
+
+		if ts <= cur_ts -2:
+			print("Server lagging detected. Restarting connection. ")
+			algo_connection = threading.Thread(target=algo_server, args=(util_response,q),daemon=True)
+			algo_connection.start()
+
+
+		time.sleep(30)
+
+
+		#data = threading.Thread(target=self.recv, name="Authen thread",daemon=True)
+		#data.start()
+
+def algo_server(ulti_response,supervisor):
 
 	k=""
 	counter = 0
@@ -328,7 +366,7 @@ def algo_server(ulti_response):
 				# 	print( datetime.now().strftime("%H:%M:%S : ") ,"No algo update")
 
 
-					
+				supervisor.put(now.hour*60+now.minute)
 					#ulti_response.send(["Util init"])
 			print("Algo Server disconnected")
 		except Exception as e:

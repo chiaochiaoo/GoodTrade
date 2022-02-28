@@ -452,7 +452,7 @@ if __name__ == '__main__':
 
 
 	root = tk.Tk() 
-	root.title("GoodTrade v526") 
+	root.title("GoodTrade v527 - Scanner Stable Fix") 
 	root.geometry("1800x900")
 	root.minsize(1500, 600)
 	root.maxsize(3000, 1500)
@@ -466,7 +466,7 @@ if __name__ == '__main__':
 	# receiver = multiprocessing.Process(target=algo_server,args=(util_response,),daemon=True)
 	# receiver.daemon=True
 
-	algo_connection = multiprocessing.Process(target=algo_server, args=(util_response,),daemon=True)
+	algo_connection = multiprocessing.Process(target=algo_server_shell, args=(util_response,),daemon=True)
 	algo_connection.daemon=True
 	
 
