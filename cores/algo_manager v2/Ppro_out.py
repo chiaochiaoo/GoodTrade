@@ -53,6 +53,13 @@ def register_web(symbol,port):
 	postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&feedtype=L1&output=" + str(port)+"&status=on"
 
 	return postbody,"register "+symbol,"register failed "+symbol
+
+
+def deregister_web(symbol,port):
+
+	postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&feedtype=L1&output=" + str(port)+"&status=off"
+
+	return postbody,"register "+symbol,"register failed "+symbol
 	
 def register_to_ppro(symbol,status,port):
 
@@ -407,6 +414,12 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 				symbol = d[1]
 				#register(symbol,port)
 				request_str,sucess_str,failure_str = register_web(symbol,port)
+
+			elif type_ == DEREGISTER:
+
+				symbol = d[1]
+				#register(symbol,port)
+				request_str,sucess_str,failure_str = deregister_web(symbol,port)			
 
 			elif type_ == STOPBUY:
 

@@ -59,6 +59,8 @@ class TradingPlan:
 
 		self.passive_boundary = 0
 
+		self.algo_ui_id = 0
+		
 		self.numeric_labels = [ACTRISK,ESTRISK,CUR_PROFIT_LEVEL,CURRENT_SHARE,TARGET_SHARE,INPUT_TARGET_SHARE,AVERAGE_PRICE,LAST_AVERAGE_PRICE,RISK_PER_SHARE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3,FLATTENTIMER,BREAKPRICE,RISKTIMER,FIBCURRENT_MAX,FIBLEVEL1,FIBLEVEL2,FIBLEVEL3,FIBLEVEL4,EXIT,RELOAD_TIMES]
 		self.string_labels = [MIND,STATUS,POSITION,RISK_RATIO,SIZE_IN,ENTRYPLAN,ENTYPE,MANAGEMENTPLAN]
 
@@ -544,6 +546,9 @@ class TradingPlan:
 
 	def clear_trade(self):
 
+
+		self.ppro_out.send([DEREGISTER,self.symbol_name])
+
 		self.data[UNREAL] = 0
 		self.data[UNREAL_PSHR] = 0
 		self.data[TOTAL_REALIZED] += self.data[REALIZED]
@@ -781,6 +786,10 @@ class TradingPlan:
 		if self.tkvars[STATUS].get() ==PENDING:
 
 #			try:
+
+			self.ppro_out.send([REGISTER,self.symbol_name])
+
+
 			entryplan=self.tkvars[ENTRYPLAN].get()
 			entry_type=self.tkvars[ENTYPE].get()
 			entrytimer=int(self.tkvars[TIMER].get())

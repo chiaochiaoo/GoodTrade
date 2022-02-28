@@ -481,7 +481,7 @@ class UI(pannel):
 		info = list(infos.values())
 		labels = list(infos.keys())
 
-		for l in range(60):
+		for l in range(51):
 			self.tklabels[l]={}
 			for j in range(len(info)):
 				#"symbol","algo_status","description","break_at","position","act_r/est_r","stoplevel","average_price","shares","pxtgt1","pxtgt1","pxtgt1","unrealized_pshr","unrealized","realized"
@@ -537,8 +537,7 @@ class UI(pannel):
 		self.rebind(self.dev_canvas,self.deployment_frame)
 
 
-	def create_new_entry(self,tradingplan):
-
+	def create_entry(self,tradingplan,symbol):
 
 		infos = {
 		SELECTED:tradingplan.tkvars[SELECTED],\
@@ -573,12 +572,8 @@ class UI(pannel):
 		tradingplan.tkvars[RISKTIMER] = self.risk_timer 
 
 
-		l = self.label_count
-
 		info = list(infos.values())
-		labels = list(infos.keys())
-		symbol = l-1 #info[1]
-		#self.tklabels[symbol] = {}
+		labels = list(infos.keys())	
 
 		for j in range(len(info)):
 			#"symbol","algo_status","description","break_at","position","act_r/est_r","stoplevel","average_price","shares","pxtgt1","pxtgt1","pxtgt1","unrealized_pshr","unrealized","realized"
@@ -656,7 +651,19 @@ class UI(pannel):
 			tradingplan.tklabels[label_name] = self.tklabels[symbol][label_name]
 
 
+		tradingplan.algo_ui_id = symbol
+
+	def create_new_entry(self,tradingplan):
+
+		l = self.label_count
+		symbol = l-1 #info[1]
+		#self.tklabels[symbol] = {}
+
+		self.create_entry(tradingplan, symbol)
+
 		self.label_count +=1
+
+		
 
 		self.algo_count_number.set(self.label_count-1)
 		self.rebind(self.dev_canvas,self.deployment_frame)
