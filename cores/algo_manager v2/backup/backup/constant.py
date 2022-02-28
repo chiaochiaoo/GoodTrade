@@ -30,7 +30,7 @@ ANCART_OVERRIDE = "ancartoverride"
 USING_STOP = "Using_STOP"
 FLATTENTIMER = "flattentimer"
 
-
+ALGO_UIID = "algo_ui_id"
 TIMER = "timer"
 ACTRISK="actrisk"
 ESTRISK="estrisk"
