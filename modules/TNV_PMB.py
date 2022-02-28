@@ -99,6 +99,15 @@ class Premarket_breakout():
 		#self.entries[entry][8]["command"]= lambda symbol=rank,side=side,open_=row['open'],stop_=rscore,risk_=self.algo_risk:self.send_algo(self,symbol,side,open_,stop_,risk_)
 		risk = self.algo_risk.get()
 
+		now = datetime.now()
+		ts = now.hour*60+now.minute
+
+		deployment=True
+		if ts>=570:
+			deployment = True
+		else:
+			deployment = False
+			
 		if risk>0:
 
 			change = 0.03
