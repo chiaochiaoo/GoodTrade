@@ -547,7 +547,7 @@ class TradingPlan:
 	def clear_trade(self):
 
 
-		self.ppro_out.send([DEREGISTER,symbol])
+		self.ppro_out.send([DEREGISTER,self.symbol_name])
 
 		self.data[UNREAL] = 0
 		self.data[UNREAL_PSHR] = 0
@@ -787,7 +787,7 @@ class TradingPlan:
 
 #			try:
 
-			self.ppro_out.send([REGISTER,symbol])
+			self.ppro_out.send([REGISTER,self.symbol_name])
 
 
 			entryplan=self.tkvars[ENTRYPLAN].get()
