@@ -481,7 +481,7 @@ class UI(pannel):
 		info = list(infos.values())
 		labels = list(infos.keys())
 
-		for l in range(5):
+		for l in range(51):
 			self.tklabels[l]={}
 			for j in range(len(info)):
 				#"symbol","algo_status","description","break_at","position","act_r/est_r","stoplevel","average_price","shares","pxtgt1","pxtgt1","pxtgt1","unrealized_pshr","unrealized","realized"
@@ -652,7 +652,7 @@ class UI(pannel):
 
 
 		tradingplan.algo_ui_id = symbol
-		
+
 	def create_new_entry(self,tradingplan):
 
 		l = self.label_count
