@@ -37,10 +37,8 @@ class UI(pannel):
 		self.management_plan_options = {TRENDRIDER,FIBO,EM_STRATEGY,EMASTRAT,ONETOTWORISKREWARD,FULLMANUAL,SEMIMANUAL}#SCALPATRON #THREE_TARGETS,SMARTTRAIL,ANCARTMETHOD,ONETOTWORISKREWARD,ONETOTWORISKREWARDOLD,
 
 	def init_pannel(self):
-		self.labels = {"":4,\
-						"Symbol":8,\
-						"Status":10,\
-						"MIND":20,\
+
+		"""
 						"EntryPlan":11,\
 						"EntryType":12,\
 						"Timer":5,\
@@ -49,6 +47,13 @@ class UI(pannel):
 						"AR":4,\
 						"Sup":6,\
 						"Res":6,\
+		"""
+		self.labels = {"":4,\
+						"Symbol":8,\
+						"Status":10,\
+						"MIND":20,\
+
+
 						"Act/Est R":8,\
 						"SzIn":6,\
 						"Position":6,\
@@ -219,7 +224,7 @@ class UI(pannel):
 		# self.stats_panel.place(x=210,y=10,height=50,width=1650)
 
 		self.deployment_panel = ttk.LabelFrame(self.root,text="Algo deployment") 
-		self.deployment_panel.place(x=210,y=10,relheight=0.85,width=1650)
+		self.deployment_panel.place(x=210,y=10,relheight=0.85,width=1200)
 
 		###########################################################################################################
 
@@ -450,19 +455,26 @@ class UI(pannel):
 
 	def init_entry_pannel(self):
 
+
+		"""
+				ENTRYPLAN:"", \
+		ENTYPE:"", \
+		TIMER:"", \
+		MANAGEMENTPLAN:"", \
+
+
+		"Reload":"", \
+		'AR':"", \
+		SUPPORT:"", \
+		RESISTENCE:"", \
+		"""
 		infos = {
 		SELECTED:"",\
 		'Symbol':"", \
 		STATUS:"",\
 		MIND:"",\
-		ENTRYPLAN:"", \
-		ENTYPE:"", \
-		TIMER:"", \
-		MANAGEMENTPLAN:"", \
-		"Reload":"", \
-		'AR':"", \
-		SUPPORT:"", \
-		RESISTENCE:"", \
+
+
 		RISK_RATIO:"", \
 		'SzIn':"", \
 		'Position':"", \
@@ -539,11 +551,7 @@ class UI(pannel):
 
 	def create_entry(self,tradingplan,symbol):
 
-		infos = {
-		SELECTED:tradingplan.tkvars[SELECTED],\
-		'Symbol':tradingplan.symbol_name, \
-		STATUS:tradingplan.tkvars[STATUS],\
-		MIND: tradingplan.tkvars[MIND],\
+		"""
 		ENTRYPLAN:tradingplan.tkvars[ENTRYPLAN], \
 		ENTYPE:tradingplan.tkvars[ENTYPE], \
 		TIMER:tradingplan.tkvars[TIMER], \
@@ -552,6 +560,14 @@ class UI(pannel):
 		'AR':tradingplan.tkvars[AUTORANGE], \
 		SUPPORT:tradingplan.tkvars[SUPPORT], \
 		RESISTENCE:tradingplan.tkvars[RESISTENCE], \
+		"""
+		infos = {
+		SELECTED:tradingplan.tkvars[SELECTED],\
+		'Symbol':tradingplan.symbol_name, \
+		STATUS:tradingplan.tkvars[STATUS],\
+		MIND: tradingplan.tkvars[MIND],\
+
+
 		RISK_RATIO:tradingplan.tkvars[RISK_RATIO], \
 		'SzIn':tradingplan.tkvars[SIZE_IN], \
 		'Position':tradingplan.tkvars[POSITION], \
