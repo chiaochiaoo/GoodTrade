@@ -324,40 +324,40 @@ class TradingPlan:
 
 	""" PPRO SECTION """
 
-	def AR_toggle_check(self):
-		"""
-		This will happen whenever a trade is placed. 
-		"""
-		try:
-			self.symbol.set_resistence(self.tkvars[RESISTENCE].get())
-			self.tklabels[RESISTENCE]["background"] = "white"
-		except Exception as e:
-			log_print(self.symbol_name,"error on sup/res input.",e)
-			self.tklabels[RESISTENCE]["background"] = "red"
-			return False
-		try:
-			self.symbol.set_support(self.tkvars[SUPPORT].get())
-			self.tklabels[SUPPORT]["background"] = "white"
-		except Exception as e:
-			log_print(self.symbol_name,"error on sup/res input.",e)
-			self.tklabels[SUPPORT]["background"] = "red"
-			return False
+	# def AR_toggle_check(self):
+	# 	"""
+	# 	This will happen whenever a trade is placed. 
+	# 	"""
+	# 	try:
+	# 		self.symbol.set_resistence(self.tkvars[RESISTENCE].get())
+	# 		#self.tklabels[RESISTENCE]["background"] = "white"
+	# 	except Exception as e:
+	# 		log_print(self.symbol_name,"error on sup/res input.",e)
+	# 		#self.tklabels[RESISTENCE]["background"] = "red"
+	# 		return False
+	# 	try:
+	# 		self.symbol.set_support(self.tkvars[SUPPORT].get())
+	# 		#self.tklabels[SUPPORT]["background"] = "white"
+	# 	except Exception as e:
+	# 		log_print(self.symbol_name,"error on sup/res input.",e)
+	# 		#self.tklabels[SUPPORT]["background"] = "red"
+	# 		return False
 
-		return True
+	# 	return True
 
-	def AR_toggle(self):
-		try:
-			if self.data[POSITION] =="" and self.tkvars[AUTORANGE].get()==False:   #Turn off safety, now adjust the values. 
-				self.tklabels[SUPPORT]["state"] = "normal"
-				self.tklabels[RESISTENCE]["state"] = "normal"
-			else:  ###Turn the safety back on. 
-				if self.AR_toggle_check() == True:
-					self.tklabels[SUPPORT]["state"] = "disabled"
-					self.tklabels[RESISTENCE]["state"] = "disabled"
-				else:
-					self.tkvars[AUTORANGE].set(False)
-		except:
-			pass
+	# def AR_toggle(self):
+	# 	try:
+	# 		if self.data[POSITION] =="" and self.tkvars[AUTORANGE].get()==False:   #Turn off safety, now adjust the values. 
+	# 			self.tklabels[SUPPORT]["state"] = "normal"
+	# 			#self.tklabels[RESISTENCE]["state"] = "normal"
+	# 		else:  ###Turn the safety back on. 
+	# 			if self.AR_toggle_check() == True:
+	# 				self.tklabels[SUPPORT]["state"] = "disabled"
+	# 				self.tklabels[RESISTENCE]["state"] = "disabled"
+	# 			else:
+	# 				self.tkvars[AUTORANGE].set(False)
+	# 	except:
+	# 		pass
 
 	def ppro_update_price(self,bid,ask,ts):
 
@@ -806,12 +806,14 @@ class TradingPlan:
 			self.entry_plan_decoder(entryplan, entry_type, entrytimer)
 			self.manage_plan_decoder(manage_plan)
 
-			if self.AR_toggle_check():
-				try:
-					log_print("Deploying:",self.symbol_name,self.entry_plan.get_name(),self.symbol.get_support(),self.symbol.get_resistence(),entry_type,entrytimer,self.management_plan.get_name(),"risk:",self.data[ESTRISK],"risk timer:",self.data[RISKTIMER],"reload:",self.data[RELOAD_TIMES],"rps",self.data[RISK_PER_SHARE])
-				except:
-					pass
-				self.start_tradingplan()
+			self.start_tradingplan()
+			
+			# if self.AR_toggle_check():
+			# 	try:
+			# 		log_print("Deploying:",self.symbol_name,self.entry_plan.get_name(),self.symbol.get_support(),self.symbol.get_resistence(),entry_type,entrytimer,self.management_plan.get_name(),"risk:",self.data[ESTRISK],"risk timer:",self.data[RISKTIMER],"reload:",self.data[RELOAD_TIMES],"rps",self.data[RISK_PER_SHARE])
+			# 	except:
+			# 		pass
+			# 	self.start_tradingplan()
 
 			# except Exception as e:
 
