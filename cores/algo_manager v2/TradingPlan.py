@@ -721,7 +721,7 @@ class TradingPlan:
 
 
 		if status == DEPLOYED:
-			self.input_lock(True)
+			#self.input_lock(True)
 			self.tklabels[STATUS]["background"] = LIGHTYELLOW
 
 		elif status == RUNNING:
@@ -734,7 +734,7 @@ class TradingPlan:
 			self.tklabels[STATUS]["background"] = DEEPGREEN
 
 		elif status == PENDING:
-			self.input_lock(False)
+			#self.input_lock(False)
 			self.tklabels[STATUS]["background"] = DEFAULT
 
 			#if reload is on, turn it back on.
@@ -807,7 +807,7 @@ class TradingPlan:
 			self.manage_plan_decoder(manage_plan)
 
 			self.start_tradingplan()
-			
+
 			# if self.AR_toggle_check():
 			# 	try:
 			# 		log_print("Deploying:",self.symbol_name,self.entry_plan.get_name(),self.symbol.get_support(),self.symbol.get_resistence(),entry_type,entrytimer,self.management_plan.get_name(),"risk:",self.data[ESTRISK],"risk timer:",self.data[RISKTIMER],"reload:",self.data[RELOAD_TIMES],"rps",self.data[RISK_PER_SHARE])
