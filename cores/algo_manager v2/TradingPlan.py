@@ -549,6 +549,7 @@ class TradingPlan:
 
 		self.ppro_out.send([DEREGISTER,self.symbol_name])
 		self.ppro_out.send(["Flatten",self.symbol_name])
+
 		
 		self.data[UNREAL] = 0
 		self.data[UNREAL_PSHR] = 0
