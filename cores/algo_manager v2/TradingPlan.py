@@ -548,7 +548,8 @@ class TradingPlan:
 
 
 		self.ppro_out.send([DEREGISTER,self.symbol_name])
-
+		self.ppro_out.send(["Flatten",self.symbol_name])
+		
 		self.data[UNREAL] = 0
 		self.data[UNREAL_PSHR] = 0
 		self.data[TOTAL_REALIZED] += self.data[REALIZED]
@@ -567,7 +568,7 @@ class TradingPlan:
 		self.data[POSITION] = ""
 
 		self.tkvars[POSITION].set("")
-		
+
 		#self.tklabels[AUTORANGE]["state"] = "normal"
 		self.current_price_level = 0
 		self.current_running_strategy = None
