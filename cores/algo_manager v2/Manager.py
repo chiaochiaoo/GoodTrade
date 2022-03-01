@@ -1014,6 +1014,8 @@ class Tester:
 
 		self.gt.send(["pkg",[dic]])
 
+		
+
 		time.sleep(1)
 		wish_granter = threading.Thread(target=self.wish, daemon=True)
 		wish_granter.start()
@@ -1118,6 +1120,26 @@ class Tester:
 		data["shares"]= int(1)
 		data["timestamp"]= self.sec
 		self.ppro.send(["order confirm",data])
+
+		dic = {}
+
+		dic["algo_name"] = 'TEST'
+		dic["entry_type"] =BREAKFIRST
+		dic["symbol"] ='SPY.AM'
+		dic["support"] =412
+		dic["resistence"] =413
+		dic["risk"] =50.0
+		dic["statistics"] ={'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441,"expected_momentum":2}
+		dic["immediate_deployment"] = False
+		dic["management"] = ONETOTWORISKREWARD
+
+
+		self.gt.send(["pkg",[dic]])
+
+		
+		for i in range(45):
+			dic["symbol"]=int(i)
+			self.gt.send(["pkg",[dic]])
 
 	def sub1(self):
 		data = {}
@@ -1415,7 +1437,7 @@ if __name__ == '__main__':
 
 	root = tk.Tk()
 	root.title("GoodTrade Algo Manager v2 b17 Algo Replacing upgrade")
-	root.geometry("1920x1000")
+	root.geometry("1500x1000")
 
 	manager=Manager(root,goodtrade_pipe,ppro_out,ppro_in,TEST)
 	print(len(sys.argv))
