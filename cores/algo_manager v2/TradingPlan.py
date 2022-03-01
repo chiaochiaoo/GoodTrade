@@ -567,7 +567,8 @@ class TradingPlan:
 		self.data[POSITION] = ""
 
 		self.tkvars[POSITION].set("")
-		self.tklabels[AUTORANGE]["state"] = "normal"
+		
+		#self.tklabels[AUTORANGE]["state"] = "normal"
 		self.current_price_level = 0
 		self.current_running_strategy = None
 
