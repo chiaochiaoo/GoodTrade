@@ -25,8 +25,8 @@ class StandardScanner():
 		self.entries = []
 		self.algo_placed = []
 
-		self.algo_name = ""
-		
+		self.algo_name = algo_name	
+			
 		self.l = 1
 
 		self.NT = NT
