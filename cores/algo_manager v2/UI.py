@@ -391,10 +391,10 @@ class UI(pannel):
 		self.algo_cancel = ttk.Button(self.cmd, text="Cancel all algo",command=self.manager.cancel_all)
 		self.algo_cancel.grid(sticky="w",column=2,row=3)
 
-		self.flatten = ttk.Button(self.cmd, text="Export Algos",command=self.manager.export_algos)
+		self.flatten = ttk.Button(self.cmd, text="Weekly Report",command=graphweekly)
 		self.flatten.grid(sticky="w",column=1,row=4)
 
-		self.algo_cancel = ttk.Button(self.cmd, text="Import Algos",command=self.manager.import_algos)
+		self.algo_cancel = ttk.Button(self.cmd, text="Daily Report" ) #command=self.manager.import_algos
 		self.algo_cancel.grid(sticky="w",column=2,row=4)
 
 		row=5

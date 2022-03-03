@@ -2,6 +2,93 @@ from datetime import datetime
 
 import linecache
 import sys
+
+from datetime import datetime, timedelta
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import ticker
+import matplotlib.pyplot as plt
+
+
+def convert(df):
+	
+	algos = df.ALGO.unique()
+	dates = df.DATE.unique()
+	treal = pd.DataFrame(index=dates)
+	trisk = pd.DataFrame(index=dates)
+	for algo in algos:
+		#print(algo)
+		a = []
+		b = []
+		for date in dates:
+			a.append(sum(df.loc[(df["DATE"]==date)&(df["ALGO"]==algo)]["REALIZED"].tolist()))
+			b.append(sum(df.loc[(df["DATE"]==date)&(df["ALGO"]==algo)]["RISK"].tolist()))
+		treal[algo] = a#r.loc[r.ALGO==algo].groupby(['DATE']).sum()["REALIZED"].tolist()
+		trisk[algo] = b
+	return treal,trisk
+
+
+def graphweekly():
+
+
+	now = datetime.now()
+	monday = now - timedelta(days = now.weekday())
+	file = monday.strftime("%Y_%m_%d")+".csv"
+
+	r = pd.read_csv("../../algo_records/"+file)
+
+
+
+	algos = r.ALGO.unique()
+
+
+	fig, axs = plt.subplots(3,2,figsize=(20,15))
+	#fig.suptitle('Vertically stacked subplots')
+
+	r.groupby(['DATE']).sum().plot(ax=axs[0,0],kind='bar')
+
+	axs[0,0].axhline(0,linestyle="--")
+	axs[0,0].xaxis.set_tick_params(rotation=1)      
+	axs[0,0].yaxis.set_major_formatter(ticker.FormatStrFormatter('$%.f'))
+	axs[0,0].set_title("Total by date")
+
+	tr,trk = convert(r)
+
+	tr.plot(ax=axs[1,0],kind='bar')
+	axs[1,0].axhline(0,linestyle="--")
+	axs[1,0].xaxis.set_tick_params(rotation=1)      
+	axs[1,0].yaxis.set_major_formatter(ticker.FormatStrFormatter('$%.f'))
+	axs[1,0].set_title("Total Realized by algo by date")
+
+
+	trk.plot(ax=axs[2,0],kind='bar')
+	axs[2,0].axhline(0,linestyle="--")
+	axs[2,0].xaxis.set_tick_params(rotation=1)      
+	axs[2,0].yaxis.set_major_formatter(ticker.FormatStrFormatter('$%.f'))
+	axs[2,0].set_title("Total Risk by algo by date")
+
+
+	r.groupby(['ALGO'])["RISK"].sum().plot(ax=axs[0,1],kind='bar')
+	axs[0,1].axhline(0,linestyle="--")
+	axs[0,1].xaxis.set_tick_params(rotation=1)      
+	axs[0,1].yaxis.set_major_formatter(ticker.FormatStrFormatter('$%.f'))
+	axs[0,1].set_title("Total Risk by Algo")
+
+	r.groupby(['ALGO'])["REALIZED"].sum().plot(ax=axs[1,1],kind='bar')
+	axs[1,1].axhline(0,linestyle="--")
+	axs[1,1].xaxis.set_tick_params(rotation=1)      
+	axs[1,1].yaxis.set_major_formatter(ticker.FormatStrFormatter('$%.f'))
+	axs[1,1].set_title("Total Realized by Algo")
+
+	r.groupby(['SYMBOL'])["REALIZED"].sum().sort_values(ascending=False)[:10].plot(ax=axs[2,1],kind='bar')
+	axs[2,1].axhline(0,linestyle="--")
+	axs[2,1].xaxis.set_tick_params(rotation=1)      
+	axs[2,1].yaxis.set_major_formatter(ticker.FormatStrFormatter('$%.f'))
+	axs[2,1].set_title("Total Realized by Symbol")
+
+	plt.tight_layout()
+	plt.show()
 	
 def PrintException(info):
     exc_type, exc_obj, tb = sys.exc_info()
