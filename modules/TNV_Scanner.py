@@ -130,10 +130,21 @@ class TNV_Scanner():
 		self.tfm = TFM(self.TFM_frame,self)
 
 
-		# filtered_df = pd.read_csv("test.csv",index_col=0)
 
-		# self.update_entry([filtered_df,"test"])
+		# while True:
+		# 	receiver = threading.Thread(target=self.update_entry,args=([filtered_df,"09:31"],),daemon=True)
+		# 	receiver.start()
+		# 	time.sleep(2)
+		# 	print("New!")
 
+		# filtered_df = pd.read_csv("current.csv",index_col=0)
+
+		# self.update_entry([filtered_df,"09:31"])
+		#self.update_entry()
+
+
+		# receiver = threading.Thread(target=algo_server,args=() daemon=True)
+		# receiver.start()
 
 	def send_algo(self,msg):
 		self.algo_commlink.send(msg)
@@ -598,6 +609,16 @@ class Open_high(StandardScanner):
 		self.tnv_scanner = tnv
 		super().__init__(root,NT,"Open_High")
 
+		self.open = tk.BooleanVar(value=0)
+
+		row = 3
+		col = 5
+		ttk.Label(self.algo_frame, text="OpenBreak:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.algo_frame, variable=self.open).grid(sticky="w",column=col+1,row=row)
+
+
+
+
 	def update_entry(self,data):
 
 		df = data
@@ -613,8 +634,12 @@ class Open_high(StandardScanner):
 		algo_timer = self.hour.get()*60 + self.minute.get()
 		end_timer = self.ehour.get()*60 + self.eminute.get()
 
+		algo_timer = 0
 		#print("fade:",self.fade.get())
 		send_algo = []
+
+		open_ = self.open.get()
+
 		if 1:
 			for index, row in df.iterrows():
 				#print(row)
@@ -653,12 +678,21 @@ class Open_high(StandardScanner):
 					if trade not in self.algo_placed and self.algo_activate.get()==1 \
 					and ts>=algo_timer and ts<=end_timer:
 
-										
-
 						send = False
 						fade = self.fade.get()
 						order = {}
 						order["symbol"] = rank
+
+
+						if open_ and row["oh"]>0.5 and row["f5r"]>0.8 and relv>1.2 and ts<=700:
+
+							order["support"] = row['open']	#- (row['high']-row['price'])
+							order["resistence"] = row['price']
+							order["side"] = "UP"
+
+
+							send=True
+							self.algo_placed.append(trade)
 
 						if row['ema45change']<=-25 and row['oh']>=1:
 
@@ -712,6 +746,14 @@ class Open_low(StandardScanner):
 		self.tnv_scanner = tnv
 		super().__init__(root,NT,"Open_Low")
 
+
+		self.open = tk.BooleanVar(value=0)
+
+		row = 3
+		col = 5
+		ttk.Label(self.algo_frame, text="OpenBreak:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.algo_frame, variable=self.open).grid(sticky="w",column=col+1,row=row)
+
 	def update_entry(self,data):
 
 		#at most 8.
@@ -729,6 +771,9 @@ class Open_low(StandardScanner):
 		algo_timer = self.hour.get()*60 + self.minute.get()
 		end_timer = self.ehour.get()*60 + self.eminute.get()
 		send_algo = []
+
+		open_ = self.open.get()
+
 		if 1:
 			for index, row in df.iterrows():
 				#print(row)
@@ -767,6 +812,16 @@ class Open_low(StandardScanner):
 						order = {}
 						order["symbol"] = rank
 						fade = self.fade.get()
+
+						#print(trade,open_, row["ol"],row["f5r"],relv,ts,)
+						if open_ and row["ol"]>0.5 and row["f5r"]>0.5 and relv>0.5 and ts<=600:
+
+							order["support"] = 	row['price'] #- (row['high']-row['price'])
+							order["resistence"] =  row['open']
+							order["side"] = "DOWN"
+							send=True
+							self.algo_placed.append(trade)
+
 						if row['ema45change']>=25 and row['ol']>=1:
 
 							if fade==1:
