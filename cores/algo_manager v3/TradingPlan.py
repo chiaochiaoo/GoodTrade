@@ -274,6 +274,30 @@ class TradingPlan:
 			self.passive_price = price
 	#if the price is 2C away. chase it.
 	#if the price is unchanged, do nothing. 
+
+
+
+	def remaining_room(self):
+
+		#check the remaining risk room. 
+		#set the share number. 
+
+		risk_per_share = abs(self.symbol.get_bid() - self.data[STOP_LEVEL])		
+
+
+		remaining_risk = self.data[ESTRISK] - self.data[ACTRISK]
+
+
+		share = remaining_risk/risk_per_share
+
+		if share >=1:
+			return int(share)
+
+		elif share>0.5:
+			return 1
+		else:
+			return 0
+		
 	def passive_process(self):
 
 		fullfilled = 0
@@ -292,13 +316,17 @@ class TradingPlan:
 
 			#what just gained. 
 
-			self.passive_remaining_shares = abs(self.passive_target_shares - self.passive_current_shares)
+			### need to recalculate. ####
+			self.passive_remaining_shares = self.remaining_room()
+
+			#print("shares left:",self.passive_remaining_shares)
+			#abs(self.passive_target_shares - self.passive_current_shares)
 
 
-			if self.passive_action==ADD and self.data[CURRENT_SHARE] >= self.passive_target_shares:
+			if self.passive_action==ADD and self.passive_remaining_shares<1:#self.data[CURRENT_SHARE] >= self.passive_target_shares:
 				log_print(self.symbol_name," passive fill completed")
 				break
-			if self.passive_action==MINUS and self.data[CURRENT_SHARE] <= self.passive_target_shares:
+			if self.passive_action==MINUS and self.passive_remaining_shares<1:#self.data[CURRENT_SHARE] <= self.passive_target_shares:
 				log_print(self.symbol_name," passive fill completed")
 				break
 			if self.flatten_order==True:

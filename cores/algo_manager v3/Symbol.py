@@ -37,6 +37,30 @@ class Symbol:
 		self.mind_label = None
 
 		self.tradingplan=None
+
+
+		"""
+		UPGRADED PARTS
+
+		+ for LONG. - for SHORTS
+
+		"""
+
+		self.current_shares = 0
+
+		# plus, minus, all the updates, all go here. 
+		self.incoming_shares = []
+
+		# 1. anyone wants anything, will register here. 
+		# 2. System every second checks the outstanding shares and do corresponding actions. 
+		# 3. For mutual canling requests - automatically granted each other. Otherwise, result in an imbalance. 
+		self.outstanding_request = {}
+
+
+
+
+
+
 		self.init_data(support,resistence,stats)
 
 	def set_data(self,support,resistence,stats):
