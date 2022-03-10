@@ -1031,6 +1031,7 @@ class Tester:
 				type_ = d[0]
 
 				#time.sleep(1)
+				#print(self.buy_book)
 				if type_ == "Buy" or type_ == IOCBUY:
 
 					symbol = d[1]
@@ -1076,18 +1077,36 @@ class Tester:
 					self.ppro.send(["order confirm",data])
 
 
-				elif type_ == LIMITBUY:
+				elif type_ == LIMITBUY :
 					symbol = d[1]
 					price = d[2]
 					share = d[3]
 
 					self.buy_book[price] = share
-				elif type_ == LIMITSELL:
+				elif type_ == LIMITSELL :
 					symbol = d[1]
 					price = d[2]
 					share = d[3]
 
 					self.sell_book[price] = share
+
+				elif type_ == PASSIVEBUY:
+
+					symbol = d[1]
+					price = d[3]
+					share = d[2]
+
+					self.buy_book[price] = share
+
+				elif type_ == PASSIVESELL:
+
+					symbol = d[1]
+					price = d[3]
+					share = d[2]
+
+					self.sell_book[price] = share
+
+
 				elif type_ == "Flatten":
 
 					symbol = d[1]
@@ -1376,9 +1395,13 @@ class Tester:
 
 	def limit_buy_sell(self):
 
+		#print("checking limit buy book",self.buy_book)
 		used = []
 		for key,item in self.buy_book.items():
+
+			#print("checking",key,self.bid,self.bid <= key)
 			if self.bid <= key:
+				#print("order___CONFIRMED")
 				data={}
 				data["symbol"]= "SPY.AM"
 				data["side"]= LONG
