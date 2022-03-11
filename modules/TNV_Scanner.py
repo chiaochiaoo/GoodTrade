@@ -639,7 +639,8 @@ class Open_high(StandardScanner):
 		send_algo = []
 
 		open_ = self.open.get()
-
+		fade = self.fade.get()
+		
 		if 1:
 			for index, row in df.iterrows():
 				#print(row)
@@ -679,7 +680,7 @@ class Open_high(StandardScanner):
 					and ts>=algo_timer and ts<=end_timer:
 
 						send = False
-						fade = self.fade.get()
+						
 						order = {}
 						order["symbol"] = rank
 
@@ -773,6 +774,8 @@ class Open_low(StandardScanner):
 		send_algo = []
 
 		open_ = self.open.get()
+		fade = self.fade.get()
+
 
 		if 1:
 			for index, row in df.iterrows():
@@ -811,7 +814,7 @@ class Open_low(StandardScanner):
 
 						order = {}
 						order["symbol"] = rank
-						fade = self.fade.get()
+						
 
 						#print(trade,open_, row["ol"],row["f5r"],relv,ts,)
 						if open_ and row["ol"]>0.5 and row["f5r"]>0.5 and relv>0.5 and ts<=600:
@@ -824,7 +827,7 @@ class Open_low(StandardScanner):
 
 						if row['ema45change']>=25 and row['ol']>=1:
 
-							if fade==1:
+							if fade==True:
 								order["support"] =  row['price']	 
 								order["resistence"] = row['price'] + (row['price']-row['low'])
 								order["side"] = "DOWN"
@@ -833,15 +836,21 @@ class Open_low(StandardScanner):
 								order["resistence"] = row['price']	
 								order["side"] = "UP"			
 							send=True
-							self.algo_placed.append(trade)	
+							self.algo_placed.append(trade)
+
 						if row['ema45change']>=50 and row['ol']>=1:
 
 
-							order["support"] = row['low']- 0.03
-							order["resistence"] = row['price']	
-							order["side"] = "UP"			
-							send=True				
-							self.algo_placed.append(trade)	
+							if fade==True:
+								order["support"] =  row['price']	 
+								order["resistence"] = row['price'] + (row['price']-row['low'])
+								order["side"] = "DOWN"
+							else:	
+								order["support"] = row['low'] -0.03	
+								order["resistence"] = row['price']	
+								order["side"] = "UP"			
+							send=True
+							self.algo_placed.append(trade)
 
 		
 						if send:
