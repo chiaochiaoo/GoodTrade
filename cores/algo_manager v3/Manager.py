@@ -7,6 +7,7 @@ from Ppro_in import *
 from Ppro_out import *
 from constant import *
 
+import random
 from BackTester import *
 from Util_functions import *
 import sys
@@ -354,12 +355,25 @@ class Manager:
 		self.u_losing_min = 0
 		self.u_losing_max = 0
 
+
+		#### EXPOSURE ADJUSTING #####
+
+		self.long_exposure = 0
+		self.short_exposure = 0
+		self.delta_spx = 0
+
+		#############################
+
 		now = datetime.now()
 		monday = now - timedelta(days = now.weekday())
 		self.file = "../../algo_records/"+monday.strftime("%Y_%m_%d")+".csv"
 
 
 		self.init_record_writer()
+
+
+		handl = threading.Thread(target=self.shares_allocation,daemon=True)
+		handl.start()
 
 		good = threading.Thread(target=self.goodtrade_in, daemon=True)
 		good.start()
@@ -389,6 +403,24 @@ class Manager:
 		log_print(("record file start"))
 
 
+
+	def shares_allocation(self):
+
+		#fro each of the symbols. look at imbalance. deal with it. 
+
+		while True:
+			for symbol,val in self.symbol_data.items():
+
+				if val.share_request==True:
+					print("handling ",symbol)
+					val.mutual_request_handler()
+					# stage 1, cancel each other out in the request book
+
+					# stage 2, granted request from the incoming book
+
+					# stage 3, handle imbalance request (just use market orders now.)
+
+			time.sleep(3)
 	def new_record(self,tradingplan):
 
 		try:
@@ -414,22 +446,76 @@ class Manager:
 			log_print("writing record failure for",tradingplan.symbol_name)
 
 
-
 	def add_new_tradingplan(self,data,TEST_MODE):
 
-		#['Any level', 'TEST.AM', 1.0, 2.0, 5.0, {'ATR': 3.6, 'OHavg': 1.551, 'OHstd': 1.556, 'OLavg': 1.623, 'OLstd': 1.445}]
+		print("adding",data)
+		algo_name =  data["algo_name"]
+		entryplan = data["entry_type"]
+		symbol = data["symbol"] 
+		support = data["support"]
+		resistence =  data["resistence"]
+		risk = data["risk"]
+		stats = data["statistics"]
+		status = data["immediate_deployment"]
+		mana = data["management"]
+	
+		now = datetime.now()
+		ts = now.hour*60 + now.minute 
+		name = symbol+str(ts)+ str(random.randint(0, 9))
+		try:
+		
+			if self.ui.algo_count_number.get()<50:
+				#print(symbol,self.ui.algo_count_number.get())
+				
+				if symbol not in self.symbol_data:
+					self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats)  #register in Symbol.
 
-		# new_order["algo_name"]= "Manual Trade"
-		# new_order["entry_type"] = entryplan
-		# new_order["symbol"] = symbol
-		# new_order["side"] = side
-		# new_order["support"] = support
-		# new_order["resistence"] = resistence
-		# new_order["immediate_deployment"]= True
-		# new_order["management"] = management 
-		# new_order["risk"] = risk
-		# new_order["statistics"] = {}
+				#self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
+				self.symbols.append(symbol)
 
+				#######################################################################
+
+				self.tradingplan[symbol]=TradingPlan(name,self.symbol_data[symbol],entryplan,INSTANT,mana,risk,self.pipe_ppro_out,0,TEST_MODE,algo_name,self)
+				self.ui.create_new_entry(self.tradingplan[symbol])
+
+				if status == True:
+					self.tradingplan[symbol].deploy(9600)
+			else:
+
+				find_ = False
+				replace_id = 0
+				for trade in self.tradingplan.values():
+
+					if trade.tkvars[STATUS].get()==PENDING or trade.tkvars[STATUS].get()==DONE:
+						replace_id = trade.algo_ui_id
+						find_ = True
+						log_print("Replacing",trade.symbol_name)
+						break 
+				if find_:
+					if symbol not in self.symbol_data:
+						self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats)  #register in Symbol.
+					#self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
+					self.symbols.append(symbol)
+
+					#######################################################################
+
+					self.tradingplan[symbol]=TradingPlan(name,self.symbol_data[symbol],entryplan,INSTANT,mana,risk,self.pipe_ppro_out,0,TEST_MODE,algo_name,self)
+					self.ui.create_entry(self.tradingplan[symbol],replace_id)
+
+					if status == True:
+						self.tradingplan[symbol].deploy(9600)
+				else:
+					log_print("System at full capacity.")
+
+				# now find an empty spot. 
+
+
+		except Exception as e:
+			log_print("adding new tradingplan problem",e,data)
+			PrintException("adding new tradingplan problem")
+
+
+	def add_new_tradingplan_old(self,data,TEST_MODE):
 
 		algo_name =  data["algo_name"]
 		entryplan = data["entry_type"]
@@ -447,7 +533,7 @@ class Manager:
 				if self.ui.algo_count_number.get()<50:
 					#print(symbol,self.ui.algo_count_number.get())
 					self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats)  #register in Symbol.
-					self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
+					#self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
 					self.symbols.append(symbol)
 
 					#######################################################################
@@ -470,7 +556,7 @@ class Manager:
 							break 
 					if find_:
 						self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats)  #register in Symbol.
-						self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
+						#self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
 						self.symbols.append(symbol)
 
 						#######################################################################
@@ -491,7 +577,7 @@ class Manager:
 
 
 					self.symbol_data[symbol].set_data(support,resistence,stats)
-					self.symbol_data[symbol].set_mind("Updated",DEFAULT)
+					#self.symbol_data[symbol].set_mind("Updated",DEFAULT)
 
 
 					self.tradingplan[symbol].set_data(risk,entryplan,INSTANT,mana,support,resistence)
@@ -774,8 +860,19 @@ class Manager:
 				shares = data["shares"]
 				side = data["side"]
 
-				if symbol in self.tradingplan:
-					self.tradingplan[symbol].ppro_process_orders(price,shares,side)
+				## HERE. Append it to the new symbol warehouse system. 
+
+
+				if symbol in self.symbols:
+
+					if side == LONG:
+						self.symbol_data[symbol].holdings_update(price,shares)
+
+					elif side == SHORT:
+						self.symbol_data[symbol].holdings_update(price,-shares)
+
+
+					#self.tradingplan[symbol].ppro_process_orders(price,shares,side)
 
 				#if TEST:
 					#log_print(self.tradingplan[symbol].data)
@@ -787,8 +884,13 @@ class Manager:
 				ask = data["ask"]
 				ts = data["timestamp"]
 
-				if symbol in self.tradingplan:
-					self.tradingplan[symbol].ppro_update_price(bid,ask,ts)
+				# here I update the symbol instead. 
+				# and then the symbol update each of the tradingplan bound to it. 
+				if symbol in self.symbols:
+					self.symbol_data[symbol].update_price(bid,ask,ts)
+
+				# if symbol in self.tradingplan:
+				# 	self.tradingplan[symbol].ppro_update_price(bid,ask,ts)
 
 			elif d[0] =='order update_m':
 				data = d[1]
@@ -1002,19 +1104,32 @@ class Tester:
 		dic = {}
 
 		dic["algo_name"] = 'TEST'
-		dic["entry_type"] =BREAKFIRST
+		dic["entry_type"] =INSTANTLONG
 		dic["symbol"] ='SPY.AM'
 		dic["support"] =412
 		dic["resistence"] =413
 		dic["risk"] =50.0
 		dic["statistics"] ={'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441,"expected_momentum":2}
 		dic["immediate_deployment"] = False
-		dic["management"] = ONETOTWORISKREWARD
+		dic["management"] = FULLMANUAL
 
 
 		self.gt.send(["pkg",[dic]])
 
-		
+		dic = {}
+
+		dic["algo_name"] = 'TEST'
+		dic["entry_type"] =INSTANTSHORT
+		dic["symbol"] ='SPY.AM'
+		dic["support"] =412
+		dic["resistence"] =413
+		dic["risk"] =50.0
+		dic["statistics"] ={'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441,"expected_momentum":2}
+		dic["immediate_deployment"] = False
+		dic["management"] = FULLMANUAL
+
+
+		self.gt.send(["pkg",[dic]])
 
 		time.sleep(1)
 		wish_granter = threading.Thread(target=self.wish, daemon=True)
@@ -1143,7 +1258,7 @@ class Tester:
 		dic = {}
 
 		dic["algo_name"] = 'TEST'
-		dic["entry_type"] =BREAKFIRST
+		dic["entry_type"] =BREAKANY
 		dic["symbol"] ='SPY.AM'
 		dic["support"] =412
 		dic["resistence"] =413
@@ -1154,7 +1269,7 @@ class Tester:
 
 
 		self.gt.send(["pkg",[dic]])
-
+		
 		
 		for i in range(45):
 			dic["symbol"]=int(i)

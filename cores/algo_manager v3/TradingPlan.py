@@ -12,13 +12,18 @@ import random
 
 class TradingPlan:
 
-	def __init__(self,symbol:Symbol,entry_plan=None,entry_type=None,manage_plan=None,risk=None,ppro_out=None,default_reload=0,TEST_MODE=False,algo_name="",Manager=None):
+	def __init__(self,name:"",symbol:Symbol,entry_plan=None,entry_type=None,manage_plan=None,risk=None,ppro_out=None,default_reload=0,TEST_MODE=False,algo_name="",Manager=None):
 
+		self.name = name 
 		self.symbol = symbol
+
+		self.symbol.register_tradingplan(name,self)
+		#self.symbol.set_tradingplan(self)
 
 		self.manager = Manager
 
-		self.symbol.set_tradingplan(self)
+
+
 		self.symbol_name = symbol.get_name()
 		self.test_mode = TEST_MODE
 
@@ -350,55 +355,22 @@ class TradingPlan:
 		self.passive_in_process = False
 		self.passive_price = 0
 
-	""" PPRO SECTION """
 
-	# def AR_toggle_check(self):
-	# 	"""
-	# 	This will happen whenever a trade is placed. 
-	# 	"""
-	# 	try:
-	# 		self.symbol.set_resistence(self.tkvars[RESISTENCE].get())
-	# 		#self.tklabels[RESISTENCE]["background"] = "white"
-	# 	except Exception as e:
-	# 		log_print(self.symbol_name,"error on sup/res input.",e)
-	# 		#self.tklabels[RESISTENCE]["background"] = "red"
-	# 		return False
-	# 	try:
-	# 		self.symbol.set_support(self.tkvars[SUPPORT].get())
-	# 		#self.tklabels[SUPPORT]["background"] = "white"
-	# 	except Exception as e:
-	# 		log_print(self.symbol_name,"error on sup/res input.",e)
-	# 		#self.tklabels[SUPPORT]["background"] = "red"
-	# 		return False
-
-	# 	return True
-
-	# def AR_toggle(self):
-	# 	try:
-	# 		if self.data[POSITION] =="" and self.tkvars[AUTORANGE].get()==False:   #Turn off safety, now adjust the values. 
-	# 			self.tklabels[SUPPORT]["state"] = "normal"
-	# 			#self.tklabels[RESISTENCE]["state"] = "normal"
-	# 		else:  ###Turn the safety back on. 
-	# 			if self.AR_toggle_check() == True:
-	# 				self.tklabels[SUPPORT]["state"] = "disabled"
-	# 				self.tklabels[RESISTENCE]["state"] = "disabled"
-	# 			else:
-	# 				self.tkvars[AUTORANGE].set(False)
-	# 	except:
-	# 		pass
 
 	def ppro_update_price(self,bid,ask,ts):
 
-		if bid!=self.symbol.get_bid() or ask!=self.symbol.get_ask():
-			self.symbol.update_price(bid,ask,ts,self.tkvars[AUTORANGE].get(),self.tkvars[STATUS].get())
+		#if bid!=self.symbol.get_bid() or ask!=self.symbol.get_ask():
+
+			#move this to symbol
+			#self.symbol.update_price(bid,ask,ts,self.tkvars[AUTORANGE].get(),self.tkvars[STATUS].get())
 
 			#check stop. 
-			if self.data[POSITION]!="":
-				self.check_pnl(bid,ask,ts)
+		if self.data[POSITION]!="":
+			self.check_pnl(bid,ask,ts)
 
-			#check triggers
-			if self.current_running_strategy!=None:
-				self.current_running_strategy.update()
+		#check triggers
+		if self.current_running_strategy!=None:
+			self.current_running_strategy.update()
 
 		# except Exception as e:
 		# 	log_print("TP issue:",e)
@@ -478,7 +450,7 @@ class TradingPlan:
 
 	def ppro_process_orders(self,price,shares,side):
 		
-		#log_print("TP processing:",self.symbol_name,price,shares,side)
+		log_print("TP processing:",self.symbol_name,price,shares,side)
 		if self.data[POSITION]=="": # 1. No position.
 			if self.expect_orders==side: # or self.management_plan.strategy_name=="ScalpaTron":
 				self.ppro_confirm_new_order(price,shares,side)

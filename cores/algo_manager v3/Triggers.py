@@ -45,6 +45,8 @@ class AbstractTrigger:
 
 		self.next_triggers = set()
 
+		print(description,conditions)
+
 	def add_conditions(subject1,d_type1,subject2,d_type2,type_):
 		self.conditions.append([subject1,d_type1,subject2,d_type2,type_])
 
@@ -111,6 +113,7 @@ class AbstractTrigger:
 			for i in self.conditions:
 				s1,s2,t1,t2,type_= self.decode_conditions(i)
 
+				print(type_,s1[t1],s2[t2])
 				try:
 					if type_ ==">":
 						if not s1[t1] > s2[t2]:
@@ -650,6 +653,7 @@ class Break_any_Purchase_trigger(AbstractTrigger):
 				checker = True
 				break
 
+				p
 		if checker:
 			log_print("Trigger problem on purchase_trigger,conditions:",conditions)
 	#add the actual stuff here.
@@ -696,10 +700,12 @@ class Break_any_Purchase_trigger(AbstractTrigger):
 
 				spread_risk = spread*share/self.risk
 
-				log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk)
+				#log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk)
 
 
-				self.ppro_out.send([IOCBUY,self.symbol_name,share,self.symbol_data[ASK]])
+				self.tradingplan.symbol.new_request(self.tradingplan.name,share)
+
+				#self.ppro_out.send([IOCBUY,self.symbol_name,share,self.symbol_data[ASK]])
 				# if spread_risk < 0.15:
 				# 	log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk)
 				# 	self.ppro_out.send([IOCBUY,self.symbol_name,share,self.symbol_data[ASK]])
@@ -722,7 +728,10 @@ class Break_any_Purchase_trigger(AbstractTrigger):
 				log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk)
 
 
-				self.ppro_out.send([IOCSELL,self.symbol_name,share,self.symbol_data[BID]])
+
+				self.tradingplan.symbol.new_request(self.tradingplan.name,-share)
+
+				#self.ppro_out.send([IOCSELL,self.symbol_name,share,self.symbol_data[BID]])
 				# if spread_risk < 0.15:
 
 				# else:

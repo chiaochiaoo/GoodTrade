@@ -1210,10 +1210,12 @@ class FullManual(ManagementStrategy):
 
 	def __init__(self,symbol,tradingplan):
 
-		self.supress_warning = True
+		
 
 		super().__init__("Management: FullManual",symbol,tradingplan)
 
+		#super(ManagementStrategy,self).supress_warning = True
+		self.supress_warnings()
 		#self.manaTrigger = HoldTilCloseManager("FullManual",self)
 
 		#self.add_initial_triggers(self.manaTrigger)
@@ -1285,7 +1287,9 @@ class SemiManual(ManagementStrategy):
 
 		super().__init__("Management: SemiManual",symbol,tradingplan)
 
-		self.supress_warning = True
+		self.supress_warnings()
+		#super(ManagementStrategy,self).supress_warning = True
+
 
 		self.manaTrigger = SemiManualManager("SemiManual Trigger",self)
 

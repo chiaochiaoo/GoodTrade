@@ -62,6 +62,9 @@ class Strategy:
 		return self.strategy_name
 
 
+	def supress_warnings(self):
+		self.supress_warning = True
+		
 	def clear_initial_triggers(self):
 		self.initial_triggers = set()
 
@@ -202,8 +205,8 @@ class BreakUp(EntryStrategy): #the parameters contains? dk. yet .  #Can make sin
 		self.repeat = repeat
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
-		self.buyTrigger = Break_any_Passive_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
-		#Break_any_Passive_trigger
+		self.buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
+		#Break_any_Purchase_trigger
 		#Break_any_Purchase_trigger
 		self.add_initial_triggers(self.buyTrigger)
 
@@ -244,7 +247,7 @@ class BreakDown(EntryStrategy): #the parameters contains? dk. yet .  #Can make s
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 		#print("breakdown!!!!")
-		self.sellTrigger = Break_any_Passive_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
+		self.sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
 
 		self.add_initial_triggers(self.sellTrigger)
 
@@ -286,8 +289,8 @@ class InstantLong(EntryStrategy): #the parameters contains? dk. yet .  #Can make
 		# self.timer = timer
 		# self.repeat = repeat
 
-		self.buyTrigger = Break_any_Passive_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,BID]],SUPPORT,self.risk,"Instant Long",0,1,LONG,self.ppro_out)
-		#Break_any_Passive_trigger
+		self.buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,ASK]],SUPPORT,self.risk,"Instant Long",0,1,LONG,self.ppro_out)
+		#Break_any_Purchase_trigger
 		#Break_any_Purchase_trigger
 		self.add_initial_triggers(self.buyTrigger)
 
@@ -308,13 +311,13 @@ class InstantLong(EntryStrategy): #the parameters contains? dk. yet .  #Can make
 
 class InstantShort(EntryStrategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry.
 	def __init__(self,symbol,tradingplan):
-		super().__init__("Entry : Break downn",symbol,tradingplan)
+		super().__init__("Entry : Instant Short",symbol,tradingplan)
 		# self.timer = timer
 		# self.repeat = repeat
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 		#print("breakdown!!!!")
-		self.sellTrigger = Break_any_Passive_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,ASK]],RESISTENCE,self.risk,"Instant Short",0,1,SHORT,self.ppro_out)
+		self.sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,ASK]],RESISTENCE,self.risk,"Instant Short",0,1,SHORT,self.ppro_out)
 
 		self.add_initial_triggers(self.sellTrigger)
 
@@ -340,8 +343,8 @@ class TargetLong(EntryStrategy): #the parameters contains? dk. yet .  #Can make 
 		# self.timer = timer
 		# self.repeat = repeat
 
-		self.buyTrigger = Break_any_Passive_trigger([[SYMBOL_DATA,BID,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"Target Long",0,1,LONG,self.ppro_out)
-		#Break_any_Passive_trigger
+		self.buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"Target Long",0,1,LONG,self.ppro_out)
+		#Break_any_Purchase_trigger
 		#Break_any_Purchase_trigger
 		self.add_initial_triggers(self.buyTrigger)
 
@@ -368,7 +371,7 @@ class TargetShort(EntryStrategy): #the parameters contains? dk. yet .  #Can make
 		#description,trigger_timer:int,trigger_limit=1
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 		#print("breakdown!!!!")
-		self.sellTrigger = Break_any_Passive_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"Target Short",0,1,SHORT,self.ppro_out)
+		self.sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"Target Short",0,1,SHORT,self.ppro_out)
 
 		self.add_initial_triggers(self.sellTrigger)
 
@@ -502,8 +505,8 @@ class BreakFirst(EntryStrategy):
 		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
 		self.timer = timer
 		self.repeat = repeat
-		self.buyTrigger = Break_any_Passive_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
-		self.sellTrigger = Break_any_Passive_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
+		self.buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"break up",timer,repeat,LONG,self.ppro_out)
+		self.sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",timer,repeat,SHORT,self.ppro_out)
 
 		self.add_initial_triggers(self.buyTrigger)
 		self.add_initial_triggers(self.sellTrigger)
