@@ -23,12 +23,14 @@ class Symbol:
 	"""
 	'ATR': 3.6, 'OHavg': 1.551, 'OHstd': 1.556, 'OLavg': 1.623, 'OLstd': 1.445
 	"""
-	def __init__(self,symbol,support,resistence,stats):
+	def __init__(self,symbol,support,resistence,stats,pproout):
 
-		self.symbol = symbol
+		self.ticker = symbol
 
 		self.init_open = False
 		self.init_high_low = False
+
+		self.ppro_out = pproout
 
 		self.numeric_labels = [TRADE_TIMESTAMP,TIMESTAMP,BID,ASK,RESISTENCE,SUPPORT,OPEN,HIGH,LOW,PREMARKETHIGH,PREMARKETLOW,STOP,EXIT,ENTRY,CUSTOM]
 
@@ -71,14 +73,19 @@ class Symbol:
 
 
 		self.init_data(support,resistence,stats)
-
+		self.ppro_out.send([REGISTER,self.ticker])
 
 	def register_tradingplan(self,name,tradingplan):
 
 		self.incoming_request[name] = 0
 		self.tradingplans[name] = tradingplan
 
-		log_print(name,"registered at",self.symbol)
+		log_print(name,"registered at",self.ticker)
+
+	def deregister_tradingplan(self,name,tradingplans):
+
+		del self.incoming_request[name]
+		del self.tradingplans[name]
 
 	def new_request(self,tradingplan_name,shares,passive=""):
 
@@ -94,11 +101,21 @@ class Symbol:
 
 		#iterate each of the tradingplan once, starting from the smallest by magnitude. 
 
+
+		# process the incoming orders.
+		# deal with the remianing orders. 
+
+		#### STAEGE 1 -> Incoming Shares Pairing #####
+
+
+
+		#### STAGE 2 -> MUTUAL PLANS PAIRING #####
+
 		cur_imbalance = sum(self.incoming_request.values())
 
 		tps = sorted(self.incoming_request, key=lambda dict_key: abs(self.incoming_request[dict_key]))
 
-		print(tps)
+		#print(tps)
 
 		for i in range(len(tps)):
 			if abs(self.incoming_request[tps[i]])>0:
@@ -111,12 +128,25 @@ class Symbol:
 
 		print("current shares remaning:",sum(self.incoming_request.values()))
 
-		if sum(self.incoming_request.values())==0:
+
+		#### STAGE 3 -> IMBALANCE HANDLING #####
+		
+		remaining_share = sum(self.incoming_request.values())
+		if remaining_share==0:
 			self.share_request = False
+
+		else:
+			if remaining_share>0:
+				self.ppro_out.send([IOCBUY,self.ticker,remaining_share,self.data[ASK]])
+			else:
+				self.ppro_out.send([IOCSELL,self.ticker,remaining_share,self.data[BID]])
 
 	def holdings_update(self,price,share):
 
 		self.incoming_shares.append((price,share))
+
+		#print("inc",self.incoming_shares)
+
 
 	def pair_off(self,tp1,tp2):
 
@@ -176,7 +206,7 @@ class Symbol:
 		self.data[AUTORANGE] = Bool
 
 	def get_name(self):
-		return self.symbol
+		return self.ticker
 
 	# def set_mind_object(self):
 	# 	try:

@@ -55,7 +55,7 @@ class Strategy:
 		self.symbol=symbol
 		self.symbol_name = symbol.get_name()
 		self.tradingplan = tradingplan
-		self.ppro_out = self.tradingplan.ppro_out
+		#self.ppro_out = self.tradingplan.ppro_out
 		self.risk = self.tradingplan.get_risk()
 
 	def get_name(self):
@@ -64,7 +64,7 @@ class Strategy:
 
 	def supress_warnings(self):
 		self.supress_warning = True
-		
+
 	def clear_initial_triggers(self):
 		self.initial_triggers = set()
 

@@ -12,12 +12,12 @@ import random
 
 class TradingPlan:
 
-	def __init__(self,name:"",symbol:Symbol,entry_plan=None,entry_type=None,manage_plan=None,risk=None,ppro_out=None,default_reload=0,TEST_MODE=False,algo_name="",Manager=None):
+	def __init__(self,name:"",symbol:Symbol,entry_plan=None,entry_type=None,manage_plan=None,risk=None,default_reload=0,TEST_MODE=False,algo_name="",Manager=None):
 
 		self.name = name 
 		self.symbol = symbol
 
-		self.symbol.register_tradingplan(name,self)
+		
 		#self.symbol.set_tradingplan(self)
 
 		self.manager = Manager
@@ -37,7 +37,7 @@ class TradingPlan:
 
 		self.default_reload = default_reload
 
-		self.ppro_out = ppro_out
+		#self.ppro_out = ppro_out
 
 		self.expect_orders = ""
 		# self.expect_long = False
@@ -410,8 +410,6 @@ class TradingPlan:
 			if price >=  self.data[STOP_LEVEL]:
 				flatten=True
 
-
-
 		if self.data[CURRENT_SHARE] >0:
 			self.data[UNREAL_PSHR] = gain
 			self.data[UNREAL]= round(gain*self.data[CURRENT_SHARE],4)
@@ -444,7 +442,17 @@ class TradingPlan:
 		if flatten and self.flatten_order==False and self.data[USING_STOP]:
 			self.flatten_order=True
 			self.data[FLATTENTIMER]=0
-			self.ppro_out.send(["Flatten",self.symbol_name])
+
+
+			if self.data[POSITION]==LONG:
+				self.symbol.new_request(self.name,-self.data[CURRENT_SHARE])
+			elif self.data[POSITION]==SHORT:
+				self.symbol.new_request(self.name,self.data[CURRENT_SHARE])
+			
+
+			#self.ppro_out.send(["Flatten",self.symbol_name])
+
+			#self.symbol.
 
 		self.update_displays()
 
@@ -547,8 +555,8 @@ class TradingPlan:
 	def clear_trade(self):
 
 
-		self.ppro_out.send([DEREGISTER,self.symbol_name])
-		self.ppro_out.send(["Flatten",self.symbol_name])
+		#self.ppro_out.send([DEREGISTER,self.symbol_name])
+		#self.ppro_out.send(["Flatten",self.symbol_name])
 
 		
 		self.data[UNREAL] = 0
@@ -651,7 +659,14 @@ class TradingPlan:
 		if self.tkvars[STATUS].get()==PENDING:
 			self.cancel_algo()
 		else:
-			self.ppro_out.send(["Flatten",self.symbol_name])
+			# self.ppro_out.send(["Flatten",self.symbol_name])
+
+
+			if self.data[POSITION]==LONG:
+				self.symbol.new_request(self.name,-self.data[CURRENT_SHARE])
+			elif self.data[POSITION]==SHORT:
+				self.symbol.new_request(self.name,self.data[CURRENT_SHARE])
+			
 
 	"""	UI related  """
 	def update_symbol_tkvar(self):
@@ -790,8 +805,9 @@ class TradingPlan:
 
 #			try:
 
-			self.ppro_out.send([REGISTER,self.symbol_name])
+			#self.ppro_out.send([REGISTER,self.symbol_name])
 
+			self.symbol.register_tradingplan(self.name,self)
 
 			entryplan=self.tkvars[ENTRYPLAN].get()
 			entry_type=self.tkvars[ENTYPE].get()

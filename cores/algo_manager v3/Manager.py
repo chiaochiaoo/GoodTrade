@@ -19,7 +19,7 @@ import requests
 import select
 from datetime import datetime, timedelta
 import json
-import os
+import os,sys
 
 #May this class bless by the Deus Mechanicus.
 
@@ -449,6 +449,7 @@ class Manager:
 	def add_new_tradingplan(self,data,TEST_MODE):
 
 		print("adding",data)
+
 		algo_name =  data["algo_name"]
 		entryplan = data["entry_type"]
 		symbol = data["symbol"] 
@@ -468,14 +469,14 @@ class Manager:
 				#print(symbol,self.ui.algo_count_number.get())
 				
 				if symbol not in self.symbol_data:
-					self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats)  #register in Symbol.
+					self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats,self.pipe_ppro_out)  #register in Symbol.
 
 				#self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
 				self.symbols.append(symbol)
 
 				#######################################################################
 
-				self.tradingplan[symbol]=TradingPlan(name,self.symbol_data[symbol],entryplan,INSTANT,mana,risk,self.pipe_ppro_out,0,TEST_MODE,algo_name,self)
+				self.tradingplan[symbol]=TradingPlan(name,self.symbol_data[symbol],entryplan,INSTANT,mana,risk,0,TEST_MODE,algo_name,self)
 				self.ui.create_new_entry(self.tradingplan[symbol])
 
 				if status == True:
@@ -493,13 +494,13 @@ class Manager:
 						break 
 				if find_:
 					if symbol not in self.symbol_data:
-						self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats)  #register in Symbol.
+						self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats,self.pipe_ppro_out)  #register in Symbol.
 					#self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
 					self.symbols.append(symbol)
 
 					#######################################################################
 
-					self.tradingplan[symbol]=TradingPlan(name,self.symbol_data[symbol],entryplan,INSTANT,mana,risk,self.pipe_ppro_out,0,TEST_MODE,algo_name,self)
+					self.tradingplan[symbol]=TradingPlan(name,self.symbol_data[symbol],entryplan,INSTANT,mana,risk,0,TEST_MODE,algo_name,self)
 					self.ui.create_entry(self.tradingplan[symbol],replace_id)
 
 					if status == True:
@@ -511,8 +512,10 @@ class Manager:
 
 
 		except Exception as e:
-			log_print("adding new tradingplan problem",e,data)
-			PrintException("adding new tradingplan problem")
+
+			exc_type, exc_obj, exc_tb = sys.exc_info()
+			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+			log_print("adding new tradingplan errors:",e,data,exc_type, fname, exc_tb.tb_lineno)
 
 
 	def add_new_tradingplan_old(self,data,TEST_MODE):
@@ -798,7 +801,10 @@ class Manager:
 					for i in d[1]:
 						self.add_new_tradingplan(i,self.test_mode)
 				except Exception as e:
-					log_print("adding algo errors:",e,i)
+
+					exc_type, exc_obj, exc_tb = sys.exc_info()
+					fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+					log_print("adding algo errors:",e,i,exc_type, fname, exc_tb.tb_lineno)
 
 	def ppro_order_confirmation(self,data):
 
@@ -1505,8 +1511,8 @@ class Tester:
 			return False
 			
 	def new_ema(self,current,last_EMA,n):
-	    
-	    return round((current - last_EMA)*(2/(n+1)) + last_EMA,2)
+		
+		return round((current - last_EMA)*(2/(n+1)) + last_EMA,2)
 
 	def limit_buy_sell(self):
 
