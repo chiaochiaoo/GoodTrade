@@ -616,7 +616,7 @@ class Open_high(StandardScanner):
 		ttk.Label(self.algo_frame, text="OpenBreak:").grid(sticky="w",column=col,row=row)
 		ttk.Checkbutton(self.algo_frame, variable=self.open).grid(sticky="w",column=col+1,row=row)
 
-
+		self.openbreak = []
 
 
 	def update_entry(self,data):
@@ -685,7 +685,7 @@ class Open_high(StandardScanner):
 						order["symbol"] = rank
 
 
-						if open_ and row["oh"]>0.5 and row["f5r"]>0.8 and relv>1.2 and ts<=700:
+						if open_ and row["oh"]>0.5 and row["f5r"]>0.8 and relv>1.2 and ts<=700 and rank not in self.openbreak:
 
 							order["support"] = row['open']	#- (row['high']-row['price'])
 							order["resistence"] = row['price']
@@ -693,6 +693,7 @@ class Open_high(StandardScanner):
 
 
 							send=True
+							self.openbreak.append(rank)
 							self.algo_placed.append(trade)
 
 						if row['ema45change']<=-25 and row['oh']>=1:
@@ -754,6 +755,9 @@ class Open_low(StandardScanner):
 		col = 5
 		ttk.Label(self.algo_frame, text="OpenBreak:").grid(sticky="w",column=col,row=row)
 		ttk.Checkbutton(self.algo_frame, variable=self.open).grid(sticky="w",column=col+1,row=row)
+
+		self.openbreak = []
+
 
 	def update_entry(self,data):
 
@@ -817,12 +821,14 @@ class Open_low(StandardScanner):
 						
 
 						#print(trade,open_, row["ol"],row["f5r"],relv,ts,)
-						if open_ and row["ol"]>0.5 and row["f5r"]>0.5 and relv>0.5 and ts<=600:
+						if open_ and row["ol"]>0.5 and row["f5r"]>0.5 and relv>0.5 and ts<=600 and rank not in self.openbreak:
 
 							order["support"] = 	row['price'] #- (row['high']-row['price'])
 							order["resistence"] =  row['open']
 							order["side"] = "DOWN"
 							send=True
+
+							self.openbreak.append(rank)
 							self.algo_placed.append(trade)
 
 						if row['ema45change']>=25 and row['ol']>=1:
