@@ -113,7 +113,7 @@ class AbstractTrigger:
 			for i in self.conditions:
 				s1,s2,t1,t2,type_= self.decode_conditions(i)
 
-				print(type_,s1[t1],s2[t2])
+				#print(type_,s1[t1],s2[t2])
 				try:
 					if type_ ==">":
 						if not s1[t1] > s2[t2]:
