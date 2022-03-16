@@ -107,6 +107,12 @@ class Symbol:
 
 		#### STAEGE 1 -> Incoming Shares Pairing #####
 
+		#for tp,val in self.incoming_request.items():
+
+		#first calculate all the positive, then all the negative? NO... it's by
+
+		if len(self.incoming_shares)>0:
+			self.incoming_shares_pairing()
 
 
 		#### STAGE 2 -> MUTUAL PLANS PAIRING #####
@@ -124,9 +130,9 @@ class Symbol:
 					if pair_off_test(self.incoming_request[tps[i]], self.incoming_request[tps[j]]):
 						self.pair_off(tps[i], tps[j])
 
-		print("pairing sucessful, now: ",self.incoming_request)
+		log_print(("pairing sucessful, now remaining request: ",self.incoming_request))
 
-		print("current shares remaning:",sum(self.incoming_request.values()))
+		log_print(("current shares remaning:",sum(self.incoming_request.values())))
 
 
 		#### STAGE 3 -> IMBALANCE HANDLING #####
@@ -137,9 +143,34 @@ class Symbol:
 
 		else:
 			if remaining_share>0:
-				self.ppro_out.send([IOCBUY,self.ticker,remaining_share,self.data[ASK]])
+				self.ppro_out.send([IOCBUY,self.ticker,abs(remaining_share),self.data[ASK]])
 			else:
-				self.ppro_out.send([IOCSELL,self.ticker,remaining_share,self.data[BID]])
+				self.ppro_out.send([IOCSELL,self.ticker,abs(remaining_share),self.data[BID]])
+
+
+	def incoming_shares_pairing(self):
+
+		# two ways to go about this.. tp first.. then shares. OR, shares first, then TP. ideally they are equal.in practice ? SHARES FIRST
+
+		paired = []
+		for t in range(len(self.incoming_shares)):
+
+			price = self.incoming_shares[t][0]
+			share = self.incoming_shares[t][1]
+
+			for tp,val in self.incoming_request.items():
+
+				if share >0 and val>0:
+					self.tradingplans[tp].ppro_process_orders(price,abs(share),LONG)
+					self.incoming_request[tp]-=share
+					paired.append(t)
+				elif share<0 and val<0:
+					self.tradingplans[tp].ppro_process_orders(price,abs(share),SHORT)
+					self.incoming_request[tp]-=share
+					paired.append(t)
+
+		for i in paired:
+			self.incoming_shares.pop(i)
 
 	def holdings_update(self,price,share):
 
@@ -157,9 +188,9 @@ class Symbol:
 
 		if self.incoming_request[tp1]>0:
 			self.tradingplans[tp1].ppro_process_orders(self.get_bid(),self.incoming_request[tp1],LONG)
-			self.tradingplans[tp2].ppro_process_orders(self.get_bid(),self.incoming_request[tp1],SHORT)
+			self.tradingplans[tp2].ppro_process_orders(self.get_bid(),abs(self.incoming_request[tp1]),SHORT)
 		else:
-			self.tradingplans[tp1].ppro_process_orders(self.get_bid(),self.incoming_request[tp1],SHORT)
+			self.tradingplans[tp1].ppro_process_orders(self.get_bid(),abs(self.incoming_request[tp1]),SHORT)
 			self.tradingplans[tp2].ppro_process_orders(self.get_bid(),self.incoming_request[tp1],LONG)
 
 		self.incoming_request[tp2] += self.incoming_request[tp1]
