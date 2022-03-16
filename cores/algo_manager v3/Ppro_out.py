@@ -272,7 +272,7 @@ def init_driver(pipe_status):
 
 	while True:
 		try:
-			PATH = "sys/chromedriver.exe"
+			PATH = "../sys/chromedriver.exe"
 
 			#driver = webdriver.Chrome(ChromeDriverManager().install())
 			driver = webdriver.Chrome(PATH)
