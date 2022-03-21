@@ -1117,7 +1117,7 @@ class Tester:
 		dic["risk"] =50.0
 		dic["statistics"] ={'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441,"expected_momentum":2}
 		dic["immediate_deployment"] = False
-		dic["management"] = SEMIMANUAL
+		dic["management"] = ONETOTWORISKREWARD
 
 
 		self.gt.send(["pkg",[dic]])
@@ -1132,7 +1132,7 @@ class Tester:
 		dic["risk"] =50.0
 		dic["statistics"] ={'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441,"expected_momentum":2}
 		dic["immediate_deployment"] = False
-		dic["management"] = SEMIMANUAL
+		dic["management"] = ONETOTWORISKREWARD
 
 
 		self.gt.send(["pkg",[dic]])
