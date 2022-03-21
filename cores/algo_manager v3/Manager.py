@@ -471,24 +471,25 @@ class Manager:
 			mana = data["management"]
 
 			# pair reversed region. 
+			if self.ui.pair_label_count < 25:
 
+				if symbol1 not in self.symbol_data:
+					self.symbol_data[symbol1] = Symbol(symbol1,0,0,symbol1_stats,self.pipe_ppro_out)  	
+
+				if symbol2 not in self.symbol_data:
+					self.symbol_data[symbol2] = Symbol(symbol2,0,0,symbol2_stats,self.pipe_ppro_out)  
+
+				name = symbol1[:-3]+"/"+symbol2[:-3]
+				### name:"",symbol:Symbol1,symbol:Symbol2,share1,share2,manage_plan=None,risk=None,TEST_MODE=False,algo_name="",Manager=None
+				self.tradingplan[symbol] = PairTP(name,self.symbol_data[symbol1],self.symbol_data[symbol2],symbol1_share,symbol2_share,mana,risk,TEST_MODE,algo_name,self)
+
+				self.ui.create_new_single_entry(self.tradingplan[symbol],type_name)
+
+				self.tradingplan[symbol].deploy(9600)
 			try:
 
-				if self.ui.pair_label_count < 25:
+				pass 
 
-					if symbol1 not in self.symbol_data:
-						self.symbol_data[symbol1] = Symbol(symbol1,0,0,symbol1_stats,self.pipe_ppro_out)  	
-
-					if symbol2 not in self.symbol_data:
-						self.symbol_data[symbol2] = Symbol(symbol2,0,0,symbol2_stats,self.pipe_ppro_out)  
-
-					name = symbol1[:-3]+"/"+symbol2[:-3]
-					### name:"",symbol:Symbol1,symbol:Symbol2,share1,share2,manage_plan=None,risk=None,TEST_MODE=False,algo_name="",Manager=None
-					self.tradingplan[symbol] = PairTP(name,self.symbol_data[symbol1],self.symbol_data[symbol2],symbol1_share,symbol2_share,mana,risk,0,TEST_MODE,algo_name,self)
-
-					self.ui.create_new_single_entry(self.tradingplan[symbol],type_name)
-
-					self.tradingplan[symbol].deploy(9600)
 			except Exception as e:
 
 				exc_type, exc_obj, exc_tb = sys.exc_info()
