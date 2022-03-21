@@ -868,7 +868,6 @@ class Break_any_Passive_trigger(AbstractTrigger):
 		#print()
 		if self.pos == LONG:
 
-
 			self.tradingplan.data[STOP_LEVEL]=self.stop_price#self.symbol_data[self.stop]
 			self.tradingplan.tkvars[STOP_LEVEL].set(self.stop_price)
 
@@ -1823,11 +1822,18 @@ class SemiManualManager(AbstractTrigger):
 			action = ""
 			if self.tradingplan.data[POSITION] ==LONG:
 				action = LIMITSELL
+
+				share = -self.tradingplan.data[CURRENT_SHARE]//2
 			elif self.tradingplan.data[POSITION] ==SHORT:
 				action = LIMITBUY
 
+				share = self.tradingplan.data[CURRENT_SHARE]//2
+
 			#print(action,self.tradingplan.data[CURRENT_SHARE]//2," shares",self.tradingplan.data[TRIGGER_PRICE_2])
-			self.ppro_out.send([action,self.symbol_name,self.tradingplan.data[TRIGGER_PRICE_2],self.tradingplan.data[CURRENT_SHARE]//2,0,"Exit price "])
+
+			self.tradingplan.symbol.new_request(self.tradingplan.name,share)
+
+			#self.ppro_out.send([action,self.symbol_name,self.tradingplan.data[TRIGGER_PRICE_2],self.tradingplan.data[CURRENT_SHARE]//2,0,"Exit price "])
 			self.strategy.orders_level+=1
 		# new_stop =round(self.tradingplan.data[TRIGGER_PRICE_6],2)
 		# self.bring_up_stop(new_stop)

@@ -1060,7 +1060,7 @@ class Tester:
 		now = datetime.now()
 
 		self.sec =  now.hour*3600 + now.minute*60 + now.second
-		print(self.sec)
+		#print(self.sec)
 		self.bid=0
 		self.ask=0
 		self.data = {}
@@ -1117,7 +1117,7 @@ class Tester:
 		dic["risk"] =50.0
 		dic["statistics"] ={'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441,"expected_momentum":2}
 		dic["immediate_deployment"] = False
-		dic["management"] = FULLMANUAL
+		dic["management"] = SEMIMANUAL
 
 
 		self.gt.send(["pkg",[dic]])
@@ -1132,7 +1132,7 @@ class Tester:
 		dic["risk"] =50.0
 		dic["statistics"] ={'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441,"expected_momentum":2}
 		dic["immediate_deployment"] = False
-		dic["management"] = FULLMANUAL
+		dic["management"] = SEMIMANUAL
 
 
 		self.gt.send(["pkg",[dic]])
