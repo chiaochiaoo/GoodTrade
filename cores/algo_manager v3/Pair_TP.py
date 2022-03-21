@@ -10,19 +10,33 @@ import threading
 import random
 # MAY THE MACHINE GOD BLESS THY AIM
 
-class TradingPlan:
 
-	def __init__(self,name:"",symbol:Symbol,entry_plan=None,entry_type=None,manage_plan=None,risk=None,default_reload=0,TEST_MODE=False,algo_name="",Manager=None):
+
+# PTP
+
+# Different Stop level - purely on PNL based. shares are already given. 
+# Symbol1 , Symbol2, Share 1, Share 2. 
+
+class PairTP:
+
+	def __init__(self,name:"",Symbol1,Symbol2,share1,share2,manage_plan=None,risk=None,TEST_MODE=False,algo_name="",Manager=None):
 
 		self.name = name 
-		self.symbol = symbol
+		self.symbols ={}
 
+		self.symbols[Symbol1.ticker] = Symbol1
+		self.symbols[Symbol2.ticker] = Symbol2
 		
+
+		self.symbol1share = share1
+		self.symbol2share = share2
+
 		#self.symbol.set_tradingplan(self)
 
 		self.manager = Manager
 
-		self.symbol_name = symbol.get_name()
+		self.symbol_name = Symbol1[:-3]+":"+Symbol2[:-3]#symbol.get_name()
+
 		self.test_mode = TEST_MODE
 
 		self.current_running_strategy = None
@@ -33,7 +47,8 @@ class TradingPlan:
 		self.management_plan = None
 		self.algo_name = algo_name
 
-		self.default_reload = default_reload
+
+		#self.default_reload = default_reload
 
 		#self.ppro_out = ppro_out
 
@@ -69,7 +84,7 @@ class TradingPlan:
 
 		self.bool_labels= [AUTORANGE,AUTOMANAGE,RELOAD,SELECTED,ANCART_OVERRIDE,USING_STOP]
 
-		self.init_data(risk,entry_plan,entry_type,manage_plan)
+		self.init_data(risk,manage_plan)
 
 
 	def set_data(self,risk,entry_plan,entry_type,manage_plan,support,resistence):
