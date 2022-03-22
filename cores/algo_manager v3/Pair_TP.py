@@ -203,9 +203,9 @@ class PairTP:
 		if self.data[POSITION]!="":
 			#self.check_pnl(bid,ask,ts)
 
-			gain = (self.symbols[self.symbol1].get_ask() - self.data[AVERAGE_PRICE1]) *self.data[SYMBOL1_SHARE]
+			gain = (self.symbols[self.symbol1].get_bid() - self.data[AVERAGE_PRICE1]) *self.data[SYMBOL1_SHARE]
 
-			gain +=( self.data[AVERAGE_PRICE2]- self.symbols[self.symbol2].get_bid() ) *self.data[SYMBOL2_SHARE]
+			gain +=( self.data[AVERAGE_PRICE2]- self.symbols[self.symbol2].get_ask() ) *self.data[SYMBOL2_SHARE]
 
 			self.data[UNREAL]= round(gain,2)
 
@@ -229,86 +229,6 @@ class PairTP:
 
 		self.update_displays()
 
-	def check_pnl(self,bid,ask,ts):
-		"""
-		PNL, STOP TRIGGER.
-		"""
-
-		#log_print("PNL CHECK ON",self.symbol_name,self.data[POSITION])
-		flatten = False
-		gain = 0
-		stillbreak = True
-
-		if self.data[POSITION]==LONG:
-
-			price = bid
-			gain = round((price-self.data[AVG_P]),4)
-
-			#gap = abs(self.data[BREAKPRICE]-self.data[STOP_LEVEL])*0.05
-			# if price < self.data[BREAKPRICE]:#-gap:
-			# 	stillbreak = False
-
-			if price <= self.data[STOP_LEVEL]:
-				flatten=True
-
-		elif self.data[POSITION]==SHORT:
-			price = ask
-			gain = round(self.data[AVG_P]-price,4)
-
-			#gap = abs(self.data[STOP_LEVEL]-self.data[BREAKPRICE])*0.05
-
-
-			# if price > self.data[BREAKPRICE]:#+gap:
-			# 	stillbreak = False
-
-			if price >=  self.data[STOP_LEVEL]:
-				flatten=True
-
-		if self.data[CURRENT] >0:
-			self.data[UNREAL_PSHR] = gain
-			self.data[UNREAL]= round(gain*self.data[CURRENT],4)
-
-			try:
-				self.data[CUR_PROFIT_LEVEL] = self.data[UNREAL_PSHR]/self.data[RISK_PER_SHARE]
-			except:
-				self.data[CUR_PROFIT_LEVEL] = 0 
-			#print("profit level:",round(self.data[CUR_PROFIT_LEVEL],2))
-
-		if  self.data[UNREAL] < -self.data[ACTRISK]*0.05:#+gap:
-			stillbreak = False
-
-		##IMPlement PNL timer here
-
-		#print(self.symbol_name,self.data[UNREAL],round(-self.data[ACTRISK]*0.1,2),self.data[BREAKPRICE],price,self.data[FLATTENTIMER],self.data[RISKTIMER],stillbreak)
-
-		if self.data[FLATTENTIMER]==0:
-			if not stillbreak: #first time set. 
-				self.data[FLATTENTIMER] = ts
-		else:
-			if not stillbreak:
-				#print(self.symbol_name,"timer:",ts-self.data[FLATTENTIMER],self.data[RISKTIMER])
-				if ts-self.data[FLATTENTIMER]>self.data[RISKTIMER]:
-					flatten=True
-					log_print(self.symbol_name,"risk timer triggered. flattening")
-			else:
-				self.data[FLATTENTIMER]=0
-				#print("reset flatten timer to 0")
-		if flatten and self.flatten_order==False and self.data[USING_STOP]:
-			self.flatten_order=True
-			self.data[FLATTENTIMER]=0
-
-
-			if self.data[POSITION]==LONG:
-				self.symbol.new_request(self.name,-self.data[CURRENT])
-			elif self.data[POSITION]==SHORT:
-				self.symbol.new_request(self.name,self.data[CURRENT])
-			
-
-			#self.ppro_out.send(["Flatten",self.symbol_name])
-
-			#self.symbol.
-
-		self.update_displays()
 
 	def ppro_process_orders(self,price,shares,side,symbol):
 		
@@ -695,7 +615,7 @@ class PairTP:
 			self.mark_algo_status(CANCELED)
 
 	def cancle_deployment(self):
-		if self.data[POSITION] =="" and self.data[CURRENT]==0:
+		if self.data[POSITION] =="" and self.data[SYMBOL1_SHARE]==0 and self.data[SYMBOL2_SHARE]==0:
 			self.mark_algo_status(PENDING)
 			self.stop_tradingplan()
 		else:
@@ -918,6 +838,87 @@ class PairTP:
 	def management_strategy_done(self):
 
 		pass
+
+	# def check_pnl(self,bid,ask,ts):
+	# 	"""
+	# 	PNL, STOP TRIGGER.
+	# 	"""
+
+	# 	#log_print("PNL CHECK ON",self.symbol_name,self.data[POSITION])
+	# 	flatten = False
+	# 	gain = 0
+	# 	stillbreak = True
+
+	# 	if self.data[POSITION]==LONG:
+
+	# 		price = bid
+	# 		gain = round((price-self.data[AVG_P]),4)
+
+	# 		#gap = abs(self.data[BREAKPRICE]-self.data[STOP_LEVEL])*0.05
+	# 		# if price < self.data[BREAKPRICE]:#-gap:
+	# 		# 	stillbreak = False
+
+	# 		if price <= self.data[STOP_LEVEL]:
+	# 			flatten=True
+
+	# 	elif self.data[POSITION]==SHORT:
+	# 		price = ask
+	# 		gain = round(self.data[AVG_P]-price,4)
+
+	# 		#gap = abs(self.data[STOP_LEVEL]-self.data[BREAKPRICE])*0.05
+
+
+	# 		# if price > self.data[BREAKPRICE]:#+gap:
+	# 		# 	stillbreak = False
+
+	# 		if price >=  self.data[STOP_LEVEL]:
+	# 			flatten=True
+
+	# 	if self.data[CURRENT] >0:
+	# 		self.data[UNREAL_PSHR] = gain
+	# 		self.data[UNREAL]= round(gain*self.data[CURRENT],4)
+
+	# 		try:
+	# 			self.data[CUR_PROFIT_LEVEL] = self.data[UNREAL_PSHR]/self.data[RISK_PER_SHARE]
+	# 		except:
+	# 			self.data[CUR_PROFIT_LEVEL] = 0 
+	# 		#print("profit level:",round(self.data[CUR_PROFIT_LEVEL],2))
+
+	# 	if  self.data[UNREAL] < -self.data[ACTRISK]*0.05:#+gap:
+	# 		stillbreak = False
+
+	# 	##IMPlement PNL timer here
+
+	# 	#print(self.symbol_name,self.data[UNREAL],round(-self.data[ACTRISK]*0.1,2),self.data[BREAKPRICE],price,self.data[FLATTENTIMER],self.data[RISKTIMER],stillbreak)
+
+	# 	if self.data[FLATTENTIMER]==0:
+	# 		if not stillbreak: #first time set. 
+	# 			self.data[FLATTENTIMER] = ts
+	# 	else:
+	# 		if not stillbreak:
+	# 			#print(self.symbol_name,"timer:",ts-self.data[FLATTENTIMER],self.data[RISKTIMER])
+	# 			if ts-self.data[FLATTENTIMER]>self.data[RISKTIMER]:
+	# 				flatten=True
+	# 				log_print(self.symbol_name,"risk timer triggered. flattening")
+	# 		else:
+	# 			self.data[FLATTENTIMER]=0
+	# 			#print("reset flatten timer to 0")
+	# 	if flatten and self.flatten_order==False and self.data[USING_STOP]:
+	# 		self.flatten_order=True
+	# 		self.data[FLATTENTIMER]=0
+
+
+	# 		if self.data[POSITION]==LONG:
+	# 			self.symbol.new_request(self.name,-self.data[CURRENT])
+	# 		elif self.data[POSITION]==SHORT:
+	# 			self.symbol.new_request(self.name,self.data[CURRENT])
+			
+
+	# 		#self.ppro_out.send(["Flatten",self.symbol_name])
+
+	# 		#self.symbol.
+
+	# 	self.update_displays()
 
 
 # if __name__ == '__main__':
