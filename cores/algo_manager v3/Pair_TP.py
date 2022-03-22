@@ -24,6 +24,10 @@ class PairTP:
 		self.name = name 
 		self.symbols ={}
 
+
+		self.symbol1 = Symbol1.ticker
+		self.symbol2 = Symbol2.ticker
+
 		self.symbols[Symbol1.ticker] = Symbol1
 		self.symbols[Symbol2.ticker] = Symbol2
 		
@@ -35,7 +39,7 @@ class PairTP:
 
 		self.manager = Manager
 
-		self.symbol_name = Symbol1[:-3]+":"+Symbol2[:-3]#symbol.get_name()
+		self.symbol_name = Symbol1.ticker[:-3] + ":" + Symbol2.ticker[:-3] #symbol.get_name()
 
 		self.test_mode = TEST_MODE
 
@@ -47,12 +51,11 @@ class PairTP:
 		self.management_plan = None
 		self.algo_name = algo_name
 
-
 		#self.default_reload = default_reload
-
 		#self.ppro_out = ppro_out
 
 		self.expect_orders = ""
+
 		# self.expect_long = False
 		# self.expect_short = False
 
@@ -61,9 +64,12 @@ class PairTP:
 		self.data = {}
 		self.tkvars = {}
 
-		self.tklabels= {} ##returned by UI.
+		self.tklabels= {} #returned by UI.
 
-		self.holdings = []
+		self.holdings1 = []
+		self.holdings2 = []
+
+
 		self.current_price_level = 0
 		self.price_levels = {}
 
@@ -79,7 +85,8 @@ class PairTP:
 
 		self.algo_ui_id = 0
 		
-		self.numeric_labels = [ACTRISK,ESTRISK,CUR_PROFIT_LEVEL,CURRENT_SHARE,TARGET_SHARE,INPUT_TARGET_SHARE,AVERAGE_PRICE,LAST_AVERAGE_PRICE,RISK_PER_SHARE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3,FLATTENTIMER,BREAKPRICE,RISKTIMER,FIBCURRENT_MAX,FIBLEVEL1,FIBLEVEL2,FIBLEVEL3,FIBLEVEL4,EXIT,RELOAD_TIMES]
+		self.numeric_labels = [ACTRISK,ESTRISK,CUR_PROFIT_LEVEL,SYMBOL1_SHARE,SYMBOL2_SHARE,INPUT_TARGET_SHARE,AVERAGE_PRICE,AVERAGE_PRICE1,AVERAGE_PRICE2,LAST_AVERAGE_PRICE,RISK_PER_SHARE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3,FLATTENTIMER,BREAKPRICE,RISKTIMER,FIBCURRENT_MAX,FIBLEVEL1,FIBLEVEL2,FIBLEVEL3,FIBLEVEL4,EXIT]
+		
 		self.string_labels = [MIND,STATUS,POSITION,RISK_RATIO,SIZE_IN,ENTRYPLAN,ENTYPE,MANAGEMENTPLAN]
 
 		self.bool_labels= [AUTORANGE,AUTOMANAGE,RELOAD,SELECTED,ANCART_OVERRIDE,USING_STOP]
@@ -87,11 +94,13 @@ class PairTP:
 		self.init_data(risk,manage_plan)
 
 
-	def set_data(self,risk,entry_plan,entry_type,manage_plan,support,resistence):
+	def set_data(self,risk,manage_plan,support,resistence):
+
 		#default values.
 		self.tkvars[SELECTED].set(False)
 		self.tkvars[RELOAD].set(False)
-		self.data[RELOAD_TIMES]=self.default_reload
+
+		#self.data[RELOAD_TIMES]=self.default_reload
 		#Non String, Non Numeric Value
 
 		#Set some default value
@@ -99,8 +108,8 @@ class PairTP:
 		self.tkvars[ESTRISK].set(risk)
 		self.tkvars[RISK_RATIO].set(str(0)+"/"+str(self.data[ESTRISK]))
 
-		self.tkvars[ENTRYPLAN].set(entry_plan)
-		self.tkvars[ENTYPE].set(entry_type)
+		# self.tkvars[ENTRYPLAN].set(entry_plan)
+		# self.tkvars[ENTYPE].set(entry_type)
 		self.tkvars[MANAGEMENTPLAN].set(manage_plan)
 
 		self.data[STATUS] = PENDING
@@ -108,7 +117,7 @@ class PairTP:
 
 		self.update_symbol_tkvar()
 
-	def init_data(self,risk,entry_plan,entry_type,manage_plan):
+	def init_data(self,risk,manage_plan):
 
 
 		for i in self.numeric_labels:
@@ -119,8 +128,8 @@ class PairTP:
 			self.data[i] = ""
 			self.tkvars[i] = tk.StringVar(value="")
 
-		for i in self.symbol.numeric_labels:
-			self.tkvars[i] = tk.DoubleVar(value=self.symbol.data[i])
+		# for i in self.symbol.numeric_labels:
+		# 	self.tkvars[i] = tk.DoubleVar(value=self.symbol.data[i])
 
 		for i in self.bool_labels:
 			self.data[i] = True
@@ -128,20 +137,22 @@ class PairTP:
 
 		self.data[ANCART_OVERRIDE]=False
 
-
 		#default values.
+
 		self.tkvars[SELECTED].set(False)
 		self.tkvars[RELOAD].set(False)
-		self.data[RELOAD_TIMES]=self.default_reload
-		#Non String, Non Numeric Value
 
+		#self.data[RELOAD_TIMES]=self.default_reload
+		#Non String, Non Numeric Value
 		#Set some default value
+
 		self.data[ESTRISK] = risk
 		self.tkvars[ESTRISK].set(risk)
 		self.tkvars[RISK_RATIO].set(str(0)+"/"+str(self.data[ESTRISK]))
 
-		self.tkvars[ENTRYPLAN].set(entry_plan)
-		self.tkvars[ENTYPE].set(entry_type)
+		# self.tkvars[ENTRYPLAN].set(entry_plan)
+		# self.tkvars[ENTYPE].set(entry_type)
+
 		self.tkvars[MANAGEMENTPLAN].set(manage_plan)
 
 		self.data[STATUS] = PENDING
@@ -152,142 +163,6 @@ class PairTP:
 
 
 	""" PASSSIVE ENTRY/EXIT OVER A PERIOD AMONT OF TIME """
-
-
-	""" PASSIVE ENTRY/EXIT """
-
-	def passive_initialization(self,side,target_shares,final_target=-1):
-
-
-		if not self.passive_in_process:
-
-			self.passive_position = side
-			self.passive_action = ""
-			self.passive_current_shares = self.data[CURRENT_SHARE] 
-			
-			#self.data[POSITION]
-
-			if final_target ==-1:
-
-				if (self.data[POSITION]==LONG and side ==BUY) or  (self.data[POSITION]==SHORT and side ==SELL):
-					self.passive_target_shares = self.data[CURRENT_SHARE] + target_shares 
-
-					self.passive_action = ADD
-				else:
-					self.passive_target_shares = self.data[CURRENT_SHARE] - target_shares  
-
-					self.passive_action = MINUS
-			#when no positions
-			else: 
-
-				self.passive_target_shares = final_target
-				self.passive_action = ADD
-
-				if final_target ==0:
-					self.passive_action = MINUS
-				
-			
-
-			log_print(self.symbol_name," passive order received, target shares:",target_shares,self.passive_target_shares)
-			done = threading.Thread(target=self.passive_process,daemon=True)
-			done.start()
-		else:
-			log_print("already passive in progress")
-
-
-	def passive_orders(self):
-
-
-		coefficient = 0.01
-
-		k = self.symbol.get_bid()//100
-
-		gap = (self.symbol.get_ask() -self.symbol.get_bid())
-		midpoint = round((self.symbol.get_ask() +self.symbol.get_bid())/2,2)
-
-		if k==0: k = 1
-
-		if self.passive_position == BUY :
-
-			price = self.symbol.get_bid()
-			
-			#log_print(price,"last price",self.passive_price)
-			if price >= self.passive_price+0.01*k or self.passive_price==0:
-
-				#step 1, cancel existing orders
-				self.ppro_out.send([CANCEL,self.symbol_name])
-				#step 2, placing around current.
-				time.sleep(0.2)
-
-				if price<=10:
-					self.ppro_out.send([PASSIVEBUY,self.symbol_name,self.passive_remaining_shares,price])
-				else:
-
-					if self.passive_remaining_shares<=4:
-						self.ppro_out.send([PASSIVEBUY,self.symbol_name,self.passive_remaining_shares,price])
-					else:
-
-						# share = self.passive_remaining_shares//3
-						# sharer = self.passive_remaining_shares- 2*share
-
-						share = self.passive_remaining_shares//2
-						remaning = self.passive_remaining_shares-share
-						#self.ppro_out.send([PASSIVEBUY,self.symbol_name,share,price])
-
-						# when big gap, one order on bid, one order on midpoint. 
-						if gap>=0.05:
-							self.ppro_out.send([PASSIVEBUY,self.symbol_name, remaning,price])
-							self.ppro_out.send([PASSIVEBUY,self.symbol_name,share,midpoint])
-							#price-0.01*k
-						# when tight spread. just one on bid. 
-						elif gap<=0.01:
-							self.ppro_out.send([PASSIVEBUY,self.symbol_name,self.passive_remaining_shares,price])
-						else:
-							self.ppro_out.send([PASSIVEBUY,self.symbol_name, remaning,price])
-							self.ppro_out.send([PASSIVEBUY,self.symbol_name,share,round(price+0.01,2)])
-
-						#self.ppro_out.send([PASSIVEBUY,self.symbol_name,sharer,price-0.01*2*k])
-
-			self.passive_price = price			
-		elif self.passive_position == SELL:
-
-			price = self.symbol.get_ask()
-
-			#log_print(price,"last price",self.passive_price)
-			if price <= self.passive_price -0.01*k or self.passive_price==0:
-
-				#step 1, cancel existing orders
-				self.ppro_out.send([CANCEL,self.symbol_name])
-				#step 2, placing around current.
-				time.sleep(0.2)
-
-
-				if price<=10:
-					self.ppro_out.send([PASSIVESELL,self.symbol_name,self.passive_remaining_shares,price])
-				else:
-
-					if self.passive_remaining_shares<=4:
-						self.ppro_out.send([PASSIVESELL,self.symbol_name,self.passive_remaining_shares,price])
-					else:
-
-						share = self.passive_remaining_shares//2
-						remaning = self.passive_remaining_shares-share
-
-						if gap>=0.05:
-							self.ppro_out.send([PASSIVESELL,self.symbol_name, remaning,price])
-							self.ppro_out.send([PASSIVESELL,self.symbol_name,share,midpoint])
-							#price-0.01*k
-						# when tight spread. just one on bid. 
-						elif gap<=0.01:
-							self.ppro_out.send([PASSIVESELL,self.symbol_name,self.passive_remaining_shares,price])
-						else:
-							self.ppro_out.send([PASSIVESELL,self.symbol_name, remaning,price])
-							self.ppro_out.send([PASSIVESELL,self.symbol_name,share,round(price-0.01,2)])
-
-
-			self.passive_price = price
-	#if the price is 2C away. chase it.
-	#if the price is unchanged, do nothing. 
 
 
 
@@ -312,61 +187,9 @@ class PairTP:
 		else:
 			return 0
 		
-	def passive_process(self):
-
-		fullfilled = 0
-		timecount = 0
-
-		price = 0
-
-		while timecount<120:
-
-			#update current.
-
-			#what's in stock
-			#log_print(self.symbol_name," Remaining:",self.passive_remaining_shares)
-
-			self.passive_current_shares = self.data[CURRENT_SHARE] 
-
-			#what just gained. 
-
-			### need to recalculate. ####
-			self.passive_remaining_shares = self.remaining_room()
-
-			#print("shares left:",self.passive_remaining_shares)
-			#abs(self.passive_target_shares - self.passive_current_shares)
 
 
-			if self.passive_action==ADD and self.passive_remaining_shares<1:#self.data[CURRENT_SHARE] >= self.passive_target_shares:
-				log_print(self.symbol_name," passive fill completed")
-				break
-			if self.passive_action==MINUS and self.passive_remaining_shares<1:#self.data[CURRENT_SHARE] <= self.passive_target_shares:
-				log_print(self.symbol_name," passive fill completed")
-				break
-			if self.flatten_order==True:
-				break
-
-			self.passive_orders()
-				
-			#ORDER SENDING MOUDULE. 
-
-			wait =random.randrange(5,11)
-			time.sleep(wait)
-			timecount+=wait
-
-
-		#clean. 
-		
-		self.passive_position = ""
-		self.passive_current_shares = 0
-		self.passive_init_shares = 0
-		self.passive_remaining_shares = 0
-		self.passive_in_process = False
-		self.passive_price = 0
-
-
-
-	def ppro_update_price(self,bid,ask,ts):
+	def ppro_update_price(self,symbol="",bid=0,ask=0,ts=0):
 
 		#if bid!=self.symbol.get_bid() or ask!=self.symbol.get_ask():
 
@@ -374,15 +197,37 @@ class PairTP:
 			#self.symbol.update_price(bid,ask,ts,self.tkvars[AUTORANGE].get(),self.tkvars[STATUS].get())
 
 			#check stop. 
+
+		flatten = False
+
 		if self.data[POSITION]!="":
-			self.check_pnl(bid,ask,ts)
+			#self.check_pnl(bid,ask,ts)
+
+			gain = (self.symbols[self.symbol1].get_ask() - self.data[AVERAGE_PRICE1]) *self.data[SYMBOL1_SHARE]
+
+			gain +=( self.data[AVERAGE_PRICE2]- self.symbols[self.symbol2].get_bid() ) *self.data[SYMBOL2_SHARE]
+
+			self.data[UNREAL]= round(gain,2)
+
+			if gain + self.data[ESTRISK] <0:
+				flatten = True
+
+
+			#SYMBOL1
+
+			#SYMBOL2
 
 		#check triggers
 		if self.current_running_strategy!=None:
 			self.current_running_strategy.update()
 
+		if flatten and not self.flatten_order:
+			self.flatten_order = True
+			self.flatten_cmd()
 		# except Exception as e:
 		# 	log_print("TP issue:",e)
+
+		self.update_displays()
 
 	def check_pnl(self,bid,ask,ts):
 		"""
@@ -397,7 +242,7 @@ class PairTP:
 		if self.data[POSITION]==LONG:
 
 			price = bid
-			gain = round((price-self.data[AVERAGE_PRICE]),4)
+			gain = round((price-self.data[AVG_P]),4)
 
 			#gap = abs(self.data[BREAKPRICE]-self.data[STOP_LEVEL])*0.05
 			# if price < self.data[BREAKPRICE]:#-gap:
@@ -408,7 +253,7 @@ class PairTP:
 
 		elif self.data[POSITION]==SHORT:
 			price = ask
-			gain = round(self.data[AVERAGE_PRICE]-price,4)
+			gain = round(self.data[AVG_P]-price,4)
 
 			#gap = abs(self.data[STOP_LEVEL]-self.data[BREAKPRICE])*0.05
 
@@ -419,9 +264,9 @@ class PairTP:
 			if price >=  self.data[STOP_LEVEL]:
 				flatten=True
 
-		if self.data[CURRENT_SHARE] >0:
+		if self.data[CURRENT] >0:
 			self.data[UNREAL_PSHR] = gain
-			self.data[UNREAL]= round(gain*self.data[CURRENT_SHARE],4)
+			self.data[UNREAL]= round(gain*self.data[CURRENT],4)
 
 			try:
 				self.data[CUR_PROFIT_LEVEL] = self.data[UNREAL_PSHR]/self.data[RISK_PER_SHARE]
@@ -454,9 +299,9 @@ class PairTP:
 
 
 			if self.data[POSITION]==LONG:
-				self.symbol.new_request(self.name,-self.data[CURRENT_SHARE])
+				self.symbol.new_request(self.name,-self.data[CURRENT])
 			elif self.data[POSITION]==SHORT:
-				self.symbol.new_request(self.name,self.data[CURRENT_SHARE])
+				self.symbol.new_request(self.name,self.data[CURRENT])
 			
 
 			#self.ppro_out.send(["Flatten",self.symbol_name])
@@ -465,21 +310,41 @@ class PairTP:
 
 		self.update_displays()
 
-	def ppro_process_orders(self,price,shares,side):
+	def ppro_process_orders(self,price,shares,side,symbol):
 		
-		log_print("TP processing:",self.symbol_name,price,shares,side)
-		if self.data[POSITION]=="": # 1. No position.
-			if self.expect_orders==side: # or self.management_plan.strategy_name=="ScalpaTron":
-				self.ppro_confirm_new_order(price,shares,side)
-			else:
-				log_print("TP processing: unexpected orders on",self.symbol_name)
-		
-		else:  # 2. Have position. 
+		log_print("TP processing:",self.name,price,shares,side)
 
-			if self.data[POSITION]==side: #same side.
-				self.ppro_orders_loadup(price,shares,side)
-			else: #opposite
-				self.ppro_orders_loadoff(price,shares,side)
+		self.data[POSITION] = LONG
+
+		if symbol == self.symbol1:
+
+
+			if side == LONG:
+				self.ppro_orders_loadup(price,shares,side,symbol)
+			else:
+				self.ppro_orders_loadoff(price,shares,side,symbol)
+
+
+		elif symbol == self.symbol2:
+
+			if side == LONG:
+				self.ppro_orders_loadoff(price,shares,side,symbol)
+			else:
+				self.ppro_orders_loadup(price,shares,side,symbol)
+		
+
+		# if self.data[POSITION]=="": # 1. No position.
+		# 	if self.expect_orders==side: # or self.management_plan.strategy_name=="ScalpaTron":
+		# 		self.ppro_confirm_new_order(price,shares,side)
+		# 	else:
+		# 		log_print("TP processing: unexpected orders on",self.symbol_name)
+		
+		# else:  # 2. Have position. 
+
+		# 	if self.data[POSITION]==side: #same side.
+		# 		self.ppro_orders_loadup(price,shares,side)
+		# 	else: #opposite
+		# 		self.ppro_orders_loadoff(price,shares,side)
 
 		# if self.test_mode:
 		# 	log_print("TP processing:",self.data)
@@ -490,68 +355,94 @@ class PairTP:
 		"""set the state as running, then load up"""
 
 		log_print(self.symbol_name,"New order confirmed:",price,shares,side)
+
 		self.mark_algo_status(RUNNING)
-		self.data[POSITION]=side
-		self.tkvars[POSITION].set(side)
+
+		# self.data[POSITION]=side
+		# self.tkvars[POSITION].set(side)
 		self.data[REALIZED] = 0
 		self.data[FLATTENTIMER]=0
 		self.flatten_order = False
 		self.ppro_orders_loadup(price,shares,side)
 
-	def ppro_orders_loadup(self,price,shares,side):
+	def ppro_orders_loadup(self,price,shares,side,symbol):
 
-		current = self.data[CURRENT_SHARE]
+		if symbol == self.symbol1:
 
-		self.data[CURRENT_SHARE] = self.data[CURRENT_SHARE] + shares
+			CURRENT = SYMBOL1_SHARE
+			AVG_P = AVERAGE_PRICE1
+			holding = self.holdings1
+		elif symbol == self.symbol2:
 
-		if current ==0 or self.data[CURRENT_SHARE]==0:
-			self.data[AVERAGE_PRICE] = round(price,3)
+			CURRENT = SYMBOL2_SHARE
+			AVG_P = AVERAGE_PRICE2
+			holding = self.holdings2
+
+		current = self.data[CURRENT]
+
+		self.data[CURRENT] = self.data[CURRENT] + shares
+
+		if current ==0 or self.data[CURRENT]==0:
+			self.data[AVG_P] = round(price,3)
 		else:
-			self.data[AVERAGE_PRICE]= round(((self.data[AVERAGE_PRICE]*current)+(price*shares))/self.data[CURRENT_SHARE],3)
+			self.data[AVG_P]= round(((self.data[AVG_P]*current)+(price*shares))/self.data[CURRENT],3)
 
 		for i in range(shares):
-			self.holdings.append(price)
+			holding.append(price)
 
-		self.adjusting_risk()
+		#self.adjusting_risk()
 
-		if self.data[AVERAGE_PRICE]!=self.data[LAST_AVERAGE_PRICE]:
-			self.management_plan.on_loading_up()
+		# if self.data[AVG_P]!=self.data[LAST_AVERAGE_PRICE]:
+		# 	self.management_plan.on_loading_up()
 			
-			log_print(self.symbol_name," ",side,",",self.data[AVERAGE_PRICE]," at ",self.data[CURRENT_SHARE],"act risk:",self.data[ACTRISK])
+		# 	log_print(self.symbol_name," ",side,",",self.data[AVG_P]," at ",self.data[CURRENT],"act risk:",self.data[ACTRISK])
 
-		self.data[LAST_AVERAGE_PRICE] = self.data[AVERAGE_PRICE]
+		# self.data[LAST_AVERAGE_PRICE] = self.data[AVG_P]
 
-	def ppro_orders_loadoff(self,price,shares,side):
+	def ppro_orders_loadoff(self,price,shares,side,symbol):
 
-		current = self.data[CURRENT_SHARE]
+		print("load off",symbol,price,shares,side)
+		if symbol == self.symbol1:
 
-		self.data[CURRENT_SHARE] = current-shares	
+			CURRENT = SYMBOL1_SHARE
+			AVG_P = AVERAGE_PRICE1
+			holding = self.holdings1
+		elif symbol == self.symbol2:
+
+			CURRENT = SYMBOL2_SHARE
+			AVG_P = AVERAGE_PRICE2
+			holding = self.holdings2
+
+
+		current = self.data[CURRENT]
+
+		self.data[CURRENT] = current-shares	
 		
 		gain = 0
 
-		if self.data[POSITION] == LONG:
+		if symbol == self.symbol1:
 			for i in range(shares):
 				try:
-					gain += price-self.holdings.pop()
+					gain += price-holding.pop()
 				except:
 					log_print("TP processing: Holding calculation error,holdings are empty.")
-		elif self.data[POSITION] == SHORT:
+		elif symbol == self.symbol2:
 			for i in range(shares):
 				try:
-					gain += self.holdings.pop() - price	
+					gain +=  holding.pop() - price 	
 				except:
 					log_print("TP processing: Holding calculation error,holdings are empty.")	
 
 		self.data[REALIZED]+=gain
 		self.data[REALIZED]= round(self.data[REALIZED],2)
 
-		self.adjusting_risk()
+		#self.adjusting_risk()
 
-		#log_print(self.symbol_name," sold:",shares," current shares:",self.data[CURRENT_SHARE],"realized:",self.data[REALIZED])
+		#log_print(self.symbol_name," sold:",shares," current shares:",self.data[CURRENT],"realized:",self.data[REALIZED])
 
 		#finish a trade if current share is 0.
 
-		if self.data[CURRENT_SHARE] <= 0:
+		if self.data[SYMBOL1_SHARE] <= 0 and self.data[SYMBOL2_SHARE]<= 0:
 
 
 			self.manager.new_record(self)
@@ -593,7 +484,7 @@ class PairTP:
 
 		#if reload is on, revert it back to entry stage. 
 		if self.tkvars[RELOAD].get() == True:
-			log_print("TP processing:",self.symbol_name,":"," Reload activated. Trading triggers re-initialized. reload remaining:",self.data[RELOAD_TIMES])
+			log_print("TP processing:",self.symbol_name,":"," Reload activated. Trading triggers re-initialized. reload remaining:")
 			self.tkvars[RELOAD].set(False)
 			self.start_tradingplan()
 
@@ -613,8 +504,8 @@ class PairTP:
 		else:
 			process = True
 
-		if self.data[CURRENT_SHARE]>0 and process:
-			shares = int(self.data[CURRENT_SHARE]*percentage)
+		if self.data[CURRENT]>0 and process:
+			shares = int(self.data[CURRENT]*percentage)
 			pproaction = ""
 			if shares ==0:
 				shares = 1
@@ -644,24 +535,25 @@ class PairTP:
 
 	""" risk related ## """
 
-	def adjusting_risk(self):
+	# def adjusting_risk(self):
 
-		if self.data[POSITION] == LONG:
-			self.data[ACTRISK] = round(((self.data[AVERAGE_PRICE]-self.data[STOP_LEVEL])*self.data[CURRENT_SHARE]),2)
-		else:
-			self.data[ACTRISK] = round(((self.data[STOP_LEVEL]-self.data[AVERAGE_PRICE])*self.data[CURRENT_SHARE]),2)
 
-		#diff = self.data[ACTRISK]-self.data[ESTRISK]
-		ratio = (self.data[ACTRISK]/self.data[ESTRISK])-0.3#self.data[ESTRISK]/diff
-		if ratio>1.2 : ratio = 1.2
-		if ratio<0 : ratio = 0
-		##change color and change text.
+	# 	if self.data[POSITION] == LONG:
+	# 		self.data[ACTRISK] = round(((self.data[AVERAGE_PRICE]-self.data[STOP_LEVEL])*self.data[CURRENT_SHARE]),2)
+	# 	else:
+	# 		self.data[ACTRISK] = round(((self.data[STOP_LEVEL]-self.data[AVERAGE_PRICE])*self.data[CURRENT_SHARE]),2)
 
-		self.tklabels[RISK_RATIO]["background"] = hexcolor_red(ratio)
-		self.tkvars[RISK_RATIO].set(str(self.data[ACTRISK])+"/"+str(self.data[ESTRISK]))
+	# 	#diff = self.data[ACTRISK]-self.data[ESTRISK]
+	# 	ratio = (self.data[ACTRISK]/self.data[ESTRISK])-0.3#self.data[ESTRISK]/diff
+	# 	if ratio>1.2 : ratio = 1.2
+	# 	if ratio<0 : ratio = 0
+	# 	##change color and change text.
 
-		if self.data[CURRENT_SHARE] == 0:
-			self.tklabels[RISK_RATIO]["background"] = DEFAULT
+	# 	self.tklabels[RISK_RATIO]["background"] = hexcolor_red(ratio)
+	# 	self.tkvars[RISK_RATIO].set(str(self.data[ACTRISK])+"/"+str(self.data[ESTRISK]))
+
+	# 	if self.data[CURRENT_SHARE] == 0:
+	# 		self.tklabels[RISK_RATIO]["background"] = DEFAULT
 
 	def flatten_cmd(self):
 		
@@ -669,28 +561,28 @@ class PairTP:
 			self.cancel_algo()
 		else:
 			# self.ppro_out.send(["Flatten",self.symbol_name])
-
-
-			if self.data[POSITION]==LONG:
-				self.symbol.new_request(self.name,-self.data[CURRENT_SHARE])
-			elif self.data[POSITION]==SHORT:
-				self.symbol.new_request(self.name,self.data[CURRENT_SHARE])
+			self.symbols[self.symbol1].new_request(self.name,-1*self.data[SYMBOL1_SHARE])
+			self.symbols[self.symbol2].new_request(self.name,self.data[SYMBOL2_SHARE])
+			# if self.data[POSITION]==LONG:
+				
+			# elif self.data[POSITION]==SHORT:
+				
 			
 
 	"""	UI related  """
-	def update_symbol_tkvar(self):
-		#print("updatem",elf.symbol.get_support(),elf.symbol.get_resistence())
-		self.tkvars[SUPPORT].set(self.symbol.get_support())
-		self.tkvars[RESISTENCE].set(self.symbol.get_resistence())
+	# def update_symbol_tkvar(self):
+	# 	#print("updatem",elf.symbol.get_support(),elf.symbol.get_resistence())
+	# 	self.tkvars[SUPPORT].set(self.symbol.get_support())
+	# 	self.tkvars[RESISTENCE].set(self.symbol.get_resistence())
 
 	def update_displays(self):
 
-		self.tkvars[SIZE_IN].set(str(self.data[CURRENT_SHARE])+"/"+str(self.data[TARGET_SHARE]))
+		self.tkvars[SIZE_IN].set(str(self.data[SYMBOL1_SHARE])+"/"+str(-self.data[SYMBOL2_SHARE]))
 		self.tkvars[REALIZED].set(str(self.data[REALIZED]))
 		self.tkvars[TOTAL_REALIZED].set(str(self.data[TOTAL_REALIZED]))
 		self.tkvars[UNREAL].set(str(self.data[UNREAL]))
 		self.tkvars[UNREAL_PSHR].set(str(self.data[UNREAL_PSHR]))
-		self.tkvars[AVERAGE_PRICE].set(self.data[AVERAGE_PRICE])
+		self.tkvars[AVERAGE_PRICE].set(str(self.data[AVERAGE_PRICE1])+"/"+str(self.data[AVERAGE_PRICE2]))
 
 		#check color.f9f9f9
 
@@ -698,10 +590,10 @@ class PairTP:
 
 		self.tklabels[UNREAL]["background"]
 
-		if self.data[UNREAL_PSHR]>0:
+		if self.data[UNREAL]>0:
 			self.tklabels[UNREAL_PSHR]["background"] = STRONGGREEN
 			self.tklabels[UNREAL]["background"] = STRONGGREEN
-		elif self.data[UNREAL_PSHR]<0:
+		elif self.data[UNREAL]<0:
 			self.tklabels[UNREAL_PSHR]["background"] = STRONGRED
 			self.tklabels[UNREAL]["background"] = STRONGRED
 		else:
@@ -740,6 +632,7 @@ class PairTP:
 			self.tklabels[PXT1]["background"] = DEFAULT
 			self.tklabels[PXT2]["background"] = DEFAULT
 			self.tklabels[PXT3]["background"] = DEFAULT	
+
 
 	def mark_algo_status(self,status):
 
@@ -802,7 +695,7 @@ class PairTP:
 			self.mark_algo_status(CANCELED)
 
 	def cancle_deployment(self):
-		if self.data[POSITION] =="" and self.data[CURRENT_SHARE]==0:
+		if self.data[POSITION] =="" and self.data[CURRENT]==0:
 			self.mark_algo_status(PENDING)
 			self.stop_tradingplan()
 		else:
@@ -816,11 +709,17 @@ class PairTP:
 
 			#self.ppro_out.send([REGISTER,self.symbol_name])
 
-			self.symbol.register_tradingplan(self.name,self)
+			self.symbols[self.symbol1].register_tradingplan(self.name,self) 
+			self.symbols[self.symbol2].register_tradingplan(self.name,self) 
 
-			entryplan=self.tkvars[ENTRYPLAN].get()
-			entry_type=self.tkvars[ENTYPE].get()
-			entrytimer=int(self.tkvars[TIMER].get())
+
+			self.symbols[self.symbol1].new_request(self.name,self.symbol1share)
+
+			self.symbols[self.symbol2].new_request(self.name,-self.symbol2share)
+
+			# entryplan=self.tkvars[ENTRYPLAN].get()
+			# entry_type=self.tkvars[ENTYPE].get()
+			# entrytimer=int(self.tkvars[TIMER].get())
 			manage_plan =self.tkvars[MANAGEMENTPLAN].get()
 
 			if risktimer ==0:
@@ -828,11 +727,11 @@ class PairTP:
 			else:
 				self.data[RISKTIMER] = risktimer
 
-			self.data[RISK_PER_SHARE] = abs(self.symbol.get_resistence()-self.symbol.get_support())
+			#self.data[RISK_PER_SHARE] = abs(self.symbol.get_resistence()-self.symbol.get_support())
 
 			self.set_mind("",DEFAULT)
-			self.entry_plan_decoder(entryplan, entry_type, entrytimer)
-			self.manage_plan_decoder(manage_plan)
+			#self.entry_plan_decoder(entryplan, entry_type, entrytimer)
+			#self.manage_plan_decoder(manage_plan)
 
 			self.start_tradingplan()
 
@@ -850,9 +749,9 @@ class PairTP:
 	def start_tradingplan(self):
 		self.mark_algo_status(DEPLOYED)
 
-		self.entry_plan.on_deploying()
-		self.management_plan.on_deploying()
-		self.current_running_strategy = self.entry_plan
+		#self.entry_plan.on_deploying()
+		#self.management_plan.on_deploying()
+		#self.current_running_strategy = self.entry_plan
 
 		# if self.tkvars[RELOAD].get()==False:
 		# 	#print("h",self.data[RELOAD_TIMES] )

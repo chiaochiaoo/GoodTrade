@@ -351,7 +351,7 @@ class TradingPlan:
 
 
 
-	def ppro_update_price(self,bid,ask,ts):
+	def ppro_update_price(self,symbol="",bid=0,ask=0,ts=0):
 
 		#if bid!=self.symbol.get_bid() or ask!=self.symbol.get_ask():
 
@@ -450,7 +450,7 @@ class TradingPlan:
 
 		self.update_displays()
 
-	def ppro_process_orders(self,price,shares,side):
+	def ppro_process_orders(self,price,shares,side,symbol):
 		
 		log_print("TP processing:",self.symbol_name,price,shares,side)
 		if self.data[POSITION]=="": # 1. No position.

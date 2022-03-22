@@ -63,8 +63,8 @@ class UI(pannel):
 						"Act/Est R":8,\
 						"SzIn":6,\
 						"Position":6,\
-						"Stop":8,\
-						"AvgPx":8,\
+						"Stop":6,\
+						"AvgPx":10,\
 						"PxT1":5,\
 						"PxT2":5,\
 						"PxT3":5,\
@@ -632,7 +632,6 @@ class UI(pannel):
 
 
 
-
 	def create_new_single_entry(self,tradingplan,single):
 
 		if single=="Single":
@@ -652,7 +651,7 @@ class UI(pannel):
 			row_number = l-1 #info[1]
 			#self.tk_labels_single[symbol] = {}
 
-			self.create_single_entry(tradingplan, row_number)
+			self.create_pair_entry(tradingplan, row_number)
 
 			self.single_label_count +=1
 

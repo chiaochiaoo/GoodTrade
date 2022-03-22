@@ -322,6 +322,8 @@ class Manager:
 		self.symbol_data = {}
 		self.tradingplan = {}
 
+		self.pair_plans = {}
+
 
 		self.manage_lock = 0
 
@@ -470,22 +472,33 @@ class Manager:
 			symbol2_stats = data["symbol2_statistics"]
 			mana = data["management"]
 
+			name = symbol1[:-3]+"/"+symbol2[:-3]
+
 			# pair reversed region. 
+			# self.pair_plans
+
 			if self.ui.pair_label_count < 25:
 
 				if symbol1 not in self.symbol_data:
 					self.symbol_data[symbol1] = Symbol(symbol1,0,0,symbol1_stats,self.pipe_ppro_out)  	
 
+					self.symbols.append(symbol1)
+					if symbol1 not in self.pair_plans:
+						self.pair_plans[symbol1] = name
+
 				if symbol2 not in self.symbol_data:
 					self.symbol_data[symbol2] = Symbol(symbol2,0,0,symbol2_stats,self.pipe_ppro_out)  
 
-				name = symbol1[:-3]+"/"+symbol2[:-3]
+					if symbol2 not in self.pair_plans:
+						self.pair_plans[symbol2] = name	
+
+					self.symbols.append(symbol2)
 				### name:"",symbol:Symbol1,symbol:Symbol2,share1,share2,manage_plan=None,risk=None,TEST_MODE=False,algo_name="",Manager=None
-				self.tradingplan[symbol] = PairTP(name,self.symbol_data[symbol1],self.symbol_data[symbol2],symbol1_share,symbol2_share,mana,risk,TEST_MODE,algo_name,self)
+				self.tradingplan[name] = PairTP(name,self.symbol_data[symbol1],self.symbol_data[symbol2],symbol1_share,symbol2_share,mana,risk,TEST_MODE,algo_name,self)
 
-				self.ui.create_new_single_entry(self.tradingplan[symbol],type_name)
+				self.ui.create_new_single_entry(self.tradingplan[name],type_name)
 
-				self.tradingplan[symbol].deploy(9600)
+				#self.tradingplan[name].deploy(9600)
 			try:
 
 				pass 
@@ -516,9 +529,9 @@ class Manager:
 					
 					if symbol not in self.symbol_data:
 						self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats,self.pipe_ppro_out)  #register in Symbol.
-
+						self.symbols.append(symbol)
 					#self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
-					#self.symbols.append(symbol)
+						
 
 					#######################################################################
 
@@ -542,7 +555,7 @@ class Manager:
 						if symbol not in self.symbol_data:
 							self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats,self.pipe_ppro_out)  #register in Symbol.
 						#self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
-						self.symbols.append(symbol)
+							self.symbols.append(symbol)
 
 						#######################################################################
 
@@ -844,10 +857,11 @@ class Manager:
 					log_print(e)
 			if d[0] =="pkg":
 				log_print("new package arrived",d)
-
+				for i in d[1]:
+					self.add_new_tradingplan(i,self.test_mode)
 				try:
-					for i in d[1]:
-						self.add_new_tradingplan(i,self.test_mode)
+					pass
+					
 				except Exception as e:
 
 					exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -954,7 +968,7 @@ class Manager:
 				ts = data["timestamp"]
 
 				techindicator = d[2]
-
+				#print("update",symbol,bid,ask)
 				if symbol in self.tradingplan:
 					self.tradingplan[symbol].ppro_update_price(bid,ask,ts)
 					self.tradingplan[symbol].symbol.update_techindicators(techindicator)
@@ -1109,12 +1123,22 @@ class Tester:
 
 		self.sec =  now.hour*3600 + now.minute*60 + now.second
 		#print(self.sec)
-		self.bid=0
-		self.ask=0
+		self.spybid=0
+		self.spyask=0
+
+		self.qbid = 0
+		self.qask = 0
+
 		self.data = {}
 		self.root = tk.Toplevel(width=780,height=250)
 		self.gt = receive_pipe
 		self.ppro = ppro_in
+
+
+		self.spybid=0
+		self.spyask=0
+		self.qqqbid=0
+		self.qqqask=0
 
 		self.ppro_out = ppro_out
 
@@ -1240,7 +1264,12 @@ class Tester:
 					data ={}
 					data["symbol"]= symbol
 					data["side"]= LONG
-					data["price"]= float(self.ask)
+
+					if symbol == "SPY.AM":
+						data["price"]= float(self.spyask)
+					else:
+						data["price"]=float(self.qask)
+
 					data["shares"]= int(share)
 					data["timestamp"]= self.sec
 					self.ppro.send(["order confirm",data])
@@ -1260,9 +1289,15 @@ class Tester:
 						self.share -=share
 
 					data ={}
+
 					data["symbol"]= symbol
 					data["side"]= SHORT
-					data["price"]= float(self.bid)
+
+					if symbol == "SPY.AM":
+						data["price"]= float(self.spybid)
+					else:
+						data["price"]=float(self.qbid)
+
 					data["shares"]= int(share)
 					data["timestamp"]= self.sec
 					self.ppro.send(["order confirm",data])
@@ -1305,7 +1340,7 @@ class Tester:
 						data ={}
 						data["symbol"]= symbol
 						data["side"]= SHORT
-						data["price"]= float(self.bid)
+						data["price"]= float(self.spybid)
 						data["shares"]= int(self.share)
 						data["timestamp"]= self.sec
 						self.ppro.send(["order confirm",data])
@@ -1313,7 +1348,7 @@ class Tester:
 						data ={}
 						data["symbol"]= symbol
 						data["side"]= LONG
-						data["price"]= float(self.bid)
+						data["price"]= float(self.spybid)
 						data["shares"]= int(self.share)
 						data["timestamp"]= self.sec
 						self.ppro.send(["order confirm",data])
@@ -1326,7 +1361,7 @@ class Tester:
 		data = {}
 		data["symbol"]= "SPY.AM"
 		data["side"]= LONG
-		data["price"]= float(self.ask)
+		data["price"]= float(self.spyask)
 		data["shares"]= int(1)
 		data["timestamp"]= self.sec
 		self.ppro.send(["order confirm",data])
@@ -1355,7 +1390,7 @@ class Tester:
 		data = {}
 		data["symbol"]= "SPY.AM"
 		data["side"]= SHORT
-		data["price"]= float(self.ask)
+		data["price"]= float(self.spyask)
 		data["shares"]= int(1)
 		data["timestamp"]= self.sec
 		self.ppro.send(["order confirm",data])
@@ -1422,8 +1457,12 @@ class Tester:
 				self.price_flip = True
 			#print("hello")
 
-		self.bid = round(float(self.price.get()-0.02),2)
-		self.ask = round(float(self.price.get()+0.02),2)
+		self.spybid = round(float(self.price.get()-0.02),2)
+		self.spyask = round(float(self.price.get()+0.02),2)
+
+
+		self.qbid = self.spybid -100
+		self.qask = self.spyask - 100
 
 		# data["symbol"]= "SPY.AM"
 		# data["bid"]= round(float(self.price.get()-0.01),2)
@@ -1432,7 +1471,9 @@ class Tester:
 
 		#self.ppro.send(["order update",data])
 
-		self.decode_l1("SPY.AM",self.bid,self.ask,self.sec,self.ppro,self.data)
+		self.decode_l1("SPY.AM",self.spybid,self.spyask,self.sec,self.ppro,self.data)
+
+		self.decode_l1("QQQ.NQ",self.qbid,self.qask,self.sec,self.ppro,self.data)
 		self.limit_buy_sell()
 
 	def decode_l1(self,symbol,bid,ask,ts,pipe,l1data):
@@ -1590,13 +1631,13 @@ class Tester:
 		used = []
 		for key,item in self.buy_book.items():
 
-			#print("checking",key,self.bid,self.bid <= key)
-			if self.bid <= key:
+			#print("checking",key,self.spybid,self.spybid <= key)
+			if self.spybid <= key:
 				#print("order___CONFIRMED")
 				data={}
 				data["symbol"]= "SPY.AM"
 				data["side"]= LONG
-				data["price"]= float(self.ask)
+				data["price"]= float(self.spyask)
 				data["shares"]= self.buy_book[key]
 				data["timestamp"]= self.sec
 				self.ppro.send(["order confirm",data])
@@ -1609,11 +1650,11 @@ class Tester:
 
 		used = []
 		for key,item in self.sell_book.items():
-			if self.ask >= key:
+			if self.spyask >= key:
 				data={}
 				data["symbol"]= "SPY.AM"
 				data["side"]= SHORT
-				data["price"]= float(self.bid)
+				data["price"]= float(self.spybid)
 				data["shares"]= self.sell_book[key]
 				data["timestamp"]= self.sec
 				self.ppro.send(["order confirm",data])

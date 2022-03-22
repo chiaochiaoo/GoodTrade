@@ -305,6 +305,7 @@ class InstantLong(EntryStrategy): #the parameters contains? dk. yet .  #Can make
 
 	def on_deploying(self):
 
+		#print("INSTANT LONG GLNOANGONGOENGOWG")
 		super().on_deploying()
 
 		#self.buyTrigger.deploy_stop_order()
