@@ -273,24 +273,6 @@ class PairTrade():
 			support = 0
 			resistence = 0
 
-			# if type_=="Rightaway":
-			# 	if side == "Long":
-			# 		entryplan= "Instant Long"
-			# 		support = stop
-			# 	elif side =="Short":
-			# 		entryplan= "Instant Short"
-			# 		resistence = stop
-			# else:
-			# 	triggerprice = self.limit_price.get()
-
-			# 	if side == "Long":
-			# 		entryplan= "Target Long"
-			# 		resistence = triggerprice
-			# 		support = stop
-			# 	elif side =="Short":
-			# 		entryplan= "Target Short"
-			# 		resistence = stop
-			# 		support = triggerprice
 
 			check = [symbol1,symbol2,symbol1share,symbol2share,risk,management]
 
@@ -311,8 +293,8 @@ class PairTrade():
 				new_order["symbol1"] = symbol1
 				new_order["symbol2"] = symbol2
 
-				new_order["symbol1share"] = symbol1share
-				new_order["symbol2share"] = symbol2share
+				new_order["symbol1_share"] = symbol1share
+				new_order["symbol2_share"] = symbol2share
 
 				new_order["risk"] = risk
 				new_order["management"] = management 
