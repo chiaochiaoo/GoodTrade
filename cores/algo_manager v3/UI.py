@@ -667,7 +667,7 @@ class UI(pannel):
 
 			self.create_pair_entry(tradingplan, row_number)
 
-			self.single_label_count +=1
+			self.pair_label_count +=1
 
 			self.rebind(self.dev_canvas,self.deployment_frame)
 			#self.recreate_labels()
