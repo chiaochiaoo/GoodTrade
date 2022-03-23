@@ -311,8 +311,8 @@ class PairTrade():
 				new_order["symbol1"] = symbol1
 				new_order["symbol2"] = symbol2
 
-				new_order["symbol1share"] = symbol1_share
-				new_order["symbol2share"] = symbol2_share
+				new_order["symbol1share"] = symbol1share
+				new_order["symbol2share"] = symbol2share
 
 				new_order["risk"] = risk
 				new_order["management"] = management 
