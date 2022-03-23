@@ -1264,16 +1264,22 @@ class Tester:
 					data ={}
 					data["symbol"]= symbol
 					data["side"]= LONG
+					data["timestamp"]= self.sec
 
 					if symbol == "SPY.AM":
 						data["price"]= float(self.spyask)
 					else:
 						data["price"]=float(self.qask)
 
-					data["shares"]= int(share)
-					data["timestamp"]= self.sec
-					self.ppro.send(["order confirm",data])
-
+					if share>3:
+						data["shares"]= int(share)//3
+						
+						self.ppro.send(["order confirm",data])
+						self.ppro.send(["order confirm",data])
+						self.ppro.send(["order confirm",data])
+					else:
+						data["shares"]= int(share)
+						self.ppro.send(["order confirm",data])
 				elif type_ =="Sell" or type_ == IOCSELL:
 
 					symbol = d[1]
@@ -1298,9 +1304,18 @@ class Tester:
 					else:
 						data["price"]=float(self.qbid)
 
-					data["shares"]= int(share)
+
 					data["timestamp"]= self.sec
-					self.ppro.send(["order confirm",data])
+
+					if share>3:
+						data["shares"]= int(share)//3
+						
+						self.ppro.send(["order confirm",data])
+						self.ppro.send(["order confirm",data])
+						self.ppro.send(["order confirm",data])
+					else:
+						data["shares"]= int(share)
+						self.ppro.send(["order confirm",data])
 
 
 				elif type_ == LIMITBUY :
