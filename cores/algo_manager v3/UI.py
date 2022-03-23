@@ -109,6 +109,11 @@ class UI(pannel):
 
 		self.current_upside = tk.DoubleVar()
 
+		self.deltaspx = tk.DoubleVar()
+		self.longexp = tk.DoubleVar()
+		self.shortexp = tk.DoubleVar()
+		self.overallexp = tk.DoubleVar()
+
 
 		self.current_downside_max = tk.DoubleVar()
 		self.u_winning = tk.DoubleVar()
@@ -157,43 +162,29 @@ class UI(pannel):
 		self.t2_.grid(sticky="w",column=4,row=row)
 
 
-		row +=1 
-		self.t2 = ttk.Label(self.stats, text="Winnig:")
-		self.t2.grid(sticky="w",column=1,row=row,padx=10)
-		self.t2_ = ttk.Label(self.stats, textvariable=self.u_winning)
-		self.t2_.grid(sticky="w",column=2,row=row)
+		# row +=1 
+		# self.t2 = ttk.Label(self.stats, text="Winnig:")
+		# self.t2.grid(sticky="w",column=1,row=row,padx=10)
+		# self.t2_ = ttk.Label(self.stats, textvariable=self.u_winning)
+		# self.t2_.grid(sticky="w",column=2,row=row)
 
 
 
-		self.t2_ = ttk.Label(self.stats, textvariable=self.u_winning_max)
-		self.t2_.grid(sticky="w",column=4,row=row)
+		# self.t2_ = ttk.Label(self.stats, textvariable=self.u_winning_max)
+		# self.t2_.grid(sticky="w",column=4,row=row)
 
 
-		row +=1 
-		self.t2 = ttk.Label(self.stats, text="Losing:")
-		self.t2.grid(sticky="w",column=1,row=row,padx=10)
-		self.t2_ = ttk.Label(self.stats, textvariable=self.u_losing)
-		self.t2_.grid(sticky="w",column=2,row=row)
+		# row +=1 
+		# self.t2 = ttk.Label(self.stats, text="Losing:")
+		# self.t2.grid(sticky="w",column=1,row=row,padx=10)
+		# self.t2_ = ttk.Label(self.stats, textvariable=self.u_losing)
+		# self.t2_.grid(sticky="w",column=2,row=row)
 
 
-
-		self.t2_ = ttk.Label(self.stats, textvariable=self.u_losing_max)
-		self.t2_.grid(sticky="w",column=4,row=row)
-
+		# self.t2_ = ttk.Label(self.stats, textvariable=self.u_losing_max)
+		# self.t2_.grid(sticky="w",column=4,row=row)
 
 
-
-
-		row +=1 
-		self.t3 = ttk.Label(self.stats, text="Total R:")
-		self.t3.grid(sticky="w",column=1,row=row,padx=10)
-		self.t3_ = ttk.Label(self.stats, textvariable=self.total_r)
-		self.t3_.grid(sticky="w",column=2,row=row)
-		self.t3_ = ttk.Label(self.stats, textvariable=self.total_r_min)
-		self.t3_.grid(sticky="w",column=3,row=row)
-
-		self.t3_ = ttk.Label(self.stats, textvariable=self.total_r_max)
-		self.t3_.grid(sticky="w",column=4,row=row)
 
 		row +=1 
 		self.t6 = ttk.Label(self.stats, text="Total Risk:")
@@ -203,13 +194,36 @@ class UI(pannel):
 		self.t6_ = ttk.Label(self.stats, textvariable=self.max_risk)
 		self.t6_.grid(sticky="w",column=4,row=row)
 
-
+		row +=1 
+		self.t6 = ttk.Label(self.stats, text="Delta SPX:")
+		self.t6.grid(sticky="w",column=1,row=row,padx=10)
+		self.t6_ = ttk.Label(self.stats, textvariable=self.deltaspx)
+		self.t6_.grid(sticky="w",column=2,row=row)
+		# self.t6_ = ttk.Label(self.stats, textvariable=self.max_risk)
+		# self.t6_.grid(sticky="w",column=4,row=row)
+		row +=1 
+		self.t6 = ttk.Label(self.stats, text="LONG EXP:")
+		self.t6.grid(sticky="w",column=1,row=row,padx=10)
+		self.t6_ = ttk.Label(self.stats, textvariable=self.longexp)
+		self.t6_.grid(sticky="w",column=2,row=row)
 
 		row +=1 
-		self.t6 = ttk.Label(self.stats, text="Locked in:")
+		self.t6 = ttk.Label(self.stats, text="SHORT EXP:")
 		self.t6.grid(sticky="w",column=1,row=row,padx=10)
-		self.t6_ = ttk.Label(self.stats, textvariable=self.current_upside)
+		self.t6_ = ttk.Label(self.stats, textvariable=self.shortexp)
 		self.t6_.grid(sticky="w",column=2,row=row)
+
+		row +=1 
+		self.t6 = ttk.Label(self.stats, text="OVERALL.EXP:")
+		self.t6.grid(sticky="w",column=1,row=row,padx=10)
+		self.t6_ = ttk.Label(self.stats, textvariable=self.overallexp)
+		self.t6_.grid(sticky="w",column=2,row=row)
+
+		# row +=1 
+		# self.t6 = ttk.Label(self.stats, text="Locked in:")
+		# self.t6.grid(sticky="w",column=1,row=row,padx=10)
+		# self.t6_ = ttk.Label(self.stats, textvariable=self.current_upside)
+		# self.t6_.grid(sticky="w",column=2,row=row)
 
 
 
