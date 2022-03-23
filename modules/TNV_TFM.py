@@ -292,7 +292,7 @@ class PairTrade():
 					resistence = stop
 					support = triggerprice
 
-			check = [symbol1,symbol2,symbol1share,symbol2share,risk,,stop,management]
+			check = [symbol1,symbol2,symbol1share,symbol2share,risk,stop,management]
 
 			for i in check:
 				if i =="" or i==0:
