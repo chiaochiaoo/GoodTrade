@@ -169,9 +169,13 @@ class Symbol:
 					self.incoming_request[tp]-=share
 					paired.append(t)
 
-		for i in paired:
-			self.incoming_shares.pop(i)
 
+		log_print(self.ticker,"incoming shares",self.incoming_shares)
+		for i in paired:
+			try:
+				self.incoming_shares.pop(i)
+			except Exception as e:
+				print(e,"poping failure",e,i,self.incoming_shares)
 	def holdings_update(self,price,share):
 
 		self.incoming_shares.append((price,share))
