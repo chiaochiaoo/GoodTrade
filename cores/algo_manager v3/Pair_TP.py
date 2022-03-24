@@ -621,6 +621,7 @@ class PairTP:
 		else:
 			log_print("cannot cancel, holding positions.")
 
+
 	def deploy(self,risktimer=0):
 
 		if self.tkvars[STATUS].get() ==PENDING:
