@@ -74,7 +74,7 @@ class TradingPlan:
 
 		self.bool_labels= [AUTORANGE,AUTOMANAGE,RELOAD,SELECTED,ANCART_OVERRIDE,USING_STOP]
 
-		self.init_data(risk,entry_plan,manage_plan)
+		self.init_data(risk,entry_plan,manage_plan,support,resistence)
 
 
 	def set_data(self,risk,entry_plan,manage_plan,support,resistence):
@@ -96,9 +96,12 @@ class TradingPlan:
 		self.data[STATUS] = PENDING
 		self.tkvars[STATUS].set(PENDING)
 
+		self.data[SUPPORT] = support
+		self.data[RESISTENCE] = resistence
+
 		self.update_symbol_tkvar()
 
-	def init_data(self,risk,entry_plan,manage_plan):
+	def init_data(self,risk,entry_plan,manage_plan,support,resistence):
 
 
 		for i in self.numeric_labels:
@@ -118,6 +121,8 @@ class TradingPlan:
 
 		self.data[ANCART_OVERRIDE]=False
 
+		self.data[SUPPORT] = support
+		self.data[RESISTENCE] = resistence
 
 		#default values.
 		self.tkvars[SELECTED].set(False)
