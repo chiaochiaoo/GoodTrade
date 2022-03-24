@@ -51,6 +51,7 @@ class Strategy:
 
 		self.set_symbol(symbol,tradingplan)
 
+
 	def set_symbol(self,symbol:Symbol,tradingplan):
 		self.symbol=symbol
 		self.symbol_name = symbol.get_name()
@@ -58,9 +59,9 @@ class Strategy:
 		#self.ppro_out = self.tradingplan.ppro_out
 		self.risk = self.tradingplan.get_risk()
 
+
 	def get_name(self):
 		return self.strategy_name
-
 
 	def supress_warnings(self):
 		self.supress_warning = True
@@ -101,7 +102,6 @@ class Strategy:
 
 				if len(self.current_triggers)==0: #if there is no trigger, call the finish even.t
 					self.on_finish()
-
 		else:
 
 			if not self.supress_warning:

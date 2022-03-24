@@ -8,11 +8,12 @@ import tkinter as tkvars
 import time
 import threading
 import random
+
 # MAY THE MACHINE GOD BLESS THY AIM
 
 class TradingPlan:
 
-	def __init__(self,name:"",symbol:Symbol,entry_plan=None,entry_type=None,manage_plan=None,risk=None,default_reload=0,TEST_MODE=False,algo_name="",Manager=None):
+	def __init__(self,name:"",symbol:Symbol,entry_plan=None,manage_plan=None,support=0,resistence=0,risk=None,TEST_MODE=False,algo_name="",Manager=None):
 
 		self.name = name 
 		self.symbol = symbol
@@ -29,11 +30,11 @@ class TradingPlan:
 		self.entry_strategy_start = False
 
 		self.entry_plan = None
-		self.entry_type = None
+
 		self.management_plan = None
 		self.algo_name = algo_name
 
-		self.default_reload = default_reload
+		#self.default_reload = default_reload
 
 		#self.ppro_out = ppro_out
 
@@ -64,19 +65,23 @@ class TradingPlan:
 
 		self.algo_ui_id = 0
 		
-		self.numeric_labels = [ACTRISK,ESTRISK,CUR_PROFIT_LEVEL,CURRENT_SHARE,TARGET_SHARE,INPUT_TARGET_SHARE,AVERAGE_PRICE,LAST_AVERAGE_PRICE,RISK_PER_SHARE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3,FLATTENTIMER,BREAKPRICE,RISKTIMER,FIBCURRENT_MAX,FIBLEVEL1,FIBLEVEL2,FIBLEVEL3,FIBLEVEL4,EXIT,RELOAD_TIMES]
+		self.numeric_labels = [ACTRISK,ESTRISK,CUR_PROFIT_LEVEL,CURRENT_SHARE,TARGET_SHARE,INPUT_TARGET_SHARE,AVERAGE_PRICE,LAST_AVERAGE_PRICE,\
+		RISK_PER_SHARE,STOP_LEVEL,UNREAL,UNREAL_PSHR,REALIZED,TOTAL_REALIZED,TIMER,PXT1,PXT2,PXT3,FLATTENTIMER,BREAKPRICE,RISKTIMER,\
+		FIBCURRENT_MAX,FIBLEVEL1,FIBLEVEL2,FIBLEVEL3,FIBLEVEL4,EXIT,RELOAD_TIMES,RESISTENCE,SUPPORT]
+
+
 		self.string_labels = [MIND,STATUS,POSITION,RISK_RATIO,SIZE_IN,ENTRYPLAN,ENTYPE,MANAGEMENTPLAN]
 
 		self.bool_labels= [AUTORANGE,AUTOMANAGE,RELOAD,SELECTED,ANCART_OVERRIDE,USING_STOP]
 
-		self.init_data(risk,entry_plan,entry_type,manage_plan)
+		self.init_data(risk,entry_plan,manage_plan)
 
 
-	def set_data(self,risk,entry_plan,entry_type,manage_plan,support,resistence):
+	def set_data(self,risk,entry_plan,manage_plan,support,resistence):
 		#default values.
 		self.tkvars[SELECTED].set(False)
 		self.tkvars[RELOAD].set(False)
-		self.data[RELOAD_TIMES]=self.default_reload
+		#self.data[RELOAD_TIMES]=self.default_reload
 		#Non String, Non Numeric Value
 
 		#Set some default value
@@ -85,7 +90,7 @@ class TradingPlan:
 		self.tkvars[RISK_RATIO].set(str(0)+"/"+str(self.data[ESTRISK]))
 
 		self.tkvars[ENTRYPLAN].set(entry_plan)
-		self.tkvars[ENTYPE].set(entry_type)
+
 		self.tkvars[MANAGEMENTPLAN].set(manage_plan)
 
 		self.data[STATUS] = PENDING
@@ -93,7 +98,7 @@ class TradingPlan:
 
 		self.update_symbol_tkvar()
 
-	def init_data(self,risk,entry_plan,entry_type,manage_plan):
+	def init_data(self,risk,entry_plan,manage_plan):
 
 
 		for i in self.numeric_labels:
@@ -117,7 +122,7 @@ class TradingPlan:
 		#default values.
 		self.tkvars[SELECTED].set(False)
 		self.tkvars[RELOAD].set(False)
-		self.data[RELOAD_TIMES]=self.default_reload
+		#self.data[RELOAD_TIMES]=self.default_reload
 		#Non String, Non Numeric Value
 
 		#Set some default value
@@ -126,7 +131,7 @@ class TradingPlan:
 		self.tkvars[RISK_RATIO].set(str(0)+"/"+str(self.data[ESTRISK]))
 
 		self.tkvars[ENTRYPLAN].set(entry_plan)
-		self.tkvars[ENTYPE].set(entry_type)
+
 		self.tkvars[MANAGEMENTPLAN].set(manage_plan)
 
 		self.data[STATUS] = PENDING
@@ -804,7 +809,7 @@ class TradingPlan:
 			self.symbol.register_tradingplan(self.name,self)
 
 			entryplan=self.tkvars[ENTRYPLAN].get()
-			entry_type=self.tkvars[ENTYPE].get()
+
 			entrytimer=int(self.tkvars[TIMER].get())
 			manage_plan =self.tkvars[MANAGEMENTPLAN].get()
 
@@ -816,7 +821,7 @@ class TradingPlan:
 			self.data[RISK_PER_SHARE] = abs(self.symbol.get_resistence()-self.symbol.get_support())
 
 			self.set_mind("",DEFAULT)
-			self.entry_plan_decoder(entryplan, entry_type, entrytimer)
+			self.entry_plan_decoder(entryplan, entrytimer)
 			self.manage_plan_decoder(manage_plan)
 
 			self.start_tradingplan()
@@ -852,18 +857,10 @@ class TradingPlan:
 		self.current_running_strategy = None
 
 	""" Plan Handler """	
-	def entry_plan_decoder(self,entry_plan,entry_type,entrytimer):
+	def entry_plan_decoder(self,entry_plan,entrytimer):
 
-		if entry_type ==None or entry_type ==INSTANT:
-			instant = 1 
-		if entry_type ==INCREMENTAL:
-			instant = 3 
-		if entry_type ==INCREMENTAL2:
-			instant = 5
+		instant = 1 
 
-		if instant >1:
-			if entrytimer<5:
-				entrytimer = 5
 
 		if entry_plan == BREAKANY:
 			self.set_EntryStrategy(BreakAny(entrytimer,instant,self.symbol,self))
