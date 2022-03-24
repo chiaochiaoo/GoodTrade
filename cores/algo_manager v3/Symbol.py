@@ -164,11 +164,14 @@ class Symbol:
 					self.tradingplans[tp].ppro_process_orders(price,abs(share),LONG,self.ticker)
 					self.incoming_request[tp]-=share
 					paired.append(t)
+
+					break
 				elif share<0 and val<0:
 					self.tradingplans[tp].ppro_process_orders(price,abs(share),SHORT,self.ticker)
 					self.incoming_request[tp]-=share
 					paired.append(t)
 
+					break
 
 		#log_print(self.ticker,"incoming shares",self.incoming_shares)
 
@@ -196,11 +199,11 @@ class Symbol:
 		#price,shares,side
 
 		if self.incoming_request[tp1]>0:
-			self.tradingplans[tp1].ppro_process_orders(self.get_bid(),self.incoming_request[tp1],LONG)
-			self.tradingplans[tp2].ppro_process_orders(self.get_bid(),abs(self.incoming_request[tp1]),SHORT)
+			self.tradingplans[tp1].ppro_process_orders(self.get_bid(),self.incoming_request[tp1],LONG,self.ticker)
+			self.tradingplans[tp2].ppro_process_orders(self.get_bid(),abs(self.incoming_request[tp1]),SHORT,self.ticker)
 		else:
-			self.tradingplans[tp1].ppro_process_orders(self.get_bid(),abs(self.incoming_request[tp1]),SHORT)
-			self.tradingplans[tp2].ppro_process_orders(self.get_bid(),self.incoming_request[tp1],LONG)
+			self.tradingplans[tp1].ppro_process_orders(self.get_bid(),abs(self.incoming_request[tp1]),SHORT,self.ticker)
+			self.tradingplans[tp2].ppro_process_orders(self.get_bid(),self.incoming_request[tp1],LONG,self.ticker)
 
 		self.incoming_request[tp2] += self.incoming_request[tp1]
 		self.incoming_request[tp1] = 0
