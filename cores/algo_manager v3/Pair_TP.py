@@ -287,11 +287,14 @@ class PairTP:
 
 	def ppro_orders_loadup(self,price,shares,side,symbol):
 
+		self.mark_algo_status(RUNNING)
+		
 		if symbol == self.symbol1:
 
 			CURRENT = SYMBOL1_SHARE
 			AVG_P = AVERAGE_PRICE1
 			holding = self.holdings1
+
 		elif symbol == self.symbol2:
 
 			CURRENT = SYMBOL2_SHARE
