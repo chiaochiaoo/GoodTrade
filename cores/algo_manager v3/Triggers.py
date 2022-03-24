@@ -296,7 +296,7 @@ class Purchase_trigger(AbstractTrigger):
 
 		self.entry_price = self.symbol_data[self.entry]
 		
-		log_print(self.symbol_name,"Trigger: ",self.pos,share,"stop :",self.stop,self.symbol_data[self.stop],self.symbol.get_time())
+		log_print(self.symbol_name,"Trigger: ",self.pos,share,"stop :",self.stop,self.stop,self.symbol_data[self.stop],self.symbol.get_time())
 
 		if self.pos!="":
 			self.tradingplan.expect_orders = self.pos
