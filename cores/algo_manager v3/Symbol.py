@@ -130,9 +130,9 @@ class Symbol:
 					if pair_off_test(self.incoming_request[tps[i]], self.incoming_request[tps[j]]):
 						self.pair_off(tps[i], tps[j])
 
-		log_print(("pairing sucessful, now remaining request: ",self.ticker,self.incoming_request))
+		#log_print(("pairing sucessful, now remaining request: ",self.ticker,self.incoming_request))
 
-		log_print(("current shares remaning:",self.ticker,sum(self.incoming_request.values())))
+		#log_print(("current shares remaning:",self.ticker,sum(self.incoming_request.values())))
 
 
 		#### STAGE 3 -> IMBALANCE HANDLING #####
@@ -170,7 +170,7 @@ class Symbol:
 					paired.append(t)
 
 
-		log_print(self.ticker,"incoming shares",self.incoming_shares)
+		#log_print(self.ticker,"incoming shares",self.incoming_shares)
 
 		c = 0
 		for i in paired:
