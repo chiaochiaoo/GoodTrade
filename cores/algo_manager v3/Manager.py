@@ -957,6 +957,9 @@ class Manager:
 
 				# here I update the symbol instead. 
 				# and then the symbol update each of the tradingplan bound to it. 
+
+				#print(symbol,bid,ask,ts)
+
 				if symbol in self.symbols:
 					self.symbol_data[symbol].update_price(bid,ask,ts)
 
@@ -971,10 +974,14 @@ class Manager:
 				ts = data["timestamp"]
 
 				techindicator = d[2]
-				#print("update",symbol,bid,ask)
+				#print("update",symbol,bid,ask,ts)
 				if symbol in self.tradingplan:
-					self.tradingplan[symbol].ppro_update_price(bid,ask,ts)
-					self.tradingplan[symbol].symbol.update_techindicators(techindicator)
+
+
+					if symbol in self.symbols:
+						self.symbol_data[symbol].update_price(bid,ask,ts)
+						self.symbol_data[symbol].update_techindicators(techindicator)
+
 				### UPDATE THE EMAs. 
 
 			elif d[0] =="order rejected":
@@ -1491,7 +1498,7 @@ class Tester:
 
 		self.decode_l1("SPY.AM",self.spybid,self.spyask,self.sec,self.ppro,self.data)
 
-		self.decode_l1("QQQ.NQ",self.qbid,self.qask,self.sec,self.ppro,self.data)
+		#self.decode_l1("QQQ.NQ",self.qbid,self.qask,self.sec,self.ppro,self.data)
 		self.limit_buy_sell()
 
 	def decode_l1(self,symbol,bid,ask,ts,pipe,l1data):

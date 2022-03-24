@@ -130,9 +130,9 @@ class Symbol:
 					if pair_off_test(self.incoming_request[tps[i]], self.incoming_request[tps[j]]):
 						self.pair_off(tps[i], tps[j])
 
-		#log_print(("pairing sucessful, now remaining request: ",self.ticker,self.incoming_request))
+		log_print(("pairing sucessful, now remaining request: ",self.ticker,self.incoming_request))
 
-		#log_print(("current shares remaning:",self.ticker,sum(self.incoming_request.values())))
+		log_print(("current shares remaning:",self.ticker,sum(self.incoming_request.values())))
 
 
 		#### STAGE 3 -> IMBALANCE HANDLING #####
@@ -310,6 +310,7 @@ class Symbol:
 
 	def update_price(self,bid,ask,ts):
 
+		#print("price",bid,ask,ts)
 		if self.data[BID]!= bid and self.data[ASK]!=ask:
 
 			self.data[BID] = bid
@@ -318,9 +319,12 @@ class Symbol:
 
 		#update on the tradingplans. 
 		#print(self.tradingplans.keys())
+
+
 		for tp,val in self.tradingplans.items():
 			#print("tp update",tp)
-			val.ppro_update_price(bid=bid,ask=ask,ts=ts)
+			#print(bid,ask,ts)
+			val.ppro_update_price(symbol=self.ticker,bid=bid,ask=ask,ts=ts)
 
 
 	def update_price_old(self,bid,ask,ts,AR,pos):

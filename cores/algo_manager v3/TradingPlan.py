@@ -369,6 +369,8 @@ class TradingPlan:
 			#self.symbol.update_price(bid,ask,ts,self.tkvars[AUTORANGE].get(),self.tkvars[STATUS].get())
 
 			#check stop. 
+
+		#print("check_pnl",bid,ask,ts)
 		if self.data[POSITION]!="":
 			self.check_pnl(bid,ask,ts)
 
@@ -389,6 +391,7 @@ class TradingPlan:
 		gain = 0
 		stillbreak = True
 
+		#print("check_pnl",bid,ask,ts)
 		if self.data[POSITION]==LONG:
 
 			price = bid
@@ -413,6 +416,7 @@ class TradingPlan:
 
 			if price >=  self.data[STOP_LEVEL]:
 				flatten=True
+				print("flatening,",price,self.data[STOP_LEVEL])
 
 		if self.data[CURRENT_SHARE] >0:
 			self.data[UNREAL_PSHR] = gain
@@ -447,6 +451,7 @@ class TradingPlan:
 			self.flatten_order=True
 			self.data[FLATTENTIMER]=0
 
+			log_print(self.name,"flattening")
 
 			if self.data[POSITION]==LONG:
 				self.symbol.new_request(self.name,-self.data[CURRENT_SHARE])
