@@ -207,6 +207,7 @@ class PairTP:
 
 			gain +=( self.data[AVERAGE_PRICE2]- self.symbols[self.symbol2].get_ask() ) *self.data[SYMBOL2_SHARE]
 
+			print(self.symbols[self.symbol1].get_bid(),self.data[AVERAGE_PRICE1],self.data[AVERAGE_PRICE2],self.symbols[self.symbol2].get_ask() )
 			self.data[UNREAL]= round(gain,2)
 
 			if gain + self.data[ESTRISK] <0:
@@ -288,7 +289,7 @@ class PairTP:
 	def ppro_orders_loadup(self,price,shares,side,symbol):
 
 		self.mark_algo_status(RUNNING)
-		
+
 		if symbol == self.symbol1:
 
 			CURRENT = SYMBOL1_SHARE

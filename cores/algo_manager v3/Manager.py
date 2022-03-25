@@ -1498,7 +1498,7 @@ class Tester:
 
 		self.decode_l1("SPY.AM",self.spybid,self.spyask,self.sec,self.ppro,self.data)
 
-		#self.decode_l1("QQQ.NQ",self.qbid,self.qask,self.sec,self.ppro,self.data)
+		self.decode_l1("QQQ.NQ",self.qbid,self.qask,self.sec,self.ppro,self.data)
 		self.limit_buy_sell()
 
 	def decode_l1(self,symbol,bid,ask,ts,pipe,l1data):
