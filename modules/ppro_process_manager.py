@@ -1156,7 +1156,11 @@ def process_and_send(lst,pipe,database):
 	if timestamp>569 and timestamp <=575:
 		d["f5r"] = d["last_5_range"]
 		d["f5v"] = d["vol"]
-		d["log_return_first5"] = (np.log(open_) - np.log(price))*100
+
+		try:
+			d["log_return_first5"] = (np.log(open_) - np.log(price))*100
+		except:
+			d["log_return_first5"] = 0
 
 	#check if the data is lagged. Premarket. Real. Aftermarket.
 	register_again = False
