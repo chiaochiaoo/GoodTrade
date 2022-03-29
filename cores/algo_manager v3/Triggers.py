@@ -1583,10 +1583,10 @@ class TwoToOneWideStopTrigger(AbstractTrigger):
 		elif self.strategy.orders_level ==3: level= TRIGGER_PRICE_3
 		elif self.strategy.orders_level ==4: level= TRIGGER_PRICE_4
 		elif self.strategy.orders_level ==5: level= TRIGGER_PRICE_5
-		elif self.strategy.orders_level ==6: level= TRIGGER_PRICE_6
-		elif self.strategy.orders_level ==7: level= TRIGGER_PRICE_7
-		elif self.strategy.orders_level ==8: level= TRIGGER_PRICE_8
-		elif self.strategy.orders_level ==9: level= TRIGGER_PRICE_9
+		# elif self.strategy.orders_level ==6: level= TRIGGER_PRICE_6
+		# elif self.strategy.orders_level ==7: level= TRIGGER_PRICE_7
+		# elif self.strategy.orders_level ==8: level= TRIGGER_PRICE_8
+		# elif self.strategy.orders_level ==9: level= TRIGGER_PRICE_9
 
 		if self.tradingplan.data[POSITION] == LONG:
 			self.conditions = [[SYMBOL_DATA,ASK,">",TP_DATA,level]]
@@ -1620,63 +1620,65 @@ class TwoToOneWideStopTrigger(AbstractTrigger):
 		if self.strategy.orders_level == 1:
 			
 			#75
-			pass
+			
 			# new_stop = round((self.tradingplan.data[STOP_LEVEL]*3+self.tradingplan.data[AVERAGE_PRICE])/4,2)
 			# self.bring_up_stop(new_stop)
 
 			# self.set_mind("75% risk",GREEN)
-			self.strategy.deploy_n_batch_torpedoes(3)
+			#self.strategy.deploy_n_batch_torpedoes(3)
+
+			self.set_mind("Break even",GREEN)
+
+			self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[AVERAGE_PRICE]
+			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[AVERAGE_PRICE])
+
+			#sell 25%. 
+			self.tradingplan.symbol.new_request(self.tradingplan.name,self.strategy.lot)
 
 		if self.strategy.orders_level == 2:
 			
 			#BREAK EVEN
-			pass
+			
 			# new_stop =round((self.tradingplan.data[STOP_LEVEL]*2+self.tradingplan.data[AVERAGE_PRICE])/3,2)
 			# self.bring_up_stop(new_stop)
 
 			# self.set_mind("Half risk",GREEN)
 
+			self.set_mind("Covered No."+str(1)+" lot.",GREEN)
+			self.tradingplan.symbol.new_request(self.tradingplan.name,self.strategy.lot)
+
 		if self.strategy.orders_level == 3:
 			
 			#BREAK EVEN
+			self.set_mind("Covered No."+str(2)+" lot.",GREEN)
+			self.tradingplan.symbol.new_request(self.tradingplan.name,self.strategy.lot)
 
-			new_stop =round(self.tradingplan.data[AVERAGE_PRICE],2)
-			#self.bring_up_stop(new_stop)
 
-			self.set_mind("Break even",GREEN)
+			
 
 		if self.strategy.orders_level == 4:
 
-			new_stop =round(self.tradingplan.data[AVERAGE_PRICE],2)
-			#self.bring_up_stop(new_stop)
+			self.set_mind("Covered No."+str(3)+" lot.",GREEN)
+			self.tradingplan.symbol.new_request(self.tradingplan.name,self.strategy.lot)
+			
 
-			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
-			self.tradingplan.current_price_level = 2
-			self.set_mind("Covered No."+str(1)+" lot.",GREEN)
 
 		if self.strategy.orders_level == 5:
-			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
 
-			new_stop =round(self.tradingplan.data[AVERAGE_PRICE],2)
-			#self.bring_up_stop(new_stop)
-			
-		if self.strategy.orders_level == 6:
-			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
-			self.tradingplan.current_price_level = 3
-			self.set_mind("Covered No."+str(2)+" lot.",GREEN)
+			#sell everything.
+			#self.tradingplan.symbol.new_request(self.tradingplan.name,self.strategy.lot)
 
-			new_stop =round(self.tradingplan.data[AVERAGE_PRICE],2)
-			self.bring_up_stop(new_stop)
+			# self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
 
-		if self.strategy.orders_level == 7:
-			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
 
-			new_stop =round(self.tradingplan.data[TRIGGER_PRICE_5],2)
-			self.bring_up_stop(new_stop)
+			self.set_mind("Covered No."+str(4)+" lot.",GREEN)
+			if self.tradingplan.data[POSITION] == LONG:
+				self.tradingplan.symbol.new_request(self.tradingplan.name,self.tradingplan.data[CURRENT_SHARE]*-1)
+			else:
+				self.tradingplan.symbol.new_request(self.tradingplan.name,self.tradingplan.data[CURRENT_SHARE])
 
-		if self.strategy.orders_level == 8:
-			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
-			new_stop =round(self.tradingplan.data[TRIGGER_PRICE_6],2)
+
+			new_stop =round(self.tradingplan.data[TRIGGER_PRICE_3],2)
 			self.bring_up_stop(new_stop)
 		# log_print(self.symbol_name," Hit price target", self.tradingplan.current_price_level,"New Stop:",self.tradingplan.data[STOP_LEVEL])
 
@@ -1687,7 +1689,6 @@ class TwoToOneWideStopTrigger(AbstractTrigger):
 		self.strategy.orders_level +=1
 		self.tradingplan.adjusting_risk()
 		self.tradingplan.update_displays()
-
 ### once ema count exceed X. 
 
 class EMAManager(AbstractTrigger):
