@@ -1040,6 +1040,7 @@ class Manager:
 
 				d.adjusting_risk()
 				d.update_displays()
+				
 	# def terminateGT(self):
 
 	# 	if self.termination:
