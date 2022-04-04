@@ -10,6 +10,14 @@ import matplotlib.pyplot as plt
 from matplotlib import ticker
 import matplotlib.pyplot as plt
 
+def find_between(data, first, last):
+	try:
+		start = data.index(first) + len(first)
+		end = data.index(last, start)
+		return data[start:end]
+	except ValueError:
+		return data
+
 
 def convert(df):
 	
@@ -149,13 +157,6 @@ def timestamp_seconds(s):
 		print("Timestamp conversion error:",e)
 		return 0
 
-def find_between(data, first, last):
-	try:
-		start = data.index(first) + len(first)
-		end = data.index(last, start)
-		return data[start:end]
-	except ValueError:
-		return data
 
 def hex_to_string(int):
 	a = hex(int)[-2:]
