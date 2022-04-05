@@ -244,6 +244,7 @@ class StandardScanner():
 
 					new_order = {}
 					
+					new_order["type_name"] = "Single"
 					new_order["algo_name"]= self.algo_name
 					new_order["entry_type"] = " BreakDn"
 					new_order["symbol"] = lst[i]["symbol"]
