@@ -291,6 +291,8 @@ def decode_l1(stream_data,pipe,writer,l1data):
 			update_["EMA21C"]=l1data[symbol]["internal"]["EMA21C"]
 
 
+			update_["close"] = l1data[symbol]["internal"]["close"]
+			
 			update_["EMAcount"]=l1data[symbol]["internal"]["EMA_count"]
 
 			pipe.send(["order update_m",l1data[symbol],update_])

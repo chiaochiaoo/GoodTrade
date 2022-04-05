@@ -9,6 +9,8 @@ SUPPORT="support"
 OPEN="open" 
 HIGH="high"
 LOW="low" 
+CLOSE = "close"
+
 TIMESTAMP="timestamp"
 TRADE_TIMESTAMP = "TRADE_timestamp"
 PREMARKETHIGH="phigh"
