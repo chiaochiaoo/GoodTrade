@@ -1081,42 +1081,13 @@ class EDGX_break_Purchase_trigger(AbstractTrigger):
 			self.tradingplan.tkvars[STOP_LEVEL].set(self.stop_price)
 
 			self.tradingplan.data[BREAKPRICE]=self.entry_price#self.symbol_data[self.stop]
-			#self.tradingplan.tkvars[BREAKPRICE].set(self.entry_price)
-			#self.tradingplan.expect_orders = True
-			#log_print("Trigger: Purchase: ",self.symbol_name,self.pos,share,"at",self.symbol.get_time())
-		
-			# if share>0:
 
-			# 	spread = self.symbol_data[ASK]-self.symbol_data[BID]
-
-			# 	spread_risk = spread*share/self.risk
-
-			# 	if spread_risk < 0.15:
-			# 		log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk)
-			# 		self.ppro_out.send([IOCBUY,self.symbol_name,share,self.symbol_data[ASK]])
-			# 	else:
-			# 		log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk,"CANCEL ENTRY")
-			# 		self.set_mind("Spread TOO HIGH",GREEN)
 		elif self.pos ==SHORT:
 
 			self.tradingplan.data[STOP_LEVEL]=self.stop_price#self.symbol_data[self.stop]
 			self.tradingplan.tkvars[STOP_LEVEL].set(self.stop_price)
 
 			self.tradingplan.data[BREAKPRICE]=self.entry_price#self.symbol_data[self.stop]
-			#self.tradingplan.tkvars[BREAKPRICE].set(self.entry_price)
-
-			# if share>0:
-
-			# 	spread = self.symbol_data[ASK]-self.symbol_data[BID]
-			# 	spread_risk = spread*share/self.risk
-
-			# 	if spread_risk < 0.15:
-			# 		log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk)
-			# 		self.ppro_out.send([IOCSELL,self.symbol_name,share,self.symbol_data[BID]])
-			# 	else:
-			# 		log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk,"CANCEL ENTRY")
-			# 		self.set_mind("Spread TOO HIGH",GREEN)
-
 				
 		else:
 			log_print("unidentified side. ")
@@ -1214,6 +1185,42 @@ class TwoToOneTriggerOLD(AbstractTrigger):
 		self.set_mind("Covered No."+str(self.tradingplan.current_price_level)+" lot.",GREEN)
 		self.tradingplan.current_price_level+=1
 		self.tradingplan.update_displays()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1481,7 +1488,14 @@ class TwoToOneTrigger(AbstractTrigger):
 			coefficient = -1
 
 		#print(new_stop,self.tradingplan.data[STOP_LEVEL])
-		if new_stop*coefficient >self.tradingplan.data[STOP_LEVEL]*coefficient:
+		# if new_stop*coefficient >self.tradingplan.data[STOP_LEVEL]*coefficient:
+		# 	self.tradingplan.data[STOP_LEVEL]=new_stop
+		# 	self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[STOP_LEVEL])
+
+		if new_stop*coefficient > self.symbol.data[CLOSE]*coefficient:
+			self.tradingplan.data[STOP_LEVEL] = round(self.symbol.data[CLOSE] - 0.02*coefficient,2)
+			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[STOP_LEVEL])
+		else:
 			self.tradingplan.data[STOP_LEVEL]=new_stop
 			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[STOP_LEVEL])
 
@@ -1832,7 +1846,6 @@ class SemiManualManager(AbstractTrigger):
 		# new_stop =round(self.tradingplan.data[TRIGGER_PRICE_6],2)
 		# self.bring_up_stop(new_stop)
 		# log_print(self.symbol_name," Hit price target", self.tradingplan.current_price_level,"New Stop:",self.tradingplan.data[STOP_LEVEL])
-
 
 
 
