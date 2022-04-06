@@ -22,6 +22,12 @@ from datetime import datetime, timedelta
 import json
 import os,sys
 
+from http.server import BaseHTTPRequestHandler, HTTPServer
+import logging
+
+
+
+
 #May this class bless by the Deus Mechanicus.
 
 try:
@@ -34,6 +40,88 @@ f.close()
 
 
 TEST = True
+
+
+#how do i take a pipe in? 
+#uses global? 
+
+class S(BaseHTTPRequestHandler):
+	def _set_response(self):
+		self.send_response(200)
+		self.send_header('Content-type', 'text/html')
+		self.end_headers()
+
+	def do_GET(self):
+
+		self._set_response()
+		self.wfile.write("received".encode('utf-8'))
+
+		print(self.path[1:])
+		stream_data = self.path[1:]
+
+		self.send_message(stream_data)
+
+		# type_ = find_between(stream_data,"Type=",",")
+
+		# if type_!="TEST":
+		# 	self.send_message(msg)
+
+	def do_POST(self):
+
+		self._set_response()
+		self.wfile.write("received".encode('utf-8'))
+
+		#print(self.path[1:])
+
+	def send_message(self,msg):
+
+		pipec.send(["pkg",msg])
+		#pipe.send(msg)
+
+
+
+
+		#msgid=xxx,Message=L1,MarketTime=14:24:38.206,Symbol=SNDL.NQ,BidPrice=0.828300,BidSize=13899,AskPrice=0.828400,AskSize=2364,Tick=?\n'
+
+		# msgid = find_between(stream_data,"")
+		# symbol = find_between(stream_data, "Symbol=", ",")
+		# side = find_between(stream_data, "Side=", ",")
+		# info = find_between(stream_data, "InfoText=", ",")
+
+		# print("hello",str(self.path))
+		# self._set_response()
+		# self.wfile.write("received".encode('utf-8'))
+
+		# content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
+		# post_data = self.rfile.read(content_length) # <--- Gets the data itself
+		# logging.info("POST request,\nPath: %s\nHeaders:\n%s\n\nBody:\n%s\n",
+		#         str(self.path), str(self.headers), post_data.decode('utf-8'))
+
+		# self._set_response()
+		# self.wfile.write("POST request for {}".format(self.path).encode('utf-8'))
+
+def httpserver(pipex):
+
+	from http.server import BaseHTTPRequestHandler, HTTPServer
+	import logging
+
+	global pipec
+	pipec = pipex
+	server_class=HTTPServer
+	handler_class=S
+	port=4441
+
+	logging.basicConfig(level=logging.INFO)
+	server_address = ('', port)
+	httpd = server_class(server_address, handler_class)
+	logging.info('Starting httpd...\n')
+	try:
+		httpd.serve_forever()
+	except KeyboardInterrupt:
+		pass
+	httpd.server_close()
+	logging.info('Stopping httpd...\n')
+
 
 def algo_manager_voxcom(pipe):
 
@@ -194,7 +282,6 @@ def algo_manager_voxcom2(pipe):
 			log_print(e)
 
 
-
 def algo_manager_voxcom3(pipe):
 
 	#tries to establish commuc
@@ -319,6 +406,8 @@ class Manager:
 
 		self.symbols = []
 
+		self.algo_ids = []
+
 		self.symbol_data = {}
 		self.tradingplan = {}
 
@@ -406,7 +495,6 @@ class Manager:
 		log_print(("record file start"))
 
 
-
 	def shares_allocation(self):
 
 		#fro each of the symbols. look at imbalance. deal with it. 
@@ -454,130 +542,138 @@ class Manager:
 		#print("adding",data)
 
 		type_name = data["type_name"]
+		algo_id = data["algo_id"]
+
 
 		now = datetime.now()
 		ts = now.hour*60 + now.minute 
 		
 
-		if type_name =="Pair":
+		if algo_id not in self.algo_ids:
 
-			algo_name =  data["algo_name"]
+			self.algo_ids.append(algo_id)
 
-			symbol1 = data["symbol1"] 
-			symbol2 = data["symbol2"]
-			symbol1_share = data["symbol1_share"]
-			symbol2_share =  data["symbol2_share"]
-			risk = data["risk"]
-			symbol1_stats = data["symbol1_statistics"]
-			symbol2_stats = data["symbol2_statistics"]
-			mana = data["management"]
+			if type_name =="Pair":
 
-			name = symbol1[:-3]+"/"+symbol2[:-3]
+				algo_name =  data["algo_name"]
 
-			# pair reversed region. 
-			# self.pair_plans
+				symbol1 = data["symbol1"] 
+				symbol2 = data["symbol2"]
+				symbol1_share = data["symbol1_share"]
+				symbol2_share =  data["symbol2_share"]
+				risk = data["risk"]
+				symbol1_stats = data["symbol1_statistics"]
+				symbol2_stats = data["symbol2_statistics"]
+				mana = data["management"]
 
-			if self.ui.pair_label_count < 25:
+				name = algo_id   #symbol1[:-3]+"/"+symbol2[:-3]
 
-				if symbol1 not in self.symbol_data:
-					self.symbol_data[symbol1] = Symbol(symbol1,0,0,symbol1_stats,self.pipe_ppro_out)  	
+				# pair reversed region. 
+				# self.pair_plans
 
-					self.symbols.append(symbol1)
-					if symbol1 not in self.pair_plans:
-						self.pair_plans[symbol1] = name
+				if self.ui.pair_label_count < 25:
 
-				if symbol2 not in self.symbol_data:
-					self.symbol_data[symbol2] = Symbol(symbol2,0,0,symbol2_stats,self.pipe_ppro_out)  
+					if symbol1 not in self.symbol_data:
+						self.symbol_data[symbol1] = Symbol(symbol1,0,0,symbol1_stats,self.pipe_ppro_out)  	
 
-					if symbol2 not in self.pair_plans:
-						self.pair_plans[symbol2] = name	
+						self.symbols.append(symbol1)
+						if symbol1 not in self.pair_plans:
+							self.pair_plans[symbol1] = name
 
-					self.symbols.append(symbol2)
-				### name:"",symbol:Symbol1,symbol:Symbol2,share1,share2,manage_plan=None,risk=None,TEST_MODE=False,algo_name="",Manager=None
-				self.tradingplan[name] = PairTP(name,self.symbol_data[symbol1],self.symbol_data[symbol2],symbol1_share,symbol2_share,mana,risk,TEST_MODE,algo_name,self)
+					if symbol2 not in self.symbol_data:
+						self.symbol_data[symbol2] = Symbol(symbol2,0,0,symbol2_stats,self.pipe_ppro_out)  
 
-				self.ui.create_new_single_entry(self.tradingplan[name],type_name)
+						if symbol2 not in self.pair_plans:
+							self.pair_plans[symbol2] = name	
 
-				#self.tradingplan[name].deploy(9600)
-			try:
+						self.symbols.append(symbol2)
+					### name:"",symbol:Symbol1,symbol:Symbol2,share1,share2,manage_plan=None,risk=None,TEST_MODE=False,algo_name="",Manager=None
+					self.tradingplan[name] = PairTP(name,self.symbol_data[symbol1],self.symbol_data[symbol2],symbol1_share,symbol2_share,mana,risk,TEST_MODE,algo_name,self)
 
-				pass 
+					self.ui.create_new_single_entry(self.tradingplan[name],type_name)
 
-			except Exception as e:
+					#self.tradingplan[name].deploy(9600)
+				try:
 
-				exc_type, exc_obj, exc_tb = sys.exc_info()
-				fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-				log_print("adding new tradingplan errors:",e,data,exc_type, fname, exc_tb.tb_lineno)
+					pass 
 
-		elif type_name == "Single":
+				except Exception as e:
 
-			algo_name =  data["algo_name"]
-			entryplan = data["entry_type"]
-			symbol = data["symbol"] 
-			support = data["support"]
-			resistence =  data["resistence"]
-			risk = data["risk"]
-			stats = data["statistics"]
-			status = data["immediate_deployment"]
-			mana = data["management"]
-		
-			name = symbol+str(ts)+ str(random.randint(0, 9))
-			try:
+					exc_type, exc_obj, exc_tb = sys.exc_info()
+					fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+					log_print("adding new tradingplan errors:",e,data,exc_type, fname, exc_tb.tb_lineno)
+
+			elif type_name == "Single":
+
+				algo_name =  data["algo_name"]
+
+				symbol = data["symbol"] 
+				entryplan = data["entry_type"]
+				
+				support = data["support"]
+				resistence =  data["resistence"]
+				risk = data["risk"]
+				stats = data["statistics"]
+				status = data["immediate_deployment"]
+				mana = data["management"]
 			
-				if self.ui.algo_count_number.get()<50:
-					#print(symbol,self.ui.algo_count_number.get())
-					
-					if symbol not in self.symbol_data:
-						self.symbol_data[symbol] = Symbol(symbol,support,resistence,stats,self.pipe_ppro_out)  #register in Symbol.
-						self.symbols.append(symbol)
-					#self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
+				name = algo_id #symbol+str(ts)+ str(random.randint(0, 9))
+				try:
+				
+					if self.ui.algo_count_number.get()<50:
+						#print(symbol,self.ui.algo_count_number.get())
 						
-
-					#######################################################################
-
-					#def __init__(self,name:"",symbol:Symbol,entry_plan=None,manage_plan=None,support=0,resistence=0,risk=None,TEST_MODE=False,algo_name="",Manager=None):
-
-					self.tradingplan[symbol] = TradingPlan(name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
-					self.ui.create_new_single_entry(self.tradingplan[symbol],type_name)
-
-					if status == True:
-						self.tradingplan[symbol].deploy(9600)
-				else:
-
-					find_ = False
-					replace_id = 0
-					for trade in self.tradingplan.values():
-
-						if trade.tkvars[STATUS].get()==PENDING or trade.tkvars[STATUS].get()==DONE:
-							replace_id = trade.algo_ui_id
-							find_ = True
-							log_print("Replacing",trade.symbol_name)
-							break 
-					if find_:
 						if symbol not in self.symbol_data:
-							self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats,self.pipe_ppro_out)  #register in Symbol.
-						#self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
+							self.symbol_data[symbol] = Symbol(symbol,support,resistence,stats,self.pipe_ppro_out)  #register in Symbol.
 							self.symbols.append(symbol)
+						#self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
+							
 
 						#######################################################################
 
+						#def __init__(self,name:"",symbol:Symbol,entry_plan=None,manage_plan=None,support=0,resistence=0,risk=None,TEST_MODE=False,algo_name="",Manager=None):
+
 						self.tradingplan[symbol] = TradingPlan(name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
-						#self.tradingplan[symbol]=TradingPlan(name,self.symbol_data[symbol],entryplan,INSTANT,mana,risk,0,TEST_MODE,algo_name,self)
-						self.ui.create_single_entry(self.tradingplan[symbol],replace_id)
+						self.ui.create_new_single_entry(self.tradingplan[symbol],type_name)
 
 						if status == True:
 							self.tradingplan[symbol].deploy(9600)
 					else:
-						log_print("System at full capacity.")
 
-					# now find an empty spot. 
+						find_ = False
+						replace_id = 0
+						for trade in self.tradingplan.values():
+
+							if trade.tkvars[STATUS].get()==PENDING or trade.tkvars[STATUS].get()==DONE:
+								replace_id = trade.algo_ui_id
+								find_ = True
+								log_print("Replacing",trade.symbol_name)
+								break 
+						if find_:
+							if symbol not in self.symbol_data:
+								self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats,self.pipe_ppro_out)  #register in Symbol.
+							#self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
+								self.symbols.append(symbol)
+
+							#######################################################################
+
+							self.tradingplan[symbol] = TradingPlan(name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
+							#self.tradingplan[symbol]=TradingPlan(name,self.symbol_data[symbol],entryplan,INSTANT,mana,risk,0,TEST_MODE,algo_name,self)
+							self.ui.create_single_entry(self.tradingplan[symbol],replace_id)
+
+							if status == True:
+								self.tradingplan[symbol].deploy(9600)
+						else:
+							log_print("System at full capacity.")
+
+						# now find an empty spot. 
 
 
-			except Exception as e:
+				except Exception as e:
 
-				exc_type, exc_obj, exc_tb = sys.exc_info()
-				fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-				log_print("adding new tradingplan errors:",e,data,exc_type, fname, exc_tb.tb_lineno)
+					exc_type, exc_obj, exc_tb = sys.exc_info()
+					fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+					log_print("adding new tradingplan errors:",e,data,exc_type, fname, exc_tb.tb_lineno)
 
 
 
@@ -846,7 +942,7 @@ class Manager:
 		count = 0
 		while True:
 			d = self.pipe_goodtrade.recv()
-			#print(d)
+			print(d)
 			if d[0] =="msg":
 				try:
 					self.ui.main_app_status.set(str(d[1]))
@@ -1700,8 +1796,11 @@ if __name__ == '__main__':
 
 	goodtrade_pipe, receive_pipe = multiprocessing.Pipe()
 
-	algo_voxcom = multiprocessing.Process(target=algo_manager_voxcom3, args=(receive_pipe,),daemon=True)
+	# algo_voxcom = multiprocessing.Process(target=algo_manager_voxcom3, args=(receive_pipe,),daemon=True)
+	# algo_voxcom.daemon=True
+	algo_voxcom = multiprocessing.Process(target=httpserver, args=(receive_pipe,),daemon=True)
 	algo_voxcom.daemon=True
+
 
 
 	ppro_in, ppro_pipe_end = multiprocessing.Pipe()
