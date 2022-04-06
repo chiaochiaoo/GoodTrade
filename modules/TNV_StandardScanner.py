@@ -19,13 +19,14 @@ def ts_to_min(ts):
 
 
 class StandardScanner():
-	def __init__(self,root,NT,algo_name=""):
+	def __init__(self,root,NT):
 
 		self.buttons = []
 		self.entries = []
 		self.algo_placed = []
 
-		self.algo_name = algo_name	
+		self.algo_placed_time = {}
+
 			
 		self.l = 1
 
@@ -161,59 +162,12 @@ class StandardScanner():
 				self.entries[k].append(self.b)
 			self.l+=1
 
-	# def update_entry(self,data):
-
-	# 	#at most 8.
-	# 	# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
-
-	# 	df = data
-
-
-	# 	#df.to_csv("tttt.csv")
-	# 	entry = 0
-
-	# 	if 1:
-	# 		for index, row in df.iterrows():
-	# 			#print(row)
-	# 			rank = index
-	# 			sec = row['sector']
-	# 			relv = row['rrvol']
-	# 			near = row['rangescore']
-	# 			high = row['high']
-
-	# 			oh = row["oh"]
-	# 			so = row['SO']
-	# 			sc = row['SC']
-
-	# 			############ add since, and been to the thing #############
-	# 			if rank in self.NT.nasdaq_trader_symbols_ranking:
-	# 				listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
-	# 			else:
-	# 				listed = "No"
-	# 			#print(self.NT.nasdaq_trader_symbols)
-	# 			if 1: #score>0:	
-
-	# 				lst = [rank,sec,oh,relv,near,high,so,sc,listed]
-
-	# 				for i in range(len(lst)):
-	# 					self.entries[entry][i]["text"] = lst[i]
-	# 				entry+=1
-	# 				if entry ==50:
-	# 					break
-
-	# 		while entry<50:
-	# 			#print("ok")
-	# 			for i in range(self.total_len):
-	# 				self.entries[entry][i]["text"] = ""
-	# 			entry+=1
-	# 	# except Exception as e:
-	# 	# 	print("TNV scanner construction near high:",e)
 
 	def send_group_algos(self,lst):
 
 		risk = self.algo_risk.get()
-
 		management = self.management.get()
+
 		#print("HELLO.",lst)
 		order = ["New order"]
 		if risk>0:
@@ -225,9 +179,11 @@ class StandardScanner():
 					new_order = {}
 
 					new_order["type_name"] = "Single"
-					new_order["algo_name"]= self.algo_name
-					new_order["entry_type"] = " BreakUp"
+					new_order["algo_id"] = lst[i]["algo_id"]
 					new_order["symbol"] = lst[i]["symbol"]
+					new_order["algo_name"]= lst[i]["algo_name"]  #self.algo_name
+
+					new_order["entry_type"] = " BreakUp"
 					new_order["side"] = "Long"
 					new_order["support"] = lst[i]["support"]
 					new_order["resistence"] = lst[i]["resistence"]
@@ -245,9 +201,12 @@ class StandardScanner():
 					new_order = {}
 					
 					new_order["type_name"] = "Single"
-					new_order["algo_name"]= self.algo_name
-					new_order["entry_type"] = " BreakDn"
+					new_order["algo_id"] = lst[i]["algo_id"]
+					new_order["algo_name"]= lst[i]["algo_name"] #self.algo_name
 					new_order["symbol"] = lst[i]["symbol"]
+
+
+					new_order["entry_type"] = " BreakDn"
 					new_order["side"] = "Short"
 					new_order["support"] = lst[i]["support"]
 					new_order["resistence"] = lst[i]["resistence"]

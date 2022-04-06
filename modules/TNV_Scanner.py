@@ -607,7 +607,7 @@ class Open_high(StandardScanner):
 		self.labels = ["Symbol","Sector","OH","Rel.V","E45T","E45C","SO%","SC%","listed","Add"]
 		self.total_len = len(self.labels)
 		self.tnv_scanner = tnv
-		super().__init__(root,NT,"Open_High")
+		super().__init__(root,NT)
 
 		self.open = tk.BooleanVar(value=0)
 
@@ -617,6 +617,11 @@ class Open_high(StandardScanner):
 		ttk.Checkbutton(self.algo_frame, variable=self.open).grid(sticky="w",column=col+1,row=row)
 
 		self.openbreak = []
+
+
+		self.algo_name = "Open_high"
+		self.algo_name_fade = "Open_high_fade"
+		self.algo_name_alternative = "Open_high_break"
 
 
 	def update_entry(self,data):
@@ -685,16 +690,15 @@ class Open_high(StandardScanner):
 						order["symbol"] = rank
 
 
-						if open_ and row["oh"]>0.5 and row["f5r"]>0.8 and relv>1.2 and ts<=700 and rank not in self.openbreak:
+						# if open_ and row["oh"]>0.5 and row["f5r"]>0.8 and relv>1.2 and ts<=700 and rank not in self.openbreak:
 
-							order["support"] = row['open']	#- (row['high']-row['price'])
-							order["resistence"] = row['price']
-							order["side"] = "UP"
+						# 	order["support"] = row['open']	#- (row['high']-row['price'])
+						# 	order["resistence"] = row['price']
+						# 	order["side"] = "UP"
 
-
-							send=True
-							self.openbreak.append(rank)
-							self.algo_placed.append(trade)
+						# 	send=True
+						# 	self.openbreak.append(rank)
+						# 	self.algo_placed.append(trade)
 
 						if row['ema45change']<=-25 and row['oh']>=1:
 
@@ -703,10 +707,17 @@ class Open_high(StandardScanner):
 								order["support"] = row['price']	- (row['high']-row['price'])
 								order["resistence"] = row['price']
 								order["side"] = "UP"	
+
+								order["algo_name"] = self.algo_name_fade
+								order["algo_id"] = self.algo_name_fade + rank  + str(ts)
 							else:
 								order["support"] = row['price']	 
 								order["resistence"] = row['high']+0.03
 								order["side"] = "DOWN"	
+
+								order["algo_name"] = self.algo_name
+								order["algo_id"] = self.algo_name + rank  + str(ts)
+
 							self.algo_placed.append(trade)		
 							send=True
 
@@ -716,10 +727,17 @@ class Open_high(StandardScanner):
 								order["support"] = row['price']	- (row['high']-row['price'])
 								order["resistence"] = row['price']
 								order["side"] = "UP"	
+
+								order["algo_name"] = self.algo_name_fade
+								order["algo_id"] = self.algo_name_fade + rank  + str(ts)
 							else:
 								order["support"] = row['price']	
 								order["resistence"] = row['high']+0.03
 								order["side"] = "DOWN"
+
+								order["algo_name"] = self.algo_name
+								order["algo_id"] = self.algo_name + rank  + str(ts)
+
 							self.algo_placed.append(trade)			
 							send=True				
 
@@ -746,7 +764,7 @@ class Open_low(StandardScanner):
 		self.labels = ["Symbol","Sector","OL","Rel.V","E45T","E45C","SO%","SC%","listed","Add"]
 		self.total_len = len(self.labels)
 		self.tnv_scanner = tnv
-		super().__init__(root,NT,"Open_Low")
+		super().__init__(root,NT)
 
 
 		self.open = tk.BooleanVar(value=0)
@@ -757,6 +775,10 @@ class Open_low(StandardScanner):
 		ttk.Checkbutton(self.algo_frame, variable=self.open).grid(sticky="w",column=col+1,row=row)
 
 		self.openbreak = []
+
+		self.algo_name = "Open_low"
+		self.algo_name_fade = "Open_low_fade"
+		self.algo_name_alternative = "Open_low_break"
 
 
 	def update_entry(self,data):
@@ -837,10 +859,17 @@ class Open_low(StandardScanner):
 								order["support"] =  row['price']	 
 								order["resistence"] = row['price'] + (row['price']-row['low'])
 								order["side"] = "DOWN"
+
+								order["algo_name"] = self.algo_name_fade
+								order["algo_id"] = self.algo_name_fade + rank  + str(ts)
+
 							else:	
 								order["support"] = row['low'] -0.03	
 								order["resistence"] = row['price']	
 								order["side"] = "UP"			
+
+								order["algo_name"] = self.algo_name
+								order["algo_id"] = self.algo_name + rank  + str(ts)
 							send=True
 							self.algo_placed.append(trade)
 
@@ -851,10 +880,17 @@ class Open_low(StandardScanner):
 								order["support"] =  row['price']	 
 								order["resistence"] = row['price'] + (row['price']-row['low'])
 								order["side"] = "DOWN"
+
+								order["algo_name"] = self.algo_name_fade
+								order["algo_id"] = self.algo_name_fade + rank  + str(ts)
+								
 							else:	
 								order["support"] = row['low'] -0.03	
 								order["resistence"] = row['price']	
-								order["side"] = "UP"			
+								order["side"] = "UP"	
+
+								order["algo_name"] = self.algo_name
+								order["algo_id"] = self.algo_name + rank  + str(ts)		
 							send=True
 							self.algo_placed.append(trade)
 
