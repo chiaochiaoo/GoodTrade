@@ -99,13 +99,16 @@ class util_client:
 				with open(file) as json_file:
 					d = json.load(json_file)
 
-				for key,item in d.items():
-					if key!= "rel_volume":
-						self.data[key][symbol].set(item)
-					else:
-						self.data[key][symbol] = item[:] 
+				try:
+					for key,item in d.items():
+						if key!= "rel_volume":
+							self.data[key][symbol].set(item)
+						else:
+							self.data[key][symbol] = item[:] 
 
-				self.data_status[symbol].set(True)
+					self.data_status[symbol].set(True)
+				except Exception as e:
+					print(symbol,"load failed",e)
 			else:
 				no.append(symbol)
 
@@ -159,6 +162,7 @@ class util_client:
 
 					if d[0]=="NasdaqTrader update":
 						#self.pannel.add_nasdaq_labels(d[1])
+
 						try:
 							self.pannel.add_nasdaq_labels(d[1])
 						except Exception as e:
@@ -224,6 +228,7 @@ class util_client:
 
 					else:
 						print("unkown server package:",d)
+
 			except Exception as e:
 				print("Util receive unkown:",e,d)
 
