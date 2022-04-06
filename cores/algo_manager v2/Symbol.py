@@ -21,7 +21,7 @@ class Symbol:
 
 		self.numeric_labels = [TRADE_TIMESTAMP,TIMESTAMP,BID,ASK,RESISTENCE,SUPPORT,OPEN,HIGH,LOW,PREMARKETHIGH,PREMARKETLOW,STOP,EXIT,ENTRY,CUSTOM]
 
-		self.tech_indicators = [EMACOUNT,EMA8H,EMA8L,EMA8C,EMA5H,EMA5L,EMA5C,EMA21H,EMA21L,EMA21C]
+		self.tech_indicators = [EMACOUNT,EMA8H,EMA8L,EMA8C,EMA5H,EMA5L,EMA5C,EMA21H,EMA21L,EMA21C,CLOSE]
 
 		self.data = {}
 		self.tkvars = {}
@@ -71,7 +71,7 @@ class Symbol:
 				self.data[key]=value
 				self.tkvars[key].set(value)
 				
-		#print(self.data)
+		print(self.data)
 		#print(dic)
 #
 	def toggle_autorange(self,Bool):
@@ -224,5 +224,10 @@ class Symbol:
 
 	def get_time(self):
 		return self.data[TIMESTAMP]
+
+
+	def get_close(self):
+
+		return self.data[CLOSE]
 	# def add_trigger(self,info,type_,trigger_price,timer):
 	# 	self.triggers.append(trigger(self,info,type_,trigger_price,timer))
