@@ -252,7 +252,8 @@ class PairTrade():
 
 
 		#check, symbol, risk. type. timing / price, 
-
+		now = datetime.now()
+		ts = now.hour*60+now.minute+now.second
 		try:
 			symbol1 = self.symbol1.get().upper()
 			symbol2 = self.symbol2.get().upper()
@@ -288,6 +289,7 @@ class PairTrade():
 
 				new_order = {}
 
+				new_order["algo_id"] = "Manual"+"_"+symbol1+symbol2+str(ts)
 				new_order["type_name"] = "Pair"
 				new_order["algo_name"]= "Manual Trade Pair"
 				new_order["symbol1"] = symbol1
@@ -533,6 +535,8 @@ class SinlgeTrade():
 
 
 		#check, symbol, risk. type. timing / price, 
+		now = datetime.now()
+		ts = now.hour*60+now.minute+now.second
 
 		try:
 			symbol = self.symbol.get().upper()
@@ -582,6 +586,10 @@ class SinlgeTrade():
 				new_order = {}
 
 				new_order["type_name"] = "Single"
+
+
+				new_order["algo_id"]= "Manual"+"_"+symbol+str(ts)
+
 				new_order["algo_name"]= "Manual Trade"
 				new_order["entry_type"] = entryplan
 				new_order["symbol"] = symbol
