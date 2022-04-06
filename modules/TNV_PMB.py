@@ -43,10 +43,10 @@ class Premarket_breakout():
 
 
 		self.hour = tk.IntVar(value=9)
-		self.minute = tk.IntVar(value=27)
+		self.minute = tk.IntVar(value=29)
 
 		self.ehour = tk.IntVar(value=9)
-		self.eminute = tk.IntVar(value=40)
+		self.eminute = tk.IntVar(value=35)
 
 		self.rel_v = tk.DoubleVar(value=0)
 		self.re_score = tk.DoubleVar(value=0)
@@ -54,7 +54,7 @@ class Premarket_breakout():
 
 		self.recreate_labels(self.root)
 
-
+		self.name = "Breakout"
 		self.toggle  = True
 
 		self.file = "signals/open_resersal_"+datetime.now().strftime("%m-%d")+".csv"
@@ -126,7 +126,11 @@ class Premarket_breakout():
 
 				new_order = {}
 
+				new_order["type_name"] = "Single"
+
+				new_order["algo_id"]= self.name+"_"+symbol
 				new_order["algo_name"]= self.algo_name
+
 				new_order["entry_type"] = " BreakUp"
 				new_order["symbol"] = symbol#lst[i]["symbol"]
 				new_order["side"] = "Long"
@@ -142,6 +146,8 @@ class Premarket_breakout():
 			else:
 
 				new_order = {}
+				new_order["type_name"] = "Single"
+				new_order["algo_id"]= self.name+"_"+symbol
 				new_order["algo_name"]= self.algo_name
 				new_order["entry_type"] = " BreakDn"
 				new_order["symbol"] = symbol
@@ -180,6 +186,9 @@ class Premarket_breakout():
 
 					new_order = {}
 
+					new_order["type_name"] = "Single"
+
+					new_order["algo_id"]= self.name+"_"+symbol
 					new_order["algo_name"]= self.algo_name
 					new_order["entry_type"] = " BreakUp"
 					new_order["symbol"] = lst[i]["symbol"]
@@ -198,7 +207,11 @@ class Premarket_breakout():
 
 					new_order = {}
 
+					new_order["type_name"] = "Single"
+
+					new_order["algo_id"]= self.name+"_"+symbol
 					new_order["algo_name"]= self.algo_name
+
 					new_order["entry_type"] = " BreakDn"
 					new_order["symbol"] = lst[i]["symbol"]
 					new_order["side"] = "Short"
