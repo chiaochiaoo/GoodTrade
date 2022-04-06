@@ -1796,10 +1796,10 @@ if __name__ == '__main__':
 
 	goodtrade_pipe, receive_pipe = multiprocessing.Pipe()
 
-	# algo_voxcom = multiprocessing.Process(target=algo_manager_voxcom3, args=(receive_pipe,),daemon=True)
-	# algo_voxcom.daemon=True
-	algo_voxcom = multiprocessing.Process(target=httpserver, args=(receive_pipe,),daemon=True)
+	algo_voxcom = multiprocessing.Process(target=algo_manager_voxcom3, args=(receive_pipe,),daemon=True)
 	algo_voxcom.daemon=True
+	# algo_voxcom = multiprocessing.Process(target=httpserver, args=(receive_pipe,),daemon=True)
+	# algo_voxcom.daemon=True
 
 
 
