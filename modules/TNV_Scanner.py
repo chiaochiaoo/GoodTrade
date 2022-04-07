@@ -147,6 +147,8 @@ class TNV_Scanner():
 		# receiver.start()
 
 	def send_algo(self,msg):
+
+		#print("recive,",msg)
 		self.algo_commlink.send(msg)
 
 	def color(self,vals,val):

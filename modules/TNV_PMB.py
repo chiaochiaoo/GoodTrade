@@ -147,8 +147,10 @@ class Premarket_breakout():
 
 				new_order = {}
 				new_order["type_name"] = "Single"
+
 				new_order["algo_id"]= self.name+"_"+symbol
 				new_order["algo_name"]= self.algo_name
+
 				new_order["entry_type"] = " BreakDn"
 				new_order["symbol"] = symbol
 				new_order["side"] = "Short"
@@ -176,10 +178,15 @@ class Premarket_breakout():
 			deployment = False
 
 		risk = self.algo_risk.get()
+
 		management = self.management.get()
-		#print("HELLO.",lst)
+		
 		order = ["New order"]
+
+		#print("PMB HELLO",risk)
 		if risk>0:
+
+			#print("PMB HELLO2",lst)
 			for i in range(len(lst)):
 
 				if lst[i]["side"]=="UP":
@@ -188,7 +195,7 @@ class Premarket_breakout():
 
 					new_order["type_name"] = "Single"
 
-					new_order["algo_id"]= self.name+"_"+symbol
+					new_order["algo_id"]= self.name+"_"+lst[i]["symbol"]
 					new_order["algo_name"]= self.algo_name
 					new_order["entry_type"] = " BreakUp"
 					new_order["symbol"] = lst[i]["symbol"]
@@ -209,7 +216,7 @@ class Premarket_breakout():
 
 					new_order["type_name"] = "Single"
 
-					new_order["algo_id"]= self.name+"_"+symbol
+					new_order["algo_id"]= self.name+"_"+lst[i]["symbol"]
 					new_order["algo_name"]= self.algo_name
 
 					new_order["entry_type"] = " BreakDn"
@@ -227,6 +234,7 @@ class Premarket_breakout():
 					#order.append([" BreakDn",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},status,management])
 
 
+			#print("sending order",order)
 			self.tnv_scanner.send_algo(order)
 
 	def algo_pannel(self,frame):
@@ -395,6 +403,7 @@ class Premarket_breakout():
 							if self.algo_activate.get()==1 and ts>=algo_timer and ts<=end_timer:
 								if rank not in self.algo_placed:
 
+									#print("PMB SEND")
 									#self.send_algo(rank,support,resistence,self.algo_risk)
 									self.algo_placed.append(rank)
 
