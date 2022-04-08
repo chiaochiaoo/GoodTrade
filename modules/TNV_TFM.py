@@ -4,10 +4,26 @@ import threading
 import pandas as pd
 import time
 from datetime import datetime
+import requests
 #from pannel import *
 #from modules.pannel import *
 
 from tkinter import *
+
+
+TRADETYPE = "Trade_type="
+ALGOID ="Algo_id="
+ALGONAME ="Algo_name="
+SYMBOL = "Symbol="
+ENTRYPLAN = "Entry_type"
+SUPPORT = "Support"
+RESISTANCE = "Resistance"
+RISK =  "Risk="
+SIDE =  "Side="
+DEPLOY = "Deploy="
+MANAGEMENT = "Management="
+
+
 
 def ts_to_min(ts):
 	ts = int(ts)
@@ -345,6 +361,7 @@ class PairTrade():
 
 
 
+
 class SinlgeTrade():
 	def __init__(self,root,TNV_scanner):
 
@@ -604,8 +621,21 @@ class SinlgeTrade():
 
 				info = ["New order",new_order]
 
+				strs = [TRADETYPE,ALGOID,ALGONAME,SYMBOL,ENTRYPLAN,SUPPORT,RESISTANCE,RISK,SIDE,DEPLOY,MANAGEMENT]
+
+				vals = ["S",new_order["algo_id"],new_order["algo_name"],new_order["symbol"],new_order["entry_type"],new_order["support"],new_order["resistence"],new_order["risk"],new_order["side"],"T",new_order["management"]]
+
+
+				msg = "localhost:4441/"
+
+				for i in range(len(strs)):
+
+					msg+=strs[i]+str(vals[i])+","
 				#[entryplan,symbol,support,resistence,risk,{},"deploy",management]
-				self.tnv_scanner.send_algo(info)
+				#self.tnv_scanner.send_algo(info)
+
+				requests.get(msg)
+
 
 				self.status["text"]="Status: Algo placed"
 		except Exception as e:
@@ -633,6 +663,20 @@ class SinlgeTrade():
 			self.l+=1
 
 
+
+
+
+TRADETYPE = "Trade_type="
+ALGOID ="Algo_id="
+ALGONAME ="Algo_name="
+SYMBOL = "Symbol="
+ENTRYPLAN = "Entry_type"
+SUPPORT = "Support"
+RESISTANCE = "Resistance"
+RISK =  "Risk="
+SIDE =  "Side="
+DEPLOY = "Deploy="
+MANAGEMENT = "Management="
 
 if __name__ == '__main__':
 
