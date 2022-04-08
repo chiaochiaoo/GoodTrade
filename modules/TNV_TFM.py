@@ -626,7 +626,7 @@ class SinlgeTrade():
 				vals = ["S",new_order["algo_id"],new_order["algo_name"],new_order["symbol"],new_order["entry_type"],new_order["support"],new_order["resistence"],new_order["risk"],new_order["side"],"T",new_order["management"]]
 
 
-				msg = "localhost:4441/"
+				msg = "http://localhost:4441/"	
 
 				for i in range(len(strs)):
 
