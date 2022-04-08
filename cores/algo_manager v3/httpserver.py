@@ -75,8 +75,8 @@ def find_between(data, first, last):
 class S(BaseHTTPRequestHandler):
 	def _set_response(self):
 		self.send_response(200)
-		#self.send_header('Content-type', 'text/html')
-		#self.end_headers()
+		self.send_header('Content-type', 'text/html')
+		self.end_headers()
 
 	def do_GET(self):
 
@@ -163,8 +163,9 @@ class S(BaseHTTPRequestHandler):
 
 	def send_message(self,msg):
 
-		print("sending",msg)
-		#pipec.send(["pkg",msg])
+		global pipec
+		#print("sending",msg,pipec)
+		pipec.send(["pkg",msg])
 		#pipe.send(msg)
 
 		#msgid=xxx,Message=L1,MarketTime=14:24:38.206,Symbol=SNDL.NQ,BidPrice=0.828300,BidSize=13899,AskPrice=0.828400,AskSize=2364,Tick=?\n'
@@ -210,7 +211,7 @@ def httpserver(pipex):
 
 
 
-# httpserver(None)
+#httpserver("GEGE")
 
 
 # TRADETYPE = "Trade_type="

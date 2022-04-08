@@ -23,7 +23,7 @@ import json
 import os,sys
 
 
-from httpserver improt *
+from httpserver import *
 
 
 
@@ -1718,8 +1718,8 @@ if __name__ == '__main__':
 	algo_voxcom.daemon=True
 
 
-	algo_voxcom = multiprocessing.Process(target=httpserver, args=(receive_pipe,),daemon=True)
-	algo_voxcom.daemon=True
+	algo_voxcom2 = multiprocessing.Process(target=httpserver, args=(receive_pipe,),daemon=True)
+	algo_voxcom2.daemon=True
 
 
 
@@ -1748,6 +1748,7 @@ if __name__ == '__main__':
 	else:
 		a=1
 		algo_voxcom.start()
+		algo_voxcom2.start()
 		ppro_out_manager.start()
 		ppro_in_manager.start()		
 
