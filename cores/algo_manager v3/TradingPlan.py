@@ -485,22 +485,24 @@ class TradingPlan:
 		# 	log_print("TP processing:",self.data)
 		self.update_displays()
 
-	def ppro_confirm_new_order(self,price,shares,side):
+	# def ppro_confirm_new_order(self,price,shares,side):
 
-		"""set the state as running, then load up"""
+	# 	"""set the state as running, then load up"""
 
-		log_print(self.symbol_name,"New order confirmed:",price,shares,side)
-		self.mark_algo_status(RUNNING)
-		self.data[POSITION]=side
-		self.tkvars[POSITION].set(side)
-		self.data[REALIZED] = 0
-		self.data[FLATTENTIMER]=0
-		self.flatten_order = False
-		self.ppro_orders_loadup(price,shares,side)
+	# 	log_print(self.symbol_name,"New order confirmed:",price,shares,side)
+	# 	self.mark_algo_status(RUNNING)
+	# 	self.data[POSITION]=side
+	# 	self.tkvars[POSITION].set(side)
+	# 	self.data[REALIZED] = 0
+	# 	self.data[FLATTENTIMER]=0
+	# 	self.flatten_order = False
+	# 	self.ppro_orders_loadup(price,shares,side)
 
 	def ppro_orders_loadup(self,price,shares,side):
 
 		current = self.data[CURRENT_SHARE]
+
+		#self.symbol.load_confirmation(self.name,shares)
 
 		self.data[CURRENT_SHARE] = self.data[CURRENT_SHARE] + shares
 

@@ -72,6 +72,8 @@ class Symbol:
 
 		self.tradingplans = {}
 
+		self.tradingplan_holdings = {}
+
 
 		self.init_data(support,resistence,stats)
 		self.ppro_out.send([REGISTER,self.ticker])
@@ -79,6 +81,7 @@ class Symbol:
 	def register_tradingplan(self,name,tradingplan):
 
 		self.incoming_request[name] = 0
+		self.tradingplan_holdings[name] = 0
 		self.tradingplans[name] = tradingplan
 
 		log_print(name,"registered at",self.ticker)
@@ -95,6 +98,10 @@ class Symbol:
 		log_print("new request",self.incoming_request)
 
 		self.share_request = True
+
+	def load_confirmation(self,tradingplan_name,shares):
+
+		self.tradingplan_holdings[tradingplan_name] += shares
 
 	def cancel_all_request(self,tradingplan_name):
 
@@ -157,7 +164,6 @@ class Symbol:
 			else:
 				self.ppro_out.send([IOCSELL,self.ticker,abs(remaining_share),self.data[BID]])
 
-
 	def incoming_shares_pairing(self):
 
 		# two ways to go about this.. tp first.. then shares. OR, shares first, then TP. ideally they are equal.in practice ? SHARES FIRST
@@ -172,12 +178,17 @@ class Symbol:
 
 				if share >0 and val>0:
 					self.tradingplans[tp].ppro_process_orders(price,abs(share),LONG,self.ticker)
+
+					self.load_confirmation(tp,share)
 					self.incoming_request[tp]-=share
+
 					paired.append(t)
 
 					break
 				elif share<0 and val<0:
 					self.tradingplans[tp].ppro_process_orders(price,abs(share),SHORT,self.ticker)
+
+					self.load_confirmation(tp,share)
 					self.incoming_request[tp]-=share
 					paired.append(t)
 
@@ -226,9 +237,15 @@ class Symbol:
 		if self.incoming_request[tp1]>0:
 			self.tradingplans[tp1].ppro_process_orders(self.get_bid(),self.incoming_request[tp1],LONG,self.ticker)
 			self.tradingplans[tp2].ppro_process_orders(self.get_bid(),abs(self.incoming_request[tp1]),SHORT,self.ticker)
+
+			self.load_confirmation(tp1,abs(self.incoming_request[tp1]))
+			self.load_confirmation(tp2,-abs(self.incoming_request[tp1]))
 		else:
 			self.tradingplans[tp1].ppro_process_orders(self.get_bid(),abs(self.incoming_request[tp1]),SHORT,self.ticker)
 			self.tradingplans[tp2].ppro_process_orders(self.get_bid(),self.incoming_request[tp1],LONG,self.ticker)
+
+			self.load_confirmation(tp1,-abs(self.incoming_request[tp1]))
+			self.load_confirmation(tp2,abs(self.incoming_request[tp1]))
 
 		self.incoming_request[tp2] += self.incoming_request[tp1]
 		self.incoming_request[tp1] = 0
