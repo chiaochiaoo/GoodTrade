@@ -620,7 +620,7 @@ class TradingPlan:
 			self.symbol.cancel_all_request(self.name)
 			self.mark_algo_status(REJECTED)
 
-		elif:
+		else:
 
 			log_print("rejection messge received on ",self.name)
 
