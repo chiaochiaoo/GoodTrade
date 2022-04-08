@@ -666,17 +666,17 @@ class SinlgeTrade():
 
 
 
-TRADETYPE = "Trade_type="
-ALGOID ="Algo_id="
-ALGONAME ="Algo_name="
-SYMBOL = "Symbol="
-ENTRYPLAN = "Entry_type"
-SUPPORT = "Support"
-RESISTANCE = "Resistance"
-RISK =  "Risk="
-SIDE =  "Side="
-DEPLOY = "Deploy="
-MANAGEMENT = "Management="
+# TRADETYPE = "Trade_type="
+# ALGOID ="Algo_id="
+# ALGONAME ="Algo_name="
+# SYMBOL = "Symbol="
+# ENTRYPLAN = "Entry_type"
+# SUPPORT = "Support"
+# RESISTANCE = "Resistance"
+# RISK =  "Risk="
+# SIDE =  "Side="
+# DEPLOY = "Deploy="
+# MANAGEMENT = "Management="
 
 if __name__ == '__main__':
 

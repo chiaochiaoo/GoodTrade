@@ -132,46 +132,45 @@ class Symbol:
 			self.incoming_shares_pairing()
 
 
-			cur_imbalance = sum(self.incoming_request.values())
+		cur_imbalance = sum(self.incoming_request.values())
 
-			if cur_imbalance>0:
+		### STAGE 2 -> Unplaned user event handling 
 
-				### STAGE 2 -> Unplaned user event handling 
-
-
-				#### STAGE 3 -> MUTUAL PLANS PAIRING #####
-
-
-				tps = sorted(self.incoming_request, key=lambda dict_key: abs(self.incoming_request[dict_key]))
-
-				#print(tps)
-
-				for i in range(len(tps)):
-					if abs(self.incoming_request[tps[i]])>0:
-						for j in range(i,len(tps)):
-							#if j > i and is opposite sign. 
-							if pair_off_test(self.incoming_request[tps[i]], self.incoming_request[tps[j]]):
-								self.pair_off(tps[i], tps[j])
-
-				log_print(("pairing sucessful, now remaining request: ",self.ticker,self.incoming_request))
-
-				log_print(("current shares remaning:",self.ticker,sum(self.incoming_request.values())))
+		if cur_imbalance!=0:
+			self.unplan_shares_pairing(cur_imbalance)
+		#### STAGE 3 -> MUTUAL PLANS PAIRING #####
 
 
-				#### STAGE 3 -> IMBALANCE HANDLING #####
-				
-				remaining_share = sum(self.incoming_request.values())
-				self.current_imbalance = remaining_share
+		tps = sorted(self.incoming_request, key=lambda dict_key: abs(self.incoming_request[dict_key]))
 
-				if remaining_share==0:
-					self.share_request = False
-				
+		#print(tps)
 
-				else:
-					if remaining_share>0:
-						self.ppro_out.send([IOCBUY,self.ticker,abs(remaining_share),self.data[ASK]])
-					else:
-						self.ppro_out.send([IOCSELL,self.ticker,abs(remaining_share),self.data[BID]])
+		for i in range(len(tps)):
+			if abs(self.incoming_request[tps[i]])>0:
+				for j in range(i,len(tps)):
+					#if j > i and is opposite sign. 
+					if pair_off_test(self.incoming_request[tps[i]], self.incoming_request[tps[j]]):
+						self.pair_off(tps[i], tps[j])
+
+		log_print(("pairing sucessful, now remaining request: ",self.ticker,self.incoming_request))
+
+		log_print(("current shares remaning:",self.ticker,sum(self.incoming_request.values())))
+
+
+		#### STAGE 3 -> IMBALANCE HANDLING #####
+		
+		remaining_share = sum(self.incoming_request.values())
+		self.current_imbalance = remaining_share
+
+		if remaining_share==0:
+			self.share_request = False
+		
+
+		else:
+			if remaining_share>0:
+				self.ppro_out.send([IOCBUY,self.ticker,abs(remaining_share),self.data[ASK]])
+			else:
+				self.ppro_out.send([IOCSELL,self.ticker,abs(remaining_share),self.data[BID]])
 
 	def incoming_shares_pairing(self):
 
@@ -217,7 +216,7 @@ class Symbol:
 			# except Exception as e:
 			# 	print(e,"poping failure",e,i,self.incoming_shares)
 
-	def unplan_shares_pairing(self,imbalance):
+	def unplan_shares_pairing(self):
 
 		### only viable when there are only 1 plan that currently has holding. i.e. in running state ###
 		
