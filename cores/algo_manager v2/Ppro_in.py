@@ -23,6 +23,7 @@ def save_file(f):
 
 	f.close()
 
+
 def Ppro_in(port,pipe):
 
 
@@ -289,6 +290,8 @@ def decode_l1(stream_data,pipe,writer,l1data):
 			update_["EMA21L"]=l1data[symbol]["internal"]["EMA21L"]
 			update_["EMA21C"]=l1data[symbol]["internal"]["EMA21C"]
 
+
+			update_["close"] = l1data[symbol]["internal"]["close"]
 
 			update_["EMAcount"]=l1data[symbol]["internal"]["EMA_count"]
 

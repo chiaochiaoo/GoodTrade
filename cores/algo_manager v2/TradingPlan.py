@@ -133,8 +133,6 @@ class TradingPlan:
 		# self.manage_plan_decoder(manage_plan)
 
 
-
-
 	""" PASSSIVE ENTRY/EXIT OVER A PERIOD AMONT OF TIME """
 
 
@@ -413,6 +411,10 @@ class TradingPlan:
 		gain = 0
 		stillbreak = True
 
+
+		close = self.symbol.get_close()
+
+
 		if self.data[POSITION]==LONG:
 
 			price = bid
@@ -422,23 +424,27 @@ class TradingPlan:
 			# if price < self.data[BREAKPRICE]:#-gap:
 			# 	stillbreak = False
 
-			if price <= self.data[STOP_LEVEL]:
+
+
+			if close <= self.data[STOP_LEVEL] and close!=0:
 				flatten=True
 
+				print("flatten",close,"stop",self.data[STOP_LEVEL])
+
 		elif self.data[POSITION]==SHORT:
+			
 			price = ask
 			gain = round(self.data[AVERAGE_PRICE]-price,4)
 
 			#gap = abs(self.data[STOP_LEVEL]-self.data[BREAKPRICE])*0.05
 
-
 			# if price > self.data[BREAKPRICE]:#+gap:
 			# 	stillbreak = False
 
-			if price >=  self.data[STOP_LEVEL]:
+			if close >=  self.data[STOP_LEVEL] and close!=0:
 				flatten=True
 
-
+				print("flatten",close,"stop",self.data[STOP_LEVEL])
 
 		if self.data[CURRENT_SHARE] >0:
 			self.data[UNREAL_PSHR] = gain
@@ -452,6 +458,7 @@ class TradingPlan:
 
 		if  self.data[UNREAL] < -self.data[ACTRISK]*0.05:#+gap:
 			stillbreak = False
+
 
 		##IMPlement PNL timer here
 
@@ -469,10 +476,12 @@ class TradingPlan:
 			else:
 				self.data[FLATTENTIMER]=0
 				#print("reset flatten timer to 0")
+
 		if flatten and self.flatten_order==False and self.data[USING_STOP]:
 			self.flatten_order=True
 			self.data[FLATTENTIMER]=0
 			self.ppro_out.send(["Flatten",self.symbol_name])
+			log_print(self.symbol_name," flatten order sent")
 
 		self.update_displays()
 

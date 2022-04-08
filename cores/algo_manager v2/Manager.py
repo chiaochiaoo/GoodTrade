@@ -952,7 +952,6 @@ class Tester:
 		now = datetime.now()
 
 		self.sec =  now.hour*3600 + now.minute*60 + now.second
-		print(self.sec)
 		self.bid=0
 		self.ask=0
 		self.data = {}
@@ -1027,7 +1026,7 @@ class Tester:
 		while True:
 			try:
 				d = self.ppro_out.recv()
-				log_print("PPRO order:",d)
+				log_print("PPRO order:",d,"Current",self.share)
 				type_ = d[0]
 
 				#time.sleep(1)
@@ -1052,7 +1051,11 @@ class Tester:
 					data["price"]= float(self.ask)
 					data["shares"]= int(share)
 					data["timestamp"]= self.sec
+
+					print("current shares",self.share,"side",self.pos)
+
 					self.ppro.send(["order confirm",data])
+
 
 				elif type_ =="Sell" or type_ == IOCSELL:
 
@@ -1074,6 +1077,9 @@ class Tester:
 					data["price"]= float(self.bid)
 					data["shares"]= int(share)
 					data["timestamp"]= self.sec
+
+					print("current shares",self.share,"side",self.pos)
+
 					self.ppro.send(["order confirm",data])
 
 
@@ -1118,6 +1124,7 @@ class Tester:
 						data["shares"]= int(self.share)
 						data["timestamp"]= self.sec
 						self.ppro.send(["order confirm",data])
+						print("order",data)
 					else:
 						data ={}
 						data["symbol"]= symbol
@@ -1126,6 +1133,7 @@ class Tester:
 						data["shares"]= int(self.share)
 						data["timestamp"]= self.sec
 						self.ppro.send(["order confirm",data])
+						print("order",data)
 					self.share = 0
 					self.pos =""
 			except Exception as e:
@@ -1321,7 +1329,7 @@ class Tester:
 				update_["EMA21H"]=l1data[symbol]["internal"]["EMA21H"]
 				update_["EMA21L"]=l1data[symbol]["internal"]["EMA21L"]
 				update_["EMA21C"]=l1data[symbol]["internal"]["EMA21C"]
-
+				update_["close"] = l1data[symbol]["internal"]["close"]
 				update_["EMAcount"]=l1data[symbol]["internal"]["EMA_count"]
 				pipe.send(["order update_m",l1data[symbol],update_])
 
@@ -1409,7 +1417,11 @@ class Tester:
 				data["shares"]= self.buy_book[key]
 				data["timestamp"]= self.sec
 				self.ppro.send(["order confirm",data])
-				self.share -= data["shares"]
+
+				if self.pos == LONG:
+					self.share += data["shares"]
+				else:
+					self.share -= data["shares"]
 
 				used.append(key)
 
@@ -1426,7 +1438,12 @@ class Tester:
 				data["shares"]= self.sell_book[key]
 				data["timestamp"]= self.sec
 				self.ppro.send(["order confirm",data])
-				self.share-= data["shares"]
+				#self.share-= data["shares"]
+
+				if self.pos == SHORT:
+					self.share += data["shares"]
+				else:
+					self.share -= data["shares"]
 				used.append(key)
 
 		for i in used:
