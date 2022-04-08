@@ -457,7 +457,7 @@ class Manager:
 
 	def add_new_tradingplan(self,data,TEST_MODE):
 
-		print("adding",data)
+		#print("adding",data)
 
 		type_name = data["type_name"]
 		algo_id = data["algo_id"]
@@ -480,6 +480,9 @@ class Manager:
 				symbol1_share = int(data["symbol1_share"])
 				symbol2_share =  int(data["symbol2_share"])
 				risk = float(data["risk"])
+
+				symbol1_stats = {}
+				symbol2_stats = {}
 				#symbol1_stats = data["symbol1_statistics"]
 				#symbol2_stats = data["symbol2_statistics"]
 				mana = data["management"]
@@ -531,7 +534,7 @@ class Manager:
 				support = float(data["support"])
 				resistence =  float(data["resistence"])
 				risk = float(data["risk"])
-				#stats = data["statistics"]
+				stats = {} #data["statistics"]
 				status = data["immediate_deployment"]
 				mana = data["management"]
 			
