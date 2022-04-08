@@ -578,12 +578,12 @@ class Manager:
 
 							#######################################################################
 
-							self.tradingplan[symbol] = TradingPlan(name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
+							self.tradingplan[name] = TradingPlan(name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
 							#self.tradingplan[symbol]=TradingPlan(name,self.symbol_data[symbol],entryplan,INSTANT,mana,risk,0,TEST_MODE,algo_name,self)
 							self.ui.create_single_entry(self.tradingplan[symbol],replace_id)
 
 							if status == True:
-								self.tradingplan[symbol].deploy(9600)
+								self.tradingplan[name].deploy(9600)
 						else:
 							log_print("System at full capacity.")
 
@@ -598,83 +598,6 @@ class Manager:
 
 
 
-
-	def add_new_tradingplan_old(self,data,TEST_MODE):
-
-		algo_name =  data["algo_name"]
-		entryplan = data["entry_type"]
-		symbol = data["symbol"] 
-		support = data["support"]
-		resistence =  data["resistence"]
-		risk = data["risk"]
-		stats = data["statistics"]
-		status = data["immediate_deployment"]
-		mana = data["management"]
-
-
-		try:
-			if symbol not in self.symbols:
-				if self.ui.algo_count_number.get()<50:
-					#print(symbol,self.ui.algo_count_number.get())
-					self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats)  #register in Symbol.
-					#self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
-					self.symbols.append(symbol)
-
-					#######################################################################
-
-					self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,mana,risk,self.pipe_ppro_out,0,TEST_MODE,algo_name,self)
-					self.ui.create_new_single_entry(self.tradingplan[symbol])
-
-					if status == True:
-						self.tradingplan[symbol].deploy(9600)
-				else:
-
-					find_ = False
-					replace_id = 0
-					for trade in self.tradingplan.values():
-
-						if trade.tkvars[STATUS].get()==PENDING or trade.tkvars[STATUS].get()==DONE:
-							replace_id = trade.algo_ui_id
-							find_ = True
-							log_print("Replacing",trade.symbol_name)
-							break 
-					if find_:
-						self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats)  #register in Symbol.
-						#self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
-						self.symbols.append(symbol)
-
-						#######################################################################
-
-						self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,mana,risk,self.pipe_ppro_out,0,TEST_MODE,algo_name,self)
-						self.ui.create_single_entry(self.tradingplan[symbol],replace_id)
-
-						if status == True:
-							self.tradingplan[symbol].deploy(9600)
-					else:
-						log_print("System at full capacity.")
-
-					# now find an empty spot. 
-			else:
-				log_print("symbols already exists, modifying current parameter.")
-
-				if self.tradingplan[symbol].data[STATUS] == PENDING or self.tradingplan[symbol].data[STATUS] == DONE:
-
-
-					self.symbol_data[symbol].set_data(support,resistence,stats)
-					#self.symbol_data[symbol].set_mind("Updated",DEFAULT)
-
-
-					self.tradingplan[symbol].set_data(risk,entryplan,INSTANT,mana,support,resistence)
-
-					if status ==True:
-						self.tradingplan[symbol].deploy(9600)
-					else:
-						self.tradingplan[symbol].set_data(risk,entryplan,INSTANT,ONETOTWORISKREWARD,support,resistence)
-
-
-		except Exception as e:
-			log_print("adding new tradingplan problem",e,data)
-			PrintException("adding new tradingplan problem")
 
 	def timer(self):
 
@@ -992,17 +915,17 @@ class Manager:
 
 				techindicator = d[2]
 				#print("update",symbol,bid,ask,ts)
-				if symbol in self.tradingplan:
+				#if symbol in self.tradingplan:
 
 
-					if symbol in self.symbols:
-						self.symbol_data[symbol].update_price(bid,ask,ts)
-						self.symbol_data[symbol].update_techindicators(techindicator)
+				if symbol in self.symbols:
+					self.symbol_data[symbol].update_price(bid,ask,ts)
+					self.symbol_data[symbol].update_techindicators(techindicator)
 
 				### UPDATE THE EMAs. 
 
 			elif d[0] =="order rejected":
-
+  
 				if symbol in self.tradingplan:
 					self.tradingplan[symbol].ppro_order_rejection()
 
@@ -1778,3 +1701,96 @@ if __name__ == '__main__':
 	os._exit(1)
 
 	print("exit")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	# def add_new_tradingplan_old(self,data,TEST_MODE):
+
+	# 	algo_name =  data["algo_name"]
+	# 	entryplan = data["entry_type"]
+	# 	symbol = data["symbol"] 
+	# 	support = data["support"]
+	# 	resistence =  data["resistence"]
+	# 	risk = data["risk"]
+	# 	stats = data["statistics"]
+	# 	status = data["immediate_deployment"]
+	# 	mana = data["management"]
+
+
+	# 	try:
+	# 		if symbol not in self.symbols:
+	# 			if self.ui.algo_count_number.get()<50:
+	# 				#print(symbol,self.ui.algo_count_number.get())
+	# 				self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats)  #register in Symbol.
+	# 				#self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
+	# 				self.symbols.append(symbol)
+
+	# 				#######################################################################
+
+	# 				self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,mana,risk,self.pipe_ppro_out,0,TEST_MODE,algo_name,self)
+	# 				self.ui.create_new_single_entry(self.tradingplan[symbol])
+
+	# 				if status == True:
+	# 					self.tradingplan[symbol].deploy(9600)
+	# 			else:
+
+	# 				find_ = False
+	# 				replace_id = 0
+	# 				for trade in self.tradingplan.values():
+
+	# 					if trade.tkvars[STATUS].get()==PENDING or trade.tkvars[STATUS].get()==DONE:
+	# 						replace_id = trade.algo_ui_id
+	# 						find_ = True
+	# 						log_print("Replacing",trade.symbol_name)
+	# 						break 
+	# 				if find_:
+	# 					self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats)  #register in Symbol.
+	# 					#self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
+	# 					self.symbols.append(symbol)
+
+	# 					#######################################################################
+
+	# 					self.tradingplan[symbol]=TradingPlan(self.symbol_data[symbol],entryplan,INSTANT,mana,risk,self.pipe_ppro_out,0,TEST_MODE,algo_name,self)
+	# 					self.ui.create_single_entry(self.tradingplan[symbol],replace_id)
+
+	# 					if status == True:
+	# 						self.tradingplan[symbol].deploy(9600)
+	# 				else:
+	# 					log_print("System at full capacity.")
+
+	# 				# now find an empty spot. 
+	# 		else:
+	# 			log_print("symbols already exists, modifying current parameter.")
+
+	# 			if self.tradingplan[symbol].data[STATUS] == PENDING or self.tradingplan[symbol].data[STATUS] == DONE:
+
+
+	# 				self.symbol_data[symbol].set_data(support,resistence,stats)
+	# 				#self.symbol_data[symbol].set_mind("Updated",DEFAULT)
+
+
+	# 				self.tradingplan[symbol].set_data(risk,entryplan,INSTANT,mana,support,resistence)
+
+	# 				if status ==True:
+	# 					self.tradingplan[symbol].deploy(9600)
+	# 				else:
+	# 					self.tradingplan[symbol].set_data(risk,entryplan,INSTANT,ONETOTWORISKREWARD,support,resistence)
+
+
+	# 	except Exception as e:
+	# 		log_print("adding new tradingplan problem",e,data)
+	# 		PrintException("adding new tradingplan problem")
