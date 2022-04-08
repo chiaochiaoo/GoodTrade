@@ -101,6 +101,7 @@ class Symbol:
 
 		self.incoming_request[tradingplan_name] = 0
 
+
 	def mutual_request_handler(self):
 
 		#lets say I hae -100 and +100. so they cancel each other out. 
@@ -144,10 +145,11 @@ class Symbol:
 		#### STAGE 3 -> IMBALANCE HANDLING #####
 		
 		remaining_share = sum(self.incoming_request.values())
+		self.current_imbalance = remaining_share
+
 		if remaining_share==0:
 			self.share_request = False
-
-		self.current_imbalance = remaining_share
+		
 
 		else:
 			if remaining_share>0:
