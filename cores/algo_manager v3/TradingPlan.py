@@ -597,9 +597,34 @@ class TradingPlan:
 			self.tkvars[RELOAD].set(False)
 			self.start_tradingplan()
 
-	def ppro_order_rejection(self):
 
-		self.mark_algo_status(REJECTED)
+	def rejection_handling(self):
+
+
+		### if have position, ignore. ###
+
+
+		### if no position, flatten. ###
+
+
+		if self.data[STATUS] == DEPLOYED:
+
+			# cancel whatever requested on symbol.
+
+			# withdraw the algo. 
+
+			# show rejection. 
+
+			self.symbol.cancel_all_request(self.name)
+			self.mark_algo_status(REJECTED)
+
+		elif:
+
+			log_print("rejection messge received on ",self.name)
+
+	# def ppro_order_rejection(self):
+
+	# 	self.mark_algo_status(REJECTED)
 
 
 	""" Trade management """

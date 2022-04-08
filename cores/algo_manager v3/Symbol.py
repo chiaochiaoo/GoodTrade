@@ -57,13 +57,14 @@ class Symbol:
 		"""
 		self.current_shares = 0
 
+		self.current_imbalance = 0
+
 		# plus, minus, all the updates, all go here. 
 		self.incoming_shares = []
 
 		# 1. anyone wants anything, will register here. 
 		# 2. System every second checks the outstanding shares and do corresponding actions. 
 		# 3. For mutual canling requests - automatically granted each other. Otherwise, result in an imbalance. 
-
 
 		self.share_request = False
 
@@ -94,6 +95,11 @@ class Symbol:
 		log_print("new request",self.incoming_request)
 
 		self.share_request = True
+
+	def cancel_all_request(self,tradingplan_name):
+
+
+		self.incoming_request[tradingplan_name] = 0
 
 	def mutual_request_handler(self):
 
@@ -140,6 +146,8 @@ class Symbol:
 		remaining_share = sum(self.incoming_request.values())
 		if remaining_share==0:
 			self.share_request = False
+
+		self.current_imbalance = remaining_share
 
 		else:
 			if remaining_share>0:
@@ -189,6 +197,21 @@ class Symbol:
 		self.incoming_shares.append((price,share))
 
 		#print("inc",self.incoming_shares)
+
+	def rejection_message(self,side):
+
+		## iterate through all the TPs request. check who is requesting. if it is not running withdraw and cancel it. 
+
+		if side == "Long":
+			coefficient = 1
+		elif side =="Short":
+			coefficient = -1
+
+		for tp,val in self.incoming_request.items():
+
+			#if val fit. if tp not started but deploy.
+			if val*coefficient >0:
+				self.tradingplans[tp].rejection_handling()
 
 
 	def pair_off(self,tp1,tp2):

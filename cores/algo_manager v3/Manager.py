@@ -926,8 +926,14 @@ class Manager:
 
 			elif d[0] =="order rejected":
   
-				if symbol in self.tradingplan:
-					self.tradingplan[symbol].ppro_order_rejection()
+  				data = d[1]
+
+  				symbol = data["symbol"]
+  				side = data["side"]
+
+  				self.symbol_data[symbol].rejection_message(side)
+				# if symbol in self.tradingplan:
+				# 	self.tradingplan[symbol].ppro_order_rejection()
 
 			# if d[0] =="new stoporder":
 
