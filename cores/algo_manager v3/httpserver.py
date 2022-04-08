@@ -5,19 +5,17 @@ import Util_functions
 
 
 #message creation
-
 TRADETYPE = "Trade_type="
 ALGOID ="Algo_id="
 ALGONAME ="Algo_name="
 SYMBOL = "Symbol="
-ENTRYPLAN = "Entry_type"
-SUPPORT = "Support"
-RESISTANCE = "Resistance"
+ENTRYPLAN = "Entry_type="
+SUPPORT = "Support="
+RESISTANCE = "Resistance="
 RISK =  "Risk="
 SIDE =  "Side="
 DEPLOY = "Deploy="
 MANAGEMENT = "Management="
-
 
 
 SINGLE = "S"
@@ -88,8 +86,11 @@ class S(BaseHTTPRequestHandler):
 		#self.send_message(stream_data)
 
 		
+		if "%20" in stream_data:
+			stream_data = stream_data.replace("%20"," ")
 
 		if TRADETYPE in stream_data:
+
 
 			#print(stream_data)
 			type_ = find_between(stream_data,TRADETYPE,",")
@@ -211,6 +212,11 @@ def httpserver(pipex):
 
 
 
+# s=" /Trade_type=Single,Algo_id=Manual_LCID.NQ944,Algo_name=Manual%20Trade,Symbol=LCID.NQ,Entry_typeInstant%20Short,Support0,Resistance22.0,Risk=3.0,Side=Short,Deploy=T,Management=FullManual"
+
+
+# s.replace("%20"," ")
+# print(s.replace("%20"," "))
 #httpserver("GEGE")
 
 
