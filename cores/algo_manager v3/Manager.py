@@ -22,9 +22,8 @@ from datetime import datetime, timedelta
 import json
 import os,sys
 
-from http.server import BaseHTTPRequestHandler, HTTPServer
-import logging
 
+from httpserver improt *
 
 
 
@@ -40,87 +39,6 @@ f.close()
 
 
 TEST = True
-
-
-#how do i take a pipe in? 
-#uses global? 
-
-class S(BaseHTTPRequestHandler):
-	def _set_response(self):
-		self.send_response(200)
-		self.send_header('Content-type', 'text/html')
-		self.end_headers()
-
-	def do_GET(self):
-
-		self._set_response()
-		self.wfile.write("received".encode('utf-8'))
-
-		print(self.path[1:])
-		stream_data = self.path[1:]
-
-		self.send_message(stream_data)
-
-		# type_ = find_between(stream_data,"Type=",",")
-
-		# if type_!="TEST":
-		# 	self.send_message(msg)
-
-	def do_POST(self):
-
-		self._set_response()
-		self.wfile.write("received".encode('utf-8'))
-
-		#print(self.path[1:])
-
-	def send_message(self,msg):
-
-		pipec.send(["pkg",msg])
-		#pipe.send(msg)
-
-
-
-
-		#msgid=xxx,Message=L1,MarketTime=14:24:38.206,Symbol=SNDL.NQ,BidPrice=0.828300,BidSize=13899,AskPrice=0.828400,AskSize=2364,Tick=?\n'
-
-		# msgid = find_between(stream_data,"")
-		# symbol = find_between(stream_data, "Symbol=", ",")
-		# side = find_between(stream_data, "Side=", ",")
-		# info = find_between(stream_data, "InfoText=", ",")
-
-		# print("hello",str(self.path))
-		# self._set_response()
-		# self.wfile.write("received".encode('utf-8'))
-
-		# content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
-		# post_data = self.rfile.read(content_length) # <--- Gets the data itself
-		# logging.info("POST request,\nPath: %s\nHeaders:\n%s\n\nBody:\n%s\n",
-		#         str(self.path), str(self.headers), post_data.decode('utf-8'))
-
-		# self._set_response()
-		# self.wfile.write("POST request for {}".format(self.path).encode('utf-8'))
-
-def httpserver(pipex):
-
-	from http.server import BaseHTTPRequestHandler, HTTPServer
-	import logging
-
-	global pipec
-	pipec = pipex
-	server_class=HTTPServer
-	handler_class=S
-	port=4441
-
-	logging.basicConfig(level=logging.INFO)
-	server_address = ('', port)
-	httpd = server_class(server_address, handler_class)
-	logging.info('Starting httpd...\n')
-	try:
-		httpd.serve_forever()
-	except KeyboardInterrupt:
-		pass
-	httpd.server_close()
-	logging.info('Stopping httpd...\n')
 
 
 def algo_manager_voxcom(pipe):
@@ -559,11 +477,11 @@ class Manager:
 
 				symbol1 = data["symbol1"] 
 				symbol2 = data["symbol2"]
-				symbol1_share = data["symbol1_share"]
-				symbol2_share =  data["symbol2_share"]
-				risk = data["risk"]
-				symbol1_stats = data["symbol1_statistics"]
-				symbol2_stats = data["symbol2_statistics"]
+				symbol1_share = int(data["symbol1_share"])
+				symbol2_share =  int(data["symbol2_share"])
+				risk = float(data["risk"])
+				#symbol1_stats = data["symbol1_statistics"]
+				#symbol2_stats = data["symbol2_statistics"]
 				mana = data["management"]
 
 				name = algo_id   #symbol1[:-3]+"/"+symbol2[:-3]
@@ -610,10 +528,10 @@ class Manager:
 				symbol = data["symbol"] 
 				entryplan = data["entry_type"]
 				
-				support = data["support"]
-				resistence =  data["resistence"]
-				risk = data["risk"]
-				stats = data["statistics"]
+				support = float(data["support"])
+				resistence =  float(data["resistence"])
+				risk = float(data["risk"])
+				#stats = data["statistics"]
 				status = data["immediate_deployment"]
 				mana = data["management"]
 			
@@ -1798,8 +1716,10 @@ if __name__ == '__main__':
 
 	algo_voxcom = multiprocessing.Process(target=algo_manager_voxcom3, args=(receive_pipe,),daemon=True)
 	algo_voxcom.daemon=True
-	# algo_voxcom = multiprocessing.Process(target=httpserver, args=(receive_pipe,),daemon=True)
-	# algo_voxcom.daemon=True
+
+
+	algo_voxcom = multiprocessing.Process(target=httpserver, args=(receive_pipe,),daemon=True)
+	algo_voxcom.daemon=True
 
 
 
