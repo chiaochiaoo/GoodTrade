@@ -457,7 +457,7 @@ class Manager:
 
 	def add_new_tradingplan(self,data,TEST_MODE):
 
-		#print("adding",data)
+		print("adding",data)
 
 		type_name = data["type_name"]
 		algo_id = data["algo_id"]

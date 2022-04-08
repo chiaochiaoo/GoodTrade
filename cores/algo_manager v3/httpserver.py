@@ -97,7 +97,7 @@ class S(BaseHTTPRequestHandler):
 
 			data = {}
 			if algo_id not in algoids:
-				if type_=="S"  :
+				if type_=="Single"  :
 					algoids.append(algo_id)
 
 					data["type_name"] = type_
@@ -120,7 +120,7 @@ class S(BaseHTTPRequestHandler):
 
 					self.send_message(data)
 
-				if type_ =="P":
+				if type_ =="Pair":
 
 					data["type_name"] = type_
 					data["algo_id"] = algo_id
@@ -165,7 +165,7 @@ class S(BaseHTTPRequestHandler):
 
 		global pipec
 		#print("sending",msg,pipec)
-		pipec.send(["pkg",msg])
+		pipec.send(["pkg",[msg]])
 		#pipe.send(msg)
 
 		#msgid=xxx,Message=L1,MarketTime=14:24:38.206,Symbol=SNDL.NQ,BidPrice=0.828300,BidSize=13899,AskPrice=0.828400,AskSize=2364,Tick=?\n'
