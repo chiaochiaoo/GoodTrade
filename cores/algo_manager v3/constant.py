@@ -224,7 +224,7 @@ STRONGRED = "#FC433D"
 DEEPGREEN = "#059a12"
 
 
-print("12:42:53"[6:8])
+#print("12:42:53"[6:8])
 	# def deploy_orders(self,orders):
 
 	# 	coefficient = 1

@@ -126,43 +126,52 @@ class Symbol:
 		#first calculate all the positive, then all the negative? NO... it's by
 
 		if len(self.incoming_shares)>0:
+
+
+			### STAGE 1 -> Planed request handling 
 			self.incoming_shares_pairing()
 
 
-		#### STAGE 2 -> MUTUAL PLANS PAIRING #####
+			cur_imbalance = sum(self.incoming_request.values())
 
-		cur_imbalance = sum(self.incoming_request.values())
+			if cur_imbalance>0:
 
-		tps = sorted(self.incoming_request, key=lambda dict_key: abs(self.incoming_request[dict_key]))
-
-		#print(tps)
-
-		for i in range(len(tps)):
-			if abs(self.incoming_request[tps[i]])>0:
-				for j in range(i,len(tps)):
-					#if j > i and is opposite sign. 
-					if pair_off_test(self.incoming_request[tps[i]], self.incoming_request[tps[j]]):
-						self.pair_off(tps[i], tps[j])
-
-		log_print(("pairing sucessful, now remaining request: ",self.ticker,self.incoming_request))
-
-		log_print(("current shares remaning:",self.ticker,sum(self.incoming_request.values())))
+				### STAGE 2 -> Unplaned user event handling 
 
 
-		#### STAGE 3 -> IMBALANCE HANDLING #####
-		
-		remaining_share = sum(self.incoming_request.values())
-		self.current_imbalance = remaining_share
+				#### STAGE 3 -> MUTUAL PLANS PAIRING #####
 
-		if remaining_share==0:
-			self.share_request = False
-		
 
-		else:
-			if remaining_share>0:
-				self.ppro_out.send([IOCBUY,self.ticker,abs(remaining_share),self.data[ASK]])
-			else:
-				self.ppro_out.send([IOCSELL,self.ticker,abs(remaining_share),self.data[BID]])
+				tps = sorted(self.incoming_request, key=lambda dict_key: abs(self.incoming_request[dict_key]))
+
+				#print(tps)
+
+				for i in range(len(tps)):
+					if abs(self.incoming_request[tps[i]])>0:
+						for j in range(i,len(tps)):
+							#if j > i and is opposite sign. 
+							if pair_off_test(self.incoming_request[tps[i]], self.incoming_request[tps[j]]):
+								self.pair_off(tps[i], tps[j])
+
+				log_print(("pairing sucessful, now remaining request: ",self.ticker,self.incoming_request))
+
+				log_print(("current shares remaning:",self.ticker,sum(self.incoming_request.values())))
+
+
+				#### STAGE 3 -> IMBALANCE HANDLING #####
+				
+				remaining_share = sum(self.incoming_request.values())
+				self.current_imbalance = remaining_share
+
+				if remaining_share==0:
+					self.share_request = False
+				
+
+				else:
+					if remaining_share>0:
+						self.ppro_out.send([IOCBUY,self.ticker,abs(remaining_share),self.data[ASK]])
+					else:
+						self.ppro_out.send([IOCSELL,self.ticker,abs(remaining_share),self.data[BID]])
 
 	def incoming_shares_pairing(self):
 
@@ -180,6 +189,7 @@ class Symbol:
 					self.tradingplans[tp].ppro_process_orders(price,abs(share),LONG,self.ticker)
 
 					self.load_confirmation(tp,share)
+
 					self.incoming_request[tp]-=share
 
 					paired.append(t)
@@ -189,6 +199,8 @@ class Symbol:
 					self.tradingplans[tp].ppro_process_orders(price,abs(share),SHORT,self.ticker)
 
 					self.load_confirmation(tp,share)
+
+					## if share is negative, then minus will add to it. 
 					self.incoming_request[tp]-=share
 					paired.append(t)
 
@@ -204,6 +216,30 @@ class Symbol:
 				
 			# except Exception as e:
 			# 	print(e,"poping failure",e,i,self.incoming_shares)
+
+	def unplan_shares_pairing(self,imbalance):
+
+		### only viable when there are only 1 plan that currently has holding. i.e. in running state ###
+		
+		count = 0
+		tpname = ""
+		for tp,val in self.tradingplans.items():
+
+			if val.data[STATUS] == RUNNING:
+				count+=1
+				tpname=tp
+
+		if count==1:
+
+			for t in range(len(self.incoming_shares)):
+				price = self.incoming_shares[t][0]
+				share = self.incoming_shares[t][1]
+
+				if share >0:
+					self.tradingplans[tp].ppro_process_orders(price,abs(share),LONG,self.ticker)
+				else:
+					self.tradingplans[tp].ppro_process_orders(price,abs(share),SHORT,self.ticker)
+
 
 	def holdings_update(self,price,share):
 
@@ -507,3 +543,9 @@ def pair_off_test(a,b):
 # 		break
 
 
+# a = {}
+# a["a"] = 1
+# a["b"] = 0
+# a["c"] = 1
+
+# print(list(a.values()))
