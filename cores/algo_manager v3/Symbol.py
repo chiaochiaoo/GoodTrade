@@ -134,10 +134,15 @@ class Symbol:
 
 		cur_imbalance = sum(self.incoming_request.values())
 
-		### STAGE 2 -> Unplaned user event handling 
+		remian_shares =  0 #sum(self.incoming_shares.values())
 
-		if cur_imbalance!=0:
-			self.unplan_shares_pairing(cur_imbalance)
+		for i in range(len(self.incoming_shares)):
+			remian_shares+=self.incoming_shares[i][1]
+
+		### STAGE 2 -> Unplaned user event handling 
+		print(remian_shares,self.incoming_shares)
+		if remian_shares!=0:
+			self.unplan_shares_pairing()
 		#### STAGE 3 -> MUTUAL PLANS PAIRING #####
 
 
@@ -244,6 +249,7 @@ class Symbol:
 
 		self.incoming_shares.append((price,share))
 
+		self.share_request = True
 		#print("inc",self.incoming_shares)
 
 	def rejection_message(self,side):
