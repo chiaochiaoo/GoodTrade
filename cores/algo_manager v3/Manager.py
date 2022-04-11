@@ -1700,7 +1700,7 @@ if __name__ == '__main__':
 
 
 	root = tk.Tk()
-	root.title("GoodTrade Algo Manager v3 Pair_trading & Trade_Stacking ")
+	root.title("GoodTrade Algo Manager v3 Pair_trading & Trade_Stacking b1 ")
 	root.geometry("1500x1000")
 
 	manager=Manager(root,goodtrade_pipe,ppro_out,ppro_in,TEST)
