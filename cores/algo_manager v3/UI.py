@@ -646,11 +646,13 @@ class UI(pannel):
 
 
 
-	def create_new_single_entry(self,tradingplan,single):
+	def create_new_single_entry(self,tradingplan,single,row_number=None):
 
 		if single=="Single":
-			l = self.single_label_count
-			row_number = l-1 #info[1]
+
+			if row_number==None:
+				l = self.single_label_count
+				row_number = l-1 #info[1]
 			#self.tk_labels_single[symbol] = {}
 
 			self.create_single_entry(tradingplan, row_number)
@@ -661,8 +663,13 @@ class UI(pannel):
 			#self.recreate_labels()
 			tradingplan.update_displays()
 		else:
-			l = self.pair_label_count
-			row_number = l-1 #info[1]
+
+			if row_number==None:
+				# l = self.single_label_count
+				# row_number = l-1 #info[1]
+				l = self.pair_label_count
+				row_number = l-1 #info[1]
+				
 			#self.tk_labels_single[symbol] = {}
 
 			self.create_pair_entry(tradingplan, row_number)

@@ -555,7 +555,7 @@ class Manager:
 						#def __init__(self,name:"",symbol:Symbol,entry_plan=None,manage_plan=None,support=0,resistence=0,risk=None,TEST_MODE=False,algo_name="",Manager=None):
 
 						self.tradingplan[symbol] = TradingPlan(name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
-						self.ui.create_new_single_entry(self.tradingplan[symbol],type_name)
+						self.ui.create_new_single_entry(self.tradingplan[symbol],type_name,None)
 
 						if status == True:
 							self.tradingplan[symbol].deploy(9600)
@@ -573,14 +573,14 @@ class Manager:
 						if find_:
 							if symbol not in self.symbol_data:
 								self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats,self.pipe_ppro_out)  #register in Symbol.
-							#self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
 								self.symbols.append(symbol)
 
 							#######################################################################
 
 							self.tradingplan[name] = TradingPlan(name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
 							#self.tradingplan[symbol]=TradingPlan(name,self.symbol_data[symbol],entryplan,INSTANT,mana,risk,0,TEST_MODE,algo_name,self)
-							self.ui.create_single_entry(self.tradingplan[symbol],replace_id)
+							self.ui.create_new_single_entry(self.tradingplan[symbol],type_name,replace_id)
+							#self.ui.create_single_entry(self.tradingplan[symbol],replace_id)
 
 							if status == True:
 								self.tradingplan[name].deploy(9600)
