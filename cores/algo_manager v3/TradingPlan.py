@@ -18,6 +18,7 @@ class TradingPlan:
 		self.name = name 
 		self.symbol = symbol
 
+		self.in_use = True
 		self.pair_plan = False
 		
 		#self.symbol.set_tradingplan(self)
@@ -78,6 +79,8 @@ class TradingPlan:
 		self.init_data(risk,entry_plan,manage_plan,support,resistence)
 
 
+	def deactive(self):
+		self.in_use = False
 	def set_data(self,risk,entry_plan,manage_plan,support,resistence):
 		#default values.
 		self.tkvars[SELECTED].set(False)

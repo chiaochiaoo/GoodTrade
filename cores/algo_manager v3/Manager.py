@@ -329,8 +329,8 @@ class Manager:
 		self.symbol_data = {}
 
 
-		self.tradingplan = {}
 
+		self.tradingplan = {}
 
 		self.pair_plans = {}
 
@@ -495,7 +495,7 @@ class Manager:
 				# pair reversed region. 
 				# self.pair_plans
 
-				if self.ui.pair_label_count < 25:
+				if self.ui.pair_label_count < 5:
 
 					if symbol1 not in self.symbol_data:
 						self.symbol_data[symbol1] = Symbol(symbol1,0,0,symbol1_stats,self.pipe_ppro_out)  	
@@ -511,45 +511,53 @@ class Manager:
 							self.pair_plans[symbol2] = name	
 
 						self.symbols.append(symbol2)
+
 					### name:"",symbol:Symbol1,symbol:Symbol2,share1,share2,manage_plan=None,risk=None,TEST_MODE=False,algo_name="",Manager=None
 					self.tradingplan[name] = PairTP(name,self.symbol_data[symbol1],self.symbol_data[symbol2],symbol1_share,symbol2_share,mana,risk,TEST_MODE,algo_name,self)
 
 					self.ui.create_new_single_entry(self.tradingplan[name],type_name,None)
 
 					#self.tradingplan[name].deploy(9600)
-				try:
+				else:
 
 					find_ = False
 					replace_id = 0
 
 					for trade in self.tradingplan.values():
 
-						if (trade.tkvars[STATUS].get()==PENDING or trade.tkvars[STATUS].get()==DONE) and trade.pair_plan==True:
+						if (trade.tkvars[STATUS].get()==PENDING or trade.tkvars[STATUS].get()==DONE) and trade.pair_plan==True and trade.in_use ==True:
 							replace_id = trade.algo_ui_id
+							trade.deactive()
 							find_ = True
-							log_print("Replacing",trade.symbol_name,"replace_id")
+							log_print("Replacing",trade.symbol_name,"replace_id",replace_id)
 							break 
 					if find_:
-						if symbol not in self.symbol_data:
-							if symbol1 not in self.symbol_data:
-								self.symbol_data[symbol1] = Symbol(symbol1,0,0,symbol1_stats,self.pipe_ppro_out)  	
 
-								self.symbols.append(symbol1)
-								if symbol1 not in self.pair_plans:
-									self.pair_plans[symbol1] = name
+						if symbol1 not in self.symbol_data:
+							self.symbol_data[symbol1] = Symbol(symbol1,0,0,symbol1_stats,self.pipe_ppro_out)  	
 
-							if symbol2 not in self.symbol_data:
-								self.symbol_data[symbol2] = Symbol(symbol2,0,0,symbol2_stats,self.pipe_ppro_out)  
+							self.symbols.append(symbol1)
+							if symbol1 not in self.pair_plans:
+								self.pair_plans[symbol1] = name
 
-								if symbol2 not in self.pair_plans:
-									self.pair_plans[symbol2] = name	
+						if symbol2 not in self.symbol_data:
+							self.symbol_data[symbol2] = Symbol(symbol2,0,0,symbol2_stats,self.pipe_ppro_out)  
 
-								self.symbols.append(symbol2)
+							if symbol2 not in self.pair_plans:
+								self.pair_plans[symbol2] = name	
+
+							self.symbols.append(symbol2)
 
 						self.tradingplan[name] = PairTP(name,self.symbol_data[symbol1],self.symbol_data[symbol2],symbol1_share,symbol2_share,mana,risk,TEST_MODE,algo_name,self)
 
 						self.ui.create_new_single_entry(self.tradingplan[name],type_name,replace_id)
 
+					else:
+
+						log_print("System at full capacity.")
+
+				try:
+					pass
 				except Exception as e:
 
 					exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -597,8 +605,9 @@ class Manager:
 						replace_id = 0
 						for trade in self.tradingplan.values():
 
-							if (trade.tkvars[STATUS].get()==PENDING or trade.tkvars[STATUS].get()==DONE) and trade.pair_plan==False:
+							if (trade.tkvars[STATUS].get()==PENDING or trade.tkvars[STATUS].get()==DONE) and trade.pair_plan==False and trade.in_use ==True:
 								replace_id = trade.algo_ui_id
+								trade.deactive()
 								find_ = True
 								log_print("Replacing",trade.symbol_name,"replace_id")
 								break 

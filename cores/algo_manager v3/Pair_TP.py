@@ -24,7 +24,7 @@ class PairTP:
 		self.name = name 
 
 		self.pair_plan = True
-
+		self.in_use = True
 		
 		self.symbols ={}
 
@@ -98,6 +98,8 @@ class PairTP:
 		self.init_data(risk,manage_plan)
 
 
+	def deactive(self):
+		self.in_use = False
 	def set_data(self,risk,manage_plan,support,resistence):
 
 		#default values.

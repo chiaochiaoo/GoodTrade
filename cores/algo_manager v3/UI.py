@@ -646,7 +646,7 @@ class UI(pannel):
 
 
 
-	def create_new_single_entry(self,tradingplan,single,row_number=None):
+	def create_new_single_entry(self,tradingplan,single,row_number):
 
 		if single=="Single":
 
@@ -664,12 +664,16 @@ class UI(pannel):
 			tradingplan.update_displays()
 		else:
 
+			print("XXXXXXXXXXXXXXX using row number",row_number,self.pair_label_count)
+
 			if row_number==None:
 				# l = self.single_label_count
 				# row_number = l-1 #info[1]
 				l = self.pair_label_count
 				row_number = l-1 #info[1]
-				
+			
+
+			print("XXXXXXXXXXXXXXX using row number",row_number,self.pair_label_count)
 			#self.tk_labels_single[symbol] = {}
 
 			self.create_pair_entry(tradingplan, row_number)
