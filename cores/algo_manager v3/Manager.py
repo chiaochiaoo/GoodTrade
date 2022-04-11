@@ -568,7 +568,7 @@ class Manager:
 							if trade.tkvars[STATUS].get()==PENDING or trade.tkvars[STATUS].get()==DONE:
 								replace_id = trade.algo_ui_id
 								find_ = True
-								log_print("Replacing",trade.symbol_name)
+								log_print("Replacing",trade.symbol_name,"replace_id")
 								break 
 						if find_:
 							if symbol not in self.symbol_data:
