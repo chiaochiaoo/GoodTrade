@@ -583,7 +583,7 @@ class Manager:
 							#self.ui.create_single_entry(self.tradingplan[symbol],replace_id)
 
 							if status == True:
-								self.tradingplan[name].deploy(9600)
+								self.tradingplan[symbol].deploy(9600)
 						else:
 							log_print("System at full capacity.")
 
