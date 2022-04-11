@@ -228,14 +228,14 @@ class UI(pannel):
 
 
 
-		self.config = ttk.LabelFrame(self.root,text="Config") 
-		self.config.place(x=10,y=360,height=260,width=210)
+		# self.config = ttk.LabelFrame(self.root,text="Config") 
+		# self.config.place(x=10,y=360,height=260,width=210)
 
 		self.cmd = ttk.LabelFrame(self.root,text="Command") 
-		self.cmd.place(x=10,y=600,height=500,width=210)
+		self.cmd.place(x=10,y=360,height=500,width=210)
 
 
-		self.init_config_pannel()
+		#self.init_config_pannel()
 		self.init_command()
 		# self.log_panel = ttk.LabelFrame(self.root,text="Events") 
 		# self.log_panel.place(x=10,y=300,relheight=0.5,width=210)

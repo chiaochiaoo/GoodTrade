@@ -612,7 +612,6 @@ class TradingPlan:
 
 		### if no position, flatten. ###
 
-
 		if self.data[STATUS] == DEPLOYED:
 
 			# cancel whatever requested on symbol.
@@ -646,32 +645,47 @@ class TradingPlan:
 
 		if self.data[CURRENT_SHARE]>0 and process:
 			shares = int(self.data[CURRENT_SHARE]*percentage)
+
+			coefficient = 1
+
 			pproaction = ""
+
 			if shares ==0:
 				shares = 1
 
 			if action ==ADD:
 				if self.data[POSITION] == LONG:
 					pproaction = BUY
+					coefficient =1 
 				elif self.data[POSITION] == SHORT:
 					pproaction = SELL
+					coefficient = -1
+
 			elif action ==MINUS:
+				coefficient = -1
 				if self.data[POSITION] == LONG:
 					pproaction = SELL
+					coefficient = -1
 				elif self.data[POSITION] == SHORT:
 					pproaction = BUY
+					coefficient = 1
+
 
 			description = "Trades aggregation"
+
 			if pproaction!="":
 
-				if passive:
+				self.symbol.new_request(self.name,shares*coefficient)
 
-					if percentage ==1:
-						self.passive_initialization(pproaction,shares,final_target=0)
-					else:
-						self.passive_initialization(pproaction,shares)
-				else:
-					self.ppro_out.send([pproaction,self.symbol_name,shares,description])
+				# self.ppro_out.send([pproaction,self.symbol_name,shares,description])
+				# if passive:
+
+				# 	if percentage ==1:
+				# 		self.passive_initialization(pproaction,shares,final_target=0)
+				# 	else:
+				# 		self.passive_initialization(pproaction,shares)
+				# else:
+				# 	self.ppro_out.send([pproaction,self.symbol_name,shares,description])
 
 	""" risk related ## """
 
