@@ -843,15 +843,16 @@ class Manager:
 			if d[0] =="pkg":
 				log_print("new package arrived",d)
 				for i in d[1]:
-					self.add_new_tradingplan(i,self.test_mode)
-				try:
-					pass
-					
-				except Exception as e:
 
-					exc_type, exc_obj, exc_tb = sys.exc_info()
-					fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-					log_print("adding algo errors:",e,i,exc_type, fname, exc_tb.tb_lineno)
+					try:
+						self.add_new_tradingplan(i,self.test_mode)
+
+						
+					except Exception as e:
+
+						exc_type, exc_obj, exc_tb = sys.exc_info()
+						fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+						log_print("adding algo errors:",e,i,exc_type, fname, exc_tb.tb_lineno)
 
 	def ppro_order_confirmation(self,data):
 
