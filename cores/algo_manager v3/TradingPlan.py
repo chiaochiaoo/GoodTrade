@@ -18,6 +18,7 @@ class TradingPlan:
 		self.name = name 
 		self.symbol = symbol
 
+		self.pair_plan = False
 		
 		#self.symbol.set_tradingplan(self)
 

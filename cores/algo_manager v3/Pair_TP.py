@@ -22,6 +22,10 @@ class PairTP:
 	def __init__(self,name:"",Symbol1,Symbol2,share1,share2,manage_plan=None,risk=None,TEST_MODE=False,algo_name="",Manager=None):
 
 		self.name = name 
+
+		self.pair_plan = True
+
+		
 		self.symbols ={}
 
 
