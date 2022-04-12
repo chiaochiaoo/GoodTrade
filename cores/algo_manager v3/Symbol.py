@@ -150,6 +150,7 @@ class Symbol:
 
 		### STAGE 2 -> Unplaned user event handling 
 		print(remian_shares,self.incoming_shares)
+
 		if remian_shares!=0:
 			self.unplan_shares_pairing()
 		#### STAGE 3 -> MUTUAL PLANS PAIRING #####
@@ -178,16 +179,17 @@ class Symbol:
 
 		if self.current_imbalance==0:
 			self.share_request = False
+			self.passive_price = 0
 		
 
 		else:
 
-			#self.passive_orders()
+			self.passive_orders()
 
-			if remaining_share>0:
-				self.ppro_out.send([IOCBUY,self.ticker,abs(remaining_share),self.data[ASK]])
-			else:
-				self.ppro_out.send([IOCSELL,self.ticker,abs(remaining_share),self.data[BID]])
+			# if remaining_share>0:
+			# 	self.ppro_out.send([IOCBUY,self.ticker,abs(remaining_share),self.data[ASK]])
+			# else:
+			# 	self.ppro_out.send([IOCSELL,self.ticker,abs(remaining_share),self.data[BID]])
 
 
 			## HERE USE PASSIVE ## 
@@ -214,8 +216,11 @@ class Symbol:
 
 			action = PASSIVEBUY
 			price = self.get_bid()
+
 			if price >= self.passive_price+0.01*k or self.passive_price==0:
 				order_process = True
+
+
 		else:
 			action = PASSIVESELL
 			price = self.get_ask()
@@ -228,6 +233,8 @@ class Symbol:
 		if order_process and ts > self.passive_request_ts + DELAY:
 
 
+			total_shares = abs(self.current_imbalance)
+
 			self.passive_request_ts = ts
 
 			#step 1, cancel existing orders
@@ -236,16 +243,16 @@ class Symbol:
 			#time.sleep(0.2)
 
 			if price<=10:
-				self.ppro_out.send([action,self.ticker,self.current_imbalance,price])
+				self.ppro_out.send([action,self.ticker,total_shares,price])
 			else:
 
-				if self.current_imbalance<=4:
-					self.ppro_out.send([action,self.ticker,self.current_imbalance,price])
+				if total_shares<=4:
+					self.ppro_out.send([action,self.ticker,total_shares,price])
 				else:
 
 
-					share = self.current_imbalance//2
-					remaning = self.current_imbalance-share
+					share = total_shares//2
+					remaning = total_shares-share
 
 					# when big gap, one order on bid, one order on midpoint. 
 					if gap>=0.05:
@@ -254,7 +261,7 @@ class Symbol:
 
 					# when tight spread. just one on bid. 
 					elif gap<=0.01:
-						self.ppro_out.send([action,self.ticker,self.current_imbalance,price])
+						self.ppro_out.send([action,self.ticker,total_shares,price])
 					else:
 						self.ppro_out.send([action,self.ticker, remaning,price])
 						self.ppro_out.send([action,self.ticker,share,round(price+0.01*k,2)])

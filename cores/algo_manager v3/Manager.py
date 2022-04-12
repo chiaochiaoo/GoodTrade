@@ -916,6 +916,7 @@ class Manager:
 
 				## HERE. Append it to the new symbol warehouse system. 
 
+				#print("HOLDING UPDATE",symbol,price,shares,side)
 
 				if symbol in self.symbols:
 
@@ -1253,7 +1254,7 @@ class Tester:
 				type_ = d[0]
 
 				#time.sleep(1)
-				#print(self.buy_book)
+				
 				if type_ == "Buy" or type_ == IOCBUY:
 
 					symbol = d[1]
@@ -1355,6 +1356,11 @@ class Tester:
 					self.sell_book[price] = share
 
 
+				elif type_ == "Cancel":
+
+
+					self.sell_book ={}
+					self.buy_book = {}
 				elif type_ == "Flatten":
 
 					symbol = d[1]
@@ -1600,6 +1606,7 @@ class Tester:
 
 		"""two senarios. within current timestamp, and out. """
 
+
 		if dic["timestamp"]  != ms: #a new minute. 
 
 			dic["timestamp"] = ms
@@ -1649,7 +1656,7 @@ class Tester:
 
 	def limit_buy_sell(self):
 
-		#print("checking limit buy book",self.buy_book)
+		print("checking limit buy book",self.buy_book,self.sell_book)
 		used = []
 		for key,item in self.buy_book.items():
 
