@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import ticker
 import matplotlib.pyplot as plt
+import traceback
 
 def find_between(data, first, last):
 	try:
@@ -98,7 +99,7 @@ def graphweekly():
 	plt.tight_layout()
 	plt.show()
 	
-def PrintException(additional="ERROR",info):
+def PrintException(info,additional="ERROR"):
 	# exc_type, exc_obj, tb = sys.exc_info()
 	# f = tb.tb_frame
 	# lineno = tb.tb_lineno
@@ -108,7 +109,7 @@ def PrintException(additional="ERROR",info):
 	# log_print (info+'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj))
 	exc_type, exc_obj, exc_tb = sys.exc_info()
 	fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-	log_print(additional,info,exc_type, fname, exc_tb.tb_lineno)
+	log_print(additional,info,exc_type, fname, exc_tb.tb_lineno,traceback.format_exc())
 
 def log_print(*args):
 	"""My custom log_print() function."""

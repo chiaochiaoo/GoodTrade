@@ -495,9 +495,43 @@ class Manager:
 				# pair reversed region. 
 				# self.pair_plans
 
-				try:
-					
-					if self.ui.pair_label_count < 5:
+				if self.ui.pair_label_count < 5:
+
+					if symbol1 not in self.symbol_data:
+						self.symbol_data[symbol1] = Symbol(symbol1,0,0,symbol1_stats,self.pipe_ppro_out)  	
+
+						self.symbols.append(symbol1)
+						if symbol1 not in self.pair_plans:
+							self.pair_plans[symbol1] = name
+
+					if symbol2 not in self.symbol_data:
+						self.symbol_data[symbol2] = Symbol(symbol2,0,0,symbol2_stats,self.pipe_ppro_out)  
+
+						if symbol2 not in self.pair_plans:
+							self.pair_plans[symbol2] = name	
+
+						self.symbols.append(symbol2)
+
+					### name:"",symbol:Symbol1,symbol:Symbol2,share1,share2,manage_plan=None,risk=None,TEST_MODE=False,algo_name="",Manager=None
+					self.tradingplan[name] = PairTP(name,self.symbol_data[symbol1],self.symbol_data[symbol2],symbol1_share,symbol2_share,mana,risk,TEST_MODE,algo_name,self)
+
+					self.ui.create_new_single_entry(self.tradingplan[name],type_name,None)
+
+					#self.tradingplan[name].deploy(9600)
+				else:
+
+					find_ = False
+					replace_id = 0
+
+					for trade in self.tradingplan.values():
+
+						if (trade.tkvars[STATUS].get()==PENDING or trade.tkvars[STATUS].get()==DONE) and trade.pair_plan==True and trade.in_use ==True:
+							replace_id = trade.algo_ui_id
+							trade.deactive()
+							find_ = True
+							log_print("Replacing",trade.symbol_name,"replace_id",replace_id)
+							break 
+					if find_:
 
 						if symbol1 not in self.symbol_data:
 							self.symbol_data[symbol1] = Symbol(symbol1,0,0,symbol1_stats,self.pipe_ppro_out)  	
@@ -514,56 +548,15 @@ class Manager:
 
 							self.symbols.append(symbol2)
 
-						### name:"",symbol:Symbol1,symbol:Symbol2,share1,share2,manage_plan=None,risk=None,TEST_MODE=False,algo_name="",Manager=None
 						self.tradingplan[name] = PairTP(name,self.symbol_data[symbol1],self.symbol_data[symbol2],symbol1_share,symbol2_share,mana,risk,TEST_MODE,algo_name,self)
 
-						self.ui.create_new_single_entry(self.tradingplan[name],type_name,None)
+						self.ui.create_new_single_entry(self.tradingplan[name],type_name,replace_id)
 
-						#self.tradingplan[name].deploy(9600)
 					else:
 
-						find_ = False
-						replace_id = 0
-
-						for trade in self.tradingplan.values():
-
-							if (trade.tkvars[STATUS].get()==PENDING or trade.tkvars[STATUS].get()==DONE) and trade.pair_plan==True and trade.in_use ==True:
-								replace_id = trade.algo_ui_id
-								trade.deactive()
-								find_ = True
-								log_print("Replacing",trade.symbol_name,"replace_id",replace_id)
-								break 
-						if find_:
-
-							if symbol1 not in self.symbol_data:
-								self.symbol_data[symbol1] = Symbol(symbol1,0,0,symbol1_stats,self.pipe_ppro_out)  	
-
-								self.symbols.append(symbol1)
-								if symbol1 not in self.pair_plans:
-									self.pair_plans[symbol1] = name
-
-							if symbol2 not in self.symbol_data:
-								self.symbol_data[symbol2] = Symbol(symbol2,0,0,symbol2_stats,self.pipe_ppro_out)  
-
-								if symbol2 not in self.pair_plans:
-									self.pair_plans[symbol2] = name	
-
-								self.symbols.append(symbol2)
-
-							self.tradingplan[name] = PairTP(name,self.symbol_data[symbol1],self.symbol_data[symbol2],symbol1_share,symbol2_share,mana,risk,TEST_MODE,algo_name,self)
-
-							self.ui.create_new_single_entry(self.tradingplan[name],type_name,replace_id)
-
-						else:
-
-							log_print("System at full capacity.")
+						log_print("System at full capacity.")
 
 
-				except Exception as e:
-
-					exc_type, exc_obj, exc_tb = sys.exc_info()
-					fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-					log_print("adding new tradingplan errors:",e,data,exc_type, fname, exc_tb.tb_lineno)
 
 			elif type_name == "Single":
 
@@ -580,63 +573,56 @@ class Manager:
 				mana = data["management"]
 			
 				name = algo_id #symbol+str(ts)+ str(random.randint(0, 9))
-				try:
-				
-					if self.ui.algo_count_number.get()<50:
-						#print(symbol,self.ui.algo_count_number.get())
+			
+			
+				if self.ui.algo_count_number.get()<50:
+					#print(symbol,self.ui.algo_count_number.get())
+					
+					if symbol not in self.symbol_data:
+						self.symbol_data[symbol] = Symbol(symbol,support,resistence,stats,self.pipe_ppro_out)  #register in Symbol.
+						self.symbols.append(symbol)
+					#self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
 						
+
+					#######################################################################
+
+					#def __init__(self,name:"",symbol:Symbol,entry_plan=None,manage_plan=None,support=0,resistence=0,risk=None,TEST_MODE=False,algo_name="",Manager=None):
+
+					self.tradingplan[symbol] = TradingPlan(name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
+					self.ui.create_new_single_entry(self.tradingplan[symbol],type_name,None)
+
+					if status == True:
+						self.tradingplan[symbol].deploy(9600)
+				else:
+
+					find_ = False
+					replace_id = 0
+					for trade in self.tradingplan.values():
+
+						if (trade.tkvars[STATUS].get()==PENDING or trade.tkvars[STATUS].get()==DONE) and trade.pair_plan==False and trade.in_use ==True:
+							replace_id = trade.algo_ui_id
+							trade.deactive()
+							find_ = True
+							log_print("Replacing",trade.symbol_name,"replace_id")
+							break 
+					if find_:
 						if symbol not in self.symbol_data:
-							self.symbol_data[symbol] = Symbol(symbol,support,resistence,stats,self.pipe_ppro_out)  #register in Symbol.
+							self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats,self.pipe_ppro_out)  #register in Symbol.
 							self.symbols.append(symbol)
-						#self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
-							
 
 						#######################################################################
 
-						#def __init__(self,name:"",symbol:Symbol,entry_plan=None,manage_plan=None,support=0,resistence=0,risk=None,TEST_MODE=False,algo_name="",Manager=None):
-
 						self.tradingplan[symbol] = TradingPlan(name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
-						self.ui.create_new_single_entry(self.tradingplan[symbol],type_name,None)
+						#self.tradingplan[symbol]=TradingPlan(name,self.symbol_data[symbol],entryplan,INSTANT,mana,risk,0,TEST_MODE,algo_name,self)
+						self.ui.create_new_single_entry(self.tradingplan[symbol],type_name,replace_id)
+						#self.ui.create_single_entry(self.tradingplan[symbol],replace_id)
 
 						if status == True:
 							self.tradingplan[symbol].deploy(9600)
 					else:
-
-						find_ = False
-						replace_id = 0
-						for trade in self.tradingplan.values():
-
-							if (trade.tkvars[STATUS].get()==PENDING or trade.tkvars[STATUS].get()==DONE) and trade.pair_plan==False and trade.in_use ==True:
-								replace_id = trade.algo_ui_id
-								trade.deactive()
-								find_ = True
-								log_print("Replacing",trade.symbol_name,"replace_id")
-								break 
-						if find_:
-							if symbol not in self.symbol_data:
-								self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats,self.pipe_ppro_out)  #register in Symbol.
-								self.symbols.append(symbol)
-
-							#######################################################################
-
-							self.tradingplan[symbol] = TradingPlan(name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
-							#self.tradingplan[symbol]=TradingPlan(name,self.symbol_data[symbol],entryplan,INSTANT,mana,risk,0,TEST_MODE,algo_name,self)
-							self.ui.create_new_single_entry(self.tradingplan[symbol],type_name,replace_id)
-							#self.ui.create_single_entry(self.tradingplan[symbol],replace_id)
-
-							if status == True:
-								self.tradingplan[symbol].deploy(9600)
-						else:
-							log_print("System at full capacity.")
-
-						# now find an empty spot. 
+						log_print("System at full capacity.")
 
 
-				except Exception as e:
-
-					exc_type, exc_obj, exc_tb = sys.exc_info()
-					fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-					log_print("adding new tradingplan errors:",e,data,exc_type, fname, exc_tb.tb_lineno)
 
 
 
@@ -839,7 +825,7 @@ class Manager:
 						self.termination = False
 						self.ui.main_status["background"] = "red"
 				except Exception as e:
-					log_print(e)
+					PrintException(e,"msg error")
 			if d[0] =="pkg":
 				log_print("new package arrived",d)
 				for i in d[1]:
@@ -850,9 +836,8 @@ class Manager:
 					
 					except Exception as e:
 
-						exc_type, exc_obj, exc_tb = sys.exc_info()
-						fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-						log_print("adding algo errors:",e,i,exc_type, fname, exc_tb.tb_lineno)
+						PrintException(e,"adding algo error")
+
 
 	def ppro_order_confirmation(self,data):
 
@@ -889,7 +874,7 @@ class Manager:
 						self.pipe_ppro_out.send(["Register","QQQ.NQ"])
 						# re-register the symbols
 				except Exception as e:
-					PrintException("PPRO IN ERROR",e)
+					PrintException(e,"PPRO IN ERROR")
 
 			elif d[0] =="ppro_out":
 
@@ -901,7 +886,7 @@ class Manager:
 					else:
 						self.ui.ppro_status_out["background"] = "red"
 				except Exception as e:
-					PrintException("PPRO OUT ERROR",e)
+					PrintException(e,"PPRO OUT ERROR")
 
 			elif d[0] =="msg":
 				log_print(d[1])
@@ -926,8 +911,9 @@ class Manager:
 
 						elif side == SHORT:
 							self.symbol_data[symbol].holdings_update(price,-shares)
+
 				except	Exception	as e:
-					PrintException("Order confim error",e)
+					PrintException(e,"Order confim error")
 
 					#self.tradingplan[symbol].ppro_process_orders(price,shares,side)
 
@@ -950,7 +936,7 @@ class Manager:
 					if symbol in self.symbols:
 						self.symbol_data[symbol].update_price(bid,ask,ts)
 				except	Exception	as e:
-					PrintException("Order update error",e)
+					PrintException(e,"Order update error")
 				# if symbol in self.tradingplan:
 				# 	self.tradingplan[symbol].ppro_update_price(bid,ask,ts)
 
@@ -970,20 +956,20 @@ class Manager:
 						self.symbol_data[symbol].update_techindicators(techindicator)
 						self.symbol_data[symbol].update_price(bid,ask,ts)
 				except	Exception	as e:
-					PrintException("Order update error",e)
+					PrintException(e,"Order update error")
 				### UPDATE THE EMAs. 
 
 			elif d[0] =="order rejected":
   
-  				data = d[1]
+				data = d[1]
 
-  				symbol = data["symbol"]
-  				side = data["side"]
+				symbol = data["symbol"]
+				side = data["side"]
 
-  				try:
-  					self.symbol_data[symbol].rejection_message(side)
-				except	Exception	as e:
-					PrintException("Order rejection error",e)
+				try:
+					self.symbol_data[symbol].rejection_message(side)
+				except Exception as e:
+					PrintException(e,"Order rejection error")
 				# if symbol in self.tradingplan:
 				# 	self.tradingplan[symbol].ppro_order_rejection()
 
