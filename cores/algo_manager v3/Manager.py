@@ -1047,11 +1047,13 @@ class Manager:
 
 	def withdraw_all(self):
 		for d in self.tradingplan.values():
-			d.cancle_deployment()
+			if d.in_use:
+				d.cancle_deployment()
 
 	def flatten_all(self):
 		for d in self.tradingplan.values():
-			d.flatten_cmd()
+			if d.in_use:
+				d.flatten_cmd()
 
 	def trades_aggregation(self,side,action,percent,positive_pnl,passive):
 
