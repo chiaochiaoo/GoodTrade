@@ -2,7 +2,7 @@ from datetime import datetime
 
 import linecache
 import sys
-
+import os
 from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np
@@ -98,14 +98,17 @@ def graphweekly():
 	plt.tight_layout()
 	plt.show()
 	
-def PrintException(info):
-    exc_type, exc_obj, tb = sys.exc_info()
-    f = tb.tb_frame
-    lineno = tb.tb_lineno
-    filename = f.f_code.co_filename
-    linecache.checkcache(filename)
-    line = linecache.getline(filename, lineno, f.f_globals)
-    log_print (info+'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj))
+def PrintException(additional="ERROR",info):
+	# exc_type, exc_obj, tb = sys.exc_info()
+	# f = tb.tb_frame
+	# lineno = tb.tb_lineno
+	# filename = f.f_code.co_filename
+	# linecache.checkcache(filename)
+	# line = linecache.getline(filename, lineno, f.f_globals)
+	# log_print (info+'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj))
+	exc_type, exc_obj, exc_tb = sys.exc_info()
+	fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+	log_print(additional,info,exc_type, fname, exc_tb.tb_lineno)
 
 def log_print(*args):
 	"""My custom log_print() function."""
@@ -184,3 +187,5 @@ def hexcolor_red(level):
 # 		tk.Label(text="",background=hexcolor_red(i/10),width=10).grid(column=i,row=1)
 
 # 	root.mainloop()
+
+

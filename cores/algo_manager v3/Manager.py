@@ -889,7 +889,7 @@ class Manager:
 						self.pipe_ppro_out.send(["Register","QQQ.NQ"])
 						# re-register the symbols
 				except Exception as e:
-					log_print(e)
+					PrintException("PPRO IN ERROR",e)
 
 			elif d[0] =="ppro_out":
 
@@ -901,7 +901,7 @@ class Manager:
 					else:
 						self.ui.ppro_status_out["background"] = "red"
 				except Exception as e:
-					log_print(e)
+					PrintException("PPRO OUT ERROR",e)
 
 			elif d[0] =="msg":
 				log_print(d[1])
@@ -918,14 +918,16 @@ class Manager:
 
 				#print("HOLDING UPDATE",symbol,price,shares,side)
 
-				if symbol in self.symbols:
+				try:
+					if symbol in self.symbols:
 
-					if side == LONG:
-						self.symbol_data[symbol].holdings_update(price,shares)
+						if side == LONG:
+							self.symbol_data[symbol].holdings_update(price,shares)
 
-					elif side == SHORT:
-						self.symbol_data[symbol].holdings_update(price,-shares)
-
+						elif side == SHORT:
+							self.symbol_data[symbol].holdings_update(price,-shares)
+				except	Exception	as e:
+					PrintException("Order confim error",e)
 
 					#self.tradingplan[symbol].ppro_process_orders(price,shares,side)
 
@@ -944,9 +946,11 @@ class Manager:
 
 				#print(symbol,bid,ask,ts)
 
-				if symbol in self.symbols:
-					self.symbol_data[symbol].update_price(bid,ask,ts)
-
+				try:
+					if symbol in self.symbols:
+						self.symbol_data[symbol].update_price(bid,ask,ts)
+				except	Exception	as e:
+					PrintException("Order update error",e)
 				# if symbol in self.tradingplan:
 				# 	self.tradingplan[symbol].ppro_update_price(bid,ask,ts)
 
@@ -961,12 +965,12 @@ class Manager:
 				#print("update",symbol,bid,ask,ts)
 				#if symbol in self.tradingplan:
 
-
-				if symbol in self.symbols:
-					
-					self.symbol_data[symbol].update_techindicators(techindicator)
-					self.symbol_data[symbol].update_price(bid,ask,ts)
-
+				try:
+					if symbol in self.symbols:
+						self.symbol_data[symbol].update_techindicators(techindicator)
+						self.symbol_data[symbol].update_price(bid,ask,ts)
+				except	Exception	as e:
+					PrintException("Order update error",e)
 				### UPDATE THE EMAs. 
 
 			elif d[0] =="order rejected":
@@ -976,8 +980,10 @@ class Manager:
   				symbol = data["symbol"]
   				side = data["side"]
 
-  				self.symbol_data[symbol].rejection_message(side)
-
+  				try:
+  					self.symbol_data[symbol].rejection_message(side)
+				except	Exception	as e:
+					PrintException("Order rejection error",e)
 				# if symbol in self.tradingplan:
 				# 	self.tradingplan[symbol].ppro_order_rejection()
 
@@ -1385,7 +1391,7 @@ class Tester:
 					self.share = 0
 					self.pos =""
 			except Exception as e:
-				log_print(e)
+				PrintException(e)
 
 	def add1(self):
 		data = {}

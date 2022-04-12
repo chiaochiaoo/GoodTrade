@@ -74,10 +74,10 @@ class Symbol:
 
 		self.share_request = False
 
+		### NEED LOCK FOR EACH OF THESE
+
 		self.incoming_request = {}
-
 		self.tradingplans = {}
-
 		self.tradingplan_holdings = {}
 
 
@@ -178,7 +178,7 @@ class Symbol:
 		self.current_imbalance = remaining_share
 
 		if self.current_imbalance==0:
-			
+
 			self.share_request = False
 			self.passive_price = 0
 		
