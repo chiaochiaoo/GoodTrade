@@ -847,7 +847,7 @@ class Manager:
 					try:
 						self.add_new_tradingplan(i,self.test_mode)
 
-						
+					
 					except Exception as e:
 
 						exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -1202,6 +1202,7 @@ class Tester:
 
 		dic = {}
 
+		dic["algo_id"] = 'TEST'
 		dic["type_name"] = 'Single'
 		dic["algo_name"] = 'TEST'
 		dic["entry_type"] =INSTANTSHORT
@@ -1220,6 +1221,7 @@ class Tester:
 
 		dic = {}
 
+		dic["algo_id"] = 'TEST2'
 		dic["type_name"] = 'Pair'
 		dic["algo_name"] = 'TEST'
 		dic["symbol1"] ='SPY.AM'

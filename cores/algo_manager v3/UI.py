@@ -664,7 +664,7 @@ class UI(pannel):
 			tradingplan.update_displays()
 		else:
 
-			print("XXXXXXXXXXXXXXX using row number",row_number,self.pair_label_count)
+			#print("XXXXXXXXXXXXXXX using row number",row_number,self.pair_label_count)
 
 			if row_number==None:
 				# l = self.single_label_count
@@ -673,7 +673,7 @@ class UI(pannel):
 				row_number = l-1 #info[1]
 			
 
-			print("XXXXXXXXXXXXXXX using row number",row_number,self.pair_label_count)
+			#print("XXXXXXXXXXXXXXX using row number",row_number,self.pair_label_count)
 			#self.tk_labels_single[symbol] = {}
 
 			self.create_pair_entry(tradingplan, row_number)

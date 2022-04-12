@@ -207,15 +207,13 @@ class Symbol:
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second
 
-		
-
+	
 		order_process = False
 
 		if self.current_imbalance>0:
 
 			action = PASSIVEBUY
 			price = self.get_bid()
-			k = k *-1
 			if price >= self.passive_price+0.01*k or self.passive_price==0:
 				order_process = True
 		else:
@@ -225,12 +223,13 @@ class Symbol:
 			if price <= self.passive_price -0.01*k or self.passive_price==0:
 				order_process = True
 
-
+		print(order_process,ts-self.passive_request_ts)
 
 		if order_process and ts > self.passive_request_ts + DELAY:
 
 
 			self.passive_request_ts = ts
+
 			#step 1, cancel existing orders
 			self.ppro_out.send([CANCEL,self.ticker])
 			#step 2, placing around current.

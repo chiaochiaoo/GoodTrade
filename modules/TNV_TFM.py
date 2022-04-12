@@ -631,6 +631,8 @@ class SinlgeTrade():
 				for i in range(len(strs)):
 
 					msg+=strs[i]+str(vals[i])+","
+
+				print("HTTP REQUEST:",msg)
 				#[entryplan,symbol,support,resistence,risk,{},"deploy",management]
 				#self.tnv_scanner.send_algo(info)
 
