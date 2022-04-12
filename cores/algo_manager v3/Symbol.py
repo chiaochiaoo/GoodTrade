@@ -210,13 +210,13 @@ class Symbol:
 		order_process = False
 		if self.current_imbalance>0:
 			action = PASSIVEBUY
-			price = self.symbol.get_bid()
+			price = self.get_bid()
 
 			if price >= self.passive_price+0.01*k or self.passive_price==0:
 				order_process = True
 		else:
 			action = PASSIVESELL
-			price = self.symbol.get_ask()
+			price = self.get_ask()
 
 			if price <= self.passive_price -0.01*k or self.passive_price==0:
 				order_process = True
@@ -230,7 +230,6 @@ class Symbol:
 
 		if self.passive_position == BUY :
 
-			price = self.symbol.get_bid()
 			
 			#log_print(price,"last price",self.passive_price)
 			if price >= self.passive_price+0.01*k or self.passive_price==0:
@@ -270,7 +269,6 @@ class Symbol:
 
 		elif self.passive_position == SELL:
 
-			price = self.symbol.get_ask()
 
 			#log_print(price,"last price",self.passive_price)
 			if price <= self.passive_price -0.01*k or self.passive_price==0:
