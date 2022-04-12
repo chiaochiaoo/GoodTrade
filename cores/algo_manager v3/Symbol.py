@@ -2,6 +2,8 @@ from constant import *
 import tkinter as tk
 #from Triggers import *
 from Util_functions import *
+from datetime import datetime, timedelta
+
 
 def sign_test(a,b):
 
@@ -27,6 +29,7 @@ class Symbol:
 
 		self.ticker = symbol
 
+
 		self.init_open = False
 		self.init_high_low = False
 
@@ -49,6 +52,9 @@ class Symbol:
 		self.mind = None
 		self.mind_label = None
 
+
+		self.passive_request_ts = 0
+		self.passive_price = 0
 		"""
 		UPGRADED PARTS
 
@@ -91,6 +97,8 @@ class Symbol:
 		del self.incoming_request[name]
 		del self.tradingplans[name]
 
+
+	### PASSIVE/ACTIVE REQUEST ? ####
 	def new_request(self,tradingplan_name,shares,passive=""):
 
 		self.incoming_request[tradingplan_name] += shares 
@@ -109,6 +117,7 @@ class Symbol:
 		self.incoming_request[tradingplan_name] = 0
 
 
+	### RUN EVERY 3 SECONDS ###
 	def mutual_request_handler(self):
 
 		#lets say I hae -100 and +100. so they cancel each other out. 
@@ -167,15 +176,135 @@ class Symbol:
 		remaining_share = sum(self.incoming_request.values())
 		self.current_imbalance = remaining_share
 
-		if remaining_share==0:
+		if self.current_imbalance==0:
 			self.share_request = False
 		
 
 		else:
-			if remaining_share>0:
-				self.ppro_out.send([IOCBUY,self.ticker,abs(remaining_share),self.data[ASK]])
-			else:
-				self.ppro_out.send([IOCSELL,self.ticker,abs(remaining_share),self.data[BID]])
+
+			self.passive_orders()
+
+			# if remaining_share>0:
+			# 	self.ppro_out.send([IOCBUY,self.ticker,abs(remaining_share),self.data[ASK]])
+			# else:
+			# 	self.ppro_out.send([IOCSELL,self.ticker,abs(remaining_share),self.data[BID]])
+
+
+			## HERE USE PASSIVE ## 
+	def passive_orders(self):
+
+		# wait for at least 5 seconds since the last one 
+
+
+		coefficient = 0.01
+		k = self.get_bid()//100
+		if k==0: k = 1
+		
+		gap = (self.get_ask() -self.get_bid())
+		midpoint = round((self.get_ask() +self.get_bid())/2,2)
+
+		now = datetime.now()
+		ts = now.hour*3600 + now.minute*60 + now.second
+		self.passive_request_ts = ts
+
+		order_process = False
+		if self.current_imbalance>0:
+			action = PASSIVEBUY
+			price = self.symbol.get_bid()
+
+			if price >= self.passive_price+0.01*k or self.passive_price==0:
+				order_process = True
+		else:
+			action = PASSIVESELL
+			price = self.symbol.get_ask()
+
+			if price <= self.passive_price -0.01*k or self.passive_price==0:
+				order_process = True
+
+
+		
+
+
+
+
+
+		if self.passive_position == BUY :
+
+			price = self.symbol.get_bid()
+			
+			#log_print(price,"last price",self.passive_price)
+			if price >= self.passive_price+0.01*k or self.passive_price==0:
+
+				#step 1, cancel existing orders
+				self.ppro_out.send([CANCEL,self.ticker])
+				#step 2, placing around current.
+				#time.sleep(0.2)
+
+				if price<=10:
+					self.ppro_out.send([PASSIVEBUY,self.ticker,self.passive_remaining_shares,price])
+				else:
+
+					if self.passive_remaining_shares<=4:
+						self.ppro_out.send([PASSIVEBUY,self.ticker,self.passive_remaining_shares,price])
+					else:
+
+
+						share = self.passive_remaining_shares//2
+						remaning = self.passive_remaining_shares-share
+
+						# when big gap, one order on bid, one order on midpoint. 
+						if gap>=0.05:
+							self.ppro_out.send([PASSIVEBUY,self.ticker, remaning,price])
+							self.ppro_out.send([PASSIVEBUY,self.ticker,share,midpoint])
+
+						# when tight spread. just one on bid. 
+						elif gap<=0.01:
+							self.ppro_out.send([PASSIVEBUY,self.ticker,self.passive_remaining_shares,price])
+						else:
+							self.ppro_out.send([PASSIVEBUY,self.ticker, remaning,price])
+							self.ppro_out.send([PASSIVEBUY,self.ticker,share,round(price+0.01,2)])
+
+						#self.ppro_out.send([PASSIVEBUY,self.ticker,sharer,price-0.01*2*k])
+
+			self.passive_price = price
+
+		elif self.passive_position == SELL:
+
+			price = self.symbol.get_ask()
+
+			#log_print(price,"last price",self.passive_price)
+			if price <= self.passive_price -0.01*k or self.passive_price==0:
+
+				#step 1, cancel existing orders
+				self.ppro_out.send([CANCEL,self.ticker])
+				#step 2, placing around current.
+				#time.sleep(0.2)
+
+
+				if price<=10:
+					self.ppro_out.send([PASSIVESELL,self.ticker,self.passive_remaining_shares,price])
+				else:
+
+					if self.passive_remaining_shares<=4:
+						self.ppro_out.send([PASSIVESELL,self.ticker,self.passive_remaining_shares,price])
+					else:
+
+						share = self.passive_remaining_shares//2
+						remaning = self.passive_remaining_shares-share
+
+						if gap>=0.05:
+							self.ppro_out.send([PASSIVESELL,self.ticker, remaning,price])
+							self.ppro_out.send([PASSIVESELL,self.ticker,share,midpoint])
+							#price-0.01*k
+						# when tight spread. just one on bid. 
+						elif gap<=0.01:
+							self.ppro_out.send([PASSIVESELL,self.ticker,self.passive_remaining_shares,price])
+						else:
+							self.ppro_out.send([PASSIVESELL,self.ticker, remaning,price])
+							self.ppro_out.send([PASSIVESELL,self.ticker,share,round(price-0.01,2)])
+
+
+			self.passive_price = price
 
 	def incoming_shares_pairing(self):
 
@@ -267,7 +396,6 @@ class Symbol:
 			if val*coefficient >0:
 				self.tradingplans[tp].rejection_handling()
 
-
 	def pair_off(self,tp1,tp2):
 
 		#granted tp1 whatever it wants
@@ -290,7 +418,6 @@ class Symbol:
 
 		self.incoming_request[tp2] += self.incoming_request[tp1]
 		self.incoming_request[tp1] = 0
-
 
 
 	def set_data(self,support,resistence,stats):
