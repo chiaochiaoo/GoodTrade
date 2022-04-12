@@ -457,12 +457,14 @@ class TradingPlan:
 
 			log_print(self.name,"flattening")
 
-			if self.data[POSITION]==LONG:
-				self.symbol.new_request(self.name,-self.data[CURRENT_SHARE])
-			elif self.data[POSITION]==SHORT:
-				self.symbol.new_request(self.name,self.data[CURRENT_SHARE])
-			
+			self.flatten_cmd()
+			# xian zhan hou zou
 
+			# if self.data[POSITION]==LONG:
+			# 	self.symbol.new_request(self.name,-self.data[CURRENT_SHARE])
+			# elif self.data[POSITION]==SHORT:
+			# 	self.symbol.new_request(self.name,self.data[CURRENT_SHARE])
+			
 			#self.ppro_out.send(["Flatten",self.symbol_name])
 
 			#self.symbol.
@@ -718,9 +720,17 @@ class TradingPlan:
 		else:
 			# self.ppro_out.send(["Flatten",self.symbol_name])
 			if self.data[POSITION]==LONG:
-				self.symbol.new_request(self.name,-self.data[CURRENT_SHARE])
+				#self.symbol.new_request(self.name,-self.data[CURRENT_SHARE])
+				self.ppro_out.send([IOCSELL,self.ticker,abs(self.data[CURRENT_SHARE]),self.data[BID]])
+				self.symbol.cancel_all_request(self.name)
+				
 			elif self.data[POSITION]==SHORT:
-				self.symbol.new_request(self.name,self.data[CURRENT_SHARE])
+				#self.symbol.new_request(self.name,self.data[CURRENT_SHARE])
+				self.ppro_out.send([IOCBUY,self.ticker,abs(self.data[CURRENT_SHARE]),self.data[ASK]])
+				self.symbol.cancel_all_request(self.name)
+			# 	
+
+
 			
 
 	"""	UI related  """
@@ -845,7 +855,7 @@ class TradingPlan:
 
 	def cancel_algo(self):
 
-		self.cancel_all_request(self.name)
+		self.symbol.cancel_all_request(self.name)
 		if self.tkvars[STATUS].get()==PENDING:
 			self.mark_algo_status(CANCELED)
 
