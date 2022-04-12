@@ -714,8 +714,6 @@ class TradingPlan:
 			self.cancel_algo()
 		else:
 			# self.ppro_out.send(["Flatten",self.symbol_name])
-
-
 			if self.data[POSITION]==LONG:
 				self.symbol.new_request(self.name,-self.data[CURRENT_SHARE])
 			elif self.data[POSITION]==SHORT:
