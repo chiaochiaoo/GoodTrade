@@ -721,12 +721,12 @@ class TradingPlan:
 			# self.ppro_out.send(["Flatten",self.symbol_name])
 			if self.data[POSITION]==LONG:
 				#self.symbol.new_request(self.name,-self.data[CURRENT_SHARE])
-				self.symbol.ppro_out.send([IOCSELL,self.ticker,abs(self.data[CURRENT_SHARE]),self.data[BID]])
+				self.symbol.ppro_out.send([IOCSELL,self.symbol_name,abs(self.data[CURRENT_SHARE]),self.data[BID]])
 				self.symbol.cancel_all_request(self.name)
 
 			elif self.data[POSITION]==SHORT:
 				#self.symbol.new_request(self.name,self.data[CURRENT_SHARE])
-				self.symbol.ppro_out.send([IOCBUY,self.ticker,abs(self.data[CURRENT_SHARE]),self.data[ASK]])
+				self.symbol.ppro_out.send([IOCBUY,self.symbol_name,abs(self.data[CURRENT_SHARE]),self.data[ASK]])
 				self.symbol.cancel_all_request(self.name)
 			# 	
 
