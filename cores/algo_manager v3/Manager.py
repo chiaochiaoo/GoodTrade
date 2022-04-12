@@ -423,7 +423,7 @@ class Manager:
 		while True:
 			#create a cpy.
 
-			symbols = self.symbol_data.values()
+			symbols = list(self.symbol_data.values())
 			for val in symbols:
 
 				if val.share_request==True:
@@ -526,7 +526,7 @@ class Manager:
 					find_ = False
 					replace_id = 0
 
-					for trade in self.tradingplan.values():
+					for trade in list(self.tradingplan.values()):
 
 						if (trade.tkvars[STATUS].get()==PENDING or trade.tkvars[STATUS].get()==DONE) and trade.pair_plan==True and trade.in_use ==True:
 							replace_id = trade.algo_ui_id
@@ -600,7 +600,7 @@ class Manager:
 
 					find_ = False
 					replace_id = 0
-					for trade in self.tradingplan.values():
+					for trade in list(self.tradingplan.values()):
 
 						if (trade.tkvars[STATUS].get()==PENDING or trade.tkvars[STATUS].get()==DONE) and trade.pair_plan==False and trade.in_use ==True:
 							replace_id = trade.algo_ui_id
@@ -713,7 +713,7 @@ class Manager:
 
 
 
-		for trade in self.tradingplan.values():
+		for trade in list(self.tradingplan.values()):
 
 			if trade.data[STATUS] == RUNNING:
 				self.active_trade +=1 
@@ -1025,17 +1025,17 @@ class Manager:
 	# 		print("Already terminated or not connected")
 
 	def deploy_all(self):
-		for d in self.tradingplan.values():
+		for d in list(self.tradingplan.values()):
 			if d.in_use:
 				d.deploy()
 
 	def withdraw_all(self):
-		for d in self.tradingplan.values():
+		for d in list(self.tradingplan.values()):
 			if d.in_use:
 				d.cancle_deployment()
 
 	def flatten_all(self):
-		for d in self.tradingplan.values():
+		for d in list(self.tradingplan.values()):
 			if d.in_use and d.data[STATUS]==RUNNING:
 				d.flatten_cmd()
 
@@ -1049,7 +1049,7 @@ class Manager:
 		if diff>2:
 
 			log_print("All",side," ",action," ",percent*100,"%")
-			for d in self.tradingplan.values():
+			for d in list(self.tradingplan.values()):
 				if d.in_use and d.data[STATUS]==RUNNING:
 
 					if positive_pnl==True:
@@ -1066,7 +1066,7 @@ class Manager:
 		log_print("Trades aggregation under cooldown:",diff)
 
 	def cancel_all(self):
-		for d in self.tradingplan.values():
+		for d in list(self.tradingplan.values()):
 			d.cancel_algo()
 
 	def export_algos(self):
