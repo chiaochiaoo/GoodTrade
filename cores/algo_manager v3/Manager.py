@@ -421,7 +421,10 @@ class Manager:
 		#fro each of the symbols. look at imbalance. deal with it. 
 
 		while True:
-			for symbol,val in self.symbol_data.items():
+			#create a cpy.
+
+			symbols = self.symbol_data.values()
+			for val in symbols:
 
 				if val.share_request==True:
 					#print("handling ",symbol)
@@ -839,19 +842,7 @@ class Manager:
 						PrintException(e,"adding algo error")
 
 
-	def ppro_order_confirmation(self,data):
 
-		symbol = data["symbol"]
-		price = data["price"]
-		shares = data["shares"]
-		side = data["side"]
-
-		if symbol in self.tradingplan:
-			log_print("order",symbol,"side:",side,"shares",shares,"price",price)
-
-			self.tradingplan[symbol].ppro_process_orders(price,shares,side)
-		else:
-			log_print("irrelavant orders detected,",symbol,shares,side)
 
 	def ppro_in(self):
 		while True:
@@ -1769,3 +1760,16 @@ if __name__ == '__main__':
 
 
 
+	def ppro_order_confirmation(self,data):
+
+		symbol = data["symbol"]
+		price = data["price"]
+		shares = data["shares"]
+		side = data["side"]
+
+		if symbol in self.tradingplan:
+			log_print("order",symbol,"side:",side,"shares",shares,"price",price)
+
+			self.tradingplan[symbol].ppro_process_orders(price,shares,side)
+		else:
+			log_print("irrelavant orders detected,",symbol,shares,side)
