@@ -149,7 +149,7 @@ class Symbol:
 			remian_shares+=self.incoming_shares[i][1]
 
 		### STAGE 2 -> Unplaned user event handling 
-		print(remian_shares,self.incoming_shares)
+		#print(remian_shares,self.incoming_shares)
 
 		if remian_shares!=0:
 			self.unplan_shares_pairing()
@@ -178,6 +178,7 @@ class Symbol:
 		self.current_imbalance = remaining_share
 
 		if self.current_imbalance==0:
+			
 			self.share_request = False
 			self.passive_price = 0
 		
@@ -228,7 +229,7 @@ class Symbol:
 			if price <= self.passive_price -0.01*k or self.passive_price==0:
 				order_process = True
 
-		print(order_process,ts-self.passive_request_ts)
+		#print(order_process,ts-self.passive_request_ts)
 
 		if order_process and ts > self.passive_request_ts + DELAY:
 

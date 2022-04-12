@@ -654,21 +654,22 @@ class TradingPlan:
 				shares = 1
 
 			if action ==ADD:
+				coefficient = 1
 				if self.data[POSITION] == LONG:
 					pproaction = BUY
-					coefficient =1 
+					#coefficient =1 
 				elif self.data[POSITION] == SHORT:
 					pproaction = SELL
-					coefficient = -1
+					#coefficient = -1
 
 			elif action ==MINUS:
 				coefficient = -1
 				if self.data[POSITION] == LONG:
 					pproaction = SELL
-					coefficient = -1
+					#coefficient = -1
 				elif self.data[POSITION] == SHORT:
 					pproaction = BUY
-					coefficient = 1
+					#coefficient = 1
 
 
 			description = "Trades aggregation"

@@ -1053,7 +1053,7 @@ class Manager:
 
 	def flatten_all(self):
 		for d in self.tradingplan.values():
-			if d.in_use:
+			if d.in_use and d.data[STATUS]==RUNNING:
 				d.flatten_cmd()
 
 	def trades_aggregation(self,side,action,percent,positive_pnl,passive):
@@ -1067,15 +1067,17 @@ class Manager:
 
 			log_print("All",side," ",action," ",percent*100,"%")
 			for d in self.tradingplan.values():
-				if positive_pnl==True:
-					if d.data[UNREAL] >0:
-						print(d.data[UNREAL])
+				if d.in_use and d.data[STATUS]==RUNNING:
 
-						#side = d.data[POSITION]
+					if positive_pnl==True:
+						if d.data[UNREAL] >0:
+							#print(d.data[UNREAL])
+
+							#side = d.data[POSITION]
+							d.manage_trades(side,action,percent,passive)
+					else:
+
 						d.manage_trades(side,action,percent,passive)
-				else:
-
-					d.manage_trades(side,action,percent,passive)
 
 			self.manage_lock = ts
 		log_print("Trades aggregation under cooldown:",diff)
