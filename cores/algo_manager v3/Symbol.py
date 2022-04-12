@@ -182,12 +182,12 @@ class Symbol:
 
 		else:
 
-			self.passive_orders()
+			#self.passive_orders()
 
-			# if remaining_share>0:
-			# 	self.ppro_out.send([IOCBUY,self.ticker,abs(remaining_share),self.data[ASK]])
-			# else:
-			# 	self.ppro_out.send([IOCSELL,self.ticker,abs(remaining_share),self.data[BID]])
+			if remaining_share>0:
+				self.ppro_out.send([IOCBUY,self.ticker,abs(remaining_share),self.data[ASK]])
+			else:
+				self.ppro_out.send([IOCSELL,self.ticker,abs(remaining_share),self.data[BID]])
 
 
 			## HERE USE PASSIVE ## 
