@@ -422,6 +422,28 @@ class PairTP:
 
 		self.mark_algo_status(REJECTED)
 
+	def rejection_handling(self):
+
+
+		### if have position, ignore. ###
+
+
+		### if no position, flatten. ###
+
+		if self.data[STATUS] == DEPLOYED:
+
+			# cancel whatever requested on symbol.
+
+			# withdraw the algo. 
+
+			# show rejection. 
+			pass
+			#self.symbol.cancel_all_request(self.name)
+			#self.mark_algo_status(REJECTED)
+
+		else:
+
+			log_print("rejection messge received on ",self.name)
 
 	""" Trade management """
 
