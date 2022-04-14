@@ -497,7 +497,8 @@ class Symbol:
 		#print(self.tradingplans.keys())
 
 
-		for tp,val in self.tradingplans.items():
+		tps = list(self.tradingplans.items())
+		for val in tps:
 			#print("tp update",tp)
 			#print(bid,ask,ts)
 			val.ppro_update_price(symbol=self.ticker,bid=bid,ask=ask,ts=ts)
