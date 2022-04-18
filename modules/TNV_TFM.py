@@ -11,7 +11,15 @@ import threading
 #from modules.pannel import *
 
 from tkinter import *
-from scipy.stats import pearsonr
+
+
+try:
+	from scipy.stats import pearsonr
+    #import numpy as np
+except ImportError:
+    pip.main(['install', 'scipy'])
+    from scipy.stats import pearsonr
+
 
 
 TRADETYPE = "Trade_type="
