@@ -497,7 +497,7 @@ class Symbol:
 		#print(self.tradingplans.keys())
 
 
-		tps = list(self.tradingplans.items())
+		tps = list(self.tradingplans.values())
 		for val in tps:
 			#print("tp update",tp)
 			#print(bid,ask,ts)
