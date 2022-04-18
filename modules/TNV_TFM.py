@@ -17,6 +17,7 @@ try:
 	from scipy.stats import pearsonr
     #import numpy as np
 except ImportError:
+	import pip
     pip.main(['install', 'scipy'])
     from scipy.stats import pearsonr
 
