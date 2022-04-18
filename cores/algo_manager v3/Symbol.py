@@ -262,7 +262,7 @@ class Symbol:
 
 				self.ppro_out.send([action,self.ticker,share,0])
 				#mid point. 
-				self.ppro_out.send([action,self.ticker,remaning,(spread//2)*coefficient*-1])
+				self.ppro_out.send([action,self.ticker,remaning,round((spread/2)*coefficient*-1,2)])
 
 
 
