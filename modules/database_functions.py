@@ -10,6 +10,7 @@ import numpy as np
 import pickle
 import socket
 
+
 try:
 	from finviz.screener import Screener
 except ImportError:
@@ -705,17 +706,22 @@ def database_service(response):
 		except Exception as e:
 			print(e)
 
+
+
+
 if __name__ == '__main__':
 
-	
+	symbol1 = "QQQ.NQ"
+	symbol2 = "SMH.s"
+	print(hedge_ratio(symbol1,symbol2))
 	# s = " Last updated 3/29/2021 20:18:00"
 	# print(s[-9:-3])
 
 	#print(database_handler(["OCGN"]))
 
-	symbol1,symbol2 = "SPY.AM/QQQ.NQ".split("/")
+	# symbol1,symbol2 = "SPY.AM/QQQ.NQ".split("/")
 
-	print(symbol1[:-3],symbol2[:-3])
+	# print(symbol1[:-3],symbol2[:-3])
 	#print("SPY.AM/QQQ.NQ".replace("/","_"))
 	#print(pair_form("SPY.AM","QQQ.NQ"))
 	
