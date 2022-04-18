@@ -91,7 +91,9 @@ class PairTrade():
 		self.correlation = tk.StringVar()
 		self.correlation_stability = tk.StringVar()
 
-		self.standard_risk = tk.StringVar()
+		self.expected_risk = tk.StringVar()
+
+		#self.standard_risk = tk.StringVar()
 
 		self.algo_risk = tk.DoubleVar(value=10)
 
@@ -99,7 +101,7 @@ class PairTrade():
 
 		self.side_options = ("Long", "Short")
 		self.type_options = ("Rightaway","Target")
-		self.management_options = ("1:2 Exprmntl","1:2 Wide","Fib Only","SemiManual","FullManual")
+		self.management_options = ("1:2 Exprmntl","Market Making","Fib Only","SemiManual","FullManual")
 
 		self.algo_placed = []
 		self.ts_location = 7
@@ -209,6 +211,11 @@ class PairTrade():
 		ttk.Label(frame, text="Correlation stb:").grid(sticky="w",column=col,row=row,padx=10)
 		ttk.Label(frame,textvariable=self.correlation_stability).grid(sticky="w",column=col+1,row=row,padx=10)
 
+		row += 1
+		#col = 1
+		ttk.Label(frame, text="15MIN Expected Risk:").grid(sticky="w",column=col,row=row,padx=10)
+		ttk.Label(frame,textvariable=self.expected_risk).grid(sticky="w",column=col+1,row=row,padx=10)
+
 
 	def trade_pannel(self,frame):
 
@@ -264,6 +271,7 @@ class PairTrade():
 		self.correlation.set(str(d["correlation_score"]))
 		self.correlation_stability.set(str(d["correlation_stability"]))
 
+		self.expected_risk.set(str(d["15M_expected_risk"]))
 
 	def entry_pannel(self,frame):
 
@@ -891,13 +899,58 @@ def hedge(p,q,interval,days):
     
     return d
 
+
+
+def compute_volatility(p,q,ratio,correlation):
+    
+    p=fetch_data_day_spread(p,15,5)
+    q=fetch_data_day_spread(q,15,5)
+    
+    pr = ratio[0]
+    qr = ratio[1]
+    
+    d1 = p.keys()
+    d2 = q.keys()
+    dates = list(set(d1) & set(d2))#[0]
+    dates = list(d1)
+    
+    ts = [i for i in range(570,960)]
+    
+    d = {}
+    coefficient = 1
+    
+    if correlation>0:
+        coefficient = 1
+    else:
+        coefficient = -1
+    
+    diff = []
+    for day in dates:
+        for i in ts:
+            if i in p[day]['ts'] and i in q[day]['ts']:
+                
+                idx1 = p[day]['ts'].index(i)
+                idx2 = p[day]['ts'].index(i)
+                
+
+                l = (p[day]['closes'][idx1] -p[day]['opens'][idx2])*pr
+                s = coefficient*(q[day]['opens'][idx1] -q[day]['closes'][idx2]) *qr
+                
+                diff.append(abs(l+s))
+                
+    q75, q25 = np.percentile(diff, [75 ,25])
+    diff = np.array(diff)
+    new = round(np.mean(diff[np.where((diff>=q25) & (diff<=q75))]),2)
+    
+    return new
+    
+    
 def hedge_ratio(p,q):
     
     x1 = hedge(p,q,5,5)
     x2 = hedge(p,q,10,5)
     x3 = hedge(p,q,15,5)
-    
-    
+
     p_price,q_price = x1["p_price"],x1["q_price"]
     lst = [x1,x2,x3]
     
@@ -924,6 +977,7 @@ def hedge_ratio(p,q):
     data["correlation_score"] =   round(np.mean(correlation),2)  
     data["correlation_stability"] = round(1-(np.std(hedge_ratio)/np.mean(correlation)),2)
        
+    data["15M_expected_risk"] = compute_volatility(p,q,ratio,data["correlation_score"])
 #     data["hedge_sigma"] = 
 
     return data
@@ -1037,9 +1091,9 @@ if __name__ == '__main__':
 
 	TFM(root,None)
 
-	# symbol1 = "QQQ.NQ"
-	# symbol2 = "SMH.s"
-	# print(hedge_ratio(symbol1,symbol2))
+	symbol1 = "JETS.AM"
+	symbol2 = "SPY.AM"
+	print(hedge_ratio(symbol1,symbol2))
 
 	root.mainloop()
 
