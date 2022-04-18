@@ -399,7 +399,8 @@ class Manager:
 
 		#if Testerx==True:
 		
-		self.pipe_ppro_out.send(["Register","QQQ.NQ"])
+		self.pipe_ppro_out.send(["Register","TQQQ.NQ"])
+		self.pipe_ppro_out.send(["Register","SQQQ.NQ"])
 
 	#data part, UI part
 
@@ -862,7 +863,7 @@ class Manager:
 
 						for symbol in self.symbols:
 							self.pipe_ppro_out.send(["Register",symbol])
-						self.pipe_ppro_out.send(["Register","QQQ.NQ"])
+						self.pipe_ppro_out.send(["Register","TQQQ.NQ"])
 						# re-register the symbols
 				except Exception as e:
 					PrintException(e,"PPRO IN ERROR")
@@ -1710,7 +1711,7 @@ if __name__ == '__main__':
 
 
 	root = tk.Tk()
-	root.title("GoodTrade Algo Manager v3 Pair_trading & Trade_Stacking b1 ")
+	root.title("GoodTrade Algo Manager v3 b2 ")
 	root.geometry("1500x1000")
 
 	manager=Manager(root,goodtrade_pipe,ppro_out,ppro_in,TEST)
