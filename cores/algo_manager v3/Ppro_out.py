@@ -175,30 +175,61 @@ def sell_limit_order(symbol, price,share,gateway=0):
 
 	return r,sucess,failure
 
-def passive_buy(symbol	,share,price):
 
-	price = round(float(price),2)
+
+
+def passive_buy(symbol	,share,offset):
+
+	
 
 	# BATS Buy BATSPostOnly Limit DAY
 	# MEMX Buy MEMX Limit Visible DAY PostOnly
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit Visible DAY PostOnly&shares='+str(share)
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Buy MEMX Pegged Near DAY MidPoint&shares='+str(share)
 	sucess='passive buy limit order success on'+symbol
 	failure="Error passive buy limit order on"+symbol
 
 	return r,sucess,failure
 
-def passive_sell(symbol	,share,price):
+def passive_sell(symbol	,share,offset):
 
-	price = round(float(price),2)
+
 
 	# MEMX Sell->Short MEMX Limit Visible DAY PostOnly
 	# BATS Sell->Short BATSPostOnly Limit DAY
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit Visible DAY PostOnly&shares='+str(share)
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Sell->Short MEMX Pegged Near DAY MidPoint&shares='+str(share)
 
 	sucess='passive sell limit order success on'+symbol
 	failure="Error passive sell limit order on"+symbol
 
 	return r,sucess,failure
+
+
+# def passive_buy(symbol	,share,price):
+
+# 	price = round(float(price),2)
+
+# 	# BATS Buy BATSPostOnly Limit DAY
+# 	# MEMX Buy MEMX Limit Visible DAY PostOnly
+# 	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit Visible DAY PostOnly&shares='+str(share)
+# 	sucess='passive buy limit order success on'+symbol
+# 	failure="Error passive buy limit order on"+symbol
+
+# 	return r,sucess,failure
+
+# def passive_sell(symbol	,share,price):
+
+# 	price = round(float(price),2)
+
+# 	# MEMX Sell->Short MEMX Limit Visible DAY PostOnly
+# 	# BATS Sell->Short BATSPostOnly Limit DAY
+# 	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit Visible DAY PostOnly&shares='+str(share)
+
+# 	sucess='passive sell limit order success on'+symbol
+# 	failure="Error passive sell limit order on"+symbol
+
+# 	return r,sucess,failure
+
+
 
 def buy_aggressive_limit_order(symbol,share,ask):
 
@@ -330,17 +361,17 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 
 				symbol = d[1]
 				share = d[2]
-				ask = d[3]
+				offset = d[3]
 
-				request_str,sucess_str,failure_str=passive_buy(symbol,share,ask)
+				request_str,sucess_str,failure_str=passive_buy(symbol,share,offset)
 
 			elif type_ == PASSIVESELL:
 
 				symbol = d[1]
 				share = d[2]
-				bid = d[3]
+				offset = d[3]
 
-				request_str,sucess_str,failure_str=passive_sell(symbol,share,bid)
+				request_str,sucess_str,failure_str=passive_sell(symbol,share,offset)
 
 			elif type_ ==BREAKUPBUY:
 				symbol = d[1]
