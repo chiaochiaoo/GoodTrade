@@ -198,9 +198,11 @@ def pair_form_B(p,q):
 	d2 = q.keys()
 	
 	dates = list(set(d1) & set(d2))#[0]
-	
-	dates = list(d1)#[:-1]
-	#print(dates)
+
+	dates = [i for i in d1 if i in dates ]
+	print(dates)
+	dates = dates[-6:-1]
+	print(dates)
 	
 	ts = [i for i in range(570,960)]
 	
@@ -352,9 +354,9 @@ def compute_volatility(p,q,ratio,correlation):
 	
 def hedge_ratio(p,q):
 	
-	x1 = hedge(p,q,5,5)
-	x2 = hedge(p,q,10,5)
-	x3 = hedge(p,q,15,5)
+	x1 = hedge(p,q,5,10)
+	x2 = hedge(p,q,10,10)
+	x3 = hedge(p,q,15,10)
 
 	p_price,q_price = x1["p_price"],x1["q_price"]
 	lst = [x1,x2,x3]
@@ -506,18 +508,18 @@ def get_ts(m):
 if __name__ == '__main__':
 
 
-	# symbol1 = "JETS.AM"
-	# symbol2 = "SPY.AM"
-	# print(hedge_ratio(symbol1,symbol2))
+	symbol1 = "JETS.AM"
+	symbol2 = "SPY.AM"
+	print(hedge_ratio(symbol1,symbol2))
 
 
 	#draw_pair("SPY","QQQ",(1,1))
 
 
-	reg = threading.Thread(target=draw_pair,args=("SPY","QQQ",(1,1),), daemon=True)
-	reg.start()
+	# reg = threading.Thread(target=draw_pair,args=("SPY","QQQ",1,1), daemon=True)
+	# reg.start()
 
-	while True:
+	# while True:
 
-		print(2)
-		time.sleep(1)
+	# 	print(2)
+	# 	time.sleep(1)
