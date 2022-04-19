@@ -13,6 +13,8 @@ import threading
 from tkinter import *
 
 
+from pair_processing import *
+
 try:
 	from scipy.stats import pearsonr
 	#import numpy as np
@@ -20,6 +22,16 @@ except ImportError:
 	import pip
 	pip.main(['install', 'scipy'])
 	from scipy.stats import pearsonr
+
+
+try:
+	import mplfinance as mpf
+	#import numpy as np
+except ImportError:
+	import pip
+	pip.main(['install', 'mplfinance'])
+	import mplfinance as mpf
+
 
 
 
@@ -775,6 +787,7 @@ class SinlgeTrade():
 # SIDE =  "Side="
 # DEPLOY = "Deploy="
 # MANAGEMENT = "Management="
+
 
 def fetch_data_day_spread(symbol,interval,day):
 
