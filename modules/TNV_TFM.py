@@ -118,7 +118,7 @@ class PairTrade():
 
 		self.algo_risk = tk.DoubleVar(value=10)
 
-		self.file = "signals/open_resersal_"+datetime.now().strftime("%m-%d")+".csv"
+		self.file = ""#"signals/open_resersal_"+datetime.now().strftime("%m-%d")+".csv"
 
 		self.side_options = ("Long", "Short")
 		self.type_options = ("Rightaway","Target")
@@ -482,7 +482,7 @@ class SinlgeTrade():
 		self.symbol = tk.StringVar()
 		self.algo_risk = tk.DoubleVar(value=10)
 
-		self.file = "signals/open_resersal_"+datetime.now().strftime("%m-%d")+".csv"
+		self.file = ""#"signals/open_resersal_"+datetime.now().strftime("%m-%d")+".csv"
 
 		self.side_options = ("Long", "Short")
 		self.type_options = ("Rightaway","Target")

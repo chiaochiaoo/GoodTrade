@@ -6,7 +6,8 @@ import time
 import datetime
 import requests
 import numpy as np
-import threading
+
+
 #from pannel import *
 #from modules.pannel import *
 
@@ -20,6 +21,7 @@ except ImportError:
 	pip.main(['install', 'scipy'])
 	from scipy.stats import pearsonr
 
+import json
 
 try:
 	import mplfinance as mpf
@@ -68,65 +70,104 @@ def ts_to_min(ts):
 	return str(m)+":"+str(s)
 
 
-def fetch_data_day(symbol1,symbol2):
 
-    req = symbol.split(".")[0]
-    i = symbol
-    v= [38, 117, 115, 101, 114, 61, 115, 97, 106, 97, 108, 105, 50, 54, 64, 104, 111, 116, 109, 97, 105, 108, 46, 99, 111, 109, 38, 112, 97, 115, 115, 119, 111, 114, 100, 61, 103, 117, 117, 112, 117, 52, 117, 112, 117]
 
-    postbody = "http://api.kibot.com/?action=history&symbol="+req+"&interval=5&period="+str(day)+"&regularsession=1" +l(v)
+def draw_pair(symbol1,symbol2,ratio):
 
-    r= request(postbody, symbol)
-    
-    
-    total = []
-    keylevels = [{}]
-    
-    cur_date = []
-    
-    init = True
-    x=[]
-    le={}
-    for i in r.splitlines():
-        
-        v  = i.split(",")
-        
-        if init==True:
-            day = str(v[0])    
-            init = False
-            
-        if day != str(v[0]):
-            
-            day = str(v[0])
-            df = pd.DataFrame(columns=["Date","Open","High","Low","Close","Volume"],data=x)
-            df["Date"] = pd.DatetimeIndex(df['Date'])
-            df =df.set_index("Date")
-            
-            if len(total)>0:
-                le["high"] = max(total[-1]["High"])
-                le["low"] = min(total[-1]["Low"])
-                keylevels.append(le)
-                le={}
-            total.append(df)
+	sr1 = ratio[0]
+	sr2 = ratio[1]
 
-            x=[]
-            
-            
-        t = [datetime.datetime.strptime(str(v[0])+" "+str(v[1]),'%m/%d/%Y %H:%M')]
-        t.extend([float(i) for i in v[2:]])         
-        x.append(t)
-    
-    df = pd.DataFrame(columns=["Date","Open","High","Low","Close","Volume"],data=x)
-    df["Date"] = pd.DatetimeIndex(df['Date'])
-    df =df.set_index("Date")
+	url = "https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-chart"
 
-    if len(total)>0:
-        le["high"] = max(total[-1]["High"])
-        le["low"] = min(total[-1]["Low"])
-        keylevels.append(le)
-    total.append(df)
+	querystring1 = {"region":"US","interval":"5m","symbol":symbol1,"range":"1d"}
+	querystring2 = {"region":"US","interval":"5m","symbol":symbol2,"range":"1d"}
+	
+	headers = {
+		'x-rapidapi-host': "apidojo-yahoo-finance-v1.p.rapidapi.com",
+		'x-rapidapi-key': "0da8e9b784msh9001cc4bfc4e7e7p1c6d94jsna54c1aa52dbf"
+		}
 
-    return total,keylevels
+	response1 = requests.request("GET", url, headers=headers, params=querystring1)
+	response2 = requests.request("GET", url, headers=headers, params=querystring2)
+	res1 = json.loads(response1.text)
+	res2 = json.loads(response2.text)
+	#print(res)
+	
+	ts1 =[]
+
+	for i in res1['chart']['result'][0]['timestamp']:
+		ts1.append(datetime.datetime.fromtimestamp(i).strftime('%H:%M'))
+
+	ts2 =[]
+
+	for i in res2['chart']['result'][0]['timestamp']:
+		ts2.append(datetime.datetime.fromtimestamp(i).strftime('%H:%M'))     
+	
+	ts = list(set(ts1) & set(ts2))
+
+	ts = sorted([get_min(i) for i in ts])
+
+	#if it has 09:30. 
+	high,low = 0,0
+
+	open_ = []
+	close_ = []
+	ts_ = []
+	high_ = []
+	low_ = [] 
+
+	if 570 in ts:
+
+	    start1 = ts1.index(get_ts(570))
+	    start2 = ts2.index(get_ts(570))
+
+	    open_1 = np.log(res1['chart']['result'][0]['indicators']['quote'][0]["open"][start1])
+	    open_2 = np.log(res2['chart']['result'][0]['indicators']['quote'][0]["open"][start2])
+
+	    idx = np.where((np.array(ts)>570)&(np.array(ts)<900))[0]
+	    
+	    
+	    for i in idx:
+
+	        xo = res1['chart']['result'][0]['indicators']['quote'][0]["open"][ts1.index(get_ts(ts[i]))]
+	        yo = res2['chart']['result'][0]['indicators']['quote'][0]["open"][ts2.index(get_ts(ts[i]))]
+	        xc = res1['chart']['result'][0]['indicators']['quote'][0]["close"][ts1.index(get_ts(ts[i]))]
+	        yc = res2['chart']['result'][0]['indicators']['quote'][0]["close"][ts2.index(get_ts(ts[i]))]
+
+	        xh = res1['chart']['result'][0]['indicators']['quote'][0]["high"][ts1.index(get_ts(ts[i]))]
+	        yh = res2['chart']['result'][0]['indicators']['quote'][0]["high"][ts2.index(get_ts(ts[i]))]
+	        xl = res1['chart']['result'][0]['indicators']['quote'][0]["low"][ts1.index(get_ts(ts[i]))]
+	        yl = res2['chart']['result'][0]['indicators']['quote'][0]["low"][ts2.index(get_ts(ts[i]))]
+
+
+	        high_.append(float(xh*sr1 - yh*sr2))
+	        low_.append(float(xl*sr1 - yl*sr2))
+
+
+	        open_.append(float(xo*sr1 - yo*sr2))
+	        close_.append(float(xc*sr1 - yc*sr2))
+	        ts_.append(get_ts(ts[i]))
+
+
+	open_ = np.array(open_)
+	close_ = np.array(close_)
+	ts_ = np.array(ts_)
+	#print(open_.shape,close_.shape,ts_.shape)
+	x = np.array([ts_,open_,high_,low_,close_,[0 for i in range(len(close_))]])
+	
+	df = pd.DataFrame(columns=["Date","Open","High","Low","Close","Volume"],data=x.T)
+	df["Date"] = pd.DatetimeIndex(df['Date'])
+
+	df['Open'] = df['Open'].astype(float, errors = 'raise')
+	df['High'] = df['High'].astype(float, errors = 'raise')
+	df['Low'] = df['Low'].astype(float, errors = 'raise')
+	df['Close'] = df['Close'].astype(float, errors = 'raise')
+	df['Volume'] = df['Volume'].astype(int, errors = 'raise')
+	df =df.set_index("Date")
+
+	mpf.plot(df,type='candle',figscale=1.2)
+
+
 
 def fetch_data_day_spread(symbol,interval,day):
 
@@ -259,7 +300,6 @@ def hedge(p,q,interval,days):
 	d["q_price"] = da[k]['q_price']
 	
 	return d
-
 
 
 def compute_volatility(p,q,ratio,correlation):
@@ -444,6 +484,21 @@ def get_min(time_str):
 
 	return ts
 
+def get_ts(m):
+	h = m//60
+	if h <10:
+		h = "0" + str(h)
+	else:
+		h = str(h)
+	m = m%60
+	if m <10:
+		m = "0" + str(m)
+	else:
+		m = str(m)        
+	
+	return str(h) + ":"+str(m)
+	
+
 if __name__ == '__main__':
 
 
@@ -452,7 +507,13 @@ if __name__ == '__main__':
 	# print(hedge_ratio(symbol1,symbol2))
 
 
-	d,k=fetch_data_day("USO",3)
-	mpf.plot(d[0],type='candle',figscale=1.2)
+	#draw_pair("SPY","QQQ",(1,1))
 
-	plt.show()
+
+	reg = threading.Thread(target=draw_pair,args=("SPY","QQQ",(1,1),), daemon=True)
+	reg.start()
+
+	while True:
+
+		print(2)
+		time.sleep(1)
