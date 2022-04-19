@@ -13,7 +13,7 @@ import threading
 from tkinter import *
 
 
-from pair_processing import *
+from modules.pair_processing import *
 
 try:
 	from scipy.stats import pearsonr
