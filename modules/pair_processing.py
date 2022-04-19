@@ -72,11 +72,15 @@ def ts_to_min(ts):
 
 
 
-def draw_pair(symbol1,symbol2,ratio):
+def draw_pair(symbol1,symbol2,sr1,sr2):
 
-	sr1 = ratio[0]
-	sr2 = ratio[1]
+	symbol1 = symbol1[:-3]
+	symbol2 = symbol2[:-3]
 
+	sr1 = sr1
+	sr2 = sr2
+
+	print(symbol1,symbol2,sr1,sr2)
 	url = "https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-chart"
 
 	querystring1 = {"region":"US","interval":"5m","symbol":symbol1,"range":"1d"}
