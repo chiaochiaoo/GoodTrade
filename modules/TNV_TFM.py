@@ -393,7 +393,7 @@ class PairTrade():
 
 
 		#check, symbol, risk. type. timing / price, 
-		now = datetime.now()
+		now = datetime.datetime.now()
 		ts = now.hour*60+now.minute+now.second
 		try:
 			symbol1 = self.symbol1.get().upper()
@@ -677,7 +677,7 @@ class SinlgeTrade():
 
 
 		#check, symbol, risk. type. timing / price, 
-		now = datetime.now()
+		now = datetime.datetime.now()
 		ts = now.hour*60+now.minute+now.second
 
 		try:
