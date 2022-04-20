@@ -42,7 +42,7 @@ yahoo_same_time = 0
 global all_ts
 all_ts = np.array([570+i for i in range(391)])
 
-TEST = False
+TEST = True
 ##################################################################
 ####  pipe in, symbol. if symbol not reg, reg. if reg, dereg  ####
 ####  main loop. for each reg, thread out and return.		  ####
