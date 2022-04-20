@@ -170,7 +170,7 @@ def draw_pair(symbol1,symbol2,sr1,sr2):
 	df =df.set_index("Date")
 
 	mpf.plot(df,type='candle',figscale=1.2)
-	
+
 	return df
 
 def mpf_plot(df):
@@ -205,9 +205,9 @@ def pair_form_B(p,q):
 	dates = list(set(d1) & set(d2))#[0]
 
 	dates = [i for i in d1 if i in dates ]
-	print(dates)
+	#print(dates)
 	dates = dates[-6:-1]
-	print(dates)
+	#print(dates)
 	
 	ts = [i for i in range(570,960)]
 	
