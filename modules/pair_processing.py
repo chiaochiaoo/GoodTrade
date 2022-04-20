@@ -80,7 +80,7 @@ def draw_pair(symbol1,symbol2,sr1,sr2):
 	sr1 = sr1
 	sr2 = sr2
 
-	print(symbol1,symbol2,sr1,sr2)
+	#print(symbol1,symbol2,sr1,sr2)
 	url = "https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-chart"
 
 	querystring1 = {"region":"US","interval":"5m","symbol":symbol1,"range":"1d"}
@@ -169,6 +169,11 @@ def draw_pair(symbol1,symbol2,sr1,sr2):
 	df['Volume'] = df['Volume'].astype(int, errors = 'raise')
 	df =df.set_index("Date")
 
+	mpf.plot(df,type='candle',figscale=1.2)
+	
+	return df
+
+def mpf_plot(df):
 	mpf.plot(df,type='candle',figscale=1.2)
 
 
@@ -508,12 +513,12 @@ def get_ts(m):
 if __name__ == '__main__':
 
 
-	symbol1 = "JETS.AM"
-	symbol2 = "SPY.AM"
-	print(hedge_ratio(symbol1,symbol2))
+	# symbol1 = "JETS.AM"
+	# symbol2 = "SPY.AM"
+	# print(hedge_ratio(symbol1,symbol2))
 
 
-	#draw_pair("SPY","QQQ",(1,1))
+	draw_pair("gld.am","gdx.nq",1,1)
 
 
 	# reg = threading.Thread(target=draw_pair,args=("SPY","QQQ",1,1), daemon=True)
