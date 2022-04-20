@@ -196,7 +196,6 @@ class Symbol:
 			## HERE USE PASSIVE ## 
 
 
-
 	def passive_orders(self):
 
 		DELAY = 5
@@ -246,7 +245,12 @@ class Symbol:
 			#time.sleep(0.2)
 
 			#case 1. tight spread. no midpoint possibility.
-			if spread <= 0.02:
+
+			if total_shares<=5:
+
+				self.ppro_out.send([action,self.ticker,total_shares,0])
+
+			elif spread <= 0.02:
 
 				share = total_shares//2
 				remaning = total_shares-share
@@ -255,7 +259,7 @@ class Symbol:
 				self.ppro_out.send([action,self.ticker,remaning,0.01*coefficient])
 
 
-			if spread >= 0.03:
+			elif spread >= 0.03:
 
 				share = total_shares//2
 				remaning = total_shares-share
@@ -268,89 +272,6 @@ class Symbol:
 
 			self.passive_price = price
 
-
-	# def passive_orders(self):
-
-	# 	# wait for at least 5 seconds since the last one 
-
-	# 	DELAY = 5
-
-	# 	coefficient = 0.01
-	# 	k = self.get_bid()//100
-	# 	if k==0: k = 1
-		
-	# 	gap = (self.get_ask() -self.get_bid())
-	# 	midpoint = round((self.get_ask() +self.get_bid())/2,2)
-
-	# 	spread = self.get_ask() +self.get_bid()
-
-	# 	now = datetime.now()
-	# 	ts = now.hour*3600 + now.minute*60 + now.second
-
-	
-	# 	order_process = False
-
-	# 	# PRICE IS NOW THE OFFSET.
-	# 	# LONG: use - if 0.01, if gap, can be slightly aggresive.
-	# 	# SHORT: use + to lift it. 
-
-	# 	if self.current_imbalance>0:
-
-	# 		action = PASSIVEBUY
-	# 		price = self.get_bid()
-
-	# 		if price >= self.passive_price+0.01*k or self.passive_price==0:
-	# 			order_process = True
-
-
-	# 	else:
-	# 		action = PASSIVESELL
-	# 		price = self.get_ask()
-
-	# 		if price <= self.passive_price -0.01*k or self.passive_price==0:
-	# 			order_process = True
-
-	# 	#print(order_process,ts-self.passive_request_ts)
-
-	# 	if order_process and ts > self.passive_request_ts + DELAY:
-
-
-	# 		total_shares = abs(self.current_imbalance)
-
-	# 		self.passive_request_ts = ts
-
-	# 		#step 1, cancel existing orders
-	# 		self.ppro_out.send([CANCEL,self.ticker])
-	# 		#step 2, placing around current.
-	# 		#time.sleep(0.2)
-
-	# 		if price<=10:
-	# 			self.ppro_out.send([action,self.ticker,total_shares,price])
-	# 		else:
-
-	# 			if total_shares<=4:
-	# 				self.ppro_out.send([action,self.ticker,total_shares,price])
-	# 			else:
-
-
-	# 				share = total_shares//2
-	# 				remaning = total_shares-share
-
-	# 				# when big gap, one order on bid, one order on midpoint. 
-	# 				if gap>=0.05:
-	# 					self.ppro_out.send([action,self.ticker, remaning,price])
-	# 					self.ppro_out.send([action,self.ticker,share,midpoint])
-
-	# 				# when tight spread. just one on bid. 
-	# 				elif gap<=0.01:
-	# 					self.ppro_out.send([action,self.ticker,total_shares,price])
-	# 				else:
-	# 					self.ppro_out.send([action,self.ticker, remaning,price])
-	# 					self.ppro_out.send([action,self.ticker,share,round(price+0.01*k,2)])
-
-	# 				#self.ppro_out.send([PASSIVEBUY,self.ticker,sharer,price-0.01*2*k])
-
-	# 	self.passive_price = price
 
 
 	def incoming_shares_pairing(self):
@@ -508,62 +429,6 @@ class Symbol:
 	def get_name(self):
 		return self.ticker
 
-	# def set_mind_object(self):
-	# 	try:
-	# 		self.mind = self.tradingplan.tkvars[MIND]
-	# 		self.mind_label = self.tradingplan.tklabels[MIND]
-	# 	except:
-	# 		pass
-
-	# def set_tradingplan(self,tradingplan):
-	# 	self.tradingplan = tradingplan
-
-	# def set_mind(self,str,color=DEFAULT):
-
-	# 	try:
-	# 		if self.mind==None:
-	# 			self.set_mind_object()
-	# 		if self.mind!=None and self.mind_label !=None:
-	# 			self.mind.set(str)
-	# 			self.mind_label["background"]=color
-	# 	except:
-	# 		pass
-
-	# def false_range_detection(self,bid,ask,ts):
-
-	# 	#init
-	# 	if self.init_ts==0:
-	# 		self.init_ts = ts
-
-	# 	if self.tradingplan.tkvars[STATUS].get()==PENDING:
-
-	# 		if self.seen_low==0 and self.seen_high==0:
-	# 			self.seen_low = bid
-	# 			self.seen_high = ask
-	# 			self.set_mind("FRD: InProgress",DEFAULT)
-
-	# 		if ask>self.seen_high:
-	# 			self.seen_high = ask
-	# 		if bid<self.seen_low:
-	# 			self.seen_low = bid 
-
-	# 		if ts - self.init_ts >=900:
-	# 			s = ((self.seen_low-self.data[SUPPORT])/self.data[SUPPORT])
-	# 			r =  ((self.data[RESISTENCE]-self.seen_high)/self.seen_high)
-	# 			if s>0.004:
-	# 				self.set_mind("FRD: abnormal support",YELLOW)
-	# 			elif r>0.004:
-	# 				self.set_mind("FRD: abnormal resistence",YELLOW)
-	# 			elif s>0.004 and r>0.004:
-	# 				self.set_mind("FRD: abnormal both levels",YELLOW)
-	# 			else:
-	# 				self.set_mind("FRD: GOOD",VERYLIGHTGREEN)
-
-	# 		self.last_ts = ts
-
-
-		#descrepancy. 			
-
 
 	def update_price(self,bid,ask,ts):
 
@@ -580,7 +445,7 @@ class Symbol:
 
 		tps = list(self.tradingplans.values())
 		for val in tps:
-			#print("tp update",tp)
+			#print("tp update",val,bid,ask,ts)
 			#print(bid,ask,ts)
 			val.ppro_update_price(symbol=self.ticker,bid=bid,ask=ask,ts=ts)
 
