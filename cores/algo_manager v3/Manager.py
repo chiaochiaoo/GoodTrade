@@ -521,7 +521,7 @@ class Manager:
 
 					self.ui.create_new_single_entry(self.tradingplan[name],type_name,None)
 
-					#self.tradingplan[name].deploy(9600)
+					self.tradingplan[name].deploy(9600)
 				else:
 
 					find_ = False
@@ -555,6 +555,8 @@ class Manager:
 						self.tradingplan[name] = PairTP(name,self.symbol_data[symbol1],self.symbol_data[symbol2],symbol1_share,symbol2_share,mana,risk,TEST_MODE,algo_name,self)
 
 						self.ui.create_new_single_entry(self.tradingplan[name],type_name,replace_id)
+
+						self.tradingplan[name].deploy(9600)
 
 					else:
 
