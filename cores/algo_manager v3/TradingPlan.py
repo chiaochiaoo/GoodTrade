@@ -721,6 +721,7 @@ class TradingPlan:
 			# self.ppro_out.send(["Flatten",self.symbol_name])
 			if self.data[POSITION]==LONG:
 				#self.symbol.new_request(self.name,-self.data[CURRENT_SHARE])
+
 				self.symbol.ppro_out.send([IOCSELL,self.symbol_name,abs(self.data[CURRENT_SHARE]),self.symbol.get_bid()])
 				self.symbol.cancel_all_request(self.name)
 
@@ -729,6 +730,7 @@ class TradingPlan:
 				self.symbol.ppro_out.send([IOCBUY,self.symbol_name,abs(self.data[CURRENT_SHARE]),self.symbol.get_ask()])
 				self.symbol.cancel_all_request(self.name)
 			# 	
+			self.symbol.ppro_out.send([CANCEL,self.symbol_name])
 
 
 			
