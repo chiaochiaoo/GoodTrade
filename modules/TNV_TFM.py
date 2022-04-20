@@ -13,6 +13,8 @@ import threading
 from tkinter import *
 
 
+from modules.pair_processing import *
+
 try:
 	from scipy.stats import pearsonr
 	#import numpy as np
@@ -20,6 +22,16 @@ except ImportError:
 	import pip
 	pip.main(['install', 'scipy'])
 	from scipy.stats import pearsonr
+
+
+try:
+	import mplfinance as mpf
+	#import numpy as np
+except ImportError:
+	import pip
+	pip.main(['install', 'mplfinance'])
+	import mplfinance as mpf
+
 
 
 
@@ -95,6 +107,10 @@ class PairTrade():
 		self.symbol2_share = tk.IntVar()
 
 
+		self.xr = 0
+		self.yr = 0
+		self.cor = 0
+
 		self.hedge_ratio = tk.StringVar()
 		self.hedge_stability = tk.StringVar()
 		self.correlation = tk.StringVar()
@@ -106,7 +122,7 @@ class PairTrade():
 
 		self.algo_risk = tk.DoubleVar(value=10)
 
-		self.file = "signals/open_resersal_"+datetime.now().strftime("%m-%d")+".csv"
+		self.file = ""#"signals/open_resersal_"+datetime.now().strftime("%m-%d")+".csv"
 
 		self.side_options = ("Long", "Short")
 		self.type_options = ("Rightaway","Target")
@@ -265,22 +281,35 @@ class PairTrade():
 		row +=2
 		tk.Button(frame, text="Check",width=15,command=self.button).grid(row=row+1, column=col)#,command=self.rank
 
+		col +=1
+		tk.Button(frame, text="Plot",width=15,command=self.plot).grid(row=row+1, column=col)#,command=self.rank
 
 	def button(self):
 
 		reg = threading.Thread(target=self.info_set,args=(), daemon=True)
 		reg.start()
 
+	def plot(self):
+
+		symbol1,symbol2 = self.symbol1.get(),self.symbol2.get()
+
+		reg = threading.Thread(target=draw_pair,args=(symbol1,symbol2,self.xr,self.yr), daemon=True)
+		reg.start()
 
 	def info_set(self):
 
 		d=hedge_ratio(self.symbol1.get(),self.symbol2.get())
 		self.hedge_ratio.set(str(d["hedgeratio"]))
+
 		self.hedge_stability.set(str(d["hedgeratio_stability"]))
 		self.correlation.set(str(d["correlation_score"]))
 		self.correlation_stability.set(str(d["correlation_stability"]))
 
 		self.expected_risk.set(str(d["15M_expected_risk"]))
+
+		self.xr = d["hedgeratio"][0]
+		self.yr = d["hedgeratio"][1]
+		self.cor=d["correlation_score"]
 
 	def entry_pannel(self,frame):
 
@@ -364,7 +393,7 @@ class PairTrade():
 
 
 		#check, symbol, risk. type. timing / price, 
-		now = datetime.now()
+		now = datetime.datetime.now()
 		ts = now.hour*60+now.minute+now.second
 		try:
 			symbol1 = self.symbol1.get().upper()
@@ -470,7 +499,7 @@ class SinlgeTrade():
 		self.symbol = tk.StringVar()
 		self.algo_risk = tk.DoubleVar(value=10)
 
-		self.file = "signals/open_resersal_"+datetime.now().strftime("%m-%d")+".csv"
+		self.file = ""#"signals/open_resersal_"+datetime.now().strftime("%m-%d")+".csv"
 
 		self.side_options = ("Long", "Short")
 		self.type_options = ("Rightaway","Target")
@@ -648,7 +677,7 @@ class SinlgeTrade():
 
 
 		#check, symbol, risk. type. timing / price, 
-		now = datetime.now()
+		now = datetime.datetime.now()
 		ts = now.hour*60+now.minute+now.second
 
 		try:
@@ -775,6 +804,7 @@ class SinlgeTrade():
 # SIDE =  "Side="
 # DEPLOY = "Deploy="
 # MANAGEMENT = "Management="
+
 
 def fetch_data_day_spread(symbol,interval,day):
 
