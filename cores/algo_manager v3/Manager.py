@@ -398,7 +398,7 @@ class Manager:
 		timer.start()
 
 		#if Testerx==True:
-		
+		self.pipe_ppro_out.send(["Register","QQQ.NQ"])
 		self.pipe_ppro_out.send(["Register","TQQQ.NQ"])
 		self.pipe_ppro_out.send(["Register","SQQQ.NQ"])
 
@@ -864,6 +864,7 @@ class Manager:
 						for symbol in self.symbols:
 							self.pipe_ppro_out.send(["Register",symbol])
 						self.pipe_ppro_out.send(["Register","TQQQ.NQ"])
+						self.pipe_ppro_out.send(["Register","QQQ.NQ"])
 						# re-register the symbols
 				except Exception as e:
 					PrintException(e,"PPRO IN ERROR")
