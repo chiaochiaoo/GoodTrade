@@ -153,6 +153,14 @@ RIPSELL = "Ripsell"
 FADEANY = "FadeAny"
 BREAKFIRST = "BreakFirst"
 FREECONTROL = "FreeControl"
+
+
+####
+
+MARKETMAKING = "MarketMaking"
+PAIRONETOTWO = "PairOneToTwo"
+
+
 #MANA Plan
 NONE =          "NONE"
 THREE_TARGETS = "Three tgts "
