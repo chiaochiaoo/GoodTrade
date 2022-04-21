@@ -27,12 +27,22 @@ class Premarket_breakout():
 		self.l = 1
 		self.NT = NT
 		self.labels_width = [9,5,5,5,7,5,5,5,5,5,5,5,8,6,6,6,6]
-		self.labels = ["Symbol","Sector","SC%","Rel.V","Vol","PH","PL","Prange","Listed","Toggle","Add"]
+		self.labels = ["Symbol","Sector","SC%","Rel.V","YCR","PH","PL","Prange","Listed","Toggle","Add"]
 
 		self.management = tk.StringVar(value="1:2 Exprmntl")
 
 		self.algo_risk = tk.DoubleVar(value=10)
-		self.algo_activate = tk.BooleanVar(value=0)
+		self.algo_activate = tk.BooleanVar(value=False)
+
+
+		#conditional box
+		self.condition_sc = tk.BooleanVar(value=True)
+		self.condition_yc = tk.BooleanVar(value=True)
+
+		##############################
+		self.data = None
+
+		m=self.condition_yc .trace('w', lambda *_, data=self.data,: self.just_update_view(data))
 
 		self.fade = tk.BooleanVar(value=0)
 
@@ -56,6 +66,8 @@ class Premarket_breakout():
 
 		self.name = "Breakout"
 		self.toggle  = True
+
+		
 
 		self.file = "signals/open_resersal_"+datetime.now().strftime("%m-%d")+".csv"
 
@@ -268,6 +280,22 @@ class Premarket_breakout():
 		ttk.Checkbutton(frame, variable=self.fade).grid(sticky="w",column=col+1,row=row)
 
 
+		row = 3
+		col = 1
+		ttk.Label(frame, text="Conditions:").grid(sticky="w",column=col,row=row)
+		###
+		row = 4
+		col = 1
+		ttk.Label(frame, text="SC1%?:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(frame, variable=self.condition_sc).grid(sticky="w",column=col+1,row=row)
+
+
+		row = 4
+		col = 3
+		ttk.Label(frame, text="YC25%?:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(frame, variable=self.condition_yc).grid(sticky="w",column=col+1,row=row)
+
+
 		# row = 3
 		# col = 1
 		# ttk.Button(frame,text="Deploy now",command=self.rank).grid(sticky="w",column=col,row=row)
@@ -329,10 +357,65 @@ class Premarket_breakout():
 
 	#def deploy_now(self):
 
+	def just_update_view(self,data):
+
+		if data!=None:
+			data = self.filtering(data)
+
+			self.just_update(data)
+
+	def filtering(self,data):
+
+		if self.condition_yc.get()== True:
+			data =  data.loc[((data["ycr"]>=0.75)|(data["SC"]<=0.25))]
+			
+
+		return data
+
+
+	def just_update(self,data):
+		if len(data)>1:
+			if 1:
+				for index, row in df.iterrows():
+					#print(row)
+
+					#["Symbol","Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Ignore","Add"]
+					rank = index
+					sec = row['sector']
+					sc = row['SC']
+					relv = row['rrvol']
+					ycr = row['ycr']
+					ph = row['ph']
+					pl = row['pl']
+					pr = row['prange']
+
+					############ add since, and been to the thing #############
+
+					if self.NT != None:
+						if rank in self.NT.nasdaq_trader_symbols_ranking:
+							listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
+						else:
+							listed = "No"
+					else:
+						listed = "No"
+					#print(self.NT.nasdaq_trader_symbols)
+					if 1: #score>0:	
+
+						lst = [rank,sec,sc,relv,ycr,ph,pl,pr,listed]
+
+						ts_location = 7
+
+						for i in range(len(lst)):
+							self.entries[entry][i]["text"] = lst[i]
+
+
 	def update_entry(self,data):
 
 		#at most 8.
 		# ["Symbol","Vol","Rel.V","5M","10M","15M","SCORE","SC%","SO%","Listed","Ignore","Add"]
+
+		self.data = data
+
 
 		now = datetime.now()
 		ts = now.hour*60+now.minute
@@ -341,7 +424,7 @@ class Premarket_breakout():
 
 		end_timer = self.ehour.get()*60 + self.eminute.get()
 
-		df = data
+		df = self.filtering(data)
 
 		#timestamp = data[1]
 		#self.NT_stat["text"] = "Last update: "+timestamp
@@ -360,7 +443,7 @@ class Premarket_breakout():
 					sec = row['sector']
 					sc = row['SC']
 					relv = row['rrvol']
-					vol = row['volume']
+					ycr = row['ycr']
 					ph = row['ph']
 					pl = row['pl']
 					pr = row['prange']
@@ -377,7 +460,7 @@ class Premarket_breakout():
 					#print(self.NT.nasdaq_trader_symbols)
 					if 1: #score>0:	
 
-						lst = [rank,sec,sc,relv,vol,ph,pl,pr,listed]
+						lst = [rank,sec,sc,relv,ycr,ph,pl,pr,listed]
 
 						ts_location = 7
 
@@ -563,3 +646,21 @@ class Premarket_breakout():
 
 				self.send_group_algos(send_algo)
 
+class fake_NT():
+
+	def __init__(self):
+
+		self.nasdaq_trader_symbols_ranking=[]
+
+if __name__ == '__main__':
+
+	root = tk.Tk() 
+	root.title("GoodTrade v489") 
+	root.geometry("640x840")
+
+	#print(ratio_compute(0.8))
+	#print(ratio_compute(1.2))
+
+	Premarket_breakout(root,fake_NT(),None)
+
+	root.mainloop()
