@@ -1146,7 +1146,7 @@ if __name__ == '__main__':
 	root.geometry("1500x1000")
 
 	manager=Manager(root,goodtrade_pipe,ppro_out,ppro_in,TEST)
-	Tester(receive_pipe,ppro_pipe_end,ppro_pipe_end2)
+	#Tester(receive_pipe,ppro_pipe_end,ppro_pipe_end2)
 	print(len(sys.argv))
 	if len(sys.argv)==2:
 		BackTester(manager,receive_pipe,ppro_pipe_end,ppro_pipe_end2)
