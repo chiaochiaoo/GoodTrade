@@ -40,7 +40,7 @@ class Premarket_breakout():
 		self.condition_yc = tk.BooleanVar(value=True)
 
 		##############################
-		self.data = None
+		self.data = None #pd.read_csv("current.csv")
 
 		m=self.condition_yc .trace('w', lambda *_, data=self.data,: self.just_update_view(data))
 
@@ -359,24 +359,30 @@ class Premarket_breakout():
 
 	def just_update_view(self,data):
 
-		if data!=None:
+		#if not self.data==None:
+
+		try:
 			data = self.filtering(data)
 
 			self.just_update(data)
+		except Exception as  e:
+			print(e,"filtering issue")
+
 
 	def filtering(self,data):
 
 		if self.condition_yc.get()== True:
-			data =  data.loc[((data["ycr"]>=0.75)|(data["SC"]<=0.25))]
+			data =  data.loc[((data["ycr"]>=0.75)|(data["ycr"]<=0.25))]
 			
 
 		return data
 
 
 	def just_update(self,data):
+		entry = 0
 		if len(data)>1:
 			if 1:
-				for index, row in df.iterrows():
+				for index, row in data.iterrows():
 					#print(row)
 
 					#["Symbol","Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Ignore","Add"]
@@ -408,7 +414,9 @@ class Premarket_breakout():
 						for i in range(len(lst)):
 							self.entries[entry][i]["text"] = lst[i]
 
-
+						entry+=1
+						if entry ==30:
+							break
 	def update_entry(self,data):
 
 		#at most 8.
