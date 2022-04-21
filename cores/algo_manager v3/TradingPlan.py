@@ -462,7 +462,7 @@ class TradingPlan:
 			elif side == SHORT:
 				self.current_shares = self.current_shares - shares
 
-		log_print("load off:",self.data[CURRENT_SHARE],self.current_shares,shares)
+		log_print(self.name,"load off:",self.data[CURRENT_SHARE],self.current_shares,shares)
 		gain = 0
 
 		if self.data[POSITION] == LONG:
