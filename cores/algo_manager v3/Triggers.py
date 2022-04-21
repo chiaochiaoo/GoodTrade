@@ -1604,6 +1604,7 @@ class TwoToOneWideStopTrigger(AbstractTrigger):
 		elif self.strategy.orders_level ==3: level= TRIGGER_PRICE_3
 		elif self.strategy.orders_level ==4: level= TRIGGER_PRICE_4
 		elif self.strategy.orders_level ==5: level= TRIGGER_PRICE_5
+		elif self.strategy.orders_level >=6: self.deactivate()
 		# elif self.strategy.orders_level ==6: level= TRIGGER_PRICE_6
 		# elif self.strategy.orders_level ==7: level= TRIGGER_PRICE_7
 		# elif self.strategy.orders_level ==8: level= TRIGGER_PRICE_8
@@ -1654,7 +1655,8 @@ class TwoToOneWideStopTrigger(AbstractTrigger):
 			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[AVERAGE_PRICE])
 
 			#sell 25%. 
-			self.tradingplan.symbol.new_request(self.tradingplan.name,self.strategy.lot)
+			self.tradingplan.change_to_shares(self.strategy.lot)
+			#self.tradingplan.symbol.new_request(self.tradingplan.name,self.strategy.lot)
 
 		if self.strategy.orders_level == 2:
 			
@@ -1666,13 +1668,15 @@ class TwoToOneWideStopTrigger(AbstractTrigger):
 			# self.set_mind("Half risk",GREEN)
 
 			self.set_mind("Covered No."+str(1)+" lot.",GREEN)
-			self.tradingplan.symbol.new_request(self.tradingplan.name,self.strategy.lot)
+			self.tradingplan.change_to_shares(self.strategy.lot)
+			#self.tradingplan.symbol.new_request(self.tradingplan.name,self.strategy.lot)
 
 		if self.strategy.orders_level == 3:
 			
 			#BREAK EVEN
 			self.set_mind("Covered No."+str(2)+" lot.",GREEN)
-			self.tradingplan.symbol.new_request(self.tradingplan.name,self.strategy.lot)
+			self.tradingplan.change_to_shares(self.strategy.lot)
+			#self.tradingplan.symbol.new_request(self.tradingplan.name,self.strategy.lot)
 
 
 			
@@ -1680,7 +1684,8 @@ class TwoToOneWideStopTrigger(AbstractTrigger):
 		if self.strategy.orders_level == 4:
 
 			self.set_mind("Covered No."+str(3)+" lot.",GREEN)
-			self.tradingplan.symbol.new_request(self.tradingplan.name,self.strategy.lot)
+			self.tradingplan.change_to_shares(self.strategy.lot)
+			#self.tradingplan.symbol.new_request(self.tradingplan.name,self.strategy.lot)
 			
 
 
@@ -1694,9 +1699,11 @@ class TwoToOneWideStopTrigger(AbstractTrigger):
 
 			self.set_mind("Covered No."+str(4)+" lot.",GREEN)
 			if self.tradingplan.data[POSITION] == LONG:
-				self.tradingplan.symbol.new_request(self.tradingplan.name,self.tradingplan.data[CURRENT_SHARE]*-1)
+				self.tradingplan.submit_expected_shares(0)
+				#self.tradingplan.symbol.new_request(self.tradingplan.name,self.tradingplan.data[CURRENT_SHARE]*-1)
 			else:
-				self.tradingplan.symbol.new_request(self.tradingplan.name,self.tradingplan.data[CURRENT_SHARE])
+				self.tradingplan.submit_expected_shares(0)
+				#self.tradingplan.symbol.new_request(self.tradingplan.name,self.tradingplan.data[CURRENT_SHARE])
 
 
 			new_stop =round(self.tradingplan.data[TRIGGER_PRICE_3],2)
@@ -1849,7 +1856,8 @@ class SemiManualManager(AbstractTrigger):
 
 			#print(action,self.tradingplan.data[CURRENT_SHARE]//2," shares",self.tradingplan.data[TRIGGER_PRICE_2])
 
-			self.tradingplan.symbol.new_request(self.tradingplan.name,share)
+			self.tradingplan.change_to_shares(share)
+			#self.tradingplan.symbol.new_request(self.tradingplan.name,share)
 
 			#self.ppro_out.send([action,self.symbol_name,self.tradingplan.data[TRIGGER_PRICE_2],self.tradingplan.data[CURRENT_SHARE]//2,0,"Exit price "])
 			self.strategy.orders_level+=1
@@ -2248,132 +2256,3 @@ class EMTrigger(AbstractTrigger):
 		self.tradingplan.adjusting_risk()
 		self.tradingplan.update_displays()
 
-
-# class TwoToOneTrigger(AbstractTrigger):
-# 	#Special type of trigger, overwrites action part. everything else is generic.
-# 	def __init__(self,description,strategy):
-# 		super().__init__(description,None,trigger_timer=0,trigger_limit=9)
-
-# 		self.strategy =strategy
-# 		self.conditions = [] 
-
-# 		self.second_oders = {}
-# 		self.third_orders = {}
-
-# 	def set_orders(self,second,third):
-# 		self.second_oders = second
-# 		self.third_orders = third
-
-# 	def check_conditions(self):
-
-# 		level = ""
-
-# 		if self.strategy.orders_level ==1: level= TRIGGER_PRICE_1
-# 		elif self.strategy.orders_level ==2: level= TRIGGER_PRICE_2
-# 		elif self.strategy.orders_level ==3: level= TRIGGER_PRICE_3
-# 		elif self.strategy.orders_level ==4: level= TRIGGER_PRICE_4
-# 		elif self.strategy.orders_level ==5: level= TRIGGER_PRICE_5
-# 		# elif self.strategy.orders_level ==6: level= TRIGGER_PRICE_6
-# 		# elif self.strategy.orders_level ==7: level= TRIGGER_PRICE_7
-# 		# elif self.strategy.orders_level ==8: level= TRIGGER_PRICE_8
-# 		# elif self.strategy.orders_level ==9: level= TRIGGER_PRICE_9
-
-# 		if self.tradingplan.data[POSITION] == LONG:
-# 			self.conditions = [[SYMBOL_DATA,ASK,">",TP_DATA,level]]
-# 		elif self.tradingplan.data[POSITION] == SHORT:
-# 			self.conditions = [[SYMBOL_DATA,BID,"<",TP_DATA,level]]
-
-# 		#if self.tradingplan.data[POSITION]!="" and self.tradingplan.data[CURRENT_SHARE]>0:
-
-# 		if self.tradingplan.data[POSITION]!="":
-# 			return(super().check_conditions())
-
-# 		#add the actual stuff here.
-
-# 	def bring_up_stop(self,new_stop):
-
-# 		coefficient = 1
-# 		if self.tradingplan.data[POSITION] ==SHORT:
-# 			coefficient = -1
-
-# 		#print(new_stop,self.tradingplan.data[STOP_LEVEL])
-# 		if new_stop*coefficient >self.tradingplan.data[STOP_LEVEL]*coefficient:
-# 			self.tradingplan.data[STOP_LEVEL]=new_stop
-# 			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[STOP_LEVEL])
-
-# 		#print("new stop:",self.tradingplan.data[STOP_LEVEL])
-
-# 	def trigger_event(self):
-
-
-
-# 		if self.strategy.orders_level == 1:
-			
-# 			#75
-# 			pass
-# 			# new_stop = round((self.tradingplan.data[STOP_LEVEL]*3+self.tradingplan.data[AVERAGE_PRICE])/4,2)
-# 			# self.bring_up_stop(new_stop)
-
-# 			# self.set_mind("75% risk",GREEN)
-# 			self.strategy.deploy_n_batch_torpedoes(3)
-
-# 		if self.strategy.orders_level == 2:
-			
-# 			#BREAK EVEN
-# 			pass
-# 			# new_stop =round((self.tradingplan.data[STOP_LEVEL]*2+self.tradingplan.data[AVERAGE_PRICE])/3,2)
-# 			# self.bring_up_stop(new_stop)
-
-# 			# self.set_mind("Half risk",GREEN)
-
-# 		if self.strategy.orders_level == 3:
-			
-# 			#BREAK EVEN
-
-# 			new_stop =round(self.tradingplan.data[AVERAGE_PRICE],2)
-# 			self.bring_up_stop(new_stop)
-
-# 			self.set_mind("Break even",GREEN)
-
-# 		if self.strategy.orders_level == 4:
-
-# 			new_stop =round(self.tradingplan.data[AVERAGE_PRICE],2)
-# 			self.bring_up_stop(new_stop)
-
-# 			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
-# 			self.tradingplan.current_price_level = 2
-# 			self.set_mind("Covered No."+str(1)+" lot.",GREEN)
-
-# 		if self.strategy.orders_level == 5:
-# 			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
-
-# 			new_stop =round(self.tradingplan.data[TRIGGER_PRICE_3],2)
-# 			self.bring_up_stop(new_stop)
-			
-# 		if self.strategy.orders_level == 6:
-# 			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
-# 			self.tradingplan.current_price_level = 3
-# 			self.set_mind("Covered No."+str(2)+" lot.",GREEN)
-
-# 			new_stop =round(self.tradingplan.data[TRIGGER_PRICE_4],2)
-# 			self.bring_up_stop(new_stop)
-
-# 		if self.strategy.orders_level == 7:
-# 			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
-
-# 			new_stop =round(self.tradingplan.data[TRIGGER_PRICE_5],2)
-# 			self.bring_up_stop(new_stop)
-
-# 		if self.strategy.orders_level == 8:
-# 			self.strategy.deploy_n_batch_torpedoes(self.strategy.orders_level)
-# 			new_stop =round(self.tradingplan.data[TRIGGER_PRICE_6],2)
-# 			self.bring_up_stop(new_stop)
-# 		# log_print(self.symbol_name," Hit price target", self.tradingplan.current_price_level,"New Stop:",self.tradingplan.data[STOP_LEVEL])
-
-
-# 		if self.tradingplan.data[USING_STOP]==False:
-# 			self.set_mind("STOP BYPASSING: ON")
-
-# 		self.strategy.orders_level +=1
-# 		self.tradingplan.adjusting_risk()
-# 		self.tradingplan.update_displays()
