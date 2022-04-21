@@ -427,9 +427,9 @@ class Manager:
 			symbols = list(self.symbol_data.values())
 			for val in symbols:
 
-				if val.share_request==True:
-					#print("handling ",symbol)
-					val.mutual_request_handler()
+				if val.get_management_request()==True:
+
+					val.symbol_inspection()
 					# stage 1, cancel each other out in the request book
 
 					# stage 2, granted request from the incoming book

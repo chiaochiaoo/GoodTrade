@@ -128,7 +128,7 @@ class Tester:
 
 
 
-		self.gt.send(["pkg",[dic]])
+		#self.gt.send(["pkg",[dic]])
 
 
 		time.sleep(1)
@@ -240,9 +240,17 @@ class Tester:
 
 					
 					if symbol == "SPY.AM":
-						self.spy_buy_book[self.spybid] = share
+						if self.spybid not in self.spy_buy_book:
+							self.spy_buy_book[self.spybid] = share
+						else:
+							self.spy_buy_book[self.spybid] += share
 					else:
-						self.qqq_buy_book[self.qbid] = share
+
+						if self.qbid not in self.qqq_buy_book:
+							self.qqq_buy_book[self.qbid] = share
+						else:
+							self.qqq_buy_book[self.qbid] += share
+
 
 				elif type_ == PASSIVESELL:
 
@@ -251,9 +259,17 @@ class Tester:
 					share = d[2]
 
 					if symbol == "SPY.AM":
-						self.spy_sell_book[self.spyask] = share
+						if self.spyask not in self.spy_sell_book:
+							self.spy_sell_book[self.spyask] = share
+						else:
+							self.spy_sell_book[self.spyask] += share
 					else:
-						self.qqq_sell_book[self.qask] = share
+
+						if self.qask not in self.qqq_sell_book:
+							self.qqq_sell_book[self.qask] = share
+						else:
+							self.qqq_sell_book[self.qask] += share
+
 
 
 				elif type_ == "Cancel":
@@ -264,21 +280,24 @@ class Tester:
 				elif type_ == "Flatten":
 
 					symbol = d[1]
-					if self.pos ==LONG:
+					print(self.share)
+					if self.share >0:
 						data ={}
 						data["symbol"]= symbol
 						data["side"]= SHORT
 						data["price"]= float(self.spybid)
-						data["shares"]= int(self.share)
+						data["shares"]= abs(int(self.share))
 						data["timestamp"]= self.sec
+						print(data)
 						self.ppro.send(["order confirm",data])
 					else:
 						data ={}
 						data["symbol"]= symbol
 						data["side"]= LONG
 						data["price"]= float(self.spybid)
-						data["shares"]= int(self.share)
+						data["shares"]= abs(int(self.share))
 						data["timestamp"]= self.sec
+						print(data)
 						self.ppro.send(["order confirm",data])
 					self.share = 0
 					self.pos =""
@@ -294,25 +313,6 @@ class Tester:
 		data["timestamp"]= self.sec
 		self.ppro.send(["order confirm",data])
 
-		dic = {}
-
-		dic["algo_name"] = 'TEST'
-		dic["entry_type"] =BREAKANY
-		dic["symbol"] ='SPY.AM'
-		dic["support"] =412
-		dic["resistence"] =413
-		dic["risk"] =50.0
-		dic["statistics"] ={'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441,"expected_momentum":2}
-		dic["immediate_deployment"] = False
-		dic["management"] = ONETOTWORISKREWARD
-
-
-		self.gt.send(["pkg",[dic]])
-		
-		
-		for i in range(45):
-			dic["symbol"]=int(i)
-			self.gt.send(["pkg",[dic]])
 
 	def sub1(self):
 		data = {}
@@ -556,7 +556,8 @@ class Tester:
 
 	def limit_buy_sell(self):
 
-		#print("checking limit buy book",self.spy_buy_book,self.spy_sell_book,self.qqq_buy_book,self.qqq_sell_book)
+		#print("checking limit book SPY",self.spy_buy_book,self.spy_sell_book)
+
 		used = []
 		for key,item in self.spy_buy_book.items():
 
@@ -570,7 +571,7 @@ class Tester:
 				data["shares"]= self.spy_buy_book[key]
 				data["timestamp"]= self.sec
 				self.ppro.send(["order confirm",data])
-				self.share -= data["shares"]
+				self.share += data["shares"]
 
 				used.append(key)
 
@@ -587,7 +588,7 @@ class Tester:
 				data["shares"]= self.spy_sell_book[key]
 				data["timestamp"]= self.sec
 				self.ppro.send(["order confirm",data])
-				self.share-= data["shares"]
+				self.share -= data["shares"]
 				used.append(key)
 
 		for i in used:
@@ -606,7 +607,7 @@ class Tester:
 				data["shares"]= self.qqq_buy_book[key]
 				data["timestamp"]= self.sec
 				self.ppro.send(["order confirm",data])
-				self.share -= data["shares"]
+				self.share += data["shares"]
 
 				used.append(key)
 
@@ -623,7 +624,7 @@ class Tester:
 				data["shares"]= self.qqq_sell_book[key]
 				data["timestamp"]= self.sec
 				self.ppro.send(["order confirm",data])
-				self.share-= data["shares"]
+				self.share -= data["shares"]
 				used.append(key)
 
 		for i in used:

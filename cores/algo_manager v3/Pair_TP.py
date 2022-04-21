@@ -2,6 +2,9 @@ from Symbol import *
 from Triggers import *
 from Strategy import *
 from Strategy_Management import *
+
+from Strategy_Management_Pair import *
+
 from constant import*
 from Util_functions import *
 import tkinter as tkvars
@@ -225,6 +228,7 @@ class PairTP:
 			#SYMBOL2
 
 		#check triggers
+		#print("updating",self.current_running_strategy)
 		if self.current_running_strategy!=None:
 			self.current_running_strategy.update()
 
@@ -372,7 +376,7 @@ class PairTP:
 
 		#finish a trade if current share is 0.
 
-		if self.data[SYMBOL1_SHARE] <= 0 and self.data[SYMBOL2_SHARE]<= 0:
+		if self.data[SYMBOL1_SHARE] == 0 and self.data[SYMBOL2_SHARE] == 0:
 
 
 			self.manager.new_record(self)
@@ -485,27 +489,6 @@ class PairTP:
 				else:
 					self.ppro_out.send([pproaction,self.symbol_name,shares,description])
 
-	""" risk related ## """
-
-	# def adjusting_risk(self):
-
-
-	# 	if self.data[POSITION] == LONG:
-	# 		self.data[ACTRISK] = round(((self.data[AVERAGE_PRICE]-self.data[STOP_LEVEL])*self.data[CURRENT_SHARE]),2)
-	# 	else:
-	# 		self.data[ACTRISK] = round(((self.data[STOP_LEVEL]-self.data[AVERAGE_PRICE])*self.data[CURRENT_SHARE]),2)
-
-	# 	#diff = self.data[ACTRISK]-self.data[ESTRISK]
-	# 	ratio = (self.data[ACTRISK]/self.data[ESTRISK])-0.3#self.data[ESTRISK]/diff
-	# 	if ratio>1.2 : ratio = 1.2
-	# 	if ratio<0 : ratio = 0
-	# 	##change color and change text.
-
-	# 	self.tklabels[RISK_RATIO]["background"] = hexcolor_red(ratio)
-	# 	self.tkvars[RISK_RATIO].set(str(self.data[ACTRISK])+"/"+str(self.data[ESTRISK]))
-
-	# 	if self.data[CURRENT_SHARE] == 0:
-	# 		self.tklabels[RISK_RATIO]["background"] = DEFAULT
 
 	def flatten_cmd(self):
 		
@@ -519,13 +502,6 @@ class PairTP:
 				
 			# elif self.data[POSITION]==SHORT:
 				
-			
-
-	"""	UI related  """
-	# def update_symbol_tkvar(self):
-	# 	#print("updatem",elf.symbol.get_support(),elf.symbol.get_resistence())
-	# 	self.tkvars[SUPPORT].set(self.symbol.get_support())
-	# 	self.tkvars[RESISTENCE].set(self.symbol.get_resistence())
 
 	def update_displays(self):
 
@@ -675,6 +651,9 @@ class PairTP:
 			# entrytimer=int(self.tkvars[TIMER].get())
 			manage_plan =self.tkvars[MANAGEMENTPLAN].get()
 
+
+			
+
 			if risktimer ==0:
 				self.data[RISKTIMER] = int(self.tkvars[RISKTIMER].get())
 			else:
@@ -684,7 +663,7 @@ class PairTP:
 
 			self.set_mind("",DEFAULT)
 			#self.entry_plan_decoder(entryplan, entry_type, entrytimer)
-			#self.manage_plan_decoder(manage_plan)
+			self.manage_plan_decoder(manage_plan)
 
 			self.start_tradingplan()
 
@@ -717,6 +696,88 @@ class PairTP:
 
 	def stop_tradingplan(self):
 		self.current_running_strategy = None
+
+
+	def manage_plan_decoder(self,manage_plan):
+
+		if manage_plan ==NONE: self.tkvars[MANAGEMENTPLAN].set(NONE)
+
+
+		elif manage_plan == MARKETMAKING:
+			self.set_ManagementStrategy(MarketMaking(self.symbols[self.symbol1],self.symbols[self.symbol2],self))
+
+		elif manage_plan == THREE_TARGETS:
+			self.set_ManagementStrategy(ThreePriceTargets(self.symbol,self))
+		elif manage_plan == SMARTTRAIL:
+			self.set_ManagementStrategy(SmartTrail(self.symbol,self))
+
+		elif manage_plan == ANCARTMETHOD:
+			self.set_ManagementStrategy(AncartMethod(self.symbol,self))
+
+		elif manage_plan == ONETOTWORISKREWARD:
+			self.set_ManagementStrategy(OneToTWORiskReward(self.symbol,self))
+
+		elif manage_plan == ONETOTWOWIDE:
+			self.set_ManagementStrategy(OneToTwoWideStop(self.symbol,self))
+
+		elif manage_plan == ONETOTWORISKREWARDOLD:
+			self.set_ManagementStrategy(OneToTWORiskReward_OLD(self.symbol,self))
+
+		elif manage_plan == FULLMANUAL:
+			self.set_ManagementStrategy(FullManual(self.symbol,self))
+		elif manage_plan == SEMIMANUAL:
+			self.set_ManagementStrategy(SemiManual(self.symbol,self))
+
+		elif manage_plan == SCALPATRON:
+			self.set_ManagementStrategy(ScalpaTron(self.symbol,self))
+
+		elif manage_plan == EMASTRAT:
+			self.set_ManagementStrategy(EMAStrategy(self.symbol,self))
+
+		elif manage_plan == TRENDRIDER:
+			self.set_ManagementStrategy(TrendStrategy(self.symbol,self))
+
+		else:
+			#set default
+			log_print("Setting default plan")
+			self.set_ManagementStrategy(OneToTWORiskReward(self.symbol,self))
+
+		self.current_running_strategy = self.management_plan
+
+	def set_EntryStrategy(self,entry_plan:Strategy):
+		self.entry_plan = entry_plan
+		#self.entry_plan.set_symbol(self.symbol,self)
+
+		self.data[ENTRYPLAN] = entry_plan.get_name()
+		#self.tkvars[ENTRYPLAN].set(entry_plan.get_name())
+
+	def set_ManagementStrategy(self,management_plan:Strategy):
+		self.management_plan = management_plan
+		self.management_plan.set_symbol(self.symbol,self)		
+		self.data[MANAGEMENTPLAN] = management_plan.get_name()
+
+	def on_finish(self,plan):
+		
+		if plan==self.entry_plan:
+			log_print(self.symbol_name,self.entry_plan.get_name()," completed.")
+			self.entry_strategy_done()
+			# done = threading.Thread(target=self.entry_strategy_done, daemon=True)
+			# done.start()
+		elif plan==self.management_plan:
+			self.management_strategy_done()
+			log_print(self.symbol_name,"management strategy completed.")
+		else:
+			log_print("Trading Plan: UNKONW CALL FROM Strategy",plan)
+
+	def entry_strategy_done(self):
+
+		self.management_plan.on_start()
+		self.current_running_strategy = self.management_plan
+
+	def management_strategy_done(self):
+
+		pass
+
 
 	""" Plan Handler """	
 	def entry_plan_decoder(self,entry_plan,entry_type,entrytimer):
@@ -767,230 +828,3 @@ class PairTP:
 		else:
 			log_print("unkown plan")
 			self.set_EntryStrategy(BreakAny(entrytimer,instant,self.symbol,self))
-
-	def manage_plan_decoder(self,manage_plan):
-
-		if manage_plan ==NONE: self.tkvars[MANAGEMENTPLAN].set(NONE)
-		elif manage_plan == THREE_TARGETS:
-			self.set_ManagementStrategy(ThreePriceTargets(self.symbol,self))
-		elif manage_plan == SMARTTRAIL:
-			self.set_ManagementStrategy(SmartTrail(self.symbol,self))
-
-		elif manage_plan == ANCARTMETHOD:
-			self.set_ManagementStrategy(AncartMethod(self.symbol,self))
-
-		elif manage_plan == ONETOTWORISKREWARD:
-			self.set_ManagementStrategy(OneToTWORiskReward(self.symbol,self))
-
-		elif manage_plan == ONETOTWOWIDE:
-			self.set_ManagementStrategy(OneToTwoWideStop(self.symbol,self))
-
-		elif manage_plan == ONETOTWORISKREWARDOLD:
-			self.set_ManagementStrategy(OneToTWORiskReward_OLD(self.symbol,self))
-		elif manage_plan == FIBO:
-			self.set_ManagementStrategy(FibonacciOnly(self.symbol,self))
-
-		elif manage_plan == FIBONO:
-			self.set_ManagementStrategy(FiboNoSoft(self.symbol,self))
-			
-		elif manage_plan == EM_STRATEGY:
-
-			### NEED TO MAKE SURE IT IS WHAT IT IS. otherwise, switch. 
-
-			valid = True
-			#check if it's 0
-			#check if rrr exceed 1.5.
-			em = self.symbol.stats['expected_momentum']
-			if em==0:
-				valid = False
-			sup= self.symbol.get_support()
-			res= self.symbol.get_resistence()
-
-			l = round(res-sup,2)
-			rrr = round(em/l,2) 
-
-			if rrr<1.5:
-				valid = False
-
-			if valid:
-				log_print(self.symbol_name,"EM:",em,"SUP:",sup,"RES:",res,"RPS:",l,"RRR:",rrr)
-				self.set_ManagementStrategy(ExpectedMomentum(self.symbol,self))
-			else:
-				log_print(self.symbol_name,"EM:",em,"SUP:",sup,"RES:",res,"RPS:",l,"RRR:",rrr, "RRR to low, using Fib instd.")
-				self.tkvars[MANAGEMENTPLAN].set(FIBO)
-				self.set_ManagementStrategy(FibonacciOnly(self.symbol,self))
-		elif manage_plan == FULLMANUAL:
-			self.set_ManagementStrategy(FullManual(self.symbol,self))
-		elif manage_plan == SEMIMANUAL:
-			self.set_ManagementStrategy(SemiManual(self.symbol,self))
-
-		elif manage_plan == SCALPATRON:
-			self.set_ManagementStrategy(ScalpaTron(self.symbol,self))
-
-		elif manage_plan == EMASTRAT:
-			self.set_ManagementStrategy(EMAStrategy(self.symbol,self))
-
-		elif manage_plan == TRENDRIDER:
-			self.set_ManagementStrategy(TrendStrategy(self.symbol,self))
-
-		else:
-			#set default
-			log_print("Setting default plan")
-			self.set_ManagementStrategy(OneToTWORiskReward(self.symbol,self))
-
-	def set_EntryStrategy(self,entry_plan:Strategy):
-		self.entry_plan = entry_plan
-		#self.entry_plan.set_symbol(self.symbol,self)
-
-		self.data[ENTRYPLAN] = entry_plan.get_name()
-		#self.tkvars[ENTRYPLAN].set(entry_plan.get_name())
-
-	def set_ManagementStrategy(self,management_plan:Strategy):
-		self.management_plan = management_plan
-		self.management_plan.set_symbol(self.symbol,self)		
-		self.data[MANAGEMENTPLAN] = management_plan.get_name()
-
-	def on_finish(self,plan):
-		
-		if plan==self.entry_plan:
-			log_print(self.symbol_name,self.entry_plan.get_name()," completed.")
-			self.entry_strategy_done()
-			# done = threading.Thread(target=self.entry_strategy_done, daemon=True)
-			# done.start()
-		elif plan==self.management_plan:
-			self.management_strategy_done()
-			log_print(self.symbol_name,"management strategy completed.")
-		else:
-			log_print("Trading Plan: UNKONW CALL FROM Strategy",plan)
-
-	def entry_strategy_done(self):
-
-		self.management_plan.on_start()
-		self.current_running_strategy = self.management_plan
-
-	def management_strategy_done(self):
-
-		pass
-
-	# def check_pnl(self,bid,ask,ts):
-	# 	"""
-	# 	PNL, STOP TRIGGER.
-	# 	"""
-
-	# 	#log_print("PNL CHECK ON",self.symbol_name,self.data[POSITION])
-	# 	flatten = False
-	# 	gain = 0
-	# 	stillbreak = True
-
-	# 	if self.data[POSITION]==LONG:
-
-	# 		price = bid
-	# 		gain = round((price-self.data[AVG_P]),4)
-
-	# 		#gap = abs(self.data[BREAKPRICE]-self.data[STOP_LEVEL])*0.05
-	# 		# if price < self.data[BREAKPRICE]:#-gap:
-	# 		# 	stillbreak = False
-
-	# 		if price <= self.data[STOP_LEVEL]:
-	# 			flatten=True
-
-	# 	elif self.data[POSITION]==SHORT:
-	# 		price = ask
-	# 		gain = round(self.data[AVG_P]-price,4)
-
-	# 		#gap = abs(self.data[STOP_LEVEL]-self.data[BREAKPRICE])*0.05
-
-
-	# 		# if price > self.data[BREAKPRICE]:#+gap:
-	# 		# 	stillbreak = False
-
-	# 		if price >=  self.data[STOP_LEVEL]:
-	# 			flatten=True
-
-	# 	if self.data[CURRENT] >0:
-	# 		self.data[UNREAL_PSHR] = gain
-	# 		self.data[UNREAL]= round(gain*self.data[CURRENT],4)
-
-	# 		try:
-	# 			self.data[CUR_PROFIT_LEVEL] = self.data[UNREAL_PSHR]/self.data[RISK_PER_SHARE]
-	# 		except:
-	# 			self.data[CUR_PROFIT_LEVEL] = 0 
-	# 		#print("profit level:",round(self.data[CUR_PROFIT_LEVEL],2))
-
-	# 	if  self.data[UNREAL] < -self.data[ACTRISK]*0.05:#+gap:
-	# 		stillbreak = False
-
-	# 	##IMPlement PNL timer here
-
-	# 	#print(self.symbol_name,self.data[UNREAL],round(-self.data[ACTRISK]*0.1,2),self.data[BREAKPRICE],price,self.data[FLATTENTIMER],self.data[RISKTIMER],stillbreak)
-
-	# 	if self.data[FLATTENTIMER]==0:
-	# 		if not stillbreak: #first time set. 
-	# 			self.data[FLATTENTIMER] = ts
-	# 	else:
-	# 		if not stillbreak:
-	# 			#print(self.symbol_name,"timer:",ts-self.data[FLATTENTIMER],self.data[RISKTIMER])
-	# 			if ts-self.data[FLATTENTIMER]>self.data[RISKTIMER]:
-	# 				flatten=True
-	# 				log_print(self.symbol_name,"risk timer triggered. flattening")
-	# 		else:
-	# 			self.data[FLATTENTIMER]=0
-	# 			#print("reset flatten timer to 0")
-	# 	if flatten and self.flatten_order==False and self.data[USING_STOP]:
-	# 		self.flatten_order=True
-	# 		self.data[FLATTENTIMER]=0
-
-
-	# 		if self.data[POSITION]==LONG:
-	# 			self.symbol.new_request(self.name,-self.data[CURRENT])
-	# 		elif self.data[POSITION]==SHORT:
-	# 			self.symbol.new_request(self.name,self.data[CURRENT])
-			
-
-	# 		#self.ppro_out.send(["Flatten",self.symbol_name])
-
-	# 		#self.symbol.
-
-	# 	self.update_displays()
-
-
-# if __name__ == '__main__':
-
-# 	#TEST CASES for trigger.
-# 	root = tk.Tk() 
-# 	aapl = Symbol("aapl")
-# 	TP = TradingPlan(aapl)
-# 	aapl.set_tradingplan(TP)
-# 	aapl.set_phigh(16)
-# 	aapl.set_plow(15)
-
-# 	b = BreakUp(0,False,aapl,TP)
-# 	#b = BreakUp(0)
-# 	TP.set_EntryStrategy(b)
-# 	TP.start_EntryStrategy()
-
-	
-# 	aapl.update_price(10,10,0)
-# 	aapl.update_price(11,11,1)
-# 	aapl.update_price(12,12,2)
-# 	aapl.update_price(13,13,3)
-# 	aapl.update_price(14,14,4)
-# 	aapl.update_price(15,15,5)
-# 	##### DECRESE#######
-# 	aapl.update_price(5,5,6)
-# 	aapl.update_price(13,13,7)
-
-# 	aapl.update_price(10,10,8)
-# 	###### INCREASE #############
-# 	aapl.update_price(11,11,9)
-# 	aapl.update_price(12,12,10)
-# 	aapl.update_price(13,13,11)
-# 	aapl.update_price(14,14,12)
-# 	aapl.update_price(15,15,13)
-# 	aapl.update_price(16,16,14)
-# 	aapl.update_price(17,17,15)
-# 	aapl.update_price(18,18,16)
-# 	aapl.update_price(19,19,17)
-
-
-# 	root.mainloop()

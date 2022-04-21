@@ -65,7 +65,7 @@ class OneToTWORiskReward(ManagementStrategy):
 
 		super().__init__("Management: 1-to-2 risk-reward ",symbol,tradingplan)
 
-		self.manaTrigger = TwoToOneTrigger("manage",self)
+		self.manaTrigger = TwoToOneTrigger("Two to One Trigger",self)
 
 		self.add_initial_triggers(self.manaTrigger)
 

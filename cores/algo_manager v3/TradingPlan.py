@@ -18,7 +18,8 @@ class TradingPlan:
 		self.name = name 
 		self.symbol = symbol
 
-		self.in_use = True
+
+		self.in_use = False
 		self.pair_plan = False
 		
 		#self.symbol.set_tradingplan(self)
@@ -30,7 +31,6 @@ class TradingPlan:
 
 		self.current_running_strategy = None
 		self.entry_strategy_start = False
-
 		self.entry_plan = None
 
 		self.management_plan = None
@@ -39,12 +39,17 @@ class TradingPlan:
 		#self.default_reload = default_reload
 
 		#self.ppro_out = ppro_out
-
 		self.expect_orders = ""
-		# self.expect_long = False
-		# self.expect_short = False
 
 		self.flatten_order = False
+
+		self.read_lock = threading.Lock()
+
+
+		self.have_request = False
+		self.expected_shares = 0
+		self.current_shares = 0
+		self.current_request = 0
 
 		self.data = {}
 		self.tkvars = {}
@@ -52,9 +57,13 @@ class TradingPlan:
 		self.tklabels= {} ##returned by UI.
 
 		self.holdings = []
+
 		self.current_price_level = 0
+
 		self.price_levels = {}
 
+
+		# NO LONGER USED #
 		self.passive_in_process = False
 		self.passive_position = ""
 		self.passive_action = ""
@@ -79,8 +88,115 @@ class TradingPlan:
 		self.init_data(risk,entry_plan,manage_plan,support,resistence)
 
 
+	def internal(self):
+		log_print(self.name,"holding:",self.current_shares ,"expected:",self.expected_shares,"requested:",self.current_request)
+
+	def activate(self):
+
+		self.in_use	 = True
+
 	def deactive(self):
 		self.in_use = False
+
+		self.expect_orders = ""
+		self.have_request = False
+		self.expected_shares = 0
+		self.current_shares = 0
+		self.current_request = 0
+
+	def if_activated(self):
+		return self.in_use	
+
+	def request_granted(self):
+
+		# if request becomes 0  . match off. 
+
+		with self.read_lock:
+
+			self.current_request = self.expected_shares - self.current_shares
+
+			if self.current_request ==0:
+				self.have_request = False
+
+	#def request_calibration(self):
+
+
+	def having_request(self):
+
+		return self.have_request
+
+	def get_holdings(self):
+
+		return self.current_shares
+
+	def notify_request(self):
+
+		log_print(self.name,"have:",self.current_shares,"want:",self.expected_shares,"change:",self.current_request)
+		self.have_request = True
+		self.symbol.request_notified()
+
+	def read_current_request(self):
+
+		return self.current_request
+		# with self.read_lock:
+		# 	r,e = self.current_request,self.expected_shares
+		# return r,e
+
+	# absolute sense. 
+	def submit_expected_shares(self,shares):
+
+		with self.read_lock:
+			self.expected_shares = shares
+			self.current_request = self.expected_shares - self.current_shares
+
+
+			self.notify_request()
+
+	def change_to_shares(self,shares):
+
+		log_print("change to shares:",shares)
+
+		with self.read_lock:
+
+			#rationality check. if greater and opposite of current shares. just set to 0.
+
+			if shares*self.current_shares<0 and abs(shares)>abs(self.current_shares):
+				self.submit_expected_shares(0)
+			else:
+				self.expected_shares += shares
+				self.current_request = self.expected_shares - self.current_shares
+
+			self.notify_request()
+	# relative sense. 
+
+	def add_to_shares(self,shares):
+
+		with self.read_lock:
+			shares = abs(shares)
+			if self.current_shares <0:
+				self.expected_shares -= shares
+			else:
+				self.expected_shares += shares
+
+			self.current_request = self.expected_shares - self.current_shares
+			self.notify_request()
+
+	def take_shares_off(self,shares):
+
+		with self.read_lock:
+			shares = abs(shares)
+
+			if self.current_shares <0:
+
+				self.expected_shares += shares
+			else:
+
+
+				self.expected_shares -= shares
+				
+			self.current_request = self.expected_shares - self.current_shares
+			self.notify_request()
+
 	def set_data(self,risk,entry_plan,manage_plan,support,resistence):
 		#default values.
 		self.tkvars[SELECTED].set(False)
@@ -153,217 +269,6 @@ class TradingPlan:
 	""" PASSSIVE ENTRY/EXIT OVER A PERIOD AMONT OF TIME """
 
 
-	""" PASSIVE ENTRY/EXIT """
-
-	def passive_initialization(self,side,target_shares,final_target=-1):
-
-
-		if not self.passive_in_process:
-
-			self.passive_position = side
-			self.passive_action = ""
-			self.passive_current_shares = self.data[CURRENT_SHARE] 
-			
-			#self.data[POSITION]
-
-			if final_target ==-1:
-
-				if (self.data[POSITION]==LONG and side ==BUY) or  (self.data[POSITION]==SHORT and side ==SELL):
-					self.passive_target_shares = self.data[CURRENT_SHARE] + target_shares 
-
-					self.passive_action = ADD
-				else:
-					self.passive_target_shares = self.data[CURRENT_SHARE] - target_shares  
-
-					self.passive_action = MINUS
-			#when no positions
-			else: 
-
-				self.passive_target_shares = final_target
-				self.passive_action = ADD
-
-				if final_target ==0:
-					self.passive_action = MINUS
-				
-			
-
-			log_print(self.symbol_name," passive order received, target shares:",target_shares,self.passive_target_shares)
-			done = threading.Thread(target=self.passive_process,daemon=True)
-			done.start()
-		else:
-			log_print("already passive in progress")
-
-
-	def passive_orders(self):
-
-
-		coefficient = 0.01
-
-		k = self.symbol.get_bid()//100
-
-		gap = (self.symbol.get_ask() -self.symbol.get_bid())
-		midpoint = round((self.symbol.get_ask() +self.symbol.get_bid())/2,2)
-
-		if k==0: k = 1
-
-		if self.passive_position == BUY :
-
-			price = self.symbol.get_bid()
-			
-			#log_print(price,"last price",self.passive_price)
-			if price >= self.passive_price+0.01*k or self.passive_price==0:
-
-				#step 1, cancel existing orders
-				self.ppro_out.send([CANCEL,self.symbol_name])
-				#step 2, placing around current.
-				time.sleep(0.2)
-
-				if price<=10:
-					self.ppro_out.send([PASSIVEBUY,self.symbol_name,self.passive_remaining_shares,price])
-				else:
-
-					if self.passive_remaining_shares<=4:
-						self.ppro_out.send([PASSIVEBUY,self.symbol_name,self.passive_remaining_shares,price])
-					else:
-
-						# share = self.passive_remaining_shares//3
-						# sharer = self.passive_remaining_shares- 2*share
-
-						share = self.passive_remaining_shares//2
-						remaning = self.passive_remaining_shares-share
-						#self.ppro_out.send([PASSIVEBUY,self.symbol_name,share,price])
-
-						# when big gap, one order on bid, one order on midpoint. 
-						if gap>=0.05:
-							self.ppro_out.send([PASSIVEBUY,self.symbol_name, remaning,price])
-							self.ppro_out.send([PASSIVEBUY,self.symbol_name,share,midpoint])
-							#price-0.01*k
-						# when tight spread. just one on bid. 
-						elif gap<=0.01:
-							self.ppro_out.send([PASSIVEBUY,self.symbol_name,self.passive_remaining_shares,price])
-						else:
-							self.ppro_out.send([PASSIVEBUY,self.symbol_name, remaning,price])
-							self.ppro_out.send([PASSIVEBUY,self.symbol_name,share,round(price+0.01,2)])
-
-						#self.ppro_out.send([PASSIVEBUY,self.symbol_name,sharer,price-0.01*2*k])
-
-			self.passive_price = price			
-		elif self.passive_position == SELL:
-
-			price = self.symbol.get_ask()
-
-			#log_print(price,"last price",self.passive_price)
-			if price <= self.passive_price -0.01*k or self.passive_price==0:
-
-				#step 1, cancel existing orders
-				self.ppro_out.send([CANCEL,self.symbol_name])
-				#step 2, placing around current.
-				time.sleep(0.2)
-
-
-				if price<=10:
-					self.ppro_out.send([PASSIVESELL,self.symbol_name,self.passive_remaining_shares,price])
-				else:
-
-					if self.passive_remaining_shares<=4:
-						self.ppro_out.send([PASSIVESELL,self.symbol_name,self.passive_remaining_shares,price])
-					else:
-
-						share = self.passive_remaining_shares//2
-						remaning = self.passive_remaining_shares-share
-
-						if gap>=0.05:
-							self.ppro_out.send([PASSIVESELL,self.symbol_name, remaning,price])
-							self.ppro_out.send([PASSIVESELL,self.symbol_name,share,midpoint])
-							#price-0.01*k
-						# when tight spread. just one on bid. 
-						elif gap<=0.01:
-							self.ppro_out.send([PASSIVESELL,self.symbol_name,self.passive_remaining_shares,price])
-						else:
-							self.ppro_out.send([PASSIVESELL,self.symbol_name, remaning,price])
-							self.ppro_out.send([PASSIVESELL,self.symbol_name,share,round(price-0.01,2)])
-
-
-			self.passive_price = price
-	#if the price is 2C away. chase it.
-	#if the price is unchanged, do nothing. 
-
-
-
-	def remaining_room(self):
-
-		#check the remaining risk room. 
-		#set the share number. 
-
-		risk_per_share = abs(self.symbol.get_bid() - self.data[STOP_LEVEL])		
-
-
-		remaining_risk = self.data[ESTRISK] - self.data[ACTRISK]
-
-
-		share = remaining_risk/risk_per_share
-
-		if share >=1:
-			return int(share)
-
-		elif share>0.5:
-			return 1
-		else:
-			return 0
-		
-	def passive_process(self):
-
-		fullfilled = 0
-		timecount = 0
-
-		price = 0
-
-		while timecount<120:
-
-			#update current.
-
-			#what's in stock
-			#log_print(self.symbol_name," Remaining:",self.passive_remaining_shares)
-
-			self.passive_current_shares = self.data[CURRENT_SHARE] 
-
-			#what just gained. 
-
-			### need to recalculate. ####
-			self.passive_remaining_shares = self.remaining_room()
-
-			#print("shares left:",self.passive_remaining_shares)
-			#abs(self.passive_target_shares - self.passive_current_shares)
-
-
-			if self.passive_action==ADD and self.passive_remaining_shares<1:#self.data[CURRENT_SHARE] >= self.passive_target_shares:
-				log_print(self.symbol_name," passive fill completed")
-				break
-			if self.passive_action==MINUS and self.passive_remaining_shares<1:#self.data[CURRENT_SHARE] <= self.passive_target_shares:
-				log_print(self.symbol_name," passive fill completed")
-				break
-			if self.flatten_order==True:
-				break
-
-			self.passive_orders()
-				
-			#ORDER SENDING MOUDULE. 
-
-			wait =random.randrange(5,11)
-			time.sleep(wait)
-			timecount+=wait
-
-
-		#clean. 
-		
-		self.passive_position = ""
-		self.passive_current_shares = 0
-		self.passive_init_shares = 0
-		self.passive_remaining_shares = 0
-		self.passive_in_process = False
-		self.passive_price = 0
-
-
 
 	def ppro_update_price(self,symbol="",bid=0,ask=0,ts=0):
 
@@ -385,6 +290,7 @@ class TradingPlan:
 		# except Exception as e:
 		# 	log_print("TP issue:",e)
 
+
 	def check_pnl(self,bid,ask,ts):
 		"""
 		PNL, STOP TRIGGER.
@@ -399,6 +305,8 @@ class TradingPlan:
 		if self.data[POSITION]==LONG:
 
 			price = bid
+
+			#print("PRICE:",bid)
 			gain = round((price-self.data[AVERAGE_PRICE]),4)
 
 			#gap = abs(self.data[BREAKPRICE]-self.data[STOP_LEVEL])*0.05
@@ -407,7 +315,7 @@ class TradingPlan:
 
 			if price <= self.data[STOP_LEVEL]:
 				flatten=True
-
+				print("flatening,",price,self.data[STOP_LEVEL])
 		elif self.data[POSITION]==SHORT:
 			price = ask
 			gain = round(self.data[AVERAGE_PRICE]-price,4)
@@ -425,6 +333,7 @@ class TradingPlan:
 		if self.data[CURRENT_SHARE] >0:
 			self.data[UNREAL_PSHR] = gain
 			self.data[UNREAL]= round(gain*self.data[CURRENT_SHARE],4)
+
 
 			try:
 				self.data[CUR_PROFIT_LEVEL] = self.data[UNREAL_PSHR]/self.data[RISK_PER_SHARE]
@@ -451,6 +360,7 @@ class TradingPlan:
 			else:
 				self.data[FLATTENTIMER]=0
 				#print("reset flatten timer to 0")
+
 		if flatten and self.flatten_order==False and self.data[USING_STOP]:
 			self.flatten_order=True
 			self.data[FLATTENTIMER]=0
@@ -490,6 +400,7 @@ class TradingPlan:
 		# if self.test_mode:
 		# 	log_print("TP processing:",self.data)
 		self.update_displays()
+		self.request_granted()
 
 	def ppro_confirm_new_order(self,price,shares,side):
 
@@ -512,12 +423,20 @@ class TradingPlan:
 
 		self.data[CURRENT_SHARE] = self.data[CURRENT_SHARE] + shares
 
-		if current ==0 or self.data[CURRENT_SHARE]==0:
+		with self.read_lock:
+
+			if side == LONG:
+				self.current_shares = self.current_shares + shares
+			elif side == SHORT:
+				self.current_shares = self.current_shares - shares
+
+		if self.data[CURRENT_SHARE]==0:
 			self.data[AVERAGE_PRICE] = round(price,3)
 		else:
 			self.data[AVERAGE_PRICE]= round(((self.data[AVERAGE_PRICE]*current)+(price*shares))/self.data[CURRENT_SHARE],3)
 
 		for i in range(shares):
+			
 			self.holdings.append(price)
 
 		self.adjusting_risk()
@@ -525,16 +444,25 @@ class TradingPlan:
 		if self.data[AVERAGE_PRICE]!=self.data[LAST_AVERAGE_PRICE]:
 			self.management_plan.on_loading_up()
 			
-			log_print(self.symbol_name," ",side,",",self.data[AVERAGE_PRICE]," at ",self.data[CURRENT_SHARE],"act risk:",self.data[ACTRISK])
+			log_print(self.symbol_name," ",side,",",self.data[AVERAGE_PRICE]," at ",self.data[CURRENT_SHARE],self.current_shares,"act risk:",self.data[ACTRISK])
 
 		self.data[LAST_AVERAGE_PRICE] = self.data[AVERAGE_PRICE]
+
 
 	def ppro_orders_loadoff(self,price,shares,side):
 
 		current = self.data[CURRENT_SHARE]
 
 		self.data[CURRENT_SHARE] = current-shares	
-		
+
+		with self.read_lock:
+
+			if side == LONG:
+				self.current_shares = self.current_shares + shares
+			elif side == SHORT:
+				self.current_shares = self.current_shares - shares
+
+		log_print("load off:",self.data[CURRENT_SHARE],self.current_shares,shares)
 		gain = 0
 
 		if self.data[POSITION] == LONG:
@@ -559,7 +487,7 @@ class TradingPlan:
 
 		#finish a trade if current share is 0.
 
-		if self.data[CURRENT_SHARE] <= 0:
+		if self.data[CURRENT_SHARE] == 0:
 
 
 			self.manager.new_record(self)
@@ -570,10 +498,6 @@ class TradingPlan:
 
 
 	def clear_trade(self):
-
-
-		#self.ppro_out.send([DEREGISTER,self.symbol_name])
-		#self.ppro_out.send(["Flatten",self.symbol_name])
 
 		
 		self.data[UNREAL] = 0
@@ -586,7 +510,10 @@ class TradingPlan:
 		#mark it done.
 
 		#prevent manual conflit.
-		self.expect_orders = ""
+		
+		self.deactive()
+		self.symbol.deregister_tradingplan(self.name,self)
+
 		##################
 
 		self.mark_algo_status(DONE)
@@ -606,6 +533,7 @@ class TradingPlan:
 			self.start_tradingplan()
 
 
+
 	def rejection_handling(self):
 
 
@@ -621,8 +549,8 @@ class TradingPlan:
 			# withdraw the algo. 
 
 			# show rejection. 
-
-			self.symbol.cancel_all_request(self.name)
+			self.submit_expected_shares(0)
+			#self.symbol.cancel_all_request(self.name)
 			self.mark_algo_status(REJECTED)
 
 		else:
@@ -680,7 +608,9 @@ class TradingPlan:
 
 			if pproaction!="":
 
-				self.symbol.new_request(self.name,shares*coefficient)
+
+				self.change_to_shares(shares*coefficient)
+				#self.symbol.new_request(self.name,shares*coefficient)
 
 				# self.ppro_out.send([pproaction,self.symbol_name,shares,description])
 				# if passive:
@@ -713,25 +643,38 @@ class TradingPlan:
 		if self.data[CURRENT_SHARE] == 0:
 			self.tklabels[RISK_RATIO]["background"] = DEFAULT
 
+		# HERE, IF IT IS OVER RISK. ADJUST IT. it is overwhelmed. 
+
 	def flatten_cmd(self):
 		
 		if self.tkvars[STATUS].get()==PENDING:
 			self.cancel_algo()
 		else:
-			# self.ppro_out.send(["Flatten",self.symbol_name])
-			if self.data[POSITION]==LONG:
-				#self.symbol.new_request(self.name,-self.data[CURRENT_SHARE])
+			self.submit_expected_shares(0)
 
-				self.symbol.ppro_out.send([IOCSELL,self.symbol_name,abs(self.data[CURRENT_SHARE]),self.symbol.get_bid()])
-				self.symbol.cancel_all_request(self.name)
+			self.flatten_order=True
+			self.symbol.flatten_cmd(self.name)
 
-			elif self.data[POSITION]==SHORT:
-				#self.symbol.new_request(self.name,self.data[CURRENT_SHARE])
-				self.symbol.ppro_out.send([IOCBUY,self.symbol_name,abs(self.data[CURRENT_SHARE]),self.symbol.get_ask()])
-				self.symbol.cancel_all_request(self.name)
-			# 	
-			#self.symbol.ppro_out.send([CANCEL,self.symbol_name])
 
+			# # self.ppro_out.send(["Flatten",self.symbol_name])
+
+			# if self.data[POSITION]==LONG:
+			# 	#self.symbol.new_request(self.name,-self.data[CURRENT_SHARE])
+
+			# 	self.symbol.ppro_out.send([IOCSELL,self.symbol_name,abs(self.data[CURRENT_SHARE]),self.symbol.get_bid()])
+			# 	#self.symbol.cancel_all_request(self.name)
+			# 	self.symbol.flatten_cmd(self.name)
+			# 	self.submit_expected_shares(0)
+
+
+
+			# elif self.data[POSITION]==SHORT:
+			# 	#self.symbol.new_request(self.name,self.data[CURRENT_SHARE])
+			# 	self.symbol.ppro_out.send([IOCBUY,self.symbol_name,abs(self.data[CURRENT_SHARE]),self.symbol.get_ask()])
+			# 	#self.symbol.cancel_all_request(self.name)
+			# 	self.submit_expected_shares(0)
+			# # 	
+			# #self.symbol.ppro_out.send([CANCEL,self.symbol_name])
 
 			
 
@@ -742,6 +685,7 @@ class TradingPlan:
 		self.tkvars[RESISTENCE].set(self.symbol.get_resistence())
 
 	def update_displays(self):
+
 
 		self.tkvars[SIZE_IN].set(str(self.data[CURRENT_SHARE])+"/"+str(self.data[TARGET_SHARE]))
 		self.tkvars[REALIZED].set(str(self.data[REALIZED]))
@@ -857,7 +801,8 @@ class TradingPlan:
 
 	def cancel_algo(self):
 
-		self.symbol.cancel_all_request(self.name)
+		self.deactive()
+		#self.symbol.cancel_all_request(self.name)
 		if self.tkvars[STATUS].get()==PENDING:
 			self.mark_algo_status(CANCELED)
 
@@ -868,6 +813,9 @@ class TradingPlan:
 		else:
 			log_print("cannot cancel, holding positions.")
 
+	def get_flatten_order(self):
+		return self.flatten_order
+
 	def deploy(self,risktimer=0):
 
 		if self.tkvars[STATUS].get() ==PENDING:
@@ -877,6 +825,9 @@ class TradingPlan:
 			#self.ppro_out.send([REGISTER,self.symbol_name])
 
 			self.symbol.register_tradingplan(self.name,self)
+
+			self.activate()
+			self.flatten_order	 = False
 
 			entryplan=self.tkvars[ENTRYPLAN].get()
 
@@ -1113,3 +1064,217 @@ class TradingPlan:
 
 
 # 	root.mainloop()
+
+
+
+
+	# """ PASSIVE ENTRY/EXIT """
+
+	# def passive_initialization(self,side,target_shares,final_target=-1):
+
+
+	# 	if not self.passive_in_process:
+
+	# 		self.passive_position = side
+	# 		self.passive_action = ""
+	# 		self.passive_current_shares = self.data[CURRENT_SHARE] 
+			
+	# 		#self.data[POSITION]
+
+	# 		if final_target ==-1:
+
+	# 			if (self.data[POSITION]==LONG and side ==BUY) or  (self.data[POSITION]==SHORT and side ==SELL):
+	# 				self.passive_target_shares = self.data[CURRENT_SHARE] + target_shares 
+
+	# 				self.passive_action = ADD
+	# 			else:
+	# 				self.passive_target_shares = self.data[CURRENT_SHARE] - target_shares  
+
+	# 				self.passive_action = MINUS
+	# 		#when no positions
+	# 		else: 
+
+	# 			self.passive_target_shares = final_target
+	# 			self.passive_action = ADD
+
+	# 			if final_target ==0:
+	# 				self.passive_action = MINUS
+				
+			
+
+	# 		log_print(self.symbol_name," passive order received, target shares:",target_shares,self.passive_target_shares)
+	# 		done = threading.Thread(target=self.passive_process,daemon=True)
+	# 		done.start()
+	# 	else:
+	# 		log_print("already passive in progress")
+
+
+	# def passive_orders(self):
+
+
+	# 	coefficient = 0.01
+
+	# 	k = self.symbol.get_bid()//100
+
+	# 	gap = (self.symbol.get_ask() -self.symbol.get_bid())
+	# 	midpoint = round((self.symbol.get_ask() +self.symbol.get_bid())/2,2)
+
+	# 	if k==0: k = 1
+
+	# 	if self.passive_position == BUY :
+
+	# 		price = self.symbol.get_bid()
+			
+	# 		#log_print(price,"last price",self.passive_price)
+	# 		if price >= self.passive_price+0.01*k or self.passive_price==0:
+
+	# 			#step 1, cancel existing orders
+	# 			self.ppro_out.send([CANCEL,self.symbol_name])
+	# 			#step 2, placing around current.
+	# 			time.sleep(0.2)
+
+	# 			if price<=10:
+	# 				self.ppro_out.send([PASSIVEBUY,self.symbol_name,self.passive_remaining_shares,price])
+	# 			else:
+
+	# 				if self.passive_remaining_shares<=4:
+	# 					self.ppro_out.send([PASSIVEBUY,self.symbol_name,self.passive_remaining_shares,price])
+	# 				else:
+
+	# 					# share = self.passive_remaining_shares//3
+	# 					# sharer = self.passive_remaining_shares- 2*share
+
+	# 					share = self.passive_remaining_shares//2
+	# 					remaning = self.passive_remaining_shares-share
+	# 					#self.ppro_out.send([PASSIVEBUY,self.symbol_name,share,price])
+
+	# 					# when big gap, one order on bid, one order on midpoint. 
+	# 					if gap>=0.05:
+	# 						self.ppro_out.send([PASSIVEBUY,self.symbol_name, remaning,price])
+	# 						self.ppro_out.send([PASSIVEBUY,self.symbol_name,share,midpoint])
+	# 						#price-0.01*k
+	# 					# when tight spread. just one on bid. 
+	# 					elif gap<=0.01:
+	# 						self.ppro_out.send([PASSIVEBUY,self.symbol_name,self.passive_remaining_shares,price])
+	# 					else:
+	# 						self.ppro_out.send([PASSIVEBUY,self.symbol_name, remaning,price])
+	# 						self.ppro_out.send([PASSIVEBUY,self.symbol_name,share,round(price+0.01,2)])
+
+	# 					#self.ppro_out.send([PASSIVEBUY,self.symbol_name,sharer,price-0.01*2*k])
+
+	# 		self.passive_price = price			
+	# 	elif self.passive_position == SELL:
+
+	# 		price = self.symbol.get_ask()
+
+	# 		#log_print(price,"last price",self.passive_price)
+	# 		if price <= self.passive_price -0.01*k or self.passive_price==0:
+
+	# 			#step 1, cancel existing orders
+	# 			self.ppro_out.send([CANCEL,self.symbol_name])
+	# 			#step 2, placing around current.
+	# 			time.sleep(0.2)
+
+
+	# 			if price<=10:
+	# 				self.ppro_out.send([PASSIVESELL,self.symbol_name,self.passive_remaining_shares,price])
+	# 			else:
+
+	# 				if self.passive_remaining_shares<=4:
+	# 					self.ppro_out.send([PASSIVESELL,self.symbol_name,self.passive_remaining_shares,price])
+	# 				else:
+
+	# 					share = self.passive_remaining_shares//2
+	# 					remaning = self.passive_remaining_shares-share
+
+	# 					if gap>=0.05:
+	# 						self.ppro_out.send([PASSIVESELL,self.symbol_name, remaning,price])
+	# 						self.ppro_out.send([PASSIVESELL,self.symbol_name,share,midpoint])
+	# 						#price-0.01*k
+	# 					# when tight spread. just one on bid. 
+	# 					elif gap<=0.01:
+	# 						self.ppro_out.send([PASSIVESELL,self.symbol_name,self.passive_remaining_shares,price])
+	# 					else:
+	# 						self.ppro_out.send([PASSIVESELL,self.symbol_name, remaning,price])
+	# 						self.ppro_out.send([PASSIVESELL,self.symbol_name,share,round(price-0.01,2)])
+
+
+	# 		self.passive_price = price
+	# #if the price is 2C away. chase it.
+	# #if the price is unchanged, do nothing. 
+
+
+
+	# def remaining_room(self):
+
+	# 	#check the remaining risk room. 
+	# 	#set the share number. 
+
+	# 	risk_per_share = abs(self.symbol.get_bid() - self.data[STOP_LEVEL])		
+
+
+	# 	remaining_risk = self.data[ESTRISK] - self.data[ACTRISK]
+
+
+	# 	share = remaining_risk/risk_per_share
+
+	# 	if share >=1:
+	# 		return int(share)
+
+	# 	elif share>0.5:
+	# 		return 1
+	# 	else:
+	# 		return 0
+		
+	# def passive_process(self):
+
+	# 	fullfilled = 0
+	# 	timecount = 0
+
+	# 	price = 0
+
+	# 	while timecount<120:
+
+	# 		#update current.
+
+	# 		#what's in stock
+	# 		#log_print(self.symbol_name," Remaining:",self.passive_remaining_shares)
+
+	# 		self.passive_current_shares = self.data[CURRENT_SHARE] 
+
+	# 		#what just gained. 
+
+	# 		### need to recalculate. ####
+	# 		self.passive_remaining_shares = self.remaining_room()
+
+	# 		#print("shares left:",self.passive_remaining_shares)
+	# 		#abs(self.passive_target_shares - self.passive_current_shares)
+
+
+	# 		if self.passive_action==ADD and self.passive_remaining_shares<1:#self.data[CURRENT_SHARE] >= self.passive_target_shares:
+	# 			log_print(self.symbol_name," passive fill completed")
+	# 			break
+	# 		if self.passive_action==MINUS and self.passive_remaining_shares<1:#self.data[CURRENT_SHARE] <= self.passive_target_shares:
+	# 			log_print(self.symbol_name," passive fill completed")
+	# 			break
+	# 		if self.flatten_order==True:
+	# 			break
+
+	# 		self.passive_orders()
+				
+	# 		#ORDER SENDING MOUDULE. 
+
+	# 		wait =random.randrange(5,11)
+	# 		time.sleep(wait)
+	# 		timecount+=wait
+
+
+	# 	#clean. 
+		
+	# 	self.passive_position = ""
+	# 	self.passive_current_shares = 0
+	# 	self.passive_init_shares = 0
+	# 	self.passive_remaining_shares = 0
+	# 	self.passive_in_process = False
+	# 	self.passive_price = 0
+

@@ -3,7 +3,7 @@ import tkinter as tk
 #from Triggers import *
 from Util_functions import *
 from datetime import datetime, timedelta
-
+import threading
 
 def sign_test(a,b):
 
@@ -61,24 +61,29 @@ class Symbol:
 		+ for LONG. - for SHORTS
 
 		"""
+		self.active_tps = 0
 		self.current_shares = 0
+		self.total_expected = 0
 
 		self.current_imbalance = 0
 
 		# plus, minus, all the updates, all go here. 
-		self.incoming_shares = []
+		self.incoming_shares_lock = threading.Lock()
+		self.incoming_shares = {}
 
 		# 1. anyone wants anything, will register here. 
 		# 2. System every second checks the outstanding shares and do corresponding actions. 
 		# 3. For mutual canling requests - automatically granted each other. Otherwise, result in an imbalance. 
 
-		self.share_request = False
+		self.management_request = False
 
 		### NEED LOCK FOR EACH OF THESE
 
-		self.incoming_request = {}
+		#self.incoming_request = {}
+
+		self.tradingplan_lock = threading.Lock()
 		self.tradingplans = {}
-		self.tradingplan_holdings = {}
+		#self.tradingplan_holdings = {}
 
 
 		self.init_data(support,resistence,stats)
@@ -86,39 +91,37 @@ class Symbol:
 
 	def register_tradingplan(self,name,tradingplan):
 
-		self.incoming_request[name] = 0
-		self.tradingplan_holdings[name] = 0
-		self.tradingplans[name] = tradingplan
+		#self.incoming_request[name] = 0
+		#self.tradingplan_holdings[name] = 0
+
+		with self.tradingplan_lock:
+			self.tradingplans[name] = tradingplan
 
 		log_print(name,"registered at",self.ticker)
 
 	def deregister_tradingplan(self,name,tradingplans):
 
-		del self.incoming_request[name]
-		del self.tradingplans[name]
+		#del self.incoming_request[name]
+		with self.tradingplan_lock:
+			del self.tradingplans[name]
+
+		log_print("name","deleted",self.ticker)
 
 
-	### PASSIVE/ACTIVE REQUEST ? ####
-	def new_request(self,tradingplan_name,shares,passive=""):
+	def get_management_request(self):
+		return self.management_request
 
-		self.incoming_request[tradingplan_name] += shares 
+	def request_notified(self):
+		self.management_request = True
 
-		log_print("new request",self.incoming_request)
-
-		self.share_request = True
 
 	def load_confirmation(self,tradingplan_name,shares):
 
 		self.tradingplan_holdings[tradingplan_name] += shares
 
-	def cancel_all_request(self,tradingplan_name):
-
-
-		self.incoming_request[tradingplan_name] = 0
-
 
 	### RUN EVERY 3 SECONDS ###
-	def mutual_request_handler(self):
+	def symbol_inspection(self):
 
 		#lets say I hae -100 and +100. so they cancel each other out. 
 
@@ -134,54 +137,72 @@ class Symbol:
 
 		#first calculate all the positive, then all the negative? NO... it's by
 
-		if len(self.incoming_shares)>0:
+		#log_print(self.ticker,"Inspection")
 
+		if len(self.incoming_shares)>0:
 
 			### STAGE 1 -> Planed request handling 
 			self.incoming_shares_pairing()
 
+		#cur_imbalance = sum(self.incoming_request.values())
 
-		cur_imbalance = sum(self.incoming_request.values())
+		# remian_shares =  0 #sum(self.incoming_shares.values())
 
-		remian_shares =  0 #sum(self.incoming_shares.values())
-
-		for i in range(len(self.incoming_shares)):
-			remian_shares+=self.incoming_shares[i][1]
+		# for i in range(len(self.incoming_shares)):
+		# 	remian_shares+=self.incoming_shares[i][1]
 
 		### STAGE 2 -> Unplaned user event handling 
 		#print(remian_shares,self.incoming_shares)
 
+		#log_print(self.ticker,"UNPLANED SHARES PAIRING")
+
+		remian_shares = sum(list(self.incoming_shares.values()))
+
 		if remian_shares!=0:
+			log_print(self.ticker,"unmatched shares:",remian_shares)
+
 			self.unplan_shares_pairing()
+
+
+		#log_print(self.ticker,"PASSIVE ORDERS")
+			
 		#### STAGE 3 -> MUTUAL PLANS PAIRING #####
 
+		### CURRENTLY DISABLE ###
 
-		tps = sorted(self.incoming_request, key=lambda dict_key: abs(self.incoming_request[dict_key]))
+		# tps = sorted(self.incoming_request, key=lambda dict_key: abs(self.incoming_request[dict_key]))
 
-		#print(tps)
+		# #print(tps)
 
-		for i in range(len(tps)):
-			if abs(self.incoming_request[tps[i]])>0:
-				for j in range(i,len(tps)):
-					#if j > i and is opposite sign. 
-					if pair_off_test(self.incoming_request[tps[i]], self.incoming_request[tps[j]]):
-						self.pair_off(tps[i], tps[j])
+		# for i in range(len(tps)):
+		# 	if abs(self.incoming_request[tps[i]])>0:
+		# 		for j in range(i,len(tps)):
+		# 			#if j > i and is opposite sign. 
+		# 			if pair_off_test(self.incoming_request[tps[i]], self.incoming_request[tps[j]]):
+		# 				self.pair_off(tps[i], tps[j])
 
-		log_print(("pairing sucessful, now remaining request: ",self.ticker,self.incoming_request))
+		# log_print((self.ticker,"pairing sucessful, now remaining request: ",self.incoming_request))
 
-		log_print(("current shares remaning:",self.ticker,sum(self.incoming_request.values())))
+		# log_print((self.ticker,"current shares remaning:",sum(self.incoming_request.values())))
 
 
-		#### STAGE 3 -> IMBALANCE HANDLING #####
+
+		#### STAGE 2.5 CHecking if any flattened order is succesfully executed.
+
+
+		# #### STAGE 3 -> IMBALANCE HANDLING  (NOT COUNTING THE FLATTENED ORDER) #####
 		
-		remaining_share = sum(self.incoming_request.values())
-		self.current_imbalance = remaining_share
+		# remaining_share = sum(self.incoming_request.values())
+
+		#log_print(self.ticker,"remaining unmatched:",self.incoming_shares)
+
+
+		self.current_imbalance = self.get_all_imbalance()
 
 		if self.current_imbalance==0:
 
-			self.share_request = False
+			self.management_request = False
 			self.passive_price = 0
-		
 
 		else:
 
@@ -192,9 +213,183 @@ class Symbol:
 			# else:
 			# 	self.ppro_out.send([IOCSELL,self.ticker,abs(remaining_share),self.data[BID]])
 
-
 			## HERE USE PASSIVE ## 
 
+	def get_all_imbalance(self):
+
+		total = 0
+
+		tps = list(self.tradingplans.keys())
+
+		for tp in tps:
+
+			if self.tradingplans[tp].if_activated() and self.tradingplans[tp].having_request() and not self.tradingplans[tp].get_flatten_order():
+
+				total += self.tradingplans[tp].read_current_request()
+
+		return total
+
+	def incoming_shares_pairing(self):
+
+		# two ways to go about this.. tp first.. then shares. OR, shares first, then TP. ideally they are equal.in practice ? SHARES FIRST
+
+
+		with self.incoming_shares_lock:
+
+
+			for price in self.incoming_shares.keys():
+
+				tps = list(self.tradingplans.keys())
+
+				for tp in tps:
+
+					if self.tradingplans[tp].if_activated() and self.tradingplans[tp].having_request():
+
+						val = self.tradingplans[tp].read_current_request()
+
+						share = self.incoming_shares[price]
+
+						if share >0 and val>0:
+
+
+							paired = min(share,val)
+
+							
+							self.tradingplans[tp].ppro_process_orders(price,abs(paired),LONG,self.ticker)
+
+							self.incoming_shares[price] -= paired
+
+							#self.load_confirmation(tp,share)
+							#self.incoming_request[tp]-=share
+
+
+						elif share<0 and val<0:
+
+
+							paired = max(share,val)
+							
+							self.tradingplans[tp].ppro_process_orders(price,abs(paired),SHORT,self.ticker)
+
+							self.incoming_shares[price] -= paired
+							#self.load_confirmation(tp,share)
+
+							## if share is negative, then minus will add to it. 
+							#self.incoming_request[tp]-=share
+
+						if self.incoming_shares[price]==0:
+							break
+
+
+		## I MAY Have left overs. 
+
+		self.cleanup_incoming_shares()
+
+	def cleanup_incoming_shares(self):
+
+		terms = []
+		with self.incoming_shares_lock:
+			for key,val in self.incoming_shares.items():
+				if val==0:
+					terms.append(key)
+
+			for k in terms:
+				del self.incoming_shares[k]
+
+	def unplan_shares_pairing(self):
+
+		### First see if you can kill some TPS
+
+		### Then arbitarily add to some that risk is no full. 
+
+		### OPPOSITE SIDE TEST ### THEN POSITIVE SIDE GIVE ####
+
+		with self.incoming_shares_lock:
+
+			## NOW KILL IT 
+
+			for price in self.incoming_shares.keys():
+
+				tps = list(self.tradingplans.keys())
+
+				share =  self.incoming_shares[price]
+
+				
+				for tp in tps:
+					print("processing",tps,share,self.tradingplans[tp].having_request())
+					if self.tradingplans[tp].if_activated():
+
+						holding = self.tradingplans[tp].get_holdings()
+
+						print("stock holding",holding)
+
+						if  holding>0 and share*holding <0:
+
+							paired = min(abs(share),holding)
+
+
+							self.tradingplans[tp].ppro_process_orders(price,abs(paired),SHORT,self.ticker)
+							self.incoming_shares[price] -= -paired
+
+
+
+						elif holding<0 and share*holding <0:
+
+							paired = max(share,abs(holding))
+
+
+							self.tradingplans[tp].ppro_process_orders(price,abs(paired),LONG,self.ticker)
+							self.incoming_shares[price] -= paired
+
+
+						if self.incoming_shares[price]==0:
+							break
+
+			#self.cleanup_incoming_shares()
+			## NOW ADD TO IT. 
+			for price in self.incoming_shares.keys():
+
+				tps = list(self.tradingplans.keys())
+
+				share =  self.incoming_shares[price]
+
+				for tp in tps:
+
+					if self.tradingplans[tp].if_activated():
+
+						holding = self.tradingplans[tp].get_holdings()
+
+						if  holding>0 and share*holding >0:
+
+							paired = min(share,holding)
+
+							self.tradingplans[tp].ppro_process_orders(price,abs(paired),LONG,self.ticker)
+							self.incoming_shares[price] -= paired
+
+						elif holding<0 and share*holding >0:
+
+							paired = max(share,holding)
+							#self.tradingplans[tp].request_granted(paired)
+							self.tradingplans[tp].ppro_process_orders(price,abs(paired),SHORT,self.ticker)
+
+							self.incoming_shares[price] -= paired
+							#self.load_confirmation(tp,share)
+
+							## if share is negative, then minus will add to it. 
+							#self.incoming_request[tp]-=share
+							#paired.append(t)
+
+						if self.incoming_shares[price]==0:
+							break
+
+			
+
+
+			## whatever it is now. it is none of my business.
+			if len(self.incoming_shares)>1:
+				log_print("discarding:",self.incoming_shares)
+				self.incoming_shares = {}
+
+		self.cleanup_incoming_shares()
 
 	def passive_orders(self):
 
@@ -273,80 +468,20 @@ class Symbol:
 			self.passive_price = price
 
 
-
-	def incoming_shares_pairing(self):
-
-		# two ways to go about this.. tp first.. then shares. OR, shares first, then TP. ideally they are equal.in practice ? SHARES FIRST
-
-		paired = []
-		for t in range(len(self.incoming_shares)):
-
-			price = self.incoming_shares[t][0]
-			share = self.incoming_shares[t][1]
-
-			for tp,val in self.incoming_request.items():
-
-				if share >0 and val>0:
-					self.tradingplans[tp].ppro_process_orders(price,abs(share),LONG,self.ticker)
-
-					self.load_confirmation(tp,share)
-
-					self.incoming_request[tp]-=share
-
-					paired.append(t)
-
-					break
-				elif share<0 and val<0:
-					self.tradingplans[tp].ppro_process_orders(price,abs(share),SHORT,self.ticker)
-
-					self.load_confirmation(tp,share)
-
-					## if share is negative, then minus will add to it. 
-					self.incoming_request[tp]-=share
-					paired.append(t)
-
-					break
-
-		#log_print(self.ticker,"incoming shares",self.incoming_shares)
-
-		c = 0
-		for i in paired:
-			self.incoming_shares.pop(i-c)
-			c+=1
-			# try:
-				
-			# except Exception as e:
-			# 	print(e,"poping failure",e,i,self.incoming_shares)
-
-	def unplan_shares_pairing(self):
-
-		### only viable when there are only 1 plan that currently has holding. i.e. in running state ###
-		
-		count = 0
-		tpname = ""
-		for tp,val in self.tradingplans.items():
-
-			if val.data[STATUS] == RUNNING:
-				count+=1
-				tpname=tp
-
-		if count==1:
-
-			for t in range(len(self.incoming_shares)):
-				price = self.incoming_shares[t][0]
-				share = self.incoming_shares[t][1]
-
-				if share >0:
-					self.tradingplans[tp].ppro_process_orders(price,abs(share),LONG,self.ticker)
-				else:
-					self.tradingplans[tp].ppro_process_orders(price,abs(share),SHORT,self.ticker)
-
-
 	def holdings_update(self,price,share):
 
-		self.incoming_shares.append((price,share))
+		#log_print("holding update - optaning lock")
+		with self.incoming_shares_lock:
 
-		self.share_request = True
+			if price not in self.incoming_shares:
+
+				self.incoming_shares[price] = share
+			else:
+				self.incoming_shares[price] += share
+				#self.incoming_shares.append((price,share))
+
+			self.management_request = True
+		#log_print("holding update - releasing lock")
 		#print("inc",self.incoming_shares)
 
 	def rejection_message(self,side):
@@ -358,11 +493,17 @@ class Symbol:
 		elif side =="Short":
 			coefficient = -1
 
-		for tp,val in self.incoming_request.items():
+		tps = list(self.tradingplans.keys())
 
-			#if val fit. if tp not started but deploy.
-			if val*coefficient >0:
-				self.tradingplans[tp].rejection_handling()
+		for tp in tps:
+
+			if self.tradingplans[tp].if_activated() and self.tradingplans[tp].having_request() and not self.tradingplans[tp].get_flatten_order():
+
+				val = self.tradingplans[tp].read_current_request()
+
+				if val*coefficient >0:
+		 			self.tradingplans[tp].rejection_handling()
+	
 
 	def pair_off(self,tp1,tp2):
 
@@ -414,6 +555,21 @@ class Symbol:
 		self.data[SUPPORT] = support
 
 		
+	def flatten_cmd(self,tp):
+
+		#if i only have 1 tp actived. just flatten.
+		#print(self.tradingplans)
+		if len(list(self.tradingplans.keys())) ==1:
+			self.ppro_out.send(["Flatten",self.ticker])
+		else:
+
+			tp = self.tradingplans[tp]
+			if tp.get_holdings()>0:
+				self.ppro_out.send([IOCSELL,self.ticker,abs(tp.get_holdings()),self.get_bid()])
+			else:
+				self.ppro_out.send([IOCBUY,self.ticker,abs(tp.get_holdings()),self.get_ask()])
+		#else get out the corresponding shares. 
+
 	def update_techindicators(self,dic):
 		for key,value in dic.items():
 			if key in self.data:
@@ -594,3 +750,62 @@ def pair_off_test(a,b):
 # a["c"] = 1
 
 # print(list(a.values()))
+
+	# def incoming_shares_pairingB(self):
+
+	# 	# two ways to go about this.. tp first.. then shares. OR, shares first, then TP. ideally they are equal.in practice ? SHARES FIRST
+
+	# 	paired = []
+	# 	for t in range(len(self.incoming_shares)):
+
+	# 		price = self.incoming_shares[t][0]
+	# 		share = self.incoming_shares[t][1]
+
+	# 		for tp,val in self.incoming_request.items():
+
+	# 			if share >0 and val>0:
+	# 				self.tradingplans[tp].ppro_process_orders(price,abs(share),LONG,self.ticker)
+
+	# 				self.load_confirmation(tp,share)
+
+	# 				self.incoming_request[tp]-=share
+
+	# 				paired.append(t)
+
+	# 				break
+	# 			elif share<0 and val<0:
+	# 				self.tradingplans[tp].ppro_process_orders(price,abs(share),SHORT,self.ticker)
+
+	# 				self.load_confirmation(tp,share)
+
+	# 				## if share is negative, then minus will add to it. 
+	# 				self.incoming_request[tp]-=share
+	# 				paired.append(t)
+
+	# 				break
+
+	# 	#log_print(self.ticker,"incoming shares",self.incoming_shares)
+
+	# 	c = 0
+	# 	for i in paired:
+	# 		self.incoming_shares.pop(i-c)
+	# 		c+=1
+	# 		# try:
+				
+	# 		# except Exception as e:
+	# 		# 	print(e,"poping failure",e,i,self.incoming_shares)
+
+# a = {}
+
+# a['a']=2
+# a['b']=3
+# a['c']=4
+
+# for key,v in a.items():
+
+# 	for i in range(5):
+# 		a[key]-=1
+# 		if a[key]==0:
+# 			break
+
+# print(a)

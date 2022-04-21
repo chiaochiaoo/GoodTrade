@@ -122,7 +122,8 @@ class AbstractTrigger:
 						if not s1[t1] < s2[t2]:
 							eval = False
 				except Exception as e:
-					log_print("Error",self.symbol_name,e,self.description)
+
+					PrintException(e,"msg error"+self.symbol_name+self.description)
 
 			if eval ==True:
 
@@ -329,14 +330,15 @@ class Break_any_Purchase_trigger(AbstractTrigger):
 		
 			if share>0:
 
-				spread = self.symbol_data[ASK]-self.symbol_data[BID]
+				# spread = self.symbol_data[ASK]-self.symbol_data[BID]
 
-				spread_risk = spread*share/self.risk
+				# spread_risk = spread*share/self.risk
 
 				#log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk)
 
+				self.tradingplan.submit_expected_shares(share)
 
-				self.tradingplan.symbol.new_request(self.tradingplan.name,share)
+				#self.tradingplan.symbol.new_request(self.tradingplan.name,share)
 
 				#self.ppro_out.send([IOCBUY,self.symbol_name,share,self.symbol_data[ASK]])
 				# if spread_risk < 0.15:
@@ -355,14 +357,15 @@ class Break_any_Purchase_trigger(AbstractTrigger):
 
 			if share>0:
 
-				spread = self.symbol_data[ASK]-self.symbol_data[BID]
-				spread_risk = spread*share/self.risk
+				# spread = round(self.symbol_data[ASK]-self.symbol_data[BID],2)
+				# spread_risk = spread*share/self.risk
 
-				log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk)
+				# log_print(self.symbol_name,"Current spread:,",spread,"immediate risk loss%",spread_risk)
 
 
 
-				self.tradingplan.symbol.new_request(self.tradingplan.name,-share)
+				self.tradingplan.submit_expected_shares(-share)
+				#self.tradingplan.symbol.new_request(self.tradingplan.name,-share)
 
 				#self.ppro_out.send([IOCSELL,self.symbol_name,share,self.symbol_data[BID]])
 				# if spread_risk < 0.15:
@@ -1461,6 +1464,7 @@ class TwoToOneTrigger(AbstractTrigger):
 		elif self.strategy.orders_level ==3: level= TRIGGER_PRICE_3
 		elif self.strategy.orders_level ==4: level= TRIGGER_PRICE_4
 		elif self.strategy.orders_level ==5: level= TRIGGER_PRICE_5
+		elif self.strategy.orders_level >=6: self.deactivate()
 		# elif self.strategy.orders_level ==6: level= TRIGGER_PRICE_6
 		# elif self.strategy.orders_level ==7: level= TRIGGER_PRICE_7
 		# elif self.strategy.orders_level ==8: level= TRIGGER_PRICE_8
@@ -1511,7 +1515,9 @@ class TwoToOneTrigger(AbstractTrigger):
 			self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[AVERAGE_PRICE])
 
 			#sell 25%. 
-			self.tradingplan.symbol.new_request(self.tradingplan.name,self.strategy.lot)
+
+			self.tradingplan.change_to_shares(self.strategy.lot)
+			#self.tradingplan.symbol.new_request(self.tradingplan.name,self.strategy.lot)
 
 		if self.strategy.orders_level == 2:
 			
@@ -1523,13 +1529,15 @@ class TwoToOneTrigger(AbstractTrigger):
 			# self.set_mind("Half risk",GREEN)
 
 			self.set_mind("Covered No."+str(1)+" lot.",GREEN)
-			self.tradingplan.symbol.new_request(self.tradingplan.name,self.strategy.lot)
+			self.tradingplan.change_to_shares(self.strategy.lot)
+			#self.tradingplan.symbol.new_request(self.tradingplan.name,self.strategy.lot)
 
 		if self.strategy.orders_level == 3:
 			
 			#BREAK EVEN
 			self.set_mind("Covered No."+str(2)+" lot.",GREEN)
-			self.tradingplan.symbol.new_request(self.tradingplan.name,self.strategy.lot)
+			self.tradingplan.change_to_shares(self.strategy.lot)
+			#self.tradingplan.symbol.new_request(self.tradingplan.name,self.strategy.lot)
 
 
 			
@@ -1537,7 +1545,8 @@ class TwoToOneTrigger(AbstractTrigger):
 		if self.strategy.orders_level == 4:
 
 			self.set_mind("Covered No."+str(3)+" lot.",GREEN)
-			self.tradingplan.symbol.new_request(self.tradingplan.name,self.strategy.lot)
+			self.tradingplan.change_to_shares(self.strategy.lot)
+			#self.tradingplan.symbol.new_request(self.tradingplan.name,self.strategy.lot)
 			
 
 
@@ -1551,9 +1560,11 @@ class TwoToOneTrigger(AbstractTrigger):
 
 			self.set_mind("Covered No."+str(4)+" lot.",GREEN)
 			if self.tradingplan.data[POSITION] == LONG:
-				self.tradingplan.symbol.new_request(self.tradingplan.name,self.tradingplan.data[CURRENT_SHARE]*-1)
+				self.tradingplan.submit_expected_shares(0)
+				#self.tradingplan.symbol.new_request(self.tradingplan.name,self.tradingplan.data[CURRENT_SHARE]*-1)
 			else:
-				self.tradingplan.symbol.new_request(self.tradingplan.name,self.tradingplan.data[CURRENT_SHARE])
+				self.tradingplan.submit_expected_shares(0)
+				#self.tradingplan.symbol.new_request(self.tradingplan.name,self.tradingplan.data[CURRENT_SHARE])
 
 
 			new_stop =round(self.tradingplan.data[TRIGGER_PRICE_3],2)
