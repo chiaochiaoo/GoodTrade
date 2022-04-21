@@ -730,7 +730,7 @@ class TradingPlan:
 				self.symbol.ppro_out.send([IOCBUY,self.symbol_name,abs(self.data[CURRENT_SHARE]),self.symbol.get_ask()])
 				self.symbol.cancel_all_request(self.name)
 			# 	
-			self.symbol.ppro_out.send([CANCEL,self.symbol_name])
+			#self.symbol.ppro_out.send([CANCEL,self.symbol_name])
 
 
 			
