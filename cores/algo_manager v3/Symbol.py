@@ -137,7 +137,7 @@ class Symbol:
 
 		#first calculate all the positive, then all the negative? NO... it's by
 
-		#log_print(self.ticker,"Inspection")
+		log_print(self.ticker,"Inspection")
 
 		if len(self.incoming_shares)>0:
 
@@ -194,10 +194,12 @@ class Symbol:
 		
 		# remaining_share = sum(self.incoming_request.values())
 
-		#log_print(self.ticker,"remaining unmatched:",self.incoming_shares)
+		
 
 
 		self.current_imbalance = self.get_all_imbalance()
+
+		log_print(self.ticker,"current imbalance:",self.current_imbalance)
 
 		if self.current_imbalance==0:
 
@@ -320,7 +322,6 @@ class Symbol:
 
 						holding = self.tradingplans[tp].get_holdings()
 
-						print("stock holding",holding)
 
 						if  holding>0 and share*holding <0:
 
