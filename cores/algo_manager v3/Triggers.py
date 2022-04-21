@@ -174,10 +174,7 @@ class AbstractTrigger:
 			self.trigger_event()
 		except Exception as e:
 
-			exc_type, exc_obj, exc_tb = sys.exc_info()
-			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-			log_print("TRIGGER ERROR:",e,data,exc_type, fname, exc_tb.tb_lineno)
-
+			PrintException("trigger error",e)
 
 
 		if self.trigger_count == self.trigger_limit:
