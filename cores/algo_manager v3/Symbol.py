@@ -137,7 +137,7 @@ class Symbol:
 
 		#first calculate all the positive, then all the negative? NO... it's by
 
-		log_print(self.ticker,"Inspection")
+		log_print(self.ticker,"Inspection, holdings",self.incoming_shares)
 
 		if len(self.incoming_shares)>0:
 
