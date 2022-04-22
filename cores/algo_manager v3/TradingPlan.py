@@ -1009,7 +1009,8 @@ class TradingPlan:
 	def on_finish(self,plan):
 		
 		if plan==self.entry_plan:
-			log_print(self.symbol_name,self.entry_plan.get_name()," completed.")
+			pass 
+			
 			#self.entry_strategy_done()
 			# it is no longer that 
 			# done = threading.Thread(target=self.entry_strategy_done, daemon=True)
@@ -1021,7 +1022,7 @@ class TradingPlan:
 			log_print("Trading Plan: UNKONW CALL FROM Strategy",plan)
 
 	def entry_strategy_done(self):
-
+		log_print(self.symbol_name,self.entry_plan.get_name()," completed.")
 		self.management_plan.on_start()
 		self.current_running_strategy = self.management_plan
 
