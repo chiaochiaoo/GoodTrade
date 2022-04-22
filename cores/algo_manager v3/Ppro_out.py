@@ -117,17 +117,23 @@ def breakdown_order(symbol,share,break_price):
 def buy_market_order(symbol,share):
 
 
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=EDGX Buy ROUC Market DAY&shares='+str(share)
+
+	#r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=EDGX Buy ROUC Market DAY&shares='+str(share)
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Buy ARCX Market DAY&shares='+str(share)
 	sucess='buy market order success on'+symbol
 	failure="Error buy order on"+symbol
 
 	return r,sucess,failure
+	#
 	#req = threading.Thread(target=ppro_request, args=(r,sucess,failure,),daemon=True)
 	#req.start()
 
 def sell_market_order(symbol,share):
 
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=EDGX Sell->Short ROUC Market DAY&shares='+str(share)
+
+
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(share)
+	#r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=EDGX Sell->Short ROUC Market DAY&shares='+str(share)
 	sucess='sell market order success on'+symbol
 	failure="Error sell order on"+symbol
 
