@@ -1022,7 +1022,7 @@ class TradingPlan:
 			log_print("Trading Plan: UNKONW CALL FROM Strategy",plan)
 
 	def entry_strategy_done(self):
-		log_print(self.symbol_name,self.entry_plan.get_name()," completed.")
+		log_print(self.symbol_name,self.entry_plan.get_name()," loaded. management starts.")
 		self.management_plan.on_start()
 		self.current_running_strategy = self.management_plan
 
