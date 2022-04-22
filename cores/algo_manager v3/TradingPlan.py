@@ -40,13 +40,14 @@ class TradingPlan:
 
 		#self.ppro_out = ppro_out
 		self.expect_orders = ""
-
 		self.flatten_order = False
-
 		self.read_lock = threading.Lock()
 
 
+		# First time its expected is fullfilled. shall the management starts.
+
 		self.have_request = False
+		self.management_start = False
 		self.expected_shares = 0
 		self.current_shares = 0
 		self.current_request = 0
@@ -61,6 +62,8 @@ class TradingPlan:
 		self.current_price_level = 0
 
 		self.price_levels = {}
+
+
 
 
 		# NO LONGER USED #
@@ -117,6 +120,10 @@ class TradingPlan:
 
 			if self.current_request ==0:
 				self.have_request = False
+
+		if self.current_request ==0 and not self.management_start:
+			self.entry_strategy_done()
+			self.management_start = True
 
 	#def request_calibration(self):
 
@@ -368,7 +375,8 @@ class TradingPlan:
 			log_print(self.name,"flattening")
 
 			self.flatten_cmd()
-			# xian zhan hou zou
+
+			# xian zhan hou zou. NO! NOT LEGAL! 
 
 			# if self.data[POSITION]==LONG:
 			# 	self.symbol.new_request(self.name,-self.data[CURRENT_SHARE])
@@ -415,6 +423,8 @@ class TradingPlan:
 		self.flatten_order = False
 		self.ppro_orders_loadup(price,shares,side)
 
+
+		### INITIAL ACCUMULATING STAGE? ###
 	def ppro_orders_loadup(self,price,shares,side):
 
 		current = self.data[CURRENT_SHARE]
@@ -545,10 +555,9 @@ class TradingPlan:
 		if self.data[STATUS] == DEPLOYED:
 
 			# cancel whatever requested on symbol.
-
 			# withdraw the algo. 
-
 			# show rejection. 
+
 			self.submit_expected_shares(0)
 			#self.symbol.cancel_all_request(self.name)
 			self.mark_algo_status(REJECTED)
@@ -676,7 +685,6 @@ class TradingPlan:
 			# # 	
 			# #self.symbol.ppro_out.send([CANCEL,self.symbol_name])
 
-			
 
 	"""	UI related  """
 	def update_symbol_tkvar(self):
@@ -820,9 +828,6 @@ class TradingPlan:
 
 		if self.tkvars[STATUS].get() ==PENDING:
 
-#			try:
-
-			#self.ppro_out.send([REGISTER,self.symbol_name])
 
 			self.symbol.register_tradingplan(self.name,self)
 
@@ -1005,7 +1010,8 @@ class TradingPlan:
 		
 		if plan==self.entry_plan:
 			log_print(self.symbol_name,self.entry_plan.get_name()," completed.")
-			self.entry_strategy_done()
+			#self.entry_strategy_done()
+			# it is no longer that 
 			# done = threading.Thread(target=self.entry_strategy_done, daemon=True)
 			# done.start()
 		elif plan==self.management_plan:
