@@ -116,10 +116,15 @@ class Symbol:
 
 	def immediate_request(self,shares):
 
+		# I may need to cancel existing order first. for a 0.1 second delay.
+		
 		if shares<0:
 			self.ppro_out.send([IOCSELL,self.ticker,abs(shares),self.get_bid()])
 		else:
 			self.ppro_out.send([IOCBUY,self.ticker,abs(shares),self.get_ask()])
+
+	def clear_all_orders(self):
+		self.ppro_out.send([CANCEL,self.ticker])
 
 		#what if... hmm. there's a split second difference? 
 

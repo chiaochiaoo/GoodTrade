@@ -128,6 +128,7 @@ class TradingPlan:
 	#def request_calibration(self):
 
 
+
 	def having_request(self):
 
 		return self.have_request
@@ -1066,6 +1067,10 @@ class TradingPlan:
 
 		pass
 
+	def get_management_start(self):
+		return self.management_start
+
+		
 
 # if __name__ == '__main__':
 

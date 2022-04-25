@@ -316,8 +316,6 @@ class Manager:
 
 		self.root = root
 
-		self.receiving_signals = tk.BooleanVar(value=True)
-		self.cmd_text = tk.StringVar(value="Status:")
 
 
 
@@ -341,7 +339,14 @@ class Manager:
 
 		self.manage_lock = 0
 
+
+		self.receiving_signals = tk.BooleanVar(value=True)
+		self.cmd_text = tk.StringVar(value="Status:")
+
+
 		self.ui = UI(root,self,self.receiving_signals,self.cmd_text)
+
+		m=self.receiving_signals.trace('w', lambda *_: self.receiving())
 
 		self.active_trade = 0
 		self.active_trade_max = 0
@@ -816,6 +821,14 @@ class Manager:
 		self.ui.current_upside.set(int(-self.current_upside))  
 
 
+
+	def receiving(self):
+
+		if self.receiving_signals.get():
+			self.ui.receiving_algo["background"] = "#97FEA8"
+		else:
+			self.ui.receiving_algo["background"] = "red"
+
 	def goodtrade_in(self):
 		time.sleep(3)
 		count = 0
@@ -1063,7 +1076,7 @@ class Manager:
 			if positive_pnl:
 				self.cmd_text.set("Status: "+"Winning"+" "+str(action)+" "+str(percent*100)+"%")
 			for d in list(self.tradingplan.values()):
-				if d.in_use and d.data[STATUS]==RUNNING:
+				if d.in_use and d.data[STATUS]==RUNNING and d.get_management_start():
 					if positive_pnl==True and d.data[UNREAL] >0:
 							d.manage_trades(side,action,percent,passive)
 					else:

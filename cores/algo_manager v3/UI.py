@@ -415,10 +415,10 @@ class UI(pannel):
 
 	def init_command(self):
 
-		
+		self.receiving_algo = ttk.Label(self.cmd, text="Receiving Algo:")
+		self.receiving_algo["background"] = "#97FEA8"
+		self.receiving_algo.grid(sticky="w",column=1,row=1)
 
-
-		ttk.Label(self.cmd, text="Receiving Algo:").grid(sticky="w",column=1,row=1)
 		ttk.Checkbutton(self.cmd, variable=self.receiving_signals).grid(sticky="w",column=2,row=1)
 
 		#self.receiving_signals
