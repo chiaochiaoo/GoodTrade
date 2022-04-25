@@ -318,9 +318,10 @@ def algo_server(ulti_response,supervisor):
 
 				now  = datetime.now()
 
+				cur_min_ts = now.hour*60+now.minute
 				if now.hour*3600+now.minute *60+now.second - ts>10:
 					try:
-						s.sendall("algo requesting update".encode())
+						s.sendall("algo requesting update"+str(cur_min_ts).encode())
 						print(now.strftime("%H:%M:%S : ") ,"Algo requesting update:")
 					except:
 						connection = False
