@@ -178,12 +178,17 @@ class TradingPlan:
 
 		log_print(self.symbol_name, "change to shares:",shares, "immediately:",immediately)
 
+		flatten = False
 		with self.read_lock:
 
 			#rationality check. if greater and opposite of current shares. just set to 0.
 
 			if shares*self.current_shares<0 and abs(shares)>abs(self.current_shares):
 				self.submit_expected_shares(0)
+				flatten= True
+				#if immediately. just go flatten then. 
+
+
 			else:
 				self.expected_shares += shares
 				self.current_request = self.expected_shares - self.current_shares
@@ -191,7 +196,10 @@ class TradingPlan:
 			if not immediately:
 				self.notify_request()
 			else:
-				self.notify_immediate_request(self.current_request)
+				if flatten:
+					self.flatten_cmd()
+				else:
+					self.notify_immediate_request(self.current_request)
 
 
 	# def immediately_change_to_shares(self,shares):
@@ -1070,7 +1078,7 @@ class TradingPlan:
 	def get_management_start(self):
 		return self.management_start
 
-		
+
 
 # if __name__ == '__main__':
 
