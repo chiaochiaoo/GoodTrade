@@ -335,7 +335,7 @@ class TradingPlan:
 
 			if price >=  self.data[STOP_LEVEL]:
 				flatten=True
-				print("flatening,",price,self.data[STOP_LEVEL])
+				#print("flatening,",price,)
 
 		if self.data[CURRENT_SHARE] >0:
 			self.data[UNREAL_PSHR] = gain
@@ -372,7 +372,7 @@ class TradingPlan:
 			self.flatten_order=True
 			self.data[FLATTENTIMER]=0
 
-			log_print(self.name,"flattening")
+			log_print(self.name,"flattening",self.data[STOP_LEVEL],self.name)
 
 			self.flatten_cmd()
 
