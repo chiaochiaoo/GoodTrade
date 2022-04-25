@@ -1,5 +1,6 @@
 from pannel import *
 from tkinter import ttk
+import tkinter as tk 
 from Symbol import *
 from TradingPlan import *
 from Pair_TP import *
@@ -315,6 +316,11 @@ class Manager:
 
 		self.root = root
 
+		self.receiving_signals = tk.BooleanVar(value=True)
+		self.cmd_text = tk.StringVar(value="Status:")
+
+
+
 		self.termination = False
 		self.pipe_ppro_in = ppro_in
 		self.pipe_ppro_out = ppro_out
@@ -328,8 +334,6 @@ class Manager:
 
 		self.symbol_data = {}
 
-
-
 		self.tradingplan = {}
 
 		self.pair_plans = {}
@@ -337,7 +341,7 @@ class Manager:
 
 		self.manage_lock = 0
 
-		self.ui = UI(root,self)
+		self.ui = UI(root,self,self.receiving_signals,self.cmd_text)
 
 		self.active_trade = 0
 		self.active_trade_max = 0
@@ -594,11 +598,11 @@ class Manager:
 
 					#def __init__(self,name:"",symbol:Symbol,entry_plan=None,manage_plan=None,support=0,resistence=0,risk=None,TEST_MODE=False,algo_name="",Manager=None):
 
-					self.tradingplan[symbol] = TradingPlan(name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
-					self.ui.create_new_single_entry(self.tradingplan[symbol],type_name,None)
+					self.tradingplan[algo_id] = TradingPlan(name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
+					self.ui.create_new_single_entry(self.tradingplan[algo_id],type_name,None)
 
 					if status == True:
-						self.tradingplan[symbol].deploy(9600)
+						self.tradingplan[algo_id].deploy(9600)
 				else:
 
 					find_ = False
@@ -618,19 +622,15 @@ class Manager:
 
 						#######################################################################
 
-						self.tradingplan[symbol] = TradingPlan(name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
+						self.tradingplan[algo_id] = TradingPlan(name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
 						#self.tradingplan[symbol]=TradingPlan(name,self.symbol_data[symbol],entryplan,INSTANT,mana,risk,0,TEST_MODE,algo_name,self)
-						self.ui.create_new_single_entry(self.tradingplan[symbol],type_name,replace_id)
+						self.ui.create_new_single_entry(self.tradingplan[algo_id],type_name,replace_id)
 						#self.ui.create_single_entry(self.tradingplan[symbol],replace_id)
 
 						if status == True:
-							self.tradingplan[symbol].deploy(9600)
+							self.tradingplan[algo_id].deploy(9600)
 					else:
 						log_print("System at full capacity.")
-
-
-
-
 
 
 	def timer(self):
@@ -661,6 +661,7 @@ class Manager:
 
 			time.sleep(1)
 
+		#time.sleep(5)
 		self.ui.algo_timer_string.set("Deployed")
 		self.deploy_all()
 
@@ -834,18 +835,20 @@ class Manager:
 					PrintException(e,"msg error")
 			if d[0] =="pkg":
 				log_print("new package arrived",d)
-				for i in d[1]:
-
-					try:
-						self.add_new_tradingplan(i,self.test_mode)
-
-					
-					except Exception as e:
-
-						PrintException(e,"adding algo error")
 
 
+				if self.receiving_signals.get():
+					for i in d[1]:
 
+						try:
+							self.add_new_tradingplan(i,self.test_mode)
+
+						
+						except Exception as e:
+
+							PrintException(e,"adding algo error")
+				else:
+					log_print("Algo rejection. deployment denied.")
 
 	def ppro_in(self):
 		while True:
@@ -1030,7 +1033,8 @@ class Manager:
 
 	def deploy_all(self):
 		for d in list(self.tradingplan.values()):
-			if d.in_use:
+			#print(list(self.tradingplan.values()))
+			if d.data[STATUS]==PENDING:
 				d.deploy()
 
 	def withdraw_all(self):
@@ -1050,25 +1054,27 @@ class Manager:
 
 		passive = passive.get()
 		diff =  ts -self.manage_lock
+
 		if diff>2:
 
 			log_print("All",side," ",action," ",percent*100,"%")
+			if side!=None:
+				self.cmd_text.set("Status: "+str(side)+" "+str(action)+" "+str(percent*100)+"%")
+			if positive_pnl:
+				self.cmd_text.set("Status: "+"Winning"+" "+str(action)+" "+str(percent*100)+"%")
 			for d in list(self.tradingplan.values()):
 				if d.in_use and d.data[STATUS]==RUNNING:
-
-					if positive_pnl==True:
-						if d.data[UNREAL] >0:
-							#print(d.data[UNREAL])
-
-							#side = d.data[POSITION]
+					if positive_pnl==True and d.data[UNREAL] >0:
 							d.manage_trades(side,action,percent,passive)
 					else:
 
 						d.manage_trades(side,action,percent,passive)
 
 			self.manage_lock = ts
-		log_print("Trades aggregation under cooldown:",diff)
+		else:
 
+			log_print("Trades aggregation under cooldown:",diff)
+			self.cmd_text.set("Status: Under CoolDown:"+str(diff))
 	def cancel_all(self):
 		for d in list(self.tradingplan.values()):
 			d.cancel_algo()

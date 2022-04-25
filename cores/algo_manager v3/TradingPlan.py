@@ -142,6 +142,20 @@ class TradingPlan:
 		self.have_request = True
 		self.symbol.request_notified()
 
+	def notify__request_with_delay(self):
+
+		time.sleep(1.5)
+		self.notify_request()
+
+	def notify_immediate_request(self,shares):
+
+		# add a little delay using thread.
+		self.symbol.immediate_request(shares)
+
+		delayed_notification = threading.Thread(target=self.notify__request_with_delay, daemon=True)
+		delayed_notification.start()
+
+
 	def read_current_request(self):
 
 		return self.current_request
@@ -159,9 +173,9 @@ class TradingPlan:
 
 			self.notify_request()
 
-	def change_to_shares(self,shares):
+	def change_to_shares(self,shares,immediately=False):
 
-		log_print("change to shares:",shares)
+		log_print(self.symbol_name, "change to shares:",shares, "immediately:",immediately)
 
 		with self.read_lock:
 
@@ -173,7 +187,24 @@ class TradingPlan:
 				self.expected_shares += shares
 				self.current_request = self.expected_shares - self.current_shares
 
-			self.notify_request()
+			if not immediately:
+				self.notify_request()
+			else:
+				self.notify_immediate_request(self.current_request)
+
+
+	# def immediately_change_to_shares(self,shares):
+
+	# 	log_print("change to shares:,"shares)
+
+	# 		if shares*self.current_shares<0 and abs(shares)>abs(self.current_shares):
+	# 			self.submit_expected_shares(0)
+	# 		else:
+	# 			self.expected_shares += shares
+	# 			self.current_request = self.expected_shares - self.current_shares
+
+	# 		self.notify_immediate_request(self.current_request)
+
 	# relative sense. 
 
 	def add_to_shares(self,shares):
@@ -618,7 +649,12 @@ class TradingPlan:
 			if pproaction!="":
 
 
-				self.change_to_shares(shares*coefficient)
+				if passive:
+
+					self.change_to_shares(shares*coefficient,immediately=False)
+
+				else:
+					self.change_to_shares(shares*coefficient,immediately=True)
 				#self.symbol.new_request(self.name,shares*coefficient)
 
 				# self.ppro_out.send([pproaction,self.symbol_name,shares,description])

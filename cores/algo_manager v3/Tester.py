@@ -78,7 +78,7 @@ class Tester:
 
 		dic = {}
 
-		dic["algo_id"] = 'TESTx'
+		dic["algo_id"] = 'TEST1'
 		dic["type_name"] = 'Single'
 		dic["algo_name"] = 'TEST'
 		dic["entry_type"] =INSTANTLONG
@@ -95,7 +95,7 @@ class Tester:
 
 		dic = {}
 
-		dic["algo_id"] = 'TESTz'
+		dic["algo_id"] = 'TEST2'
 		dic["type_name"] = 'Single'
 		dic["algo_name"] = 'TEST'
 		dic["entry_type"] =INSTANTSHORT

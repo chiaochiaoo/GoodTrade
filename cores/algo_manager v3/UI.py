@@ -3,12 +3,16 @@ from constant import *
 from Util_functions import *
 
 class UI(pannel):
-	def __init__(self,root,manager=None):
+	def __init__(self,root,manager=None,receiving_signals=None,cmd_text=None):
 
 		self.root = root
 
 
 		self.manager = manager
+
+
+		self.receiving_signals = receiving_signals
+		self.command_text = cmd_text
 
 		self.tk_strings=["algo_status","realized","shares","unrealized","unrealized_pshr","average_price"]
 		self.tk_labels=[SYMBOL,STATUS,MIND, 'EntryPlan', 'EntryType', 'ETmr', 'Management','Reload', 'AR', 'Sup', 'Res', 'Act/Est R', 'Position', 'AvgPx', 'SzIn', 'UPshr', 'U', 'R', 'TR', 'flatten', 'log']
@@ -411,34 +415,51 @@ class UI(pannel):
 
 	def init_command(self):
 
-		self.command_text = tk.StringVar(value="Ready:")
+		
 
-		ttk.Label(self.cmd, text="").grid(sticky="w",column=1,row=1)
 
-		ttk.Label(self.cmd, textvariable=self.command_text).place(x=0,y=0)
+		ttk.Label(self.cmd, text="Receiving Algo:").grid(sticky="w",column=1,row=1)
+		ttk.Checkbutton(self.cmd, variable=self.receiving_signals).grid(sticky="w",column=2,row=1)
 
+		#self.receiving_signals
+
+
+		row = 2
 
 		self.algo_deploy = ttk.Button(self.cmd, text="Deploy all algo",command=self.manager.deploy_all)#,command=self.deploy_all_stoporders)
-		self.algo_deploy.grid(sticky="w",column=1,row=2)
+		self.algo_deploy.grid(sticky="w",column=1,row=row)
 
 		self.algo_pend = ttk.Button(self.cmd, text="Withdraw all algo",command=self.manager.withdraw_all)#,command=self.cancel_all_stoporders)
-		self.algo_pend.grid(sticky="w",column=2,row=2)
+		self.algo_pend.grid(sticky="w",column=2,row=row)
+
+		row +=1 
 
 		self.flatten = ttk.Button(self.cmd, text="Flatten all algo",command=self.manager.flatten_all)
-		self.flatten.grid(sticky="w",column=1,row=3)
+		self.flatten.grid(sticky="w",column=1,row=row)
 
-		self.algo_cancel = ttk.Button(self.cmd, text="Cancel all algo",command=self.manager.cancel_all)
-		self.algo_cancel.grid(sticky="w",column=2,row=3)
+		# self.algo_cancel = ttk.Button(self.cmd, text="Cancel all algo",command=self.manager.cancel_all)
+		# self.algo_cancel.grid(sticky="w",column=2,row=row)
+
+		row +=1 
 
 		self.flatten = ttk.Button(self.cmd, text="Weekly Report",command=graphweekly)
-		self.flatten.grid(sticky="w",column=1,row=4)
+		self.flatten.grid(sticky="w",column=1,row=row)
 
 		self.algo_cancel = ttk.Button(self.cmd, text="Daily Report" ) #command=self.manager.import_algos
-		self.algo_cancel.grid(sticky="w",column=2,row=4)
+		self.algo_cancel.grid(sticky="w",column=2,row=row)
 
-		row=5
+		row=6
 
 		ttk.Label(self.cmd, text=" ").grid(sticky="w",column=1,row=row)
+		row+=2
+
+
+
+		row+=1
+		#self.command_text = tk.StringVar(value="Status:")
+		ttk.Label(self.cmd, textvariable=self.command_text).grid(sticky="w",column=1,row=row,columnspan =2)
+
+
 		row+=1
 
 		ttk.Label(self.cmd, text="Passive Fills:").grid(sticky="w",column=1,row=row)

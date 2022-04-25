@@ -114,6 +114,14 @@ class Symbol:
 	def request_notified(self):
 		self.management_request = True
 
+	def immediate_request(self,shares):
+
+		if shares<0:
+			self.ppro_out.send([IOCSELL,self.ticker,abs(shares),self.get_bid()])
+		else:
+			self.ppro_out.send([IOCBUY,self.ticker,abs(shares),self.get_ask()])
+
+		#what if... hmm. there's a split second difference? 
 
 	def load_confirmation(self,tradingplan_name,shares):
 
@@ -317,7 +325,7 @@ class Symbol:
 
 				
 				for tp in tps:
-					print("processing",tps,share,self.tradingplans[tp].having_request())
+					#print("processing",tps,share,self.tradingplans[tp].having_request())
 					if self.tradingplans[tp].if_activated():
 
 						holding = self.tradingplans[tp].get_holdings()
