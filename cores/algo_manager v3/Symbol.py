@@ -77,6 +77,8 @@ class Symbol:
 
 		self.management_request = False
 
+		self.expecting_market_order = False
+
 		### NEED LOCK FOR EACH OF THESE
 
 		#self.incoming_request = {}
@@ -107,6 +109,9 @@ class Symbol:
 
 		log_print("name","deleted",self.ticker)
 
+	def expecting_marketorder(self):
+		self.expecting_market_order = True
+
 
 	def get_management_request(self):
 		return self.management_request
@@ -117,7 +122,7 @@ class Symbol:
 	def immediate_request(self,shares):
 
 		# I may need to cancel existing order first. for a 0.1 second delay.
-		
+
 		if shares<0:
 			self.ppro_out.send([IOCSELL,self.ticker,abs(shares),self.get_bid()])
 		else:
@@ -221,7 +226,9 @@ class Symbol:
 
 		else:
 
-			self.passive_orders()
+			if self.expecting_market_order!=True:
+				self.passive_orders()
+				
 
 			# if remaining_share>0:
 			# 	self.ppro_out.send([IOCBUY,self.ticker,abs(remaining_share),self.data[ASK]])
@@ -229,6 +236,8 @@ class Symbol:
 			# 	self.ppro_out.send([IOCSELL,self.ticker,abs(remaining_share),self.data[BID]])
 
 			## HERE USE PASSIVE ## 
+
+		self.expecting_market_order = False
 
 	def get_all_imbalance(self):
 

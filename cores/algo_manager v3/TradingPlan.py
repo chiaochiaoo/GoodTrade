@@ -146,12 +146,16 @@ class TradingPlan:
 	def notify__request_with_delay(self):
 
 		time.sleep(1.5)
+
+		self.symbol.expecting_marketorder()
 		self.notify_request()
 
 	def notify_immediate_request(self,shares):
 
 		# add a little delay using thread.
+
 		self.symbol.immediate_request(shares)
+		
 
 		delayed_notification = threading.Thread(target=self.notify__request_with_delay, daemon=True)
 		delayed_notification.start()
