@@ -171,15 +171,16 @@ class Tester:
 					else:
 						data["price"]=float(self.qask)
 
-					if share>3:
-						data["shares"]= int(share)//3
+					data["shares"]= int(share)
+					self.ppro.send(["order confirm",data])
+					# if share>3:
+					# 	data["shares"]= int(share)//3
 						
-						self.ppro.send(["order confirm",data])
-						self.ppro.send(["order confirm",data])
-						self.ppro.send(["order confirm",data])
-					else:
-						data["shares"]= int(share)
-						self.ppro.send(["order confirm",data])
+					# 	self.ppro.send(["order confirm",data])
+					# 	self.ppro.send(["order confirm",data])
+					# 	self.ppro.send(["order confirm",data])
+					# else:
+
 
 				elif type_ =="Sell" or type_ == IOCSELL:
 
@@ -207,16 +208,17 @@ class Tester:
 
 
 					data["timestamp"]= self.sec
+					data["shares"]= int(share)
+					self.ppro.send(["order confirm",data])
 
-					if share>3:
-						data["shares"]= int(share)//3
+					# if share>3:
+					# 	data["shares"]= int(share)//3
 						
-						self.ppro.send(["order confirm",data])
-						self.ppro.send(["order confirm",data])
-						self.ppro.send(["order confirm",data])
-					else:
-						data["shares"]= int(share)
-						self.ppro.send(["order confirm",data])
+					# 	self.ppro.send(["order confirm",data])
+					# 	self.ppro.send(["order confirm",data])
+					# 	self.ppro.send(["order confirm",data])
+					# else:
+
 
 
 				elif type_ == LIMITBUY :
