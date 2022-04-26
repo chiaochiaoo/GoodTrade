@@ -315,10 +315,7 @@ class Manager:
 	def __init__(self,root,goodtrade_pipe=None,ppro_out=None,ppro_in=None,TEST_MODE=False):
 
 		self.root = root
-
-
-
-
+		
 		self.termination = False
 		self.pipe_ppro_in = ppro_in
 		self.pipe_ppro_out = ppro_out
@@ -1070,14 +1067,16 @@ class Manager:
 
 		if diff>2:
 
-			log_print("All",side," ",action," ",percent*100,"%")
+			log_print("All",side," ",action," ",percent*100,"%"," winning?",positive_pnl)
 			if side!=None:
 				self.cmd_text.set("Status: "+str(side)+" "+str(action)+" "+str(percent*100)+"%")
 			if positive_pnl:
 				self.cmd_text.set("Status: "+"Winning"+" "+str(action)+" "+str(percent*100)+"%")
 			for d in list(self.tradingplan.values()):
 				if d.in_use and d.data[STATUS]==RUNNING and d.get_management_start():
-					if positive_pnl==True and d.data[UNREAL] >0:
+					if positive_pnl==True:
+						if d.data[UNREAL] >0:
+							#print("CHEKCING UNREAL",d.data[UNREAL])
 							d.manage_trades(side,action,percent,passive)
 					else:
 

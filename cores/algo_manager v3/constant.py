@@ -60,7 +60,7 @@ TOTAL_REALIZED = "TOTAL_REALIZED"
 STOP = "Stop"
 STOP_LEVEL = "Stop_level"
 SYMBOL = "Symbol"
-MIND = "MIND"
+MIND = "Msg"
 RELOAD_TIMES = "Reloadtimes"
 
 CUR_PROFIT_LEVEL = "Current_profit_level"

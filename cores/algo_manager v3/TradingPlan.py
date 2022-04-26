@@ -125,9 +125,6 @@ class TradingPlan:
 			self.entry_strategy_done()
 			self.management_start = True
 
-	#def request_calibration(self):
-
-
 
 	def having_request(self):
 
@@ -145,7 +142,7 @@ class TradingPlan:
 
 	def notify__request_with_delay(self):
 
-		time.sleep(1.5)
+		#time.sleep(1.5)
 
 		self.symbol.expecting_marketorder()
 		self.notify_request()
@@ -156,9 +153,10 @@ class TradingPlan:
 
 		self.symbol.immediate_request(shares)
 		
+		self.notify__request_with_delay()
 
-		delayed_notification = threading.Thread(target=self.notify__request_with_delay, daemon=True)
-		delayed_notification.start()
+		# delayed_notification = threading.Thread(target=self.notify__request_with_delay, daemon=True)
+		# delayed_notification.start()
 
 
 	def read_current_request(self):
@@ -204,21 +202,6 @@ class TradingPlan:
 					self.flatten_cmd()
 				else:
 					self.notify_immediate_request(self.current_request)
-
-
-	# def immediately_change_to_shares(self,shares):
-
-	# 	log_print("change to shares:,"shares)
-
-	# 		if shares*self.current_shares<0 and abs(shares)>abs(self.current_shares):
-	# 			self.submit_expected_shares(0)
-	# 		else:
-	# 			self.expected_shares += shares
-	# 			self.current_request = self.expected_shares - self.current_shares
-
-	# 		self.notify_immediate_request(self.current_request)
-
-	# relative sense. 
 
 	def add_to_shares(self,shares):
 
@@ -318,8 +301,6 @@ class TradingPlan:
 
 
 	""" PASSSIVE ENTRY/EXIT OVER A PERIOD AMONT OF TIME """
-
-
 
 	def ppro_update_price(self,symbol="",bid=0,ask=0,ts=0):
 
@@ -502,7 +483,6 @@ class TradingPlan:
 
 		self.data[LAST_AVERAGE_PRICE] = self.data[AVERAGE_PRICE]
 
-
 	def ppro_orders_loadoff(self,price,shares,side):
 
 		current = self.data[CURRENT_SHARE]
@@ -549,8 +529,6 @@ class TradingPlan:
 			self.clear_trade()
 			log_print(self.symbol_name,"Trade completed."," this trade:",self.data[REALIZED]," total:",self.data[TOTAL_REALIZED])
 
-
-
 	def clear_trade(self):
 
 		
@@ -586,8 +564,6 @@ class TradingPlan:
 			self.tkvars[RELOAD].set(False)
 			self.start_tradingplan()
 
-
-
 	def rejection_handling(self):
 
 
@@ -603,6 +579,7 @@ class TradingPlan:
 			# show rejection. 
 
 			self.submit_expected_shares(0)
+
 			#self.symbol.cancel_all_request(self.name)
 			self.mark_algo_status(REJECTED)
 
@@ -613,7 +590,6 @@ class TradingPlan:
 	# def ppro_order_rejection(self):
 
 	# 	self.mark_algo_status(REJECTED)
-
 
 	""" Trade management """
 
@@ -1072,6 +1048,9 @@ class TradingPlan:
 
 	def entry_strategy_done(self):
 		log_print(self.symbol_name,self.entry_plan.get_name()," loaded. management starts.")
+
+		self.set_mind("Managemetn Starts:",GREEN)
+
 		self.management_plan.on_start()
 		self.current_running_strategy = self.management_plan
 

@@ -311,7 +311,7 @@ class Break_any_Purchase_trigger(AbstractTrigger):
 			if self.trigger_count!= self.trigger_limit:
 				self.set_mind("Entry: "+str(self.trigger_count)+"/"+str(self.trigger_limit),DEFAULT)
 			else:
-				self.set_mind("Entry: Complete",GREEN)
+				self.set_mind("Allocating Shares:",GREEN)
 
 		#print()
 		if self.pos == LONG:
