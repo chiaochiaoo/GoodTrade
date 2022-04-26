@@ -289,28 +289,30 @@ def algo_server(ulti_response,supervisor):
 	package_reception = 0
 
 
+	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	s.setblocking(True)
+	
 	while True:
-
 
 		try:
 			HOST = '10.29.10.132'  # The server's hostname or IP address
 			PORT = 65425       # The port used by the server
 
-			print("Trying to connect to the Algo server")
-			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			print("Trying to connect to the Algo server - socket blocking",s.getblocking())
+
 			connected = False
 
 			while not connected:
 				try:
 					s.connect((HOST, PORT))
 					connected = True
-				except:
+				except Exception as e:
 					#pipe.send(["msg","Cannot connected. Try again in 2 seconds."])
-					print("Cannot connect Algo server. Try again in 2 seconds.")
+					print("Cannot connect Algo server. Try again in 2 seconds.",e)
 					time.sleep(5)
 
 			connection = True
-			#s.setblocking(0)
+			#
 
 			print("Algo server Connection Successful")
 
@@ -322,7 +324,7 @@ def algo_server(ulti_response,supervisor):
 				if now.hour*3600+now.minute *60+now.second - ts>10:
 					try:
 						s.sendall("algo requesting update"+str(cur_min_ts).encode())
-						print(now.strftime("%H:%M:%S : ") ,"Algo requesting update:")
+						print(now.strftime("%H:%M:%S : ") ,"Algo requesting update   :")
 					except:
 						connection = False
 						break
@@ -349,7 +351,7 @@ def algo_server(ulti_response,supervisor):
 
 					#problem. when a dead package is received, it will destroy the system.
 
-					print(now.strftime("%H:%M:%S : ") ,"Algo update, package ts:",k[1][1])
+					print(now.strftime("%H:%M:%S : ") ,"Algo updated, package ts:   ",k[1][1])
 
 					ts = now.hour*3600+now.minute *60+now.second
 
