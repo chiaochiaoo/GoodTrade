@@ -279,8 +279,8 @@ class PairTP:
 	def submit_expected_shares(self,shares,symbol):
 
 		with self.read_lock[symbol]:
-			self.expected_shares[symbol] = shares
-			self.current_request[symbol] = self.expected_shares[symbol] - self.current_shares[symbol]
+			self.expected_shares[symbol] = int(shares)
+			self.current_request[symbol] = int(self.expected_shares[symbol]) - int(self.current_shares[symbol])
 
 
 			self.notify_request(symbol)
@@ -347,13 +347,13 @@ class PairTP:
 	def submit_expected_pairs(self,pairs):
 
 		with self.pair_read_lock:
-			self.expected_pairs = pairs
-			self.current_request_pairs = self.expected_pairs - self.current_pairs
+			self.expected_pairs = int(pairs)
+			self.current_request_pairs = int(self.expected_pairs) - int(self.current_pairs)
 
 			# now i need to figure out who needs from whom. 
 
-			self.expected_shares[self.symbol1] = self.current_request_pairs*self.ratio[0]
-			self.expected_shares[self.symbol2] = self.current_request_pairs*self.ratio[1]
+			self.expected_shares[self.symbol1] = int(self.current_request_pairs*self.ratio[0])
+			self.expected_shares[self.symbol2] = int(self.current_request_pairs*self.ratio[1])
 
 			self.submit_expected_shares(self.expected_shares[self.symbol1],self.symbol1)
 			self.submit_expected_shares(self.expected_shares[self.symbol2],self.symbol2)
