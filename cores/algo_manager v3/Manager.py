@@ -315,7 +315,7 @@ class Manager:
 	def __init__(self,root,goodtrade_pipe=None,ppro_out=None,ppro_in=None,TEST_MODE=False):
 
 		self.root = root
-		
+
 		self.termination = False
 		self.pipe_ppro_in = ppro_in
 		self.pipe_ppro_out = ppro_out
@@ -490,8 +490,11 @@ class Manager:
 
 				symbol1 = data["symbol1"] 
 				symbol2 = data["symbol2"]
-				symbol1_share = int(data["symbol1_share"])
-				symbol2_share =  int(data["symbol2_share"])
+
+				ratio = data["ratio"]
+				share = data["share"]
+				#symbol1_share = int(data["symbol1_share"])
+				#symbol2_share =  int(data["symbol2_share"])
 				risk = float(data["risk"])
 
 				symbol1_stats = {}
@@ -522,8 +525,9 @@ class Manager:
 
 						self.symbols.append(symbol2)
 
+					#def __init__(self,name:"",Symbol1,Symbol2,ratio,share,manage_plan=None,risk=None,TEST_MODE=False,algo_name="",Manager=None):
 					### name:"",symbol:Symbol1,symbol:Symbol2,share1,share2,manage_plan=None,risk=None,TEST_MODE=False,algo_name="",Manager=None
-					self.tradingplan[name] = PairTP(name,self.symbol_data[symbol1],self.symbol_data[symbol2],symbol1_share,symbol2_share,mana,risk,TEST_MODE,algo_name,self)
+					self.tradingplan[name] = PairTP(name,self.symbol_data[symbol1],self.symbol_data[symbol2],ratio,share,mana,risk,TEST_MODE,algo_name,self)
 
 					self.ui.create_new_single_entry(self.tradingplan[name],type_name,None)
 

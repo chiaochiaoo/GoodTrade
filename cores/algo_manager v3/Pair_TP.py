@@ -22,15 +22,51 @@ import random
 
 class PairTP:
 
-	def __init__(self,name:"",Symbol1,Symbol2,share1,share2,manage_plan=None,risk=None,TEST_MODE=False,algo_name="",Manager=None):
+
+	def __init__(self,name:"",Symbol1,Symbol2,ratio,share,manage_plan=None,risk=None,TEST_MODE=False,algo_name="",Manager=None):
 
 		self.name = name 
 
 		self.pair_plan = True
 		self.in_use = True
-		
-		self.symbols ={}
 
+		#self.read_lock = threading.Lock()
+		
+		self.read_lock = {}
+		self.read_lock[Symbol1.ticker] = threading.Lock()
+		self.read_lock[Symbol2.ticker] = threading.Lock()
+		self.pair_read_lock = threading.Lock()
+
+		self.management_start = False
+
+		### MANAGEMENT DATA #####
+
+
+		self.ratio = ratio
+
+		self.expected_pairs = share
+		self.current_pairs = 0
+		self.current_request_pairs = 0
+
+		self.have_request = {}
+		self.have_request[Symbol1.ticker] = False
+		self.have_request[Symbol2.ticker] = False
+
+		self.expected_shares = {}
+		self.expected_shares[Symbol1.ticker] = 0
+		self.expected_shares[Symbol2.ticker] = 0
+
+		self.current_shares = {}
+		self.current_shares[Symbol1.ticker] = 0
+		self.current_shares[Symbol2.ticker] = 0
+
+		self.current_request = {}
+		self.current_request[Symbol1.ticker] = 0
+		self.current_request[Symbol2.ticker] = 0
+
+
+		###########################################
+		self.symbols ={}
 
 		self.symbol1 = Symbol1.ticker
 		self.symbol2 = Symbol2.ticker
@@ -38,9 +74,8 @@ class PairTP:
 		self.symbols[Symbol1.ticker] = Symbol1
 		self.symbols[Symbol2.ticker] = Symbol2
 		
-
-		self.symbol1share = share1
-		self.symbol2share = share2
+		# self.symbol1share = share1
+		# self.symbol2share = share2
 
 		#self.symbol.set_tradingplan(self)
 
@@ -101,8 +136,17 @@ class PairTP:
 		self.init_data(risk,manage_plan)
 
 
+	""" Initialization Steps """
+
 	def deactive(self):
 		self.in_use = False
+
+	def activate(self):
+		self.in_use	 = True
+
+	def if_activated(self):
+		return self.in_use
+
 	def set_data(self,risk,manage_plan,support,resistence):
 
 		#default values.
@@ -116,7 +160,7 @@ class PairTP:
 		self.data[ESTRISK] = risk
 		self.tkvars[ESTRISK].set(risk)
 		self.tkvars[RISK_RATIO].set(str(0)+"/"+str(self.data[ESTRISK]))
-
+ 
 		# self.tkvars[ENTRYPLAN].set(entry_plan)
 		# self.tkvars[ENTYPE].set(entry_type)
 		self.tkvars[MANAGEMENTPLAN].set(manage_plan)
@@ -171,31 +215,194 @@ class PairTP:
 		# self.manage_plan_decoder(manage_plan)
 
 
-	""" PASSSIVE ENTRY/EXIT OVER A PERIOD AMONT OF TIME """
 
+	""" SHARES MANAGEMENT """
 
+	def request_granted(self,symbol):
 
-	def remaining_room(self):
+		# if request becomes 0  . match off. 
 
-		#check the remaining risk room. 
-		#set the share number. 
+		with self.read_lock[symbol]:
 
-		risk_per_share = abs(self.symbol.get_bid() - self.data[STOP_LEVEL])		
+			self.current_request[symbol] = self.expected_shares[symbol] - self.current_shares[symbol]
 
+			if self.current_request[symbol] ==0:
+				self.have_request[symbol] = False
 
-		remaining_risk = self.data[ESTRISK] - self.data[ACTRISK]
+		if not self.management_start and self.current_request[self.symbol1] ==0 and self.current_request[self.symbol2] ==0:
+			self.entry_strategy_done()
+			self.management_start = True
 
+	def having_request(self,symbol):
 
-		share = remaining_risk/risk_per_share
+		#Called by the symbol to see if there is specific request by the TP. 
+		return self.have_request[symbol]
 
-		if share >=1:
-			return int(share)
+	def get_holdings(self,symbol):
 
-		elif share>0.5:
-			return 1
-		else:
-			return 0
+		return self.current_shares[symbol]
+
+	def notify_request(self,symbol):
+
+		log_print(self.name,"have:",self.current_shares[symbol],"want:",self.expected_shares[symbol],"change:",self.current_request[symbol])
+		self.have_request[symbol] = True
+		#self.symbol.request_notified()
+		self.symbols[symbol].request_notified()
+
+	def notify__request_with_delay(self,symbol):
+
+		#time.sleep(1.5)
+
+		self.symbols[symbol].expecting_marketorder()
+		self.notify_request(symbol)
+
+	def notify_immediate_request(self,shares,symbol):
+
+		# add a little delay using thread.
+
+		self.symbols[symbol].immediate_request(shares)
 		
+		self.notify__request_with_delay(symbol)
+
+		# delayed_notification = threading.Thread(target=self.notify__request_with_delay, daemon=True)
+		# delayed_notification.start()
+
+	def read_current_request(self,symbol):
+
+		return self.current_request[symbol]
+		# with self.read_lock:
+		# 	r,e = self.current_request,self.expected_shares
+		# return r,e
+
+	# INTERNAL USE
+	def submit_expected_shares(self,shares,symbol):
+
+		with self.read_lock[symbol]:
+			self.expected_shares[symbol] = shares
+			self.current_request[symbol] = self.expected_shares[symbol] - self.current_shares[symbol]
+
+
+			self.notify_request(symbol)
+
+	def change_to_shares(self,shares,symbol=None,immediately=False):
+
+		log_print(self.symbol_name, "change to shares:",shares, "immediately:",immediately)
+
+		flatten = False
+		with self.read_lock[symbol]:
+
+			#rationality check. if greater and opposite of current shares. just set to 0.
+
+			if shares*self.current_shares[symbol]<0 and abs(shares)>abs(self.current_shares[symbol]):
+				self.submit_expected_shares(0,symbol)
+				flatten= True
+				#if immediately. just go flatten then. 
+
+
+			else:
+				self.expected_shares[symbol] += shares
+				self.current_request[symbol] = self.expected_shares[symbol] - self.current_shares[symbol]
+
+			if not immediately:
+				self.notify_request(symbol)
+			else:
+				if flatten:
+					self.flatten_cmd()
+				else:
+					self.notify_immediate_request(self.current_request,symbol)
+
+
+	# def add_to_shares(self,shares):
+
+	# 	with self.read_lock:
+	# 		shares = abs(shares)
+	# 		if self.current_shares <0:
+	# 			self.expected_shares -= shares
+	# 		else:
+	# 			self.expected_shares += shares
+
+	# 		self.current_request = self.expected_shares - self.current_shares
+	# 		self.notify_request()
+
+	# def take_shares_off(self,shares):
+
+	# 	with self.read_lock:
+	# 		shares = abs(shares)
+
+	# 		if self.current_shares <0:
+
+	# 			self.expected_shares += shares
+	# 		else:
+
+
+	# 			self.expected_shares -= shares
+				
+	# 		self.current_request = self.expected_shares - self.current_shares
+	# 		self.notify_request()
+
+	""" PAIR MANAGEMENT """
+
+
+	def submit_expected_pairs(self,pairs):
+
+		with self.pair_read_lock:
+			self.expected_pairs = pairs
+			self.current_request_pairs = self.expected_pairs - self.current_pairs
+
+			# now i need to figure out who needs from whom. 
+
+			self.expected_shares[self.symbol1] = self.current_request_pairs*self.ratio[0]
+			self.expected_shares[self.symbol2] = self.current_request_pairs*self.ratio[1]
+
+			self.submit_expected_shares(self.expected_shares[self.symbol1],self.symbol1)
+			self.submit_expected_shares(self.expected_shares[self.symbol2],self.symbol2)
+
+			# self.current_request[self.symbol1] = 
+			# self.current_request[self.symbol2] =
+
+
+	def recalibrated_pairs(self):
+
+		# count. according to the shares. how many pairs i do have now
+		# By knowing much many shares i have. compute the pairs. 
+		# if I get out too much? get out too less? 
+
+		### I want X% increment at most each request ### But this is other version. Current version, see the imbalance, cancel all position, punch in. minimal latency principles.
+
+		pair_delta = self.current_shares[self.symbol1]//self.ratio[0] - self.current_shares[self.symbol2]//self.ratio[1]
+
+		symbol1_imbalance = self.ratio[0] * pair_delta
+		symbol2_imbalance = self.ratio[1] * pair_delta
+
+		#during loading on. 
+		if pair_delta !=0:
+
+
+
+			if pair_delta>0 and self.expected_pairs>self.current_pairs:
+				#right load more
+				self.notify_immediate_request(symbol2_imbalance,self.symbol2)
+
+			elif pair_delta>0 and self.expected_pairs<self.current_pairs:
+				#left load off
+				self.notify_immediate_request(symbol1_imbalance,self.symbol1)
+
+			elif pair_delta<0 and self.expected_pairs>self.current_pairs:
+				#left load more
+				self.notify_immediate_request(-symbol1_imbalance,self.symbol1)
+			elif pair_delta<0 and self.expected_pairs<self.current_pairs:
+				#right load off
+				self.notify_immediate_request(-symbol2_imbalance,self.symbol2)
+
+		# adjust the remaining. ..... 
+
+		# self.expected_pairs = share
+		# self.current_pairs = 0
+		# self.current_request = 0
+
+
+
+	""" PASSSIVE ENTRY/EXIT OVER A PERIOD AMONT OF TIME """
 
 
 	def ppro_update_price(self,symbol="",bid=0,ask=0,ts=0):
@@ -240,7 +447,6 @@ class PairTP:
 
 		self.update_displays()
 
-
 	def ppro_process_orders(self,price,shares,side,symbol):
 		
 		log_print("TP processing:",self.name,price,shares,side)
@@ -248,7 +454,6 @@ class PairTP:
 		self.data[POSITION] = LONG
 
 		if symbol == self.symbol1:
-
 
 			if side == LONG:
 				self.ppro_orders_loadup(price,shares,side,symbol)
@@ -280,21 +485,8 @@ class PairTP:
 		# if self.test_mode:
 		# 	log_print("TP processing:",self.data)
 		self.update_displays()
+		self.recalibrated_pairs()
 
-	def ppro_confirm_new_order(self,price,shares,side):
-
-		"""set the state as running, then load up"""
-
-		log_print(self.symbol_name,"New order confirmed:",price,shares,side)
-
-		self.mark_algo_status(RUNNING)
-
-		# self.data[POSITION]=side
-		# self.tkvars[POSITION].set(side)
-		self.data[REALIZED] = 0
-		self.data[FLATTENTIMER]=0
-		self.flatten_order = False
-		self.ppro_orders_loadup(price,shares,side)
 
 	def ppro_orders_loadup(self,price,shares,side,symbol):
 
@@ -316,6 +508,12 @@ class PairTP:
 
 		self.data[CURRENT] = self.data[CURRENT] + shares
 
+		with self.read_lock[symbol]:
+			if side ==LONG:
+				self.current_shares[symbol] += shares
+			else:
+				self.current_shares[symbol] -= shares
+
 		if current ==0 or self.data[CURRENT]==0:
 			self.data[AVG_P] = round(price,3)
 		else:
@@ -336,6 +534,7 @@ class PairTP:
 	def ppro_orders_loadoff(self,price,shares,side,symbol):
 
 		print("load off",symbol,price,shares,side)
+
 		if symbol == self.symbol1:
 
 			CURRENT = SYMBOL1_SHARE
@@ -352,6 +551,12 @@ class PairTP:
 
 		self.data[CURRENT] = current-shares	
 		
+		with self.read_lock[symbol]:
+			if side ==LONG:
+				self.current_shares[symbol] += shares
+			else:
+				self.current_shares[symbol] -= shares
+
 		gain = 0
 
 		if symbol == self.symbol1:
@@ -383,7 +588,6 @@ class PairTP:
 
 			self.clear_trade()
 			log_print(self.symbol_name,"Trade completed."," this trade:",self.data[REALIZED]," total:",self.data[TOTAL_REALIZED])
-
 
 
 	def clear_trade(self):
@@ -489,7 +693,6 @@ class PairTP:
 				else:
 					self.ppro_out.send([pproaction,self.symbol_name,shares,description])
 
-
 	def flatten_cmd(self):
 		
 		if self.tkvars[STATUS].get()==PENDING:
@@ -502,7 +705,6 @@ class PairTP:
 				
 			# elif self.data[POSITION]==SHORT:
 				
-
 	def update_displays(self):
 
 		self.tkvars[SIZE_IN].set(str(self.data[SYMBOL1_SHARE])+"/"+str(-self.data[SYMBOL2_SHARE]))
@@ -561,7 +763,6 @@ class PairTP:
 			self.tklabels[PXT2]["background"] = DEFAULT
 			self.tklabels[PXT3]["background"] = DEFAULT	
 
-
 	def mark_algo_status(self,status):
 
 		self.data[STATUS] = status
@@ -604,6 +805,9 @@ class PairTP:
 	def get_data(self):
 		return self.data
 
+	def get_flatten_order(self):
+		return self.flatten_order
+
 	""" Deployment initialization """
 
 	def input_lock(self,lock):
@@ -629,30 +833,27 @@ class PairTP:
 		else:
 			log_print("cannot cancel, holding positions.")
 
-
 	def deploy(self,risktimer=0):
 
 		if self.tkvars[STATUS].get() ==PENDING:
-
-#			try:
-
-			#self.ppro_out.send([REGISTER,self.symbol_name])
 
 			self.symbols[self.symbol1].register_tradingplan(self.name,self) 
 			self.symbols[self.symbol2].register_tradingplan(self.name,self) 
 
 
-			self.symbols[self.symbol1].new_request(self.name,self.symbol1share)
+			self.submit_expected_pairs(self.expected_pairs)
 
-			self.symbols[self.symbol2].new_request(self.name,-self.symbol2share)
+			#self.submit_expected_shares(self.symbol1share,self.symbol1)
+			#self.submit_expected_shares(self.symbol2share,self.symbol2)
 
-			# entryplan=self.tkvars[ENTRYPLAN].get()
-			# entry_type=self.tkvars[ENTYPE].get()
-			# entrytimer=int(self.tkvars[TIMER].get())
+			# self.symbols[self.symbol1].new_request(self.name,self.symbol1share)
+
+			# self.symbols[self.symbol2].new_request(self.name,-self.symbol2share)
+
 			manage_plan =self.tkvars[MANAGEMENTPLAN].get()
 
 
-			
+		
 
 			if risktimer ==0:
 				self.data[RISKTIMER] = int(self.tkvars[RISKTIMER].get())
@@ -663,7 +864,7 @@ class PairTP:
 
 			self.set_mind("",DEFAULT)
 			#self.entry_plan_decoder(entryplan, entry_type, entrytimer)
-			self.manage_plan_decoder(manage_plan)
+			#self.manage_plan_decoder(manage_plan)
 
 			self.start_tradingplan()
 
@@ -698,51 +899,6 @@ class PairTP:
 		self.current_running_strategy = None
 
 
-	def manage_plan_decoder(self,manage_plan):
-
-		if manage_plan ==NONE: self.tkvars[MANAGEMENTPLAN].set(NONE)
-
-
-		elif manage_plan == MARKETMAKING:
-			self.set_ManagementStrategy(MarketMaking(self.symbols[self.symbol1],self.symbols[self.symbol2],self))
-
-		elif manage_plan == THREE_TARGETS:
-			self.set_ManagementStrategy(ThreePriceTargets(self.symbol,self))
-		elif manage_plan == SMARTTRAIL:
-			self.set_ManagementStrategy(SmartTrail(self.symbol,self))
-
-		elif manage_plan == ANCARTMETHOD:
-			self.set_ManagementStrategy(AncartMethod(self.symbol,self))
-
-		elif manage_plan == ONETOTWORISKREWARD:
-			self.set_ManagementStrategy(OneToTWORiskReward(self.symbol,self))
-
-		elif manage_plan == ONETOTWOWIDE:
-			self.set_ManagementStrategy(OneToTwoWideStop(self.symbol,self))
-
-		elif manage_plan == ONETOTWORISKREWARDOLD:
-			self.set_ManagementStrategy(OneToTWORiskReward_OLD(self.symbol,self))
-
-		elif manage_plan == FULLMANUAL:
-			self.set_ManagementStrategy(FullManual(self.symbol,self))
-		elif manage_plan == SEMIMANUAL:
-			self.set_ManagementStrategy(SemiManual(self.symbol,self))
-
-		elif manage_plan == SCALPATRON:
-			self.set_ManagementStrategy(ScalpaTron(self.symbol,self))
-
-		elif manage_plan == EMASTRAT:
-			self.set_ManagementStrategy(EMAStrategy(self.symbol,self))
-
-		elif manage_plan == TRENDRIDER:
-			self.set_ManagementStrategy(TrendStrategy(self.symbol,self))
-
-		else:
-			#set default
-			log_print("Setting default plan")
-			self.set_ManagementStrategy(OneToTWORiskReward(self.symbol,self))
-
-		self.current_running_strategy = self.management_plan
 
 	def set_EntryStrategy(self,entry_plan:Strategy):
 		self.entry_plan = entry_plan
@@ -760,7 +916,7 @@ class PairTP:
 		
 		if plan==self.entry_plan:
 			log_print(self.symbol_name,self.entry_plan.get_name()," completed.")
-			self.entry_strategy_done()
+			#self.entry_strategy_done()
 			# done = threading.Thread(target=self.entry_strategy_done, daemon=True)
 			# done.start()
 		elif plan==self.management_plan:
@@ -771,6 +927,9 @@ class PairTP:
 
 	def entry_strategy_done(self):
 
+		log_print(self.symbol_name,self.entry_plan.get_name()," loaded. management starts.")
+
+		self.set_mind("Managemetn Starts:",GREEN)
 		self.management_plan.on_start()
 		self.current_running_strategy = self.management_plan
 
@@ -828,3 +987,64 @@ class PairTP:
 		else:
 			log_print("unkown plan")
 			self.set_EntryStrategy(BreakAny(entrytimer,instant,self.symbol,self))
+
+	def manage_plan_decoder(self,manage_plan):
+
+		if manage_plan ==NONE: self.tkvars[MANAGEMENTPLAN].set(NONE)
+
+
+		elif manage_plan == MARKETMAKING:
+			self.set_ManagementStrategy(MarketMaking(self.symbols[self.symbol1],self.symbols[self.symbol2],self))
+
+		elif manage_plan == THREE_TARGETS:
+			self.set_ManagementStrategy(ThreePriceTargets(self.symbol,self))
+		elif manage_plan == SMARTTRAIL:
+			self.set_ManagementStrategy(SmartTrail(self.symbol,self))
+
+
+		elif manage_plan == ONETOTWORISKREWARD:
+			self.set_ManagementStrategy(OneToTWORiskReward(self.symbol,self))
+
+		elif manage_plan == ONETOTWOWIDE:
+			self.set_ManagementStrategy(OneToTwoWideStop(self.symbol,self))
+
+		elif manage_plan == ONETOTWORISKREWARDOLD:
+			self.set_ManagementStrategy(OneToTWORiskReward_OLD(self.symbol,self))
+
+		elif manage_plan == FULLMANUAL:
+			self.set_ManagementStrategy(FullManual(self.symbol,self))
+		elif manage_plan == SEMIMANUAL:
+			self.set_ManagementStrategy(SemiManual(self.symbol,self))
+
+		elif manage_plan == SCALPATRON:
+			self.set_ManagementStrategy(ScalpaTron(self.symbol,self))
+
+		elif manage_plan == EMASTRAT:
+			self.set_ManagementStrategy(EMAStrategy(self.symbol,self))
+
+		elif manage_plan == TRENDRIDER:
+			self.set_ManagementStrategy(TrendStrategy(self.symbol,self))
+
+		else:
+			#set default
+			log_print("Setting default plan")
+			self.set_ManagementStrategy(OneToTWORiskReward(self.symbol,self))
+
+		self.current_running_strategy = self.management_plan
+
+
+
+	# def ppro_confirm_new_order(self,price,shares,side):
+
+	# 	"""set the state as running, then load up"""
+
+	# 	log_print(self.symbol_name,"New order confirmed:",price,shares,side)
+
+	# 	self.mark_algo_status(RUNNING)
+
+	# 	# self.data[POSITION]=side
+	# 	# self.tkvars[POSITION].set(side)
+	# 	self.data[REALIZED] = 0
+	# 	self.data[FLATTENTIMER]=0
+	# 	self.flatten_order = False
+	# 	self.ppro_orders_loadup(price,shares,side)

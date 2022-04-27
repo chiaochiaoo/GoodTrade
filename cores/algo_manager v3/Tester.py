@@ -114,21 +114,21 @@ class Tester:
 
 		dic = {}
 
-		dic["algo_id"] = 'TEST2'
+		dic["algo_id"] = 'PairTest'
 		dic["type_name"] = 'Pair'
 		dic["algo_name"] = 'TEST'
 		dic["symbol1"] ='SPY.AM'
 		dic["symbol2"] ='QQQ.NQ'
-		dic["symbol1_share"] =10
-		dic["symbol2_share"] =20
+		dic["ratio"] =(1,1)
+		dic["share"] =20
 		dic["risk"] =50.0
 		dic["symbol1_statistics"] ={}
 		dic["symbol2_statistics"] = {}
-		dic["management"] = MARKETMAKING
+		dic["management"] = ONETOTWORISKREWARD#MARKETMAKING
 
 
 
-		#self.gt.send(["pkg",[dic]])
+		self.gt.send(["pkg",[dic]])
 
 
 		time.sleep(1)

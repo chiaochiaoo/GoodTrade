@@ -28,6 +28,7 @@ class Symbol:
 	def __init__(self,symbol,support,resistence,stats,pproout):
 
 		self.ticker = symbol
+		self.symbol_name = symbol
 
 
 		self.init_open = False
@@ -247,9 +248,9 @@ class Symbol:
 
 		for tp in tps:
 
-			if self.tradingplans[tp].if_activated() and self.tradingplans[tp].having_request() and not self.tradingplans[tp].get_flatten_order():
+			if self.tradingplans[tp].if_activated() and self.tradingplans[tp].having_request(self.symbol_name) and not self.tradingplans[tp].get_flatten_order():
 
-				total += self.tradingplans[tp].read_current_request()
+				total += self.tradingplans[tp].read_current_request(self.symbol_name)
 
 		return total
 
@@ -267,9 +268,9 @@ class Symbol:
 
 				for tp in tps:
 
-					if self.tradingplans[tp].if_activated() and self.tradingplans[tp].having_request():
+					if self.tradingplans[tp].if_activated() and self.tradingplans[tp].having_request(self.symbol_name):
 
-						val = self.tradingplans[tp].read_current_request()
+						val = self.tradingplans[tp].read_current_request(self.symbol_name)
 
 						share = self.incoming_shares[price]
 
@@ -342,7 +343,7 @@ class Symbol:
 					#print("processing",tps,share,self.tradingplans[tp].having_request())
 					if self.tradingplans[tp].if_activated():
 
-						holding = self.tradingplans[tp].get_holdings()
+						holding = self.tradingplans[tp].get_holdings(self.symbol_name)
 
 
 						if  holding>0 and share*holding <0:
@@ -379,7 +380,7 @@ class Symbol:
 
 					if self.tradingplans[tp].if_activated():
 
-						holding = self.tradingplans[tp].get_holdings()
+						holding = self.tradingplans[tp].get_holdings(self.symbol_name)
 
 						if  holding>0 and share*holding >0:
 
@@ -520,9 +521,9 @@ class Symbol:
 
 		for tp in tps:
 
-			if self.tradingplans[tp].if_activated() and self.tradingplans[tp].having_request() and not self.tradingplans[tp].get_flatten_order():
+			if self.tradingplans[tp].if_activated() and self.tradingplans[tp].having_request(self.symbol_name) and not self.tradingplans[tp].get_flatten_order():
 
-				val = self.tradingplans[tp].read_current_request()
+				val = self.tradingplans[tp].read_current_request(self.symbol_name)
 
 				if val*coefficient >0:
 		 			self.tradingplans[tp].rejection_handling()

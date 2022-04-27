@@ -110,7 +110,7 @@ class TradingPlan:
 	def if_activated(self):
 		return self.in_use	
 
-	def request_granted(self):
+	def request_granted(self,symbol=None):
 
 		# if request becomes 0  . match off. 
 
@@ -126,28 +126,28 @@ class TradingPlan:
 			self.management_start = True
 
 
-	def having_request(self):
+	def having_request(self,symbol=None):
 
 		return self.have_request
 
-	def get_holdings(self):
+	def get_holdings(self,symbol=None):
 
 		return self.current_shares
 
-	def notify_request(self):
+	def notify_request(self,symbol=None):
 
 		log_print(self.name,"have:",self.current_shares,"want:",self.expected_shares,"change:",self.current_request)
 		self.have_request = True
 		self.symbol.request_notified()
 
-	def notify__request_with_delay(self):
+	def notify__request_with_delay(self,symbol=None):
 
 		#time.sleep(1.5)
 
 		self.symbol.expecting_marketorder()
 		self.notify_request()
 
-	def notify_immediate_request(self,shares):
+	def notify_immediate_request(self,shares,symbol=None):
 
 		# add a little delay using thread.
 
@@ -159,12 +159,10 @@ class TradingPlan:
 		# delayed_notification.start()
 
 
-	def read_current_request(self):
+	def read_current_request(self,symbol=None):
 
 		return self.current_request
-		# with self.read_lock:
-		# 	r,e = self.current_request,self.expected_shares
-		# return r,e
+
 
 	# absolute sense. 
 	def submit_expected_shares(self,shares):
@@ -176,7 +174,8 @@ class TradingPlan:
 
 			self.notify_request()
 
-	def change_to_shares(self,shares,immediately=False):
+	#internal use
+	def change_to_shares(self,shares,symbol=None,immediately=False):
 
 		log_print(self.symbol_name, "change to shares:",shares, "immediately:",immediately)
 
