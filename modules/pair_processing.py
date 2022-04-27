@@ -379,6 +379,7 @@ def hedge_ratio(p,q):
 		ratio,coverage = ratio_compute(p_price*hedge_ratio,q_price)
 	else:
 		ratio,coverage = ratio_compute(p_price,q_price*(1/hedge_ratio))
+
 	data["hedgeratio"] = ratio
 	data["coverage_imbalance"] = coverage
 	## COMPUTE THE DIRECT RATIO
@@ -387,6 +388,10 @@ def hedge_ratio(p,q):
 	data["hedgeratio_stability"] = round(1-(np.std(hedge_ratio)/np.mean(hedge_ratio)),2) #ACROSS MULTIPLE TIME FRAME
 	
 	data["correlation_score"] =   round(np.mean(correlation),2)  
+
+	if data["correlation_score"]>0:
+		data["hedgeratio"] = (ratio[0],-ratio[1])
+
 	data["correlation_stability"] = round(1-(np.std(hedge_ratio)/np.mean(correlation)),2)
 	   
 	data["15M_expected_risk"] = compute_volatility(p,q,ratio,data["correlation_score"])

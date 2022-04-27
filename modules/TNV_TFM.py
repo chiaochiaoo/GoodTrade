@@ -7,13 +7,16 @@ from datetime import datetime
 import requests
 import numpy as np
 import threading
+
 #from pannel import *
 #from modules.pannel import *
 
 from tkinter import *
 
-
-from modules.pair_processing import *
+try:
+	from modules.pair_processing import *
+except:
+	from pair_processing import *
 
 try:
 	from scipy.stats import pearsonr
@@ -103,9 +106,17 @@ class PairTrade():
 
 		self.symbol1 = tk.StringVar()
 		self.symbol2 = tk.StringVar()
+
+		self.pair_number = tk.DoubleVar(value=1)
+
+
+		self.s1ratio=0
+		self.s2ratio=0
+
 		self.symbol1_share = tk.IntVar()
 		self.symbol2_share = tk.IntVar()
 
+		self.risk_per_share = tk.DoubleVar(value=1)
 
 		self.xr = 0
 		self.yr = 0
@@ -120,7 +131,11 @@ class PairTrade():
 
 		#self.standard_risk = tk.StringVar()
 
-		self.algo_risk = tk.DoubleVar(value=10)
+		self.algo_risk = tk.DoubleVar(value=0)
+
+		self.pair_number.trace('w',  lambda *_ : self.recompute_total_risk())
+		self.risk_per_share.trace('w',  lambda *_ : self.recompute_total_risk())
+		
 
 		self.file = ""#"signals/open_resersal_"+datetime.now().strftime("%m-%d")+".csv"
 
@@ -143,7 +158,11 @@ class PairTrade():
 		
 		#self.update_entry(pd.read_csv("tttt.csv",index_col=0))
 
-
+	def recompute_total_risk(self):
+		try:
+			self.algo_risk.set(float(self.risk_per_share.get()*self.pair_number.get()))
+		except:
+			pass
 	def recreate_labels_single(self,frame):
 
 		self.symbol_frame = ttk.LabelFrame(self.root,text="Trade Setup")
@@ -238,8 +257,14 @@ class PairTrade():
 
 		row += 1
 		#col = 1
-		ttk.Label(frame, text="15MIN Expected Risk:").grid(sticky="w",column=col,row=row,padx=10)
+		ttk.Label(frame, text="15MIN Expected Return:").grid(sticky="w",column=col,row=row,padx=10)
 		ttk.Label(frame,textvariable=self.expected_risk).grid(sticky="w",column=col+1,row=row,padx=10)
+
+		row += 1
+		x= ttk.Label(frame, text="Total Risk:")
+		x.grid(sticky="w",column=col,row=row,padx=10)
+		x["background"] = "yellow"
+		ttk.Label(frame,textvariable=self.algo_risk).grid(sticky="w",column=col+1,row=row,padx=10)
 
 
 	def trade_pannel(self,frame):
@@ -262,22 +287,24 @@ class PairTrade():
 		row +=2
 
 		col = 1
-		ttk.Label(frame, text="Symbol1 Share:").grid(sticky="w",column=col,row=row,padx=10)
-		ttk.Entry(frame, textvariable=self.symbol1_share).grid(sticky="w",column=col,row=row+1,padx=10)
 
-		col +=1
-		ttk.Label(frame, text="Symbol2 Share:").grid(sticky="w",column=col,row=row,padx=10)
-		ttk.Entry(frame, textvariable=self.symbol2_share).grid(sticky="w",column=col,row=row+1,padx=10)
+		
+		ttk.Label(frame, text="Pair Amount:").grid(sticky="w",column=col,row=row,padx=10)
+		ttk.Entry(frame, textvariable=self.pair_number).grid(sticky="w",column=col,row=row+1,padx=10)
+
+		# col +=1
+		# ttk.Label(frame, text="Symbol2 Share:").grid(sticky="w",column=col,row=row,padx=10)
+		# ttk.Entry(frame, textvariable=self.symbol2_share).grid(sticky="w",column=col,row=row+1,padx=10)
 
 
 
-		row +=2
+		#row +=2
+		col += 1
+
+		ttk.Label(frame, text="Risk per pair:").grid(sticky="w",column=col,row=row,padx=10)
+		ttk.Entry(frame, textvariable=self.risk_per_share).grid(sticky="w",column=col,row=row+1,padx=10)
+
 		col = 1
-
-
-		ttk.Label(frame, text="Risk:").grid(sticky="w",column=col,row=row,padx=10)
-		ttk.Entry(frame, textvariable=self.algo_risk).grid(sticky="w",column=col,row=row+1,padx=10)
-
 		row +=2
 		tk.Button(frame, text="Check",width=15,command=self.button).grid(row=row+1, column=col)#,command=self.rank
 
@@ -293,7 +320,10 @@ class PairTrade():
 
 		symbol1,symbol2 = self.symbol1.get(),self.symbol2.get()
 
-		draw_pair(symbol1,symbol2,self.xr,self.yr)
+		try:
+			draw_pair(symbol1,symbol2,self.xr,self.yr)
+		except Exception as e:
+			print("ploting issue",e)
 		# reg = threading.Thread(target=draw_pair,args=(symbol1,symbol2,self.xr,self.yr), daemon=True)
 		# reg.start()
 
@@ -301,6 +331,9 @@ class PairTrade():
 
 		d=hedge_ratio(self.symbol1.get(),self.symbol2.get())
 		self.hedge_ratio.set(str(d["hedgeratio"]))
+
+		self.s1ratio = d["hedgeratio"][0]
+		self.s2ratio = d["hedgeratio"][1]
 
 		self.hedge_stability.set(str(d["hedgeratio_stability"]))
 		self.correlation.set(str(d["correlation_score"]))
@@ -403,6 +436,9 @@ class PairTrade():
 			symbol1share = self.symbol1_share.get()
 			symbol2share = self.symbol2_share.get()
 
+			ratio = (self.s1ratio,self.s2ratio)
+			pair = self.pair_number.get()
+
 			#side = self.side.get()
 			risk = self.algo_risk.get()
 
@@ -417,7 +453,7 @@ class PairTrade():
 			resistence = 0
 
 
-			check = [symbol1,symbol2,symbol1share,symbol2share,risk,management]
+			check = [symbol1,symbol2,ratio,pair,risk,management]
 
 			for i in check:
 				if i =="" or i==0:
@@ -437,8 +473,8 @@ class PairTrade():
 				new_order["symbol1"] = symbol1
 				new_order["symbol2"] = symbol2
 
-				new_order["symbol1_share"] = symbol1share
-				new_order["symbol2_share"] = symbol2share
+				new_order["ratio"] = ratio
+				new_order["share"] = pair
 
 				new_order["risk"] = risk
 				new_order["management"] = management 
@@ -457,6 +493,7 @@ class PairTrade():
 
 				info = ["New order",new_order]
 
+				print(info)
 				#[entryplan,symbol,support,resistence,risk,{},"deploy",management]
 				self.tnv_scanner.send_algo(info)
 
@@ -808,11 +845,11 @@ if __name__ == '__main__':
 	root.title("TFM") 
 	root.geometry("640x840")
 
-	TFM(root,None)
+	PairTrade(root,None)
 
-	symbol1 = "JETS.AM"
-	symbol2 = "SPY.AM"
-	print(hedge_ratio(symbol1,symbol2))
+	# symbol1 = "JETS.AM"
+	# symbol2 = "SPY.AM"
+	# print(hedge_ratio(symbol1,symbol2))
 
 	root.mainloop()
 
