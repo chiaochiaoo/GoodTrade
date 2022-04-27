@@ -213,9 +213,6 @@ class Symbol:
 		
 		# remaining_share = sum(self.incoming_request.values())
 
-		
-
-
 		self.current_imbalance = self.get_all_imbalance()
 
 		log_print(self.ticker,"current imbalance:",self.current_imbalance)
@@ -492,6 +489,13 @@ class Symbol:
 			self.passive_price = price
 
 
+	def check_holdings(self):
+
+		with self.incoming_shares_lock:
+
+			return sum(list(self.incoming_shares.values()))
+
+			
 	def holdings_update(self,price,share):
 
 		#log_print("holding update - optaning lock")

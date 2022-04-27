@@ -41,6 +41,7 @@ class PairTP:
 
 		### MANAGEMENT DATA #####
 
+		self.double_processed = True
 
 		self.ratio = ratio
 
@@ -244,7 +245,7 @@ class PairTP:
 
 	def notify_request(self,symbol):
 
-		log_print(self.name,"have:",self.current_shares[symbol],"want:",self.expected_shares[symbol],"change:",self.current_request[symbol])
+		log_print(self.name,symbol,"have:",self.current_shares[symbol],"want:",self.expected_shares[symbol],"change:",self.current_request[symbol])
 		self.have_request[symbol] = True
 		#self.symbol.request_notified()
 		self.symbols[symbol].request_notified()
@@ -357,11 +358,14 @@ class PairTP:
 			self.submit_expected_shares(self.expected_shares[self.symbol1],self.symbol1)
 			self.submit_expected_shares(self.expected_shares[self.symbol2],self.symbol2)
 
+
+			log_print(self.name,": want",self.expected_pairs," pairs, with each",self.expected_shares)
+
 			# self.current_request[self.symbol1] = 
 			# self.current_request[self.symbol2] =
 
 
-	def recalibrated_pairs(self):
+	def recalibrated_pairs(self,othersymbool):
 
 		# count. according to the shares. how many pairs i do have now
 		# By knowing much many shares i have. compute the pairs. 
@@ -369,37 +373,50 @@ class PairTP:
 
 		### I want X% increment at most each request ### But this is other version. Current version, see the imbalance, cancel all position, punch in. minimal latency principles.
 
-		pair_delta = self.current_shares[self.symbol1]//self.ratio[0] - self.current_shares[self.symbol2]//self.ratio[1]
+		#recheck the holdings of two.
 
-		symbol1_imbalance = self.ratio[0] * pair_delta
-		symbol2_imbalance = self.ratio[1] * pair_delta
+		
+
+
+		log_print(self.name,"imbalance pair imbalance check:")
+
+		self.symbols[othersymbool].incoming_shares_pairing()
+
+		pair_imbalance = self.current_shares[self.symbol1]//self.ratio[0] - self.current_shares[self.symbol2]//self.ratio[1]
+
+		log_print(self.name,"check holdings complete, current pair imbalance is",pair_imbalance)
+
+		symbol1_imbalance = self.ratio[0] * pair_imbalance
+		symbol2_imbalance = self.ratio[1] * pair_imbalance
+
 
 		#during loading on. 
-		if pair_delta !=0:
+		if pair_imbalance !=0:
 
 
 
-			if pair_delta>0 and self.expected_pairs>self.current_pairs:
+			if pair_imbalance>0 and self.expected_pairs>self.current_pairs:
 				#right load more
 				self.notify_immediate_request(symbol2_imbalance,self.symbol2)
 
-			elif pair_delta>0 and self.expected_pairs<self.current_pairs:
+			elif pair_imbalance>0 and self.expected_pairs<self.current_pairs:
 				#left load off
 				self.notify_immediate_request(symbol1_imbalance,self.symbol1)
 
-			elif pair_delta<0 and self.expected_pairs>self.current_pairs:
+			elif pair_imbalance<0 and self.expected_pairs>self.current_pairs:
 				#left load more
 				self.notify_immediate_request(-symbol1_imbalance,self.symbol1)
-			elif pair_delta<0 and self.expected_pairs<self.current_pairs:
+			elif pair_imbalance<0 and self.expected_pairs<self.current_pairs:
 				#right load off
 				self.notify_immediate_request(-symbol2_imbalance,self.symbol2)
 
+		self.double_processed = True
 		# adjust the remaining. ..... 
 
 		# self.expected_pairs = share
 		# self.current_pairs = 0
 		# self.current_request = 0
-
+		log_print("recalibration ends")
 
 
 	""" PASSSIVE ENTRY/EXIT OVER A PERIOD AMONT OF TIME """
@@ -454,7 +471,7 @@ class PairTP:
 		self.data[POSITION] = LONG
 
 		if symbol == self.symbol1:
-
+			othersymbool = self.symbol2
 			if side == LONG:
 				self.ppro_orders_loadup(price,shares,side,symbol)
 			else:
@@ -462,7 +479,7 @@ class PairTP:
 
 
 		elif symbol == self.symbol2:
-
+			othersymbool = self.symbol1
 			if side == LONG:
 				self.ppro_orders_loadoff(price,shares,side,symbol)
 			else:
@@ -485,7 +502,14 @@ class PairTP:
 		# if self.test_mode:
 		# 	log_print("TP processing:",self.data)
 		self.update_displays()
-		self.recalibrated_pairs()
+
+		#check the other holdings? need to avoid loop. 
+		self.request_granted(symbol)
+
+		if self.double_processed:
+			# may call the function again. 
+			self.double_processed = False
+			self.recalibrated_pairs(othersymbool)
 
 
 	def ppro_orders_loadup(self,price,shares,side,symbol):
@@ -927,10 +951,10 @@ class PairTP:
 
 	def entry_strategy_done(self):
 
-		log_print(self.symbol_name,self.entry_plan.get_name()," loaded. management starts.")
+		#log_print(self.symbol_name,self.entry_plan.get_name()," loaded. management starts.")
 
 		self.set_mind("Managemetn Starts:",GREEN)
-		self.management_plan.on_start()
+		#self.management_plan.on_start()
 		self.current_running_strategy = self.management_plan
 
 	def management_strategy_done(self):

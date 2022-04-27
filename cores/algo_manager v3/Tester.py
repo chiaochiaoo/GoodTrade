@@ -119,7 +119,7 @@ class Tester:
 		dic["algo_name"] = 'TEST'
 		dic["symbol1"] ='SPY.AM'
 		dic["symbol2"] ='QQQ.NQ'
-		dic["ratio"] =(1,1)
+		dic["ratio"] =(1,-1)
 		dic["share"] =20
 		dic["risk"] =50.0
 		dic["symbol1_statistics"] ={}
