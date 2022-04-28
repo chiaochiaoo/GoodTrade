@@ -108,7 +108,7 @@ class Tester:
 		dic["management"] = ONETOTWORISKREWARD
 
 
-		#self.gt.send(["pkg",[dic]])
+		self.gt.send(["pkg",[dic]])
 
 
 

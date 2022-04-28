@@ -19,7 +19,7 @@ class TradingPlan_MMP1(TradingPlan):
 		super().__init__("MMP1"+name,symbol,entry_plan,manage_plan,support,resistence,risk,TEST_MODE,algo_name,Manager)
 
 		self.ppro_out = symbol.ppro_out
-		
+		self.imbalance = 0
 		self.market_making_go = True
 
 	def ppro_update_price(self,symbol="",bid=0,ask=0,ts=0):
