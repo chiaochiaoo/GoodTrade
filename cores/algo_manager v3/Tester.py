@@ -88,7 +88,7 @@ class Tester:
 		dic["risk"] =50.0
 		dic["statistics"] ={'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441,"expected_momentum":2}
 		dic["immediate_deployment"] = False
-		dic["management"] = ONETOTWORISKREWARD
+		dic["management"] = MARKETMAKING
 
 
 		self.gt.send(["pkg",[dic]])
@@ -108,7 +108,7 @@ class Tester:
 		dic["management"] = ONETOTWORISKREWARD
 
 
-		self.gt.send(["pkg",[dic]])
+		#self.gt.send(["pkg",[dic]])
 
 
 
@@ -128,7 +128,7 @@ class Tester:
 
 
 
-		self.gt.send(["pkg",[dic]])
+		#self.gt.send(["pkg",[dic]])
 
 
 		time.sleep(1)

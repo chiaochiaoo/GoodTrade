@@ -54,6 +54,9 @@ class Symbol:
 		self.mind_label = None
 
 
+		self.market_making = False
+
+
 		self.passive_request_ts = 0
 		self.passive_price = 0
 		"""
@@ -97,10 +100,11 @@ class Symbol:
 		#self.incoming_request[name] = 0
 		#self.tradingplan_holdings[name] = 0
 
-		with self.tradingplan_lock:
-			self.tradingplans[name] = tradingplan
+		if self.get_market_making()==False:
+			with self.tradingplan_lock:
+				self.tradingplans[name] = tradingplan
 
-		log_print(name,"registered at",self.ticker)
+			log_print(name,"registered at",self.ticker)
 
 	def deregister_tradingplan(self,name,tradingplans):
 
@@ -129,6 +133,15 @@ class Symbol:
 		else:
 			self.ppro_out.send([IOCBUY,self.ticker,abs(shares),self.get_ask()])
 
+	def turn_market_making(self,tp):
+
+		self.market_making = True
+
+		self.market_making_tp = tp
+
+	def get_market_making(self):
+		return self.market_making
+
 	def clear_all_orders(self):
 		self.ppro_out.send([CANCEL,self.ticker])
 
@@ -137,7 +150,6 @@ class Symbol:
 	def load_confirmation(self,tradingplan_name,shares):
 
 		self.tradingplan_holdings[tradingplan_name] += shares
-
 
 	### RUN EVERY 3 SECONDS ###
 	def symbol_inspection(self):
@@ -499,16 +511,26 @@ class Symbol:
 	def holdings_update(self,price,share):
 
 		#log_print("holding update - optaning lock")
-		with self.incoming_shares_lock:
 
-			if price not in self.incoming_shares:
 
-				self.incoming_shares[price] = share
+		if self.get_market_making()==False:
+			with self.incoming_shares_lock:
+
+				if price not in self.incoming_shares:
+
+					self.incoming_shares[price] = share
+				else:
+					self.incoming_shares[price] += share
+					#self.incoming_shares.append((price,share))
+
+				self.management_request = True
+
+		else:
+			if share>0:
+				self.market_making_tp.ppro_process_orders(price,abs(share),LONG,self.ticker)
 			else:
-				self.incoming_shares[price] += share
-				#self.incoming_shares.append((price,share))
-
-			self.management_request = True
+				self.market_making_tp.ppro_process_orders(price,abs(share),SHORT,self.ticker)
+			
 		#log_print("holding update - releasing lock")
 		#print("inc",self.incoming_shares)
 
