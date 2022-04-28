@@ -34,6 +34,13 @@ class TradingPlan_MMP1(TradingPlan):
 			self.ppro_out.send([PASSIVEBUY,self.symbol_name,5,0])
 
 
+			if abs(self.current_shares)!=0:
+
+				if self.current_shares>0:
+					self.ppro_out.send([IOCSELL,self.symbol_name,self.imbalance,0])
+				else:
+					self.ppro_out.send([IOCBUY,self.symbol_name,self.imbalance,0])
+
 	def orders_out(self):
 		pass
 
@@ -63,14 +70,6 @@ class TradingPlan_MMP1(TradingPlan):
 		else:
 
 			self.imbalance = abs(self.current_shares)
-
-
-		if abs(self.current_shares)!=0:
-
-			if self.current_shares>0:
-				self.ppro_out.send([IOCSELL,self.symbol_name,self.imbalance,0])
-			else:
-				self.ppro_out.send([IOCBUY,self.symbol_name,self.imbalance,0])
 
 
 		if self.data[REALIZED] <= -self.data[ESTRISK]:
