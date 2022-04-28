@@ -1205,30 +1205,11 @@ if __name__ == '__main__':
 	print("All subprocesses terminated")
 
 	print("checking",multiprocessing.active_children(),threading.active_count())
+
+	
+	print(1/0)
+
 	os._exit(1)
 
 	print("exit")
 
-
-
-
-
-
-
-
-
-
-
-	def ppro_order_confirmation(self,data):
-
-		symbol = data["symbol"]
-		price = data["price"]
-		shares = data["shares"]
-		side = data["side"]
-
-		if symbol in self.tradingplan:
-			log_print("order",symbol,"side:",side,"shares",shares,"price",price)
-
-			self.tradingplan[symbol].ppro_process_orders(price,shares,side)
-		else:
-			log_print("irrelavant orders detected,",symbol,shares,side)
