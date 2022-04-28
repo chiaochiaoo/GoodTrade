@@ -41,8 +41,6 @@ class PairTP:
 
 		### MANAGEMENT DATA #####
 
-		self.double_processed = True
-
 		self.ratio = ratio
 
 		self.expected_pairs = share
@@ -65,7 +63,6 @@ class PairTP:
 		self.current_request[Symbol1.ticker] = 0
 		self.current_request[Symbol2.ticker] = 0
 
-
 		###########################################
 		self.symbols ={}
 
@@ -74,7 +71,29 @@ class PairTP:
 
 		self.symbols[Symbol1.ticker] = Symbol1
 		self.symbols[Symbol2.ticker] = Symbol2
+
+		self.side = {}
+
+		if ratio[0]>0:
+			self.side[self.symbol1] = LONG
+		else:
+			self.side[self.symbol1] = SHORT
+
+		if ratio[1]>0:
+			self.side[self.symbol2] = LONG
+		else:
+			self.side[self.symbol2] = SHORT
 		
+		if abs(ratio[0])>=abs(ratio[1]):
+			self.main_symbol = self.symbol1
+			self.matching_symbol = self.symbol2
+			self.main_ratio = self.ratio[0]
+			self.matching_ratio = self.ratio[1]
+		else:
+			self.main_symbol = self.symbol2
+			self.matching_symbol = 	self.symbol1		
+			self.main_ratio = self.ratio[1]
+			self.matching_ratio = self.ratio[0]
 		# self.symbol1share = share1
 		# self.symbol2share = share2
 
@@ -222,7 +241,7 @@ class PairTP:
 	def request_granted(self,symbol):
 
 		# if request becomes 0  . match off. 
-
+		print(self.name,symbol,"request granted",self.current_shares[symbol],self.expected_shares[symbol])
 		with self.read_lock[symbol]:
 
 			self.current_request[symbol] = self.expected_shares[symbol] - self.current_shares[symbol]
@@ -245,25 +264,34 @@ class PairTP:
 
 	def notify_request(self,symbol):
 
-		log_print(self.name,symbol,"have:",self.current_shares[symbol],"want:",self.expected_shares[symbol],"change:",self.current_request[symbol])
+		log_print(self.name,symbol,"Notify Request","have:",self.current_shares[symbol],"want:",self.expected_shares[symbol],"change:",self.current_request[symbol])
 		self.have_request[symbol] = True
 		#self.symbol.request_notified()
 		self.symbols[symbol].request_notified()
 
-	def notify__request_with_delay(self,symbol):
+	# def notify__request_with_delay(self,symbol):
 
-		#time.sleep(1.5)
+	# 	#time.sleep(1.5)
 
-		self.symbols[symbol].expecting_marketorder()
-		self.notify_request(symbol)
 
 	def notify_immediate_request(self,shares,symbol):
 
 		# add a little delay using thread.
 
-		self.symbols[symbol].immediate_request(shares)
 		
-		self.notify__request_with_delay(symbol)
+		
+		self.symbols[symbol].expecting_marketorder()
+
+		
+
+		if symbol==self.matching_symbol:
+			#self.expected_shares[symbol] += shares
+
+			self.submit_expected_shares(shares,symbol)
+
+		#print(symbol,"request:",self.expected_shares)
+		self.symbols[symbol].immediate_request(self.current_request[symbol])
+		self.notify_request(symbol)
 
 		# delayed_notification = threading.Thread(target=self.notify__request_with_delay, daemon=True)
 		# delayed_notification.start()
@@ -284,6 +312,8 @@ class PairTP:
 
 
 			self.notify_request(symbol)
+
+			log_print(self.name,"submit_expected_shares",symbol,self.expected_shares[symbol],self.current_request[symbol])
 
 	def change_to_shares(self,shares,symbol=None,immediately=False):
 
@@ -313,59 +343,48 @@ class PairTP:
 					self.notify_immediate_request(self.current_request,symbol)
 
 
-	# def add_to_shares(self,shares):
 
-	# 	with self.read_lock:
-	# 		shares = abs(shares)
-	# 		if self.current_shares <0:
-	# 			self.expected_shares -= shares
-	# 		else:
-	# 			self.expected_shares += shares
-
-	# 		self.current_request = self.expected_shares - self.current_shares
-	# 		self.notify_request()
-
-	# def take_shares_off(self,shares):
-
-	# 	with self.read_lock:
-	# 		shares = abs(shares)
-
-	# 		if self.current_shares <0:
-
-	# 			self.expected_shares += shares
-	# 		else:
-
-
-	# 			self.expected_shares -= shares
-				
-	# 		self.current_request = self.expected_shares - self.current_shares
-	# 		self.notify_request()
 
 	""" PAIR MANAGEMENT """
 
 
 	def submit_expected_pairs(self,pairs):
 
+		log_print(self.name," expected paris",self.current_pairs,self.expected_pairs)
 		with self.pair_read_lock:
 			self.expected_pairs = int(pairs)
 			self.current_request_pairs = int(self.expected_pairs) - int(self.current_pairs)
 
 			# now i need to figure out who needs from whom. 
 
-			self.expected_shares[self.symbol1] = int(self.current_request_pairs*self.ratio[0])
-			self.expected_shares[self.symbol2] = int(self.current_request_pairs*self.ratio[1])
+			self.expected_shares[self.main_symbol] = int(self.current_request_pairs*self.main_ratio)
+			#self.expected_shares[self.symbol2] = int(self.current_request_pairs*self.ratio[1])
 
-			self.submit_expected_shares(self.expected_shares[self.symbol1],self.symbol1)
-			self.submit_expected_shares(self.expected_shares[self.symbol2],self.symbol2)
+			# put the main to work.
+
+			if pairs ==0:
+				self.submit_expected_shares(0,self.main_symbol)
+			else:
+				self.submit_expected_shares(self.expected_shares[self.main_symbol],self.main_symbol)
+			#self.submit_expected_shares(self.expected_shares[self.symbol2],self.symbol2)
 
 
-			log_print(self.name,": want",self.expected_pairs," pairs, with each",self.expected_shares)
+			log_print(self.name,": want",self.expected_pairs," pairs,","main symbol",self.main_symbol,self.current_request_pairs*self.main_ratio,\
+				"maching symbol",self.matching_symbol,self.current_request_pairs*self.matching_ratio)
 
 			# self.current_request[self.symbol1] = 
 			# self.current_request[self.symbol2] =
 
+	def pairs_count(self):
 
-	def recalibrated_pairs(self,othersymbool):
+		### change the state of the thing. 
+
+		with self.pair_read_lock:
+
+			self.current_pairs = min(self.current_shares[self.main_symbol]//self.main_ratio,self.current_shares[self.main_symbol]//self.main_ratio)
+
+
+	def recalibrated_pairs(self):
 
 		# count. according to the shares. how many pairs i do have now
 		# By knowing much many shares i have. compute the pairs. 
@@ -375,48 +394,19 @@ class PairTP:
 
 		#recheck the holdings of two.
 
-		
+
+		#self.symbols[othersymbool].incoming_shares_pairing()
 
 
-		log_print(self.name,"imbalance pair imbalance check:")
+		matching_expected = (self.current_shares[self.main_symbol]//self.main_ratio)* self.matching_ratio
 
-		self.symbols[othersymbool].incoming_shares_pairing()
-
-		pair_imbalance = self.current_shares[self.symbol1]//self.ratio[0] - self.current_shares[self.symbol2]//self.ratio[1]
-
-		log_print(self.name,"check holdings complete, current pair imbalance is",pair_imbalance)
-
-		symbol1_imbalance = self.ratio[0] * pair_imbalance
-		symbol2_imbalance = self.ratio[1] * pair_imbalance
+		log_print(self.name,"imbalance pair imbalance check:, current :",self.current_shares[self.main_symbol],self.current_shares[self.matching_symbol])
 
 
-		#during loading on. 
-		if pair_imbalance !=0:
+		self.notify_immediate_request(matching_expected,self.matching_symbol)
 
 
-
-			if pair_imbalance>0 and self.expected_pairs>self.current_pairs:
-				#right load more
-				self.notify_immediate_request(symbol2_imbalance,self.symbol2)
-
-			elif pair_imbalance>0 and self.expected_pairs<self.current_pairs:
-				#left load off
-				self.notify_immediate_request(symbol1_imbalance,self.symbol1)
-
-			elif pair_imbalance<0 and self.expected_pairs>self.current_pairs:
-				#left load more
-				self.notify_immediate_request(-symbol1_imbalance,self.symbol1)
-			elif pair_imbalance<0 and self.expected_pairs<self.current_pairs:
-				#right load off
-				self.notify_immediate_request(-symbol2_imbalance,self.symbol2)
-
-		self.double_processed = True
-		# adjust the remaining. ..... 
-
-		# self.expected_pairs = share
-		# self.current_pairs = 0
-		# self.current_request = 0
-		log_print("recalibration ends")
+		#log_print("recalibration ends")
 
 
 	""" PASSSIVE ENTRY/EXIT OVER A PERIOD AMONT OF TIME """
@@ -468,49 +458,28 @@ class PairTP:
 		
 		log_print("TP processing:",self.name,price,shares,side)
 
-		self.data[POSITION] = LONG
-
-		if symbol == self.symbol1:
-			othersymbool = self.symbol2
-			if side == LONG:
-				self.ppro_orders_loadup(price,shares,side,symbol)
-			else:
-				self.ppro_orders_loadoff(price,shares,side,symbol)
 
 
-		elif symbol == self.symbol2:
-			othersymbool = self.symbol1
-			if side == LONG:
-				self.ppro_orders_loadoff(price,shares,side,symbol)
-			else:
-				self.ppro_orders_loadup(price,shares,side,symbol)
-		
+		if self.side[symbol] == side:
+			self.ppro_orders_loadup(price,shares,side,symbol)
+		else:
+			self.ppro_orders_loadoff(price,shares,side,symbol)
 
-		# if self.data[POSITION]=="": # 1. No position.
-		# 	if self.expect_orders==side: # or self.management_plan.strategy_name=="ScalpaTron":
-		# 		self.ppro_confirm_new_order(price,shares,side)
-		# 	else:
-		# 		log_print("TP processing: unexpected orders on",self.symbol_name)
-		
-		# else:  # 2. Have position. 
 
-		# 	if self.data[POSITION]==side: #same side.
-		# 		self.ppro_orders_loadup(price,shares,side)
-		# 	else: #opposite
-		# 		self.ppro_orders_loadoff(price,shares,side)
-
-		# if self.test_mode:
-		# 	log_print("TP processing:",self.data)
 		self.update_displays()
 
 		#check the other holdings? need to avoid loop. 
 		self.request_granted(symbol)
 
-		if self.double_processed:
+		
+		if symbol == self.main_symbol:
 			# may call the function again. 
-			self.double_processed = False
-			self.recalibrated_pairs(othersymbool)
 
+			self.recalibrated_pairs()
+
+		self.pairs_count()
+
+		log_print(self.name,'current',self.current_shares,'expected',self.expected_shares,'request',self.current_request)
 
 	def ppro_orders_loadup(self,price,shares,side,symbol):
 
@@ -557,7 +526,7 @@ class PairTP:
 
 	def ppro_orders_loadoff(self,price,shares,side,symbol):
 
-		print("load off",symbol,price,shares,side)
+		#print("load off",symbol,price,shares,side)
 
 		if symbol == self.symbol1:
 
@@ -722,16 +691,23 @@ class PairTP:
 		if self.tkvars[STATUS].get()==PENDING:
 			self.cancel_algo()
 		else:
+
+			self.flatten_order= True
+
+			self.submit_expected_pairs(0)
+			# once the flatten cmd is on. NoMore management received.
+
+
 			# self.ppro_out.send(["Flatten",self.symbol_name])
-			self.symbols[self.symbol1].new_request(self.name,-1*self.data[SYMBOL1_SHARE])
-			self.symbols[self.symbol2].new_request(self.name,self.data[SYMBOL2_SHARE])
+			#self.symbols[self.symbol1].new_request(self.name,-1*self.data[SYMBOL1_SHARE])
+			#self.symbols[self.symbol2].new_request(self.name,self.data[SYMBOL2_SHARE])
 			# if self.data[POSITION]==LONG:
 				
 			# elif self.data[POSITION]==SHORT:
 				
 	def update_displays(self):
 
-		self.tkvars[SIZE_IN].set(str(self.data[SYMBOL1_SHARE])+"/"+str(-self.data[SYMBOL2_SHARE]))
+		self.tkvars[SIZE_IN].set(str(self.current_pairs)+" |"+str(self.data[SYMBOL1_SHARE])+"/"+str(-self.data[SYMBOL2_SHARE]))
 		self.tkvars[REALIZED].set(str(self.data[REALIZED]))
 		self.tkvars[TOTAL_REALIZED].set(str(self.data[TOTAL_REALIZED]))
 		self.tkvars[UNREAL].set(str(self.data[UNREAL]))
@@ -830,7 +806,7 @@ class PairTP:
 		return self.data
 
 	def get_flatten_order(self):
-		return self.flatten_order
+		return False #self.flatten_order
 
 	""" Deployment initialization """
 
