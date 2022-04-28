@@ -125,3 +125,13 @@ class TradingPlan_MMP1(TradingPlan):
 			# except Exception as e:
 
 			# 	log_print("Deplying Error:",self.symbol_name,e)
+
+
+	def flatten_cmd(self):
+		
+		if self.tkvars[STATUS].get()==PENDING:
+			self.cancel_algo()
+		else:
+			self.market_making_go = False
+			self.flatten_order=True
+			self.symbol.flatten_cmd(self.name)
