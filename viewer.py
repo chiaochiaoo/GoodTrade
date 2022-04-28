@@ -507,6 +507,6 @@ if __name__ == '__main__':
 	process_ppro.join()
 
 	print("All subprocesses terminated")
-	
+	print(1/0)
 	os._exit(1) 
 	print("exit")
