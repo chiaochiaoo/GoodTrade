@@ -122,35 +122,35 @@ def draw_pair(symbol1,symbol2,sr1,sr2):
 
 	if 570 in ts:
 
-	    start1 = ts1.index(get_ts(570))
-	    start2 = ts2.index(get_ts(570))
+		start1 = ts1.index(get_ts(570))
+		start2 = ts2.index(get_ts(570))
 
-	    open_1 = np.log(res1['chart']['result'][0]['indicators']['quote'][0]["open"][start1])
-	    open_2 = np.log(res2['chart']['result'][0]['indicators']['quote'][0]["open"][start2])
+		open_1 = np.log(res1['chart']['result'][0]['indicators']['quote'][0]["open"][start1])
+		open_2 = np.log(res2['chart']['result'][0]['indicators']['quote'][0]["open"][start2])
 
-	    idx = np.where((np.array(ts)>570)&(np.array(ts)<900))[0]
-	    
-	    
-	    for i in idx:
+		idx = np.where((np.array(ts)>570)&(np.array(ts)<900))[0]
+		
+		
+		for i in idx:
 
-	        xo = res1['chart']['result'][0]['indicators']['quote'][0]["open"][ts1.index(get_ts(ts[i]))]
-	        yo = res2['chart']['result'][0]['indicators']['quote'][0]["open"][ts2.index(get_ts(ts[i]))]
-	        xc = res1['chart']['result'][0]['indicators']['quote'][0]["close"][ts1.index(get_ts(ts[i]))]
-	        yc = res2['chart']['result'][0]['indicators']['quote'][0]["close"][ts2.index(get_ts(ts[i]))]
+			xo = res1['chart']['result'][0]['indicators']['quote'][0]["open"][ts1.index(get_ts(ts[i]))]
+			yo = res2['chart']['result'][0]['indicators']['quote'][0]["open"][ts2.index(get_ts(ts[i]))]
+			xc = res1['chart']['result'][0]['indicators']['quote'][0]["close"][ts1.index(get_ts(ts[i]))]
+			yc = res2['chart']['result'][0]['indicators']['quote'][0]["close"][ts2.index(get_ts(ts[i]))]
 
-	        xh = res1['chart']['result'][0]['indicators']['quote'][0]["high"][ts1.index(get_ts(ts[i]))]
-	        yh = res2['chart']['result'][0]['indicators']['quote'][0]["high"][ts2.index(get_ts(ts[i]))]
-	        xl = res1['chart']['result'][0]['indicators']['quote'][0]["low"][ts1.index(get_ts(ts[i]))]
-	        yl = res2['chart']['result'][0]['indicators']['quote'][0]["low"][ts2.index(get_ts(ts[i]))]
-
-
-	        high_.append(float(xh*sr1 + yh*sr2))
-	        low_.append(float(xl*sr1 + yl*sr2))
+			xh = res1['chart']['result'][0]['indicators']['quote'][0]["high"][ts1.index(get_ts(ts[i]))]
+			yh = res2['chart']['result'][0]['indicators']['quote'][0]["high"][ts2.index(get_ts(ts[i]))]
+			xl = res1['chart']['result'][0]['indicators']['quote'][0]["low"][ts1.index(get_ts(ts[i]))]
+			yl = res2['chart']['result'][0]['indicators']['quote'][0]["low"][ts2.index(get_ts(ts[i]))]
 
 
-	        open_.append(float(xo*sr1 + yo*sr2))
-	        close_.append(float(xc*sr1 + yc*sr2))
-	        ts_.append(get_ts(ts[i]))
+			high_.append(float(xh*sr1 + yh*sr2))
+			low_.append(float(xl*sr1 + yl*sr2))
+
+
+			open_.append(float(xo*sr1 + yo*sr2))
+			close_.append(float(xc*sr1 + yc*sr2))
+			ts_.append(get_ts(ts[i]))
 
 
 	open_ = np.array(open_)
@@ -237,8 +237,10 @@ def pair_form_B(p,q):
 				idx = q[day]['ts'].index(i)
 				p2 = abs( np.log(q[day]['opens'][idx])- np.log(q[day]['closes'][idx]))*100
 				
-			d[day]['p1'].append(p1)
-			d[day]['p2'].append(p2)
+			d[day]['p1'].append(p[day]['closes'][idx]-p[day]['opens'][idx])
+			d[day]['p2'].append(q[day]['closes'][idx]-q[day]['opens'][idx])
+			# d[day]['p1'].append(p1)
+			# d[day]['p2'].append(p2)
 			
 			if p2!=0:
 				d[day]['rt'].append(p1/p2)
@@ -518,12 +520,12 @@ def get_ts(m):
 if __name__ == '__main__':
 
 
-	# symbol1 = "JETS.AM"
-	# symbol2 = "SPY.AM"
-	# print(hedge_ratio(symbol1,symbol2))
+	symbol1 = "TQQQ.AM"
+	symbol2 = "SQQQ.AM"
+	print(hedge_ratio(symbol1,symbol2))
 
 
-	draw_pair("gld.am","gdx.nq",1,1)
+	#draw_pair("gld.am","gdx.nq",1,1)
 
 
 	# reg = threading.Thread(target=draw_pair,args=("SPY","QQQ",1,1), daemon=True)
