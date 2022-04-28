@@ -3,6 +3,7 @@ from tkinter import ttk
 import tkinter as tk 
 from Symbol import *
 from TradingPlan import *
+from TradingPlan_MMP1 import *
 from Pair_TP import *
 from UI import *
 from Ppro_in import *
@@ -433,7 +434,7 @@ class Manager:
 			symbols = list(self.symbol_data.values())
 			for val in symbols:
 
-				if val.get_management_request()==True:
+				if val.get_management_request()==True and val.get_market_making()==False:
 
 					val.symbol_inspection()
 					# stage 1, cancel each other out in the request book
@@ -604,7 +605,10 @@ class Manager:
 
 					#def __init__(self,name:"",symbol:Symbol,entry_plan=None,manage_plan=None,support=0,resistence=0,risk=None,TEST_MODE=False,algo_name="",Manager=None):
 
-					self.tradingplan[algo_id] = TradingPlan(name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
+					if mana==MARKETMAKING:
+						self.tradingplan[algo_id] = TradingPlan_MMP1(name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
+					else:
+						self.tradingplan[algo_id] = TradingPlan(name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
 					self.ui.create_new_single_entry(self.tradingplan[algo_id],type_name,None)
 
 					if status == True:
