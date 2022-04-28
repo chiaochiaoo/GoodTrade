@@ -144,12 +144,12 @@ def draw_pair(symbol1,symbol2,sr1,sr2):
 	        yl = res2['chart']['result'][0]['indicators']['quote'][0]["low"][ts2.index(get_ts(ts[i]))]
 
 
-	        high_.append(float(xh*sr1 - yh*sr2))
-	        low_.append(float(xl*sr1 - yl*sr2))
+	        high_.append(float(xh*sr1 + yh*sr2))
+	        low_.append(float(xl*sr1 + yl*sr2))
 
 
-	        open_.append(float(xo*sr1 - yo*sr2))
-	        close_.append(float(xc*sr1 - yc*sr2))
+	        open_.append(float(xo*sr1 + yo*sr2))
+	        close_.append(float(xc*sr1 + yc*sr2))
 	        ts_.append(get_ts(ts[i]))
 
 
