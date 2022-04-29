@@ -436,7 +436,8 @@ class PairTP:
 				gain = (self.symbols[self.symbol1].get_bid() - self.data[AVERAGE_PRICE1]) *self.data[SYMBOL1_SHARE]
 			else:
 				gain = (self.data[AVERAGE_PRICE1]-self.symbols[self.symbol1].get_ask()) *self.data[SYMBOL1_SHARE]
-			if self.side[self.symbol1]==LONG:
+
+			if self.side[self.symbol2]==LONG:
 				gain +=(self.symbols[self.symbol2].get_bid() -  self.data[AVERAGE_PRICE2] ) *self.data[SYMBOL2_SHARE]
 			else:
 				gain +=( self.data[AVERAGE_PRICE2]- self.symbols[self.symbol2].get_ask() ) *self.data[SYMBOL2_SHARE]
@@ -483,7 +484,7 @@ class PairTP:
 		self.request_granted(symbol)
 
 		
-		if symbol == self.main_symbol:
+		if symbol == self.main_symbol and self.if_activated():
 			# may call the function again. 
 
 			self.recalibrated_pairs()
@@ -613,7 +614,7 @@ class PairTP:
 		#prevent manual conflit.
 		self.expect_orders = ""
 		##################
-
+		self.deactive()
 		self.mark_algo_status(DONE)
 		self.set_mind("Trade completed.",VERYLIGHTGREEN)
 		self.data[POSITION] = ""
@@ -642,20 +643,14 @@ class PairTP:
 
 		### if no position, flatten. ###
 
-		if self.data[STATUS] == DEPLOYED:
+		if self.management_start!=True:
 
-			# cancel whatever requested on symbol.
-
-			# withdraw the algo. 
-
-			# show rejection. 
-			pass
-			#self.symbol.cancel_all_request(self.name)
-			#self.mark_algo_status(REJECTED)
-
-		else:
-
+			self.data[STATUS] = REJECTED
 			log_print("rejection messge received on ",self.name)
+			self.flatten_cmd()
+
+
+			
 
 	""" Trade management """
 
@@ -851,7 +846,7 @@ class PairTP:
 			self.symbols[self.symbol1].register_tradingplan(self.name,self) 
 			self.symbols[self.symbol2].register_tradingplan(self.name,self) 
 
-
+			self.activate()
 			self.submit_expected_pairs(self.expected_pairs)
 
 
