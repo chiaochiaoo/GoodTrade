@@ -10,6 +10,8 @@ from Ppro_in import *
 from Ppro_out import *
 from constant import *
 
+import os
+
 import random
 from BackTester import *
 from Util_functions import *
@@ -28,6 +30,12 @@ from Tester import *
 from httpserver import *
 
 
+try:
+	import psutil
+except ImportError:
+	import pip
+	pip.main(['install', 'psutil'])
+	import psutil
 
 #May this class bless by the Deus Mechanicus.
 
@@ -1146,24 +1154,24 @@ if __name__ == '__main__':
 
 	goodtrade_pipe, receive_pipe = multiprocessing.Pipe()
 
-	algo_voxcom = multiprocessing.Process(target=algo_manager_voxcom3, args=(receive_pipe,),daemon=True)
+	algo_voxcom = multiprocessing.Process(name="algo vox1",target=algo_manager_voxcom3, args=(receive_pipe,),daemon=True)
 	algo_voxcom.daemon=True
 
 
-	algo_voxcom2 = multiprocessing.Process(target=httpserver, args=(receive_pipe,),daemon=True)
+	algo_voxcom2 = multiprocessing.Process(name="algo vox2",target=httpserver, args=(receive_pipe,),daemon=True)
 	algo_voxcom2.daemon=True
 
 
 
 	ppro_in, ppro_pipe_end = multiprocessing.Pipe()
 
-	ppro_in_manager = multiprocessing.Process(target=Ppro_in, args=(port,ppro_pipe_end),daemon=True)
+	ppro_in_manager = multiprocessing.Process(name="ppro in",target=Ppro_in, args=(port,ppro_pipe_end),daemon=True)
 	ppro_in_manager.daemon=True
 
 
 	ppro_out, ppro_pipe_end2 = multiprocessing.Pipe()
 
-	ppro_out_manager = multiprocessing.Process(target=Ppro_out, args=(ppro_pipe_end2,port,ppro_pipe_end,),daemon=True)
+	ppro_out_manager = multiprocessing.Process(name="ppro out",target=Ppro_out, args=(ppro_pipe_end2,port,ppro_pipe_end,),daemon=True)
 	ppro_out_manager.daemon=True
 
 
@@ -1194,21 +1202,24 @@ if __name__ == '__main__':
 
 	time.sleep(2)
 
+	algo_voxcom2.terminate()
 	algo_voxcom.terminate()
 	ppro_in_manager.terminate()
 	ppro_out_manager.terminate()
 
-
+	algo_voxcom2.join()
 	algo_voxcom.join()
 	ppro_in_manager.join()
 	ppro_out_manager.join()
 	print("All subprocesses terminated")
 
-	print("checking",multiprocessing.active_children(),threading.active_count())
+	print("checking remaining processes:",multiprocessing.active_children(),threading.active_count())
 
-	
-	print(1/0)
+		
+	current_system_pid = os.getpid()
 
+	ThisSystem = psutil.Process(current_system_pid)
+	ThisSystem.terminate()
 	os._exit(1)
 
 	print("exit")
