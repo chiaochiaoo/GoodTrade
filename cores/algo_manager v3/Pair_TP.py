@@ -286,11 +286,12 @@ class PairTP:
 
 		if symbol==self.matching_symbol:
 			#self.expected_shares[symbol] += shares
-
+			
+			previous_request = self.current_request[symbol]
 			self.submit_expected_shares(shares,symbol)
 
 		#print(symbol,"request:",self.expected_shares)
-		self.symbols[symbol].immediate_request(self.current_request[symbol])
+		self.symbols[symbol].immediate_request(self.current_request[symbol]-previous_request)
 		self.notify_request(symbol)
 
 		# delayed_notification = threading.Thread(target=self.notify__request_with_delay, daemon=True)
@@ -307,6 +308,7 @@ class PairTP:
 	def submit_expected_shares(self,shares,symbol):
 
 		with self.read_lock[symbol]:
+
 			self.expected_shares[symbol] = int(shares)
 			self.current_request[symbol] = int(self.expected_shares[symbol]) - int(self.current_shares[symbol])
 
@@ -843,12 +845,7 @@ class PairTP:
 
 			self.submit_expected_pairs(self.expected_pairs)
 
-			#self.submit_expected_shares(self.symbol1share,self.symbol1)
-			#self.submit_expected_shares(self.symbol2share,self.symbol2)
 
-			# self.symbols[self.symbol1].new_request(self.name,self.symbol1share)
-
-			# self.symbols[self.symbol2].new_request(self.name,-self.symbol2share)
 
 			manage_plan =self.tkvars[MANAGEMENTPLAN].get()
 
