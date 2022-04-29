@@ -286,7 +286,7 @@ class PairTP:
 
 		if symbol==self.matching_symbol:
 			#self.expected_shares[symbol] += shares
-			
+
 			previous_request = self.current_request[symbol]
 			self.submit_expected_shares(shares,symbol)
 
@@ -425,12 +425,21 @@ class PairTP:
 
 		flatten = False
 
-		if self.data[POSITION]!="":
+		#if self.data[POSITION]!="":
 			#self.check_pnl(bid,ask,ts)
 
-			gain = (self.symbols[self.symbol1].get_bid() - self.data[AVERAGE_PRICE1]) *self.data[SYMBOL1_SHARE]
+		### depending on the postition. 
 
-			gain +=( self.data[AVERAGE_PRICE2]- self.symbols[self.symbol2].get_ask() ) *self.data[SYMBOL2_SHARE]
+		if self.management_start:
+
+			if self.side[self.symbol1]==LONG:
+				gain = (self.symbols[self.symbol1].get_bid() - self.data[AVERAGE_PRICE1]) *self.data[SYMBOL1_SHARE]
+			else:
+				gain = (self.data[AVERAGE_PRICE1]-self.symbols[self.symbol1].get_ask()) *self.data[SYMBOL1_SHARE]
+			if self.side[self.symbol1]==LONG:
+				gain +=(self.symbols[self.symbol2].get_bid() -  self.data[AVERAGE_PRICE2] ) *self.data[SYMBOL2_SHARE]
+			else:
+				gain +=( self.data[AVERAGE_PRICE2]- self.symbols[self.symbol2].get_ask() ) *self.data[SYMBOL2_SHARE]
 
 			#print(self.symbols[self.symbol1].get_bid(),self.data[AVERAGE_PRICE1],self.data[AVERAGE_PRICE2],self.symbols[self.symbol2].get_ask() )
 			self.data[UNREAL]= round(gain,2)
