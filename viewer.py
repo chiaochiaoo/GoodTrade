@@ -14,6 +14,13 @@ except ImportError:
     pip.main(['install', 'numpy'])
     import numpy as np
 
+try:
+	import psutil
+except ImportError:
+	import pip
+	pip.main(['install', 'psutil'])
+	import psutil
+
 # try:
 #     pip.main(['install', 'matplotlib'])
 #     pip.main(['install', 'requests'])
@@ -507,6 +514,10 @@ if __name__ == '__main__':
 	process_ppro.join()
 
 	print("All subprocesses terminated")
-	print(1/0)
+	
+	current_system_pid = os.getpid()
+
+	ThisSystem = psutil.Process(current_system_pid)
+	ThisSystem.terminate()
 	os._exit(1) 
 	print("exit")
