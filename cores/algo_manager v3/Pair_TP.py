@@ -449,18 +449,18 @@ class PairTP:
 				flatten = True
 
 
-			#SYMBOL1
-
-			#SYMBOL2
-
 		#check triggers
 		#print("updating",self.current_running_strategy)
 		if self.current_running_strategy!=None:
 			self.current_running_strategy.update()
 
-		if flatten and not self.flatten_order:
+		if flatten:
 			self.flatten_order = True
 			self.flatten_cmd()
+
+		if self.flatten_order:
+
+			self.submit_expected_pairs(0)
 		# except Exception as e:
 		# 	log_print("TP issue:",e)
 
