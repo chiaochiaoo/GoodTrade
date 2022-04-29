@@ -467,13 +467,13 @@ if __name__ == '__main__':
 
 	#algo_manager = algo_process_manager_client(algo_manager_process_comm,root)
 	
-	utility = multiprocessing.Process(target=utils, args=(algo_manager_receive_comm,util_response),daemon=True)
+	utility = multiprocessing.Process(name="utils",target=utils, args=(algo_manager_receive_comm,util_response),daemon=True)
 	utility.daemon=True
 	#utility.name = "utility"
 	# receiver = multiprocessing.Process(target=algo_server,args=(util_response,),daemon=True)
 	# receiver.daemon=True
 
-	algo_connection = multiprocessing.Process(target=algo_server_shell, args=(util_response,),daemon=True)
+	algo_connection = multiprocessing.Process(name="algo connection",target=algo_server_shell, args=(util_response,),daemon=True)
 	algo_connection.daemon=True
 	
 
@@ -482,7 +482,7 @@ if __name__ == '__main__':
 	util_process = util_client(util_request)
 
 	request_pipe, receive_pipe = multiprocessing.Pipe()
-	process_ppro = multiprocessing.Process(target=multi_processing_price, args=(receive_pipe,util_process,),daemon=True)
+	process_ppro = multiprocessing.Process(name="pproprice",target=multi_processing_price, args=(receive_pipe,util_process,),daemon=True)
 	process_ppro.daemon=True
 	process_ppro.start()
 	ppro = ppro_process_manager(request_pipe)
@@ -508,16 +508,20 @@ if __name__ == '__main__':
 	#scanner_request_scanner.send(["terminate"])
 	utility.terminate()
 	process_ppro.terminate()
+	algo_connection.terminate()
 	#scanner_request_scanner.recv()
 
+	algo_connection.join()
 	utility.join()
 	process_ppro.join()
 
 	print("All subprocesses terminated")
-	
+	print("checking remaining processes:",multiprocessing.active_children(),threading.active_count())
+
 	current_system_pid = os.getpid()
 
 	ThisSystem = psutil.Process(current_system_pid)
 	ThisSystem.terminate()
+
 	os._exit(1) 
 	print("exit")
