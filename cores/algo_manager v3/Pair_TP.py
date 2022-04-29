@@ -458,7 +458,7 @@ class PairTP:
 			self.flatten_order = True
 			self.flatten_cmd()
 
-		if self.flatten_order:
+		if self.flatten_order and self.if_activated():
 
 			self.submit_expected_pairs(0)
 		# except Exception as e:
