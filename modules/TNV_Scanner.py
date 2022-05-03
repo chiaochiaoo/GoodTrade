@@ -18,12 +18,16 @@ from tkinter import *
 #from TNV_Trend import *
 #from TNV_OR import *
 
-
-from modules.TNV_PMB import *
-from modules.TNV_TFM import *
-from modules.TNV_StandardScanner import *
-
-
+try:
+	from modules.TNV_Spread import *
+	from modules.TNV_PMB import *
+	from modules.TNV_TFM import *
+	from modules.TNV_StandardScanner import *
+except:
+	from TNV_Spread import *
+	from TNV_PMB import *
+	from TNV_TFM import *
+	from TNV_StandardScanner import *
 # from modules.TNV_OR import *
 # from modules.TNV_Trend import *
 class fake_NT():
@@ -119,10 +123,10 @@ class TNV_Scanner():
 		self.TNV_TAB.add(self.trending_frame, text ='Trending')
 		self.trending = ADX(self.trending_frame,NT,self)
 
-		# Spread 
-		# self.spread_frame = tk.Canvas(self.TNV_TAB)
-		# self.TNV_TAB.add(self.spread_frame, text ='Spread')
-		# self.spread = Spread(self.spread_frame,NT)
+		#Spread 
+		self.spread_frame = tk.Canvas(self.TNV_TAB)
+		self.TNV_TAB.add(self.spread_frame, text ='Spread')
+		self.spread = Spread(self.spread_frame,NT,self)
 
 		# # TFM
 		self.TFM_frame = tk.Canvas(self.TNV_TAB)
