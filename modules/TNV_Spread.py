@@ -444,7 +444,7 @@ class Spread():
 
 					#["Symbol","Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Ignore","Add"]
 					rank = index
-					sec = row['hedgeratio']
+					sec = str(row['hedgeratio'])
 					sc = row['correlation_score']
 					relv = row['correlation_stability']
 					ycr = row['day_avg_move']
