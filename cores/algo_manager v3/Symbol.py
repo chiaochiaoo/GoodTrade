@@ -357,8 +357,7 @@ class Symbol:
 
 						if  holding>0 and share*holding <0:
 
-							paired = min(abs(share),holding)
-
+							paired = min(abs(share),abs(holding))
 
 							self.tradingplans[tp].ppro_process_orders(price,abs(paired),SHORT,self.ticker)
 							self.incoming_shares[price] -= -paired
@@ -367,7 +366,7 @@ class Symbol:
 
 						elif holding<0 and share*holding <0:
 
-							paired = max(share,abs(holding))
+							paired = min(abs(share),abs(holding))
 
 
 							self.tradingplans[tp].ppro_process_orders(price,abs(paired),LONG,self.ticker)
