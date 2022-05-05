@@ -282,6 +282,79 @@ class BreakDown(EntryStrategy): #the parameters contains? dk. yet .  #Can make s
 # 			# self.add_initial_triggers(self.cont_sellTrigger)
 			
 
+class FadeDown(EntryStrategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry.
+	def __init__(self,timer,repeat,symbol,tradingplan):
+		super().__init__("Entry : Fade down",symbol,tradingplan)
+
+		self.timer = timer
+		self.repeat = repeat
+		#description,trigger_timer:int,trigger_limit=1
+		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
+		self.buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,">",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"Fade down",timer,repeat,SHORT,self.ppro_out)
+		#Break_any_Purchase_trigger
+		#Break_any_Purchase_trigger
+		self.add_initial_triggers(self.buyTrigger)
+
+	def on_redeploying(self):
+
+		if not self.buyTrigger.pre_deploying_check():
+			self.buyTrigger.total_reset()
+			self.restart()
+		else:
+
+			self.tradingplan.mark_algo_status(DONE)
+
+	def on_deploying(self):
+
+		super().on_deploying()
+
+		#self.buyTrigger.deploy_stop_order()
+
+class FadeUp(EntryStrategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry.
+	def __init__(self,timer,repeat,symbol,tradingplan):
+		super().__init__("Entry : Fade up",symbol,tradingplan)
+		self.timer = timer
+		self.repeat = repeat
+		#description,trigger_timer:int,trigger_limit=1
+		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
+		#print("breakdown!!!!")
+		self.sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"Fade up",timer,repeat,LONG,self.ppro_out)
+
+		self.add_initial_triggers(self.sellTrigger)
+
+	def on_deploying(self):
+
+		super().on_deploying()
+
+		#self.sellTrigger.deploy_stop_order()
+
+		
+	def on_redeploying(self):
+
+		if not self.sellTrigger.pre_deploying_check():
+			self.sellTrigger.total_reset()
+			self.restart()
+		else:
+
+			self.tradingplan.mark_algo_status(DONE)
+
+# 			# self.transitional_trigger = AbstractTrigger("transition to below pH.",[[SYMBOL_DATA,BID,">",SYMBOL_DATA,SUPPORT]],0,1,"REACTIVATE")
+# 			# self.sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,ASK,"<",SYMBOL_DATA,SUPPORT]],RESISTENCE,self.risk,"break down",self.timer,self.repeat,SHORT,self.ppro_out)
+# 			# self.transitional_trigger.add_next_trigger(self.sellTrigger)
+
+
+# 			# self.symbol.data[EXIT] = self.tradingplan.data[FIBLEVEL2]
+# 			# self.symbol.data[ENTRY] = self.symbol.data[LOW]
+
+# 			# self.cont_sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,ENTRY]],EXIT,self.risk,"break down contituation",0,1,SHORT,self.ppro_out)
+# 			# log_print(self.symbol_name,"setting contituation on ",round(self.symbol.data[ENTRY],2),"stop:",round(self.symbol.data[EXIT],2),0,1)
+
+# 			# self.set_initial_trigger(self.transitional_trigger)
+# 			# self.add_initial_triggers(self.cont_sellTrigger)
+			
+
+
+
 class InstantLong(EntryStrategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry.
 	def __init__(self,symbol,tradingplan):
 		super().__init__("Entry : Instant Long",symbol,tradingplan)
@@ -337,12 +410,15 @@ class InstantShort(EntryStrategy): #the parameters contains? dk. yet .  #Can mak
 		else:
 
 			self.tradingplan.mark_algo_status(DONE)
+
 class TargetLong(EntryStrategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry.
 	def __init__(self,symbol,tradingplan):
 		super().__init__("Entry : Target Long",symbol,tradingplan)
 
 		# self.timer = timer
 		# self.repeat = repeat
+
+		## i have one problem here. this assumes current price is lower than the long. but what if i want to break-- and reverse? 
 
 		self.buyTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,">",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"Target Long",0,1,LONG,self.ppro_out)
 		#Break_any_Purchase_trigger

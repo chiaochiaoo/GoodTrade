@@ -143,6 +143,8 @@ INCREMENTAL = 'Incrmntl'
 INCREMENTAL2 = 'NewIncremtl'
 
 #Entry Plan
+FADEUP = "Fadeup"
+FADEDOWN = "Fadedown"
 BREAISH =   "  Bearish"
 BULLISH =   "  Bullish"
 BREAKUP =   " BreakUp"

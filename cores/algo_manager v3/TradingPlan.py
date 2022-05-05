@@ -919,6 +919,12 @@ class TradingPlan:
 		elif entry_plan == BREAKDOWN:
 			
 			self.set_EntryStrategy(BreakDown(entrytimer,instant,self.symbol,self))
+
+		elif entry_plan == FADEUP:
+			self.set_EntryStrategy(FadeUp(entrytimer,instant,self.symbol,self))
+		elif entry_plan == FADEDOWN:
+			self.set_EntryStrategy(FadeDown(entrytimer,instant,self.symbol,self))
+			
 		elif entry_plan == BREAISH:
 			self.set_EntryStrategy(Bearish(entrytimer,instant,self.symbol,self))
 		elif entry_plan == BULLISH:
