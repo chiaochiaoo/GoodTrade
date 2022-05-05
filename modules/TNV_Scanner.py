@@ -194,6 +194,7 @@ class TNV_Scanner():
 
 			filtered_df = data[0]
 
+			pair_df = data[3]
 
 			#print("Current ts:",ts)
 
@@ -278,6 +279,7 @@ class TNV_Scanner():
 
 			self.pmb.update_entry(pb)
 
+			self.spread.update_entry(pair_df)
 			self.open_reversal.update_entry(openreverse)
 			self.trending.update_entry(trending)
 			

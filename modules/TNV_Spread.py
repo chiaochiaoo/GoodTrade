@@ -69,9 +69,9 @@ class Spread():
 
 		
 
-		self.file = "signals/open_resersal_"+datetime.now().strftime("%m-%d")+".csv"
+		#self.file = "signals/open_resersal_"+datetime.now().strftime("%m-%d")+".csv"
 
-		#self.update_entry(pd.read_csv("tttt.csv",index_col=0))
+		#self.update_entry(pd.read_csv("df_pair.csv",index_col=0))
 
 	def recreate_labels(self,frame):
 
@@ -366,12 +366,13 @@ class Spread():
 
 	def filtering(self,data):
 
-		if self.condition_yc.get()== True:
-			data =  data.loc[((data["ycr"]>=0.75)|(data["ycr"]<=0.25))]
+		# if self.condition_yc.get()== True:
+		# 	data =  data.loc[((data["ycr"]>=0.75)|(data["ycr"]<=0.25))]
 			
 
 		return data
 
+#		self.labels = 
 
 	def just_update(self,data):
 		entry = 0
@@ -380,15 +381,15 @@ class Spread():
 				for index, row in data.iterrows():
 					#print(row)
 
-					#["Symbol","Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Ignore","Add"]
+					#["Pairs","Ratio","COR","COR STB","Avg move","OH","OL","15-Avg  σ"]
 					rank = index
-					sec = row['sector']
-					sc = row['SC']
-					relv = row['rrvol']
-					ycr = row['ycr']
-					ph = row['ph']
-					pl = row['pl']
-					pr = row['prange']
+					sec = row['hedgeratio']
+					sc = row['correlation_score']
+					relv = row['correlation_stability']
+					ycr = row['day_avg_move']
+					ph = row['OH eval']
+					pl = row['OL eval']
+					pr = row['15_avg_sigma_per_pair']
 
 					############ add since, and been to the thing #############
 
@@ -443,27 +444,20 @@ class Spread():
 
 					#["Symbol","Vol","Rel.V","Side","Re.SCORE","SC%","Listed","Since","Ignore","Add"]
 					rank = index
-					sec = row['sector']
-					sc = row['SC']
-					relv = row['rrvol']
-					ycr = row['ycr']
-					ph = row['ph']
-					pl = row['pl']
-					pr = row['prange']
+					sec = str(row['hedgeratio'])
+					sc = row['correlation_score']
+					relv = row['correlation_stability']
+					ycr = row['day_avg_move']
+					ph = round(row['OH eval'],2)
+					pl = round(row['OL eval'],2)
+					pr = row['15_avg_sigma_per_pair']
 
 					############ add since, and been to the thing #############
 
-					if self.NT != None:
-						if rank in self.NT.nasdaq_trader_symbols_ranking:
-							listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
-						else:
-							listed = "No"
-					else:
-						listed = "No"
 					#print(self.NT.nasdaq_trader_symbols)
 					if 1: #score>0:	
 
-						lst = [rank,sec,sc,relv,ycr,ph,pl,pr,listed]
+						lst = [rank,sec,sc,relv,ycr,ph,pl,pr]
 
 						ts_location = 7
 
@@ -476,32 +470,32 @@ class Spread():
 							# 	self.entries[entry][i]["background"] = "LIGHTGREEN"
 							# 	self.entries[entry][8].grid()
 
-							if sc>0:
-								side = "UP"
-							else:
-								side = "DOWN"
-							support = row['pl']
-							resistence = row['ph']
+							# if sc>0:
+							# 	side = "UP"
+							# else:
+							# 	side = "DOWN"
+							# support = row['pl']
+							# resistence = row['ph']
 
-							self.entries[entry][9]["command"]= lambda symbol=rank,support=support,side=side,resistence=resistence:self.send_algo(symbol,support,resistence,side)
+							# self.entries[entry][9]["command"]= lambda symbol=rank,support=support,side=side,resistence=resistence:self.send_algo(symbol,support,resistence,side)
 
 
-							if self.algo_activate.get()==1 and ts>=algo_timer and ts<=end_timer:
-								if rank not in self.algo_placed:
+							# if self.algo_activate.get()==1 and ts>=algo_timer and ts<=end_timer:
+							# 	if rank not in self.algo_placed:
 
-									#print("PMB SEND")
-									#self.send_algo(rank,support,resistence,self.algo_risk)
-									self.algo_placed.append(rank)
+							# 		#print("PMB SEND")
+							# 		#self.send_algo(rank,support,resistence,self.algo_risk)
+							# 		self.algo_placed.append(rank)
 
-									order = {}
+							# 		order = {}
 
-									order["symbol"] = rank
-									order["support"] = support
-									order["resistence"] = resistence
+							# 		order["symbol"] = rank
+							# 		order["support"] = support
+							# 		order["resistence"] = resistence
 
-									order["side"] = side
+							# 		order["side"] = side
 
-									send_algo.append(order)
+							# 		send_algo.append(order)
 
 
 						entry+=1
@@ -510,7 +504,7 @@ class Spread():
 
 				while entry<30:
 					#print("ok")
-					for i in range(10):
+					for i in range(5):
 						self.entries[entry][i]["text"] = ""
 					entry+=1
 
