@@ -153,9 +153,8 @@ class Premarket_breakout():
 				new_order["risk"] = risk
 				new_order["statistics"] = {}
 
-				info = ["New order",new_order]
 				#print("sending",info)
-			else:
+			elif  side =="DOWN":
 
 				new_order = {}
 				new_order["type_name"] = "Single"
@@ -173,8 +172,50 @@ class Premarket_breakout():
 				new_order["risk"] = risk
 				new_order["statistics"] = {}
 
-				info = ["New order",new_order]
+				
 
+			elif lst[i]["side"]=="FADEUP":
+
+				new_order = {}
+
+				new_order["type_name"] = "Single"
+
+				new_order["algo_id"]= self.name+"_"+lst[i]["symbol"]
+				new_order["algo_name"]= self.algo_name
+
+				new_order["entry_type"] = "Fadeup"
+				new_order["symbol"] = lst[i]["symbol"]
+				new_order["side"] = "Long"
+				new_order["support"] = lst[i]["support"]
+				new_order["resistence"] = lst[i]["resistence"]
+				new_order["immediate_deployment"]= deployment
+				new_order["management"] = management 
+				new_order["risk"] = risk
+				new_order["statistics"] = {}
+
+
+				order.append(new_order)
+
+			elif lst[i]["side"]=="FADEDOWN":
+
+				new_order = {}
+
+				new_order["type_name"] = "Single"
+
+				new_order["algo_id"]= self.name+"_"+lst[i]["symbol"]
+				new_order["algo_name"]= self.algo_name
+
+				new_order["entry_type"] = "Fadedown"
+				new_order["symbol"] = lst[i]["symbol"]
+				new_order["side"] = "Short"
+				new_order["support"] = lst[i]["support"]
+				new_order["resistence"] = lst[i]["resistence"]
+				new_order["immediate_deployment"]= deployment
+				new_order["management"] = management 
+				new_order["risk"] = risk
+				new_order["statistics"] = {}
+
+			info = ["New order",new_order]
 			self.tnv_scanner.send_algo(info)
 
 
