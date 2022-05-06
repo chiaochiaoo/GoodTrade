@@ -527,11 +527,11 @@ class Premarket_breakout():
 
 							if fade==True:
 								if sc>0:
-									side = "FADEUP"
+									side = "FADEDOWN"
 									resistence = row['ph'] + row['hist_oh']/2
 									support = row['ph']
 								else:
-									side = "FADEDOWN"
+									side = "FADEUP"
 									resistence =  row['pl']
 									support = row['pl'] - row['hist_ol']/2
 
