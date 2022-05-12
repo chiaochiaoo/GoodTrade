@@ -778,6 +778,7 @@ class Open_low(StandardScanner):
 		self.tnv_scanner = tnv
 		super().__init__(root,NT)
 
+		self.open = tk.BooleanVar(value=0)
 		row = 3
 		col = 5
 		self.reversal_type = tk.StringVar(value="Both")
