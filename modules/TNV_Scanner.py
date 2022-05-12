@@ -621,8 +621,12 @@ class Open_high(StandardScanner):
 
 		row = 3
 		col = 5
-		ttk.Label(self.algo_frame, text="OpenBreak:").grid(sticky="w",column=col,row=row)
-		ttk.Checkbutton(self.algo_frame, variable=self.open).grid(sticky="w",column=col+1,row=row)
+
+		self.reversal_type = tk.StringVar(value="Both")
+		# ttk.Label(self.algo_frame, text="OpenBreak:").grid(sticky="w",column=col,row=row)
+		# ttk.Checkbutton(self.algo_frame, variable=self.open).grid(sticky="w",column=col+1,row=row)
+		ttk.Label(self.algo_frame, text="Reversal Type:").grid(sticky="w",column=col,row=row)
+		ttk.OptionMenu(self.algo_frame, self.reversal_type,*("","Both","Reversal Candle","EMA Break")).grid(sticky="w",column=col+1,row=row)
 
 		self.openbreak = []
 
@@ -774,13 +778,14 @@ class Open_low(StandardScanner):
 		self.tnv_scanner = tnv
 		super().__init__(root,NT)
 
-
 		self.open = tk.BooleanVar(value=0)
-
 		row = 3
 		col = 5
-		ttk.Label(self.algo_frame, text="OpenBreak:").grid(sticky="w",column=col,row=row)
-		ttk.Checkbutton(self.algo_frame, variable=self.open).grid(sticky="w",column=col+1,row=row)
+		self.reversal_type = tk.StringVar(value="Both")
+		# ttk.Label(self.algo_frame, text="OpenBreak:").grid(sticky="w",column=col,row=row)
+		# ttk.Checkbutton(self.algo_frame, variable=self.open).grid(sticky="w",column=col+1,row=row)
+		ttk.Label(self.algo_frame, text="Reversal Type:").grid(sticky="w",column=col,row=row)
+		ttk.OptionMenu(self.algo_frame, self.reversal_type,*("","Both","Reversal Candle","EMA Break")).grid(sticky="w",column=col+1,row=row)
 
 		self.openbreak = []
 
