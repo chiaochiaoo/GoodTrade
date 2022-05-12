@@ -548,7 +548,7 @@ class Manager:
 
 					for trade in list(self.tradingplan.values()):
 
-						if (trade.tkvars[STATUS].get()==PENDING or trade.tkvars[STATUS].get()==DONE) and trade.pair_plan==True and trade.in_use ==True:
+						if (trade.tkvars[STATUS].get()==PENDING or trade.tkvars[STATUS].get()==DONE) and trade.pair_plan==True and trade.in_use ==False:
 							replace_id = trade.algo_ui_id
 							trade.deactive()
 							find_ = True
