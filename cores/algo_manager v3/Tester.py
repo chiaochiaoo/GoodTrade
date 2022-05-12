@@ -27,6 +27,7 @@ class Tester:
 		self.gt = receive_pipe
 		self.ppro = ppro_in
 
+		self.algonum = 3
 
 		self.spybid=0
 		self.spyask=0
@@ -68,7 +69,7 @@ class Tester:
 		tk.Button(self.root ,text="up 0.1",command=self.price_up_little).grid(column=1,row=5)
 		tk.Button(self.root ,text="down 0.1",command=self.price_down_little).grid(column=2,row=5)	
 
-		tk.Button(self.root ,text="up 1",command=self.price_upx).grid(column=1,row=6)	
+		tk.Button(self.root ,text="add new",command=self.addnew).grid(column=1,row=6)	
 		tk.Button(self.root ,text="down 1",command=self.price_downx).grid(column=2,row=6)	
 
 		tk.Button(self.root ,text="add 1 share",command=self.add1).grid(column=1,row=7)	
@@ -137,6 +138,25 @@ class Tester:
 
 		price_changer = threading.Thread(target=self.price_changer, daemon=True)
 		price_changer.start()
+
+	def addnew(self):
+
+		
+		dic={}
+		dic["algo_id"] = 'TEST'+str(self.algonum)
+		dic["type_name"] = 'Single'
+		dic["algo_name"] = 'TEST'
+		dic["entry_type"] = FADEUP#INSTANTSHORT
+		dic["symbol"] =str(self.algonum)
+		dic["support"] =413
+		dic["resistence"] =412
+		dic["risk"] =50.0
+		dic["statistics"] ={'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441,"expected_momentum":2}
+		dic["immediate_deployment"] = True
+		dic["management"] = ONETOTWORISKREWARD
+		self.algonum+=1
+
+		self.gt.send(["pkg",[dic]])
 
 	def wish(self): #a sperate process. GLOBALLY. 
 		while True:

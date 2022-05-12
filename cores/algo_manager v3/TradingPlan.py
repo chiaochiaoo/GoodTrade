@@ -840,6 +840,7 @@ class TradingPlan:
 
 	def cancle_deployment(self):
 		if self.data[POSITION] =="" and self.data[CURRENT_SHARE]==0:
+			self.deactive()
 			self.mark_algo_status(PENDING)
 			self.stop_tradingplan()
 		else:

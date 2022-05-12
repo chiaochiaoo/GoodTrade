@@ -600,7 +600,7 @@ class Manager:
 				name = algo_id #symbol+str(ts)+ str(random.randint(0, 9))
 			
 			
-				if self.ui.algo_count_number.get()<50:
+				if self.ui.algo_count_number.get()<60:
 					#print(symbol,self.ui.algo_count_number.get())
 					
 					if symbol not in self.symbol_data:
@@ -628,12 +628,17 @@ class Manager:
 					for trade in list(self.tradingplan.values()):
 
 						if (trade.tkvars[STATUS].get()==PENDING or trade.tkvars[STATUS].get()==DONE) and trade.pair_plan==False and trade.in_use ==False:
+
+							trade.tkvars[STATUS].set("EVICTED")
 							replace_id = trade.algo_ui_id
 							trade.deactive()
 							find_ = True
 							log_print("Replacing",trade.symbol_name,"replace_id")
 							break 
+
+
 					if find_:
+						# get rid off that tradingplan. 
 						if symbol not in self.symbol_data:
 							self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats,self.pipe_ppro_out)  #register in Symbol.
 							self.symbols.append(symbol)
