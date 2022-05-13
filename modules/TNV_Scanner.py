@@ -712,8 +712,7 @@ class Open_high(StandardScanner):
 						# 	self.openbreak.append(rank)
 						# 	self.algo_placed.append(trade)
 
-						if row['ema45change']<=-25 and row['oh']>=1:
-
+						if row['ema45time']>=25 and row['oh']>=0.5 and row['new_high_this_5']==True and row['prev_5_close_range'] <=0.25 and row['prev_5_close_eval']>1.3:
 
 							if fade==True:
 								order["support"] = row['price']	- (row['high']-row['price'])
@@ -729,29 +728,48 @@ class Open_high(StandardScanner):
 
 								order["algo_name"] = self.algo_name
 								order["algo_id"] = self.algo_name + rank  + str(ts//15)
-
-							self.algo_placed.append(trade)		
 							send=True
+							self.algo_placed.append(trade)
+						# if row['ema45change']<=-25 and row['oh']>=1:
 
-						if row['ema45change']<=-50 and row['oh']>=1:
 
-							if fade==True:
-								order["support"] = row['price']	- (row['high']-row['price'])
-								order["resistence"] = row['price']
-								order["side"] = "UP"	
+						# 	if fade==True:
+						# 		order["support"] = row['price']	- (row['high']-row['price'])
+						# 		order["resistence"] = row['price']
+						# 		order["side"] = "UP"	
 
-								order["algo_name"] = self.algo_name_fade
-								order["algo_id"] = self.algo_name_fade + rank  + str(ts//15)
-							else:
-								order["support"] = row['price']	
-								order["resistence"] = row['high']+0.03
-								order["side"] = "DOWN"
+						# 		order["algo_name"] = self.algo_name_fade
+						# 		order["algo_id"] = self.algo_name_fade + rank  + str(ts//15)
+						# 	else:
+						# 		order["support"] = row['price']	 
+						# 		order["resistence"] = row['high']+0.03
+						# 		order["side"] = "DOWN"	
 
-								order["algo_name"] = self.algo_name
-								order["algo_id"] = self.algo_name + rank  + str(ts//15)
+						# 		order["algo_name"] = self.algo_name
+						# 		order["algo_id"] = self.algo_name + rank  + str(ts//15)
 
-							self.algo_placed.append(trade)			
-							send=True				
+						# 	self.algo_placed.append(trade)		
+						# 	send=True
+
+						# if row['ema45change']<=-50 and row['oh']>=1:
+
+						# 	if fade==True:
+						# 		order["support"] = row['price']	- (row['high']-row['price'])
+						# 		order["resistence"] = row['price']
+						# 		order["side"] = "UP"	
+
+						# 		order["algo_name"] = self.algo_name_fade
+						# 		order["algo_id"] = self.algo_name_fade + rank  + str(ts//15)
+						# 	else:
+						# 		order["support"] = row['price']	
+						# 		order["resistence"] = row['high']+0.03
+						# 		order["side"] = "DOWN"
+
+						# 		order["algo_name"] = self.algo_name
+						# 		order["algo_id"] = self.algo_name + rank  + str(ts//15)
+
+						# 	self.algo_placed.append(trade)			
+						# 	send=True				
 
 
 						if send:
@@ -856,17 +874,17 @@ class Open_low(StandardScanner):
 						
 
 						#print(trade,open_, row["ol"],row["f5r"],relv,ts,)
-						if open_ and row["ol"]>0.5 and row["f5r"]>0.5 and relv>0.5 and ts<=600 and rank not in self.openbreak:
+						# if open_ and row["ol"]>0.5 and row["f5r"]>0.5 and relv>0.5 and ts<=600 and rank not in self.openbreak:
 
-							order["support"] = 	row['price'] #- (row['high']-row['price'])
-							order["resistence"] =  row['open']
-							order["side"] = "DOWN"
-							send=True
+						# 	order["support"] = 	row['price'] #- (row['high']-row['price'])
+						# 	order["resistence"] =  row['open']
+						# 	order["side"] = "DOWN"
+						# 	send=True
 
-							self.openbreak.append(rank)
-							self.algo_placed.append(trade)
+						# 	self.openbreak.append(rank)
+						# 	self.algo_placed.append(trade)
 
-						if row['ema45change']>=25 and row['ol']>=1:
+						if row['ema45time']<=-25 and row['ol']>=0.5 and row['new_high_this_5']==True and row['prev_5_close_range'] >=0.75 and row['prev_5_close_eval']>1.3:
 
 							if fade==True:
 								order["support"] =  row['price']	 
@@ -886,26 +904,46 @@ class Open_low(StandardScanner):
 							send=True
 							self.algo_placed.append(trade)
 
-						if row['ema45change']>=50 and row['ol']>=1:
+						# if row['ema45change']>=25 and row['ol']>=0.5:
+
+						# 	if fade==True:
+						# 		order["support"] =  row['price']	 
+						# 		order["resistence"] = row['price'] + (row['price']-row['low'])
+						# 		order["side"] = "DOWN"
+
+						# 		order["algo_name"] = self.algo_name_fade
+						# 		order["algo_id"] = self.algo_name_fade +"_"+ rank[:-3]  + str(ts//15)
+
+						# 	else:	
+						# 		order["support"] = row['low'] -0.03	
+						# 		order["resistence"] = row['price']	
+						# 		order["side"] = "UP"			
+
+						# 		order["algo_name"] = self.algo_name
+						# 		order["algo_id"] = self.algo_name + "_" + rank[:-3]  + str(ts//15)
+						# 	send=True
+						# 	self.algo_placed.append(trade)
+
+						# if row['ema45change']>=50 and row['ol']>=1:
 
 
-							if fade==True:
-								order["support"] =  row['price']	 
-								order["resistence"] = row['price'] + (row['price']-row['low'])
-								order["side"] = "DOWN"
+						# 	if fade==True:
+						# 		order["support"] =  row['price']	 
+						# 		order["resistence"] = row['price'] + (row['price']-row['low'])
+						# 		order["side"] = "DOWN"
 
-								order["algo_name"] = self.algo_name_fade
-								order["algo_id"] = self.algo_name_fade +"_"+ rank[:-3]  + str(ts//15)
+						# 		order["algo_name"] = self.algo_name_fade
+						# 		order["algo_id"] = self.algo_name_fade +"_"+ rank[:-3]  + str(ts//15)
 
-							else:	
-								order["support"] = row['low'] -0.03	
-								order["resistence"] = row['price']	
-								order["side"] = "UP"	
+						# 	else:	
+						# 		order["support"] = row['low'] -0.03	
+						# 		order["resistence"] = row['price']	
+						# 		order["side"] = "UP"	
 
-								order["algo_name"] = self.algo_name
-								order["algo_id"] = self.algo_name +"_" + rank[:-3]  + str(ts//15)		
-							send=True
-							self.algo_placed.append(trade)
+						# 		order["algo_name"] = self.algo_name
+						# 		order["algo_id"] = self.algo_name +"_" + rank[:-3]  + str(ts//15)		
+						# 	send=True
+						# 	self.algo_placed.append(trade)
 
 		
 						if send:
