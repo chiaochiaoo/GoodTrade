@@ -731,7 +731,7 @@ class Open_high(StandardScanner):
 						if fast_reversal and row['ema45time']>=25 and row['oh']>=0.5 and row['new_high_this_5']==True and row['prev_5_close_range'] <=0.25 and row['prev_5_close_eval']>1.3:
 
 							if fade==True:
-								order["support"] = row['price']	- row['hist_oh']*0.2 #(row['high']-row['price'])
+								order["support"] = row['price']	- row['hist_oh']*0.1 #(row['high']-row['price'])
 								order["resistence"] = row['price']
 								order["side"] = "UP"	
 
@@ -739,7 +739,7 @@ class Open_high(StandardScanner):
 								order["algo_id"] = self.algo_name_fade + rank  +"_fast_"+ str(ts//15)
 							else:
 								order["support"] = row['price']	 
-								order["resistence"] = row['high']+ (row['hist_oh']*0.2)
+								order["resistence"] = row['high']+ (row['hist_oh']*0.1)
 								order["side"] = "DOWN"	
 
 								order["algo_name"] = self.algo_name
@@ -759,7 +759,7 @@ class Open_high(StandardScanner):
 								order["algo_id"] = self.algo_name_fade + rank  +"_slow_"+ str(ts//15)
 							else:
 								order["support"] = row['price']	 
-								order["resistence"] = row['high'] + (row['hist_oh']*0.1)
+								order["resistence"] = row['high'] + (row['hist_oh']*0.05)
 								order["side"] = "DOWN"	
 
 								order["algo_name"] = self.algo_name
@@ -779,7 +779,7 @@ class Open_high(StandardScanner):
 								order["algo_id"] = self.algo_name_fade + rank  + str(ts//15)
 							else:
 								order["support"] = row['price']	
-								order["resistence"] = row['high']  + (row['hist_oh']*0.1)
+								order["resistence"] = row['high']  + (row['hist_oh']*0.025)
 								order["side"] = "DOWN"
 
 								order["algo_name"] = self.algo_name
@@ -919,7 +919,7 @@ class Open_low(StandardScanner):
 
 							if fade==True:
 								order["support"] =  row['price']	 
-								order["resistence"] = row['price'] +  row['hist_ol']*0.2  #(row['price']-row['low'])
+								order["resistence"] = row['price'] +  row['hist_ol']*0.1  #(row['price']-row['low'])
 								order["side"] = "DOWN"
 
 								order["algo_name"] = self.algo_name_fade
@@ -946,7 +946,7 @@ class Open_low(StandardScanner):
 								order["algo_id"] = self.algo_name_fade +"_slow_"+ rank[:-3]  + str(ts//15)
 
 							else:	
-								order["support"] = row['low'] -  row['hist_ol']*0.2  #0.03	
+								order["support"] = row['low'] -  row['hist_ol']*0.1  #0.03	
 								order["resistence"] = row['price']	
 								order["side"] = "UP"			
 
@@ -967,7 +967,7 @@ class Open_low(StandardScanner):
 								order["algo_id"] = self.algo_name_fade +"_slow_"+ rank[:-3]  + str(ts//15)
 
 							else:	
-								order["support"] = row['low'] -  row['hist_ol']*0.2
+								order["support"] = row['low'] -  row['hist_ol']*0.1
 								order["resistence"] = row['price']	
 								order["side"] = "UP"	
 
