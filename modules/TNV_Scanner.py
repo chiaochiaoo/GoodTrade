@@ -658,6 +658,22 @@ class Open_high(StandardScanner):
 		open_ = self.open.get()
 		fade = self.fade.get()
 		
+
+		fast_reversal = False
+		slow_reversal = False
+
+		type_ = self.reversal_type.get()
+
+		if type_=="Both":
+			fast_reversal = True
+			slow_reversal = True
+		elif type_=="Reversal Candle":
+			fast_reversal = True
+			slow_reversal = False
+		elif type_ =="EMA Break":
+			fast_reversal = False
+			slow_reversal = True
+
 		if 1:
 			for index, row in df.iterrows():
 				#print(row)
@@ -702,7 +718,7 @@ class Open_high(StandardScanner):
 						order["symbol"] = rank
 
 
-						# if open_ and row["oh"]>0.5 and row["f5r"]>0.8 and relv>1.2 and ts<=700 and rank not in self.openbreak:
+						# if open_ and row["oh"]>0.5 and row["f5r"]>0.8 and relv>1.2 and ts<=700 and rank not in self.openbreak:   #hist_oh
 
 						# 	order["support"] = row['open']	#- (row['high']-row['price'])
 						# 	order["resistence"] = row['price']
@@ -712,7 +728,47 @@ class Open_high(StandardScanner):
 						# 	self.openbreak.append(rank)
 						# 	self.algo_placed.append(trade)
 
-						if row['ema45time']>=25 and row['oh']>=0.5 and row['new_high_this_5']==True and row['prev_5_close_range'] <=0.25 and row['prev_5_close_eval']>1.3:
+						if fast_reversal and row['ema45time']>=25 and row['oh']>=0.5 and row['new_high_this_5']==True and row['prev_5_close_range'] <=0.25 and row['prev_5_close_eval']>1.3:
+
+							if fade==True:
+								order["support"] = row['price']	- row['hist_oh']*0.2 #(row['high']-row['price'])
+								order["resistence"] = row['price']
+								order["side"] = "UP"	
+
+								order["algo_name"] = self.algo_name_fade
+								order["algo_id"] = self.algo_name_fade + rank  +"_fast_"+ str(ts//15)
+							else:
+								order["support"] = row['price']	 
+								order["resistence"] = row['high']+ (row['hist_oh']*0.2)
+								order["side"] = "DOWN"	
+
+								order["algo_name"] = self.algo_name
+								order["algo_id"] = self.algo_name + rank   +"_fast_"+ str(ts//15)
+							send=True
+							self.algo_placed.append(trade)
+
+						if slow_reversal and row['ema45change']<=-25 and row['oh']>=1:
+
+
+							if fade==True:
+								order["support"] = row['price']	- (row['high']-row['price'])
+								order["resistence"] = row['price']
+								order["side"] = "UP"	
+
+								order["algo_name"] = self.algo_name_fade
+								order["algo_id"] = self.algo_name_fade + rank  +"_slow_"+ str(ts//15)
+							else:
+								order["support"] = row['price']	 
+								order["resistence"] = row['high'] + (row['hist_oh']*0.1)
+								order["side"] = "DOWN"	
+
+								order["algo_name"] = self.algo_name
+								order["algo_id"] = self.algo_name + rank   +"_slow_"+  str(ts//15)
+
+							self.algo_placed.append(trade)		
+							send=True
+
+						if slow_reversal and row['ema45change']<=-50 and row['oh']>=0.8:
 
 							if fade==True:
 								order["support"] = row['price']	- (row['high']-row['price'])
@@ -722,54 +778,15 @@ class Open_high(StandardScanner):
 								order["algo_name"] = self.algo_name_fade
 								order["algo_id"] = self.algo_name_fade + rank  + str(ts//15)
 							else:
-								order["support"] = row['price']	 
-								order["resistence"] = row['high']+0.03
-								order["side"] = "DOWN"	
+								order["support"] = row['price']	
+								order["resistence"] = row['high']  + (row['hist_oh']*0.1)
+								order["side"] = "DOWN"
 
 								order["algo_name"] = self.algo_name
 								order["algo_id"] = self.algo_name + rank  + str(ts//15)
-							send=True
-							self.algo_placed.append(trade)
-						# if row['ema45change']<=-25 and row['oh']>=1:
 
-
-						# 	if fade==True:
-						# 		order["support"] = row['price']	- (row['high']-row['price'])
-						# 		order["resistence"] = row['price']
-						# 		order["side"] = "UP"	
-
-						# 		order["algo_name"] = self.algo_name_fade
-						# 		order["algo_id"] = self.algo_name_fade + rank  + str(ts//15)
-						# 	else:
-						# 		order["support"] = row['price']	 
-						# 		order["resistence"] = row['high']+0.03
-						# 		order["side"] = "DOWN"	
-
-						# 		order["algo_name"] = self.algo_name
-						# 		order["algo_id"] = self.algo_name + rank  + str(ts//15)
-
-						# 	self.algo_placed.append(trade)		
-						# 	send=True
-
-						# if row['ema45change']<=-50 and row['oh']>=1:
-
-						# 	if fade==True:
-						# 		order["support"] = row['price']	- (row['high']-row['price'])
-						# 		order["resistence"] = row['price']
-						# 		order["side"] = "UP"	
-
-						# 		order["algo_name"] = self.algo_name_fade
-						# 		order["algo_id"] = self.algo_name_fade + rank  + str(ts//15)
-						# 	else:
-						# 		order["support"] = row['price']	
-						# 		order["resistence"] = row['high']+0.03
-						# 		order["side"] = "DOWN"
-
-						# 		order["algo_name"] = self.algo_name
-						# 		order["algo_id"] = self.algo_name + rank  + str(ts//15)
-
-						# 	self.algo_placed.append(trade)			
-						# 	send=True				
+							self.algo_placed.append(trade)			
+							send=True				
 
 
 						if send:
@@ -833,6 +850,20 @@ class Open_low(StandardScanner):
 		open_ = self.open.get()
 		fade = self.fade.get()
 
+		fast_reversal = False
+		slow_reversal = False
+
+		type_ = self.reversal_type.get()
+
+		if type_=="Both":
+			fast_reversal = True
+			slow_reversal = True
+		elif type_=="Reversal Candle":
+			fast_reversal = True
+			slow_reversal = False
+		elif type_ =="EMA Break":
+			fast_reversal = False
+			slow_reversal = True
 
 		if 1:
 			for index, row in df.iterrows():
@@ -884,7 +915,27 @@ class Open_low(StandardScanner):
 						# 	self.openbreak.append(rank)
 						# 	self.algo_placed.append(trade)
 
-						if row['ema45time']<=-25 and row['ol']>=0.5 and row['new_high_this_5']==True and row['prev_5_close_range'] >=0.75 and row['prev_5_close_eval']>1.3:
+						if fast_reversal and row['ema45time']<=-25 and row['ol']>=0.5 and row['new_high_this_5']==True and row['prev_5_close_range'] >=0.75 and row['prev_5_close_eval']>1.3:
+
+							if fade==True:
+								order["support"] =  row['price']	 
+								order["resistence"] = row['price'] +  row['hist_ol']*0.2  #(row['price']-row['low'])
+								order["side"] = "DOWN"
+
+								order["algo_name"] = self.algo_name_fade
+								order["algo_id"] = self.algo_name_fade +"_fast_"+ rank[:-3]  + str(ts//15)
+
+							else:	
+								order["support"] = row['low'] -  row['hist_ol']*0.1
+								order["resistence"] = row['price']	
+								order["side"] = "UP"			
+
+								order["algo_name"] = self.algo_name
+								order["algo_id"] = self.algo_name + "_fast_" + rank[:-3]  + str(ts//15)
+							send=True
+							self.algo_placed.append(trade)
+
+						if slow_reversal and row['ema45change']>=25 and row['ol']>=0.5:
 
 							if fade==True:
 								order["support"] =  row['price']	 
@@ -892,58 +943,38 @@ class Open_low(StandardScanner):
 								order["side"] = "DOWN"
 
 								order["algo_name"] = self.algo_name_fade
-								order["algo_id"] = self.algo_name_fade +"_"+ rank[:-3]  + str(ts//15)
+								order["algo_id"] = self.algo_name_fade +"_slow_"+ rank[:-3]  + str(ts//15)
 
 							else:	
-								order["support"] = row['low'] -0.03	
+								order["support"] = row['low'] -  row['hist_ol']*0.2  #0.03	
 								order["resistence"] = row['price']	
 								order["side"] = "UP"			
 
 								order["algo_name"] = self.algo_name
-								order["algo_id"] = self.algo_name + "_" + rank[:-3]  + str(ts//15)
+								order["algo_id"] = self.algo_name + "_slow_" + rank[:-3]  + str(ts//15)
 							send=True
 							self.algo_placed.append(trade)
 
-						# if row['ema45change']>=25 and row['ol']>=0.5:
-
-						# 	if fade==True:
-						# 		order["support"] =  row['price']	 
-						# 		order["resistence"] = row['price'] + (row['price']-row['low'])
-						# 		order["side"] = "DOWN"
-
-						# 		order["algo_name"] = self.algo_name_fade
-						# 		order["algo_id"] = self.algo_name_fade +"_"+ rank[:-3]  + str(ts//15)
-
-						# 	else:	
-						# 		order["support"] = row['low'] -0.03	
-						# 		order["resistence"] = row['price']	
-						# 		order["side"] = "UP"			
-
-						# 		order["algo_name"] = self.algo_name
-						# 		order["algo_id"] = self.algo_name + "_" + rank[:-3]  + str(ts//15)
-						# 	send=True
-						# 	self.algo_placed.append(trade)
-
-						# if row['ema45change']>=50 and row['ol']>=1:
+						if slow_reversal and row['ema45change']>=50 and row['ol']>=1:
 
 
-						# 	if fade==True:
-						# 		order["support"] =  row['price']	 
-						# 		order["resistence"] = row['price'] + (row['price']-row['low'])
-						# 		order["side"] = "DOWN"
+							if fade==True:
+								order["support"] =  row['price']	 
+								order["resistence"] = row['price'] + (row['price']-row['low'])
+								order["side"] = "DOWN"
 
-						# 		order["algo_name"] = self.algo_name_fade
-						# 		order["algo_id"] = self.algo_name_fade +"_"+ rank[:-3]  + str(ts//15)
+								order["algo_name"] = self.algo_name_fade
+								order["algo_id"] = self.algo_name_fade +"_slow_"+ rank[:-3]  + str(ts//15)
 
-						# 	else:	
-						# 		order["support"] = row['low'] -0.03	
-						# 		order["resistence"] = row['price']	
-						# 		order["side"] = "UP"	
+							else:	
+								order["support"] = row['low'] -  row['hist_ol']*0.2
+								order["resistence"] = row['price']	
+								order["side"] = "UP"	
 
-						# 		order["algo_name"] = self.algo_name
-						# 		order["algo_id"] = self.algo_name +"_" + rank[:-3]  + str(ts//15)		
-						# 	send=True
-						# 	self.algo_placed.append(trade)
+								order["algo_name"] = self.algo_name
+								order["algo_id"] = self.algo_name +"_slow_" + rank[:-3]  + str(ts//15)		
+							send=True
+							self.algo_placed.append(trade)
 
 		
 						if send:
