@@ -951,7 +951,7 @@ class SemiManual(ManagementStrategy):
 
 class HoldXseconds(ManagementStrategy):
 
-	def __init__(self,symbol,tradingplan,X=10):
+	def __init__(self,symbol,tradingplan,X=60):
 
 		super().__init__("Management: SemiManual",symbol,tradingplan)
 
@@ -968,28 +968,27 @@ class HoldXseconds(ManagementStrategy):
 		self.initialized = False
 
 		self.tradingplan.data[USING_STOP] = False
-		now = datetime.now()
-				
-		self.x = now.hour*3600+now.minute*60+now.second  + X
+
+		self.X = X
+
+
 	def on_loading_up(self): #call this whenever the break at price changes. Onl
 		#print("loading up:",self.initialized)
-		if not self.initialized:
+		#if not self.initialized:
 
-			self.shares_loaded = True
-			self.on_start()
+		self.shares_loaded = True
+		self.on_start()
 
 	def on_start(self):
 
-		if self.shares_loaded: 
-			#super().on_start()
-			self.initialized = True
-
-		else:
-			self.management_start=True
-
+		self.initialized = True
 
 	def on_deploying(self): #refresh it when reusing.
-		#print("ON DEPLOYING")
+
+		now = datetime.now()
+		self.x = now.hour*3600+now.minute*60+now.second  + self.X
+
+		#print("HOLD X - ON DEPLOYING")
 		self.initialized = False
 		self.shares_loaded = False
 
@@ -1009,6 +1008,7 @@ class HoldXseconds(ManagementStrategy):
 
 		ts = now.hour*3600+now.minute*60+now.second 
 
+		print(ts-self.x)
 		if ts>self.x:
 
 			log_print("TIME UP")

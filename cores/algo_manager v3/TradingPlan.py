@@ -103,6 +103,7 @@ class TradingPlan:
 
 		self.expect_orders = ""
 		self.have_request = False
+		self.management_start = False
 		self.expected_shares = 0
 		self.current_shares = 0
 		self.current_request = 0
@@ -152,16 +153,23 @@ class TradingPlan:
 
 	def market_in(self,shares,symbol=None):
 
+		if shares>0:
+			self.expect_orders = LONG
+		else:
+			self.expect_orders = SHORT
 		self.current_request = shares
+		self.expected_shares = shares
 		self.notify_immediate_request(shares)
 
 	def notify_immediate_request(self,shares,symbol=None):
 
 		# add a little delay using thread.
 
-		self.symbol.immediate_request(shares)
+		
 		
 		self.notify__request_with_delay()
+
+		self.symbol.immediate_request(shares)
 
 		# delayed_notification = threading.Thread(target=self.notify__request_with_delay, daemon=True)
 		# delayed_notification.start()
@@ -537,6 +545,8 @@ class TradingPlan:
 			log_print(self.symbol_name,"Trade completed."," this trade:",self.data[REALIZED]," total:",self.data[TOTAL_REALIZED])
 
 	def clear_trade(self):
+
+		
 
 		
 		self.data[UNREAL] = 0
