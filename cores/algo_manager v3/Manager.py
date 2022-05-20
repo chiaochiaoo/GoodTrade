@@ -414,9 +414,9 @@ class Manager:
 
 		#if Testerx==True:
 		self.pipe_ppro_out.send(["Register","QQQ.NQ"])
-		self.pipe_ppro_out.send(["Register","TQQQ.NQ"])
-		self.pipe_ppro_out.send(["Register","SQQQ.NQ"])
-
+		self.pipe_ppro_out.send(["Register","SPY.AM"])
+		#self.pipe_ppro_out.send(["Register","SQQQ.NQ"])
+#
 	#data part, UI part
 
 	def init_record_writer(self):

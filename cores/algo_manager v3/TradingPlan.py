@@ -147,6 +147,14 @@ class TradingPlan:
 		self.symbol.expecting_marketorder()
 		self.notify_request()
 
+
+
+
+	def market_in(self,shares,symbol=None):
+
+		self.current_request = shares
+		self.notify_immediate_request(shares)
+
 	def notify_immediate_request(self,shares,symbol=None):
 
 		# add a little delay using thread.
@@ -346,7 +354,7 @@ class TradingPlan:
 
 			if price <= self.data[STOP_LEVEL]:
 				flatten=True
-				print("flatening,",price,self.data[STOP_LEVEL])
+				#print("flatening,",price,self.data[STOP_LEVEL])
 		elif self.data[POSITION]==SHORT:
 			price = ask
 			gain = round(self.data[AVERAGE_PRICE]-price,4)
@@ -950,7 +958,8 @@ class TradingPlan:
 		elif entry_plan == TARGETSHORT:
 			self.set_EntryStrategy(TargetShort(self.symbol,self))
 
-
+		elif entry_plan == MARKETACTION:
+			self.set_EntryStrategy(MarketAction(self.symbol,self))
 		else:
 			log_print("unkown plan")
 			self.set_EntryStrategy(BreakAny(entrytimer,instant,self.symbol,self))
@@ -1020,6 +1029,8 @@ class TradingPlan:
 		elif manage_plan == TRENDRIDER:
 			self.set_ManagementStrategy(TrendStrategy(self.symbol,self))
 
+		elif manage_plan == HOLDXSECOND:
+			self.set_ManagementStrategy(HoldXseconds(self.symbol,self))
 		else:
 			#set default
 			log_print("Setting default plan")

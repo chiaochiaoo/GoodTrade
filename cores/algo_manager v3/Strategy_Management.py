@@ -5,6 +5,7 @@ from Util_functions import *
 from Strategy import *
 import threading
 import time
+from datetime import datetime
 #import sys, inspect
 # "Omnissiah, Omnissiah.
 
@@ -947,6 +948,71 @@ class SemiManual(ManagementStrategy):
 		self.initialized = False
 
 
+
+class HoldXseconds(ManagementStrategy):
+
+	def __init__(self,symbol,tradingplan,X=10):
+
+		super().__init__("Management: SemiManual",symbol,tradingplan)
+
+		self.supress_warnings()
+
+
+		#super(ManagementStrategy,self).supress_warning = True
+
+
+		#description,trigger_timer:int,trigger_limit=1
+		#conditions,stop,risk,description,trigger_timer,trigger_limit,pos,ppro_out
+		###upon activating, reset all parameters. 
+
+		self.initialized = False
+
+		self.tradingplan.data[USING_STOP] = False
+		now = datetime.now()
+				
+		self.x = now.hour*3600+now.minute*60+now.second  + X
+	def on_loading_up(self): #call this whenever the break at price changes. Onl
+		#print("loading up:",self.initialized)
+		if not self.initialized:
+
+			self.shares_loaded = True
+			self.on_start()
+
+	def on_start(self):
+
+		if self.shares_loaded: 
+			#super().on_start()
+			self.initialized = True
+
+		else:
+			self.management_start=True
+
+
+	def on_deploying(self): #refresh it when reusing.
+		#print("ON DEPLOYING")
+		self.initialized = False
+		self.shares_loaded = False
+
+
+
+	def reset(self):
+		self.initialized = False
+
+
+
+	## overwrite update ##
+
+	def update(self):
+
+		### conunt time. then flatten. ###
+		now = datetime.now()
+
+		ts = now.hour*3600+now.minute*60+now.second 
+
+		if ts>self.x:
+
+			log_print("TIME UP")
+			self.tradingplan.flatten_cmd()
 #################### ARCHIVED ########################################
 
 class ThreePriceTargets(ManagementStrategy):

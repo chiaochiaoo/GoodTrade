@@ -355,6 +355,22 @@ class FadeUp(EntryStrategy): #the parameters contains? dk. yet .  #Can make sing
 
 
 
+
+class MarketAction(EntryStrategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry.
+	def __init__(self,symbol,tradingplan,share=5):
+		super().__init__("Entry : Market Action",symbol,tradingplan)
+		self.share = share
+	def on_deploying(self):
+
+		#print("INSTANT LONG GLNOANGONGOENGOWG")
+		self.tradingplan.market_in(self.share)
+		#self.buyTrigger.deploy_stop_order()
+
+
+	def update(self):
+		pass
+
+
 class InstantLong(EntryStrategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry.
 	def __init__(self,symbol,tradingplan):
 		super().__init__("Entry : Instant Long",symbol,tradingplan)
