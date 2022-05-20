@@ -756,14 +756,14 @@ class Open_high(StandardScanner):
 								order["side"] = "UP"	
 
 								order["algo_name"] = self.algo_name_fade
-								order["algo_id"] = self.algo_name_fade + rank  +"_slow_"+ str(ts//90)
+								order["algo_id"] = self.algo_name_fade + rank  +"_slow_"+ str(ts//30)
 							else:
 								order["support"] = row['price']	 
 								order["resistence"] = row['high'] + (row['hist_oh']*0.05)
 								order["side"] = "DOWN"	
 
 								order["algo_name"] = self.algo_name
-								order["algo_id"] = self.algo_name + rank   +"_slow_"+  str(ts//90)
+								order["algo_id"] = self.algo_name + rank   +"_slow_"+  str(ts//30)
 
 							self.algo_placed.append(trade)		
 							send=True
@@ -776,14 +776,14 @@ class Open_high(StandardScanner):
 								order["side"] = "UP"	
 
 								order["algo_name"] = self.algo_name_fade
-								order["algo_id"] = self.algo_name_fade + rank  + str(ts//90)
+								order["algo_id"] = self.algo_name_fade + rank  + str(ts//30)
 							else:
 								order["support"] = row['price']	
 								order["resistence"] = row['high']  + (row['hist_oh']*0.025)
 								order["side"] = "DOWN"
 
 								order["algo_name"] = self.algo_name
-								order["algo_id"] = self.algo_name + rank  + str(ts//90)
+								order["algo_id"] = self.algo_name + rank  + str(ts//30)
 
 							self.algo_placed.append(trade)			
 							send=True				
@@ -943,7 +943,7 @@ class Open_low(StandardScanner):
 								order["side"] = "DOWN"
 
 								order["algo_name"] = self.algo_name_fade
-								order["algo_id"] = self.algo_name_fade +"_slow_"+ rank[:-3]  + str(ts//90)
+								order["algo_id"] = self.algo_name_fade +"_slow_"+ rank[:-3]  + str(ts//30)
 
 							else:	
 								order["support"] = row['low'] -  row['hist_ol']*0.1  #0.03	
@@ -951,7 +951,7 @@ class Open_low(StandardScanner):
 								order["side"] = "UP"			
 
 								order["algo_name"] = self.algo_name
-								order["algo_id"] = self.algo_name + "_slow_" + rank[:-3]  + str(ts//90)
+								order["algo_id"] = self.algo_name + "_slow_" + rank[:-3]  + str(ts//30)
 							send=True
 							self.algo_placed.append(trade)
 
@@ -964,7 +964,7 @@ class Open_low(StandardScanner):
 								order["side"] = "DOWN"
 
 								order["algo_name"] = self.algo_name_fade
-								order["algo_id"] = self.algo_name_fade +"_slow_"+ rank[:-3]  + str(ts//90)
+								order["algo_id"] = self.algo_name_fade +"_slow_"+ rank[:-3]  + str(ts//30)
 
 							else:	
 								order["support"] = row['low'] -  row['hist_ol']*0.1
@@ -972,7 +972,7 @@ class Open_low(StandardScanner):
 								order["side"] = "UP"	
 
 								order["algo_name"] = self.algo_name
-								order["algo_id"] = self.algo_name +"_slow_" + rank[:-3]  + str(ts//90)		
+								order["algo_id"] = self.algo_name +"_slow_" + rank[:-3]  + str(ts//30)		
 							send=True
 							self.algo_placed.append(trade)
 
