@@ -966,6 +966,7 @@ class HoldXseconds(ManagementStrategy):
 		###upon activating, reset all parameters. 
 
 		self.initialized = False
+		self.flattened = False
 
 		self.tradingplan.data[USING_STOP] = False
 		now = datetime.now()
@@ -992,7 +993,7 @@ class HoldXseconds(ManagementStrategy):
 		#print("ON DEPLOYING")
 		self.initialized = False
 		self.shares_loaded = False
-
+		self.flattened = False
 
 
 	def reset(self):
@@ -1009,9 +1010,10 @@ class HoldXseconds(ManagementStrategy):
 
 		ts = now.hour*3600+now.minute*60+now.second 
 
-		if ts>self.x:
+		if ts>self.x and not self.flattened:
 
 			log_print("TIME UP")
+			self.flattened = True
 			self.tradingplan.flatten_cmd()
 #################### ARCHIVED ########################################
 

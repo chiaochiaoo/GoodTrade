@@ -688,6 +688,33 @@ class Manager:
 		self.ui.algo_timer_string.set("Deployed")
 		self.deploy_all()
 
+
+		timestamp = 600
+
+		while True:
+
+			now = datetime.now()
+			ts = now.hour*60 + now.minute
+			remain = timestamp - ts
+			#log_print(timestamp,ts)
+			hour = remain//60
+			minute = remain%60
+
+			if minute>0:
+				self.ui.algo_timer_close_string.set(str(hour)+" H : "+str(minute)+" M")
+			else:
+				self.ui.algo_timer_close_string.set(str(minute)+" minutes")
+			if remain<0:
+				log_print("Trigger")
+				self.withdraw_all()
+				break
+
+			## UPPDAtes
+			self.update_stats()
+
+			time.sleep(5)
+
+
 		timestamp = 955
 		while True:
 
