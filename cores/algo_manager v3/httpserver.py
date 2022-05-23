@@ -78,13 +78,14 @@ class S(BaseHTTPRequestHandler):
 
 	def do_GET(self):
 
+
 		self._set_response()
 		#self.wfile.write("received".encode('utf-8'))
 
 		stream_data = self.path[1:]
 
 		#self.send_message(stream_data)
-
+		print(stream_data)
 		
 		if "%20" in stream_data:
 			stream_data = stream_data.replace("%20"," ")
@@ -138,6 +139,7 @@ class S(BaseHTTPRequestHandler):
 					# data["symbol1_statistics"]
 					# data["symbol2_statistics"]
 
+
 		# if type_!="TEST":
 		# 	self.send_message(msg)
 
@@ -157,6 +159,16 @@ class S(BaseHTTPRequestHandler):
 
 	def do_POST(self):
 
+		stream_data = self.path[1:]
+
+		#self.send_message(stream_data)
+		#print(stream_data)
+
+		self.data_string = self.rfile.read(int(self.headers['Content-Length'])).decode()
+
+		## this is where special channel come in.
+
+		#print(self.data_string)
 		self._set_response()
 		#self.wfile.write("received".encode('utf-8'))
 
@@ -166,6 +178,9 @@ class S(BaseHTTPRequestHandler):
 
 		global pipec
 		#print("sending",msg,pipec)
+
+		print("receiving:",msg)
+
 		pipec.send(["pkg",[msg]])
 		#pipe.send(msg)
 
@@ -217,7 +232,7 @@ def httpserver(pipex):
 
 # s.replace("%20"," ")
 # print(s.replace("%20"," "))
-#httpserver("GEGE")
+# httpserver("GEGE")
 
 
 # TRADETYPE = "Trade_type="

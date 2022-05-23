@@ -82,15 +82,21 @@ class Tester:
 		dic["algo_id"] = 'TEST1'
 		dic["type_name"] = 'Single'
 		dic["algo_name"] = 'TEST'
-		dic["entry_type"] = MARKETACTION#INSTANTLONG
+		dic["entry_type"] = MARKETACTION    #INSTANTLONG
 		dic["symbol"] ='SPY.AM'
 		dic["support"] =413
 		dic["resistence"] =414
 		dic["risk"] =50.0
-		dic["statistics"] ={'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441,"expected_momentum":2}
-		dic["immediate_deployment"] = False
+		#dic["statistics"] ={'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441,"expected_momentum":2}
+		dic["immediate_deployment"] = True
 		dic["management"] = HOLDXSECOND
 
+
+		s=""
+		for key,item in dic.items():
+			s+=key+":"+str(item)
+
+		print(s)
 
 		self.gt.send(["pkg",[dic]])
 
@@ -651,3 +657,27 @@ class Tester:
 
 		for i in used:
 			del self.qqq_sell_book[i]
+
+
+
+
+# dic = {}
+
+# dic["algo_id"] = 'TEST1'
+# dic["type_name"] = 'Single'
+# dic["algo_name"] = 'TEST'
+# dic["entry_type"] = MARKETACTION    #INSTANTLONG
+# dic["symbol"] ='SPY.AM'
+# dic["support"] =413
+# dic["resistence"] =414
+# dic["risk"] =50.0
+# #dic["statistics"] ={'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441,"expected_momentum":2}
+# dic["immediate_deployment"] = True
+# dic["management"] = HOLDXSECOND
+
+
+# s=""
+# for key,item in dic.items():
+# 	s+=key+":"+str(item)+','
+
+# print(s)

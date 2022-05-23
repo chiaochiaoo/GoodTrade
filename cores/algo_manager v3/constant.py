@@ -177,6 +177,10 @@ SEMIMANUAL = "SemiManual"
 
 
 MARKETACTION = "MarketAction"
+
+MARKETLONG = "MarketLong"
+MARKETSHORT = "MarketShort"
+
 INSTANTLONG = "Instant Long"
 INSTANTSHORT = "Instant Short"
 TARGETLONG = "Target Long"
