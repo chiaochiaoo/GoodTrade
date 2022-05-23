@@ -951,7 +951,7 @@ class SemiManual(ManagementStrategy):
 
 class HoldXseconds(ManagementStrategy):
 
-	def __init__(self,symbol,tradingplan,X=10):
+	def __init__(self,symbol,tradingplan,X=60):
 
 		super().__init__("Management: SemiManual",symbol,tradingplan)
 
