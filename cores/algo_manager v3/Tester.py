@@ -659,7 +659,7 @@ class Tester:
 			del self.qqq_sell_book[i]
 
 
-
+# algo_id:TEST1,type_name:Single,algo_name:TEST,entry_type:MarketAction,symbol:SPY.AM,support:413,resistence:414,risk:50.0,immediate_deployment:True,management:HoldXSecond,
 
 # dic = {}
 

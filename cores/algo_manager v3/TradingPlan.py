@@ -548,7 +548,7 @@ class TradingPlan:
 
 		
 
-		
+
 		self.data[UNREAL] = 0
 		self.data[UNREAL_PSHR] = 0
 		self.data[TOTAL_REALIZED] += self.data[REALIZED]
@@ -968,8 +968,10 @@ class TradingPlan:
 		elif entry_plan == TARGETSHORT:
 			self.set_EntryStrategy(TargetShort(self.symbol,self))
 
-		elif entry_plan == MARKETACTION:
-			self.set_EntryStrategy(MarketAction(self.symbol,self))
+		elif entry_plan == MARKETLONG:
+			self.set_EntryStrategy(MarketLong(self.symbol,self))
+		elif entry_plan == MARKETSHORT:
+			self.set_EntryStrategy(MarketShort(self.symbol,self))
 		else:
 			log_print("unkown plan")
 			self.set_EntryStrategy(BreakAny(entrytimer,instant,self.symbol,self))
@@ -1043,7 +1045,7 @@ class TradingPlan:
 			self.set_ManagementStrategy(HoldXseconds(self.symbol,self))
 		else:
 			#set default
-			log_print("Setting default plan")
+			log_print(manage_plan," not found, Setting default plan")
 			self.set_ManagementStrategy(OneToTWORiskReward(self.symbol,self))
 
 	def set_EntryStrategy(self,entry_plan:Strategy):

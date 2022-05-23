@@ -78,7 +78,7 @@ class S(BaseHTTPRequestHandler):
 
 	def do_GET(self):
 
-
+		global algoids
 		self._set_response()
 		#self.wfile.write("received".encode('utf-8'))
 
@@ -98,6 +98,7 @@ class S(BaseHTTPRequestHandler):
 			algo_id = find_between(stream_data,ALGOID,",")
 
 			data = {}
+
 			if algo_id not in algoids:
 				if type_=="Single"  :
 					algoids.append(algo_id)
@@ -159,16 +160,65 @@ class S(BaseHTTPRequestHandler):
 
 	def do_POST(self):
 
-		stream_data = self.path[1:]
-
 		#self.send_message(stream_data)
 		#print(stream_data)
+		global algoids
 
-		self.data_string = self.rfile.read(int(self.headers['Content-Length'])).decode()
+		stream_data = self.rfile.read(int(self.headers['Content-Length'])).decode()
 
-		## this is where special channel come in.
 
-		#print(self.data_string)
+		#algo_id:TEST1,type_name:Single,algo_name:TEST,entry_type:MarketAction,symbol:SPY.AM,support:413,resistence:414,risk:50.0,immediate_deployment:True,management:HoldXSecond,
+
+
+		type_ = find_between(stream_data,TRADETYPE,",")
+		algo_id = find_between(stream_data,ALGOID,",")
+
+		data = {}
+
+		print(stream_data,type_,algo_id,algoids)
+
+		if algo_id not in algoids:
+			if type_=="Single"  :
+				algoids.append(algo_id)
+
+				data["type_name"] = type_
+				data["algo_id"] = algo_id
+				data["algo_name"] = find_between(stream_data,ALGONAME,",")
+				data["symbol"] = find_between(stream_data,SYMBOL,",")
+				data["entry_type"] = find_between(stream_data,ENTRYPLAN,",")
+				data["support"] = find_between(stream_data,SUPPORT,",")
+				data["resistence"] = find_between(stream_data,RESISTANCE,",")
+				data["risk"] = find_between(stream_data,RISK,",")
+				#data["statistics"] = find_between(stream_data,ALGOID,",")
+
+				if find_between(stream_data,DEPLOY,",")=="T":
+					data["immediate_deployment"] = True
+				else:
+					data["immediate_deployment"] = False
+
+
+				data["management"] = find_between(stream_data,MANAGEMENT,",")
+
+				self.send_message(data)
+
+			if type_ =="Pair":
+
+				data["type_name"] = type_
+				data["algo_id"] = algo_id
+				data["algo_name"] = find_between(stream_data,ALGONAME,",")
+				data["symbol1"]  = find_between(stream_data,SYMBOL1,",")
+				data["symbol2"]  = find_between(stream_data,SYMBOL2,",")
+				data["symbol1_share"] = find_between(stream_data,SYMBOL1SHARE,",")
+				data["symbol2_share"] =  find_between(stream_data,SYMBOL2SHARE,",")
+				data["risk"] =find_between(stream_data,RISK,",")
+
+				data["management"] = find_between(stream_data,MANAGEMENT,",")
+
+				self.send_message(data)
+				# data["symbol1_statistics"]
+				# data["symbol2_statistics"]
+		else:
+			print("already contained")
 		self._set_response()
 		#self.wfile.write("received".encode('utf-8'))
 
@@ -232,7 +282,7 @@ def httpserver(pipex):
 
 # s.replace("%20"," ")
 # print(s.replace("%20"," "))
-# httpserver("GEGE")
+#httpserver("GEGE")
 
 
 # TRADETYPE = "Trade_type="
@@ -260,3 +310,8 @@ def httpserver(pipex):
 # 	msg+= str(a[i])+str(b[i])+","
 
 # print(msg)
+
+#s = "Algo_id=TEST1,Trade_type=Single,Algo_name=TEST,Entry_type=MarketAction,Symbol=SPY.AM,Support=413,Resistance=414,Side=Long,Risk=50.0,Deploy=T,Management=HoldXSecond"
+
+#Algo_id=TEST1,Trade_type=Single,Algo_name=TEST,Entry_type=MarketLong,Symbol=SPY.AM,Support=413,Resistance=414,Side=Long,Risk=5.0,Deploy=T,Management=HoldXSecond,
+#Algo_id=TEST1,Trade_type=Single,Algo_name=TEST,Entry_type=MarketShort,Symbol=SPY.AM,Support=413,Resistance=414,Side=Short,Risk=5.0,Deploy=T,Management=HoldXSecond,
