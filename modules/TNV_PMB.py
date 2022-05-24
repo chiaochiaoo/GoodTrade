@@ -590,7 +590,7 @@ class Premarket_breakout():
 
 
 							if self.algo_activate.get()==1 and ts>=algo_timer and ts<=end_timer:
-								if rank not in self.algo_placed and (abs(resistence)-abs(support))<0.1* min(row['hist_oh'],row['hist_ol']):
+								if rank not in self.algo_placed and abs(resistence-support)>0.1* min(row['hist_oh'],row['hist_ol']):
 
 									#print("PMB SEND")
 									#self.send_algo(rank,support,resistence,self.algo_risk)

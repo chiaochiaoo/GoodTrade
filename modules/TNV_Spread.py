@@ -26,8 +26,8 @@ class Spread():
 		self.entries = []
 		self.l = 1
 		self.NT = NT
-		self.labels_width = [9,10,5,8,8,5,5,8,5,5,5,5,8,6,6,6,6]
-		self.labels = ["Pairs","Ratio","COR","COR STB","Avg move","OH","OL","15-Avg  σ"]
+		self.labels_width = [9,10,5,8,8,5,5,5,5,8,5,5,5,5,8,6,6,6,6]
+		self.labels = ["Pairs","Ratio","COR","Avg move","OH","OH Max","OL","OL Max","15-Avg  σ"]
 
 		self.management = tk.StringVar(value="1:2 Exprmntl")
 
@@ -389,6 +389,9 @@ class Spread():
 					ycr = row['day_avg_move']
 					ph = row['OH eval']
 					pl = row['OL eval']
+
+					mh = row['OH max']
+					ml = row['OL max']
 					pr = row['15_avg_sigma_per_pair']
 
 					############ add since, and been to the thing #############
@@ -403,7 +406,7 @@ class Spread():
 					#print(self.NT.nasdaq_trader_symbols)
 					if 1: #score>0:	
 
-						lst = [rank,sec,sc,relv,ycr,ph,pl,pr,listed]
+						lst = [rank,sec,sc,ycr,ph,mh,pl,ml,pr,listed]
 
 						ts_location = 7
 
@@ -450,14 +453,19 @@ class Spread():
 					ycr = row['day_avg_move']
 					ph = round(row['OH eval'],2)
 					pl = round(row['OL eval'],2)
+
+					mh = round(row['OH max'],2)
+					ml = round(row['OL max'],2)
 					pr = row['15_avg_sigma_per_pair']
+
+
 
 					############ add since, and been to the thing #############
 
 					#print(self.NT.nasdaq_trader_symbols)
 					if 1: #score>0:	
 
-						lst = [rank,sec,sc,relv,ycr,ph,pl,pr]
+						lst = [rank,sec,sc,ycr,ph,mh,pl,ml,pr]
 
 						ts_location = 7
 
