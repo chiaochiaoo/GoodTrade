@@ -390,7 +390,7 @@ class Spread():
 
 										order = {}
 										split = rank.split(',')
-										order['symbol1'],order["symbol2"] = split[0],split[1]
+										order['symbol1'],order["symbol2"] = row['symbol1_ticker'],row['symbol2_ticker']
 
 										order["algo_name"] = "PairReversal"
 										order["algo_id"] = order["algo_name"]+order['symbol1']+order["symbol2"]
@@ -398,18 +398,19 @@ class Spread():
 										order['risk_per_pair'] = ycr*(mh-ph)
 
 										send_algo.append(order)
+										self.algo_placed.append(rank)
 									elif (ml-pl)>= 0.15 and ml>=1:
 
 										order = {}
 										split = rank.split(',')
-										order['symbol1'],order["symbol2"] = split[1],split[0]
+										order['symbol1'],order["symbol2"] = row['symbol2_ticker'],row['symbol1_ticker']
 										order["algo_name"] = "PairReversal"
 										order["algo_id"] = order["algo_name"]+order['symbol1']+order["symbol2"]
 
 										order['ratio'] = row['hedgeratio']
 										order['risk_per_pair'] = ycr*(ml-pl)
 										send_algo.append(order)
-
+										self.algo_placed.append(rank)
 						entry+=1
 						if entry ==30:
 							break
