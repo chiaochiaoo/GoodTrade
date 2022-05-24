@@ -36,13 +36,13 @@ class Spread():
 
 
 		#conditional box
-		self.condition_sc = tk.BooleanVar(value=True)
-		self.condition_yc = tk.BooleanVar(value=True)
+		self.momentum_trade = tk.BooleanVar(value=True)
+		self.reversal_trade = tk.BooleanVar(value=True)
 
 		##############################
 		self.data = None #pd.read_csv("current.csv")
 
-		m=self.condition_yc .trace('w', lambda *_, data=self.data,: self.just_update_view(data))
+		#m=self.reversal_trade .trace('w', lambda *_, data=self.data,: self.just_update_view(data))
 
 		#self.fade = tk.BooleanVar(value=0)
 
@@ -68,6 +68,10 @@ class Spread():
 		self.toggle  = True
 
 		
+
+		#data = pd.read_csv("pair_test.csv")
+
+		#self.update_entry(pd.read_csv("pair_test.csv",index_col=0))
 
 		#self.file = "signals/open_resersal_"+datetime.now().strftime("%m-%d")+".csv"
 
@@ -180,17 +184,8 @@ class Spread():
 
 	def send_group_algos(self,lst):
 
-		now = datetime.now()
-		ts = now.hour*60+now.minute
-
-		deployment=True
-		if ts>=570:
-			deployment = True
-		else:
-			deployment = False
 
 		risk = self.algo_risk.get()
-
 		management = self.management.get()
 		
 		order = ["New order"]
@@ -201,49 +196,41 @@ class Spread():
 			#print("PMB HELLO2",lst)
 			for i in range(len(lst)):
 
-				if lst[i]["side"]=="UP":
+				new_order = {}
 
-					new_order = {}
+				# order["algo_name"] = "PairReversal"
+				# order["algo_id"] = order["algo_name"]+order['symbol1']+order["symbol2"]
+				# order['ratio'] = row['hedgeratio']
+				# order['risk_per_pair'] = ycr*(mh-ph)
 
-					new_order["type_name"] = "Single"
+				new_order["algo_id"] = lst[i]["algo_id"] #"Manual"+"_"+symbol1+symbol2+str(ts)
+				new_order["type_name"] = "Pair"
+				new_order["algo_name"]= lst[i]["algo_name"]
+				new_order["symbol1"] = lst[i]["symbol1"]
+				new_order["symbol2"] = lst[i]["symbol2"]
 
-					new_order["algo_id"]= self.name+"_"+lst[i]["symbol"]
-					new_order["algo_name"]= self.algo_name
-					new_order["entry_type"] = " BreakUp"
-					new_order["symbol"] = lst[i]["symbol"]
-					new_order["side"] = "Long"
-					new_order["support"] = lst[i]["support"]
-					new_order["resistence"] = lst[i]["resistence"]
-					new_order["immediate_deployment"]= deployment
-					new_order["management"] = management 
-					new_order["risk"] = risk
-					new_order["statistics"] = {}
+				new_order["ratio"] = lst[i]["ratio"]
 
-					order.append(new_order)
-					#order.append([" BreakUp",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},status,management])
-
-				elif lst[i]["side"]=="DOWN":
-
-					new_order = {}
-
-					new_order["type_name"] = "Single"
-
-					new_order["algo_id"]= self.name+"_"+lst[i]["symbol"]
-					new_order["algo_name"]= self.algo_name
-
-					new_order["entry_type"] = " BreakDn"
-					new_order["symbol"] = lst[i]["symbol"]
-					new_order["side"] = "Short"
-					new_order["support"] = lst[i]["support"]
-					new_order["resistence"] = lst[i]["resistence"]
-					new_order["immediate_deployment"]= deployment
-					new_order["management"] = management 
-					new_order["risk"] = risk
-					new_order["statistics"] = {}
+				new_order["share"] = risk//lst[i]['risk_per_pair']
 
 
-					order.append(new_order)
-					#order.append([" BreakDn",lst[i]["symbol"],lst[i]["support"],lst[i]["resistence"],risk,{},status,management])
+
+				new_order["risk"] = risk
+				new_order["management"] = management 
+
+				new_order["symbol1_statistics"] = {}
+
+				new_order["symbol2_statistics"] = {}
+
+				new_order["support"] = 0
+				new_order["resistence"] = 0
+				new_order["immediate_deployment"]= True
+				
+				
+				new_order["statistics"] = {}
+
+
+				order.append(new_order)
 
 
 			#print("sending order",order)
@@ -282,52 +269,16 @@ class Spread():
 		row = 4
 		col = 1
 		ttk.Label(frame, text="Momentum").grid(sticky="w",column=col,row=row)
-		ttk.Checkbutton(frame, variable=self.condition_sc).grid(sticky="w",column=col+1,row=row)
+		ttk.Checkbutton(frame, variable=self.momentum_trade).grid(sticky="w",column=col+1,row=row)
 
 
 		row = 4
 		col = 3
 		ttk.Label(frame, text="Reversal").grid(sticky="w",column=col,row=row)
-		ttk.Checkbutton(frame, variable=self.condition_yc).grid(sticky="w",column=col+1,row=row)
-
-
-		# row = 3
-		# col = 1
-		# ttk.Button(frame,text="Deploy now",command=self.rank).grid(sticky="w",column=col,row=row)
-		# ttk.Label(frame, text="End").grid(sticky="w",column=col,row=row)
-		# ttk.Entry(frame, textvariable=self.ehour).grid(sticky="w",column=col+1,row=row)
-
-		# ttk.Label(frame, text=":").grid(sticky="w",column=col+2,row=row)
-		# ttk.Entry(frame, textvariable=self.eminute).grid(sticky="w",column=col+3,row=row)
+		ttk.Checkbutton(frame, variable=self.reversal_trade).grid(sticky="w",column=col+1,row=row)
 
 
 
-		# row = 3
-		# col = 1
-		# ttk.Label(frame, text="End").grid(sticky="w",column=col,row=row)
-		# ttk.Entry(frame, textvariable=self.ehour).grid(sticky="w",column=col+1,row=row)
-
-		# ttk.Label(frame, text=":").grid(sticky="w",column=col+2,row=row)
-		# ttk.Entry(frame, textvariable=self.eminute).grid(sticky="w",column=col+3,row=row)
-
-		# self.side_ = tk.StringVar(value='x')
-		# self.listed_ = tk.BooleanVar(value=False)
-		
-		# row = 4
-		# col = 1
-
-
-		# ttk.Label(frame, text="Side:").grid(sticky="w",column=col,row=row)
-		# l={"Up","Down","Any","Any"}
-		# ttk.OptionMenu(frame, self.side_, *sorted(l)).grid(sticky="w",column=col+1,row=row)
-
-
-		# ttk.Label(frame, text="Listed?").grid(sticky="w",column=col+2,row=row)
-		# ttk.Checkbutton(frame, variable=self.listed_).grid(sticky="w",column=col+3,row=row)
-
-
-		#algo_timer = self.hour.get()*60 + self.minute.get()
-		#print("algo time",algo_timer)
 
 	def create_entry(self):
 
@@ -366,7 +317,7 @@ class Spread():
 
 	def filtering(self,data):
 
-		# if self.condition_yc.get()== True:
+		# if self.reversal_trade.get()== True:
 		# 	data =  data.loc[((data["ycr"]>=0.75)|(data["ycr"]<=0.25))]
 			
 
@@ -374,48 +325,6 @@ class Spread():
 
 #		self.labels = 
 
-	def just_update(self,data):
-		entry = 0
-		if len(data)>1:
-			if 1:
-				for index, row in data.iterrows():
-					#print(row)
-
-					#["Pairs","Ratio","COR","COR STB","Avg move","OH","OL","15-Avg  σ"]
-					rank = index
-					sec = row['hedgeratio']
-					sc = row['correlation_score']
-					relv = row['correlation_stability']
-					ycr = row['day_avg_move']
-					ph = row['OH eval']
-					pl = row['OL eval']
-
-					mh = row['OH max']
-					ml = row['OL max']
-					pr = row['15_avg_sigma_per_pair']
-
-					############ add since, and been to the thing #############
-
-					if self.NT != None:
-						if rank in self.NT.nasdaq_trader_symbols_ranking:
-							listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
-						else:
-							listed = "No"
-					else:
-						listed = "No"
-					#print(self.NT.nasdaq_trader_symbols)
-					if 1: #score>0:	
-
-						lst = [rank,sec,sc,ycr,ph,mh,pl,ml,pr,listed]
-
-						ts_location = 7
-
-						for i in range(len(lst)):
-							self.entries[entry][i]["text"] = lst[i]
-
-						entry+=1
-						if entry ==30:
-							break
 	def update_entry(self,data):
 
 		#at most 8.
@@ -472,39 +381,34 @@ class Spread():
 						for i in range(len(lst)):
 							self.entries[entry][i]["text"] = lst[i]
 
-							#self.entries[entry][9].grid_remove() 	
 
-							# if lst[ts_location] >=ts and lst[ts_location]>=algo_timer and lst[ts_location]<=end_timer:
-							# 	self.entries[entry][i]["background"] = "LIGHTGREEN"
-							# 	self.entries[entry][8].grid()
-
-							# if sc>0:
-							# 	side = "UP"
-							# else:
-							# 	side = "DOWN"
-							# support = row['pl']
-							# resistence = row['ph']
-
-							# self.entries[entry][9]["command"]= lambda symbol=rank,support=support,side=side,resistence=resistence:self.send_algo(symbol,support,resistence,side)
+							if self.algo_activate.get()==1 and self.reversal_trade.get()==1:
+								if rank not in self.algo_placed:
 
 
-							# if self.algo_activate.get()==1 and ts>=algo_timer and ts<=end_timer:
-							# 	if rank not in self.algo_placed:
+									if (mh-ph)>= 0.15 and mh>=1:
 
-							# 		#print("PMB SEND")
-							# 		#self.send_algo(rank,support,resistence,self.algo_risk)
-							# 		self.algo_placed.append(rank)
+										order = {}
+										split = rank.split(',')
+										order['symbol1'],order["symbol2"] = split[0],split[1]
 
-							# 		order = {}
+										order["algo_name"] = "PairReversal"
+										order["algo_id"] = order["algo_name"]+order['symbol1']+order["symbol2"]
+										order['ratio'] = row['hedgeratio']
+										order['risk_per_pair'] = ycr*(mh-ph)
 
-							# 		order["symbol"] = rank
-							# 		order["support"] = support
-							# 		order["resistence"] = resistence
+										send_algo.append(order)
+									elif (ml-pl)>= 0.15 and ml>=1:
 
-							# 		order["side"] = side
+										order = {}
+										split = rank.split(',')
+										order['symbol1'],order["symbol2"] = split[1],split[0]
+										order["algo_name"] = "PairReversal"
+										order["algo_id"] = order["algo_name"]+order['symbol1']+order["symbol2"]
 
-							# 		send_algo.append(order)
-
+										order['ratio'] = row['hedgeratio']
+										order['risk_per_pair'] = ycr*(ml-pl)
+										send_algo.append(order)
 
 						entry+=1
 						if entry ==30:

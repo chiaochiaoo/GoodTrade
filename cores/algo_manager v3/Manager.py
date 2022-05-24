@@ -709,7 +709,6 @@ class Manager:
 				self.withdraw_all()
 				break
 
-			## UPPDAtes
 			self.update_stats()
 
 			time.sleep(5)
@@ -733,9 +732,6 @@ class Manager:
 				log_print("Trigger")
 				self.flatten_all()
 				break
-
-			## UPPDAtes
-
 
 			self.update_stats()
 
