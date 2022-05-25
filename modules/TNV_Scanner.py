@@ -79,6 +79,12 @@ class TNV_Scanner():
 		self.TNV_TAB.place(x=0,rely=0.05,relheight=1,width=640)
 
 		# OR 
+
+
+		self.today_frame = tk.Canvas(self.TNV_TAB)
+		self.TNV_TAB.add(self.today_frame, text ='Today Trade')
+		self.today_trade = TodayTrade(self.today_frame,self)
+
 		self.or_frame = tk.Canvas(self.TNV_TAB)
 		self.TNV_TAB.add(self.or_frame, text ='Open Reversal')
 		self.open_reversal = Open_Reversal(self.or_frame,NT,self)
@@ -132,6 +138,8 @@ class TNV_Scanner():
 		self.TFM_frame = tk.Canvas(self.TNV_TAB)
 		self.TNV_TAB.add(self.TFM_frame, text ='TradeForMe')
 		self.tfm = TFM(self.TFM_frame,self)
+
+
 
 
 
@@ -1147,6 +1155,31 @@ def ratio_compute(n):
 		return str(int(100*n)) +":100"
 	else:
 		return "100:"+str(int(100/n)) 
+
+
+
+class TodayTrade():
+
+	def __init__(self,root,TNV_scanner):
+
+		self.root = root 
+		self.labels_width = [9,9,9]
+		self.labels = ["Time","Algo","Symbol"]
+		self.total_len = len(self.labels)
+		self.tnv_scanner = TNV_scanner
+		self.l=0
+		for i in range(len(self.labels)): #Rows
+			self.b = tk.Button(self.root, text=self.labels[i],width=self.labels_width[i])#,command=self.rank
+			self.b.configure(activebackground="#f9f9f9")
+			self.b.configure(activeforeground="black")
+			self.b.configure(background="#d9d9d9")
+			self.b.configure(disabledforeground="#a3a3a3")
+			self.b.configure(relief="ridge")
+			self.b.configure(foreground="#000000")
+			self.b.configure(highlightbackground="#d9d9d9")
+			self.b.configure(highlightcolor="black")
+			self.b.grid(row=self.l, column=i)
+
 
 if __name__ == '__main__':
 
