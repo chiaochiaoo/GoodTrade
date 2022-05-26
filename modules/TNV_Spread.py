@@ -407,7 +407,7 @@ class Spread():
 										order["algo_name"] = "PairReversal"
 										order["algo_id"] = order["algo_name"]+order['symbol1']+order["symbol2"]
 
-										order['ratio'] = row['hedgeratio']
+										order['ratio'] = [row['hedgeratio'][1],row['hedgeratio'][0]]
 										order['risk_per_pair'] = ycr*(ml-pl)
 										send_algo.append(order)
 										self.algo_placed.append(rank)

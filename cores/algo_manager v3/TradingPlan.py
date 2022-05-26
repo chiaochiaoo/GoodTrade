@@ -29,10 +29,12 @@ class TradingPlan:
 		self.symbol_name = symbol.get_name()
 		self.test_mode = TEST_MODE
 
+
 		self.current_running_strategy = None
 		self.entry_strategy_start = False
 		self.entry_plan = None
 
+		self.entry_set = False
 		self.management_plan = None
 		self.algo_name = algo_name
 
@@ -122,7 +124,7 @@ class TradingPlan:
 			if self.current_request ==0:
 				self.have_request = False
 
-		if self.current_request ==0 and not self.management_start:
+		if self.current_request ==0 and self.current_shares!= 0 and not self.management_start:
 			self.entry_strategy_done()
 			self.management_start = True
 
@@ -326,7 +328,10 @@ class TradingPlan:
 
 			#check stop. 
 
-		#print("check_pnl",bid,ask,ts)
+		#print("check_pnl",bid,ask,ts,self.current_running_strategy.get_name())
+
+		#print("Checking status:"," Current Stategy:",self.current_running_strategy.strategy_name," strategy status:",self.current_running_strategy.get_status())
+
 		if self.data[POSITION]!="":
 			self.check_pnl(bid,ask,ts)
 
@@ -542,12 +547,16 @@ class TradingPlan:
 			self.manager.new_record(self)
 
 			self.clear_trade()
+
 			log_print(self.symbol_name,"Trade completed."," this trade:",self.data[REALIZED]," total:",self.data[TOTAL_REALIZED])
 
 	def clear_trade(self):
 
 		
+		gain = self.data[UNREAL]
+		risk = self.data[ESTRISK]
 
+		#log_print("XXXX:",gain,risk)
 
 		self.data[UNREAL] = 0
 		self.data[UNREAL_PSHR] = 0
@@ -560,11 +569,11 @@ class TradingPlan:
 
 		#prevent manual conflit.
 		
-		self.deactive()
-		self.symbol.deregister_tradingplan(self.name,self)
+
 
 		##################
-
+		self.symbol.deregister_tradingplan(self.name,self)
+		self.deactive()
 		self.mark_algo_status(DONE)
 		self.set_mind("Trade completed.",VERYLIGHTGREEN)
 		self.data[POSITION] = ""
@@ -576,10 +585,12 @@ class TradingPlan:
 		self.current_running_strategy = None
 
 		#if reload is on, revert it back to entry stage. 
-		if self.tkvars[RELOAD].get() == True:
+		if self.tkvars[RELOAD].get() == True and gain<0 and abs(gain)>0.5*risk:
 			log_print("TP processing:",self.symbol_name,":"," Reload activated. Trading triggers re-initialized. reload remaining:",self.data[RELOAD_TIMES])
 			self.tkvars[RELOAD].set(False)
-			self.start_tradingplan()
+			self.deploy()
+			
+
 
 	def rejection_handling(self):
 
@@ -869,18 +880,18 @@ class TradingPlan:
 
 	def deploy(self,risktimer=0):
 
-		if self.tkvars[STATUS].get() ==PENDING:
+		if self.tkvars[STATUS].get() ==PENDING or self.tkvars[STATUS].get() ==DONE:
 
+			log_print("Deploying:",self.symbol_name,self.name)
 
+			self.mark_algo_status(DEPLOYED)
+			self.flatten_order	 = False
 			self.symbol.register_tradingplan(self.name,self)
 
 			self.activate()
-			self.flatten_order	 = False
-
+			
 			entryplan=self.tkvars[ENTRYPLAN].get()
-
-			entrytimer=int(self.tkvars[TIMER].get())
-			manage_plan =self.tkvars[MANAGEMENTPLAN].get()
+			#entrytimer=self.tkvar
 
 			if risktimer ==0:
 				self.data[RISKTIMER] = int(self.tkvars[RISKTIMER].get())
@@ -890,8 +901,14 @@ class TradingPlan:
 			self.data[RISK_PER_SHARE] = abs(self.symbol.get_resistence()-self.symbol.get_support())
 
 			self.set_mind("",DEFAULT)
-			self.entry_plan_decoder(entryplan, entrytimer)
-			self.manage_plan_decoder(manage_plan)
+
+			# only if it is not set. 
+
+
+			self.entry_plan_decoder(entryplan, 0)
+
+			self.manage_plan_decoder(self.tkvars[MANAGEMENTPLAN].get())
+			#self.manage_plan_decoder(manage_plan)
 
 			self.start_tradingplan()
 
@@ -907,9 +924,10 @@ class TradingPlan:
 			# 	log_print("Deplying Error:",self.symbol_name,e)
 	
 	def start_tradingplan(self):
-		self.mark_algo_status(DEPLOYED)
+
 
 		self.entry_plan.on_deploying()
+
 		self.management_plan.on_deploying()
 		self.current_running_strategy = self.entry_plan
 
@@ -930,52 +948,53 @@ class TradingPlan:
 
 		instant = 1 
 
+		if not self.entry_set:
+			if entry_plan == BREAKANY:
+				self.set_EntryStrategy(BreakAny(entrytimer,instant,self.symbol,self))
+			elif entry_plan == BREAKUP:
+				self.set_EntryStrategy(BreakUp(entrytimer,instant,self.symbol,self))
+			elif entry_plan == BREAKDOWN:
+				
+				self.set_EntryStrategy(BreakDown(entrytimer,instant,self.symbol,self))
 
-		if entry_plan == BREAKANY:
-			self.set_EntryStrategy(BreakAny(entrytimer,instant,self.symbol,self))
-		elif entry_plan == BREAKUP:
-			self.set_EntryStrategy(BreakUp(entrytimer,instant,self.symbol,self))
-		elif entry_plan == BREAKDOWN:
-			
-			self.set_EntryStrategy(BreakDown(entrytimer,instant,self.symbol,self))
+			elif entry_plan == FADEUP:
+				self.set_EntryStrategy(FadeUp(entrytimer,instant,self.symbol,self))
+			elif entry_plan == FADEDOWN:
+				self.set_EntryStrategy(FadeDown(entrytimer,instant,self.symbol,self))
+				
+			elif entry_plan == BREAISH:
+				self.set_EntryStrategy(Bearish(entrytimer,instant,self.symbol,self))
+			elif entry_plan == BULLISH:
+				self.set_EntryStrategy(Bullish(entrytimer,instant,self.symbol,self))
+			elif entry_plan == RIPSELL:
+				self.set_EntryStrategy(Ripsell(entrytimer,instant,self.symbol,self))
+			elif entry_plan == DIPBUY:
+				self.set_EntryStrategy(Dipbuy(entrytimer,instant,self.symbol,self))
+			elif entry_plan == FADEANY:
+				self.set_EntryStrategy(Fadeany(entrytimer,instant,self.symbol,self))
+			elif entry_plan == BREAKFIRST:
+				self.set_EntryStrategy(BreakFirst(entrytimer,instant,self.symbol,self))
 
-		elif entry_plan == FADEUP:
-			self.set_EntryStrategy(FadeUp(entrytimer,instant,self.symbol,self))
-		elif entry_plan == FADEDOWN:
-			self.set_EntryStrategy(FadeDown(entrytimer,instant,self.symbol,self))
-			
-		elif entry_plan == BREAISH:
-			self.set_EntryStrategy(Bearish(entrytimer,instant,self.symbol,self))
-		elif entry_plan == BULLISH:
-			self.set_EntryStrategy(Bullish(entrytimer,instant,self.symbol,self))
-		elif entry_plan == RIPSELL:
-			self.set_EntryStrategy(Ripsell(entrytimer,instant,self.symbol,self))
-		elif entry_plan == DIPBUY:
-			self.set_EntryStrategy(Dipbuy(entrytimer,instant,self.symbol,self))
-		elif entry_plan == FADEANY:
-			self.set_EntryStrategy(Fadeany(entrytimer,instant,self.symbol,self))
-		elif entry_plan == BREAKFIRST:
-			self.set_EntryStrategy(BreakFirst(entrytimer,instant,self.symbol,self))
+			elif entry_plan == FREECONTROL:
+				self.set_EntryStrategy(FreeControl(entrytimer,instant,self.symbol,self))
+			elif entry_plan == INSTANTLONG:
+				self.set_EntryStrategy(InstantLong(self.symbol,self))
+			elif entry_plan == INSTANTSHORT:
+				self.set_EntryStrategy(InstantShort(self.symbol,self))
+			elif entry_plan == TARGETLONG:
+				self.set_EntryStrategy(TargetLong(self.symbol,self))
+			elif entry_plan == TARGETSHORT:
+				self.set_EntryStrategy(TargetShort(self.symbol,self))
 
-		elif entry_plan == FREECONTROL:
-			self.set_EntryStrategy(FreeControl(entrytimer,instant,self.symbol,self))
-		elif entry_plan == INSTANTLONG:
-			self.set_EntryStrategy(InstantLong(self.symbol,self))
-		elif entry_plan == INSTANTSHORT:
-			self.set_EntryStrategy(InstantShort(self.symbol,self))
-		elif entry_plan == TARGETLONG:
-			self.set_EntryStrategy(TargetLong(self.symbol,self))
-		elif entry_plan == TARGETSHORT:
-			self.set_EntryStrategy(TargetShort(self.symbol,self))
+			elif entry_plan == MARKETLONG:
+				self.set_EntryStrategy(MarketLong(self.symbol,self))
+			elif entry_plan == MARKETSHORT:
+				self.set_EntryStrategy(MarketShort(self.symbol,self))
+			else:
+				log_print("unkown plan")
+				self.set_EntryStrategy(BreakAny(entrytimer,instant,self.symbol,self))
 
-		elif entry_plan == MARKETLONG:
-			self.set_EntryStrategy(MarketLong(self.symbol,self))
-		elif entry_plan == MARKETSHORT:
-			self.set_EntryStrategy(MarketShort(self.symbol,self))
-		else:
-			log_print("unkown plan")
-			self.set_EntryStrategy(BreakAny(entrytimer,instant,self.symbol,self))
-
+			self.entry_set = True
 	def manage_plan_decoder(self,manage_plan):
 
 		if manage_plan ==NONE: self.tkvars[MANAGEMENTPLAN].set(NONE)

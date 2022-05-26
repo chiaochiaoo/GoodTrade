@@ -64,6 +64,8 @@ class TNV_Scanner():
 
 		self.current_ts = 0
 		if data!=None:
+
+
 			self.socket = Label(self.root,textvariable=self.data.algo_socket,background="red",height=1,width=12)
 			self.connection =Label(self.root,textvariable=self.data.algo_manager_connected,background="red",height=1,width=14)
 
@@ -112,7 +114,6 @@ class TNV_Scanner():
 		self.oh_frame = tk.Canvas(self.TNV_TAB)
 		self.ol_frame = tk.Canvas(self.TNV_TAB)
 
-
 		self.TNV_TAB.add(self.oh_frame, text ='Open High')
 		self.TNV_TAB.add(self.ol_frame, text ='Open Low')
 		self.oh = Open_high(self.oh_frame,NT,self)
@@ -122,8 +123,6 @@ class TNV_Scanner():
 		self.rrvol_frame = tk.Canvas(self.TNV_TAB)
 		self.TNV_TAB.add(self.rrvol_frame, text ='RRVol')
 		self.rrvol = RRvol(self.rrvol_frame,NT)
-
-
  
 		self.trending_frame = tk.Canvas(self.TNV_TAB)
 		self.TNV_TAB.add(self.trending_frame, text ='Trending')
@@ -138,9 +137,6 @@ class TNV_Scanner():
 		self.TFM_frame = tk.Canvas(self.TNV_TAB)
 		self.TNV_TAB.add(self.TFM_frame, text ='TradeForMe')
 		self.tfm = TFM(self.TFM_frame,self)
-
-
-
 
 
 		# while True:
@@ -169,6 +165,11 @@ class TNV_Scanner():
 			vals["background"] = "red"
 		elif val.get()[-4:]=="True":
 			vals["background"] = "#97FEA8"
+
+
+	def server_disconnection(self):
+
+		pass 
 
 
 	def update_entry(self,data):
@@ -1167,7 +1168,9 @@ class TodayTrade():
 		self.labels = ["Time","Algo","Symbol"]
 		self.total_len = len(self.labels)
 		self.tnv_scanner = TNV_scanner
+		self.entries = []
 		self.l=0
+
 		for i in range(len(self.labels)): #Rows
 			self.b = tk.Button(self.root, text=self.labels[i],width=self.labels_width[i])#,command=self.rank
 			self.b.configure(activebackground="#f9f9f9")
@@ -1179,6 +1182,29 @@ class TodayTrade():
 			self.b.configure(highlightbackground="#d9d9d9")
 			self.b.configure(highlightcolor="black")
 			self.b.grid(row=self.l, column=i)
+
+		self.l+=1
+		self.create_entry()
+
+	def create_entry(self):
+
+		for k in range(0,30):
+
+			self.entries.append([])
+
+			for i in range(len(self.labels)): #Rows
+				
+				if i == 9:
+					self.b = tk.Button(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
+				elif i ==9:
+					self.b = tk.Button(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
+				else:
+					self.b = tk.Label(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
+				self.b.grid(row=self.l, column=i)
+				self.entries[k].append(self.b)
+				# if i == 9:
+				# 	self.b.grid_remove()
+			self.l+=1
 
 
 if __name__ == '__main__':

@@ -80,10 +80,12 @@ class Strategy:
 
 	def update(self):
 
+		#print(self.current_triggers)
 		if len(self.current_triggers)>0:
 			check = False
 			triggered = None
 			for i in self.current_triggers:
+				#print(i)
 				if self.symbol!=None:
 					check = False
 					if i.check_conditions():
@@ -134,6 +136,8 @@ class Strategy:
 		except:
 			pass
 
+	def get_status(self):
+		pass
 
 	def print_current_triggers(self):
 
@@ -210,11 +214,17 @@ class BreakUp(EntryStrategy): #the parameters contains? dk. yet .  #Can make sin
 		#Break_any_Purchase_trigger
 		self.add_initial_triggers(self.buyTrigger)
 
+		tradingplan.tkvars[RELOAD].set(True)
+
+		self.deployment = False
+
 	def on_redeploying(self):
 
 		if not self.buyTrigger.pre_deploying_check():
 			self.buyTrigger.total_reset()
 			self.restart()
+
+			print("reset")
 		else:
 
 			self.tradingplan.mark_algo_status(DONE)
@@ -235,8 +245,11 @@ class BreakUp(EntryStrategy): #the parameters contains? dk. yet .  #Can make sin
 
 	def on_deploying(self):
 
+		if self.deployment:
+			self.on_redeploying()
 		super().on_deploying()
 
+		self.deployment = True
 		#self.buyTrigger.deploy_stop_order()
 
 class BreakDown(EntryStrategy): #the parameters contains? dk. yet .  #Can make single entry, or multiple entry.
@@ -251,6 +264,9 @@ class BreakDown(EntryStrategy): #the parameters contains? dk. yet .  #Can make s
 
 		self.add_initial_triggers(self.sellTrigger)
 
+		tradingplan.tkvars[RELOAD].set(True)
+		self.deployment = False
+
 	def on_deploying(self):
 
 		super().on_deploying()
@@ -261,6 +277,7 @@ class BreakDown(EntryStrategy): #the parameters contains? dk. yet .  #Can make s
 	def on_redeploying(self):
 
 		if not self.sellTrigger.pre_deploying_check():
+
 			self.sellTrigger.total_reset()
 			self.restart()
 		else:
@@ -306,7 +323,11 @@ class FadeDown(EntryStrategy): #the parameters contains? dk. yet .  #Can make si
 
 	def on_deploying(self):
 
+		if self.deployment:
+			self.on_redeploying()
 		super().on_deploying()
+
+		self.deployment = True
 
 		#self.buyTrigger.deploy_stop_order()
 
