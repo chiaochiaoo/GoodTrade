@@ -213,6 +213,8 @@ class Spread():
 
 				new_order["share"] = risk//lst[i]['risk_per_pair']
 
+				if new_order["share"]>10:
+					new_order["share"] = 10
 
 
 				new_order["risk"] = risk
@@ -386,7 +388,7 @@ class Spread():
 								if rank not in self.algo_placed:
 
 
-									if (mh-ph)>= 0.15 and mh>=1:
+									if (ml-pl)>= 0.15 and ml>=1:
 
 										order = {}
 										split = rank.split(',')
@@ -394,12 +396,12 @@ class Spread():
 
 										order["algo_name"] = "PairReversal"
 										order["algo_id"] = order["algo_name"]+order['symbol1']+order["symbol2"]
-										order['ratio'] = row['hedgeratio']
-										order['risk_per_pair'] = ycr*(mh-ph)
+										order['ratio'] = [row['hedgeratio'][0],row['hedgeratio'][1]*-1]
+										order['risk_per_pair'] = ycr*(ml-pl)
 
 										send_algo.append(order)
 										self.algo_placed.append(rank)
-									elif (ml-pl)>= 0.15 and ml>=1:
+									elif (mh-ph)>= 0.15 and mh>=1:
 
 										order = {}
 										split = rank.split(',')
@@ -407,8 +409,8 @@ class Spread():
 										order["algo_name"] = "PairReversal"
 										order["algo_id"] = order["algo_name"]+order['symbol1']+order["symbol2"]
 
-										order['ratio'] = [row['hedgeratio'][1],row['hedgeratio'][0]]
-										order['risk_per_pair'] = ycr*(ml-pl)
+										order['ratio'] = [row['hedgeratio'][1],row['hedgeratio'][0]*-1]
+										order['risk_per_pair'] = ycr*(mh-ph)
 										send_algo.append(order)
 										self.algo_placed.append(rank)
 						entry+=1
