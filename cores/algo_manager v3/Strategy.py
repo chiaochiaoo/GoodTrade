@@ -311,6 +311,7 @@ class FadeDown(EntryStrategy): #the parameters contains? dk. yet .  #Can make si
 		#Break_any_Purchase_trigger
 		#Break_any_Purchase_trigger
 		self.add_initial_triggers(self.buyTrigger)
+		self.deployment = False
 
 	def on_redeploying(self):
 
@@ -342,10 +343,14 @@ class FadeUp(EntryStrategy): #the parameters contains? dk. yet .  #Can make sing
 		self.sellTrigger = Break_any_Purchase_trigger([[SYMBOL_DATA,BID,"<",SYMBOL_DATA,RESISTENCE]],SUPPORT,self.risk,"Fade up",timer,repeat,LONG,self.ppro_out)
 
 		self.add_initial_triggers(self.sellTrigger)
-
+		self.deployment = False
+		
 	def on_deploying(self):
-
+		if self.deployment:
+			self.on_redeploying()
 		super().on_deploying()
+
+		self.deployment = True
 
 		#self.sellTrigger.deploy_stop_order()
 
