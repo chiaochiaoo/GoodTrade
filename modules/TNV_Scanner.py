@@ -627,7 +627,7 @@ class Open_high(StandardScanner):
 		super().__init__(root,NT)
 
 		self.open = tk.BooleanVar(value=0)
-
+		self.algo_activate.set(True)
 		row = 3
 		col = 5
 
@@ -823,6 +823,7 @@ class Open_low(StandardScanner):
 		super().__init__(root,NT)
 
 		self.open = tk.BooleanVar(value=0)
+		self.algo_activate.set(True)
 		row = 3
 		col = 5
 		self.reversal_type = tk.StringVar(value="Both")

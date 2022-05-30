@@ -32,7 +32,7 @@ class Premarket_breakout():
 		self.management = tk.StringVar(value="1:2 Exprmntl")
 
 		self.algo_risk = tk.DoubleVar(value=10)
-		self.algo_activate = tk.BooleanVar(value=False)
+		self.algo_activate = tk.BooleanVar(value=True)
 
 
 		#conditional box
