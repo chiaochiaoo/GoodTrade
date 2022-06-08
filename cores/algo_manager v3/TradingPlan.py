@@ -894,9 +894,10 @@ class TradingPlan:
 			#entrytimer=self.tkvar
 
 			if risktimer ==0:
-				self.data[RISKTIMER] = int(self.tkvars[RISKTIMER].get())
+				self.data[RISKTIMER] = 9600
+				# int(self.tkvars[RISKTIMER].get())
 			else:
-				self.data[RISKTIMER] = risktimer
+				self.data[RISKTIMER] = 9600# risktimer
 
 			self.data[RISK_PER_SHARE] = abs(self.symbol.get_resistence()-self.symbol.get_support())
 
