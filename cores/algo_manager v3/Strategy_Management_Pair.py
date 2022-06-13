@@ -65,6 +65,11 @@ class MarketMaking(ManagementStrategyPair):
 
 		super().__init__("Management:Market Making ",symbol1,symbol2,tradingplan)
 
+		self.symbol1 = symbol1
+		self.symbol2 = symbol2
+		
+		self.symbol1.turn_market_making(tradingplan)
+		self.symbol2.turn_market_making(tradingplan)
 
 	def update(self):
 
