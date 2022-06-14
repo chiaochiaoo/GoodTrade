@@ -444,6 +444,8 @@ class PairTrade():
 
 			type_ = self.type.get()
 			#stop = self.stop.get()
+
+			sigma = self.expected_risk.get()
 			
 			management = self.management_type.get()
 
@@ -476,6 +478,7 @@ class PairTrade():
 				new_order["ratio"] = ratio
 				new_order["share"] = pair
 
+				new_order["sigma"] = sigma
 				new_order["risk"] = risk
 				new_order["management"] = management 
 
@@ -774,6 +777,7 @@ class SinlgeTrade():
 				new_order["entry_type"] = entryplan
 				new_order["symbol"] = symbol
 				new_order["side"] = side
+
 				new_order["support"] = support
 				new_order["resistence"] = resistence
 				new_order["immediate_deployment"]= True
