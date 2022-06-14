@@ -125,7 +125,7 @@ class PairTP_MM:
 		self.manager = Manager
 
 
-		log_print(self.algo_name,"base_share {}, min {}, max {}",self.base_share,self.comfort_zone_min,self.comfort_zone_max)
+		log_print(algo_name,"base_share {}, min {}, max {}",self.base_share,self.comfort_zone_min,self.comfort_zone_max)
 
 		self.symbol_name = Symbol1.ticker[:-3] + ":" + Symbol2.ticker[:-3] #symbol.get_name()
 
