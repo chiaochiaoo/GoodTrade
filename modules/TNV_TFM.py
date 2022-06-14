@@ -445,7 +445,7 @@ class PairTrade():
 			type_ = self.type.get()
 			#stop = self.stop.get()
 
-			sigma = self.expected_risk.get()
+			sigma = float(self.expected_risk.get())
 			
 			management = self.management_type.get()
 
