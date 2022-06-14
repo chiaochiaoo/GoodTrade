@@ -5,6 +5,7 @@ from Symbol import *
 from TradingPlan import *
 from TradingPlan_MMP1 import *
 from Pair_TP import *
+from Pair_TP_MM import *
 from UI import *
 from Ppro_in import *
 from Ppro_out import *
@@ -536,7 +537,11 @@ class Manager:
 
 					#def __init__(self,name:"",Symbol1,Symbol2,ratio,share,manage_plan=None,risk=None,TEST_MODE=False,algo_name="",Manager=None):
 					### name:"",symbol:Symbol1,symbol:Symbol2,share1,share2,manage_plan=None,risk=None,TEST_MODE=False,algo_name="",Manager=None
-					self.tradingplan[name] = PairTP(name,self.symbol_data[symbol1],self.symbol_data[symbol2],ratio,share,mana,risk,TEST_MODE,algo_name,self)
+					#self,name:"",Symbol1,Symbol2,ratio,sigma=0.01,manage_plan=None,risk=None,TEST_MODE=False,algo_name="",Manager=None
+					if mana==MARKETMAKING:
+						self.tradingplan[name] = PairTP_MM(name,self.symbol_data[symbol1],self.symbol_data[symbol2],ratio,data["sigma"],risk,algo_name,self)
+					else:
+						self.tradingplan[name] = PairTP(name,self.symbol_data[symbol1],self.symbol_data[symbol2],ratio,share,mana,risk,TEST_MODE,algo_name,self)
 
 					self.ui.create_new_single_entry(self.tradingplan[name],type_name,None)
 

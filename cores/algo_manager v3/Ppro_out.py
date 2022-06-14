@@ -190,7 +190,9 @@ def passive_buy(symbol	,share,offset):
 
 	# BATS Buy BATSPostOnly Limit DAY
 	# MEMX Buy MEMX Limit Visible DAY PostOnly
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Buy MEMX Pegged Near DAY MidPoint&shares='+str(share)
+	# 	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Buy MEMX Pegged Near DAY MidPoint&shares='+str(share)
+
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Buy MEMX Limit Near Visible DAY PostOnly&shares='+str(share)
 	sucess='passive buy limit order success on'+symbol
 	failure="Error passive buy limit order on"+symbol
 
@@ -202,7 +204,9 @@ def passive_sell(symbol	,share,offset):
 
 	# MEMX Sell->Short MEMX Limit Visible DAY PostOnly
 	# BATS Sell->Short BATSPostOnly Limit DAY
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Sell->Short MEMX Pegged Near DAY MidPoint&shares='+str(share)
+	#	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Sell->Short MEMX Pegged Near DAY MidPoint&shares='+str(share)
+
+	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Sell->Short MEMX Limit Near Visible DAY PostOnly&shares='+str(share)
 
 	sucess='passive sell limit order success on'+symbol
 	failure="Error passive sell limit order on"+symbol
@@ -210,7 +214,10 @@ def passive_sell(symbol	,share,offset):
 	return r,sucess,failure
 
 
+# MEMX Buy MEMX Limit Near Visible DAY PostOnly #
+#################################################
 # def passive_buy(symbol	,share,price):
+
 
 # 	price = round(float(price),2)
 
@@ -560,6 +567,12 @@ def cancel_stoporder(id_):
 
 
 
+
+# symbol="QQQ.NQ"
+# offset = 0.01
+# share = 1
+# a='http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Buy MEMX Limit Near Visible DAY PostOnly&shares='+str(share)
+# print(a)
 
 # request = 
 
