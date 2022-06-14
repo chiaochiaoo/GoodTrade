@@ -113,12 +113,19 @@ class PairTP_MM:
 		self.dividing_coefficient = 30
 		self.maximum_share_size = int(1//self.sigma) * self.main_ratio
 		self.base_share = int(self.maximum_share_size//self.dividing_coefficient)
-		self.base_share = self.base_share - self.base_share%self.main_ratio
+
+		if self.base_share <= self.main_ratio:
+			self.base_share = self.main_ratio
+		else:
+			self.base_share = self.base_share - self.base_share%self.main_ratio
 
 		self.comfort_zone_min = int(self.maximum_share_size * 0.2)
 
 		self.comfort_zone_max = int(self.maximum_share_size * 0.95)
 		self.manager = Manager
+
+
+		log_print(self.algo_name,"base_share {}, min {}, max {}",self.base_share,self.comfort_zone_min,self.comfort_zone_max)
 
 		self.symbol_name = Symbol1.ticker[:-3] + ":" + Symbol2.ticker[:-3] #symbol.get_name()
 
@@ -573,7 +580,6 @@ class PairTP_MM:
 	def cancle_deployment(self):
 		if self.data[POSITION] =="" and self.data[SYMBOL1_SHARE]==0 and self.data[SYMBOL2_SHARE]==0:
 			self.mark_algo_status(PENDING)
-			self.stop_tradingplan()
 		else:
 			log_print("cannot cancel, holding positions.")
 
@@ -581,6 +587,8 @@ class PairTP_MM:
 	def deploy(self,risktimer=0):
 
 		if self.tkvars[STATUS].get() ==PENDING:
+
+			self.mark_algo_status(DEPLOYED)
 
 			self.symbols[self.symbol1].register_tradingplan(self.name,self) 
 			self.symbols[self.symbol2].register_tradingplan(self.name,self) 
@@ -699,10 +707,6 @@ class PairTP_MM:
 
 
 		#log_print("recalibration ends")
-
-
-
-
 
 
 
