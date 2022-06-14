@@ -647,14 +647,20 @@ class Symbol:
 		#update on the tradingplans. 
 		#print(self.tradingplans.keys())
 
-
-		tps = list(self.tradingplans.values())
-		for val in tps:
-			#print("tp update",val,bid,ask,ts)
-			#print(bid,ask,ts)
-			val.ppro_update_price(symbol=self.ticker,bid=bid,ask=ask,ts=ts)
+		if self.get_market_making()==False:
 
 
+
+			tps = list(self.tradingplans.values())
+			#print("tp update",bid,ask,ts,tps)
+
+			for val in tps:
+				
+				#print(bid,ask,ts)
+				val.ppro_update_price(symbol=self.ticker,bid=bid,ask=ask,ts=ts)
+		else:
+			
+			self.market_making_tp.ppro_update_price(symbol=self.ticker,bid=bid,ask=ask,ts=ts)
 	def update_price_old(self,bid,ask,ts,AR,pos):
 
 		try:

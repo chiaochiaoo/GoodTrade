@@ -270,8 +270,8 @@ class PairTP_MM:
 			#self.check_pnl(bid,ask,ts)
 
 		### depending on the postition. 
-
-		if symbol==self.main_symbol:
+		#print(symbol,bid,ask,ts)
+		if symbol==self.main_symbol and self.deployed:
 
 
 			# level moved. 
@@ -468,7 +468,7 @@ class PairTP_MM:
 			self.cancel_algo()
 		else:
 			self.flatten_order= True
-
+			self.deployed = False
 			self.passive_flatten()
 			
 	def update_displays(self):
@@ -591,6 +591,8 @@ class PairTP_MM:
 			self.symbols[self.symbol1].register_tradingplan(self.name,self) 
 			self.symbols[self.symbol2].register_tradingplan(self.name,self) 
 
+
+
 			self.activate()
 
 			self.deployed = True
@@ -661,7 +663,7 @@ class PairTP_MM:
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second
 
-		if ts>self.order_ts-3 and not self.flatten_order:
+		if ts>self.order_ts+3 and not self.flatten_order:
 
 			base = self.base_share
 
