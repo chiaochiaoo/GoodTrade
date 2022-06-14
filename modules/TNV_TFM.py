@@ -141,7 +141,7 @@ class PairTrade():
 
 		self.side_options = ("Long", "Short")
 		self.type_options = ("Rightaway","Target")
-		self.management_options = ("1:2 Exprmntl","Market Making","Fib Only","SemiManual","FullManual","MarketMaking")
+		self.management_options = ("1:2 Exprmntl","MarketMaking","Fib Only","SemiManual","FullManual","MarketMaking")
 
 		self.algo_placed = []
 		self.ts_location = 7

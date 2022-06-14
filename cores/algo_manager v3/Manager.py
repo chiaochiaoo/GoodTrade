@@ -539,6 +539,7 @@ class Manager:
 					### name:"",symbol:Symbol1,symbol:Symbol2,share1,share2,manage_plan=None,risk=None,TEST_MODE=False,algo_name="",Manager=None
 					#self,name:"",Symbol1,Symbol2,ratio,sigma=0.01,manage_plan=None,risk=None,TEST_MODE=False,algo_name="",Manager=None
 					if mana==MARKETMAKING:
+						print("MARKETMAKING")
 						self.tradingplan[name] = PairTP_MM(name,self.symbol_data[symbol1],self.symbol_data[symbol2],ratio,data["sigma"],risk,algo_name,self)
 					else:
 						self.tradingplan[name] = PairTP(name,self.symbol_data[symbol1],self.symbol_data[symbol2],ratio,share,mana,risk,TEST_MODE,algo_name,self)
