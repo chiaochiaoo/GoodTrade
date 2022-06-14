@@ -11,6 +11,8 @@ import tkinter as tkvars
 import time
 import threading
 import random
+
+
 # MAY THE MACHINE GOD BLESS THY AIM
 
 
@@ -111,7 +113,7 @@ class PairTP_MM:
 
 		# MMM parameters #
 		self.dividing_coefficient = 30
-		self.maximum_share_size = int(1//self.sigma) * self.main_ratio
+		self.maximum_share_size = int(10//self.sigma) * self.main_ratio
 		self.base_share = int(self.maximum_share_size//self.dividing_coefficient)
 
 		if self.base_share <= self.main_ratio:
@@ -129,6 +131,12 @@ class PairTP_MM:
 
 		self.symbol_name = Symbol1.ticker[:-3] + ":" + Symbol2.ticker[:-3] #symbol.get_name()
 
+
+		self.cur_bid = 0
+		self.cur_ask = 0
+		self.order_ts = 0
+
+		self.sitting_order = 0 
 
 		self.current_running_strategy = None
 		self.entry_strategy_start = False
@@ -258,43 +266,30 @@ class PairTP_MM:
 
 
 
-		flatten = False
-
 		#if self.data[POSITION]!="":
 			#self.check_pnl(bid,ask,ts)
 
 		### depending on the postition. 
 
-		if self.management_start:
-
-			if self.side[self.symbol1]==LONG:
-				gain = (self.symbols[self.symbol1].get_bid() - self.data[AVERAGE_PRICE1]) *self.data[SYMBOL1_SHARE]
-			else:
-				gain = (self.data[AVERAGE_PRICE1]-self.symbols[self.symbol1].get_ask()) *self.data[SYMBOL1_SHARE]
-
-			if self.side[self.symbol2]==LONG:
-				gain +=(self.symbols[self.symbol2].get_bid() -  self.data[AVERAGE_PRICE2] ) *self.data[SYMBOL2_SHARE]
-			else:
-				gain +=( self.data[AVERAGE_PRICE2]- self.symbols[self.symbol2].get_ask() ) *self.data[SYMBOL2_SHARE]
-
-			#print(self.symbols[self.symbol1].get_bid(),self.data[AVERAGE_PRICE1],self.data[AVERAGE_PRICE2],self.symbols[self.symbol2].get_ask() )
-			self.data[UNREAL]= round(gain,2)
-
-			if gain + self.data[ESTRISK] <0:
-				flatten = True
+		if symbol==self.main_symbol:
 
 
-		if flatten:
-			self.flatten_order = True
-			self.flatten_cmd()
+			# level moved. 
+			if bid!=self.cur_bid or ask!=self.cur_ask:
 
-		if self.flatten_order and self.if_activated():
+				if self.current_shares[self.main_symbol] <= self.comfort_zone_min:
 
-			self.submit_expected_pairs(0)
-		# except Exception as e:
-		# 	log_print("TP issue:",e)
+					self.send_orders(1,0)
 
-		self.update_displays()
+				elif self.current_shares[self.main_symbol] > self.comfort_zone_min and self.current_shares[self.main_symbol] < self.comfort_zone_max:
+
+					self.send_orders(1,1)
+				else:
+
+					self.send_orders(0,1)
+
+				self.cur_bid = bid
+				self.cur_ask = ask
 
 	def ppro_process_orders(self,price,shares,side,symbol):
 		
@@ -408,6 +403,7 @@ class PairTP_MM:
 
 			self.manager.new_record(self)
 
+			self.mark_algo_status(DONE)
 			self.clear_trade()
 			log_print(self.symbol_name,"Trade completed."," this trade:",self.data[REALIZED]," total:",self.data[TOTAL_REALIZED])
 
@@ -472,6 +468,8 @@ class PairTP_MM:
 			self.cancel_algo()
 		else:
 			self.flatten_order= True
+
+			self.passive_flatten()
 			
 	def update_displays(self):
 
@@ -599,8 +597,8 @@ class PairTP_MM:
 
 			self.set_mind(RUNNING,DEFAULT)
 
-			event_loop = threading.Thread(target=self.event_loop, daemon=True)
-			event_loop.start()
+			# event_loop = threading.Thread(target=self.event_loop, daemon=True)
+			# event_loop.start()
 
 
 
@@ -641,6 +639,7 @@ class PairTP_MM:
 		self.mark_algo_status(DONE)
 
 
+
 	def passive_flatten(self):
 
 		self.ppro_out.send([CANCEL,self.main_symbol])
@@ -658,19 +657,25 @@ class PairTP_MM:
 		#second, depending on ratio, do the orders 
 		#MEMX Buy MEMX Limit Near Visible DAY PostOnly  self.main_symbol
 
-		base = self.base_share
+	
+		now = datetime.now()
+		ts = now.hour*3600 + now.minute*60 + now.second
 
-		self.ppro_out.send([CANCEL,self.main_symbol])
+		if ts>self.order_ts-3 and not self.flatten_order:
 
+			base = self.base_share
+
+			self.ppro_out.send([CANCEL,self.main_symbol])
 		
-		if buy>0:
-			self.ppro_out.send([PASSIVEBUY,self.main_symbol,base*buy,0])
-			self.ppro_out.send([PASSIVEBUY,self.main_symbol,base*buy,0.01])
+			if buy>0:
+				self.ppro_out.send([PASSIVEBUY,self.main_symbol,base*buy,0])
+				self.ppro_out.send([PASSIVEBUY,self.main_symbol,base*buy,0.01])
 
-		if sell>0:
-			self.ppro_out.send([PASSIVESELL,self.main_symbol,base*sell,0])
-			self.ppro_out.send([PASSIVESELL,self.main_symbol,base*sell,0.01])
+			if sell>0:
+				self.ppro_out.send([PASSIVESELL,self.main_symbol,base*sell,0])
+				self.ppro_out.send([PASSIVESELL,self.main_symbol,base*sell,0.01])
 
+			self.order_ts = ts
 
 	""" SHARES MANAGEMENT """
 
