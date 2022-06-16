@@ -84,8 +84,8 @@ class TNV_Scanner():
 
 
 		self.today_frame = tk.Canvas(self.TNV_TAB)
-		self.TNV_TAB.add(self.today_frame, text ='Today Trade')
-		self.today_trade = TodayTrade(self.today_frame,self)
+		self.TNV_TAB.add(self.today_frame, text ='TICK Algo')
+		self.today_trade = Tick_Algo(self.today_frame,self)
 
 		self.or_frame = tk.Canvas(self.TNV_TAB)
 		self.TNV_TAB.add(self.or_frame, text ='Open Reversal')
@@ -124,9 +124,9 @@ class TNV_Scanner():
 		self.TNV_TAB.add(self.rrvol_frame, text ='RRVol')
 		self.rrvol = RRvol(self.rrvol_frame,NT)
  
-		self.trending_frame = tk.Canvas(self.TNV_TAB)
-		self.TNV_TAB.add(self.trending_frame, text ='Trending')
-		self.trending = ADX(self.trending_frame,NT,self)
+		# self.trending_frame = tk.Canvas(self.TNV_TAB)
+		# self.TNV_TAB.add(self.trending_frame, text ='Trending')
+		# self.trending = ADX(self.trending_frame,NT,self)
 
 		#Spread 
 		self.spread_frame = tk.Canvas(self.TNV_TAB)
@@ -135,7 +135,7 @@ class TNV_Scanner():
 
 		# # TFM
 		self.TFM_frame = tk.Canvas(self.TNV_TAB)
-		self.TNV_TAB.add(self.TFM_frame, text ='TradeForMe')
+		self.TNV_TAB.add(self.TFM_frame, text ='TFM')
 		self.tfm = TFM(self.TFM_frame,self)
 
 
@@ -259,8 +259,8 @@ class TNV_Scanner():
 			openreverse = openreverse.sort_values(by=["reversal_timer"],ascending=False)[:20]
 			
 
-			trending =  filtered_df.loc[(filtered_df["ema45time"]>=20)|(filtered_df["ema45time"]<=-20)]
-			trending =  trending.reindex(trending.ema45.abs().sort_values(ascending=False).index)[:20] #df.sort_values(by=["ema21"],ascending=False)
+			# trending =  filtered_df.loc[(filtered_df["ema45time"]>=20)|(filtered_df["ema45time"]<=-20)]
+			# trending =  trending.reindex(trending.ema45.abs().sort_values(ascending=False).index)[:20] #df.sort_values(by=["ema21"],ascending=False)
 
 			# OH , OL, RRVOL
 
@@ -290,7 +290,7 @@ class TNV_Scanner():
 
 			self.spread.update_entry(pair_df)
 			self.open_reversal.update_entry(openreverse)
-			self.trending.update_entry(trending)
+			# self.trending.update_entry(trending)
 			
 			self.oh.update_entry(oh)
 			self.ol.update_entry(ol)
@@ -1206,6 +1206,103 @@ class TodayTrade():
 				# if i == 9:
 				# 	self.b.grid_remove()
 			self.l+=1
+
+
+
+class Tick_Algo():
+
+	def __init__(self,root,TNV_scanner):
+
+		self.root = root 
+		# self.labels_width = [9,9,9]
+		# self.labels = ["Time","Algo","Symbol"]
+		#self.total_len = len(self.labels)
+		self.tnv_scanner = TNV_scanner
+		self.entries = []
+
+		self.algo_risk = tk.DoubleVar(value=5)
+		self.algo_activate = tk.BooleanVar(value=0)
+		# self.l=0
+
+		# for i in range(len(self.labels)): #Rows
+		# 	self.b = tk.Button(self.root, text=self.labels[i],width=self.labels_width[i])#,command=self.rank
+		# 	self.b.configure(activebackground="#f9f9f9")
+		# 	self.b.configure(activeforeground="black")
+		# 	self.b.configure(background="#d9d9d9")
+		# 	self.b.configure(disabledforeground="#a3a3a3")
+		# 	self.b.configure(relief="ridge")
+		# 	self.b.configure(foreground="#000000")
+		# 	self.b.configure(highlightbackground="#d9d9d9")
+		# 	self.b.configure(highlightcolor="black")
+		# 	self.b.grid(row=self.l, column=i)
+
+		# self.l+=1
+		self.algo_frame = ttk.LabelFrame(self.root,text="Algo setup")
+		self.algo_frame.place(x=0, rely=0, relheight=0.1, relwidth=1)
+		
+
+
+		self.algos = ttk.LabelFrame(self.root,text="TICK Algos")
+		self.algos.place(x=0, rely=0.101, relheight=0.85, relwidth=1)
+
+		self.tick_opening = tk.BooleanVar(value=0)
+		self.tick_intraday_v1 = tk.BooleanVar(value=0)
+		self.tick_intraday_v2 = tk.BooleanVar(value=0)
+
+
+		self.algo_pannel()
+
+	def algo_pannel(self):
+
+		row = 1
+		col = 1
+		ttk.Label(self.algo_frame, text="Algo:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.algo_frame, variable=self.algo_activate).grid(sticky="w",column=col+1,row=row)
+
+		ttk.Label(self.algo_frame, text="Risk:").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(self.algo_frame, textvariable=self.algo_risk).grid(sticky="w",column=col+3,row=row)
+
+
+		row +=1
+
+		ttk.Label(self.algo_frame, text="Toggle All:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.algo_frame, variable=self.tick_opening).grid(sticky="w",column=col+1,row=row)
+
+
+		row +=1
+
+		ttk.Label(self.algos, text="TICK Opening:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.algos, variable=self.tick_opening).grid(sticky="w",column=col+1,row=row)
+
+
+		row +=1
+
+		ttk.Label(self.algos, text="TICK Intraday V1:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.algos, variable=self.tick_intraday_v1).grid(sticky="w",column=col+1,row=row)
+
+
+		row +=1
+
+		ttk.Label(self.algos, text="TICK Intraday V2:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.algos, variable=self.tick_intraday_v2).grid(sticky="w",column=col+1,row=row)
+		# for k in range(0,30):
+
+		# 	self.entries.append([])
+
+		# 	for i in range(len(self.labels)): #Rows
+				
+		# 		if i == 9:
+		# 			self.b = tk.Button(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
+		# 		elif i ==9:
+		# 			self.b = tk.Button(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
+		# 		else:
+		# 			self.b = tk.Label(self.root, text=" ",width=self.labels_width[i])#,command=self.rank
+		# 		self.b.grid(row=self.l, column=i)
+		# 		self.entries[k].append(self.b)
+		# 		# if i == 9:
+		# 		# 	self.b.grid_remove()
+		# 	self.l+=1
+
 
 
 if __name__ == '__main__':
