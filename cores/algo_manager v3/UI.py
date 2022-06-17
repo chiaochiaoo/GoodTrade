@@ -104,6 +104,8 @@ class UI(pannel):
 		self.max_risk = tk.DoubleVar()
 
 		self.passive_aggregation = tk.BooleanVar()
+
+		self.tick_management = tk.BooleanVar()
 		self.current_total_risk = tk.DoubleVar()
 		self.current_downside = tk.DoubleVar()
 
@@ -458,6 +460,11 @@ class UI(pannel):
 		row+=1
 		#self.command_text = tk.StringVar(value="Status:")
 		ttk.Label(self.cmd, textvariable=self.command_text).grid(sticky="w",column=1,row=row,columnspan =2)
+
+		row+=1
+
+		ttk.Label(self.cmd, text="TICK Management:").grid(sticky="w",column=1,row=row)
+		ttk.Checkbutton(self.cmd, variable=self.tick_management).grid(sticky="w",column=2,row=row)
 
 
 		row+=1
