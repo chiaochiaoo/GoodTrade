@@ -386,10 +386,20 @@ class MarketLong(EntryStrategy): #the parameters contains? dk. yet .  #Can make 
 	def __init__(self,symbol,tradingplan,share=5):
 		super().__init__("Entry : Market Action",symbol,tradingplan)
 		self.share = share
+
+
 	def on_deploying(self):
 
 		#print("INSTANT LONG GLNOANGONGOENGOWG")
-		self.tradingplan.market_in(self.share)
+
+		share = int(self.tradingplan.data[ESTRISK]/(self.tradingplan.data[RESISTENCE] - self.tradingplan.data[SUPPORT]))
+
+		self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[SUPPORT]
+		self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[SUPPORT])
+
+		print("INSTANT LONG",share,self.tradingplan.data[RESISTENCE],self.tradingplan.data[SUPPORT],self.tradingplan.data[ESTRISK])
+		self.tradingplan.market_in(share)
+
 		#self.buyTrigger.deploy_stop_order()
 
 
@@ -404,7 +414,12 @@ class MarketShort(EntryStrategy): #the parameters contains? dk. yet .  #Can make
 	def on_deploying(self):
 
 		#print("INSTANT LONG GLNOANGONGOENGOWG")
-		self.tradingplan.market_in(self.share)
+		share = int(self.tradingplan.data[ESTRISK]/(self.tradingplan.data[RESISTENCE] - self.tradingplan.data[SUPPORT]))
+
+		self.tradingplan.data[STOP_LEVEL]=self.tradingplan.data[RESISTENCE]
+		self.tradingplan.tkvars[STOP_LEVEL].set(self.tradingplan.data[RESISTENCE])
+
+		self.tradingplan.market_in(-share)
 		#self.buyTrigger.deploy_stop_order()
 
 
