@@ -596,8 +596,8 @@ class Manager:
 				symbol = data["symbol"] 
 				entryplan = data["entry_type"]
 				
-				support = float(data["support"])
-				resistence =  float(data["resistence"])
+				support = round(float(data["support"]),2)
+				resistence =  round(float(data["resistence"]),2)
 				risk = float(data["risk"])
 				stats = {} #data["statistics"]
 				status = data["immediate_deployment"]
@@ -605,7 +605,7 @@ class Manager:
 			
 				name = algo_id #symbol+str(ts)+ str(random.randint(0, 9))
 			
-			
+				#print(support,resistence,risk)
 				if self.ui.algo_count_number.get()<60:
 					#print(symbol,self.ui.algo_count_number.get())
 					
