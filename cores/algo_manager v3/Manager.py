@@ -501,7 +501,7 @@ class Manager:
 			strategy = data["Strategy"]
 			share = int(data["Share"])
 
-			if side =="B"
+			if side =="B":
 				share = abs(share)
 				entryplan= INSTANTLONG
 			else:
