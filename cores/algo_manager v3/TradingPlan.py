@@ -65,9 +65,6 @@ class TradingPlan:
 
 		self.price_levels = {}
 
-
-
-
 		# NO LONGER USED #
 		self.passive_in_process = False
 		self.passive_position = ""
@@ -99,6 +96,7 @@ class TradingPlan:
 	def activate(self):
 
 		self.in_use	 = True
+
 
 	def deactive(self):
 		self.in_use = False
@@ -151,8 +149,6 @@ class TradingPlan:
 		self.notify_request()
 
 
-
-
 	def market_in(self,shares,symbol=None):
 
 		if shares>0:
@@ -191,6 +187,9 @@ class TradingPlan:
 
 
 			self.notify_request()
+
+			if self.in_use!=True:
+				self.activate()
 
 	#internal use
 	def change_to_shares(self,shares,symbol=None,immediately=False):

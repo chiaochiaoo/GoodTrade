@@ -78,20 +78,63 @@ class S(BaseHTTPRequestHandler):
 
 	def do_GET(self):
 
-		global algoids
 		self._set_response()
 		#self.wfile.write("received".encode('utf-8'))
 
 		stream_data = self.path[1:]
 
 		#self.send_message(stream_data)
-		print(stream_data)
-		
+
 		if "%20" in stream_data:
 			stream_data = stream_data.replace("%20"," ")
 
-		if TRADETYPE in stream_data:
+		self.process_msg(stream_data)
 
+
+	def do_POST(self):
+
+
+		self._set_response()
+		#self.wfile.write("received".encode('utf-8'))
+
+		stream_data = self.path[1:]
+
+		#self.send_message(stream_data)
+
+		if "%20" in stream_data:
+			stream_data = stream_data.replace("%20"," ")
+
+		self.process_msg(stream_data)
+
+
+	def process_msg(self,stream_data):
+
+
+		# 3 TYPES OF Msg. 1. TV broadcast cmd. 2. trade placement. 3. TV trade placement. 
+
+		if "Strategy" in stream_data:
+
+			data = {}
+
+			data["algo_id"] = "algo_id"
+			data["type_name"] = "Tradingview"
+			data["Strategy"] = find_between(stream_data,"Strategy=",",")
+			data["Symbol"] = find_between(stream_data,"Symbol=",",")
+			data["Side"] = find_between(stream_data,"Side=",",")
+			data["Share"] = find_between(stream_data,"Shares=",",")
+
+			self.send_pkg(data)
+			print(data)
+
+		elif "Command" in stream_data:
+
+			Command = find_between(stream_data,"Command=",",")
+
+			self.send_cmd(Command)
+			print(Command)
+
+
+		elif TRADETYPE in stream_data:
 
 			#print(stream_data)
 			type_ = find_between(stream_data,TRADETYPE,",")
@@ -121,7 +164,7 @@ class S(BaseHTTPRequestHandler):
 
 					data["management"] = find_between(stream_data,MANAGEMENT,",")
 
-					self.send_message(data)
+					self.send_pkg(data)
 
 				if type_ =="Pair":
 
@@ -136,111 +179,21 @@ class S(BaseHTTPRequestHandler):
 
 					data["management"] = find_between(stream_data,MANAGEMENT,",")
 
-					self.send_message(data)
+					self.send_pkg(data)
 					# data["symbol1_statistics"]
 					# data["symbol2_statistics"]
 
 
-		# if type_!="TEST":
-		# 	self.send_message(msg)
+	def send_cmd(self,msg):
 
+		global pipec
+		#print("sending",msg,pipec)
 
+		print("receiving:",msg)
 
-		# type_name = data["type_name"]
-		# algo_id = data["algo_id"]
-		# algo_name =  data["algo_name"]
-		# symbol = data["symbol"] 
-		# entryplan = data["entry_type"]
-		# support = data["support"]
-		# resistence =  data["resistence"]
-		# risk = data["risk"]
-		# stats = data["statistics"]
-		# status = data["immediate_deployment"]
-		# mana = data["management"]
+		pipec.send(["cmd",msg])
 
-	def do_POST(self):
-
-		#self.send_message(stream_data)
-		#print(stream_data)
-		global algoids
-
-		stream_data = self.rfile.read(int(self.headers['Content-Length'])).decode()
-
-
-		if "Strategy" in stream_data:
-
-			data = {}
-
-			data["algo_id"] = "algo_id"
-			data["type_name"] = "Tradingview"
-			data["Strategy"] = find_between(stream_data,"Strategy=",",")
-			data["Symbol"] = find_between(stream_data,"Symbol=",",")
-			data["Side"] = find_between(stream_data,"Side=",",")
-			data["Share"] = find_between(stream_data,"Shares=",",")
-
-			self.send_message(data)
-			print(data)
-
-		else:
-
-			#algo_id:TEST1,type_name:Single,algo_name:TEST,entry_type:MarketAction,symbol:SPY.AM,support:413,resistence:414,risk:50.0,immediate_deployment:True,management:HoldXSecond,
-
-			type_ = find_between(stream_data,TRADETYPE,",")
-			algo_id = find_between(stream_data,ALGOID,",")
-
-			data = {}
-
-			print(stream_data,type_,algo_id,algoids)
-
-			if algo_id not in algoids:
-				if type_=="Single" :
-
-					algoids.append(algo_id)
-
-					data["type_name"] = type_
-					data["algo_id"] = algo_id
-					data["algo_name"] = find_between(stream_data,ALGONAME,",")
-					data["symbol"] = find_between(stream_data,SYMBOL,",")
-					data["entry_type"] = find_between(stream_data,ENTRYPLAN,",")
-					data["support"] = find_between(stream_data,SUPPORT,",")
-					data["resistence"] = find_between(stream_data,RESISTANCE,",")
-					data["risk"] = find_between(stream_data,RISK,",")
-					#data["statistics"] = find_between(stream_data,ALGOID,",")
-
-					if find_between(stream_data,DEPLOY,",")=="T":
-						data["immediate_deployment"] = True
-					else:
-						data["immediate_deployment"] = False
-
-
-					data["management"] = find_between(stream_data,MANAGEMENT,",")
-
-					self.send_message(data)
-
-				if type_ =="Pair":
-
-					data["type_name"] = type_
-					data["algo_id"] = algo_id
-					data["algo_name"] = find_between(stream_data,ALGONAME,",")
-					data["symbol1"]  = find_between(stream_data,SYMBOL1,",")
-					data["symbol2"]  = find_between(stream_data,SYMBOL2,",")
-					data["symbol1_share"] = find_between(stream_data,SYMBOL1SHARE,",")
-					data["symbol2_share"] =  find_between(stream_data,SYMBOL2SHARE,",")
-					data["risk"] =find_between(stream_data,RISK,",")
-
-					data["management"] = find_between(stream_data,MANAGEMENT,",")
-
-					self.send_message(data)
-					# data["symbol1_statistics"]
-					# data["symbol2_statistics"]
-			else:
-				print("already contained")
-		self._set_response()
-		#self.wfile.write("received".encode('utf-8'))
-
-		#print(self.path[1:])
-
-	def send_message(self,msg):
+	def send_pkg(self,msg):
 
 		global pipec
 		#print("sending",msg,pipec)

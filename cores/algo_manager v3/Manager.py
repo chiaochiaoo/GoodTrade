@@ -349,6 +349,7 @@ class Manager:
 
 		self.manage_lock = 0
 
+		self.not_passvie = tk.BooleanVar(value=False)
 
 		self.receiving_signals = tk.BooleanVar(value=True)
 		self.cmd_text = tk.StringVar(value="Status:")
@@ -435,7 +436,6 @@ class Manager:
 		self.f.close()
 		log_print(("record file start"))
 
-
 	def shares_allocation(self):
 
 		#fro each of the symbols. look at imbalance. deal with it. 
@@ -456,6 +456,7 @@ class Manager:
 					# stage 3, handle imbalance request (just use market orders now.)
 
 			time.sleep(3)
+
 	def new_record(self,tradingplan):
 
 		try:
@@ -480,7 +481,6 @@ class Manager:
 
 			log_print("writing record failure for",tradingplan.symbol_name)
 
-
 	def add_new_tradingplan(self,data,TEST_MODE):
 
 		#print("adding",data)
@@ -495,10 +495,9 @@ class Manager:
 
 		if type_name =="Tradingview":
 
-			algo_name =  data["algo_name"]
+			algo_name =  data["Strategy"]
 			symbol = data["Symbol"]
 			side  = data["Side"]
-			strategy = data["Strategy"]
 			share = int(data["Share"])
 
 			if side =="B":
@@ -516,20 +515,22 @@ class Manager:
 
 			if self.ui.algo_count_number.get()<60:
 
-				if strategy+symbol not in self.direct_control_tradingplan: 
+				if algo_name+symbol not in self.direct_control_tradingplan: 
 
 					mana= FULLMANUAL
 					support=0
 					resistence=1
 					risk=share
 
-					self.direct_control_tradingplan[strategy+symbol] = TradingPlan(name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
-					self.direct_control_tradingplan[strategy+symbol].data[USING_STOP] = False
-					
-					self.tradingplan[algo_id].deploy(9600)
+					self.direct_control_tradingplan[algo_name+symbol] = TradingPlan(algo_name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
+					self.direct_control_tradingplan[algo_name+symbol].data[USING_STOP] = False
+
+					self.ui.create_new_single_entry(self.direct_control_tradingplan[algo_name+symbol],"Single",None)
+
+					self.direct_control_tradingplan[algo_name+symbol].deploy(9600)
 
 				else:
-					self.direct_control_tradingplan[strategy+symbol].submit_expected_shares(share)
+					self.direct_control_tradingplan[algo_name+symbol].submit_expected_shares(share)
 
 		if algo_id not in self.algo_ids:
 
@@ -807,9 +808,6 @@ class Manager:
 		self.u_winning = 0
 		self.u_losing = 0
 
-
-
-
 		for trade in list(self.tradingplan.values()):
 
 			if trade.data[STATUS] == RUNNING:
@@ -908,7 +906,6 @@ class Manager:
 		self.ui.current_downside.set(int(self.current_downside))  
 		self.ui.current_upside.set(int(-self.current_upside))  
 
-
 	def receiving(self):
 
 		if self.receiving_signals.get():
@@ -933,7 +930,24 @@ class Manager:
 						self.ui.main_status["background"] = "red"
 				except Exception as e:
 					PrintException(e,"msg error")
-			if d[0] =="pkg":
+
+			elif d[0] =="cmd":
+
+				log_print("cmd received:",d)
+
+				if self.ui.tick_management.get()==True:
+					if d[1] == "TickHigh":
+
+						#long cover
+						self.trades_aggregation(LONG,MINUS,0.1,False,self.not_passvie)
+
+
+					elif d[1] == "TickLow":
+
+						#short cover
+						self.trades_aggregation(SHORT,MINUS,0.1,False,self.not_passvie)
+
+			elif d[0] =="pkg":
 				log_print("new package arrived",d)
 
 
@@ -1250,7 +1264,7 @@ if __name__ == '__main__':
 
 
 	root = tk.Tk()
-	root.title("GoodTrade Algo Manager v3 b2 ")
+	root.title("GoodTrade Algo Manager v3 b2 TICK MANAGEMENT")
 	root.geometry("1500x1000")
 
 	manager=Manager(root,goodtrade_pipe,ppro_out,ppro_in,TEST)
