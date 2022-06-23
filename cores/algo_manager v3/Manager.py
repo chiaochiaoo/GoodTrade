@@ -4,6 +4,7 @@ import tkinter as tk
 from Symbol import *
 from TradingPlan import *
 from TradingPlan_MMP1 import *
+from TradingPlan_Basket import *
 from Pair_TP import *
 from Pair_TP_MM import *
 from UI import *
@@ -341,7 +342,7 @@ class Manager:
 
 		self.symbol_data = {}
 
-		self.direct_control_tradingplan = {}
+		self.baskets = {}
 		self.tradingplan = {}
 
 		self.pair_plans = {}
@@ -481,6 +482,30 @@ class Manager:
 
 			log_print("writing record failure for",tradingplan.symbol_name)
 
+
+	def apply_basket_cmd(self,basket_name,data):
+
+		if basket_name not in self.baskets:
+
+			self.baskets[basket_name] = TradingPlan_Basket(basket_name,self)
+
+		for symbol,value in data.items():
+
+			if symbol not in self.symbol_data:
+				self.symbol_data[symbol] = Symbol(symbol,0,100,{},self.pipe_ppro_out)  #register in Symbol.
+				self.symbols.append(symbol)
+
+			self.baskets[basket_name].register_symbol(symbol,self.symbol_data[symbol])
+
+
+			## now , submit the request.
+
+			self.baskets[basket_name].submit_expected_shares(symbol,value)
+
+
+
+
+
 	def add_new_tradingplan(self,data,TEST_MODE):
 
 		#print("adding",data)
@@ -492,45 +517,44 @@ class Manager:
 		now = datetime.now()
 		ts = now.hour*60 + now.minute 
 		
+		# if type_name =="Tradingview":
 
-		if type_name =="Tradingview":
+		# 	algo_name =  data["Strategy"]
+		# 	symbol = data["Symbol"]
+		# 	side  = data["Side"]
+		# 	share = int(data["Share"])
 
-			algo_name =  data["Strategy"]
-			symbol = data["Symbol"]
-			side  = data["Side"]
-			share = int(data["Share"])
+		# 	if side =="B":
+		# 		share = abs(share)
+		# 		entryplan= INSTANTLONG
+		# 	else:
+		# 		share = abs(share) * -1
+		# 		entryplan= INSTANTSHORT
+		# 	#self.direct_control_symbols
 
-			if side =="B":
-				share = abs(share)
-				entryplan= INSTANTLONG
-			else:
-				share = abs(share) * -1
-				entryplan= INSTANTSHORT
-			#self.direct_control_symbols
+		# 	if symbol not in self.symbol_data:
 
-			if symbol not in self.symbol_data:
+		# 		self.symbol_data[symbol] = Symbol(symbol,0,100,{},self.pipe_ppro_out)  #register in Symbol.
+		# 		self.symbols.append(symbol)
 
-				self.symbol_data[symbol] = Symbol(symbol,0,100,{},self.pipe_ppro_out)  #register in Symbol.
-				self.symbols.append(symbol)
+		# 	if self.ui.algo_count_number.get()<60:
 
-			if self.ui.algo_count_number.get()<60:
+		# 		if algo_name+symbol not in self.direct_control_tradingplan: 
 
-				if algo_name+symbol not in self.direct_control_tradingplan: 
+		# 			mana= FULLMANUAL
+		# 			support=0
+		# 			resistence=1
+		# 			risk=share
 
-					mana= FULLMANUAL
-					support=0
-					resistence=1
-					risk=share
+		# 			self.direct_control_tradingplan[algo_name+symbol] = TradingPlan(algo_name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
+		# 			self.direct_control_tradingplan[algo_name+symbol].data[USING_STOP] = False
 
-					self.direct_control_tradingplan[algo_name+symbol] = TradingPlan(algo_name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
-					self.direct_control_tradingplan[algo_name+symbol].data[USING_STOP] = False
+		# 			self.ui.create_new_single_entry(self.direct_control_tradingplan[algo_name+symbol],"Single",None)
 
-					self.ui.create_new_single_entry(self.direct_control_tradingplan[algo_name+symbol],"Single",None)
+		# 			self.direct_control_tradingplan[algo_name+symbol].deploy(9600)
 
-					self.direct_control_tradingplan[algo_name+symbol].deploy(9600)
-
-				else:
-					self.direct_control_tradingplan[algo_name+symbol].submit_expected_shares(share)
+		# 		else:
+		# 			self.direct_control_tradingplan[algo_name+symbol].submit_expected_shares(share)
 
 		if algo_id not in self.algo_ids:
 
@@ -947,6 +971,19 @@ class Manager:
 						#short cover
 						self.trades_aggregation(SHORT,MINUS,0.1,False,self.not_passvie)
 
+			elif d[0] =="basket":
+
+				log_print("basket update:",d)
+
+				try:
+					#d[1]   => basket name 
+					#d[2]   => share info. 
+
+					self.apply_basket_cmd(d[1],d[2])
+
+				except Exception as e:
+
+					PrintException(e,"adding algo error")
 			elif d[0] =="pkg":
 				log_print("new package arrived",d)
 

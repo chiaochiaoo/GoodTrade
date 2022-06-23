@@ -126,6 +126,23 @@ class S(BaseHTTPRequestHandler):
 			self.send_pkg(data)
 			print(data)
 
+
+		elif "Basket" in stream_data:
+
+			basket = find_between(stream_data,"Basket=",",")
+
+			infos = find_between(stream_data,"Order=","*")
+
+			print(stream_data)
+			d={}
+			for i in infos.split(","):
+
+				a,b = i.split(":")
+				d[a] = int(b)
+
+			self.send_basket(basket,d)
+
+
 		elif "Command" in stream_data:
 
 			Command = find_between(stream_data,"Command=",",")
@@ -183,7 +200,14 @@ class S(BaseHTTPRequestHandler):
 					# data["symbol1_statistics"]
 					# data["symbol2_statistics"]
 
+	def send_basket(self,basket_name,orders):
 
+		global pipec
+		#print("sending",msg,pipec)
+
+		print("receiving:",basket_name,orders)
+
+		pipec.send(["basket",basket_name,orders])
 	def send_cmd(self,msg):
 
 		global pipec
@@ -243,6 +267,27 @@ def httpserver(pipex):
 		pass
 	httpd.server_close()
 	logging.info('Stopping httpd...\n')
+
+
+
+# stream_data="Basket=koko,Order=AAPL.NQ:5,AMD.NQ*"
+# basket = find_between(stream_data,"Basket=",",")
+
+# infos = find_between(stream_data,"Order=","*")
+
+# print(basket,infos)
+
+# d={}
+# for i in infos.split(","):
+# 	print(i)
+# 	a,b = i.split(":")
+# 	d[a] = int(b)
+
+# print(d)
+
+
+
+
 
 
 # s=" /Trade_type=Single,Algo_id=Manual_LCID.NQ944,Algo_name=Manual%20Trade,Symbol=LCID.NQ,Entry_typeInstant%20Short,Support0,Resistance22.0,Risk=3.0,Side=Short,Deploy=T,Management=FullManual"
