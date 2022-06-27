@@ -44,6 +44,7 @@ class Symbol:
 		self.tkvars = {}
 
 		#for false range detection
+
 		self.seen_high =0
 		self.seen_low =0
 		self.count = 0
@@ -257,6 +258,8 @@ class Symbol:
 
 		for tp in tps:
 
+			log_print(self.ticker,"checking",self.tradingplans[tp].name,"activated:",self.tradingplans[tp].if_activated(),"requested:",self.tradingplans[tp].having_request(self.symbol_name),\
+				"flattening:",self.tradingplans[tp].get_flatten_order())
 			if self.tradingplans[tp].if_activated() and self.tradingplans[tp].having_request(self.symbol_name) and not self.tradingplans[tp].get_flatten_order():
 
 				total += self.tradingplans[tp].read_current_request(self.symbol_name)
@@ -425,7 +428,7 @@ class Symbol:
 
 	def passive_orders(self):
 
-		DELAY = 5
+		DELAY = 3
 
 		coefficient = 0.01
 		k = self.get_bid()//100
@@ -459,8 +462,10 @@ class Symbol:
 			if price <= self.passive_price -0.01 or self.passive_price==0:
 				order_process = True
 
+		log_print(self.ticker,"order:",order_process,"delayed:",ts > self.passive_request_ts + DELAY)
 
-		if order_process and ts > self.passive_request_ts + DELAY:
+		if True and ts > self.passive_request_ts + DELAY:
+
 
 
 			total_shares = abs(self.current_imbalance)
@@ -752,13 +757,7 @@ class Symbol:
 	def get_close(self):
 
 		return self.data[CLOSE]
-# t= {}
 
-# t['a']=0
-# t['b']=-1
-# t['c']=2
-# t['d']=-2
-# t['e']=4
 
 
 # print('inital',t)

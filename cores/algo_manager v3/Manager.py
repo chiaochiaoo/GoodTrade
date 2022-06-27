@@ -446,7 +446,7 @@ class Manager:
 
 			symbols = list(self.symbol_data.values())
 			for val in symbols:
-
+				log_print("inspecting:",val.ticker,"request:",val.get_management_request())
 				if val.get_management_request()==True and val.get_market_making()==False:
 
 					val.symbol_inspection()
@@ -479,24 +479,28 @@ class Manager:
 			self.f.close()
 		except:
 
-
 			log_print("writing record failure for",tradingplan.symbol_name)
 
 
 	def apply_basket_cmd(self,basket_name,data):
 
+
 		if basket_name not in self.baskets:
 
-			self.baskets[basket_name] = TradingPlan_Basket(basket_name,self)
+			if self.ui.basket_label_count<10:
+				self.baskets[basket_name] = TradingPlan_Basket(basket_name,self)
+				self.ui.create_new_single_entry(self.baskets[basket_name],"Basket",None)
 
+				self.baskets[basket_name].deploy(0)
+				
 		for symbol,value in data.items():
 
+			print("processing",symbol,value)
 			if symbol not in self.symbol_data:
 				self.symbol_data[symbol] = Symbol(symbol,0,100,{},self.pipe_ppro_out)  #register in Symbol.
 				self.symbols.append(symbol)
 
 			self.baskets[basket_name].register_symbol(symbol,self.symbol_data[symbol])
-
 
 			## now , submit the request.
 

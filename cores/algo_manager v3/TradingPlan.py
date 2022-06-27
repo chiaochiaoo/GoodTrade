@@ -94,11 +94,10 @@ class TradingPlan:
 		log_print(self.name,"holding:",self.current_shares ,"expected:",self.expected_shares,"requested:",self.current_request)
 
 	def activate(self):
-
 		self.in_use	 = True
 
-
 	def deactive(self):
+
 		self.in_use = False
 
 		self.expect_orders = ""
@@ -163,8 +162,6 @@ class TradingPlan:
 
 		# add a little delay using thread.
 
-		
-		
 		self.notify__request_with_delay()
 
 		self.symbol.immediate_request(shares)
@@ -343,6 +340,7 @@ class TradingPlan:
 
 
 	def check_pnl(self,bid,ask,ts):
+
 		"""
 		PNL, STOP TRIGGER.
 		"""
@@ -564,7 +562,6 @@ class TradingPlan:
 		self.data[REALIZED] = 0
 
 		self.data[TARGET_SHARE] = 0
-		#mark it done.
 
 		#prevent manual conflit.
 		
