@@ -303,8 +303,6 @@ class TradingPlan_Basket:
 
 	def ppro_orders_loadoff(self,symbol,price,shares,side):
 
-		self.current_shares[symbol] = self.current_shares[symbol] + shares
-
 		gain = 0
 
 		print(self.holdings[symbol])
@@ -321,6 +319,8 @@ class TradingPlan_Basket:
 					gain += self.holdings[symbol].pop() - price	
 				except Exception as e:
 					log_print("TP processing: Holding calculation error,holdings are empty.",e)	
+
+		self.current_shares[symbol] = self.current_shares[symbol] + shares
 
 		log_print(self.algo_name,"gain:",symbol,gain)
 		self.data[REALIZED]+=gain
