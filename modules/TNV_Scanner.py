@@ -1336,6 +1336,13 @@ class Custom_Algo():
 			print("Sending:",msg)
 
 			requests.get(msg)
+			reg1 = threading.Thread(target=request_post,args=(msg,), daemon=True)
+			reg1.start()
+
+def request_post(body):
+
+	requests.get(body)
+
 
 if __name__ == '__main__':
 

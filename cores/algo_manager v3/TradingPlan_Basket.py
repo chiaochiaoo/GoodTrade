@@ -370,7 +370,7 @@ class TradingPlan_Basket:
 			
 
 	# need to know which symbol got rejected. cancel the request. 
-	def rejection_handling(self):
+	def rejection_handling(self,symbol):
 
 
 		if self.data[STATUS] == DEPLOYED:
@@ -378,10 +378,10 @@ class TradingPlan_Basket:
 			# withdraw the algo. 
 			# show rejection. 
 
-			self.submit_expected_shares(0)
+			self.submit_expected_shares(symbol,0)
 
 			#self.symbol.cancel_all_request(self.name)
-			self.mark_algo_status(REJECTED)
+			#self.mark_algo_status(REJECTED)
 
 		else:
 

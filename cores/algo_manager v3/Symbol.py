@@ -556,7 +556,7 @@ class Symbol:
 				val = self.tradingplans[tp].read_current_request(self.symbol_name)
 
 				if val*coefficient >0:
-		 			self.tradingplans[tp].rejection_handling()
+		 			self.tradingplans[tp].rejection_handling(self.ticker)
 	
 
 	def pair_off(self,tp1,tp2):
