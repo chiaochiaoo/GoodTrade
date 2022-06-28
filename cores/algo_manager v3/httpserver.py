@@ -124,14 +124,16 @@ class S(BaseHTTPRequestHandler):
 			data["Share"] = find_between(stream_data,"Shares=",",")
 
 			self.send_pkg(data)
-			print(data)
+			#print(data)
 
 
 		elif "Basket" in stream_data:
 
 			basket = find_between(stream_data,"Basket=",",")
 
-			infos = find_between(stream_data,"Order=","*")
+			infos = find_between(stream_data,"Order=*","*")
+
+			risk = find_between(stream_data,"Risk=",",")
 
 			print(stream_data)
 			d={}
@@ -140,7 +142,7 @@ class S(BaseHTTPRequestHandler):
 				a,b = i.split(":")
 				d[a] = int(b)
 
-			self.send_basket(basket,d)
+			self.send_basket(basket,d,risk)
 
 
 		elif "Command" in stream_data:
@@ -200,14 +202,14 @@ class S(BaseHTTPRequestHandler):
 					# data["symbol1_statistics"]
 					# data["symbol2_statistics"]
 
-	def send_basket(self,basket_name,orders):
+	def send_basket(self,basket_name,orders,risk):
 
 		global pipec
 		#print("sending",msg,pipec)
 
-		print("sending:",basket_name,orders)
+		print("sending:",basket_name,orders,risk)
 
-		pipec.send(["basket",basket_name,orders])
+		pipec.send(["basket",basket_name,orders,risk])
 	def send_cmd(self,msg):
 
 		global pipec
@@ -328,3 +330,11 @@ def httpserver(pipex):
 
 #Algo_id=TEST1,Trade_type=Single,Algo_name=TEST,Entry_type=MarketLong,Symbol=SPY.AM,Support=413,Resistance=414,Side=Long,Risk=5.0,Deploy=T,Management=HoldXSecond,
 #Algo_id=TEST1,Trade_type=Single,Algo_name=TEST,Entry_type=MarketShort,Symbol=SPY.AM,Support=413,Resistance=414,Side=Short,Risk=5.0,Deploy=T,Management=HoldXSecond,
+
+
+# stream_data="Basket=koko,Risk=10,Order={SPY.AM:0,QQQ.NQ:0}"
+
+# basket = find_between(stream_data,"Basket=",",")
+# infos = find_between(stream_data,"Order={","}")
+# risk = find_between(stream_data,"Risk=",",")
+# print(basket,infos,risk)

@@ -15,7 +15,7 @@ class TradingPlan_Basket:
 
 	#symbols:Symbols,risk=None
 
-	def __init__(self,algo_name="",Manager=None):
+	def __init__(self,algo_name="",risk=5,Manager=None):
 
 		self.algo_name = algo_name
 
@@ -66,7 +66,7 @@ class TradingPlan_Basket:
 
 		self.bool_labels= [AUTORANGE,AUTOMANAGE,RELOAD,SELECTED,ANCART_OVERRIDE,USING_STOP]
 
-		self.init_data()
+		self.init_data(risk)
 
 		#self.mark_algo_status(DEPLOYED)
 
@@ -184,7 +184,7 @@ class TradingPlan_Basket:
 
 		self.update_symbol_tkvar()
 
-	def init_data(self):
+	def init_data(self,risk):
 
 
 		for i in self.numeric_labels:
@@ -207,8 +207,8 @@ class TradingPlan_Basket:
 		self.tkvars[SELECTED].set(False)
 		self.tkvars[RELOAD].set(False)
 
-		self.data[ESTRISK] = 0
-		self.tkvars[ESTRISK].set(0)
+		self.data[ESTRISK] = risk
+		self.tkvars[ESTRISK].set(risk)
 		self.tkvars[RISK_RATIO].set(str(0)+"/"+str(self.data[ESTRISK]))
 
 		self.data[STATUS] = PENDING

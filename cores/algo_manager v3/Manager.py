@@ -482,18 +482,18 @@ class Manager:
 			log_print("writing record failure for",tradingplan.symbol_name)
 
 
-	def apply_basket_cmd(self,basket_name,data):
+	def apply_basket_cmd(self,basket_name,orders,risk):
 
 
 		if basket_name not in self.baskets:
 
 			if self.ui.basket_label_count<10:
-				self.baskets[basket_name] = TradingPlan_Basket(basket_name,self)
+				self.baskets[basket_name] = TradingPlan_Basket(basket_name,risk,self)
 				self.ui.create_new_single_entry(self.baskets[basket_name],"Basket",None)
 
 				self.baskets[basket_name].deploy(0)
 				
-		for symbol,value in data.items():
+		for symbol,value in orders.items():
 
 			print("processing",symbol,value)
 			if symbol not in self.symbol_data:
@@ -983,7 +983,7 @@ class Manager:
 					#d[1]   => basket name 
 					#d[2]   => share info. 
 
-					self.apply_basket_cmd(d[1],d[2])
+					self.apply_basket_cmd(d[1],d[2],d[3])
 
 				except Exception as e:
 

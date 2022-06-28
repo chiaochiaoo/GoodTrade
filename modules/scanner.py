@@ -199,6 +199,11 @@ class scanner(pannel):
 	def update_TNVscanner(self,df):
 		self.TNVscanner.update_entry(df)
 
+
+	def http_order_TNVscanner(self,df):
+
+		self.TNVscanner.http_order(df)
+
 	def add_symbols(self):
 
 

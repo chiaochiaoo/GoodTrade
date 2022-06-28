@@ -138,8 +138,6 @@ class util_client:
 			self.util_request.send(["Database Request",symbol])
 
 
-
-
 	def receive_request(self):
 
 		#self.util_request.send("HELLO!")
@@ -174,6 +172,13 @@ class util_client:
 							self.pannel.update_TNVscanner(d[1])
 						except Exception as e:
 							print("Error updating Nasdaq:",e)
+
+					elif d[0]=="http":
+
+						try:
+							self.pannel.http_order_TNVscanner(d[1])
+						except Exception as e:
+							print("Error updating HTTP:",e)
 
 					elif d[0] =="Database Response":
 
@@ -225,6 +230,9 @@ class util_client:
 							self.symbol_data_manager.algo_socket.set("Socket:True")
 						else:
 							self.symbol_data_manager.algo_socket.set("Socket:False")
+
+
+					
 
 					else:
 						print("unkown server package:",d)
@@ -386,7 +394,6 @@ def util_comms(ulti_response): #connects to server for db, nt, and finviz.
 
 		HOST = '10.29.10.133'  # The server's hostname or IP address
 		PORT = 65424       # The port used by the server
-
 
 		print("Trying to connect to the Util server")
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

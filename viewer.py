@@ -50,6 +50,8 @@ from modules.ppro_process_manager import *
 from cores.algo_manager_comms import *
 from cores.algo_process_manager_client import *
 
+from modules.TNV_http import *
+
 class viewer:
 
 	def __init__(self,root,util_process,ppro_process,algo_comm,authen_comm,util_request):
@@ -412,6 +414,10 @@ def utils(algo_manager_receive_comm,util_response):
 
 		db = threading.Thread(target=database_service,args=(util_response,),daemon=True)
 		db.start()
+
+		http = threading.Thread(target=httpserver,args=(util_response,),daemon=True)
+		http.start()
+
 
 		util_comms(util_response) #for nasdaq trader 
 

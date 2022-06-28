@@ -4,6 +4,8 @@ import threading
 import pandas as pd
 import time
 from datetime import datetime
+
+import requests
 #from pannel import *
 #from modules.pannel import *
 
@@ -61,10 +63,8 @@ class TNV_Scanner():
 		self.NT_stat = ttk.Label(self.root, text="Last update: ")
 		self.NT_stat.place(x=10, y=10, height=25, width=260)	
 
-
 		self.current_ts = 0
 		if data!=None:
-
 
 			self.socket = Label(self.root,textvariable=self.data.algo_socket,background="red",height=1,width=12)
 			self.connection =Label(self.root,textvariable=self.data.algo_manager_connected,background="red",height=1,width=14)
@@ -84,8 +84,8 @@ class TNV_Scanner():
 
 
 		self.today_frame = tk.Canvas(self.TNV_TAB)
-		self.TNV_TAB.add(self.today_frame, text ='TICK Algo')
-		self.today_trade = Tick_Algo(self.today_frame,self)
+		self.TNV_TAB.add(self.today_frame, text ='Custom Algo')
+		self.custom_algo = Custom_Algo(self.today_frame,self)
 
 		self.or_frame = tk.Canvas(self.TNV_TAB)
 		self.TNV_TAB.add(self.or_frame, text ='Open Reversal')
@@ -171,6 +171,10 @@ class TNV_Scanner():
 
 		pass 
 
+
+	def http_order(self,data):
+
+		self.custom_algo.http_order(data)
 
 	def update_entry(self,data):
 
@@ -1209,7 +1213,7 @@ class TodayTrade():
 
 
 
-class Tick_Algo():
+class Custom_Algo():
 
 	def __init__(self,root,TNV_scanner):
 
@@ -1235,20 +1239,20 @@ class Tick_Algo():
 		# 	self.b.configure(highlightbackground="#d9d9d9")
 		# 	self.b.configure(highlightcolor="black")
 		# 	self.b.grid(row=self.l, column=i)
-
 		# self.l+=1
+
 		self.algo_frame = ttk.LabelFrame(self.root,text="Algo setup")
 		self.algo_frame.place(x=0, rely=0, relheight=0.1, relwidth=1)
-		
 
 
-		self.algos = ttk.LabelFrame(self.root,text="TICK Algos")
+		self.algos = ttk.LabelFrame(self.root,text="Custom Algos")
 		self.algos.place(x=0, rely=0.101, relheight=0.85, relwidth=1)
 
 		self.tick_opening = tk.BooleanVar(value=0)
 		self.tick_intraday_v1 = tk.BooleanVar(value=0)
 		self.tick_intraday_v2 = tk.BooleanVar(value=0)
 
+		self.corey_deip_buy = tk.BooleanVar(value=0)
 
 		self.algo_pannel()
 
@@ -1285,6 +1289,13 @@ class Tick_Algo():
 
 		ttk.Label(self.algos, text="TICK Intraday V2:").grid(sticky="w",column=col,row=row)
 		ttk.Checkbutton(self.algos, variable=self.tick_intraday_v2).grid(sticky="w",column=col+1,row=row)
+
+
+
+		row +=1
+
+		ttk.Label(self.algos, text="Corey Dip Buy:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.algos, variable=self.corey_deip_buy).grid(sticky="w",column=col+1,row=row)
 		# for k in range(0,30):
 
 		# 	self.entries.append([])
@@ -1303,7 +1314,28 @@ class Tick_Algo():
 		# 		# 	self.b.grid_remove()
 		# 	self.l+=1
 
+	def http_order(self,data):
 
+		#print("RECEVING:",data)
+
+		if "Basket" in data:
+
+			## PARSE IT AND RE PARSE IT. ? ADD RISK TO IT. 
+
+
+			risk = int(self.algo_risk.get())
+
+			data += ","+"Risk="+str(risk)+","
+
+			
+
+			msg = "http://localhost:4441/"	
+
+			msg +=data
+
+			print("Sending:",msg)
+
+			requests.get(msg)
 
 if __name__ == '__main__':
 
