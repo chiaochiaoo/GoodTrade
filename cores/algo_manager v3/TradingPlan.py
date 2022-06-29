@@ -588,7 +588,7 @@ class TradingPlan:
 			
 
 
-	def rejection_handling(self):
+	def rejection_handling(self,symbol):
 
 
 		### if have position, ignore. ###
