@@ -464,7 +464,7 @@ class Symbol:
 
 		log_print(self.ticker,"order:",order_process,"delayed:",ts > self.passive_request_ts + DELAY)
 
-		if True and ts > self.passive_request_ts + DELAY:
+		if order_process and ts > self.passive_request_ts + DELAY:
 
 
 
