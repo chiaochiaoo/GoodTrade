@@ -446,7 +446,7 @@ class Manager:
 
 			symbols = list(self.symbol_data.values())
 			for val in symbols:
-				log_print("inspecting:",val.ticker,"request:",val.get_management_request())
+				#log_print("inspecting:",val.ticker,"request:",val.get_management_request())
 				if val.get_management_request()==True and val.get_market_making()==False:
 
 					val.symbol_inspection()
