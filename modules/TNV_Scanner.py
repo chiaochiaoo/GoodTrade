@@ -1312,7 +1312,7 @@ class Custom_Algo():
 		row +=1
 
 		ttk.Label(self.algos, text="Corey Dip Buy:").grid(sticky="w",column=col,row=row)
-		ttk.Checkbutton(self.algos, variable=self.corey_deip_buy).grid(sticky="w",column=col+1,row=row)
+		ttk.Checkbutton(self.algos, variable=self.corey1).grid(sticky="w",column=col+1,row=row)
 
 
 		row +=1
