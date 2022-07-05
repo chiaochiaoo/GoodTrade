@@ -45,6 +45,15 @@ def ts_to_min(ts):
 
 	return str(m)+":"+str(s)
 
+def find_between(data, first, last):
+	try:
+		start = data.index(first) + len(first)
+		end = data.index(last, start)
+		return data[start:end]
+	except ValueError:
+		return data
+
+
 class TNV_Scanner():
 
 	def __init__(self,root,NT,commlink,data):
@@ -1252,7 +1261,15 @@ class Custom_Algo():
 		self.tick_intraday_v1 = tk.BooleanVar(value=0)
 		self.tick_intraday_v2 = tk.BooleanVar(value=0)
 
-		self.corey_deip_buy = tk.BooleanVar(value=0)
+		self.corey1 = tk.BooleanVar(value=0)
+
+
+		self.bax1 = tk.BooleanVar(value=0)
+		self.bax2 = tk.BooleanVar(value=0)
+		self.bax3 = tk.BooleanVar(value=0)
+		self.bax4 = tk.BooleanVar(value=0)
+		self.bax5 = tk.BooleanVar(value=0)
+
 
 		self.algo_pannel()
 
@@ -1296,7 +1313,32 @@ class Custom_Algo():
 
 		ttk.Label(self.algos, text="Corey Dip Buy:").grid(sticky="w",column=col,row=row)
 		ttk.Checkbutton(self.algos, variable=self.corey_deip_buy).grid(sticky="w",column=col+1,row=row)
-		# for k in range(0,30):
+
+
+		row +=1
+
+		ttk.Label(self.algos, text="BAX1:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.algos, variable=self.bax1).grid(sticky="w",column=col+1,row=row)
+
+		row +=1
+
+		ttk.Label(self.algos, text="BAX2:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.algos, variable=self.bax2).grid(sticky="w",column=col+1,row=row)
+
+		row +=1
+
+		ttk.Label(self.algos, text="BAX3:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.algos, variable=self.bax3).grid(sticky="w",column=col+1,row=row)
+
+		row +=1
+
+		ttk.Label(self.algos, text="BAX4:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.algos, variable=self.bax4).grid(sticky="w",column=col+1,row=row)
+
+		row +=1
+
+		ttk.Label(self.algos, text="BAX5:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.algos, variable=self.bax5).grid(sticky="w",column=col+1,row=row)		# for k in range(0,30):
 
 		# 	self.entries.append([])
 
@@ -1322,22 +1364,37 @@ class Custom_Algo():
 
 			## PARSE IT AND RE PARSE IT. ? ADD RISK TO IT. 
 
+			name = find_between(stream_data, "Basket=", ",")
 
-			risk = int(self.algo_risk.get())
+			confimed = False 
 
-			data += ","+"Risk="+str(risk)+","
+			if name == "BAX1" and self.bax1.get()==True:
+				confimed = True
+			elif name =="BAX2" and self.bax2.get()==True:
+				confimed = True
+			elif name =="BAX3" and self.bax2.get()==True:
+				confimed = True
+			elif name =="BAX4" and self.bax2.get()==True:
+				confimed = True
+			elif name =="BAX5" and self.bax2.get()==True:
+				confimed = True
+			elif name =="COREY1" and self.corey1.get()==True:
+				confimed = True
 
-			
+			if confirmed:
 
-			msg = "http://localhost:4441/"	
+				risk = int(self.algo_risk.get())
+				data += ","+"Risk="+str(risk)+","
+				msg = "http://localhost:4441/"	
+				msg +=data
+				print("Sending:",msg)
 
-			msg +=data
+				requests.get(msg)
+				reg1 = threading.Thread(target=request_post,args=(msg,), daemon=True)
+				reg1.start()
 
-			print("Sending:",msg)
 
-			requests.get(msg)
-			reg1 = threading.Thread(target=request_post,args=(msg,), daemon=True)
-			reg1.start()
+
 
 def request_post(body):
 
