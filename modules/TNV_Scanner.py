@@ -1263,6 +1263,10 @@ class Custom_Algo():
 
 		self.corey1 = tk.BooleanVar(value=0)
 		self.corey1_multiplier = tk.IntVar(value=1)
+		self.corey2 = tk.BooleanVar(value=0)
+		self.corey2_multiplier = tk.IntVar(value=1)
+		self.corey3 = tk.BooleanVar(value=0)
+		self.corey3_multiplier = tk.IntVar(value=1)
 
 
 		self.bax1 = tk.BooleanVar(value=0)
@@ -1316,6 +1320,21 @@ class Custom_Algo():
 		ttk.Checkbutton(self.algos, variable=self.corey1).grid(sticky="w",column=col+1,row=row)
 
 		ttk.Entry(self.algos, textvariable=self.corey1_multiplier).grid(sticky="w",column=col+2,row=row)
+
+		row +=1
+
+		ttk.Label(self.algos, text="Corey algo 2 :").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.algos, variable=self.corey2).grid(sticky="w",column=col+1,row=row)
+
+		ttk.Entry(self.algos, textvariable=self.corey2_multiplier).grid(sticky="w",column=col+2,row=row)
+
+
+		row +=1
+
+		ttk.Label(self.algos, text="Corey algo 3:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.algos, variable=self.corey3).grid(sticky="w",column=col+1,row=row)
+
+		ttk.Entry(self.algos, textvariable=self.corey3_multiplier).grid(sticky="w",column=col+2,row=row)
 
 		row +=1
 
@@ -1382,7 +1401,7 @@ class Custom_Algo():
 
 		return data
 
-		
+
 	def http_order(self,data):
 
 		#print("RECEVING:",data)
@@ -1409,7 +1428,15 @@ class Custom_Algo():
 				confimed = True
 
 				data = self.corey_multiplier(data)
-				## the order numbers get multiplied. 
+			elif name =="COREY2" and self.corey1.get()==True:
+				confimed = True
+
+				data = self.corey_multiplier(data)
+			elif name =="COREY3" and self.corey1.get()==True:
+				confimed = True
+
+				data = self.corey_multiplier(data)
+
 
 			if confimed:
 
