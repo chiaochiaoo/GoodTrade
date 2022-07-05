@@ -1262,6 +1262,7 @@ class Custom_Algo():
 		self.tick_intraday_v2 = tk.BooleanVar(value=0)
 
 		self.corey1 = tk.BooleanVar(value=0)
+		self.corey1_multiplier = tk.IntVar(value=1)
 
 
 		self.bax1 = tk.BooleanVar(value=0)
@@ -1314,6 +1315,7 @@ class Custom_Algo():
 		ttk.Label(self.algos, text="Corey Dip Buy:").grid(sticky="w",column=col,row=row)
 		ttk.Checkbutton(self.algos, variable=self.corey1).grid(sticky="w",column=col+1,row=row)
 
+		ttk.Entry(self.algos, textvariable=self.corey1_multiplier).grid(sticky="w",column=col+2,row=row)
 
 		row +=1
 
@@ -1364,7 +1366,7 @@ class Custom_Algo():
 
 			## PARSE IT AND RE PARSE IT. ? ADD RISK TO IT. 
 
-			name = find_between(stream_data, "Basket=", ",")
+			name = find_between(data, "Basket=", ",")
 
 			confimed = False 
 
@@ -1381,7 +1383,7 @@ class Custom_Algo():
 			elif name =="COREY1" and self.corey1.get()==True:
 				confimed = True
 
-			if confirmed:
+			if confimed:
 
 				risk = int(self.algo_risk.get())
 				data += ","+"Risk="+str(risk)+","
