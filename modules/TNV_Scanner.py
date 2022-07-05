@@ -1358,6 +1358,31 @@ class Custom_Algo():
 		# 		# 	self.b.grid_remove()
 		# 	self.l+=1
 
+	def corey_multiplier(self,data):
+
+
+		basket = find_between(data,"Basket=",",") 
+		symbol = find_between(data,"Order=*","*") 
+
+		new_order = "Order=*"
+
+		z = 0 
+		for i in symbol.split(","):
+			if z>=1:
+				new_order+=","
+			k = i.split(":")
+			new_order+= k[0]
+			new_order+= ":"+str(int(k[1])*self.corey1_multiplier.get())
+			z+=1
+
+		new_order+="*"
+
+
+		data = "Basket="+basket+","+new_order
+
+		return data
+
+		
 	def http_order(self,data):
 
 		#print("RECEVING:",data)
@@ -1382,6 +1407,9 @@ class Custom_Algo():
 				confimed = True
 			elif name =="COREY1" and self.corey1.get()==True:
 				confimed = True
+
+				data = self.corey_multiplier(data)
+				## the order numbers get multiplied. 
 
 			if confimed:
 
