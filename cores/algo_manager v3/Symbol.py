@@ -452,17 +452,20 @@ class Symbol:
 			action = PASSIVEBUY
 			price = self.get_bid()
 			coefficient = -1
-			if price >= self.passive_price+0.01 or self.passive_price==0:
+			if (price >= self.passive_price+0.01) or (self.passive_price==0) or (price<= self.passive_price-0.02):
 				order_process = True
 
 		else:
 			action = PASSIVESELL
 			price = self.get_ask()
 			coefficient = 1
-			if price <= self.passive_price -0.01 or self.passive_price==0:
+			if price <= self.passive_price -0.01 or (price>= self.passive_price+0.02) or (self.passive_price==0) :
 				order_process = True
 
-		log_print(self.ticker,"order:",order_process,"delayed:",ts > self.passive_request_ts + DELAY)
+			if ts > self.passive_request_ts + 15:
+				order_process = True
+
+		log_print(self.ticker,"order:",price,order_process,"delayed:",ts > self.passive_request_ts + DELAY)
 
 		if order_process and ts > self.passive_request_ts + DELAY:
 

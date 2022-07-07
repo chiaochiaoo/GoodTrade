@@ -1254,12 +1254,17 @@ class Custom_Algo():
 		self.algo_frame.place(x=0, rely=0, relheight=0.1, relwidth=1)
 
 
-		self.algos = ttk.LabelFrame(self.root,text="Custom Algos")
+		self.algos = ttk.LabelFrame(self.root,text="Custom Algos / Risk multiplier")
 		self.algos.place(x=0, rely=0.101, relheight=0.85, relwidth=1)
 
 		self.tick_opening = tk.BooleanVar(value=0)
 		self.tick_intraday_v1 = tk.BooleanVar(value=0)
 		self.tick_intraday_v2 = tk.BooleanVar(value=0)
+
+
+		self.market_long = tk.BooleanVar(value=0)
+		self.market_short = tk.BooleanVar(value=0)
+
 
 		self.corey1 = tk.BooleanVar(value=0)
 		self.corey1_multiplier = tk.IntVar(value=1)
@@ -1285,7 +1290,7 @@ class Custom_Algo():
 		ttk.Label(self.algo_frame, text="Algo:").grid(sticky="w",column=col,row=row)
 		ttk.Checkbutton(self.algo_frame, variable=self.algo_activate).grid(sticky="w",column=col+1,row=row)
 
-		ttk.Label(self.algo_frame, text="Risk:").grid(sticky="w",column=col+2,row=row)
+		ttk.Label(self.algo_frame, text="Basket Total Risk:").grid(sticky="w",column=col+2,row=row)
 		ttk.Entry(self.algo_frame, textvariable=self.algo_risk).grid(sticky="w",column=col+3,row=row)
 
 
@@ -1297,19 +1302,24 @@ class Custom_Algo():
 
 		row +=1
 
-		ttk.Label(self.algos, text="TICK Opening:").grid(sticky="w",column=col,row=row)
-		ttk.Checkbutton(self.algos, variable=self.tick_opening).grid(sticky="w",column=col+1,row=row)
+		ttk.Label(self.algos, text="Market Long:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.algos, variable=self.market_long).grid(sticky="w",column=col+1,row=row)
 
 
 		row +=1
 
-		ttk.Label(self.algos, text="TICK Intraday V1:").grid(sticky="w",column=col,row=row)
-		ttk.Checkbutton(self.algos, variable=self.tick_intraday_v1).grid(sticky="w",column=col+1,row=row)
+		ttk.Label(self.algos, text="Market Short:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.algos, variable=self.market_short).grid(sticky="w",column=col+1,row=row)
 
 
 		row +=1
 
-		ttk.Label(self.algos, text="TICK Intraday V2:").grid(sticky="w",column=col,row=row)
+		ttk.Label(self.algos, text="TICK Long:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.algos, variable=self.tick_intraday_v2).grid(sticky="w",column=col+1,row=row)
+
+		row +=1
+
+		ttk.Label(self.algos, text="TICK Short:").grid(sticky="w",column=col,row=row)
 		ttk.Checkbutton(self.algos, variable=self.tick_intraday_v2).grid(sticky="w",column=col+1,row=row)
 
 
@@ -1414,7 +1424,12 @@ class Custom_Algo():
 
 			confimed = False 
 
-			if name == "BAX1" and self.bax1.get()==True:
+
+			if name =="MarketLong" and self.market_long.get()==True:
+				confimed = True
+			elif name =="MarketShort" and self.market_short.get()==True:
+				confimed = True
+			elif name == "BAX1" and self.bax1.get()==True:
 				confimed = True
 			elif name =="BAX2" and self.bax2.get()==True:
 				confimed = True
