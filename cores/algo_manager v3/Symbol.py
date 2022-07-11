@@ -420,7 +420,7 @@ class Symbol:
 
 
 			## whatever it is now. it is none of my business.
-			if len(self.incoming_shares)>1:
+			if len(self.incoming_shares)>=1:
 				log_print("discarding:",self.incoming_shares)
 				self.incoming_shares = {}
 
