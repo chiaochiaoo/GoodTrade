@@ -111,8 +111,48 @@ class Custom_Algo():
 		self.bax4 = tk.BooleanVar(value=0)
 		self.bax5 = tk.BooleanVar(value=0)
 
-
+		self.market_timing_algos_pannel()
 		self.algo_pannel()
+
+
+	def market_timing_algos_pannel(self):
+
+		row = 0
+		col = 0
+
+		self.market_timing_per_risk = tk.IntVar(value=1)
+		self.market_timing_total_risk =tk.IntVar(value=1)
+
+		ttk.Label(self.market_timing_algos, text="Risk Per Trade:").grid(sticky="w",column=col+0,row=row)
+		ttk.Entry(self.market_timing_algos, textvariable=self.algo_risk).grid(sticky="w",column=col+1,row=row)
+
+		row +=1
+
+		ttk.Label(self.market_timing_algos, text="Stategy Total Risk:").grid(sticky="w",column=col+0,row=row)
+		ttk.Entry(self.market_timing_algos, textvariable=self.algo_risk).grid(sticky="w",column=col+1,row=row)
+
+		col +=2
+		row = 0
+		ttk.Label(self.market_timing_algos, text="Market Long Timing:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.market_timing_algos, variable=self.market_long).grid(sticky="w",column=col+1,row=row)
+
+		col +=2
+
+		ttk.Label(self.market_timing_algos, text="Market Short Timing:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.market_timing_algos, variable=self.market_short).grid(sticky="w",column=col+1,row=row)
+
+		row+=1
+		col -=2
+
+		ttk.Label(self.market_timing_algos, text="TICK Long:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.market_timing_algos, variable=self.tick_intraday_v2).grid(sticky="w",column=col+1,row=row)
+
+		col +=2
+
+		ttk.Label(self.market_timing_algos, text="TICK Short:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.market_timing_algos, variable=self.tick_intraday_v2).grid(sticky="w",column=col+1,row=row)
+
+
 
 	def algo_pannel(self):
 
@@ -129,30 +169,6 @@ class Custom_Algo():
 
 		# ttk.Label(self.algo_frame, text="Toggle All:").grid(sticky="w",column=col,row=row)
 		# ttk.Checkbutton(self.algo_frame, variable=self.tick_opening).grid(sticky="w",column=col+1,row=row)
-
-
-		row +=1
-
-		ttk.Label(self.market_timing_algos, text="Market Long:").grid(sticky="w",column=col,row=row)
-		ttk.Checkbutton(self.market_timing_algos, variable=self.market_long).grid(sticky="w",column=col+1,row=row)
-
-
-		row +=1
-
-		ttk.Label(self.market_timing_algos, text="Market Short:").grid(sticky="w",column=col,row=row)
-		ttk.Checkbutton(self.market_timing_algos, variable=self.market_short).grid(sticky="w",column=col+1,row=row)
-
-
-		row +=1
-
-		ttk.Label(self.market_timing_algos, text="TICK Long:").grid(sticky="w",column=col,row=row)
-		ttk.Checkbutton(self.market_timing_algos, variable=self.tick_intraday_v2).grid(sticky="w",column=col+1,row=row)
-
-		row +=1
-
-		ttk.Label(self.market_timing_algos, text="TICK Short:").grid(sticky="w",column=col,row=row)
-		ttk.Checkbutton(self.market_timing_algos, variable=self.tick_intraday_v2).grid(sticky="w",column=col+1,row=row)
-
 
 
 		row +=1
