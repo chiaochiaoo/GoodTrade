@@ -539,7 +539,7 @@ class RelativeStrength():
 			type_.append([])
 
 			for i in range(len(self.labels)): #Rows
-				self.b = tk.Label(frame, text=" ",width=self.labels_width[i])#,command=self.rank
+				self.b = tk.Label(frame, text=" -",width=self.labels_width[i])#,command=self.rank
 				self.b.grid(row=self.l, column=i)
 				type_[k].append(self.b)
 			self.l+=1
