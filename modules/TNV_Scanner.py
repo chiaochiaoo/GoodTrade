@@ -155,13 +155,13 @@ class TNV_Scanner():
 		self.tfm = TFM(self.TFM_frame,self)
 
 
-		rs = pd.read_csv("current.csv",index_col=0)
+		# rs = pd.read_csv("current.csv",index_col=0)
 
-		rs.loc[rs["oh"]==0,"k"] = rs["ol"]*-1
-		rs.loc[rs["ol"]==0,"k"] = rs["oh"]
+		# rs.loc[rs["oh"]==0,"k"] = rs["ol"]*-1
+		# rs.loc[rs["ol"]==0,"k"] = rs["oh"]
 
-		rs=rs.sort_values(by="k",ascending=True)
-		self.rrst.update_entry(rs)
+		# rs=rs.sort_values(by="k",ascending=True)
+		# self.rrst.update_entry(rs)
 
 		# while True:
 		# 	receiver = threading.Thread(target=self.update_entry,args=([filtered_df,"09:31"],),daemon=True)
