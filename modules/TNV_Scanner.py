@@ -595,7 +595,7 @@ class RelativeStrength():
 
 
 		entry = 0
-		
+
 		for index, row in df[:20].iterrows():
 			#print(row)
 			rank = index
@@ -617,14 +617,12 @@ class RelativeStrength():
 				lst = [rank,sec,relv,near,so,sc,listed]
 
 				for i in range(len(lst)):
-					print(i)
 					self.weak_entries[entry][i]["text"] = lst[i]
 				entry+=1
 				if entry ==20:
 					break
 
 		while entry<20:
-			#print("ok")
 			for i in range(self.total_len):
 				self.weak_entries[entry][i]["text"] = ""
 			entry+=1
