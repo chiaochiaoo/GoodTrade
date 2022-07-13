@@ -28,7 +28,7 @@ def Ppro_in(port,pipe):
 
 	now = datetime.now()
 	ts = now.hour*60+now.minute 
-
+	last_ts = 0
 	l1data = {}
 
 	UDP_IP = "localhost"
@@ -78,7 +78,9 @@ def Ppro_in(port,pipe):
 				ts = cur_ts 
 				ppro_conn = threading.Thread(target=ppro_connection_service,args=(pipe,port), daemon=True)
 				ppro_conn.start()
-
+			if cur_ts !=last_ts:
+				log_print("PPRO message updating normal,",cur_ts)
+				last_ts = cur_ts
 			if type_ == "OrderStatus":
 				decode_order(stream_data,pipe)
 			elif type_ =="L1":
