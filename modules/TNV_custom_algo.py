@@ -124,12 +124,12 @@ class Custom_Algo():
 		self.market_timing_total_risk =tk.IntVar(value=1)
 
 		ttk.Label(self.market_timing_algos, text="Risk Per Trade:").grid(sticky="w",column=col+0,row=row)
-		ttk.Entry(self.market_timing_algos, textvariable=self.algo_risk).grid(sticky="w",column=col+1,row=row)
+		ttk.Entry(self.market_timing_algos, textvariable=self.market_timing_per_risk).grid(sticky="w",column=col+1,row=row)
 
 		row +=1
 
 		ttk.Label(self.market_timing_algos, text="Stategy Total Risk:").grid(sticky="w",column=col+0,row=row)
-		ttk.Entry(self.market_timing_algos, textvariable=self.algo_risk).grid(sticky="w",column=col+1,row=row)
+		ttk.Entry(self.market_timing_algos, textvariable=self.market_timing_total_risk).grid(sticky="w",column=col+1,row=row)
 
 		col +=2
 		row = 0
@@ -161,8 +161,8 @@ class Custom_Algo():
 		ttk.Label(self.algo_frame, text="Algo:").grid(sticky="w",column=col,row=row)
 		ttk.Checkbutton(self.algo_frame, variable=self.algo_activate).grid(sticky="w",column=col+1,row=row)
 
-		ttk.Label(self.algo_frame, text="Default Basket Total Risk:").grid(sticky="w",column=col+2,row=row)
-		ttk.Entry(self.algo_frame, textvariable=self.algo_risk).grid(sticky="w",column=col+3,row=row)
+		# ttk.Label(self.algo_frame, text="Default Basket Total Risk:").grid(sticky="w",column=col+2,row=row)
+		# ttk.Entry(self.algo_frame, textvariable=self.algo_risk).grid(sticky="w",column=col+3,row=row)
 
 
 		# row +=1

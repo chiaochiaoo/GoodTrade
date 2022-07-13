@@ -1120,7 +1120,8 @@ class Manager:
 				side = data["side"]
 
 				try:
-					self.symbol_data[symbol].rejection_message(side)
+					if symbol in self.symbol_data:
+						self.symbol_data[symbol].rejection_message(side)
 				except Exception as e:
 					PrintException(e,"Order rejection error")
 				# if symbol in self.tradingplan:
