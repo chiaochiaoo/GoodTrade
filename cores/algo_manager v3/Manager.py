@@ -456,7 +456,7 @@ class Manager:
 
 					# stage 3, handle imbalance request (just use market orders now.)
 
-			time.sleep(3)
+			time.sleep(5)
 
 	def new_record(self,tradingplan):
 
