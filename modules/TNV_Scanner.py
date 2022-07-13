@@ -155,13 +155,21 @@ class TNV_Scanner():
 		self.tfm = TFM(self.TFM_frame,self)
 
 
+		rs = pd.read_csv("current.csv",index_col=0)
+
+		rs.loc[rs["oh"]==0,"k"] = rs["ol"]*-1
+		rs.loc[rs["ol"]==0,"k"] = rs["oh"]
+
+		rs=rs.sort_values(by="k",ascending=True)
+		self.rrst.update_entry(rs)
+
 		# while True:
 		# 	receiver = threading.Thread(target=self.update_entry,args=([filtered_df,"09:31"],),daemon=True)
 		# 	receiver.start()
 		# 	time.sleep(2)
 		# 	print("New!")
 
-		# filtered_df = pd.read_csv("current.csv",index_col=0)
+		# filtered_df = 
 
 		# self.update_entry([filtered_df,"09:31"])
 		#self.update_entry()
@@ -312,7 +320,6 @@ class TNV_Scanner():
 			rs.loc[rs["ol"]==0,"k"] = rs["oh"]
 
 			rs=rs.sort_values(by="k",ascending=True)
-
 
 			self.pmb.update_entry(pb)
 
@@ -586,6 +593,9 @@ class RelativeStrength():
 				self.strong_entries[entry][i]["text"] = ""
 			entry+=1
 
+
+		entry = 0
+		
 		for index, row in df[:20].iterrows():
 			#print(row)
 			rank = index
@@ -607,6 +617,7 @@ class RelativeStrength():
 				lst = [rank,sec,relv,near,so,sc,listed]
 
 				for i in range(len(lst)):
+					print(i)
 					self.weak_entries[entry][i]["text"] = lst[i]
 				entry+=1
 				if entry ==20:
