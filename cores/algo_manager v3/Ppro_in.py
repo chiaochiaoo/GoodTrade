@@ -5,7 +5,7 @@ import threading
 from constant import *
 from Util_functions import *
 import csv
-
+from datetime import datetime
 
 def open_file():
 
@@ -26,6 +26,8 @@ def save_file(f):
 
 def Ppro_in(port,pipe):
 
+	now = datetime.now()
+	ts = now.hour*60+now.minute 
 
 	l1data = {}
 
@@ -69,6 +71,13 @@ def Ppro_in(port,pipe):
 				#pipe.send(["msg","algo_ppro msg receive. all functional."])
 			work=True
 			type_ = find_between(stream_data, "Message=", ",")
+
+			now = datetime.now()
+			cur_ts = now.hour*60+now.minute 
+			if cur_ts - ts >= 30:
+				ts = cur_ts 
+				ppro_conn = threading.Thread(target=ppro_connection_service,args=(pipe,port), daemon=True)
+				ppro_conn.start()
 
 			if type_ == "OrderStatus":
 				decode_order(stream_data,pipe)
