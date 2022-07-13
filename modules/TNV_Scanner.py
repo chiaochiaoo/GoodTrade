@@ -68,6 +68,7 @@ class TNV_Scanner():
 		self.algo_commlink = commlink
 
 		self.data = data
+
 		#self.NT_update_time = tk.StringVar(value='Last updated')
 		#self.NT_update_time.set('Last updated')
 
@@ -138,6 +139,10 @@ class TNV_Scanner():
 		# self.trending_frame = tk.Canvas(self.TNV_TAB)
 		# self.TNV_TAB.add(self.trending_frame, text ='Trending')
 		# self.trending = ADX(self.trending_frame,NT,self)
+
+		self.rrst_frame = tk.Canvas(self.TNV_TAB)
+		self.TNV_TAB.add(self.rrst_frame, text ='Rel.Strength')
+		self.rrst = RelativeStrength(self.rrst_frame,NT)
 
 		#Spread 
 		self.spread_frame = tk.Canvas(self.TNV_TAB)
@@ -301,6 +306,14 @@ class TNV_Scanner():
 			# else:
 			# 	self.pmb.update_entry2(pb)
 
+			rs = filtered_df.copy()
+
+			rs.loc[rs["oh"]==0,"k"] = rs["ol"]*-1
+			rs.loc[rs["ol"]==0,"k"] = rs["oh"]
+
+			rs=rs.sort_values(by="k",ascending=True)
+
+
 			self.pmb.update_entry(pb)
 
 			self.spread.update_entry(pair_df)
@@ -311,6 +324,7 @@ class TNV_Scanner():
 			self.ol.update_entry(ol)
 			self.rrvol.update_entry(rrvol)
 
+			self.rrst.update_entry(rs)
 			#print("package at TNVscanner fully processed,",timestamp)
 		else:
 			print("receiving old package.")
@@ -457,6 +471,156 @@ class RRvol():
 				entry+=1
 		# except Exception as e:
 		# 	print("TNV scanner construction near high:",e)
+
+class RelativeStrength():
+	def __init__(self,root,NT):
+
+		self.buttons = []
+		self.strong_entries = []
+		self.weak_entries = []
+
+		self.l = 1
+		self.labels_width = [9,6,5,8,5,5,6,6,6,6,6,6,8,6]
+		self.NT = NT
+		self.labels = ["Symbol","Sector","RR.Vol","Rg.Score","SO%","SC%","listed","Add"]
+		#[rank,sec,relv,near,high,so,sc]
+		self.total_len = len(self.labels)
+		self.root = root
+
+		self.strength = ttk.LabelFrame(root,text="Strength") 
+		self.strength.place(relx=0.01,rely=0,relheight=0.47,relwidth=1)
+
+		self.weakness = ttk.LabelFrame(root,text="Weakness") 
+		self.weakness.place(relx=0.01,rely=0.5,relheight=0.47,relwidth=1)
+
+		self.recreate_labels(self.strength,self.strong_entries)
+		self.recreate_labels(self.weakness,self.weak_entries)
+
+	def recreate_labels(self,frame,type_):
+
+		self.labels_position = {}
+		self.labels_position["Rank"]=0
+		self.labels_position["Symbol"]=1
+		self.labels_position["Market"]=2
+		self.labels_position["Price"]=3
+		self.labels_position["Since"]=4
+		self.labels_position["Been"]=5
+		self.labels_position["SC%"]=6
+		self.labels_position["SO%"]=7
+		self.labels_position["L5R%"]=8
+		self.labels_position["Status"]=9
+		self.labels_position["Add"]=10
+
+		self.market_sort = [0,1,2]#{'NQ':0,'NY':1,'AM':2}
+
+		self.status_code = {}
+		self.status_num = 0
+
+		for i in range(len(self.labels)): #Rows
+			self.b = tk.Button(frame, text=self.labels[i],width=self.labels_width[i])#,command=self.rank
+			self.b.configure(activebackground="#f9f9f9")
+			self.b.configure(activeforeground="black")
+			self.b.configure(background="#d9d9d9")
+			self.b.configure(disabledforeground="#a3a3a3")
+			self.b.configure(relief="ridge")
+			self.b.configure(foreground="#000000")
+			self.b.configure(highlightbackground="#d9d9d9")
+			self.b.configure(highlightcolor="black")
+			self.b.grid(row=self.l, column=i)
+			self.buttons.append(self.b)
+
+		self.l+=1
+		self.create_entry(frame,type_)
+
+	def create_entry(self,frame,type_):
+
+		for k in range(0,10):
+
+			type_.append([])
+
+			for i in range(len(self.labels)): #Rows
+				self.b = tk.Label(frame, text=" ",width=self.labels_width[i])#,command=self.rank
+				self.b.grid(row=self.l, column=i)
+				type_[k].append(self.b)
+			self.l+=1
+
+
+	def update_entry(self,data):
+
+
+		df = data
+
+		#df.to_csv("tttt.csv")
+		entry = 0
+
+
+		for index, row in df[:20].iterrows():
+			#print(row)
+			rank = index
+			sec = row['sector']
+			relv = row['rrvol']
+			near = row['rangescore']
+
+			so = row['SO']
+			sc = row['SC']
+
+			############ add since, and been to the thing #############
+			if rank in self.NT.nasdaq_trader_symbols_ranking:
+				listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
+			else:
+				listed = "No"
+			#print(self.NT.nasdaq_trader_symbols)
+			if 1: #score>0:	
+
+				lst = [rank,sec,relv,near,so,sc,listed]
+
+				for i in range(len(lst)):
+					self.strong_entries[entry][i]["text"] = lst[i]
+				entry+=1
+				if entry ==20:
+					break
+
+		while entry<20:
+			#print("ok")
+			for i in range(self.total_len):
+				self.strong_entries[entry][i]["text"] = ""
+			entry+=1
+
+		for index, row in df[-20:].iterrows():
+			#print(row)
+			rank = index
+			sec = row['sector']
+			relv = row['rrvol']
+			near = row['rangescore']
+
+			so = row['SO']
+			sc = row['SC']
+
+			############ add since, and been to the thing #############
+			if rank in self.NT.nasdaq_trader_symbols_ranking:
+				listed = str(self.NT.nasdaq_trader_symbols_ranking[rank])
+			else:
+				listed = "No"
+			#print(self.NT.nasdaq_trader_symbols)
+			if 1: #score>0:	
+
+				lst = [rank,sec,relv,near,so,sc,listed]
+
+				for i in range(len(lst)):
+					self.weak_entriesa[entry][i]["text"] = lst[i]
+				entry+=1
+				if entry ==20:
+					break
+
+		while entry<20:
+			#print("ok")
+			for i in range(self.total_len):
+				self.weak_entriesa[entry][i]["text"] = ""
+			entry+=1
+		# except Exception as e:
+		# 	print("TNV scanner construction near high:",e)
+
+
 
 class Open_Reversal(StandardScanner):
 	def __init__(self,root,NT,tnv):
