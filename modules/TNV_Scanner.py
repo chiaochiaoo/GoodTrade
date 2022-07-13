@@ -607,7 +607,7 @@ class RelativeStrength():
 				lst = [rank,sec,relv,near,so,sc,listed]
 
 				for i in range(len(lst)):
-					self.weak_entriesa[entry][i]["text"] = lst[i]
+					self.weak_entries[entry][i]["text"] = lst[i]
 				entry+=1
 				if entry ==20:
 					break
@@ -615,7 +615,7 @@ class RelativeStrength():
 		while entry<20:
 			#print("ok")
 			for i in range(self.total_len):
-				self.weak_entriesa[entry][i]["text"] = ""
+				self.weak_entries[entry][i]["text"] = ""
 			entry+=1
 		# except Exception as e:
 		# 	print("TNV scanner construction near high:",e)
