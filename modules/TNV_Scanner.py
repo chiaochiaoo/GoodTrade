@@ -491,7 +491,7 @@ class RelativeStrength():
 		self.strength.place(relx=0.01,rely=0,relheight=0.47,relwidth=1)
 
 		self.weakness = ttk.LabelFrame(root,text="Weakness") 
-		self.weakness.place(relx=0.01,rely=0.5,relheight=0.47,relwidth=1)
+		self.weakness.place(relx=0.01,rely=0.47,relheight=0.47,relwidth=1)
 
 		self.recreate_labels(self.strength,self.strong_entries)
 		self.recreate_labels(self.weakness,self.weak_entries)
@@ -534,7 +534,7 @@ class RelativeStrength():
 
 	def create_entry(self,frame,type_):
 
-		for k in range(0,10):
+		for k in range(0,22):
 
 			type_.append([])
 
@@ -554,7 +554,7 @@ class RelativeStrength():
 		entry = 0
 
 
-		for index, row in df[:20].iterrows():
+		for index, row in df[-20:].iterrows():
 			#print(row)
 			rank = index
 			sec = row['sector']
@@ -586,7 +586,7 @@ class RelativeStrength():
 				self.strong_entries[entry][i]["text"] = ""
 			entry+=1
 
-		for index, row in df[-20:].iterrows():
+		for index, row in df[:20].iterrows():
 			#print(row)
 			rank = index
 			sec = row['sector']
