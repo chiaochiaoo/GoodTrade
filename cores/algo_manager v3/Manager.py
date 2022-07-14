@@ -439,8 +439,6 @@ class Manager:
 	def shares_allocation(self):
 
 		#fro each of the symbols. look at imbalance. deal with it. 
-		
-		self.x = now.hour*3600+now.minute*60+now.second  + X
 
 		ts = 0
 
@@ -714,7 +712,7 @@ class Manager:
 						self.tradingplan[algo_id].deploy(9600)
 				else:
 					log_print("System at full capacity.")
-					
+
 					# find_ = False
 					# replace_id = 0
 					# for trade in list(self.tradingplan.values()):
