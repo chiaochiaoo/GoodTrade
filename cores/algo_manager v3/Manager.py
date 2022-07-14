@@ -336,8 +336,7 @@ class Manager:
 
 		self.symbols = []
 
-		
-
+	
 		self.algo_ids = []
 
 		self.symbol_data = {}
@@ -443,10 +442,13 @@ class Manager:
 
 		while True:
 			#create a cpy.
-
+			register = 0
 			symbols = list(self.symbol_data.values())
 			for val in symbols:
 				#log_print("inspecting:",val.ticker,"request:",val.get_management_request())
+				
+				if val.get_register()==True:
+					register+=1
 				if val.get_management_request()==True and val.get_market_making()==False:
 
 					val.symbol_inspection()
@@ -455,7 +457,7 @@ class Manager:
 					# stage 2, granted request from the incoming book
 
 					# stage 3, handle imbalance request (just use market orders now.)
-
+				log_print("Registeriing ,",register,"total",len(symbols))
 			time.sleep(5)
 
 	def new_record(self,tradingplan):

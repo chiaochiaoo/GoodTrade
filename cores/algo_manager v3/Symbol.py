@@ -37,6 +37,8 @@ class Symbol:
 		self.init_open = False
 		self.init_high_low = False
 
+		self.registered = False
+
 		self.ppro_out = pproout
 
 		self.numeric_labels = [TRADE_TIMESTAMP,TIMESTAMP,BID,ASK,RESISTENCE,SUPPORT,OPEN,HIGH,LOW,PREMARKETHIGH,PREMARKETLOW,STOP,EXIT,ENTRY,CUSTOM]
@@ -98,6 +100,7 @@ class Symbol:
 
 		self.init_data(support,resistence,stats)
 		self.ppro_out.send([REGISTER,self.ticker])
+		self.registered = True
 
 	def register_tradingplan(self,name,tradingplan):
 
@@ -111,6 +114,9 @@ class Symbol:
 			self.tradingplans[name] = tradingplan
 			log_print(name,"registered at",self.ticker)
 
+			self.registered = True
+			self.ppro_out.send([REGISTER,self.ticker])
+
 	def deregister_tradingplan(self,name,tradingplans):
 
 		#del self.incoming_request[name]
@@ -121,6 +127,10 @@ class Symbol:
 
 		if len(self.tradingplans)==0:
 			self.ppro_out.send([DEREGISTER,self.ticker])
+			self.registered = False
+
+	def get_register(self):
+		return self.registered
 
 	def expecting_marketorder(self):
 		self.expecting_market_order = True
