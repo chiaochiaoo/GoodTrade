@@ -1037,9 +1037,9 @@ class Manager:
 
 						for symbol in self.symbols:
 							self.pipe_ppro_out.send(["Register",symbol])
-						self.pipe_ppro_out.send(["Register","TQQQ.NQ"])
+
 						self.pipe_ppro_out.send(["Register","QQQ.NQ"])
-						# re-register the symbols
+
 				except Exception as e:
 					PrintException(e,"PPRO IN ERROR")
 
@@ -1056,7 +1056,7 @@ class Manager:
 					PrintException(e,"PPRO OUT ERROR")
 
 			elif d[0] =="msg":
-				log_print(d[1])
+				log_print("msg:",d[1])
 
 			elif d[0] =="order confirm":
 

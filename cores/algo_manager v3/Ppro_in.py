@@ -51,44 +51,50 @@ def Ppro_in(port,pipe):
 	pipe.send(["msg","algo_ppro working"])
 	write_count = 0
 	sock.settimeout(5)
+
+
 	while True:
-		rec= False
-		#print("restart")
+
 		try:
-			data, addr = sock.recvfrom(1024)
-			#print(data)
-			rec = True
+			rec= False
+			#print("restart")
+			try:
+				data, addr = sock.recvfrom(1024)
+				#print(data)
+				rec = True
+			except Exception as e:
+				log_print(e)
+				# IF I don't hear things for 5 seconds. it would result in a timed out. ok. good.
+				work = False
+				pipe.send(["ppro_in","Disconnected"])
+
+			if rec:
+				stream_data = str(data)
+				if work==False:
+					pipe.send(["ppro_in","Connected"])
+					#pipe.send(["msg","algo_ppro msg receive. all functional."])
+				work=True
+				type_ = find_between(stream_data, "Message=", ",")
+
+				now = datetime.now()
+				cur_ts = now.hour*60+now.minute 
+				if cur_ts - ts >= 30:
+					ts = cur_ts 
+					ppro_conn = threading.Thread(target=ppro_connection_service,args=(pipe,port), daemon=True)
+					ppro_conn.start()
+				if cur_ts !=last_ts:
+					log_print("PPRO message updating normal,",cur_ts)
+					last_ts = cur_ts
+				if type_ == "OrderStatus":
+					decode_order(stream_data,pipe)
+				elif type_ =="L1":
+					decode_l1(stream_data,pipe,writer,l1data)
+					count+=1
+					if count %1000 ==0:
+						save_file(f)
+						f,writer = open_file()
 		except Exception as e:
-			log_print(e)
-			#register_order_listener(port)
-			work = False
-			pipe.send(["ppro_in","Disconnected"])
-
-		if rec:
-			stream_data = str(data)
-			if work==False:
-				pipe.send(["ppro_in","Connected"])
-				#pipe.send(["msg","algo_ppro msg receive. all functional."])
-			work=True
-			type_ = find_between(stream_data, "Message=", ",")
-
-			now = datetime.now()
-			cur_ts = now.hour*60+now.minute 
-			if cur_ts - ts >= 30:
-				ts = cur_ts 
-				ppro_conn = threading.Thread(target=ppro_connection_service,args=(pipe,port), daemon=True)
-				ppro_conn.start()
-			if cur_ts !=last_ts:
-				log_print("PPRO message updating normal,",cur_ts)
-				last_ts = cur_ts
-			if type_ == "OrderStatus":
-				decode_order(stream_data,pipe)
-			elif type_ =="L1":
-				decode_l1(stream_data,pipe,writer,l1data)
-				count+=1
-				if count %1000 ==0:
-					save_file(f)
-					f,writer = open_file()
+			PrintException(e,"PPRO IN error")
 	f.close()
 	
 def ppro_connection_service(pipe,port):
