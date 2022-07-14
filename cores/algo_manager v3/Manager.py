@@ -439,11 +439,18 @@ class Manager:
 	def shares_allocation(self):
 
 		#fro each of the symbols. look at imbalance. deal with it. 
+		
+		self.x = now.hour*3600+now.minute*60+now.second  + X
+
+		ts = 0
 
 		while True:
 			#create a cpy.
 			register = 0
 			symbols = list(self.symbol_data.values())
+			
+
+
 			for val in symbols:
 				#log_print("inspecting:",val.ticker,"request:",val.get_management_request())
 				
@@ -457,7 +464,13 @@ class Manager:
 					# stage 2, granted request from the incoming book
 
 					# stage 3, handle imbalance request (just use market orders now.)
-				log_print("Registeriing ,",register,"total",len(symbols))
+
+				now = datetime.now()
+				cur_ts = now.hour*60+now.minute 
+				
+				if cur_ts!= ts:
+					log_print("Registeriing ,",register,"total",len(symbols))
+					ts = cur_ts
 			time.sleep(5)
 
 	def new_record(self,tradingplan):
