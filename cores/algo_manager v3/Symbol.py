@@ -18,6 +18,9 @@ def pair_off_test(a,b):
 	return sign_test(a,b) and abs_test(a,b)
 
 
+
+### I NEED TO TRACK HOW MANY SYMBOLS IT IS RUNNING SIMULTANEOUSLY. ###
+
 class Symbol:
 
 	#Symbol class tracks every data related to the symbol. Output it in a dictionary form.
