@@ -466,9 +466,9 @@ class Manager:
 				now = datetime.now()
 				cur_ts = now.hour*60+now.minute 
 
-				#if cur_ts!= ts:#
-				log_print("Registeriing ,",register,"total",len(symbols)," ts",cur_ts)
-				ts = cur_ts
+				if cur_ts!= ts:#
+					og_print("Registeriing ,",register,"total",len(symbols)," ts",cur_ts)
+					ts = cur_ts
 			time.sleep(5)
 
 	def new_record(self,tradingplan):
