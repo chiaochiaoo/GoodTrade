@@ -467,7 +467,7 @@ class Manager:
 				cur_ts = now.hour*60+now.minute 
 
 				if cur_ts!= ts:#
-					og_print("Registeriing ,",register,"total",len(symbols)," ts",cur_ts)
+					log_print("Registeriing ,",register,"total",len(symbols)," ts",cur_ts)
 					ts = cur_ts
 			time.sleep(5)
 
