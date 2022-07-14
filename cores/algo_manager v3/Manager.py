@@ -713,38 +713,39 @@ class Manager:
 					if status == True:
 						self.tradingplan[algo_id].deploy(9600)
 				else:
+					log_print("System at full capacity.")
+					
+					# find_ = False
+					# replace_id = 0
+					# for trade in list(self.tradingplan.values()):
 
-					find_ = False
-					replace_id = 0
-					for trade in list(self.tradingplan.values()):
+					# 	if (trade.tkvars[STATUS].get()==PENDING or trade.tkvars[STATUS].get()==DONE) and trade.pair_plan==False and trade.in_use ==False:
 
-						if (trade.tkvars[STATUS].get()==PENDING or trade.tkvars[STATUS].get()==DONE) and trade.pair_plan==False and trade.in_use ==False:
-
-							trade.tkvars[STATUS].set("EVICTED")
-							replace_id = trade.algo_ui_id
-							trade.deactive()
-							find_ = True
-							log_print("Replacing",trade.symbol_name,"replace_id")
-							break 
+					# 		trade.tkvars[STATUS].set("EVICTED")
+					# 		replace_id = trade.algo_ui_id
+					# 		trade.deactive()
+					# 		find_ = True
+					# 		log_print("Replacing",trade.symbol_name,"replace_id")
+					# 		break 
 
 
-					if find_:
-						# get rid off that tradingplan. 
-						if symbol not in self.symbol_data:
-							self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats,self.pipe_ppro_out)  #register in Symbol.
-							self.symbols.append(symbol)
+					# if find_:
+					# 	# get rid off that tradingplan. 
+					# 	if symbol not in self.symbol_data:
+					# 		self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats,self.pipe_ppro_out)  #register in Symbol.
+					# 		self.symbols.append(symbol)
 
-						#######################################################################
+					# 	#######################################################################
 
-						self.tradingplan[algo_id] = TradingPlan(name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
-						#self.tradingplan[symbol]=TradingPlan(name,self.symbol_data[symbol],entryplan,INSTANT,mana,risk,0,TEST_MODE,algo_name,self)
-						self.ui.create_new_single_entry(self.tradingplan[algo_id],type_name,replace_id)
-						#self.ui.create_single_entry(self.tradingplan[symbol],replace_id)
+					# 	self.tradingplan[algo_id] = TradingPlan(name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
+					# 	#self.tradingplan[symbol]=TradingPlan(name,self.symbol_data[symbol],entryplan,INSTANT,mana,risk,0,TEST_MODE,algo_name,self)
+					# 	self.ui.create_new_single_entry(self.tradingplan[algo_id],type_name,replace_id)
+					# 	#self.ui.create_single_entry(self.tradingplan[symbol],replace_id)
 
-						if status == True:
-							self.tradingplan[algo_id].deploy(9600)
-					else:
-						log_print("System at full capacity.")
+					# 	if status == True:
+					# 		self.tradingplan[algo_id].deploy(9600)
+					# else:
+					# 	log_print("System at full capacity.")
 
 
 	def timer(self):
