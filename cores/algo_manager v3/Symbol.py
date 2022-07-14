@@ -88,7 +88,7 @@ class Symbol:
 
 		#self.incoming_request = {}
 
-		self.tradingplan_lock = threading.Lock()
+		#self.tradingplan_lock = threading.Lock()
 		self.tradingplans = {}
 		#self.tradingplan_holdings = {}
 
@@ -102,18 +102,22 @@ class Symbol:
 		#self.tradingplan_holdings[name] = 0
 
 		if self.get_market_making()==False:
-			with self.tradingplan_lock:
-				self.tradingplans[name] = tradingplan
 
+			#with self.tradingplan_lock:
+
+			self.tradingplans[name] = tradingplan
 			log_print(name,"registered at",self.ticker)
 
 	def deregister_tradingplan(self,name,tradingplans):
 
 		#del self.incoming_request[name]
-		with self.tradingplan_lock:
-			del self.tradingplans[name]
+		#with self.tradingplan_lock:
+		del self.tradingplans[name]
+		
+		log_print("name","deleted",self.ticker,"remaning TP:",len(self.tradingplans))
 
-		log_print("name","deleted",self.ticker)
+		if len(self.tradingplans)==0:
+			self.ppro_out.send([DEREGISTER,self.ticker])
 
 	def expecting_marketorder(self):
 		self.expecting_market_order = True

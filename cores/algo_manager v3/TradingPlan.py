@@ -543,9 +543,11 @@ class TradingPlan:
 
 			self.manager.new_record(self)
 
+			log_print(self.symbol_name,"Trade completed."," this trade:",self.data[REALIZED]," total:",self.data[TOTAL_REALIZED])
+			
 			self.clear_trade()
 
-			log_print(self.symbol_name,"Trade completed."," this trade:",self.data[REALIZED]," total:",self.data[TOTAL_REALIZED])
+			
 
 	def clear_trade(self):
 
