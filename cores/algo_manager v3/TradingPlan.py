@@ -201,6 +201,7 @@ class TradingPlan:
 
 			if shares*self.current_shares<0 and abs(shares)>abs(self.current_shares):
 				self.submit_expected_shares(0)
+				self.no_more_orders=True
 				flatten= True
 				#if immediately. just go flatten then. 
 			else:
@@ -208,9 +209,9 @@ class TradingPlan:
 				self.expected_shares = self.current_shares + shares
 				self.current_request = self.expected_shares - self.current_shares
 
-				if self.expect_orders==0:
+				if self.expected_shares==0:
 					self.no_more_orders=True
-
+					log_print(self.symbol_name, "going flat. No more orders")
 			if not immediately:
 				self.notify_request()
 			else:
