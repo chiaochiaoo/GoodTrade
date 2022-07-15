@@ -1035,6 +1035,9 @@ class Manager:
 
 						self.pipe_ppro_out.send(["Register","QQQ.NQ"])
 
+
+					log_print("PPRO In status update:",d[1])
+
 				except Exception as e:
 					PrintException(e,"PPRO IN ERROR")
 
