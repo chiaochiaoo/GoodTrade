@@ -77,66 +77,66 @@ class Tester:
 
 
 
-		# dic = {}
+		dic = {}
 
-		# dic["algo_id"] = 'TEST1'
-		# dic["type_name"] = 'Single'
-		# dic["algo_name"] = 'TEST'
-		# dic["entry_type"] = BREAKUP    #INSTANTLONG
-		# dic["symbol"] ='SPY.AM'
-		# dic["support"] =412
-		# dic["resistence"] =414
-		# dic["risk"] =50.0
-		# #dic["statistics"] ={'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441,"expected_momentum":2}
-		# dic["immediate_deployment"] = True
-		# dic["management"] = ONETOTWORISKREWARD  #HOLDXSECOND
-
-
-		# s=""
-		# for key,item in dic.items():
-		# 	s+=key+":"+str(item)
-
-		# print(s)
-
-		# self.gt.send(["pkg",[dic]])
-
-		# dic = {}
-
-		# dic["algo_id"] = 'TEST2'
-		# dic["type_name"] = 'Single'
-		# dic["algo_name"] = 'TEST'
-		# dic["entry_type"] = BREAKDOWN#INSTANTSHORT
-		# dic["symbol"] ='SPY.AM'
-		# dic["support"] =412
-		# dic["resistence"] =414
-		# dic["risk"] =50.0
-		# dic["statistics"] ={'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441,"expected_momentum":2}
-		# dic["immediate_deployment"] = False
-		# dic["management"] = ONETOTWORISKREWARD
+		dic["algo_id"] = 'TEST1'
+		dic["type_name"] = 'Single'
+		dic["algo_name"] = 'TEST'
+		dic["entry_type"] = BREAKUP    #INSTANTLONG
+		dic["symbol"] ='SPY.AM'
+		dic["support"] =412
+		dic["resistence"] =414
+		dic["risk"] =50.0
+		#dic["statistics"] ={'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441,"expected_momentum":2}
+		dic["immediate_deployment"] = True
+		dic["management"] = ONETOTWORISKREWARD  #HOLDXSECOND
 
 
-		# self.gt.send(["pkg",[dic]])
+		s=""
+		for key,item in dic.items():
+			s+=key+":"+str(item)
 
+		print(s)
 
+		self.gt.send(["pkg",[dic]])
 
 		dic = {}
 
-		dic["algo_id"] = 'PairTest'
-		dic["type_name"] = 'Pair'
+		dic["algo_id"] = 'TEST2'
+		dic["type_name"] = 'Single'
 		dic["algo_name"] = 'TEST'
-		dic["symbol1"] ='SPY.AM'
-		dic["symbol2"] ='QQQ.NQ'
-		dic["ratio"] =(1,-1)
-		dic["share"] =20
+		dic["entry_type"] = BREAKDOWN#INSTANTSHORT
+		dic["symbol"] ='SPY.AM'
+		dic["support"] =412
+		dic["resistence"] =414
 		dic["risk"] =50.0
-		dic["sigma"] = 0.01
-		dic["symbol1_statistics"] ={}
-		dic["symbol2_statistics"] = {}
-		dic["management"] = MARKETMAKING#MARKETMAKING
-
+		dic["statistics"] ={'ATR': 3.69, 'OHavg': 1.574, 'OHstd': 1.545, 'OLavg': 1.634, 'OLstd': 1.441,"expected_momentum":2}
+		dic["immediate_deployment"] = False
+		dic["management"] = ONETOTWORISKREWARD
 
 
 		self.gt.send(["pkg",[dic]])
+
+
+
+		# dic = {}
+
+		# dic["algo_id"] = 'PairTest'
+		# dic["type_name"] = 'Pair'
+		# dic["algo_name"] = 'TEST'
+		# dic["symbol1"] ='SPY.AM'
+		# dic["symbol2"] ='QQQ.NQ'
+		# dic["ratio"] =(1,-1)
+		# dic["share"] =20
+		# dic["risk"] =50.0
+		# dic["sigma"] = 0.01
+		# dic["symbol1_statistics"] ={}
+		# dic["symbol2_statistics"] = {}
+		# dic["management"] = MARKETMAKING#MARKETMAKING
+
+
+
+		# self.gt.send(["pkg",[dic]])
 
 
 		time.sleep(1)

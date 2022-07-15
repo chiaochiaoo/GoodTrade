@@ -472,8 +472,8 @@ class UI(pannel):
 
 		row +=1 
 
-		self.flatten = ttk.Button(self.cmd, text="Weekly Report",command=graphweekly)
-		self.flatten.grid(sticky="w",column=1,row=row)
+		self.weekkk = ttk.Button(self.cmd, text="Weekly Report",command=graphweekly)
+		self.weekkk.grid(sticky="w",column=1,row=row)
 
 		self.algo_cancel = ttk.Button(self.cmd, text="Daily Report" ) #command=self.manager.import_algos
 		self.algo_cancel.grid(sticky="w",column=2,row=row)
@@ -502,7 +502,7 @@ class UI(pannel):
 
 
 		row+=1
-		ttk.Button(self.cmd, text="Flatten LONGS",command= lambda action=MINUS,percent=1:self.manager.trades_aggregation(LONG,action,percent,True,self.passive_aggregation)).grid(sticky="w",column=1,row=row)
+		ttk.Button(self.cmd, text="Flatten LONGS",command= lambda action=MINUS,percent=1:self.manager.trades_aggregation(LONG,action,percent,False,self.passive_aggregation)).grid(sticky="w",column=1,row=row)
 		ttk.Button(self.cmd, text="Flatten SHORTS",command= lambda action=MINUS,percent=1:self.manager.trades_aggregation(SHORT,action,percent,False,self.passive_aggregation)).grid(sticky="w",column=2,row=row)
 
 		row+=1

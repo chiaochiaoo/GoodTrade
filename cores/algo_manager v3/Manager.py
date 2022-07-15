@@ -446,8 +446,6 @@ class Manager:
 			#create a cpy.
 			register = 0
 			symbols = list(self.symbol_data.values())
-			
-
 
 			for val in symbols:
 				#log_print("inspecting:",val.ticker,"request:",val.get_management_request())
@@ -455,16 +453,13 @@ class Manager:
 				if val.get_register()==True:
 					register+=1
 				if val.get_management_request()==True and val.get_market_making()==False:
-
 					val.symbol_inspection()
 					# stage 1, cancel each other out in the request book
-
 					# stage 2, granted request from the incoming book
-
 					# stage 3, handle imbalance request (just use market orders now.)
 
-				now = datetime.now()
-				cur_ts = now.hour*60+now.minute 
+			now = datetime.now()
+			cur_ts = now.hour*60+now.minute 
 
 			if cur_ts!= ts:#
 				log_print("Registeriing ,",register,"total",len(symbols)," ts",cur_ts)
@@ -1217,36 +1212,40 @@ class Manager:
 			if d.in_use and d.data[STATUS]==RUNNING:
 				d.flatten_cmd()
 
+				
+	def threaded_trades_aggregation(self,side,action,percent,positive_pnl,passive):
+
+		log_print("All",side," ",action," ",percent*100,"%"," winning?",positive_pnl)
+		if side!=None:
+			self.cmd_text.set("Status: "+str(side)+" "+str(action)+" "+str(percent*100)+"%")
+		if positive_pnl:
+			self.cmd_text.set("Status: "+"Winning"+" "+str(action)+" "+str(percent*100)+"%")
+		for d in list(self.tradingplan.values()):
+			if d.in_use and d.data[STATUS]==RUNNING and d.get_management_start():
+				if positive_pnl==True:
+					if d.data[UNREAL] >0:
+						#print("CHEKCING UNREAL",d.data[UNREAL])
+						d.manage_trades(side,action,percent,passive)
+				else:
+
+					d.manage_trades(side,action,percent,passive)
+
 	def trades_aggregation(self,side,action,percent,positive_pnl,passive):
 
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second
-
-		passive = passive.get()
 		diff =  ts -self.manage_lock
 
 		if diff>2:
-
-			log_print("All",side," ",action," ",percent*100,"%"," winning?",positive_pnl)
-			if side!=None:
-				self.cmd_text.set("Status: "+str(side)+" "+str(action)+" "+str(percent*100)+"%")
-			if positive_pnl:
-				self.cmd_text.set("Status: "+"Winning"+" "+str(action)+" "+str(percent*100)+"%")
-			for d in list(self.tradingplan.values()):
-				if d.in_use and d.data[STATUS]==RUNNING and d.get_management_start():
-					if positive_pnl==True:
-						if d.data[UNREAL] >0:
-							#print("CHEKCING UNREAL",d.data[UNREAL])
-							d.manage_trades(side,action,percent,passive)
-					else:
-
-						d.manage_trades(side,action,percent,passive)
-
+			reg1 = threading.Thread(target=self.threaded_trades_aggregation,args=(side,action,percent,positive_pnl,passive,), daemon=True)
+			reg1.start()
 			self.manage_lock = ts
 		else:
-
 			log_print("Trades aggregation under cooldown:",diff)
 			self.cmd_text.set("Status: Under CoolDown:"+str(diff))
+
+
+
 	def cancel_all(self):
 		for d in list(self.tradingplan.values()):
 			d.cancel_algo()
