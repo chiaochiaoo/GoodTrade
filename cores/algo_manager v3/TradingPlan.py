@@ -45,6 +45,7 @@ class TradingPlan:
 		self.flatten_order = False
 		self.read_lock = threading.Lock()
 
+		self.no_more_orders = False
 
 		# First time its expected is fullfilled. shall the management starts.
 
@@ -191,27 +192,32 @@ class TradingPlan:
 	#internal use
 	def change_to_shares(self,shares,symbol=None,immediately=False):
 
-		log_print(self.symbol_name, "change to shares:",shares, "immediately:",immediately)
 
-		flatten = False
+		if self.no_more_orders==False:
+			log_print(self.symbol_name, "change to shares:",shares, "immediately:",immediately)
+			flatten = False
 
-		#rationality check. if greater and opposite of current shares. just set to 0.
+			#rationality check. if greater and opposite of current shares. just set to 0.
 
-		if shares*self.current_shares<0 and abs(shares)>abs(self.current_shares):
-			self.submit_expected_shares(0)
-			flatten= True
-			#if immediately. just go flatten then. 
-		else:
-			self.expected_shares += shares
-			self.current_request = self.expected_shares - self.current_shares
-
-		if not immediately:
-			self.notify_request()
-		else:
-			if flatten:
-				self.flatten_cmd()
+			if shares*self.current_shares<0 and abs(shares)>abs(self.current_shares):
+				self.submit_expected_shares(0)
+				flatten= True
+				#if immediately. just go flatten then. 
 			else:
-				self.notify_immediate_request(self.current_request)
+
+				self.expected_shares = self.current_shares + shares
+				self.current_request = self.expected_shares - self.current_shares
+
+				if self.expect_orders==0:
+					self.no_more_orders=True
+
+			if not immediately:
+				self.notify_request()
+			else:
+				if flatten:
+					self.flatten_cmd()
+				else:
+					self.notify_immediate_request(self.current_request)
 
 	def add_to_shares(self,shares):
 
@@ -659,6 +665,8 @@ class TradingPlan:
 			description = "Trades aggregation"
 
 			if pproaction!="":
+
+
 
 
 				if passive:
