@@ -83,10 +83,10 @@ class Custom_Algo():
 		self.basket_hedging_algos.place(x=0.01, rely=0.305, relheight=0.1, relwidth=0.99)
 
 		self.corey_algos = ttk.LabelFrame(self.root,text="Corey algos")
-		self.corey_algos.place(x=0.01, rely=0.405, relheight=0.1, relwidth=0.99)
+		self.corey_algos.place(x=0.01, rely=0.405, relheight=0.2, relwidth=0.99)
 
 		self.bax_algos = ttk.LabelFrame(self.root,text="Baxter algos")
-		self.bax_algos.place(x=0.01, rely=0.505, relheight=0.1, relwidth=0.99)
+		self.bax_algos.place(x=0.01, rely=0.605, relheight=0.1, relwidth=0.99)
 
 		self.tick_opening = tk.BooleanVar(value=0)
 		self.tick_intraday_v1 = tk.BooleanVar(value=0)
@@ -97,12 +97,34 @@ class Custom_Algo():
 		self.market_short = tk.BooleanVar(value=0)
 
 
-		self.corey1 = tk.BooleanVar(value=0)
-		self.corey1_multiplier = tk.IntVar(value=1)
-		self.corey2 = tk.BooleanVar(value=0)
-		self.corey2_multiplier = tk.IntVar(value=1)
-		self.corey3 = tk.BooleanVar(value=0)
-		self.corey3_multiplier = tk.IntVar(value=1)
+
+		self.corey_PUFTB = tk.BooleanVar(value=0)
+		self.corey_PUFTB_multiplier = tk.IntVar(value=1)
+
+		self.corey_MNQ = tk.BooleanVar(value=0)
+		self.corey_MNQ_multiplier = tk.IntVar(value=1)
+
+		self.corey_QTSTT = tk.BooleanVar(value=0)
+		self.corey_QTSTT_multiplier = tk.IntVar(value=1)
+
+		self.corey_STSTT = tk.BooleanVar(value=0)
+		self.corey_STSTT_multiplier = tk.IntVar(value=1)
+
+		self.corey_IWTSTT = tk.BooleanVar(value=0)
+		self.corey_IWTSTT_multiplier = tk.IntVar(value=1)
+
+		self.corey_OTS = tk.BooleanVar(value=0)
+		self.corey_OTS_multiplier = tk.IntVar(value=1)
+
+		self.corey_STS = tk.BooleanVar(value=0)
+		self.corey_STS_multiplier = tk.IntVar(value=1)
+
+		# self.corey1 = tk.BooleanVar(value=0)
+		# self.corey1_multiplier = tk.IntVar(value=1)
+		# self.corey2 = tk.BooleanVar(value=0)
+		# self.corey2_multiplier = tk.IntVar(value=1)
+		# self.corey3 = tk.BooleanVar(value=0)
+		# self.corey3_multiplier = tk.IntVar(value=1)
 
 
 		self.bax1 = tk.BooleanVar(value=0)
@@ -173,19 +195,66 @@ class Custom_Algo():
 
 		row +=1
 
-		ttk.Label(self.corey_algos, text="Corey algo 1:").grid(sticky="w",column=col,row=row)
-		ttk.Checkbutton(self.corey_algos, variable=self.corey1).grid(sticky="w",column=col+1,row=row)
+		ttk.Label(self.corey_algos, text="Corey PUFTB:").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.corey_algos, variable=self.corey_PUFTB).grid(sticky="w",column=col+1,row=row)
 
 		ttk.Label(self.corey_algos, text="Risk multiplier:").grid(sticky="w",column=col+2,row=row)
-		ttk.Entry(self.corey_algos, textvariable=self.corey1_multiplier).grid(sticky="w",column=col+3,row=row)
+		ttk.Entry(self.corey_algos, textvariable=self.corey_PUFTB_multiplier).grid(sticky="w",column=col+3,row=row)
 
 		row +=1
 
-		ttk.Label(self.corey_algos, text="Corey algo 2 :").grid(sticky="w",column=col,row=row)
-		ttk.Checkbutton(self.corey_algos, variable=self.corey2).grid(sticky="w",column=col+1,row=row)
+		ttk.Label(self.corey_algos, text="Corey MNQ :").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.corey_algos, variable=self.corey_MNQ).grid(sticky="w",column=col+1,row=row)
 
-		ttk.Entry(self.corey_algos, textvariable=self.corey2_multiplier).grid(sticky="w",column=col+3,row=row)
+		ttk.Entry(self.corey_algos, textvariable=self.corey_MNQ_multiplier).grid(sticky="w",column=col+3,row=row)
 		ttk.Label(self.corey_algos, text="Risk multiplier:").grid(sticky="w",column=col+2,row=row)
+
+
+		row +=1
+
+		ttk.Label(self.corey_algos, text="Corey QTSTT :").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.corey_algos, variable=self.corey_QTSTT).grid(sticky="w",column=col+1,row=row)
+
+		ttk.Entry(self.corey_algos, textvariable=self.corey_QTSTT_multiplier).grid(sticky="w",column=col+3,row=row)
+		ttk.Label(self.corey_algos, text="Risk multiplier:").grid(sticky="w",column=col+2,row=row)
+
+
+		row +=1
+
+		ttk.Label(self.corey_algos, text="Corey STSTT :").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.corey_algos, variable=self.corey_STSTT).grid(sticky="w",column=col+1,row=row)
+
+		ttk.Entry(self.corey_algos, textvariable=self.corey_STSTT_multiplier).grid(sticky="w",column=col+3,row=row)
+		ttk.Label(self.corey_algos, text="Risk multiplier:").grid(sticky="w",column=col+2,row=row)
+
+		row +=1
+
+		ttk.Label(self.corey_algos, text="Corey IWTSTT :").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.corey_algos, variable=self.corey_IWTSTT).grid(sticky="w",column=col+1,row=row)
+
+		ttk.Entry(self.corey_algos, textvariable=self.corey_IWTSTT_multiplier).grid(sticky="w",column=col+3,row=row)
+		ttk.Label(self.corey_algos, text="Risk multiplier:").grid(sticky="w",column=col+2,row=row)
+
+
+		row +=1
+
+		ttk.Label(self.corey_algos, text="Corey OTS :").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.corey_algos, variable=self.corey_OTS).grid(sticky="w",column=col+1,row=row)
+
+		ttk.Entry(self.corey_algos, textvariable=self.corey_OTS_multiplier).grid(sticky="w",column=col+3,row=row)
+		ttk.Label(self.corey_algos, text="Risk multiplier:").grid(sticky="w",column=col+2,row=row)
+
+
+		row +=1
+
+		ttk.Label(self.corey_algos, text="Corey STS :").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.corey_algos, variable=self.corey_STS).grid(sticky="w",column=col+1,row=row)
+
+		ttk.Entry(self.corey_algos, textvariable=self.corey_STS_multiplier).grid(sticky="w",column=col+3,row=row)
+		ttk.Label(self.corey_algos, text="Risk multiplier:").grid(sticky="w",column=col+2,row=row)
+
+
+
 
 
 		row +=1

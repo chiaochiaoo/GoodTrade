@@ -445,6 +445,10 @@ class Symbol:
 
 	def passive_orders(self):
 
+		# I NEED TO ADD A MECHANISM ON THIS
+		# If passive orders still don't full fill the request everything within some minutes
+		# Cancel all the requests. (or market in )
+
 		DELAY = 3
 
 		coefficient = 0.01
