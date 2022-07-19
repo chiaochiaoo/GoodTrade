@@ -642,10 +642,10 @@ class Symbol:
 		else:
 
 			tp = self.tradingplans[tp]
-			if tp.get_holdings()>0:
-				self.ppro_out.send([IOCSELL,self.ticker,abs(tp.get_holdings()),self.get_bid()])
+			if tp.get_holdings(self.ticker)>0:
+				self.ppro_out.send([IOCSELL,self.ticker,abs(tp.get_holdings(self.ticker)),self.get_bid()])
 			else:
-				self.ppro_out.send([IOCBUY,self.ticker,abs(tp.get_holdings()),self.get_ask()])
+				self.ppro_out.send([IOCBUY,self.ticker,abs(tp.get_holdings(self.ticker)),self.get_ask()])
 		#else get out the corresponding shares. 
 
 	def update_techindicators(self,dic):
