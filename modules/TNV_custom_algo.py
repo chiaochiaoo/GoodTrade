@@ -325,26 +325,23 @@ class Custom_Algo():
 
 		new_order+="*"
 
-
 		data = "Basket="+basket+","+new_order
 
 		risk__ = risk.get()
 		data += ","+"Risk="+str(risk__)+","
-
 
 		return data
 
 
 	def http_order(self,data):
 
-		#print("RECEVING:",data)
+		print("RECEVING:",data)
 
 		if "Basket" in data:
 
 			## PARSE IT AND RE PARSE IT. ? ADD RISK TO IT. 
 
 			name = find_between(data, "Basket=", ",")
-
 			confimed = False 
 
 			if name =="MarketLong" and self.market_long.get()==True:
@@ -398,7 +395,7 @@ class Custom_Algo():
 				# risk = int(self.algo_risk.get())
 				# data += ","+"Risk="+str(risk)+","
 				msg = "http://localhost:4441/"	
-				msg +=data
+				msg += data
 				print("Sending:",msg)
 
 				requests.get(msg)
