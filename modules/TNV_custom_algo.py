@@ -82,10 +82,10 @@ class Custom_Algo():
 		# self.basket_hedging_algos.place(x=0.01, rely=0.305, relheight=0.1, relwidth=0.99)
 
 		self.corey_algos = ttk.LabelFrame(self.root,text="Corey algos")
-		self.corey_algos.place(x=0.01, rely=0.405, relheight=0.2, relwidth=0.99)
+		self.corey_algos.place(x=0.01, rely=0.205, relheight=0.2, relwidth=0.99)
 
 		self.bax_algos = ttk.LabelFrame(self.root,text="Baxter algos")
-		self.bax_algos.place(x=0.01, rely=0.605, relheight=0.1, relwidth=0.99)
+		self.bax_algos.place(x=0.01, rely=0.405, relheight=0.1, relwidth=0.99)
 
 		self.tick_opening = tk.BooleanVar(value=0)
 		self.tick_intraday_v1 = tk.BooleanVar(value=0)
@@ -96,27 +96,33 @@ class Custom_Algo():
 		self.market_short = tk.BooleanVar(value=0)
 
 
-
 		self.corey_PUFTB = tk.BooleanVar(value=0)
 		self.corey_PUFTB_multiplier = tk.IntVar(value=1)
+		self.corey_PUFTB_risk = tk.IntVar(value=50)
 
 		self.corey_MNQ = tk.BooleanVar(value=0)
 		self.corey_MNQ_multiplier = tk.IntVar(value=1)
+		self.corey_MNQ_risk = tk.IntVar(value=50)
 
 		self.corey_QTSTT = tk.BooleanVar(value=0)
 		self.corey_QTSTT_multiplier = tk.IntVar(value=1)
+		self.corey_QTSTT_risk = tk.IntVar(value=50)
 
 		self.corey_STSTT = tk.BooleanVar(value=0)
 		self.corey_STSTT_multiplier = tk.IntVar(value=1)
+		self.corey_STSTT_risk = tk.IntVar(value=50)
 
 		self.corey_IWTSTT = tk.BooleanVar(value=0)
 		self.corey_IWTSTT_multiplier = tk.IntVar(value=1)
+		self.corey_IWTSTT_risk = tk.IntVar(value=50)
 
 		self.corey_OTS = tk.BooleanVar(value=0)
 		self.corey_OTS_multiplier = tk.IntVar(value=1)
+		self.corey_OTS_risk = tk.IntVar(value=50)
 
 		self.corey_STS = tk.BooleanVar(value=0)
 		self.corey_STS_multiplier = tk.IntVar(value=1)
+		self.corey_STS_risk = tk.IntVar(value=50)
 
 		self.bax1 = tk.BooleanVar(value=0)
 		self.bax2 = tk.BooleanVar(value=0)
@@ -174,14 +180,6 @@ class Custom_Algo():
 		ttk.Label(self.algo_frame, text="Algo:").grid(sticky="w",column=col,row=row)
 		ttk.Checkbutton(self.algo_frame, variable=self.algo_activate).grid(sticky="w",column=col+1,row=row)
 
-		# ttk.Label(self.algo_frame, text="Default Basket Total Risk:").grid(sticky="w",column=col+2,row=row)
-		# ttk.Entry(self.algo_frame, textvariable=self.algo_risk).grid(sticky="w",column=col+3,row=row)
-
-
-		# row +=1
-
-		# ttk.Label(self.algo_frame, text="Toggle All:").grid(sticky="w",column=col,row=row)
-		# ttk.Checkbutton(self.algo_frame, variable=self.tick_opening).grid(sticky="w",column=col+1,row=row)
 
 
 		row +=1
@@ -189,16 +187,22 @@ class Custom_Algo():
 		ttk.Label(self.corey_algos, text="Corey PUFTB:").grid(sticky="w",column=col,row=row)
 		ttk.Checkbutton(self.corey_algos, variable=self.corey_PUFTB).grid(sticky="w",column=col+1,row=row)
 
-		ttk.Label(self.corey_algos, text="Risk multiplier:").grid(sticky="w",column=col+2,row=row)
-		ttk.Entry(self.corey_algos, textvariable=self.corey_PUFTB_multiplier).grid(sticky="w",column=col+3,row=row)
+		ttk.Label(self.corey_algos, text="Share multiplier:").grid(sticky="w",column=col+4,row=row)
+		ttk.Entry(self.corey_algos, textvariable=self.corey_PUFTB_multiplier).grid(sticky="w",column=col+5,row=row)
+
+		ttk.Label(self.corey_algos, text="Strategy Risk:").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(self.corey_algos, textvariable=self.corey_PUFTB_risk).grid(sticky="w",column=col+3,row=row)
 
 		row +=1
 
 		ttk.Label(self.corey_algos, text="Corey MNQ :").grid(sticky="w",column=col,row=row)
 		ttk.Checkbutton(self.corey_algos, variable=self.corey_MNQ).grid(sticky="w",column=col+1,row=row)
 
-		ttk.Entry(self.corey_algos, textvariable=self.corey_MNQ_multiplier).grid(sticky="w",column=col+3,row=row)
-		ttk.Label(self.corey_algos, text="Risk multiplier:").grid(sticky="w",column=col+2,row=row)
+		ttk.Label(self.corey_algos, text="Share multiplier:").grid(sticky="w",column=col+4,row=row)
+		ttk.Entry(self.corey_algos, textvariable=self.corey_MNQ_multiplier).grid(sticky="w",column=col+5,row=row)
+
+		ttk.Label(self.corey_algos, text="Strategy Risk:").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(self.corey_algos, textvariable=self.corey_MNQ_risk).grid(sticky="w",column=col+3,row=row)
 
 
 		row +=1
@@ -206,8 +210,11 @@ class Custom_Algo():
 		ttk.Label(self.corey_algos, text="Corey QTSTT :").grid(sticky="w",column=col,row=row)
 		ttk.Checkbutton(self.corey_algos, variable=self.corey_QTSTT).grid(sticky="w",column=col+1,row=row)
 
-		ttk.Entry(self.corey_algos, textvariable=self.corey_QTSTT_multiplier).grid(sticky="w",column=col+3,row=row)
-		ttk.Label(self.corey_algos, text="Risk multiplier:").grid(sticky="w",column=col+2,row=row)
+		ttk.Label(self.corey_algos, text="Share multiplier:").grid(sticky="w",column=col+4,row=row)
+		ttk.Entry(self.corey_algos, textvariable=self.corey_QTSTT_multiplier).grid(sticky="w",column=col+5,row=row)
+
+		ttk.Label(self.corey_algos, text="Strategy Risk:").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(self.corey_algos, textvariable=self.corey_QTSTT_risk).grid(sticky="w",column=col+3,row=row)
 
 
 		row +=1
@@ -215,16 +222,22 @@ class Custom_Algo():
 		ttk.Label(self.corey_algos, text="Corey STSTT :").grid(sticky="w",column=col,row=row)
 		ttk.Checkbutton(self.corey_algos, variable=self.corey_STSTT).grid(sticky="w",column=col+1,row=row)
 
-		ttk.Entry(self.corey_algos, textvariable=self.corey_STSTT_multiplier).grid(sticky="w",column=col+3,row=row)
-		ttk.Label(self.corey_algos, text="Risk multiplier:").grid(sticky="w",column=col+2,row=row)
+		ttk.Label(self.corey_algos, text="Share multiplier:").grid(sticky="w",column=col+4,row=row)
+		ttk.Entry(self.corey_algos, textvariable=self.corey_STSTT_multiplier).grid(sticky="w",column=col+5,row=row)
+
+		ttk.Label(self.corey_algos, text="Strategy Risk:").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(self.corey_algos, textvariable=self.corey_STSTT_risk).grid(sticky="w",column=col+3,row=row)
 
 		row +=1
 
 		ttk.Label(self.corey_algos, text="Corey IWTSTT :").grid(sticky="w",column=col,row=row)
 		ttk.Checkbutton(self.corey_algos, variable=self.corey_IWTSTT).grid(sticky="w",column=col+1,row=row)
 
-		ttk.Entry(self.corey_algos, textvariable=self.corey_IWTSTT_multiplier).grid(sticky="w",column=col+3,row=row)
-		ttk.Label(self.corey_algos, text="Risk multiplier:").grid(sticky="w",column=col+2,row=row)
+		ttk.Label(self.corey_algos, text="Share multiplier:").grid(sticky="w",column=col+4,row=row)
+		ttk.Entry(self.corey_algos, textvariable=self.corey_IWTSTT_multiplier).grid(sticky="w",column=col+5,row=row)
+
+		ttk.Label(self.corey_algos, text="Strategy Risk:").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(self.corey_algos, textvariable=self.corey_IWTSTT_risk).grid(sticky="w",column=col+3,row=row)
 
 
 		row +=1
@@ -232,18 +245,22 @@ class Custom_Algo():
 		ttk.Label(self.corey_algos, text="Corey OTS :").grid(sticky="w",column=col,row=row)
 		ttk.Checkbutton(self.corey_algos, variable=self.corey_OTS).grid(sticky="w",column=col+1,row=row)
 
-		ttk.Entry(self.corey_algos, textvariable=self.corey_OTS_multiplier).grid(sticky="w",column=col+3,row=row)
-		ttk.Label(self.corey_algos, text="Risk multiplier:").grid(sticky="w",column=col+2,row=row)
+		ttk.Label(self.corey_algos, text="Share multiplier:").grid(sticky="w",column=col+4,row=row)
+		ttk.Entry(self.corey_algos, textvariable=self.corey_OTS_multiplier).grid(sticky="w",column=col+5,row=row)
 
+		ttk.Label(self.corey_algos, text="Strategy Risk:").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(self.corey_algos, textvariable=self.corey_OTS_risk).grid(sticky="w",column=col+3,row=row)
 
 		row +=1
 
 		ttk.Label(self.corey_algos, text="Corey STS :").grid(sticky="w",column=col,row=row)
 		ttk.Checkbutton(self.corey_algos, variable=self.corey_STS).grid(sticky="w",column=col+1,row=row)
 
-		ttk.Entry(self.corey_algos, textvariable=self.corey_STS_multiplier).grid(sticky="w",column=col+3,row=row)
-		ttk.Label(self.corey_algos, text="Risk multiplier:").grid(sticky="w",column=col+2,row=row)
+		ttk.Label(self.corey_algos, text="Share multiplier:").grid(sticky="w",column=col+4,row=row)
+		ttk.Entry(self.corey_algos, textvariable=self.corey_STS_multiplier).grid(sticky="w",column=col+5,row=row)
 
+		ttk.Label(self.corey_algos, text="Strategy Risk:").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(self.corey_algos, textvariable=self.corey_STS_risk).grid(sticky="w",column=col+3,row=row)
 
 
 
@@ -289,7 +306,7 @@ class Custom_Algo():
 		# 		# 	self.b.grid_remove()
 		# 	self.l+=1
 
-	def corey_multiplier(self,data,multiplier):
+	def corey_multiplier(self,data,multiplier,risk):
 
 
 		basket = find_between(data,"Basket=",",") 
@@ -311,6 +328,10 @@ class Custom_Algo():
 
 		data = "Basket="+basket+","+new_order
 
+		risk__ = risk.get()
+		data += ","+"Risk="+str(risk__)+","
+
+
 		return data
 
 
@@ -328,8 +349,15 @@ class Custom_Algo():
 
 			if name =="MarketLong" and self.market_long.get()==True:
 				confimed = True
+
+				risk = int(self.market_timing_total_risk.get())
+				data += ","+"Risk="+str(risk)+","
+
 			elif name =="MarketShort" and self.market_short.get()==True:
 				confimed = True
+				risk = int(self.market_timing_total_risk.get())
+				data += ","+"Risk="+str(risk)+","
+
 			elif name == "BAX1" and self.bax1.get()==True:
 				confimed = True
 			elif name =="BAX2" and self.bax2.get()==True:
@@ -344,31 +372,31 @@ class Custom_Algo():
 			elif name =="PUFTB" and self.corey_PUFTB.get()==True:
 				confimed = True
 
-				data = self.corey_multiplier(data,self.corey_PUFTB_multiplier)
+				data = self.corey_multiplier(data,self.corey_PUFTB_multiplier,self.corey_PUFTB_risk)
 			elif name =="MNQ" and self.corey_MNQ.get()==True:
 				confimed = True
 
-				data = self.corey_multiplier(data,self.corey_MNQ_multiplier)
+				data = self.corey_multiplier(data,self.corey_MNQ_multiplier,self.corey_MNQ_risk)
 			elif name =="QTSTT" and self.corey_QTSTT.get()==True:
 				confimed = True
-				data = self.corey_multiplier(data,self.corey_QTSTT_multiplier)
+				data = self.corey_multiplier(data,self.corey_QTSTT_multiplier,self.corey_QTSTT_risk)
 			elif name =="STSTT" and self.corey_STSTT.get()==True:
 				confimed = True
-				data = self.corey_multiplier(data,self.corey_STSTT_multiplier)
+				data = self.corey_multiplier(data,self.corey_STSTT_multiplier,self.corey_STS_risk)
 			elif name =="IWTSTT" and self.corey_IWTSTT.get()==True:
 				confimed = True
-				data = self.corey_multiplier(data,self.corey_IWTSTT_multiplier)
+				data = self.corey_multiplier(data,self.corey_IWTSTT_multiplier,self.corey_IWTSTT_risk)
 			elif name =="OTS" and self.corey_OTS.get()==True:
 				confimed = True
-				data = self.corey_multiplier(data,self.corey_OTS_multiplier)
+				data = self.corey_multiplier(data,self.corey_OTS_multiplier,self.corey_OTS_risk)
 			elif name =="STS" and self.corey_STS.get()==True:
 				confimed = True
-				data = self.corey_multiplier(data,self.corey_STS_multiplier)
+				data = self.corey_multiplier(data,self.corey_STS_multiplier,self.corey_STS_risk)
 
 			if confimed:
 
-				risk = int(self.algo_risk.get())
-				data += ","+"Risk="+str(risk)+","
+				# risk = int(self.algo_risk.get())
+				# data += ","+"Risk="+str(risk)+","
 				msg = "http://localhost:4441/"	
 				msg +=data
 				print("Sending:",msg)
