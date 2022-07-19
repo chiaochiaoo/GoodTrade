@@ -436,6 +436,7 @@ class Manager:
 		self.f.close()
 		log_print(("record file start"))
 
+
 	def shares_allocation(self):
 
 		#fro each of the symbols. look at imbalance. deal with it. 
@@ -500,22 +501,23 @@ class Manager:
 				self.ui.create_new_single_entry(self.baskets[basket_name],"Basket",None)
 
 				self.baskets[basket_name].deploy(0)
-				
-		for symbol,value in orders.items():
+		
 
-			print("processing",symbol,value)
-			if symbol not in self.symbol_data:
-				self.symbol_data[symbol] = Symbol(symbol,0,100,{},self.pipe_ppro_out)  #register in Symbol.
-				self.symbols.append(symbol)
+		if self.baskets[basket_name].shut_down==False:
+			for symbol,value in orders.items():
 
-			self.baskets[basket_name].register_symbol(symbol,self.symbol_data[symbol])
+				print("processing",symbol,value)
+				if symbol not in self.symbol_data:
+					self.symbol_data[symbol] = Symbol(symbol,0,100,{},self.pipe_ppro_out)  #register in Symbol.
+					self.symbols.append(symbol)
 
-			## now , submit the request.
+				self.baskets[basket_name].register_symbol(symbol,self.symbol_data[symbol])
 
-			self.baskets[basket_name].submit_expected_shares(symbol,value)
+				## now , submit the request.
 
-
-
+				self.baskets[basket_name].submit_expected_shares(symbol,value)
+		else:
+			log_print(basket_name,"already shutdown")
 
 
 	def add_new_tradingplan(self,data,TEST_MODE):
@@ -1340,8 +1342,10 @@ if __name__ == '__main__':
 		ppro_in_manager.start()		
 
 
+	# SWICH.  
 	# root.minsize(1600, 1000)
 	# root.maxsize(1800, 1200)
+
 	root.mainloop()
 
 	ppro_out.send(["shutdown"])
