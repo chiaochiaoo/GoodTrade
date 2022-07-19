@@ -260,6 +260,7 @@ class TradingPlan_Basket:
 			self.data[UNREAL] = round(total_unreal,2)
 			self.tkvars[UNREAL].set(self.data[UNREAL])
 
+			log_print("cheking unreal",self.data[UNREAL] , "target",self.data[ESTRISK]*-1)
 			if self.data[UNREAL]<self.data[ESTRISK]*-1:
 				self.flatten_cmd()
 				self.shut_down = True
