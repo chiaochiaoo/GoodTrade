@@ -209,8 +209,8 @@ class TradingPlan_Basket:
 		self.tkvars[SELECTED].set(False)
 		self.tkvars[RELOAD].set(False)
 
-		self.data[ESTRISK] = risk
-		self.tkvars[ESTRISK].set(risk)
+		self.data[ESTRISK] = float(risk)
+		self.tkvars[ESTRISK].set(float(risk))
 		self.tkvars[RISK_RATIO].set(str(0)+"/"+str(self.data[ESTRISK]))
 
 		self.data[STATUS] = PENDING
