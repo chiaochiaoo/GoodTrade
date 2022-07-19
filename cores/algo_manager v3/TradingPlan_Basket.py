@@ -25,6 +25,7 @@ class TradingPlan_Basket:
 		self.in_use = True
 		self.pair_plan = False
 		
+		self.shut_down = False
 		#self.symbol.set_tradingplan(self)
 
 		self.manager = Manager
@@ -161,6 +162,7 @@ class TradingPlan_Basket:
 	def submit_expected_shares(self,symbol,shares):
 
 		log_print(self.algo_name,"expect",symbol,shares)
+
 		with self.read_lock[symbol]:
 			self.expected_shares[symbol] = shares
 			self.current_request[symbol] = self.expected_shares[symbol] - self.current_shares[symbol]
@@ -258,8 +260,9 @@ class TradingPlan_Basket:
 			self.data[UNREAL] = round(total_unreal,2)
 			self.tkvars[UNREAL].set(self.data[UNREAL])
 
-			if self.data[UNREAL]<-20:
+			if self.data[UNREAL]<self.data[ESTRISK]*-1:
 				self.flatten_cmd()
+				self.shut_down = True
 
 			self.update_displays()
 
