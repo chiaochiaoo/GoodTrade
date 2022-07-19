@@ -70,17 +70,16 @@ class Custom_Algo():
 		self.algo_frame.place(x=0.01, rely=0, relheight=0.1, relwidth=0.99)
 
 
-
 		self.market_timing_algos = ttk.LabelFrame(self.root,text="Market Timing algos")
 		self.market_timing_algos.place(x=0.01, rely=0.1, relheight=0.1, relwidth=0.99)
 
 
-		self.market_POE_algos = ttk.LabelFrame(self.root,text="Market POE algos")
-		self.market_POE_algos.place(x=0.01, rely=0.205, relheight=0.1, relwidth=0.99)
+		# self.market_POE_algos = ttk.LabelFrame(self.root,text="Market POE algos")
+		# self.market_POE_algos.place(x=0.01, rely=0.205, relheight=0.1, relwidth=0.99)
 
 
-		self.basket_hedging_algos = ttk.LabelFrame(self.root,text="Basket Hedging algos")
-		self.basket_hedging_algos.place(x=0.01, rely=0.305, relheight=0.1, relwidth=0.99)
+		# self.basket_hedging_algos = ttk.LabelFrame(self.root,text="Basket Hedging algos")
+		# self.basket_hedging_algos.place(x=0.01, rely=0.305, relheight=0.1, relwidth=0.99)
 
 		self.corey_algos = ttk.LabelFrame(self.root,text="Corey algos")
 		self.corey_algos.place(x=0.01, rely=0.405, relheight=0.2, relwidth=0.99)
@@ -118,14 +117,6 @@ class Custom_Algo():
 
 		self.corey_STS = tk.BooleanVar(value=0)
 		self.corey_STS_multiplier = tk.IntVar(value=1)
-
-		# self.corey1 = tk.BooleanVar(value=0)
-		# self.corey1_multiplier = tk.IntVar(value=1)
-		# self.corey2 = tk.BooleanVar(value=0)
-		# self.corey2_multiplier = tk.IntVar(value=1)
-		# self.corey3 = tk.BooleanVar(value=0)
-		# self.corey3_multiplier = tk.IntVar(value=1)
-
 
 		self.bax1 = tk.BooleanVar(value=0)
 		self.bax2 = tk.BooleanVar(value=0)
@@ -298,7 +289,7 @@ class Custom_Algo():
 		# 		# 	self.b.grid_remove()
 		# 	self.l+=1
 
-	def corey_multiplier(self,data):
+	def corey_multiplier(self,data,multiplier):
 
 
 		basket = find_between(data,"Basket=",",") 
@@ -312,7 +303,7 @@ class Custom_Algo():
 				new_order+=","
 			k = i.split(":")
 			new_order+= k[0]
-			new_order+= ":"+str(int(k[1])*self.corey1_multiplier.get())
+			new_order+= ":"+str(int(k[1])*multiplier.get())
 			z+=1
 
 		new_order+="*"
@@ -335,7 +326,6 @@ class Custom_Algo():
 
 			confimed = False 
 
-
 			if name =="MarketLong" and self.market_long.get()==True:
 				confimed = True
 			elif name =="MarketShort" and self.market_short.get()==True:
@@ -344,25 +334,36 @@ class Custom_Algo():
 				confimed = True
 			elif name =="BAX2" and self.bax2.get()==True:
 				confimed = True
-			elif name =="BAX3" and self.bax2.get()==True:
+			elif name =="BAX3" and self.bax3.get()==True:
 				confimed = True
-			elif name =="BAX4" and self.bax2.get()==True:
+			elif name =="BAX4" and self.bax4.get()==True:
 				confimed = True
-			elif name =="BAX5" and self.bax2.get()==True:
-				confimed = True
-			elif name =="COREY1" and self.corey1.get()==True:
+			elif name =="BAX5" and self.bax5.get()==True:
 				confimed = True
 
-				data = self.corey_multiplier(data)
-			elif name =="COREY2" and self.corey1.get()==True:
+			elif name =="PUFTB" and self.corey_PUFTB.get()==True:
 				confimed = True
 
-				data = self.corey_multiplier(data)
-			elif name =="COREY3" and self.corey1.get()==True:
+				data = self.corey_multiplier(data,self.corey_PUFTB_multiplier)
+			elif name =="MNQ" and self.corey_MNQ.get()==True:
 				confimed = True
 
-				data = self.corey_multiplier(data)
-
+				data = self.corey_multiplier(data,self.corey_MNQ_multiplier)
+			elif name =="QTSTT" and self.corey_QTSTT.get()==True:
+				confimed = True
+				data = self.corey_multiplier(data,self.corey_QTSTT_multiplier)
+			elif name =="STSTT" and self.corey_STSTT.get()==True:
+				confimed = True
+				data = self.corey_multiplier(data,self.corey_STSTT_multiplier)
+			elif name =="IWTSTT" and self.corey_IWTSTT.get()==True:
+				confimed = True
+				data = self.corey_multiplier(data,self.corey_IWTSTT_multiplier)
+			elif name =="OTS" and self.corey_OTS.get()==True:
+				confimed = True
+				data = self.corey_multiplier(data,self.corey_OTS_multiplier)
+			elif name =="STS" and self.corey_STS.get()==True:
+				confimed = True
+				data = self.corey_multiplier(data,self.corey_STS_multiplier)
 
 			if confimed:
 
