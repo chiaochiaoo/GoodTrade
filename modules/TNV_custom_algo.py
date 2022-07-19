@@ -49,7 +49,7 @@ class Custom_Algo():
 		self.entries = []
 
 		self.algo_risk = tk.DoubleVar(value=5)
-		self.algo_activate = tk.BooleanVar(value=0)
+		self.algo_activate = tk.BooleanVar(value=1)
 		# self.l=0
 
 		# for i in range(len(self.labels)): #Rows
@@ -85,7 +85,7 @@ class Custom_Algo():
 		self.corey_algos.place(x=0.01, rely=0.205, relheight=0.2, relwidth=0.99)
 
 		self.bax_algos = ttk.LabelFrame(self.root,text="Baxter algos")
-		self.bax_algos.place(x=0.01, rely=0.405, relheight=0.1, relwidth=0.99)
+		self.bax_algos.place(x=0.01, rely=0.405, relheight=0.2, relwidth=0.99)
 
 		self.tick_opening = tk.BooleanVar(value=0)
 		self.tick_intraday_v1 = tk.BooleanVar(value=0)
@@ -129,6 +129,13 @@ class Custom_Algo():
 		self.bax3 = tk.BooleanVar(value=0)
 		self.bax4 = tk.BooleanVar(value=0)
 		self.bax5 = tk.BooleanVar(value=0)
+
+		self.bax1_risk = tk.IntVar(value=5)
+		self.bax2_risk = tk.IntVar(value=5)
+		self.bax3_risk = tk.IntVar(value=5)
+		self.bax4_risk = tk.IntVar(value=5)
+		self.bax5_risk = tk.IntVar(value=5)
+
 
 		self.market_timing_algos_pannel()
 		self.algo_pannel()
@@ -270,25 +277,43 @@ class Custom_Algo():
 		ttk.Label(self.bax_algos, text="BAX1:").grid(sticky="w",column=col,row=row)
 		ttk.Checkbutton(self.bax_algos, variable=self.bax1).grid(sticky="w",column=col+1,row=row)
 
-		col +=2
+		ttk.Label(self.bax_algos, text="Strategy Risk:").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(self.bax_algos, textvariable=self.bax1_risk).grid(sticky="w",column=col+3,row=row)
+
+
+		row +=1
 
 		ttk.Label(self.bax_algos, text="BAX2:").grid(sticky="w",column=col,row=row)
 		ttk.Checkbutton(self.bax_algos, variable=self.bax2).grid(sticky="w",column=col+1,row=row)
 
-		col +=4
+		ttk.Label(self.bax_algos, text="Strategy Risk:").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(self.bax_algos, textvariable=self.bax2_risk).grid(sticky="w",column=col+3,row=row)
+
+
+
+		row +=1
 
 		ttk.Label(self.bax_algos, text="BAX3:").grid(sticky="w",column=col,row=row)
 		ttk.Checkbutton(self.bax_algos, variable=self.bax3).grid(sticky="w",column=col+1,row=row)
+		ttk.Label(self.bax_algos, text="Strategy Risk:").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(self.bax_algos, textvariable=self.bax3_risk).grid(sticky="w",column=col+3,row=row)
 
-		col +=6
+
+		row +=1
 
 		ttk.Label(self.bax_algos, text="BAX4:").grid(sticky="w",column=col,row=row)
 		ttk.Checkbutton(self.bax_algos, variable=self.bax4).grid(sticky="w",column=col+1,row=row)
+		ttk.Label(self.bax_algos, text="Strategy Risk:").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(self.bax_algos, textvariable=self.bax4_risk).grid(sticky="w",column=col+3,row=row)
 
-		col +=8
+
+		row +=1
 
 		ttk.Label(self.bax_algos, text="BAX5:").grid(sticky="w",column=col,row=row)
 		ttk.Checkbutton(self.bax_algos, variable=self.bax5).grid(sticky="w",column=col+1,row=row)		# for k in range(0,30):
+		ttk.Label(self.bax_algos, text="Strategy Risk:").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(self.bax_algos, textvariable=self.bax5_risk).grid(sticky="w",column=col+3,row=row)
+
 
 		# 	self.entries.append([])
 
@@ -337,7 +362,7 @@ class Custom_Algo():
 
 		print("RECEVING:",data)
 
-		if "Basket" in data:
+		if "Basket" in data and self.algo_activate.get()==True:
 
 			## PARSE IT AND RE PARSE IT. ? ADD RISK TO IT. 
 
@@ -357,13 +382,27 @@ class Custom_Algo():
 
 			elif name == "BAX1" and self.bax1.get()==True:
 				confimed = True
+				risk = int(self.bax1_risk.get())
+				data += ","+"Risk="+str(risk)+","
+
 			elif name =="BAX2" and self.bax2.get()==True:
 				confimed = True
+				risk = int(self.bax2_risk.get())
+				data += ","+"Risk="+str(risk)+","
+
 			elif name =="BAX3" and self.bax3.get()==True:
 				confimed = True
+				risk = int(self.bax3_risk.get())
+				data += ","+"Risk="+str(risk)+","
+
 			elif name =="BAX4" and self.bax4.get()==True:
 				confimed = True
+				risk = int(self.bax4_risk.get())
+				data += ","+"Risk="+str(risk)+","
+
 			elif name =="BAX5" and self.bax5.get()==True:
+				risk = int(self.bax5_risk.get())
+				data += ","+"Risk="+str(risk)+","
 				confimed = True
 
 			elif "PUFTB" in name and self.corey_PUFTB.get()==True:
@@ -402,7 +441,8 @@ class Custom_Algo():
 				reg1 = threading.Thread(target=request_post,args=(msg,), daemon=True)
 				reg1.start()
 
-
+		else:
+			print("Not activated")
 
 
 def request_post(body):
