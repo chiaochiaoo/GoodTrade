@@ -366,27 +366,27 @@ class Custom_Algo():
 			elif name =="BAX5" and self.bax5.get()==True:
 				confimed = True
 
-			elif name =="PUFTB" and self.corey_PUFTB.get()==True:
+			elif "PUFTB" in name and self.corey_PUFTB.get()==True:
 				confimed = True
 
 				data = self.corey_multiplier(data,self.corey_PUFTB_multiplier,self.corey_PUFTB_risk)
-			elif name =="MNQ" and self.corey_MNQ.get()==True:
+			elif "MNQ" in name and self.corey_MNQ.get()==True:
 				confimed = True
 
 				data = self.corey_multiplier(data,self.corey_MNQ_multiplier,self.corey_MNQ_risk)
-			elif name =="QTSTT" and self.corey_QTSTT.get()==True:
+			elif "QTSTT" in name and self.corey_QTSTT.get()==True:
 				confimed = True
 				data = self.corey_multiplier(data,self.corey_QTSTT_multiplier,self.corey_QTSTT_risk)
-			elif name =="STSTT" and self.corey_STSTT.get()==True:
+			elif "STSTT" in name and self.corey_STSTT.get()==True:
 				confimed = True
 				data = self.corey_multiplier(data,self.corey_STSTT_multiplier,self.corey_STS_risk)
-			elif name =="IWTSTT" and self.corey_IWTSTT.get()==True:
+			elif "IWTSTT" in name and self.corey_IWTSTT.get()==True:
 				confimed = True
 				data = self.corey_multiplier(data,self.corey_IWTSTT_multiplier,self.corey_IWTSTT_risk)
-			elif name =="OTS" and self.corey_OTS.get()==True:
+			elif "OTS" in name and self.corey_OTS.get()==True:
 				confimed = True
 				data = self.corey_multiplier(data,self.corey_OTS_multiplier,self.corey_OTS_risk)
-			elif name =="STS" and self.corey_STS.get()==True:
+			elif "STS" in name and self.corey_STS.get()==True:
 				confimed = True
 				data = self.corey_multiplier(data,self.corey_STS_multiplier,self.corey_STS_risk)
 
