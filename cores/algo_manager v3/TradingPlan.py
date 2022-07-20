@@ -108,6 +108,8 @@ class TradingPlan:
 		self.current_shares = 0
 		self.current_request = 0
 
+		self.symbol.deregister_tradingplan(self.name,self)
+
 	def if_activated(self):
 		return self.in_use	
 
@@ -574,7 +576,7 @@ class TradingPlan:
 
 
 		##################
-		self.symbol.deregister_tradingplan(self.name,self)
+		
 		self.deactive()
 		self.mark_algo_status(DONE)
 		self.set_mind("Trade completed.",VERYLIGHTGREEN)
@@ -612,6 +614,8 @@ class TradingPlan:
 
 			#self.symbol.cancel_all_request(self.name)
 			self.mark_algo_status(REJECTED)
+
+			self.deactive()
 
 		else:
 
