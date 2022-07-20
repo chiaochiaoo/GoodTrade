@@ -323,7 +323,7 @@ def logging(pipe):
 
 class Manager:
 
-	def __init__(self,root,goodtrade_pipe=None,ppro_out=None,ppro_in=None,TEST_MODE=False):
+	def __init__(self,root,goodtrade_pipe=None,ppro_out=None,ppro_in=None,TEST_MODE=False,processes=[]):
 
 		self.root = root
 
@@ -335,7 +335,7 @@ class Manager:
 		self.test_mode = TEST_MODE
 
 		self.symbols = []
-
+		self.processes = processes
 	
 		self.algo_ids = []
 
@@ -404,6 +404,7 @@ class Manager:
 
 		self.init_record_writer()
 
+		self.shutdown=False
 
 		handl = threading.Thread(target=self.shares_allocation,daemon=True)
 		handl.start()
@@ -416,6 +417,7 @@ class Manager:
 
 		timer = threading.Thread(target=self.timer, daemon=True)
 		timer.start()
+
 
 		#if Testerx==True:
 		self.pipe_ppro_out.send(["Register","QQQ.NQ"])
@@ -437,6 +439,13 @@ class Manager:
 		log_print(("record file start"))
 
 
+
+	def shutdown_all_threads(self):
+
+		self.shutdown= True
+
+
+
 	def shares_allocation(self):
 
 		#fro each of the symbols. look at imbalance. deal with it. 
@@ -445,6 +454,9 @@ class Manager:
 
 		while True:
 			#create a cpy.
+
+			if self.shutdown:
+				break
 			register = 0
 			symbols = list(self.symbol_data.values())
 
@@ -769,6 +781,9 @@ class Manager:
 				log_print("Trigger")
 				break
 
+			if self.shutdown:
+				break
+
 			time.sleep(1)
 
 		#time.sleep(5)
@@ -777,9 +792,12 @@ class Manager:
 
 
 		timestamp = 600
-
+		cur_ts = 0
 		while True:
 
+			if self.shutdown:
+				break
+				
 			now = datetime.now()
 			ts = now.hour*60 + now.minute
 			remain = timestamp - ts
@@ -798,6 +816,12 @@ class Manager:
 
 			self.update_stats()
 
+			
+			if ts!=cur_ts:
+
+				checking = [i.is_alive() for i in self.processes]
+				log_print("Processes Checking:",checking)
+				cur_ts=ts
 			time.sleep(5)
 
 
@@ -1015,7 +1039,8 @@ class Manager:
 							PrintException(e,"adding algo error")
 				else:
 					log_print("Algo rejection. deployment denied.")
-
+			elif d[0] =="shutdown":
+				break
 	def ppro_in(self):
 		while True:
 			d = self.pipe_ppro_in.recv()
@@ -1141,6 +1166,9 @@ class Manager:
 				# if symbol in self.tradingplan:
 				# 	self.tradingplan[symbol].ppro_order_rejection()
 
+
+			elif d[0] =="shutdown":
+				break
 			# if d[0] =="new stoporder":
 
 			# 	self.ppro_append_new_stoporder(d[1])
@@ -1327,7 +1355,8 @@ if __name__ == '__main__':
 	root.title("GoodTrade Algo Manager v3 b2 TICK MANAGEMENT")
 	root.geometry("1500x1000")
 
-	manager=Manager(root,goodtrade_pipe,ppro_out,ppro_in,TEST)
+	processes = [algo_voxcom,algo_voxcom2,ppro_in_manager,ppro_out_manager]
+	manager=Manager(root,goodtrade_pipe,ppro_out,ppro_in,TEST,processes)
 	#Tester(receive_pipe,ppro_pipe_end,ppro_pipe_end2)
 	print(len(sys.argv))
 	if len(sys.argv)==2:
@@ -1349,6 +1378,9 @@ if __name__ == '__main__':
 	root.mainloop()
 
 	ppro_out.send(["shutdown"])
+
+	ppro_pipe_end.send(["shutdown"])
+	receive_pipe.send(["shutdown"])
 
 	time.sleep(2)
 

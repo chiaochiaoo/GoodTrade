@@ -260,9 +260,10 @@ class TradingPlan_Basket:
 			self.data[UNREAL] = round(total_unreal,2)
 			self.tkvars[UNREAL].set(self.data[UNREAL])
 
-			log_print("cheking unreal",self.data[UNREAL] , "target",self.data[ESTRISK]*-1)
+			#log_print("cheking unreal",self.data[UNREAL] , "target",self.data[ESTRISK]*-1)
 			if self.data[UNREAL]<self.data[ESTRISK]*-1:
 				self.flatten_cmd()
+				self.mark_algo_status(DONE)
 				self.shut_down = True
 
 			self.update_displays()
@@ -481,13 +482,13 @@ class TradingPlan_Basket:
 		#check color.f9f9f9
 
 		if self.data[UNREAL_PSHR]>0:
-			self.tklabels[UNREAL_PSHR]["background"] = STRONGGREEN
+			#self.tklabels[UNREAL_PSHR]["background"] = STRONGGREEN
 			self.tklabels[UNREAL]["background"] = STRONGGREEN
 		elif self.data[UNREAL_PSHR]<0:
-			self.tklabels[UNREAL_PSHR]["background"] = STRONGRED
+			#self.tklabels[UNREAL_PSHR]["background"] = STRONGRED
 			self.tklabels[UNREAL]["background"] = STRONGRED
 		else:
-			self.tklabels[UNREAL_PSHR]["background"] = DEFAULT
+			#self.tklabels[UNREAL_PSHR]["background"] = DEFAULT
 			self.tklabels[UNREAL]["background"] =DEFAULT
 
 		if self.data[REALIZED]==0:
