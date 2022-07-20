@@ -543,44 +543,6 @@ class Manager:
 		now = datetime.now()
 		ts = now.hour*60 + now.minute 
 		
-		# if type_name =="Tradingview":
-
-		# 	algo_name =  data["Strategy"]
-		# 	symbol = data["Symbol"]
-		# 	side  = data["Side"]
-		# 	share = int(data["Share"])
-
-		# 	if side =="B":
-		# 		share = abs(share)
-		# 		entryplan= INSTANTLONG
-		# 	else:
-		# 		share = abs(share) * -1
-		# 		entryplan= INSTANTSHORT
-		# 	#self.direct_control_symbols
-
-		# 	if symbol not in self.symbol_data:
-
-		# 		self.symbol_data[symbol] = Symbol(symbol,0,100,{},self.pipe_ppro_out)  #register in Symbol.
-		# 		self.symbols.append(symbol)
-
-		# 	if self.ui.algo_count_number.get()<60:
-
-		# 		if algo_name+symbol not in self.direct_control_tradingplan: 
-
-		# 			mana= FULLMANUAL
-		# 			support=0
-		# 			resistence=1
-		# 			risk=share
-
-		# 			self.direct_control_tradingplan[algo_name+symbol] = TradingPlan(algo_name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
-		# 			self.direct_control_tradingplan[algo_name+symbol].data[USING_STOP] = False
-
-		# 			self.ui.create_new_single_entry(self.direct_control_tradingplan[algo_name+symbol],"Single",None)
-
-		# 			self.direct_control_tradingplan[algo_name+symbol].deploy(9600)
-
-		# 		else:
-		# 			self.direct_control_tradingplan[algo_name+symbol].submit_expected_shares(share)
 
 		if algo_id not in self.algo_ids:
 
