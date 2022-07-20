@@ -692,7 +692,11 @@ class Manager:
 
 							trade.tkvars[STATUS].set("EVICTED")
 							replace_id = trade.algo_ui_id
-							trade.deactive()
+
+							try:
+								trade.deactive()
+							except Exception as e:
+								log_print("deactivation problem",e)
 							find_ = True
 							log_print("Replacing",trade.symbol_name,"replace_id")
 							break 

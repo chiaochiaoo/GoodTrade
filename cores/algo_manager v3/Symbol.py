@@ -121,9 +121,13 @@ class Symbol:
 
 		#del self.incoming_request[name]
 		#with self.tradingplan_lock:
-		del self.tradingplans[name]
+
+		if name in self.tradingplans:
+			del self.tradingplans[name]
 		
-		log_print("name","deleted",self.ticker,"remaning TP:",len(self.tradingplans))
+			log_print(name,"deleted",self.ticker,"remaning TP:",len(self.tradingplans))
+		else:
+			log_print(name,"already deleted or does not exist")
 
 		if len(self.tradingplans)==0:
 			self.ppro_out.send([DEREGISTER,self.ticker])
