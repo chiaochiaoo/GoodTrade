@@ -766,6 +766,9 @@ class Manager:
 		log_print("timer start")
 
 		while True:
+			if self.shutdown:
+				break
+
 			now = datetime.now()
 			ts = now.hour*3600 + now.minute*60 + now.second
 			remain = timestamp - ts
@@ -795,9 +798,10 @@ class Manager:
 		cur_ts = 0
 		while True:
 
+
 			if self.shutdown:
 				break
-				
+
 			now = datetime.now()
 			ts = now.hour*60 + now.minute
 			remain = timestamp - ts
@@ -816,12 +820,14 @@ class Manager:
 
 			self.update_stats()
 
-			
+		
 			if ts!=cur_ts:
 
 				checking = [i.is_alive() for i in self.processes]
 				log_print("Processes Checking:",checking)
+
 				cur_ts=ts
+
 			time.sleep(5)
 
 
@@ -846,6 +852,12 @@ class Manager:
 
 			self.update_stats()
 
+			if ts!=cur_ts:
+
+				checking = [i.is_alive() for i in self.processes]
+				log_print("Processes Checking:",checking)
+
+				cur_ts=ts
 
 			time.sleep(5)
 
