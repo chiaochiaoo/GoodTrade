@@ -82,10 +82,10 @@ class Custom_Algo():
 		# self.basket_hedging_algos.place(x=0.01, rely=0.305, relheight=0.1, relwidth=0.99)
 
 		self.corey_algos = ttk.LabelFrame(self.root,text="Corey algos")
-		self.corey_algos.place(x=0.01, rely=0.205, relheight=0.2, relwidth=0.99)
+		self.corey_algos.place(x=0.01, rely=0.225, relheight=0.22, relwidth=0.99)
 
 		self.bax_algos = ttk.LabelFrame(self.root,text="Baxter algos")
-		self.bax_algos.place(x=0.01, rely=0.405, relheight=0.2, relwidth=0.99)
+		self.bax_algos.place(x=0.01, rely=0.46, relheight=0.2, relwidth=0.99)
 
 		self.tick_opening = tk.BooleanVar(value=0)
 		self.tick_intraday_v1 = tk.BooleanVar(value=0)
@@ -123,6 +123,12 @@ class Custom_Algo():
 		self.corey_STS = tk.BooleanVar(value=0)
 		self.corey_STS_multiplier = tk.IntVar(value=1)
 		self.corey_STS_risk = tk.IntVar(value=50)
+
+
+		self.corey_YBO = tk.BooleanVar(value=0)
+		self.corey_YBO_multiplier = tk.IntVar(value=1)
+		self.corey_YBO_risk = tk.IntVar(value=50)
+
 
 		self.bax1 = tk.BooleanVar(value=0)
 		self.bax2 = tk.BooleanVar(value=0)
@@ -171,7 +177,7 @@ class Custom_Algo():
 		col -=2
 
 		ttk.Label(self.market_timing_algos, text="TICK Long:").grid(sticky="w",column=col,row=row)
-		ttk.Checkbutton(self.market_timing_algos, variable=self.tick_intraday_v2).grid(sticky="w",column=col+1,row=row)
+		ttk.Checkbutton(self.market_timing_algos, variable=self.tick_intraday_v1).grid(sticky="w",column=col+1,row=row)
 
 		col +=2
 
@@ -268,6 +274,19 @@ class Custom_Algo():
 
 		ttk.Label(self.corey_algos, text="Strategy Risk:").grid(sticky="w",column=col+2,row=row)
 		ttk.Entry(self.corey_algos, textvariable=self.corey_STS_risk).grid(sticky="w",column=col+3,row=row)
+
+
+		row +=1
+
+		ttk.Label(self.corey_algos, text="Corey YBO :").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.corey_algos, variable=self.corey_YBO).grid(sticky="w",column=col+1,row=row)
+
+		ttk.Label(self.corey_algos, text="Share multiplier:").grid(sticky="w",column=col+4,row=row)
+		ttk.Entry(self.corey_algos, textvariable=self.corey_YBO_multiplier).grid(sticky="w",column=col+5,row=row)
+
+		ttk.Label(self.corey_algos, text="Strategy Risk:").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(self.corey_algos, textvariable=self.corey_YBO_risk).grid(sticky="w",column=col+3,row=row)
+
 
 
 
@@ -428,6 +447,9 @@ class Custom_Algo():
 			elif "STS" in name and self.corey_STS.get()==True:
 				confimed = True
 				data = self.corey_multiplier(data,self.corey_STS_multiplier,self.corey_STS_risk)
+			elif "YBO" in name and self.corey_YBO.get()==True:
+				confimed = True
+				data = self.corey_multiplier(data,self.corey_YBO_multiplier,self.corey_YBO_risk)
 
 			if confimed:
 
