@@ -30,7 +30,8 @@ import os,sys
 
 from Tester import *
 from httpserver import *
-
+from psutil import process_iter
+import psutil
 
 try:
 	import psutil
@@ -1299,9 +1300,33 @@ class Manager:
 
 	
 
+def force_close_port(port, process_name=None):
+    """Terminate a process that is bound to a port.
+    
+    The process name can be set (eg. python), which will
+    ignore any other process that doesn't start with it.
+    """
+    for proc in psutil.process_iter():
+        for conn in proc.connections():
+            if conn.laddr[1] == port:
+                #Don't close if it belongs to SYSTEM
+                #On windows using .username() results in AccessDenied
+                #TODO: Needs testing on other operating systems
+                try:
+                    proc.username()
+                except psutil.AccessDenied:
+                    pass
+                else:
+                    if process_name is None or proc.name().startswith(process_name):
+                        try:
+                            proc.kill()
+                        except (psutil.NoSuchProcess, psutil.AccessDenied):
+                            pass 
+
 if __name__ == '__main__':
 
 
+	force_close_port(4441)
 	multiprocessing.freeze_support()
 
 	port =4609
