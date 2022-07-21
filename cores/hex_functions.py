@@ -29,21 +29,21 @@ def hexcolor_green_to_red(level):
 
 			#return "#"+hex_to_string(255-code)+"FF"+"FF"
 #print(times#tamp_seconds("13:23:46"))
-
+# hello
 #hex color test. to refect serverity.
-if __name__ == '__main__':
+# if __name__ == '__main__':
 
 
-	root = tk.Tk()
-	k=1
-	for i in range(10,-1,-1):
-		print(-i/10)
-		a=tk.Label(root ,text=-i,width=5,background=hexcolor_red(-i/10))
-		a.grid(column=1,row=k)
-		k+=1
-	for i in range(0,10):
+# 	root = tk.Tk()
+# 	k=1
+# 	for i in range(10,-1,-1):
+# 		print(-i/10)
+# 		a=tk.Label(root ,text=-i,width=5,background=hexcolor_red(-i/10))
+# 		a.grid(column=1,row=k)
+# 		k+=1
+# 	for i in range(0,10):
 
-		a=tk.Label(root ,text=i,width=5,background=hexcolor_red(i/10))
-		a.grid(column=1,row=k)
-		k+=1
-	root.mainloop()
+# 		a=tk.Label(root ,text=i,width=5,background=hexcolor_red(i/10))
+# 		a.grid(column=1,row=k)
+# 		k+=1
+# 	root.mainloop()
