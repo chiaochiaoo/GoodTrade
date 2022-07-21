@@ -652,6 +652,8 @@ class Symbol:
 				self.ppro_out.send([IOCBUY,self.ticker,abs(tp.get_holdings(self.ticker)),self.get_ask()])
 		#else get out the corresponding shares. 
 
+		###### BY SYSTEM SET UP GET OUT PASSIVELY? #####
+
 	def update_techindicators(self,dic):
 		for key,value in dic.items():
 			if key in self.data:

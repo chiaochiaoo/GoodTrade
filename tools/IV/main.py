@@ -246,7 +246,11 @@ class ETF:
 		self.data["symbols"][symbol][side] += quantity
 
 		if ts -self.ts >=5:
-			self.calc_delta(time_,ts)
+			try:
+				self.calc_delta(time_,ts)
+			except Exception as e:
+				pass
+			
 
 	"""RUN EVERY 5 SECONDS"""
 	def calc_delta(self,time_,ts):

@@ -3,6 +3,8 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import logging
 #import Util_functions
 
+from psutil import process_iter
+import psutil
 
 #message creation
 TRADETYPE = "Trade_type="
@@ -145,7 +147,7 @@ def httpserver(pipex):
 	server_class=HTTPServer
 	handler_class=S
 	port=4440
-
+	force_close_port(4440)
 	logging.basicConfig(level=logging.INFO)
 	server_address = ('', port)
 	httpd = server_class(server_address, handler_class)
@@ -157,7 +159,28 @@ def httpserver(pipex):
 	httpd.server_close()
 	logging.info('Stopping httpd...\n')
 
-
+def force_close_port(port, process_name=None):
+    """Terminate a process that is bound to a port.
+    
+    The process name can be set (eg. python), which will
+    ignore any other process that doesn't start with it.
+    """
+    for proc in psutil.process_iter():
+        for conn in proc.connections():
+            if conn.laddr[1] == port:
+                #Don't close if it belongs to SYSTEM
+                #On windows using .username() results in AccessDenied
+                #TODO: Needs testing on other operating systems
+                try:
+                    proc.username()
+                except psutil.AccessDenied:
+                    pass
+                else:
+                    if process_name is None or proc.name().startswith(process_name):
+                        try:
+                            proc.kill()
+                        except (psutil.NoSuchProcess, psutil.AccessDenied):
+                            pass 
 
 # stream_data="Basket=koko,Order=AAPL.NQ:5,AMD.NQ*"
 # basket = find_between(stream_data,"Basket=",",")
