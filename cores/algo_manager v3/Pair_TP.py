@@ -884,7 +884,7 @@ class PairTP:
 		self.mark_algo_status(DEPLOYED)
 
 		#self.entry_plan.on_deploying()
-		#self.management_plan.on_deploying()
+		self.management_plan.on_deploying()
 		#self.current_running_strategy = self.entry_plan
 
 		# if self.tkvars[RELOAD].get()==False:
