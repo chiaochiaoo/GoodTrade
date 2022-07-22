@@ -113,6 +113,14 @@ class TradingPlan:
 	def if_activated(self):
 		return self.in_use	
 
+	def cancel_request(self,symbol=None):
+
+		with self.read_lock:
+			self.current_request = 0
+			self.have_request = False
+			self.expected_shares = self.current_shares
+
+
 	def request_granted(self,symbol=None):
 
 		# if request becomes 0  . match off. 

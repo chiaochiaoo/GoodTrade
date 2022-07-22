@@ -17,10 +17,13 @@ class TradingPlan_Basket:
 
 	def __init__(self,algo_name="",risk=5,Manager=None):
 
+
+
 		self.algo_name = algo_name
 
 		self.name = algo_name
 		self.symbols = {}
+
 
 		self.in_use = True
 		self.pair_plan = False
@@ -104,6 +107,13 @@ class TradingPlan_Basket:
 
 			self.read_lock[symbol_name] = threading.Lock()
 
+
+	def cancel_request(self,symbol=None):
+
+		with self.read_lock[symbol]:
+			self.current_request[symbol] = 0
+			self.have_request[symbol] = False
+			self.expected_shares[symbol] = self.current_shares[symbol]
 
 	def request_granted(self,symbol=None):
 

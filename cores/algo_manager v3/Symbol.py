@@ -50,6 +50,10 @@ class Symbol:
 
 		#for false range detection
 
+		self.last_order_ts = 0
+		self.last_order_size = 0
+
+
 		self.seen_high =0
 		self.seen_low =0
 		self.count = 0
@@ -447,6 +451,17 @@ class Symbol:
 
 		self.cleanup_incoming_shares()
 
+
+	def cancel_all_reqeusts(self):
+
+		for tp in tps:
+			log_print(self.ticker,"Canceling all rest.")
+			if self.tradingplans[tp].if_activated() and self.tradingplans[tp].having_request(self.symbol_name) and not self.tradingplans[tp].get_flatten_order():
+
+				self.tradingplans[tp].cancel_request(self.ticker)
+
+
+
 	def passive_orders(self):
 
 		# I NEED TO ADD A MECHANISM ON THIS
@@ -468,9 +483,34 @@ class Symbol:
 	
 		order_process = False
 
+
+
+		# self.last_order_ts = 0
+		# self.last_order_size = 0
+		
+
 		# PRICE IS NOW THE OFFSET.
 		# LONG: use - if 0.01, if gap, can be slightly aggresive.
 		# SHORT: use + to lift it. 
+
+
+		## RISK PREVENTION PROCEDURE 
+
+		if self.last_order_size!=self.current_imbalance:
+			#if this is different time. refresh the ts to now. 
+			self.last_order_ts = ts
+			self.last_order_size = self.current_imbalance
+		else:
+
+			# same order size. if ts more than X. set all to 0
+			log_print(self.ticker,"repeated orders noticed",ts-self.last_order_ts)
+			if ts-self.last_order_ts>=30:
+
+				self.cancel_all_reqeusts()
+
+
+
+
 
 		if self.current_imbalance>0:
 
