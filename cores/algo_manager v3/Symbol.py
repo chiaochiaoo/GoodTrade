@@ -454,6 +454,7 @@ class Symbol:
 
 	def cancel_all_reqeusts(self):
 
+		tps = list(self.tradingplans.keys())
 		for tp in tps:
 			log_print(self.ticker,"Canceling all rest.")
 			if self.tradingplans[tp].if_activated() and self.tradingplans[tp].having_request(self.symbol_name) and not self.tradingplans[tp].get_flatten_order():
