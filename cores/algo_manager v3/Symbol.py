@@ -505,7 +505,7 @@ class Symbol:
 
 			# same order size. if ts more than X. set all to 0
 			log_print(self.ticker,"repeated orders noticed",ts-self.last_order_ts)
-			if ts-self.last_order_ts>=30:
+			if ts-self.last_order_ts>=300:
 
 				self.cancel_all_reqeusts()
 
