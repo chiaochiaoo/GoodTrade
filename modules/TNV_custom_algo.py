@@ -482,6 +482,13 @@ class Custom_Algo():
 			elif "YBO" in name and self.corey_YBO.get()==True:
 				confimed = True
 				data = self.corey_multiplier(data,self.corey_YBO_multiplier,self.corey_YBO_risk)
+			elif "QCK" in name and self.corey_QCK.get()==True:
+				confimed = True
+				data = self.corey_multiplier(data,self.corey_QCK_multiplier,self.corey_QCK_risk)
+
+			elif "TEST" in name and self.corey_TEST.get()==True:
+				confimed = True
+				data = self.corey_multiplier(data,self.corey_TEST_multiplier,self.corey_TEST_risk)
 
 			if confimed:
 
