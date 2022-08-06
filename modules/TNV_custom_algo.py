@@ -122,16 +122,20 @@ class Custom_Algo():
 
 		self.corey_STS = tk.BooleanVar(value=0)
 		self.corey_STS_multiplier = tk.IntVar(value=1)
-		self.corey_STS_risk = tk.IntVar(value=50)
+		self.corey_STS_risk = tk.IntVar(value=100)
 
 
 		self.corey_YBO = tk.BooleanVar(value=0)
 		self.corey_YBO_multiplier = tk.IntVar(value=1)
-		self.corey_YBO_risk = tk.IntVar(value=50)
+		self.corey_YBO_risk = tk.IntVar(value=100)
 
 		self.corey_QCK = tk.BooleanVar(value=0)
 		self.corey_QCK_multiplier = tk.IntVar(value=1)
-		self.corey_QCK_risk = tk.IntVar(value=50)
+		self.corey_QCK_risk = tk.IntVar(value=100)
+
+		self.corey_TEST = tk.BooleanVar(value=0)
+		self.corey_TEST_multiplier = tk.IntVar(value=1)
+		self.corey_TEST_risk = tk.IntVar(value=100)
 
 		self.bax1 = tk.BooleanVar(value=0)
 		self.bax2 = tk.BooleanVar(value=0)
@@ -301,6 +305,19 @@ class Custom_Algo():
 
 		ttk.Label(self.corey_algos, text="Strategy Risk:").grid(sticky="w",column=col+2,row=row)
 		ttk.Entry(self.corey_algos, textvariable=self.corey_QCK_risk).grid(sticky="w",column=col+3,row=row)
+
+
+		row +=1
+
+		ttk.Label(self.corey_algos, text="Corey TEST :").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.corey_algos, variable=self.corey_TEST).grid(sticky="w",column=col+1,row=row)
+
+		ttk.Label(self.corey_algos, text="Share multiplier:").grid(sticky="w",column=col+4,row=row)
+		ttk.Entry(self.corey_algos, textvariable=self.corey_TEST_multiplier).grid(sticky="w",column=col+5,row=row)
+
+		ttk.Label(self.corey_algos, text="Strategy Risk:").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(self.corey_algos, textvariable=self.corey_TEST_risk).grid(sticky="w",column=col+3,row=row)
+
 
 
 
