@@ -82,10 +82,10 @@ class Custom_Algo():
 		# self.basket_hedging_algos.place(x=0.01, rely=0.305, relheight=0.1, relwidth=0.99)
 
 		self.corey_algos = ttk.LabelFrame(self.root,text="Corey algos")
-		self.corey_algos.place(x=0.01, rely=0.225, relheight=0.22, relwidth=0.99)
+		self.corey_algos.place(x=0.01, rely=0.225, relheight=0.33, relwidth=0.99)
 
 		self.bax_algos = ttk.LabelFrame(self.root,text="Baxter algos")
-		self.bax_algos.place(x=0.01, rely=0.46, relheight=0.2, relwidth=0.99)
+		self.bax_algos.place(x=0.01, rely=0.55, relheight=0.2, relwidth=0.99)
 
 		self.tick_opening = tk.BooleanVar(value=0)
 		self.tick_intraday_v1 = tk.BooleanVar(value=0)
@@ -98,27 +98,27 @@ class Custom_Algo():
 
 		self.corey_PUFTB = tk.BooleanVar(value=0)
 		self.corey_PUFTB_multiplier = tk.IntVar(value=1)
-		self.corey_PUFTB_risk = tk.IntVar(value=50)
+		self.corey_PUFTB_risk = tk.IntVar(value=100)
 
 		self.corey_MNQ = tk.BooleanVar(value=0)
 		self.corey_MNQ_multiplier = tk.IntVar(value=1)
-		self.corey_MNQ_risk = tk.IntVar(value=50)
+		self.corey_MNQ_risk = tk.IntVar(value=100)
 
 		self.corey_QTSTT = tk.BooleanVar(value=0)
 		self.corey_QTSTT_multiplier = tk.IntVar(value=1)
-		self.corey_QTSTT_risk = tk.IntVar(value=50)
+		self.corey_QTSTT_risk = tk.IntVar(value=100)
 
 		self.corey_STSTT = tk.BooleanVar(value=0)
 		self.corey_STSTT_multiplier = tk.IntVar(value=1)
-		self.corey_STSTT_risk = tk.IntVar(value=50)
+		self.corey_STSTT_risk = tk.IntVar(value=100)
 
 		self.corey_IWTSTT = tk.BooleanVar(value=0)
 		self.corey_IWTSTT_multiplier = tk.IntVar(value=1)
-		self.corey_IWTSTT_risk = tk.IntVar(value=50)
+		self.corey_IWTSTT_risk = tk.IntVar(value=100)
 
 		self.corey_OTS = tk.BooleanVar(value=0)
 		self.corey_OTS_multiplier = tk.IntVar(value=1)
-		self.corey_OTS_risk = tk.IntVar(value=50)
+		self.corey_OTS_risk = tk.IntVar(value=100)
 
 		self.corey_STS = tk.BooleanVar(value=0)
 		self.corey_STS_multiplier = tk.IntVar(value=1)
@@ -129,6 +129,9 @@ class Custom_Algo():
 		self.corey_YBO_multiplier = tk.IntVar(value=1)
 		self.corey_YBO_risk = tk.IntVar(value=50)
 
+		self.corey_QCK = tk.BooleanVar(value=0)
+		self.corey_QCK_multiplier = tk.IntVar(value=1)
+		self.corey_QCK_risk = tk.IntVar(value=50)
 
 		self.bax1 = tk.BooleanVar(value=0)
 		self.bax2 = tk.BooleanVar(value=0)
@@ -288,10 +291,22 @@ class Custom_Algo():
 		ttk.Entry(self.corey_algos, textvariable=self.corey_YBO_risk).grid(sticky="w",column=col+3,row=row)
 
 
-
-
-
 		row +=1
+
+		ttk.Label(self.corey_algos, text="Corey QCK :").grid(sticky="w",column=col,row=row)
+		ttk.Checkbutton(self.corey_algos, variable=self.corey_QCK).grid(sticky="w",column=col+1,row=row)
+
+		ttk.Label(self.corey_algos, text="Share multiplier:").grid(sticky="w",column=col+4,row=row)
+		ttk.Entry(self.corey_algos, textvariable=self.corey_QCK_multiplier).grid(sticky="w",column=col+5,row=row)
+
+		ttk.Label(self.corey_algos, text="Strategy Risk:").grid(sticky="w",column=col+2,row=row)
+		ttk.Entry(self.corey_algos, textvariable=self.corey_QCK_risk).grid(sticky="w",column=col+3,row=row)
+
+
+
+
+
+		#row +=1
 
 		ttk.Label(self.bax_algos, text="BAX1:").grid(sticky="w",column=col,row=row)
 		ttk.Checkbutton(self.bax_algos, variable=self.bax1).grid(sticky="w",column=col+1,row=row)
