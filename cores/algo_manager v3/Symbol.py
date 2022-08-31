@@ -531,7 +531,7 @@ class Symbol:
 			if ts > self.passive_request_ts + 15:
 				order_process = True
 
-		log_print(self.ticker,"order:",price,order_process,"delayed:",ts > self.passive_request_ts + DELAY)
+		#log_print(self.ticker,"order:",price,order_process,"delayed:",ts > self.passive_request_ts + DELAY)
 
 		if order_process and ts > self.passive_request_ts + DELAY:
 
@@ -585,7 +585,7 @@ class Symbol:
 
 		#log_print("holding update - optaning lock")
 
-
+		log_print(self.ticker," holding update:",share)
 		if self.get_market_making()==False:
 			with self.incoming_shares_lock:
 

@@ -154,8 +154,8 @@ def buy_limit_order(symbol, price,share,gateway=0):
 	else:
 		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit Visible DAY&shares='+str(share)
 	#r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit DAY BookOnly&shares='+str(share)
-	sucess='buy limit order success on'+symbol
-	failure="Error buy limit order on"+symbol
+	sucess='buy limit order success on '+symbol
+	failure="Error buy limit order on "+symbol
 
 	return r,sucess,failure
 
@@ -176,8 +176,8 @@ def sell_limit_order(symbol, price,share,gateway=0):
 		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit Visible DAY&shares='+str(share)
 
 
-	sucess='sell limit order success on'+symbol
-	failure="Error sell limit order on"+symbol
+	sucess='sell limit order success on '+symbol
+	failure="Error sell limit order on "+symbol
 
 	return r,sucess,failure
 
@@ -193,8 +193,8 @@ def passive_buy(symbol	,share,offset):
 	# 	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Buy MEMX Pegged Near DAY MidPoint&shares='+str(share)
 
 	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Buy MEMX Limit Near Visible DAY PostOnly&shares='+str(share)
-	sucess='passive buy limit order success on'+symbol
-	failure="Error passive buy limit order on"+symbol
+	sucess='passive buy limit order success on '+symbol
+	failure="Error passive buy limit order on "+symbol
 
 	return r,sucess,failure
 
@@ -208,8 +208,8 @@ def passive_sell(symbol	,share,offset):
 
 	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Sell->Short MEMX Limit Near Visible DAY PostOnly&shares='+str(share)
 
-	sucess='passive sell limit order success on'+symbol
-	failure="Error passive sell limit order on"+symbol
+	sucess='passive sell limit order success on '+symbol
+	failure="Error passive sell limit order on "+symbol
 
 	return r,sucess,failure
 
@@ -306,8 +306,8 @@ def cancel_all_oders(symbol):
 
 	r = 'http://localhost:8080/CancelOrder?type=all&symbol='+str(symbol)+'&side=order'
 	#r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit DAY BookOnly&shares='+str(share)
-	sucess='cancel success on'+symbol
-	failure="cancel error on"+symbol
+	sucess='cancel success on '+symbol
+	failure="cancel error on "+symbol
 
 	return r,sucess,failure
 
@@ -495,7 +495,7 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 				while not sucessful:
 					try:
 						driver.get(request_str)
-						log_print(sucess_str)
+						#log_print(sucess_str)
 						sucessful = True
 					except Exception as e:
 						log_print(e,failure_str," driver restart")
