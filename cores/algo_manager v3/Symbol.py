@@ -177,41 +177,17 @@ class Symbol:
 
 		self.tradingplan_holdings[tradingplan_name] += shares
 
+
 	### RUN EVERY 3 SECONDS ###
 	def symbol_inspection(self):
 
-		#lets say I hae -100 and +100. so they cancel each other out. 
-
-		#iterate each of the tradingplan once, starting from the smallest by magnitude. 
-
-
-		# process the incoming orders.
-		# deal with the remianing orders. 
-
 		#### STAEGE 1 -> Incoming Shares Pairing #####
 
-		#for tp,val in self.incoming_request.items():
-
-		#first calculate all the positive, then all the negative? NO... it's by
-
-		#log_print(self.ticker,"Inspection, holdings",self.incoming_shares)
-
 		if len(self.incoming_shares)>0:
-
-			### STAGE 1 -> Planed request handling 
+			self.last_order_size = 99999
 			self.incoming_shares_pairing()
 
-		#cur_imbalance = sum(self.incoming_request.values())
-
-		# remian_shares =  0 #sum(self.incoming_shares.values())
-
-		# for i in range(len(self.incoming_shares)):
-		# 	remian_shares+=self.incoming_shares[i][1]
-
-		### STAGE 2 -> Unplaned user event handling 
-		#print(remian_shares,self.incoming_shares)
-
-		#log_print(self.ticker,"UNPLANED SHARES PAIRING")
+		### STAGE 2 -> Unplaned user event handling - send back if necessary. breakdown into senarios
 
 		remian_shares = sum(list(self.incoming_shares.values()))
 
@@ -221,35 +197,9 @@ class Symbol:
 			self.unplan_shares_pairing()
 
 
-		#log_print(self.ticker,"PASSIVE ORDERS")
-			
-		#### STAGE 3 -> MUTUAL PLANS PAIRING #####
-
-		### CURRENTLY DISABLE ###
-
-		# tps = sorted(self.incoming_request, key=lambda dict_key: abs(self.incoming_request[dict_key]))
-
-		# #print(tps)
-
-		# for i in range(len(tps)):
-		# 	if abs(self.incoming_request[tps[i]])>0:
-		# 		for j in range(i,len(tps)):
-		# 			#if j > i and is opposite sign. 
-		# 			if pair_off_test(self.incoming_request[tps[i]], self.incoming_request[tps[j]]):
-		# 				self.pair_off(tps[i], tps[j])
-
-		# log_print((self.ticker,"pairing sucessful, now remaining request: ",self.incoming_request))
-
-		# log_print((self.ticker,"current shares remaning:",sum(self.incoming_request.values())))
-
-
-
-		#### STAGE 2.5 CHecking if any flattened order is succesfully executed.
-
-
 		# #### STAGE 3 -> IMBALANCE HANDLING  (NOT COUNTING THE FLATTENED ORDER) #####
 		
-		# remaining_share = sum(self.incoming_request.values())
+
 
 		self.current_imbalance = self.get_all_imbalance()
 
@@ -283,8 +233,9 @@ class Symbol:
 
 		for tp in tps:
 
-			log_print(self.ticker,"checking",self.tradingplans[tp].name,"activated:",self.tradingplans[tp].if_activated(),"requested:",self.tradingplans[tp].having_request(self.symbol_name),\
-				"flattening:",self.tradingplans[tp].get_flatten_order())
+			# log_print(self.ticker,"checking",self.tradingplans[tp].name,"activated:",self.tradingplans[tp].if_activated(),"requested:",self.tradingplans[tp].having_request(self.symbol_name),\
+			# 	"flattening:",self.tradingplans[tp].get_flatten_order())
+
 			if self.tradingplans[tp].if_activated() and self.tradingplans[tp].having_request(self.symbol_name) and not self.tradingplans[tp].get_flatten_order():
 
 				total += self.tradingplans[tp].read_current_request(self.symbol_name)
@@ -295,9 +246,7 @@ class Symbol:
 
 		# two ways to go about this.. tp first.. then shares. OR, shares first, then TP. ideally they are equal.in practice ? SHARES FIRST
 
-
 		with self.incoming_shares_lock:
-
 
 			for price in self.incoming_shares.keys():
 
@@ -315,7 +264,6 @@ class Symbol:
 
 
 							paired = min(share,val)
-
 							
 							self.tradingplans[tp].ppro_process_orders(price,abs(paired),LONG,self.ticker)
 
@@ -451,7 +399,6 @@ class Symbol:
 
 		self.cleanup_incoming_shares()
 
-
 	def cancel_all_reqeusts(self):
 
 		tps = list(self.tradingplans.keys())
@@ -460,8 +407,6 @@ class Symbol:
 			if self.tradingplans[tp].if_activated() and self.tradingplans[tp].having_request(self.symbol_name) and not self.tradingplans[tp].get_flatten_order():
 
 				self.tradingplans[tp].cancel_request(self.ticker)
-
-
 
 	def passive_orders(self):
 
@@ -509,10 +454,6 @@ class Symbol:
 				log_print(self.ticker,"repeated orders noticed",ts-self.last_order_ts)
 				self.cancel_all_reqeusts()
 
-
-
-
-
 		if self.current_imbalance>0:
 
 			action = PASSIVEBUY
@@ -521,7 +462,7 @@ class Symbol:
 			if (price >= self.passive_price+0.01) or (self.passive_price==0) or (price<= self.passive_price-0.02):
 				order_process = True
 
-		else:
+		elif self.current_imbalance<0:
 			action = PASSIVESELL
 			price = self.get_ask()
 			coefficient = 1
@@ -531,6 +472,8 @@ class Symbol:
 			if ts > self.passive_request_ts + 15:
 				order_process = True
 
+		else:
+			pass
 		#log_print(self.ticker,"order:",price,order_process,"delayed:",ts > self.passive_request_ts + DELAY)
 
 		if order_process and ts > self.passive_request_ts + DELAY:
