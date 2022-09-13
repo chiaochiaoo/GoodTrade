@@ -365,9 +365,10 @@ class Custom_Algo():
 		ttk.Label(self.bax_algos, text="Strategy Risk:").grid(sticky="w",column=col+2,row=row)
 		ttk.Entry(self.bax_algos, textvariable=self.bax5_risk).grid(sticky="w",column=col+3,row=row)
 
-
-		self.load_corey()
-
+		try:
+			self.load_corey()
+		except:
+			pass
 		# 	self.entries.append([])
 
 		# 	for i in range(len(self.labels)): #Rows
