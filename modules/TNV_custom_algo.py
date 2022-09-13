@@ -366,6 +366,8 @@ class Custom_Algo():
 		ttk.Entry(self.bax_algos, textvariable=self.bax5_risk).grid(sticky="w",column=col+3,row=row)
 
 
+		self.load_corey()
+
 		# 	self.entries.append([])
 
 		# 	for i in range(len(self.labels)): #Rows
