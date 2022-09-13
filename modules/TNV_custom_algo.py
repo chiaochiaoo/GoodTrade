@@ -10,7 +10,7 @@ import requests
 #from modules.pannel import *
 
 from tkinter import *
-
+import json
 
 
 # from modules.TNV_OR import *
@@ -318,10 +318,10 @@ class Custom_Algo():
 		ttk.Label(self.corey_algos, text="Strategy Risk:").grid(sticky="w",column=col+2,row=row)
 		ttk.Entry(self.corey_algos, textvariable=self.corey_TEST_risk).grid(sticky="w",column=col+3,row=row)
 
+		row +=1
 
-
-
-
+		ttk.Button(self.corey_algos, text="Save Config",command=self.save_corey).grid(sticky="w",column=col,row=row)
+		ttk.Button(self.corey_algos, text="Load Config",command=self.load_corey).grid(sticky="w",column=col+2,row=row)
 
 		#row +=1
 
@@ -381,6 +381,84 @@ class Custom_Algo():
 		# 		# if i == 9:
 		# 		# 	self.b.grid_remove()
 		# 	self.l+=1
+
+	def save_corey(self):
+
+		###
+
+		d = {}
+
+		d["corey_PUFTB_multiplier"]=self.corey_PUFTB_multiplier.get()
+		d["corey_PUFTB_risk"]=self.corey_PUFTB_risk.get()
+
+		d["corey_MNQ_multiplier"]=self.corey_MNQ_multiplier.get()
+		d["corey_MNQ_risk"]=self.corey_MNQ_risk.get()
+
+		d["corey_QTSTT_multiplier"]=self.corey_QTSTT_multiplier.get()
+		d["corey_QTSTT_risk"]=self.corey_QTSTT_risk.get()
+
+		d["corey_STSTT_multiplier"]=self.corey_STSTT_multiplier.get()
+		d["corey_STSTT_risk"]=self.corey_STSTT_risk.get()
+
+		d["corey_IWTSTT_multiplier"]=self.corey_IWTSTT_multiplier.get()
+		d["corey_IWTSTT_risk"]=self.corey_IWTSTT_risk.get()
+
+		d["corey_OTS_multiplier"]=self.corey_OTS_multiplier.get()
+		d["corey_OTS_risk"]=self.corey_OTS_risk.get()
+
+		d["corey_STS_multiplier"]=self.corey_STS_multiplier.get()
+		d["corey_STS_risk"]=self.corey_STS_risk.get()
+
+		d["corey_YBO_multiplier"]=self.corey_YBO_multiplier.get()
+		d["corey_YBO_risk"]=self.corey_YBO_risk.get()
+
+		d["corey_QCK_multiplier"]=self.corey_QCK_multiplier.get()
+		d["corey_QCK_risk"]=self.corey_QCK_risk.get()
+
+		d["corey_TEST_multiplier"]=self.corey_TEST_multiplier.get()
+		d["corey_TEST_risk"]=self.corey_TEST_risk.get()
+
+		with open('corey_setting.json', 'w') as fp:
+			json.dump(d, fp)
+
+	def load_corey(self):
+
+		with open('corey_setting.json', 'r') as myfile:
+		    data=myfile.read()
+
+		# parse file
+		d = json.loads(data)
+
+		self.corey_PUFTB_multiplier.set(d["corey_PUFTB_multiplier"])
+		self.corey_PUFTB_risk.set(d["corey_PUFTB_risk"])
+
+		self.corey_MNQ_multiplier.set(d["corey_MNQ_multiplier"])
+		self.corey_MNQ_risk.set(d["corey_MNQ_risk"])
+
+		self.corey_QTSTT_multiplier.set(d["corey_QTSTT_multiplier"])
+		self.corey_QTSTT_risk.set(d["corey_QTSTT_risk"])
+
+		self.corey_STSTT_multiplier.set(d["corey_STSTT_multiplier"])
+		self.corey_STSTT_risk.set(d["corey_STSTT_risk"])
+
+		self.corey_IWTSTT_multiplier.set(d["corey_IWTSTT_multiplier"])
+		self.corey_IWTSTT_risk.set(d["corey_IWTSTT_risk"])
+
+		self.corey_OTS_multiplier.set(d["corey_OTS_multiplier"])
+		self.corey_OTS_risk.set(d["corey_OTS_risk"])
+
+		self.corey_STS_multiplier.set(d["corey_STS_multiplier"])
+		self.corey_STS_risk.set(d["corey_STS_risk"])
+
+		self.corey_YBO_multiplier.set(d["corey_YBO_multiplier"])
+		self.corey_YBO_risk.set(d["corey_YBO_risk"])
+
+		self.corey_QCK_multiplier.set(d["corey_QCK_multiplier"])
+		self.corey_QCK_risk.set(d["corey_QCK_risk"])
+
+		self.corey_TEST_multiplier.set(d["corey_TEST_multiplier"])
+		self.corey_TEST_risk.set(d["corey_TEST_risk"])
+
 
 	def corey_multiplier(self,data,multiplier,risk):
 
