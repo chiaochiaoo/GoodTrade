@@ -232,25 +232,28 @@ class ETF:
 
 	def new_imbalance(self,symbol,side,quantity,weight,time_,ts):
 
-		#print(self.data,quantity,weight)
-		if side =="B":
-			self.data["buy"]+=quantity*weight
-		elif side =="S":
-			self.data["sell"]+=quantity*weight
+		try:
+			#print(self.data,quantity,weight)
+			if side =="B":
+				self.data["buy"]+=quantity*weight
+			elif side =="S":
+				self.data["sell"]+=quantity*weight
 
-		if symbol not in self.data["symbols"]:
-			self.data["symbols"][symbol] = {}
-			self.data["symbols"][symbol]["S"] =0
-			self.data["symbols"][symbol]["B"] =0
+			if symbol not in self.data["symbols"]:
+				self.data["symbols"][symbol] = {}
+				self.data["symbols"][symbol]["S"] =0
+				self.data["symbols"][symbol]["B"] =0
 
-		self.data["symbols"][symbol][side] += quantity
+			self.data["symbols"][symbol][side] += quantity
 
-		if ts -self.ts >=5:
-			try:
-				self.calc_delta(time_,ts)
-			except Exception as e:
-				pass
-			
+			if ts -self.ts >=5:
+				try:
+					self.calc_delta(time_,ts)
+				except Exception as e:
+					print(e)
+					pass
+		except Exception as e:
+			print(e)
 
 	"""RUN EVERY 5 SECONDS"""
 	def calc_delta(self,time_,ts):
