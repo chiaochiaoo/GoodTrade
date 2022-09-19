@@ -248,6 +248,44 @@ def read_summary():
 			time.sleep(5)
 
 
+
+with open('C:/PPro8 NU/QIAOSUN_Summary_1.log', 'r') as f:
+
+	for i in f.readlines():
+		#print(i)
+
+		l = i.split(" ")
+
+
+		if len(l)>1:
+			if l[1]=="RegionAssetLayerDisplayData:":
+				#print(l)
+
+				time_ = l[0]
+				net = find_between(i, "net=", ",")
+				fees = find_between(i, "totalFees=", ",")
+				trades = find_between(i, "totalTrades=", ",")
+				sizeTraded = find_between(i, "sizeTraded=", ",")
+				unrealizedPlusNet = find_between(i, "unrealizedPlusNet=", ",")
+
+				#print(time_,net,fees,trades,sizeTraded,unrealizedPlusNet)
+
+			else:
+				
+
+				time_ = l[0]
+				symbol = find_between(i, "symbol=", ",")
+				lastPrice = find_between(i, "lastPrice=", ",")
+				l1AskPrice = find_between(i, "l1AskPrice=", ",")
+				l1BidPrice = find_between(i, "l1BidPrice=", ",")
+				print(time_,symbol,lastPrice,l1AskPrice,l1BidPrice)
+			# 4 net 
+			# 5 fees
+			# 6 trades
+			# 8 max profit 
+			# 10 sizeTraded
+			# 22 unrealizedPlusNet
+
 def get_current_positions():
 
 	try:
@@ -593,8 +631,8 @@ def decode_l1_(stream_data,pipe,writer,l1data):
 
 ### TEST. thread on summary. main on periodic check
 
-req = threading.Thread(target=read_summary,args=(), daemon=True)
-req.start()
+# req = threading.Thread(target=read_summary,args=(), daemon=True)
+# req.start()
 
 
-periodical_check(None,4135)
+# periodical_check(None,4135)
