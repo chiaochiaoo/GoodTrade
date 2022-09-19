@@ -9,6 +9,7 @@ from TradingPlan_Basket import *
 # from TradingPlan_MMP1 import *
 # from Pair_TP import *
 # from Pair_TP_MM import *
+
 from UI import *
 from Ppro_in import *
 from Ppro_out import *
@@ -52,277 +53,9 @@ f.close()
 
 
 
-
 TEST = True
 
 
-def algo_manager_voxcom(pipe):
-
-	#tries to establish commuc
-
-
-	while True:
-
-		HOST = 'localhost'  # The server's hostname or IP address
-		#PORT = 65491       # The port used by the server
-
-		try:
-			log_print("Trying to connect to the main application")
-			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			connected = False
-
-			while not connected:
-				try:
-					with open('../commlink.json') as json_file:
-						port_file = json.load(json_file)
-
-					if datetime.now().strftime("%m%d") not in port_file:
-						time.sleep(1)
-					else:
-						PORT = port_file[datetime.now().strftime("%m%d")]
-						s.connect((HOST, PORT))
-						connected = True
-
-					s.setblocking(0)
-				except Exception as e:
-					pipe.send(["msg","Disconnected"])
-					log_print("Cannot connected. Try again in 2 seconds.",e)
-					time.sleep(2)
-
-			connection = True
-			pipe.send(["msg","Connected"])
-			k = None
-
-			count = 0
-			while connection:
-
-				#from the socket
-				ready = select.select([s], [], [], 0)
-				
-				if ready[0]:
-					data = []
-					while True:
-						try:
-							part = s.recv(2048)
-						except:
-							connection = False
-							break
-						#if not part: break
-						data.append(part)
-						if len(part) < 2048:
-							#try to assemble it, if successful.jump. else, get more. 
-							try:
-								k = pickle.loads(b"".join(data))
-								break
-							except:
-								pass
-					#k is the confirmation from client. send it back to pipe.
-					if k!=None:
-						placed = []
-
-						pipe.send(["pkg",k[1:]])
-						for i in k[1:]:
-							log_print("placed:",i[1])
-							placed.append(i[1])
-						#log_print("placed:",k[1][1])
-						
-						s.send(pickle.dumps(["Algo placed",placed]))
-
-				# if pipe.poll(0):
-				# 	data = pipe.recv()
-				# 	if data == "Termination":
-				# 		s.send(pickle.dumps(["Termination"]))
-				# 		print("Terminate!")
-
-				# 	part = s.recv(2048)
-				# except:
-				# 	connection = False
-				# 	break
-				# #if not part: break
-				# data.append(part)
-				# if len(part) < 2048:
-				# 	#try to assemble it, if successful.jump. else, get more. 
-				# 	try:
-				# 		k = pickle.loads(b"".join(data))
-				# 		break
-				# 	except:
-				# 		pass
-
-				count+=1
-				print(count)
-			log_print("Main disconnected")
-			pipe.send(["msg","Main disconnected"])
-		except Exception as e:
-			pipe.send(["msg",e])
-			log_print(e)
-
-
-def algo_manager_voxcom2(pipe):
-
-	#tries to establish commuc
-	while True:
-
-		HOST = 'localhost'  # The server's hostname or IP address
-		PORT = 65491       # The port used by the server
-
-		try:
-			log_print("Trying to connect to the main application")
-			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			connected = False
-
-			while not connected:
-				try:
-					s.connect((HOST, PORT))
-					s.send(pickle.dumps(["Connection","Connected"]))
-					connected = True
-				except:
-					pipe.send(["msg","Disconnected"])
-					log_print("Cannot connected. Try again in 3 seconds.")
-					time.sleep(3)
-
-			connection = True
-
-			pipe.send(["msg","Connected"])
-
-			while connection:
-
-				data = []
-				k = None
-				while True:
-					try:
-						part = s.recv(2048)
-					except:
-						connection = False
-						break
-					#if not part: break
-					data.append(part)
-					if len(part) < 2048:
-						#try to assemble it, if successful.jump. else, get more. 
-						try:
-							k = pickle.loads(b"".join(data))
-							break
-						except Exception as e:
-							log_print(e)
-				#s.sendall(pickle.dumps(["ids"]))
-				if k!=None:
-					pipe.send(["pkg",k])
-					#log_print("placed:",k[1][1])
-					s.send(pickle.dumps(["Algo placed",k[1][1]]))
-			log_print("Main disconnected")
-			pipe.send(["msg","Disconnected"])
-		except Exception as e:
-			pipe.send(["msg",e])
-			log_print(e)
-
-
-def algo_manager_voxcom3(pipe):
-
-	#tries to establish commuc
-
-
-	while True:
-
-		HOST = 'localhost'  # The server's hostname or IP address
-		#PORT = 65491       # The port used by the server
-
-		try:
-			log_print("Trying to connect to the main application")
-			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			connected = False
-
-			while not connected:
-				try:
-					with open('../commlink.json') as json_file:
-						port_file = json.load(json_file)
-
-					if datetime.now().strftime("%m%d") not in port_file:
-						time.sleep(1)
-					else:
-						PORT = port_file[datetime.now().strftime("%m%d")]
-						s.connect((HOST, PORT))
-						connected = True
-
-					s.setblocking(1)
-				except Exception as e:
-					pipe.send(["msg","Disconnected"])
-					log_print("Cannot connected. Try again in 2 seconds.",e)
-					time.sleep(2)
-
-			connection = True
-			pipe.send(["msg","Connected"])
-			k = None
-
-			count = 0
-			while connection:
-
-				#from the socket
-				data = []
-				while True:
-					try:
-						part = s.recv(2048)
-					except:
-						connection = False
-						break
-					#if not part: break
-					data.append(part)
-					if len(part) < 2048:
-						#try to assemble it, if successful.jump. else, get more. 
-						try:
-							k = pickle.loads(b"".join(data))
-							break
-						except:
-							pass
-				#k is the confirmation from client. send it back to pipe.
-				if k!=None:
-					if k!=['checking']:
-						placed = []
-
-						pipe.send(["pkg",k[1:]])
-						for i in k[1:]:
-							log_print("placed:",i[1])
-							placed.append(i[1])
-						#log_print("placed:",k[1][1])
-						
-						s.send(pickle.dumps(["Algo placed",placed]))
-
-				# if pipe.poll(0):
-				# 	data = pipe.recv()
-				# 	if data == "Termination":
-				# 		s.send(pickle.dumps(["Termination"]))
-				# 		print("Terminate!")
-
-				# 	part = s.recv(2048)
-				# except:
-				# 	connection = False
-				# 	break
-				# #if not part: break
-				# data.append(part)
-				# if len(part) < 2048:
-				# 	#try to assemble it, if successful.jump. else, get more. 
-				# 	try:
-				# 		k = pickle.loads(b"".join(data))
-				# 		break
-				# 	except:
-				# 		pass
-
-				count+=1
-				#print("algo place counts",count)
-			log_print("Main disconnected")
-			pipe.send(["msg","Main disconnected"])
-		except Exception as e:
-			pipe.send(["msg",e])
-			log_print(e)
-
-
-def logging(pipe):
-
-	f = open(datetime.now().strftime("%d/%m")+".txt", "w")
-	while True:
-		string = pipe.recv()
-		time_ = datetime.now().strftime("%H:%M:%S")
-		log_print(string)
-		f.write(time_+" :"+string)
-	f.close()
 
 class Manager:
 
@@ -345,8 +78,9 @@ class Manager:
 		self.symbol_data = {}
 
 		self.baskets = {}
-		self.tradingplan = {}
 
+
+		self.tradingplan = {}
 		self.pair_plans = {}
 
 
@@ -409,7 +143,7 @@ class Manager:
 
 		self.shutdown=False
 
-		handl = threading.Thread(target=self.shares_allocation,daemon=True)
+		handl = threading.Thread(target=self.symbols_inspection,daemon=True)
 		handl.start()
 
 		good = threading.Thread(target=self.goodtrade_in, daemon=True)
@@ -449,7 +183,7 @@ class Manager:
 
 
 
-	def shares_allocation(self):
+	def symbols_inspection(self):
 
 		#fro each of the symbols. look at imbalance. deal with it. 
 
@@ -534,194 +268,6 @@ class Manager:
 		else:
 			log_print(basket_name,"already shutdown")
 
-
-	def add_new_tradingplan(self,data,TEST_MODE):
-
-		#print("adding",data)
-
-		type_name = data["type_name"]
-		algo_id = data["algo_id"]
-
-
-		now = datetime.now()
-		ts = now.hour*60 + now.minute 
-		
-
-		if algo_id not in self.algo_ids:
-
-			self.algo_ids.append(algo_id)
-
-			if type_name =="Pair":
-
-				algo_name =  data["algo_name"]
-
-				symbol1 = data["symbol1"] 
-				symbol2 = data["symbol2"]
-
-				ratio = data["ratio"]
-				share = data["share"]
-				#symbol1_share = int(data["symbol1_share"])
-				#symbol2_share =  int(data["symbol2_share"])
-				risk = float(data["risk"])
-
-				symbol1_stats = {}
-				symbol2_stats = {}
-				#symbol1_stats = data["symbol1_statistics"]
-				#symbol2_stats = data["symbol2_statistics"]
-				mana = data["management"]
-
-				name = algo_id   #symbol1[:-3]+"/"+symbol2[:-3]
-
-				# pair reversed region. 
-				# self.pair_plans
-
-				if self.ui.pair_label_count < 5:
-
-					if symbol1 not in self.symbol_data:
-						self.symbol_data[symbol1] = Symbol(symbol1,0,0,symbol1_stats,self.pipe_ppro_out)  	
-
-						self.symbols.append(symbol1)
-						if symbol1 not in self.pair_plans:
-							self.pair_plans[symbol1] = name
-
-					if symbol2 not in self.symbol_data:
-						self.symbol_data[symbol2] = Symbol(symbol2,0,0,symbol2_stats,self.pipe_ppro_out)  
-
-						if symbol2 not in self.pair_plans:
-							self.pair_plans[symbol2] = name	
-
-						self.symbols.append(symbol2)
-
-					#def __init__(self,name:"",Symbol1,Symbol2,ratio,share,manage_plan=None,risk=None,TEST_MODE=False,algo_name="",Manager=None):
-					### name:"",symbol:Symbol1,symbol:Symbol2,share1,share2,manage_plan=None,risk=None,TEST_MODE=False,algo_name="",Manager=None
-					#self,name:"",Symbol1,Symbol2,ratio,sigma=0.01,manage_plan=None,risk=None,TEST_MODE=False,algo_name="",Manager=None
-					if mana==MARKETMAKING:
-						print("MARKETMAKING")
-						self.tradingplan[name] = PairTP_MM(name,self.symbol_data[symbol1],self.symbol_data[symbol2],ratio,data["sigma"],risk,algo_name,self)
-					else:
-						self.tradingplan[name] = PairTP(name,self.symbol_data[symbol1],self.symbol_data[symbol2],ratio,share,mana,risk,TEST_MODE,algo_name,self)
-
-					self.ui.create_new_single_entry(self.tradingplan[name],type_name,None)
-
-					self.tradingplan[name].deploy(9600)
-				else:
-
-					find_ = False
-					replace_id = 0
-
-					for trade in list(self.tradingplan.values()):
-
-						if (trade.tkvars[STATUS].get()==PENDING or trade.tkvars[STATUS].get()==DONE) and trade.pair_plan==True and trade.in_use ==False:
-							replace_id = trade.algo_ui_id
-							trade.deactive()
-							find_ = True
-							log_print("Replacing",trade.symbol_name,"replace_id",replace_id)
-							break 
-					if find_:
-
-						if symbol1 not in self.symbol_data:
-							self.symbol_data[symbol1] = Symbol(symbol1,0,0,symbol1_stats,self.pipe_ppro_out)  	
-
-							self.symbols.append(symbol1)
-							if symbol1 not in self.pair_plans:
-								self.pair_plans[symbol1] = name
-
-						if symbol2 not in self.symbol_data:
-							self.symbol_data[symbol2] = Symbol(symbol2,0,0,symbol2_stats,self.pipe_ppro_out)  
-
-							if symbol2 not in self.pair_plans:
-								self.pair_plans[symbol2] = name	
-
-							self.symbols.append(symbol2)
-
-						self.tradingplan[name] = PairTP(name,self.symbol_data[symbol1],self.symbol_data[symbol2],symbol1_share,symbol2_share,mana,risk,TEST_MODE,algo_name,self)
-
-						self.ui.create_new_single_entry(self.tradingplan[name],type_name,replace_id)
-
-						self.tradingplan[name].deploy(9600)
-
-					else:
-
-						log_print("System at full capacity.")
-
-
-
-			elif type_name == "Single":
-
-				algo_name =  data["algo_name"]
-
-				symbol = data["symbol"] 
-				entryplan = data["entry_type"]
-				
-				support = round(float(data["support"]),2)
-				resistence =  round(float(data["resistence"]),2)
-				risk = float(data["risk"])
-				stats = {} #data["statistics"]
-				status = data["immediate_deployment"]
-				mana = data["management"]
-			
-				name = algo_id #symbol+str(ts)+ str(random.randint(0, 9))
-			
-				#print(support,resistence,risk)
-				if self.ui.algo_count_number.get()<60:
-					#print(symbol,self.ui.algo_count_number.get())
-					
-					if symbol not in self.symbol_data:
-						self.symbol_data[symbol] = Symbol(symbol,support,resistence,stats,self.pipe_ppro_out)  #register in Symbol.
-						self.symbols.append(symbol)
-					#self.symbol_data[symbol].set_mind("Yet Register",DEFAULT)
-						
-
-					#######################################################################
-
-					#def __init__(self,name:"",symbol:Symbol,entry_plan=None,manage_plan=None,support=0,resistence=0,risk=None,TEST_MODE=False,algo_name="",Manager=None):
-
-					if mana==MARKETMAKING:
-						self.tradingplan[algo_id] = TradingPlan_MMP1(name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
-					else:
-						self.tradingplan[algo_id] = TradingPlan(name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
-					self.ui.create_new_single_entry(self.tradingplan[algo_id],type_name,None)
-
-					if status == True:
-						self.tradingplan[algo_id].deploy(9600)
-				else:
-					#log_print("System at full capacity.")
-
-					find_ = False
-					replace_id = 0
-					for trade in list(self.tradingplan.values()):
-
-						if (trade.tkvars[STATUS].get()==PENDING or trade.tkvars[STATUS].get()==DONE) and trade.pair_plan==False and trade.in_use ==False:
-
-							trade.tkvars[STATUS].set("EVICTED")
-							replace_id = trade.algo_ui_id
-
-							try:
-								trade.deactive()
-							except Exception as e:
-								log_print("deactivation problem",e)
-							find_ = True
-							log_print("Replacing",trade.symbol_name,"replace_id")
-							break 
-
-
-					if find_:
-						# get rid off that tradingplan. 
-						if symbol not in self.symbol_data:
-							self.symbol_data[symbol]=Symbol(symbol,support,resistence,stats,self.pipe_ppro_out)  #register in Symbol.
-							self.symbols.append(symbol)
-
-						#######################################################################
-
-						self.tradingplan[algo_id] = TradingPlan(name,self.symbol_data[symbol],entryplan,mana,support,resistence,risk,TEST_MODE,algo_name,self)
-						#self.tradingplan[symbol]=TradingPlan(name,self.symbol_data[symbol],entryplan,INSTANT,mana,risk,0,TEST_MODE,algo_name,self)
-						self.ui.create_new_single_entry(self.tradingplan[algo_id],type_name,replace_id)
-						#self.ui.create_single_entry(self.tradingplan[symbol],replace_id)
-
-						if status == True:
-							self.tradingplan[algo_id].deploy(9600)
-					else:
-						log_print("System at full capacity.")
 
 
 	def timer(self):
@@ -1003,23 +549,8 @@ class Manager:
 
 				except Exception as e:
 
-					PrintException(e,"adding algo error")
-			elif d[0] =="pkg":
-				log_print("new package arrived",d)
+					PrintException(e,"adding basket error")
 
-
-				if self.receiving_signals.get():
-					for i in d[1]:
-
-						try:
-							self.add_new_tradingplan(i,self.test_mode)
-
-						
-						except Exception as e:
-
-							PrintException(e,"adding algo error")
-				else:
-					log_print("Algo rejection. deployment denied.")
 			elif d[0] =="shutdown":
 				break
 	def ppro_in(self):
@@ -1202,24 +733,6 @@ class Manager:
 				d.adjusting_risk()
 				d.update_displays()
 				
-	# def terminateGT(self):
-
-	# 	if self.termination:
-	# 		self.pipe_goodtrade.send("Termination")
-	# 		self.termination = False
-	# 	else:
-	# 		print("Already terminated or not connected")
-
-	def deploy_all(self):
-		for d in list(self.tradingplan.values()):
-			#print(list(self.tradingplan.values()))
-			if d.data[STATUS]==PENDING:
-				d.deploy()
-
-	def withdraw_all(self):
-		for d in list(self.tradingplan.values()):
-			if d.in_use:
-				d.cancle_deployment()
 
 	def flatten_all(self):
 		for d in list(self.tradingplan.values()):
@@ -1227,80 +740,6 @@ class Manager:
 				d.flatten_cmd()
 
 				
-	def threaded_trades_aggregation(self,side,action,percent,positive_pnl,passive):
-
-		log_print("All",side," ",action," ",percent*100,"%"," winning?",positive_pnl)
-		if side!=None:
-			self.cmd_text.set("Status: "+str(side)+" "+str(action)+" "+str(percent*100)+"%")
-		if positive_pnl:
-			self.cmd_text.set("Status: "+"Winning"+" "+str(action)+" "+str(percent*100)+"%")
-		for d in list(self.tradingplan.values()):
-			if d.in_use and d.data[STATUS]==RUNNING and d.get_management_start():
-				if positive_pnl==True:
-					if d.data[UNREAL] >0:
-						#print("CHEKCING UNREAL",d.data[UNREAL])
-						d.manage_trades(side,action,percent,passive)
-				else:
-
-					d.manage_trades(side,action,percent,passive)
-
-	def trades_aggregation(self,side,action,percent,positive_pnl,passive):
-
-		now = datetime.now()
-		ts = now.hour*3600 + now.minute*60 + now.second
-		diff =  ts -self.manage_lock
-
-		if diff>2:
-			reg1 = threading.Thread(target=self.threaded_trades_aggregation,args=(side,action,percent,positive_pnl,passive,), daemon=True)
-			reg1.start()
-			self.manage_lock = ts
-		else:
-			log_print("Trades aggregation under cooldown:",diff)
-			self.cmd_text.set("Status: Under CoolDown:"+str(diff))
-
-
-
-	def cancel_all(self):
-		for d in list(self.tradingplan.values()):
-			d.cancel_algo()
-
-	def export_algos(self):
-
-		try:
-			export = []
-
-			for d in self.tradingplan.values():
-
-				if d.tkvars[STATUS].get()==PENDING:
-					entryplan = d.tkvars[ENTRYPLAN].get()
-					symbol =d.symbol_name
-					support = d.symbol.data[SUPPORT]
-					resistence =  d.symbol.data[RESISTENCE]
-					risk = d.data[ESTRISK]
-					stats = d.symbol.get_stats()
-					export.append([entryplan,symbol,support,resistence,risk,stats])
-
-			with open("../../algo_setups/"+"algo_setups", 'w') as outfile:
-				json.dump(export, outfile)
-			self.ui.set_command_text("Export successful.")
-		except Exception as e:
-			log_print("Export failed:",e)
-			self.ui.set_command_text("Export failed.plz send log to chiao ")
-
-	def import_algos(self):
-
-		try:
-			with open("../../algo_setups/"+"algo_setups") as outfile:
-				algo_file = json.load(outfile)
-
-			for i in algo_file:
-				self.add_new_tradingplan(i,self.test_mode)
-			self.ui.set_command_text("Import successful.")
-		except Exception as e:
-			log_print("Import failed:",e)
-			self.ui.set_command_text("Import failed.plz send log to chiao ")
-
-	
 
 def force_close_port(port, process_name=None):
     """Terminate a process that is bound to a port.
