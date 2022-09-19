@@ -2,10 +2,23 @@ import time
 import requests 
 import socket
 import threading
+import os 
 from constant import *
 from Util_functions import *
 import csv
 from datetime import datetime
+
+
+global user 
+user = ""
+
+global file_location
+file_location = ""
+
+global summary_being_read
+summary_being_read = False 
+
+
 
 def open_file():
 
@@ -22,6 +35,15 @@ def open_file():
 def save_file(f):
 
 	f.close()
+
+def threading_request(request_str):
+	req = threading.Thread(target=request,args=(request_str,), daemon=True)
+	req.start()
+
+def request(request_str):
+	requests.get(request_str)
+
+
 
 
 def Ppro_in(port,pipe):
@@ -98,13 +120,7 @@ def Ppro_in(port,pipe):
 	f.close()
 	
 
-def periodical_check(pipe,port):
 
-
-	"""
-	Two things in there.
-	Periodically send out OSSTAT and request for get ENV.
-	"""
 
 
 def ppro_connection_service(pipe,port):
@@ -130,24 +146,126 @@ def ppro_connection_service(pipe,port):
 		state = False
 
 def get_env():
+
 	try:
-		p="http://localhost:8080/Register?symbol=QQQ.NQ&feedtype=L1"
+		p="http://localhost:8080/GetEnvironment?"
 		r= requests.get(p)
 
-		print("r.text")
-		#log_print(r.status_code)
-		#log_print(r)
 		if r.status_code==200:
-			return True
+			user = find_between(r.text, "User=", " ")[1:-1]
+			directory = find_between(r.text, "DataDir=", "/")[1:]
+
+			# print("user",user)
+			# print("directory",directory)
+
+			file_location = directory+"\\"+user+'_Summary_1.log'
+
+			return (user,file_location)
 		else:
-			return False
-
+			return ('','')
 	except Exception as e:
-		return False
+		PrintException(e,"Get ENV failed ")
+		return ('','')
 
-	except:
-		log_print("register failed")
-		return False
+
+def periodical_check(pipe,port):
+
+
+	"""
+	Two things in there.
+	1. Periodically send out OSSTAT and request for get ENV.
+	2. Perioddically send out read orders 
+
+
+	### UPDATE . 1. Summary PNL  2. Total Positions/Symbols 
+	"""
+	global user 
+	global file_location
+	global summary_being_read
+
+
+
+	while True:
+
+		try:
+
+			### first step, get user and file location
+			if summary_being_read==False:
+				user,file_location = get_env()
+
+			else:
+
+				log_print("periodcal new loop")
+				### 1. register OSTAT  
+				register_order_listener(port)
+
+				### 2. Get open position 
+				positions = get_current_positions()
+
+				### 3. send request for summary PNL
+				threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity")
+
+				### 4. send request for each individual symbol PNL
+				for symbol in positions.keys():
+					threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity"+"^"+user+"^"+symbol)
+
+
+
+		except Exception as e:
+			PrintException(e,"periodical_check error ")
+		time.sleep(3)
+
+
+
+def read_summary():
+
+	global file_location
+	global summary_being_read
+
+
+	while True:
+
+		if os.path.exists(file_location):
+			log_print("reading summary functional")
+			summary_being_read = True
+
+			try:
+				with open(file_location, 'r') as f:
+					#print(f.readline())
+					f.readlines()
+					while True:
+						k=f.readlines(50)
+
+						if len(k)>0:
+							print(k)  ### DO STH. SEND INFO TO MANAGER. 
+
+			except Exception as e:  ## ANYTHING HAPPENED, EJECT. 
+				log_print("reading summary error",e)
+				summary_being_read = False
+
+		else:
+			summary_being_read = False
+			time.sleep(5)
+
+
+def get_current_positions():
+
+	try:
+		d = {}
+		p="http://localhost:8080/GetOpenPositions?user=QIAOSUN"
+		r= requests.get(p)
+
+		for i in r.text.splitlines():
+			if "Position Symbol" in i:
+
+				symbol = find_between(i, "Symbol=", " ")[1:-1]
+				share = find_between(i, "Volume=", " ")[1:-1]
+				d[symbol]=share 
+		
+		return d
+	except Exception as e:
+		PrintException(e)
+		return {}
 
 def test_register():
 	try:
@@ -411,8 +529,8 @@ def process_l1(dic,bid,ask,ms):
 		return False
 
 def new_ema(current,last_EMA,n):
-    
-    return round((current - last_EMA)*(2/(n+1)) + last_EMA,2)
+	
+	return round((current - last_EMA)*(2/(n+1)) + last_EMA,2)
 
 
 
@@ -469,3 +587,14 @@ def decode_l1_(stream_data,pipe,writer,l1data):
 
 # for i in range(10):
 # 	writer.writerow(['1', '2','3',i])
+
+
+
+
+### TEST. thread on summary. main on periodic check
+
+req = threading.Thread(target=read_summary,args=(), daemon=True)
+req.start()
+
+
+periodical_check(None,4135)
