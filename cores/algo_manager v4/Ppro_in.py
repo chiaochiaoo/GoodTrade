@@ -306,7 +306,7 @@ def read_summary(pipe):
 										trades = int(find_between(i, "totalTrades=", ","))
 										sizeTraded = int(find_between(i, "sizeTraded=", ","))
 										unrealizedPlusNet = float(find_between(i, "unrealizedPlusNet=", ","))
-
+										unrealized = unrealizedPlusNet	-net 
 										#print(time_,net,fees,trades,sizeTraded,unrealizedPlusNet)
 										# SymbolLayerDisplayData: 
 										d= {}
@@ -316,6 +316,7 @@ def read_summary(pipe):
 										d['sizeTraded'] = sizeTraded
 										d['unrealizedPlusNet'] = unrealizedPlusNet
 										d['time'] = time_
+										d['unrealized'] = unrealized	
 
 										pipe.send(["summary update",d])
 

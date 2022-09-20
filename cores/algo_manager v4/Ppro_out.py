@@ -54,7 +54,6 @@ def register_web(symbol,port):
 
 	return postbody,"register "+symbol,"register failed "+symbol
 
-
 def deregister_web(symbol,port):
 
 	postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&feedtype=L1&output=" + str(port)+"&status=off"
@@ -89,8 +88,6 @@ def flatten_symbol(symbol):
 	#req = threading.Thread(target=ppro_request, args=(r,sucess,failure,),daemon=True)
 	#req.start()
 
-
-
 def breakup_order(symbol,share,break_price):
 
 
@@ -115,8 +112,6 @@ def breakdown_order(symbol,share,break_price):
 	return r,sucess,failure
 
 def buy_market_order(symbol,share):
-
-
 
 	#r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=EDGX Buy ROUC Market DAY&shares='+str(share)
 	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Buy ARCX Market DAY&shares='+str(share)
@@ -159,7 +154,6 @@ def buy_limit_order(symbol, price,share,gateway=0):
 
 	return r,sucess,failure
 
-
 def sell_limit_order(symbol, price,share,gateway=0):
 	price = round(float(price),2)
 
@@ -180,8 +174,6 @@ def sell_limit_order(symbol, price,share,gateway=0):
 	failure="Error sell limit order on "+symbol
 
 	return r,sucess,failure
-
-
 
 
 def passive_buy(symbol	,share,offset):
@@ -243,7 +235,6 @@ def passive_sell(symbol	,share,offset):
 # 	return r,sucess,failure
 
 
-
 def buy_aggressive_limit_order(symbol,share,ask):
 
 	#ask = ask*1.03
@@ -281,8 +272,6 @@ def short_aggressive_limit_order(symbol,share,bid):
 
 	return r,sucess,failure
 
-
-
 def stoporder_to_market_buy(symbol,price,share):
 
 	price = round(float(price),2)
@@ -311,7 +300,6 @@ def cancel_all_oders(symbol):
 
 	return r,sucess,failure
 
-
 def init_driver(pipe_status):
 
 	while True:
@@ -331,7 +319,6 @@ def init_driver(pipe_status):
 
 def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY. 
 
-
 	driver = init_driver(pipe_status)
 	log_print("Orders output moudule online.")
 	request_str = ""
@@ -348,13 +335,13 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 
 			log_print("PPRO ORDER:",d)
 
-
 			if type_ == "shutdown":
 				log_print("ppro out termination")
 				driver.close()
 				pipe_status.send("terminated")
 				log_print("ppro out shutdown successful")
 				termination = True
+
 			elif type_ == BUY:
 
 				symbol = d[1]
@@ -453,15 +440,6 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 				request_str,sucess_str,failure_str=cancel_all_oders(symbol)
 
 
-			elif type_ == SUMMARY:
-
-				request_str = "Get?type=tool&tool=Summary_1&key=NCSA%20Equity"
-				sucess_str=""
-				failure_str=""
-
-			elif type_ == SUMMARY_SYMBOL:
-				pass
-
 			elif type_ == FLATTEN:
 
 				symbol = d[1]
@@ -548,9 +526,7 @@ def cancel_stoporder(id_):
 
 
 
-
-
-	#return (find_between(r.text,"<Content>","</Content>"))
+#return (find_between(r.text,"<Content>","</Content>"))
 # symbol="QQQ.NQ"
 # offset = 0.01
 # share = 1
@@ -584,9 +560,6 @@ def cancel_stoporder(id_):
 # 		#time.sleep(1)
 # 	while True:
 # 		time.sleep(1)
-
-
-	
 
 
 	#sell_market_order("AAL.NQ",1)
@@ -642,9 +615,6 @@ def cancel_stoporder(id_):
 	# 				# 	self.modify_algo_count(-1)
 	# 				# else:
 	# 				# 	status_text.set("Done.")
-
-
-
 
 
 # def buy_limit_order(symbol, price,share,wait=0):
