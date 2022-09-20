@@ -8,6 +8,7 @@ from Util_functions import *
 import csv
 from datetime import datetime
 
+import multiprocessing
 
 global user 
 user = ""
@@ -47,6 +48,72 @@ def request(request_str):
 
 
 def Ppro_in(port,pipe):
+
+	p1 = threading.Thread(target=periodical_check,args=(pipe,port), daemon=True)
+	p1.start()
+
+	p2 = threading.Thread(target=read_summary,args=(pipe,), daemon=True)
+	p2.start()
+
+	last_ts = 0
+
+
+	UDP_IP = "localhost"
+	UDP_PORT = port
+
+	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	sock.bind((UDP_IP, UDP_PORT))
+
+	pipe.send(["msg","algo_ppro working"])
+	#sock.settimeout()
+	work = False
+	while True:
+
+		try:
+			rec= False
+			try:
+				data, addr = sock.recvfrom(1024)
+				#print(data)
+				rec = True
+			except Exception as e:
+				log_print(e)
+				# IF I don't hear things for 5 seconds. it would result in a timed out. ok. good.
+				work = False
+				pipe.send(["ppro_in","Disconnected"])
+
+			if rec:
+				stream_data = str(data)
+				if work==False:
+					pipe.send(["ppro_in","Connected"])
+
+				work=True
+				type_ = find_between(stream_data, "Message=", ",")
+
+				if type_ == "OrderStatus":
+					decode_order(stream_data,pipe)
+
+				#now = datetime.now()
+
+				# cur_ts = now.hour*60+now.minute 
+				# if cur_ts - ts >= 30:
+				# 	ts = cur_ts 
+				# 	ppro_conn = threading.Thread(target=ppro_connection_service,args=(pipe,port), daemon=True)
+				# 	ppro_conn.start()
+				# if cur_ts !=last_ts:
+				# 	log_print("PPRO message updating normal,",cur_ts)
+				# 	last_ts = cur_ts
+
+				# elif type_ =="L1":
+				# 	decode_l1(stream_data,pipe,writer,l1data)
+				# 	count+=1
+				# 	if count %1000 ==0:
+				# 		save_file(f)
+				# 		f,writer = open_file()
+		except Exception as e:
+			PrintException(e,"PPRO IN error")
+	f.close()
+
+def Ppro_in_old(port,pipe):
 
 	now = datetime.now()
 	ts = now.hour*60+now.minute 
@@ -122,28 +189,57 @@ def Ppro_in(port,pipe):
 
 
 
+def periodical_check(pipe,port):
 
-def ppro_connection_service(pipe,port):
 
-	#keep running and don't stop
-	state = False
+	"""
+	Two things in there.
+	1. Periodically send out OSSTAT and request for get ENV.
+	2. Perioddically send out read orders 
 
-	if test_register():
-		pipe.send(["ppro_in","Connected"])
-		if state == False:
-			log_print("Ppro connected. Registering OSTAT")
-			i = 3
-			while i >0:
-				if register_order_listener(port):
-					log_print("OSTAT registered")
-					state = True
-					break
-				else:
-					log_print("OSTAT registeration failed")
-				i-=1 
-	else:
-		pipe.send(["ppro_in","Disconnected"])
-		state = False
+
+	### UPDATE . 1. Summary PNL  2. Total Positions/Symbols 
+	"""
+	global user 
+	global file_location
+	global summary_being_read
+
+
+	c = 0
+
+	while True:
+		
+		try:
+
+			### first step, get user and file location
+			if summary_being_read==False:
+				user,file_location = get_env()
+			else:
+
+				log_print("periodcal new loop")
+				### 1. register OSTAT  
+				if c%5==0:
+					register_order_listener(port)
+
+				### 2. Get open position 
+				positions = get_current_positions()
+
+				### 3. send request for summary PNL
+				threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity")
+
+				c+=1
+				### 4. send request for each individual symbol PNL
+
+				if c%3==0:
+					for symbol in positions.keys():
+						threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity"+"^"+user+"^"+symbol)
+
+				### RETURN BUS. 
+				pipe.send(["position update",positions,user])
+
+		except Exception as e:
+			PrintException(e,"periodical_check error ")
+		time.sleep(3)
 
 def get_env():
 
@@ -168,80 +264,87 @@ def get_env():
 		return ('','')
 
 
-def periodical_check(pipe,port):
 
-
-	"""
-	Two things in there.
-	1. Periodically send out OSSTAT and request for get ENV.
-	2. Perioddically send out read orders 
-
-
-	### UPDATE . 1. Summary PNL  2. Total Positions/Symbols 
-	"""
-	global user 
-	global file_location
-	global summary_being_read
-
-
-
-	while True:
-
-		try:
-
-			### first step, get user and file location
-			if summary_being_read==False:
-				user,file_location = get_env()
-
-			else:
-
-				log_print("periodcal new loop")
-				### 1. register OSTAT  
-				register_order_listener(port)
-
-				### 2. Get open position 
-				positions = get_current_positions()
-
-				### 3. send request for summary PNL
-				threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity")
-
-				### 4. send request for each individual symbol PNL
-				for symbol in positions.keys():
-					threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity"+"^"+user+"^"+symbol)
-
-
-
-		except Exception as e:
-			PrintException(e,"periodical_check error ")
-		time.sleep(3)
-
-
-
-def read_summary():
+def read_summary(pipe):
 
 	global file_location
 	global summary_being_read
 
-
+	file_found = False 
 	while True:
 
 		if os.path.exists(file_location):
-			log_print("reading summary functional")
-			summary_being_read = True
 
-			try:
-				with open(file_location, 'r') as f:
-					#print(f.readline())
-					f.readlines()
-					while True:
-						k=f.readlines(50)
+			if file_found==False:
+				try:
+					os.remove(file_location)
+				except:
+					pass
+				file_found = True 
+			else:
 
-						if len(k)>0:
-							print(k)  ### DO STH. SEND INFO TO MANAGER. 
+				log_print("reading summary functional, removing old file")
+				summary_being_read = True
 
-			except Exception as e:  ## ANYTHING HAPPENED, EJECT. 
-				log_print("reading summary error",e)
-				summary_being_read = False
+				try:
+					with open(file_location, 'r') as f:
+						#print(f.readline())
+						f.readlines()
+						while True:
+							i=f.readline()
+
+							if len(i)>0:
+								l = i.split(" ")
+
+								if len(l)>1:
+									if l[1]=="RegionAssetLayerDisplayData:":
+										#print(l)
+
+										time_ = l[0]
+										net = float(find_between(i, "net=", ","))
+										fees = float(find_between(i, "totalFees=", ","))
+										trades = int(find_between(i, "totalTrades=", ","))
+										sizeTraded = int(find_between(i, "sizeTraded=", ","))
+										unrealizedPlusNet = float(find_between(i, "unrealizedPlusNet=", ","))
+
+										#print(time_,net,fees,trades,sizeTraded,unrealizedPlusNet)
+										# SymbolLayerDisplayData: 
+										d= {}
+										d['net'] = net
+										d['fees'] = fees
+										d['trades'] = trades
+										d['sizeTraded'] = sizeTraded
+										d['unrealizedPlusNet'] = unrealizedPlusNet
+										d['time'] = time_
+
+										pipe.send(["summary update",d])
+
+									elif l[1]=="SymbolLayerDisplayData:":
+										time_ = l[0]
+										symbol = find_between(i, "symbol=", ",")
+										lastPrice = float(find_between(i, "lastPrice=", ","))
+										l1AskPrice = float(find_between(i, "l1AskPrice=", ","))
+										l1BidPrice = float(find_between(i, "l1BidPrice=", ","))
+										
+										d= {}
+										d['time'] = time_
+										d['symbol'] = symbol
+										d['lastPrice'] = lastPrice
+										d['l1AskPrice'] = l1AskPrice
+										d['l1BidPrice'] = l1BidPrice
+
+										pipe.send(["symbol update",d])
+									# 4 net 
+									# 5 fees
+									# 6 trades
+									# 8 max profit 
+									# 10 sizeTraded
+									# 22 unrealizedPlusNet
+
+
+				except Exception as e:  ## ANYTHING HAPPENED, EJECT. 
+					PrintException("reading summary error",e)
+					summary_being_read = False
 
 		else:
 			summary_being_read = False
@@ -249,42 +352,29 @@ def read_summary():
 
 
 
-with open('C:/PPro8 NU/QIAOSUN_Summary_1.log', 'r') as f:
+def ppro_connection_service(pipe,port):
 
-	for i in f.readlines():
-		#print(i)
+	#keep running and don't stop
+	state = False
 
-		l = i.split(" ")
+	if test_register():
+		pipe.send(["ppro_in","Connected"])
+		if state == False:
+			log_print("Ppro connected. Registering OSTAT")
+			i = 3
+			while i >0:
+				if register_order_listener(port):
+					log_print("OSTAT registered")
+					state = True
+					break
+				else:
+					log_print("OSTAT registeration failed")
+				i-=1 
+	else:
+		pipe.send(["ppro_in","Disconnected"])
+		state = False
 
 
-		if len(l)>1:
-			if l[1]=="RegionAssetLayerDisplayData:":
-				#print(l)
-
-				time_ = l[0]
-				net = find_between(i, "net=", ",")
-				fees = find_between(i, "totalFees=", ",")
-				trades = find_between(i, "totalTrades=", ",")
-				sizeTraded = find_between(i, "sizeTraded=", ",")
-				unrealizedPlusNet = find_between(i, "unrealizedPlusNet=", ",")
-
-				#print(time_,net,fees,trades,sizeTraded,unrealizedPlusNet)
-
-			else:
-				
-
-				time_ = l[0]
-				symbol = find_between(i, "symbol=", ",")
-				lastPrice = find_between(i, "lastPrice=", ",")
-				l1AskPrice = find_between(i, "l1AskPrice=", ",")
-				l1BidPrice = find_between(i, "l1BidPrice=", ",")
-				print(time_,symbol,lastPrice,l1AskPrice,l1BidPrice)
-			# 4 net 
-			# 5 fees
-			# 6 trades
-			# 8 max profit 
-			# 10 sizeTraded
-			# 22 unrealizedPlusNet
 
 def get_current_positions():
 
@@ -636,3 +726,22 @@ def decode_l1_(stream_data,pipe,writer,l1data):
 
 
 # periodical_check(None,4135)
+
+multiprocessing.freeze_support()
+
+send_pipe, receive_pipe = multiprocessing.Pipe()
+
+port =4609
+
+
+req = threading.Thread(target=Ppro_in,args=(port,send_pipe), daemon=True)
+req.start()
+
+
+while True:
+
+	d = receive_pipe.recv()
+
+	print(d)
+
+
