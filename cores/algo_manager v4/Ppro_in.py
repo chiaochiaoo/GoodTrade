@@ -731,21 +731,22 @@ def decode_l1_(stream_data,pipe,writer,l1data):
 
 # periodical_check(None,4135)
 
-multiprocessing.freeze_support()
+# multiprocessing.freeze_support()
 
-send_pipe, receive_pipe = multiprocessing.Pipe()
+# send_pipe, receive_pipe = multiprocessing.Pipe()
 
-port =4609
-
-
-req = threading.Thread(target=Ppro_in,args=(port,send_pipe), daemon=True)
-req.start()
+# port =4609
 
 
-while True:
-
-	d = receive_pipe.recv()
-
-	print(d)
+# req = threading.Thread(target=Ppro_in,args=(port,send_pipe), daemon=True)
+# req.start()
 
 
+# while True:
+
+# 	d = receive_pipe.recv()
+
+# 	print(d)
+
+ms,ts,mili_ts = timestamp_mili_seconds('10:39:17.665')
+print(ms,ts,mili_ts)

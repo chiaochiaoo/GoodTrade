@@ -610,7 +610,30 @@ class Manager:
 				self.user = tk.StringVar(value="User:")
 
 			elif d[0] == SYMBOL_UPDATE:
+				# d= {}
+				# d['time'] = time_
+				# d['symbol'] = symbol
+				# d['lastPrice'] = lastPrice
+				# d['l1AskPrice'] = l1AskPrice
+				# d['l1BidPrice'] = l1BidPrice
 
+				data = d[1]
+				symbol = data["symbol"]
+				bid = data["l1BidPrice"]
+				ask = data["l1AskPrice"]
+				ts = data["timestamp"]
+
+				# here I update the symbol instead. 
+				# and then the symbol update each of the tradingplan bound to it. 
+
+				#print(symbol,bid,ask,ts)
+
+				try:
+					if symbol in self.symbols:
+						self.symbol_data[symbol].update_price(bid,ask,ts)
+				except	Exception	as e:
+					PrintException(e,"Order update error")
+					
 			elif d[0] == SUMMARY_UPDATE:
 
 				data = d[1]
