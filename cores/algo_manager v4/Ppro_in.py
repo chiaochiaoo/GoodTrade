@@ -20,6 +20,9 @@ global summary_being_read
 summary_being_read = False 
 
 
+POSITION_UPDATE = "Position Update"
+SYMBOL_UPDATE = "Symbol Update"
+SUMMARY_UPDATE  = "Summary update"
 
 def open_file():
 
@@ -235,7 +238,7 @@ def periodical_check(pipe,port):
 						threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity"+"^"+user+"^"+symbol)
 
 				### RETURN BUS. 
-				pipe.send(["position update",positions,user])
+				pipe.send([POSITION_UPDATE,positions,user])
 
 		except Exception as e:
 			PrintException(e,"periodical_check error ")
@@ -318,7 +321,7 @@ def read_summary(pipe):
 										d['time'] = time_
 										d['unrealized'] = unrealized	
 
-										pipe.send(["summary update",d])
+										pipe.send([SUMMARY_UPDATE,d])
 
 									elif l[1]=="SymbolLayerDisplayData:":
 										time_ = l[0]
@@ -334,7 +337,7 @@ def read_summary(pipe):
 										d['l1AskPrice'] = l1AskPrice
 										d['l1BidPrice'] = l1BidPrice
 
-										pipe.send(["symbol update",d])
+										pipe.send([SYMBOL_UPDATE,d])
 									# 4 net 
 									# 5 fees
 									# 6 trades

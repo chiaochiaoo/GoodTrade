@@ -5,10 +5,6 @@ from Symbol import *
 
 from TradingPlan_Basket import *
 
-# from TradingPlan import *
-# from TradingPlan_MMP1 import *
-# from Pair_TP import *
-# from Pair_TP_MM import *
 
 from UI import *
 from Ppro_in import *
@@ -64,6 +60,7 @@ class Manager:
 		self.root = root
 
 		self.termination = False
+
 		self.pipe_ppro_in = ppro_in
 		self.pipe_ppro_out = ppro_out
 		self.pipe_goodtrade = goodtrade_pipe
@@ -71,30 +68,44 @@ class Manager:
 		self.test_mode = TEST_MODE
 
 		self.symbols = []
-		self.processes = processes
-	
-		self.algo_ids = []
-
 		self.symbol_data = {}
 
 		self.baskets = {}
 
-
-		self.tradingplan = {}
-		self.pair_plans = {}
-
+		self.processes = processes
+	
+		self.algo_ids = []
 
 		self.manage_lock = 0
 
-		self.not_passvie = tk.BooleanVar(value=False)
 
+
+		""" POSITION DATA """
+
+		self.read_positions_lock = threading.lock()
+		self.current_positions = {} #for 
+
+		self.current_summary = {}
+		self.current_summary['net'] = tk.DoubleVar()
+		self.current_summary['fees'] = tk.DoubleVar()
+		self.current_summary['trades'] = tk.DoubleVar()
+		self.current_summary['sizeTraded'] = tk.DoubleVar()
+		self.current_summary['unrealizedPlusNet'] = tk.DoubleVar()
+		self.current_summary['time'] = tk.StringVar()
+		self.current_summary['unrealized'] = tk.DoubleVar()	
+
+		self.user = tk.StringVar(value="User:")
+
+		""" UI """
 		self.receiving_signals = tk.BooleanVar(value=True)
 		self.cmd_text = tk.StringVar(value="Status:")
-
 
 		self.ui = UI(root,self,self.receiving_signals,self.cmd_text)
 
 		m=self.receiving_signals.trace('w', lambda *_: self.receiving())
+
+
+		""" STATISTICS """
 
 		self.active_trade = 0
 		self.active_trade_max = 0
@@ -138,8 +149,7 @@ class Manager:
 		monday = now - timedelta(days = now.weekday())
 		self.file = "../../algo_records/"+monday.strftime("%Y_%m_%d")+".csv"
 
-
-		self.init_record_writer()
+		#self.init_record_writer()
 
 		self.shutdown=False
 
@@ -155,10 +165,8 @@ class Manager:
 		timer = threading.Thread(target=self.timer, daemon=True)
 		timer.start()
 
-
-		#if Testerx==True:
-		self.pipe_ppro_out.send(["Register","QQQ.NQ"])
-		self.pipe_ppro_out.send(["Register","SPY.AM"])
+		# self.pipe_ppro_out.send(["Register","QQQ.NQ"])
+		# self.pipe_ppro_out.send(["Register","SPY.AM"])
 		#self.pipe_ppro_out.send(["Register","SQQQ.NQ"])
 #
 	#data part, UI part
@@ -525,17 +533,17 @@ class Manager:
 
 				log_print("cmd received:",d)
 
-				if self.ui.tick_management.get()==True:
-					if d[1] == "TickHigh":
+				# if self.ui.tick_management.get()==True:
+				# 	if d[1] == "TickHigh":
 
-						#long cover
-						self.trades_aggregation(LONG,MINUS,0.1,False,self.not_passvie)
+				# 		#long cover
+				# 		self.trades_aggregation(LONG,MINUS,0.1,False,self.not_passvie)
 
 
-					elif d[1] == "TickLow":
+				# 	elif d[1] == "TickLow":
 
-						#short cover
-						self.trades_aggregation(SHORT,MINUS,0.1,False,self.not_passvie)
+				# 		#short cover
+				# 		self.trades_aggregation(SHORT,MINUS,0.1,False,self.not_passvie)
 
 			elif d[0] =="basket":
 
@@ -557,10 +565,9 @@ class Manager:
 		while True:
 			d = self.pipe_ppro_in.recv()
 
-			#log_print("Ppro in:",d)
+			#FIRST TWO CONNECTION CHECK
 
 			if d[0] =="ppro_in":
-				
 				try:
 					self.ui.ppro_status.set(str(d[1]))
 
@@ -595,7 +602,44 @@ class Manager:
 			elif d[0] =="msg":
 				log_print("msg:",d[1])
 
-			elif d[0] =="order confirm":
+			elif d[0] == POSITION_UPDATE:
+
+				self.current_positions = {} #for 
+				self.current_summary = {}
+
+				self.user = tk.StringVar(value="User:")
+
+			elif d[0] == SYMBOL_UPDATE:
+
+			elif d[0] == SUMMARY_UPDATE:
+
+				data = d[1]
+
+				for key,val in data.items():
+
+					self.current_summary[key].set(val)
+
+			elif d[0] =="order rejected":
+  
+				data = d[1]
+
+				symbol = data["symbol"]
+				side = data["side"]
+
+				try:
+					if symbol in self.symbol_data:
+						self.symbol_data[symbol].rejection_message(side)
+				except Exception as e:
+					PrintException(e,"Order rejection error")
+				# if symbol in self.tradingplan:
+				# 	self.tradingplan[symbol].ppro_order_rejection()
+
+
+			elif d[0] =="shutdown":
+				break
+
+
+			elif d[0] =="order confirm":  ### DEPRECATED. 
 
 				data = d[1]
 				symbol = data["symbol"]
@@ -604,7 +648,6 @@ class Manager:
 				side = data["side"]
 
 				## HERE. Append it to the new symbol warehouse system. 
-
 				#print("HOLDING UPDATE",symbol,price,shares,side)
 
 				try:
@@ -618,11 +661,6 @@ class Manager:
 
 				except	Exception	as e:
 					PrintException(e,"Order confim error")
-
-					#self.tradingplan[symbol].ppro_process_orders(price,shares,side)
-
-				#if TEST:
-					#log_print(self.tradingplan[symbol].data)
 
 			elif d[0] =="order update":
 				data = d[1]
@@ -663,24 +701,6 @@ class Manager:
 					PrintException(e,"Order update error")
 				### UPDATE THE EMAs. 
 
-			elif d[0] =="order rejected":
-  
-				data = d[1]
-
-				symbol = data["symbol"]
-				side = data["side"]
-
-				try:
-					if symbol in self.symbol_data:
-						self.symbol_data[symbol].rejection_message(side)
-				except Exception as e:
-					PrintException(e,"Order rejection error")
-				# if symbol in self.tradingplan:
-				# 	self.tradingplan[symbol].ppro_order_rejection()
-
-
-			elif d[0] =="shutdown":
-				break
 			# if d[0] =="new stoporder":
 
 			# 	self.ppro_append_new_stoporder(d[1])
