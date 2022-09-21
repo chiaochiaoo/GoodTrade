@@ -303,7 +303,7 @@ def read_summary(pipe):
 									if l[1]=="RegionAssetLayerDisplayData:":
 										#print(l)
 
-										time_ = l[0]
+										ms,ts,mili_ts = timestamp_mili_seconds(l[0])
 										net = float(find_between(i, "net=", ","))
 										fees = float(find_between(i, "totalFees=", ","))
 										trades = int(find_between(i, "totalTrades=", ","))
@@ -318,20 +318,20 @@ def read_summary(pipe):
 										d['trades'] = trades
 										d['sizeTraded'] = sizeTraded
 										d['unrealizedPlusNet'] = unrealizedPlusNet
-										d['time'] = time_
+										d['time'] = ts
 										d['unrealized'] = unrealized	
 
 										pipe.send([SUMMARY_UPDATE,d])
 
 									elif l[1]=="SymbolLayerDisplayData:":
-										time_ = l[0]
+										ms,ts,mili_ts = timestamp_mili_seconds(l[0])
 										symbol = find_between(i, "symbol=", ",")
 										lastPrice = float(find_between(i, "lastPrice=", ","))
 										l1AskPrice = float(find_between(i, "l1AskPrice=", ","))
 										l1BidPrice = float(find_between(i, "l1BidPrice=", ","))
 										
 										d= {}
-										d['time'] = time_
+										d['time'] = ts
 										d['symbol'] = symbol
 										d['lastPrice'] = lastPrice
 										d['l1AskPrice'] = l1AskPrice
@@ -748,5 +748,4 @@ def decode_l1_(stream_data,pipe,writer,l1data):
 
 # 	print(d)
 
-ms,ts,mili_ts = timestamp_mili_seconds('10:39:17.665')
-print(ms,ts,mili_ts)
+

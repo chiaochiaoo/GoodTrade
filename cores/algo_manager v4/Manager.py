@@ -82,7 +82,7 @@ class Manager:
 
 		""" POSITION DATA """
 
-		self.read_positions_lock = threading.lock()
+		# no need to use lock. everytime need to read. just obtain copy. 
 		self.current_positions = {} #for 
 
 		self.current_summary = {}
@@ -604,10 +604,13 @@ class Manager:
 
 			elif d[0] == POSITION_UPDATE:
 
-				self.current_positions = {} #for 
-				self.current_summary = {}
+				positions = d[1]
+				user = d[2]
 
-				self.user = tk.StringVar(value="User:")
+				self.user.set("User:"+user)
+				self.current_positions = positions
+
+
 
 			elif d[0] == SYMBOL_UPDATE:
 				# d= {}
@@ -633,14 +636,16 @@ class Manager:
 						self.symbol_data[symbol].update_price(bid,ask,ts)
 				except	Exception	as e:
 					PrintException(e,"Order update error")
-					
+
 			elif d[0] == SUMMARY_UPDATE:
 
 				data = d[1]
 
-				for key,val in data.items():
-
-					self.current_summary[key].set(val)
+				try:
+					for key,val in data.items():
+						self.current_summary[key].set(val)
+				except Exception as e :
+					PrintException(e, " Updating Summary Problem")
 
 			elif d[0] =="order rejected":
   
