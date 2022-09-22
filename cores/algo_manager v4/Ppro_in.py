@@ -391,8 +391,12 @@ def get_current_positions():
 			if "Position Symbol" in i:
 
 				symbol = find_between(i, "Symbol=", " ")[1:-1]
-				share = find_between(i, "Volume=", " ")[1:-1]
-				d[symbol]=share 
+
+				price =  float(find_between(i, "AveragePrice=", " ")[1:-1])
+				share = int(find_between(i, "Volume=", " ")[1:-1])
+
+				
+				d[symbol] = (price,share) 
 		
 		return d
 	except Exception as e:
