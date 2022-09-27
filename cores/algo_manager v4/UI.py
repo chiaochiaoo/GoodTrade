@@ -40,40 +40,71 @@ class UI(pannel):
 		self.init_entry_pannel()
 
 
-	def init_pannel(self):
 
-		"""
-						"EntryPlan":11,\
-						"EntryType":12,\
-						"Timer":5,\
-						"Management":14,\
-						"Reload":6,\
-						"AR":4,\
-						"Sup":6,\
-						"Res":6,\
-		"""
-		self.labels = {"":4,\
-						"Strategy":8,\
-						"Status":10,\
-						"INFO":20,\
-						"Est R":8,\
-						"UPshr":8,\
-						"U":8,\
-						"R":8,\
-						"TR":8,\
-						"flatten":8,}
-
-		#print(list(self.labels.keys()))
-		self.width = list(self.labels.values())
-
-		self.comms = ttk.LabelFrame(self.root,text="HQ") 
-		self.comms.place(x=10,y=10,height=150,width=210)
+	def init_system_pannel(self):
 
 
-		self.init_HQ_pannel()
 
-		self.stats = ttk.LabelFrame(self.root,text="Statistics") 
-		self.stats.place(x=10,y=160,height=260,width=210)
+	
+		self.main_app_status = tk.StringVar()
+		self.main_app_status.set("")
+
+		self.ppro_status = tk.StringVar()
+		self.ppro_status.set("")
+
+		self.ppro_out_status = tk.StringVar()
+		self.ppro_out_status.set("")
+
+		self.algo_count_number = tk.DoubleVar(value=0)
+		self.algo_number = 0
+
+		self.algo_count_string = tk.StringVar(value="0")
+		self.algo_timer_string = tk.StringVar(value="0")
+		self.algo_timer_close_string = tk.StringVar(value="0")
+
+		self.algo_count_string.set("Activated Algos:"+str(self.algo_count_number))
+
+		self.main = ttk.Label(self.system_pannel, text="Main:")
+		self.main.grid(sticky="w",column=1,row=1,padx=10)
+		
+		self.main_status = ttk.Label(self.system_pannel, textvariable=self.main_app_status)
+		self.main_status.grid(sticky="w",column=2,row=1)
+
+		self.ppro = ttk.Label(self.system_pannel, text="Ppro in:")
+		self.ppro.grid(sticky="w",column=1,row=2,padx=10)
+		self.ppro_status_ = ttk.Label(self.system_pannel, textvariable=self.ppro_status)
+		self.ppro_status_.grid(sticky="w",column=2,row=2)
+
+		self.ppro = ttk.Label(self.system_pannel, text="Ppro out:")
+		self.ppro.grid(sticky="w",column=1,row=3,padx=10)
+		self.ppro_status_out = ttk.Label(self.system_pannel, textvariable=self.ppro_out_status)
+		self.ppro_status_out.grid(sticky="w",column=2,row=3)
+
+
+		self.al = ttk.Label(self.system_pannel, text="Algo count::")
+		self.al.grid(sticky="w",column=1,row=4,padx=10)
+		self.algo_count_ = ttk.Label(self.system_pannel,  textvariable=self.algo_count_number)
+		self.algo_count_.grid(sticky="w",column=2,row=4,padx=10)
+
+		self.timerc = ttk.Label(self.system_pannel, text="Deploy in:")
+		self.timerc.grid(sticky="w",column=1,row=5,padx=10)
+		self.timersx = ttk.Label(self.system_pannel,  textvariable=self.algo_timer_string)
+		self.timersx.grid(sticky="w",column=2,row=5,padx=10)
+
+		self.timerc = ttk.Label(self.system_pannel, text="Close in:")
+		self.timerc.grid(sticky="w",column=1,row=6,padx=10)
+		self.timersx = ttk.Label(self.system_pannel,  textvariable=self.algo_timer_close_string)
+		self.timersx.grid(sticky="w",column=2,row=6,padx=10)
+
+		ttk.Label(self.system_pannel, text="Risk timer:").grid(sticky="w",column=1,row=7,padx=10)
+		tk.Entry(self.system_pannel,textvariable=self.risk_timer,width=7).grid(sticky="w",column=2,row=7,padx=10)
+
+		# self.deconstruct = ttk.Button(self.system_pannel, text="Terminate GT",command=self.manager.terminateGT)#,command=self.deploy_all_stoporders)
+		# self.deconstruct.grid(sticky="w",column=1,row=5)
+
+
+	def init_performance_pannel(self):
+
 
 		self.active_trade = tk.IntVar()
 		self.active_trade_max = tk.IntVar()
@@ -114,118 +145,91 @@ class UI(pannel):
 		self.u_losing_min = tk.DoubleVar()
 		self.u_losing_max = tk.DoubleVar()
 
-		self.x1 = ttk.Label(self.stats, text="Cur:")
+		self.x1 = ttk.Label(self.performance_pannel, text="Cur:")
 		self.x1.grid(sticky="w",column=2,row=1,padx=3)
-		self.x2 = ttk.Label(self.stats, text="Min:")
+		self.x2 = ttk.Label(self.performance_pannel, text="Min:")
 		self.x2.grid(sticky="w",column=3,row=1,padx=3)
-		self.x3 = ttk.Label(self.stats, text="Max:")
+		self.x3 = ttk.Label(self.performance_pannel, text="Max:")
 		self.x3.grid(sticky="w",column=4,row=1,padx=3)
 
 		row = 2 
-		self.t1 = ttk.Label(self.stats, text="Activated:")
+		self.t1 = ttk.Label(self.performance_pannel, text="Activated:")
 		self.t1.grid(sticky="w",column=1,row=row,padx=10)
-		self.t1_ = ttk.Label(self.stats, textvariable=self.active_trade)
+		self.t1_ = ttk.Label(self.performance_pannel, textvariable=self.active_trade)
 		self.t1_.grid(sticky="w",column=2,row=row)
 
-		ttk.Label(self.stats, textvariable=self.active_trade_max).grid(sticky="w",column=4,row=row)
+		ttk.Label(self.performance_pannel, textvariable=self.active_trade_max).grid(sticky="w",column=4,row=row)
 
 		row +=1 
-		self.t2 = ttk.Label(self.stats, text="Total Net:")
+		self.t2 = ttk.Label(self.performance_pannel, text="Total Net:")
 		self.t2.grid(sticky="w",column=1,row=row,padx=10)
-		self.t2_ = ttk.Label(self.stats, textvariable=self.net)
+		self.t2_ = ttk.Label(self.performance_pannel, textvariable=self.net)
 		self.t2_.grid(sticky="w",column=2,row=row)
 
-		ttk.Label(self.stats, textvariable=self.net_min).grid(sticky="w",column=3,row=row)
-		ttk.Label(self.stats, textvariable=self.net_max).grid(sticky="w",column=4,row=row)
+		ttk.Label(self.performance_pannel, textvariable=self.net_min).grid(sticky="w",column=3,row=row)
+		ttk.Label(self.performance_pannel, textvariable=self.net_max).grid(sticky="w",column=4,row=row)
 
 
 		row +=1 
-		self.t2 = ttk.Label(self.stats, text="Total U:")
+		self.t2 = ttk.Label(self.performance_pannel, text="Total U:")
 		self.t2.grid(sticky="w",column=1,row=row,padx=10)
-		self.t2_ = ttk.Label(self.stats, textvariable=self.total_u)
+		self.t2_ = ttk.Label(self.performance_pannel, textvariable=self.total_u)
 		self.t2_.grid(sticky="w",column=2,row=row)
 
-		self.t2_ = ttk.Label(self.stats, textvariable=self.total_u_min)
+		self.t2_ = ttk.Label(self.performance_pannel, textvariable=self.total_u_min)
 		self.t2_.grid(sticky="w",column=3,row=row)
 
-		self.t2_ = ttk.Label(self.stats, textvariable=self.total_u_max)
+		self.t2_ = ttk.Label(self.performance_pannel, textvariable=self.total_u_max)
 		self.t2_.grid(sticky="w",column=4,row=row)
 
-
-
-
 		row +=1 
-		self.t6 = ttk.Label(self.stats, text="Total Risk:")
+		self.t6 = ttk.Label(self.performance_pannel, text="Total Risk:")
 		self.t6.grid(sticky="w",column=1,row=row,padx=10)
-		self.t6_ = ttk.Label(self.stats, textvariable=self.current_total_risk)
+		self.t6_ = ttk.Label(self.performance_pannel, textvariable=self.current_total_risk)
 		self.t6_.grid(sticky="w",column=2,row=row)
-		self.t6_ = ttk.Label(self.stats, textvariable=self.max_risk)
+		self.t6_ = ttk.Label(self.performance_pannel, textvariable=self.max_risk)
 		self.t6_.grid(sticky="w",column=4,row=row)
 
 		row +=1 
-		self.t6 = ttk.Label(self.stats, text="Delta SPX:")
+		self.t6 = ttk.Label(self.performance_pannel, text="Delta SPX:")
 		self.t6.grid(sticky="w",column=1,row=row,padx=10)
-		self.t6_ = ttk.Label(self.stats, textvariable=self.deltaspx)
+		self.t6_ = ttk.Label(self.performance_pannel, textvariable=self.deltaspx)
 		self.t6_.grid(sticky="w",column=2,row=row)
-		# self.t6_ = ttk.Label(self.stats, textvariable=self.max_risk)
+		# self.t6_ = ttk.Label(self.performance_pannel, textvariable=self.max_risk)
 		# self.t6_.grid(sticky="w",column=4,row=row)
 		row +=1 
-		self.t6 = ttk.Label(self.stats, text="LONG EXP:")
+		self.t6 = ttk.Label(self.performance_pannel, text="LONG EXP:")
 		self.t6.grid(sticky="w",column=1,row=row,padx=10)
-		self.t6_ = ttk.Label(self.stats, textvariable=self.longexp)
+		self.t6_ = ttk.Label(self.performance_pannel, textvariable=self.longexp)
 		self.t6_.grid(sticky="w",column=2,row=row)
 
 		row +=1 
-		self.t6 = ttk.Label(self.stats, text="SHORT EXP:")
+		self.t6 = ttk.Label(self.performance_pannel, text="SHORT EXP:")
 		self.t6.grid(sticky="w",column=1,row=row,padx=10)
-		self.t6_ = ttk.Label(self.stats, textvariable=self.shortexp)
+		self.t6_ = ttk.Label(self.performance_pannel, textvariable=self.shortexp)
 		self.t6_.grid(sticky="w",column=2,row=row)
 
 		row +=1 
-		self.t6 = ttk.Label(self.stats, text="OVERALL.EXP:")
+		self.t6 = ttk.Label(self.performance_pannel, text="OVERALL.EXP:")
 		self.t6.grid(sticky="w",column=1,row=row,padx=10)
-		self.t6_ = ttk.Label(self.stats, textvariable=self.overallexp)
+		self.t6_ = ttk.Label(self.performance_pannel, textvariable=self.overallexp)
 		self.t6_.grid(sticky="w",column=2,row=row)
 
 		# row +=1 
-		# self.t6 = ttk.Label(self.stats, text="Locked in:")
-		# self.t6.grid(sticky="w",column=1,row=row,padx=10)
-		# self.t6_ = ttk.Label(self.stats, textvariable=self.current_upside)
-		# self.t6_.grid(sticky="w",column=2,row=row)
+	def init_deployment_pannel(self):
 
+		self.labels = {"":4,\
+						"Strategy":8,\
+						"Status":10,\
+						"INFO":20,\
+						"Est R":8,\
+						"UPshr":8,\
+						"U":8,\
+						"R":8,\
+						"TR":8,\
+						"flatten":8,}
+		self.width = list(self.labels.values())
 
-
-
-		# self.config = ttk.LabelFrame(self.root,text="Config") 
-		# self.config.place(x=10,y=360,height=260,width=210)
-
-		self.cmd = ttk.LabelFrame(self.root,text="Command") 
-		self.cmd.place(x=10,y=360,height=500,width=210)
-
-
-		#self.init_config_pannel()
-		#self.init_command()
-		# self.log_panel = ttk.LabelFrame(self.root,text="Events") 
-		# self.log_panel.place(x=10,y=300,relheight=0.5,width=210)
-
-		# self.stats_panel = ttk.LabelFrame(self.root,text="Algo Stats") 
-		# self.stats_panel.place(x=210,y=10,height=50,width=1650)
-
-		self.deployment_panel = ttk.LabelFrame(self.root,text="Single Algo") 
-		self.deployment_panel.place(x=210,rely=0.01,relheight=0.45,width=1200)
-
-		self.basket_panel = ttk.LabelFrame(self.root,text="Basket Strat") 
-		self.basket_panel.place(x=210,rely=0.46,relheight=0.30,width=1200)
-
-		self.pair_panel = ttk.LabelFrame(self.root,text="Pairs Algo") 
-		self.pair_panel.place(x=210,rely=0.76,relheight=0.24,width=1200)		
-
-
-		###########################################################################################################
-
-
-
-		###########################################################################################################
 
 		self.dev_canvas = tk.Canvas(self.deployment_panel)
 		self.dev_canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
@@ -240,100 +244,48 @@ class UI(pannel):
 		self.dev_canvas.create_window(0, 0, window=self.deployment_frame, anchor=tk.NW)
 
 
-		########################################################################################################
-		self.basket_canvas = tk.Canvas(self.basket_panel)
-		self.basket_canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
-
-		self.scroll2 = tk.Scrollbar(self.basket_panel)
-		self.scroll2.config(orient=tk.VERTICAL, command=self.basket_canvas.yview)
-		self.scroll2.pack(side=tk.RIGHT,fill="y")
-		self.basket_canvas.configure(yscrollcommand=self.scroll2.set)
-
-		self.basket_frame = tk.Frame(self.basket_canvas)
-		self.basket_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
-		self.basket_canvas.create_window(0, 0, window=self.basket_frame, anchor=tk.NW)
-
-		##########################################################################################################
-		self.pair_canvas = tk.Canvas(self.pair_panel)
-		self.pair_canvas.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)#relx=0, rely=0, relheight=1, relwidth=1)
-
-		self.scroll = tk.Scrollbar(self.pair_panel)
-		self.scroll.config(orient=tk.VERTICAL, command=self.pair_canvas.yview)
-		self.scroll.pack(side=tk.RIGHT,fill="y")
-		self.pair_canvas.configure(yscrollcommand=self.scroll.set)
-
-		self.pair_frame = tk.Frame(self.pair_canvas)
-		self.pair_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
-		self.pair_canvas.create_window(0, 0, window=self.pair_frame, anchor=tk.NW)
-
-		#self.create_example_trade()
-
 		self.rebind(self.dev_canvas,self.deployment_frame)
-
-		self.rebind(self.pair_canvas,self.pair_frame)
-
-
-		self.rebind(self.basket_canvas,self.basket_frame)
 
 		self.recreate_labels()
 
-	def init_HQ_pannel(self):
+	def init_pannel(self):
+		self.system_pannel = ttk.LabelFrame(self.root,text="System") 
+		self.system_pannel.place(x=10,y=10,height=260,width=210)
+
+		self.performance_pannel = ttk.LabelFrame(self.root,text="Performance") 
+		self.performance_pannel.place(x=230,y=10,height=260,width=700)
+
+		self.deployment_panel = ttk.LabelFrame(self.root,text="Strategy Deployment") 
+		self.deployment_panel.place(x=10,y=260,relheight=0.45,width=920)
+
+		self.init_system_pannel()
+		self.init_performance_pannel()
+		self.init_deployment_pannel()
+
+		# self.t6 = ttk.Label(self.performance_pannel, text="Locked in:")
+		# self.t6.grid(sticky="w",column=1,row=row,padx=10)
+		# self.t6_ = ttk.Label(self.performance_pannel, textvariable=self.current_upside)
+		# self.t6_.grid(sticky="w",column=2,row=row)
 
 
-		self.main_app_status = tk.StringVar()
-		self.main_app_status.set("")
-
-		self.ppro_status = tk.StringVar()
-		self.ppro_status.set("")
-
-		self.ppro_out_status = tk.StringVar()
-		self.ppro_out_status.set("")
-
-		self.algo_count_number = tk.DoubleVar(value=0)
-		self.algo_number = 0
-
-		self.algo_count_string = tk.StringVar(value="0")
-		self.algo_timer_string = tk.StringVar(value="0")
-		self.algo_timer_close_string = tk.StringVar(value="0")
-
-		self.algo_count_string.set("Activated Algos:"+str(self.algo_count_number))
-
-		self.main = ttk.Label(self.comms, text="Main:")
-		self.main.grid(sticky="w",column=1,row=1,padx=10)
-		
-		self.main_status = ttk.Label(self.comms, textvariable=self.main_app_status)
-		self.main_status.grid(sticky="w",column=2,row=1)
-
-		self.ppro = ttk.Label(self.comms, text="Ppro in:")
-		self.ppro.grid(sticky="w",column=1,row=2,padx=10)
-		self.ppro_status_ = ttk.Label(self.comms, textvariable=self.ppro_status)
-		self.ppro_status_.grid(sticky="w",column=2,row=2)
-
-		self.ppro = ttk.Label(self.comms, text="Ppro out:")
-		self.ppro.grid(sticky="w",column=1,row=3,padx=10)
-		self.ppro_status_out = ttk.Label(self.comms, textvariable=self.ppro_out_status)
-		self.ppro_status_out.grid(sticky="w",column=2,row=3)
 
 
-		self.al = ttk.Label(self.comms, text="Algo count::")
-		self.al.grid(sticky="w",column=1,row=4,padx=10)
-		self.algo_count_ = ttk.Label(self.comms,  textvariable=self.algo_count_number)
-		self.algo_count_.grid(sticky="w",column=2,row=4,padx=10)
+		# self.config = ttk.LabelFrame(self.root,text="Config") 
+		# self.config.place(x=10,y=360,height=260,width=210)
 
-		self.timerc = ttk.Label(self.comms, text="Deploy in:")
-		self.timerc.grid(sticky="w",column=1,row=5,padx=10)
-		self.timersx = ttk.Label(self.comms,  textvariable=self.algo_timer_string)
-		self.timersx.grid(sticky="w",column=2,row=5,padx=10)
+		# self.cmd = ttk.LabelFrame(self.root,text="Command") 
+		# self.cmd.place(x=10,y=360,height=500,width=210)
 
-		self.timerc = ttk.Label(self.comms, text="Close in:")
-		self.timerc.grid(sticky="w",column=1,row=6,padx=10)
-		self.timersx = ttk.Label(self.comms,  textvariable=self.algo_timer_close_string)
-		self.timersx.grid(sticky="w",column=2,row=6,padx=10)
 
-		ttk.Label(self.comms, text="Risk timer:").grid(sticky="w",column=1,row=7,padx=10)
-		tk.Entry(self.comms,textvariable=self.risk_timer,width=7).grid(sticky="w",column=2,row=7,padx=10)
-		# self.deconstruct = ttk.Button(self.comms, text="Terminate GT",command=self.manager.terminateGT)#,command=self.deploy_all_stoporders)
-		# self.deconstruct.grid(sticky="w",column=1,row=5)
+		#self.init_config_pannel()
+		#self.init_command()
+		# self.log_panel = ttk.LabelFrame(self.root,text="Events") 
+		# self.log_panel.place(x=10,y=300,relheight=0.5,width=210)
+
+		# self.performance_pannel_panel = ttk.LabelFrame(self.root,text="Algo Stats") 
+		# self.performance_pannel_panel.place(x=210,y=10,height=50,width=1650)
+
+
 
 
 	def init_config_pannel(self):
@@ -551,7 +503,7 @@ class UI(pannel):
 		info = list(infos.values())
 		labels = list(infos.keys())
 
-		for l in range(70):
+		for l in range(30):
 			self.tk_labels_single[l]={}
 			for j in range(len(self.labels)):
 				#"symbol","algo_status","description","break_at","position","act_r/est_r","stoplevel","average_price","shares","pxtgt1","pxtgt1","pxtgt1","unrealized_pshr","unrealized","realized"
@@ -1267,7 +1219,7 @@ if __name__ == '__main__':
 
 	root = tk.Tk() 
 	root.title("GoodTrade Algo Manager v4") 
-	root.geometry("1920x1000")
+	root.geometry("950x1080")
 	UI(root)
 	# root.minsize(1600, 1000)
 	# root.maxsize(1800, 1200)
