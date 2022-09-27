@@ -35,19 +35,10 @@ class UI(pannel):
 
 		self.risk_timer = tk.DoubleVar(value=300)
 
-		self.option_values()
-
 		self.init_pannel()
 
 		self.init_entry_pannel()
 
-	def option_values(self):
-
-		self.entry_type_options = {INSTANT,INCREMENTAL,INCREMENTAL2}
-
-		self.entry_plan_options = {BREAKUP,BREAKDOWN,BREAKFIRST,FREECONTROL,INSTANTLONG,INSTANTSHORT,TARGETLONG,TARGETSHORT}
-
-		self.management_plan_options = {TRENDRIDER,FIBO,EM_STRATEGY,EMASTRAT,ONETOTWORISKREWARD,FULLMANUAL,SEMIMANUAL}#SCALPATRON #THREE_TARGETS,SMARTTRAIL,ANCARTMETHOD,ONETOTWORISKREWARD,ONETOTWORISKREWARDOLD,
 
 	def init_pannel(self):
 
@@ -62,25 +53,15 @@ class UI(pannel):
 						"Res":6,\
 		"""
 		self.labels = {"":4,\
-						"Symbol":8,\
+						"Strategy":8,\
 						"Status":10,\
-						"MIND":20,\
-
-
-						"Act/Est R":8,\
-						"SzIn":6,\
-						"Position":6,\
-						"Stop":6,\
-						"AvgPx":10,\
-						"PxT1":5,\
-						"PxT2":5,\
-						"PxT3":5,\
+						"INFO":20,\
+						"Est R":8,\
 						"UPshr":8,\
 						"U":8,\
 						"R":8,\
 						"TR":8,\
-						"flatten":8,
-						"log":5}
+						"flatten":8,}
 
 		#print(list(self.labels.keys()))
 		self.width = list(self.labels.values())
@@ -170,28 +151,6 @@ class UI(pannel):
 		self.t2_ = ttk.Label(self.stats, textvariable=self.total_u_max)
 		self.t2_.grid(sticky="w",column=4,row=row)
 
-
-		# row +=1 
-		# self.t2 = ttk.Label(self.stats, text="Winnig:")
-		# self.t2.grid(sticky="w",column=1,row=row,padx=10)
-		# self.t2_ = ttk.Label(self.stats, textvariable=self.u_winning)
-		# self.t2_.grid(sticky="w",column=2,row=row)
-
-
-
-		# self.t2_ = ttk.Label(self.stats, textvariable=self.u_winning_max)
-		# self.t2_.grid(sticky="w",column=4,row=row)
-
-
-		# row +=1 
-		# self.t2 = ttk.Label(self.stats, text="Losing:")
-		# self.t2.grid(sticky="w",column=1,row=row,padx=10)
-		# self.t2_ = ttk.Label(self.stats, textvariable=self.u_losing)
-		# self.t2_.grid(sticky="w",column=2,row=row)
-
-
-		# self.t2_ = ttk.Label(self.stats, textvariable=self.u_losing_max)
-		# self.t2_.grid(sticky="w",column=4,row=row)
 
 
 
@@ -563,22 +522,26 @@ class UI(pannel):
 		SUPPORT:"", \
 		RESISTENCE:"", \
 		"""
+
+		# self.labels = {"":4,\
+		# 		"Strategy":8,\
+		# 		"Status":10,\
+		# 		"INFO":20,\
+		# 		"Est R":8,\
+		# 		"U":8,\
+		# 		"R":8,\
+		# 		"TR":8,\
+		# 		"flatten":8,}
+
 		infos = {
 		SELECTED:"",\
-		'Symbol':"", \
+		'Strategy':"", \
 		STATUS:"",\
 		MIND:"",\
-
-
 		RISK_RATIO:"", \
 		'SzIn':"", \
 		'Position':"", \
 		'Stop':"",\
-		'AvgPx':"", \
-		PXT1:"", \
-		PXT2:"", \
-		PXT3:"", \
-		UNREAL_PSHR:"", \
 		UNREAL:"", \
 		REALIZED:"", \
 		TOTAL_REALIZED:"", \
@@ -590,7 +553,7 @@ class UI(pannel):
 
 		for l in range(70):
 			self.tk_labels_single[l]={}
-			for j in range(len(info)):
+			for j in range(len(self.labels)):
 				#"symbol","algo_status","description","break_at","position","act_r/est_r","stoplevel","average_price","shares","pxtgt1","pxtgt1","pxtgt1","unrealized_pshr","unrealized","realized"
 				label_name = labels[j]
 
@@ -641,122 +604,7 @@ class UI(pannel):
 
 				self.tk_labels_single[l][label_name].grid(row= l+2, column=j,padx=0)
 
-		for l in range(10):
-
-			self.tk_labels_pair[l] = {}
-
-				
-			for j in range(len(info)):
-				#"symbol","algo_status","description","break_at","position","act_r/est_r","stoplevel","average_price","shares","pxtgt1","pxtgt1","pxtgt1","unrealized_pshr","unrealized","realized"
-				label_name = labels[j]
-
-				if label_name == "Symbol":
-					self.tk_labels_pair[l][label_name] = tk.Button(self.pair_frame ,text=info[j],width=self.width[j])
-				elif label_name == STATUS:
-					self.tk_labels_pair[l][label_name] = tk.Button(self.pair_frame ,text=info[j],width=self.width[j])
-
-				elif label_name ==TIMER:
-					self.tk_labels_pair[l][label_name] = tk.Entry(self.pair_frame,text=info[j],width=self.width[j])
-
-				elif label_name =="AR" :
-					self.tk_labels_pair[l][label_name] = tk.Checkbutton(self.pair_frame,width=2,)
-				elif label_name =="Reload" or label_name==SELECTED:
-					self.tk_labels_pair[l][label_name] = tk.Checkbutton(self.pair_frame,width=2)
-
-				elif label_name =="MIND":
-					self.tk_labels_pair[l][label_name] =tk.Button(self.pair_frame ,text=info[j],width=self.width[j])
-				elif label_name =="Stop":
-					self.tk_labels_pair[l][label_name] =tk.Button(self.pair_frame ,text=info[j],width=self.width[j])
-
-				elif label_name ==RISK_RATIO:
-					self.tk_labels_pair[l][RISK_PER_SHARE]=tk.Entry(self.pair_frame ,text=info[j],width=self.width[j])
-
-					self.tk_labels_pair[l][label_name]=tk.Button(self.pair_frame ,text=info[j],width=self.width[j])
-
-				elif label_name =='SzIn':
-					self.tk_labels_pair[l][TARGET_SHARE]=tk.Entry(self.pair_frame ,text=info[j],width=self.width[j])
-	
-
-					self.tk_labels_pair[l][label_name]=tk.Button(self.pair_frame ,text=info[j],width=self.width[j])
-
-				elif label_name =="flatten":
-					self.tk_labels_pair[l][label_name] =tk.Button(self.pair_frame ,text=info[j],width=self.width[j])
-
-				elif label_name == SUPPORT or label_name == RESISTENCE or label_name == "pxtgt1" or label_name == "pxtgt2" or label_name == "pxtgt3":
-					self.tk_labels_pair[l][label_name] =tk.Entry(self.pair_frame ,text=info[j],width=self.width[j],state="disabled")	
-				else:
-					if str(type(info[j]))=="<class 'tkinter.StringVar'>" or str(type(info[j]))=="<class 'tkinter.DoubleVar'>":
-						self.tk_labels_pair[l][label_name]=tk.Button(self.pair_frame ,text=info[j],width=self.width[j])
-					else:
-						#print(self.tk_labels_single[symbol])
-						self.tk_labels_pair[l][label_name]=tk.Button(self.pair_frame ,text=info[j],width=self.width[j])
-				try:
-					self.label_default_configure(self.tk_labels_pair[l][label_name])
-				except:
-					pass
-
-				self.tk_labels_pair[l][label_name].grid(row= l+2, column=j,padx=0)
-
-		for l in range(10):
-
-			self.tk_labels_basket[l] = {}
-
-				
-			for j in range(len(info)):
-				#"symbol","algo_status","description","break_at","position","act_r/est_r","stoplevel","average_price","shares","pxtgt1","pxtgt1","pxtgt1","unrealized_pshr","unrealized","realized"
-				label_name = labels[j]
-
-				if label_name == "Symbol":
-					self.tk_labels_basket[l][label_name] = tk.Button(self.basket_frame ,text=info[j],width=self.width[j])
-				elif label_name == STATUS:
-					self.tk_labels_basket[l][label_name] = tk.Button(self.basket_frame ,text=info[j],width=self.width[j])
-
-				elif label_name ==TIMER:
-					self.tk_labels_basket[l][label_name] = tk.Entry(self.basket_frame,text=info[j],width=self.width[j])
-
-				elif label_name =="AR" :
-					self.tk_labels_basket[l][label_name] = tk.Checkbutton(self.basket_frame,width=2,)
-				elif label_name =="Reload" or label_name==SELECTED:
-					self.tk_labels_basket[l][label_name] = tk.Checkbutton(self.basket_frame,width=2)
-
-				elif label_name =="MIND":
-					self.tk_labels_basket[l][label_name] =tk.Button(self.basket_frame ,text=info[j],width=self.width[j])
-				elif label_name =="Stop":
-					self.tk_labels_basket[l][label_name] =tk.Button(self.basket_frame ,text=info[j],width=self.width[j])
-
-				elif label_name ==RISK_RATIO:
-					self.tk_labels_basket[l][RISK_PER_SHARE]=tk.Entry(self.basket_frame ,text=info[j],width=self.width[j])
-
-					self.tk_labels_basket[l][label_name]=tk.Button(self.basket_frame ,text=info[j],width=self.width[j])
-
-				elif label_name =='SzIn':
-					self.tk_labels_basket[l][TARGET_SHARE]=tk.Entry(self.basket_frame ,text=info[j],width=self.width[j])
-	
-
-					self.tk_labels_basket[l][label_name]=tk.Button(self.basket_frame ,text=info[j],width=self.width[j])
-
-				elif label_name =="flatten":
-					self.tk_labels_basket[l][label_name] =tk.Button(self.basket_frame ,text=info[j],width=self.width[j])
-
-				elif label_name == SUPPORT or label_name == RESISTENCE or label_name == "pxtgt1" or label_name == "pxtgt2" or label_name == "pxtgt3":
-					self.tk_labels_basket[l][label_name] =tk.Entry(self.basket_frame ,text=info[j],width=self.width[j],state="disabled")	
-				else:
-					if str(type(info[j]))=="<class 'tkinter.StringVar'>" or str(type(info[j]))=="<class 'tkinter.DoubleVar'>":
-						self.tk_labels_basket[l][label_name]=tk.Button(self.basket_frame ,text=info[j],width=self.width[j])
-					else:
-						#print(self.tk_labels_single[symbol])
-						self.tk_labels_basket[l][label_name]=tk.Button(self.basket_frame ,text=info[j],width=self.width[j])
-				try:
-					self.label_default_configure(self.tk_labels_basket[l][label_name])
-				except:
-					pass
-
-				self.tk_labels_basket[l][label_name].grid(row= l+2, column=j,padx=0)
-
 		self.rebind(self.dev_canvas,self.deployment_frame)
-		self.rebind(self.pair_canvas,self.pair_frame)
-
-		self.rebind(self.basket_canvas,self.basket_frame)
 
 	def create_new_single_entry(self,tradingplan,single,row_number):
 

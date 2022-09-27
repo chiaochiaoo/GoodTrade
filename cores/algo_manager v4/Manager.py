@@ -202,26 +202,29 @@ class Manager:
 
 			if self.shutdown:
 				break
+
 			register = 0
 			symbols = list(self.symbol_data.values())
 
 			for val in symbols:
+
+				val.symbol_inspection()
 				#log_print("inspecting:",val.ticker,"request:",val.get_management_request())
 				
-				if val.get_register()==True:
-					register+=1
-				if val.get_management_request()==True and val.get_market_making()==False:
-					val.symbol_inspection()
+				# if val.get_register()==True:
+				# 	register+=1
+				# if val.get_management_request()==True and val.get_market_making()==False:
+					
 					# stage 1, cancel each other out in the request book
 					# stage 2, granted request from the incoming book
 					# stage 3, handle imbalance request (just use market orders now.)
 
-			now = datetime.now()
-			cur_ts = now.hour*60+now.minute 
+			# now = datetime.now()
+			# cur_ts = now.hour*60+now.minute 
 
-			if cur_ts!= ts:#
-				log_print("Registeriing ,",register,"total",len(symbols)," ts",cur_ts)
-				ts = cur_ts
+			# if cur_ts!= ts:#
+			# 	log_print("Registeriing ,",register,"total",len(symbols)," ts",cur_ts)
+			# 	ts = cur_ts
 			time.sleep(5)
 
 	def new_record(self,tradingplan):
