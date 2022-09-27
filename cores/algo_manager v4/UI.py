@@ -221,9 +221,9 @@ class UI(pannel):
 		self.labels = {"":4,\
 						"Strategy":8,\
 						"Status":10,\
-						"INFO":20,\
+						"Updates":40,\
 						"Est R":8,\
-						"UPshr":8,\
+						"Delta":8,\
 						"U":8,\
 						"R":8,\
 						"TR":8,\
