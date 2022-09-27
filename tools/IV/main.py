@@ -128,6 +128,11 @@ class processor:
 			while True:
 				data, addr = sock.recvfrom(1024)
 				row = str(data)
+
+
+				writer.writerow([row])
+
+				
 				Symbol = find_between(row, "Symbol=", ",")
 				symbol = Symbol[:-3]
 				time_ = find_between(row, "MarketTime=", ",")[:-4]
@@ -151,7 +156,7 @@ class processor:
 						procced = True
 
 					if procced:
-						writer.writerow([row])
+						
 						side = find_between(row, "Side=", ",")
 						volume =  int(find_between(row, "Volume=", ","))
 						#print(self.data[symbol])
@@ -190,7 +195,7 @@ class processor:
 							procced = True
 
 						if procced:
-							writer.writerow([row])
+							
 							side = find_between(row, "Side=", ",")
 							volume =  int(find_between(row, "Volume=", ","))
 
