@@ -201,9 +201,10 @@ class processor:
 								weight = data[1]
 
 								#print(symbol,etf,weight)
-
-								self.etfs[etf].new_imbalance(symbol,side,volume,weight,time_,ts)
-
+								try:
+									self.etfs[etf].new_imbalance(symbol,side,volume,weight,time_,ts)
+								except Exception as e:
+									print(symbol,e)
 					#time.sleep(0.00001)
 
 		print("finished")
