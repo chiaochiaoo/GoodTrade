@@ -230,7 +230,7 @@ class Manager:
 
 				print("processing",symbol,value)
 				if symbol not in self.symbol_data:
-					self.symbol_data[symbol] = Symbol(symbol,self.pipe_ppro_out)  #register in Symbol.
+					self.symbol_data[symbol] = Symbol(self,symbol,self.pipe_ppro_out)  #register in Symbol.
 					self.symbols.append(symbol)
 
 				self.baskets[basket_name].register_symbol(symbol,self.symbol_data[symbol])
@@ -498,18 +498,6 @@ class Manager:
 
 				log_print("cmd received:",d)
 
-				# if self.ui.tick_management.get()==True:
-				# 	if d[1] == "TickHigh":
-
-				# 		#long cover
-				# 		self.trades_aggregation(LONG,MINUS,0.1,False,self.not_passvie)
-
-
-				# 	elif d[1] == "TickLow":
-
-				# 		#short cover
-				# 		self.trades_aggregation(SHORT,MINUS,0.1,False,self.not_passvie)
-
 			elif d[0] =="basket":
 
 				log_print("basket update:",d)
@@ -526,6 +514,7 @@ class Manager:
 
 			elif d[0] =="shutdown":
 				break
+
 	def ppro_in(self):
 		while True:
 			d = self.pipe_ppro_in.recv()
@@ -697,6 +686,14 @@ class Manager:
 			# if d[0] =="new stoporder":
 
 			# 	self.ppro_append_new_stoporder(d[1])
+
+
+	def get_position(self,ticker):
+
+		if ticker in self.current_positions:
+			return self.current_positions[ticker]
+		else:
+			return (0,0)
 
 	def set_all_tp(self):
 

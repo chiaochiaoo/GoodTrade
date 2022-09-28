@@ -381,10 +381,10 @@ def ppro_connection_service(pipe,port):
 
 
 def get_current_positions():
-
+	global user
 	try:
 		d = {}
-		p="http://localhost:8080/GetOpenPositions?user=QIAOSUN"
+		p="http://localhost:8080/GetOpenPositions?user="+user
 		r= requests.get(p)
 
 		for i in r.text.splitlines():

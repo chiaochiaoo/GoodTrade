@@ -18,14 +18,14 @@ class Symbol:
 	"""
 	'ATR': 3.6, 'OHavg': 1.551, 'OHstd': 1.556, 'OLavg': 1.623, 'OLstd': 1.445
 	"""
-	def __init__(self,symbol,pproout):
+	def __init__(self,manager,symbol,pproout):
 
 		self.ticker = symbol
-		self.symbol_name = symbol
+		self.manager = manager 
 
 		self.ppro_out = pproout
 
-		self.numeric_labels = [TRADE_TIMESTAMP,TIMESTAMP,BID,ASK,RESISTENCE,SUPPORT,OPEN,HIGH,LOW,,PREMARKETLOW,STOP,EXIT,ENTRY,CUSTOM]
+		self.numeric_labels = [TRADE_TIMESTAMP,TIMESTAMP,BID,ASK,RESISTENCE,SUPPORT,OPEN,HIGH,LOW,PREMARKETLOW,STOP,EXIT,ENTRY,CUSTOM]
 		self.tech_indicators = [EMACOUNT,EMA8H,EMA8L,EMA8C,EMA5H,EMA5L,EMA5C,EMA21H,EMA21L,EMA21C,CLOSE]
 
 		self.data = {}
@@ -52,12 +52,8 @@ class Symbol:
 		#self.tradingplan_lock = threading.Lock()
 		self.tradingplans = {}
 
-
-
 	def register_tradingplan(self,name,tradingplan):
 
-		#self.incoming_request[name] = 0
-		#self.tradingplan_holdings[name] = 0
 		self.tradingplans[name] = tradingplan
 
 	def update_price(self,bid,ask,ts):
@@ -69,13 +65,72 @@ class Symbol:
 			self.data[ASK] = ask
 			self.data[TIMESTAMP] = ts
 
-		# tps = list(self.tradingplans.values())
-		# #print("tp update",bid,ask,ts,tps)
+	def symbol_inspection(self):
 
-		# for val in tps:
-			
-		# 	#print(bid,ask,ts)
-		# 	val.ppro_update_price(symbol=self.ticker,bid=bid,ask=ask,ts=ts)
+		"""
+		For both load and unload
+		"""
+
+	def get_all_expected(self):
+
+		"""
+		Doesnt matter if the TP is running or not, having request or not. it runs through. 
+		The less the parameter, the more generalizability 
+		"""
+		expected = 0
+
+		tps = list(self.tradingplans.keys())
+
+		for tp in tps:
+			expected +=  self.tradingplans[tp].get_current_expected(self.symbol_name)
+		return expected
+
+	def calc_total_imbalances(self):
+
+		current_shares = self.manager.get_position(self.ticker)[1]
+
+		expected = self.get_all_expected()
+
+		difference = expected - current_shares
+
+		if difference!=0:
+			self.deploy_orders(difference)
+
+			log_print(self.ticker," inspection complete, deploying:",difference)
+
+
+
+	def threading_order(self,share):
+
+			#lets add a bit of delay to it. 
+		self.ppro_out.send([CANCEL,self.ticker])
+		time.sleep(0.5)
+		self.ppro_out.send([action,self.ticker,share,0])
+
+	
+	def deploy_orders(self,difference):
+
+		# I NEED TO ADD A MECHANISM ON THIS
+		# If passive orders still don't full fill the request everything within some minutes
+		# Cancel all the requests. (or market in )
+
+		# ALL ORDERS AT ONCE. # First clear previous order. 
+
+		if difference>0:
+			action = PASSIVEBUY
+			price = self.get_bid()
+			coefficient = -1
+
+
+		else:
+			action = PASSIVESELL
+			price = self.get_ask()
+			coefficient = 1
+
+		handl = threading.Thread(target=self.threading_order,args=(difference,),daemon=True)
+		handl.start()
+
+
 
 
 
