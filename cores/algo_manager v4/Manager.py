@@ -193,7 +193,12 @@ class Manager:
 
 			for val in symbols:
 
-				val.symbol_inspection()
+
+				try:
+					val.symbol_inspection()
+
+				except Exception as e:
+					PrintException(e,"inspection error")
 				#log_print("inspecting:",val.ticker,"request:",val.get_management_request())
 				
 				# if val.get_register()==True:

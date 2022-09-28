@@ -52,6 +52,16 @@ class Symbol:
 		#self.tradingplan_lock = threading.Lock()
 		self.tradingplans = {}
 
+		self.init_data()
+		
+	def init_data(self):
+
+		for i in self.numeric_labels:
+			self.data[i] = 0
+			
+		for i in self.tech_indicators:
+			self.data[i] = 0
+
 	def register_tradingplan(self,name,tradingplan):
 
 		self.tradingplans[name] = tradingplan
@@ -126,15 +136,15 @@ class Symbol:
 			price = self.get_ask()
 			coefficient = 1
 
-		handl = threading.Thread(target=self.threading_order,args=(difference,),daemon=True)
+		handl = threading.Thread(target=self.threading_order,args=(action,difference,),daemon=True)
 		handl.start()
 
 
-	def threading_order(self,share):
+	def threading_order(self,action,share):
 
 			#lets add a bit of delay to it. 
 		self.ppro_out.send([CANCEL,self.symbol_name])
-		time.sleep(0.5)
+		time.sleep(0.3)
 		self.ppro_out.send([action,self.symbol_name,share,0])
 
 	def get_bid(self):
