@@ -119,6 +119,30 @@ class TradingPlan_Basket:
 			self.read_lock[symbol_name] = threading.Lock()
 
 
+
+	def submit_expected_shares(self,symbol,shares):
+
+		log_print(self.algo_name,"expect",symbol,shares)
+
+		with self.read_lock[symbol]:
+			self.expected_shares[symbol] = shares
+			# self.current_request[symbol] = self.expected_shares[symbol] - self.current_shares[symbol]
+
+
+			# self.notify_request(symbol)
+
+	def get_current_expected(self,symbol):
+
+		return self.expected_shares[symbol]
+
+
+
+
+
+
+
+
+
 	def cancel_request(self,symbol=None):
 
 		with self.read_lock[symbol]:
@@ -180,16 +204,7 @@ class TradingPlan_Basket:
 
 
 	# absolute sense. 
-	def submit_expected_shares(self,symbol,shares):
 
-		log_print(self.algo_name,"expect",symbol,shares)
-
-		with self.read_lock[symbol]:
-			self.expected_shares[symbol] = shares
-			self.current_request[symbol] = self.expected_shares[symbol] - self.current_shares[symbol]
-
-
-			self.notify_request(symbol)
 
 	def set_data(self):
 		#default values.
