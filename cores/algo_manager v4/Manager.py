@@ -14,7 +14,8 @@ from constant import *
 import os
 
 import random
-from BackTester import *
+# from BackTester import *
+
 from Util_functions import *
 import sys
 import socket
@@ -27,7 +28,7 @@ from datetime import datetime, timedelta
 import json
 import os,sys
 
-from Tester import *
+# from Tester import *
 from httpserver import *
 from psutil import process_iter
 import psutil
@@ -91,7 +92,7 @@ class Manager:
 		self.current_summary['trades'] = tk.DoubleVar()
 		self.current_summary['sizeTraded'] = tk.DoubleVar()
 		self.current_summary['unrealizedPlusNet'] = tk.DoubleVar()
-		self.current_summary['time'] = tk.StringVar()
+		self.current_summary['timestamp'] = tk.StringVar()
 		self.current_summary['unrealized'] = tk.DoubleVar()	
 
 		self.user = tk.StringVar(value="User:")
@@ -165,7 +166,7 @@ class Manager:
 		timer = threading.Thread(target=self.timer, daemon=True)
 		timer.start()
 
-		# self.pipe_ppro_out.send(["Register","QQQ.NQ"])
+		self.pipe_ppro_out.send(["Register","QQQ.NQ"])
 		# self.pipe_ppro_out.send(["Register","SPY.AM"])
 		#self.pipe_ppro_out.send(["Register","SQQQ.NQ"])
 #
@@ -245,116 +246,117 @@ class Manager:
 
 	def timer(self):
 
-		#570  34200
-		#960  57600 
-		time.sleep(2)
-		#now = datetime.now()
-		timestamp = 34200
+		# #570  34200
+		# #960  57600 
+		# time.sleep(2)
+		# #now = datetime.now()
+		# timestamp = 34200
 
-		log_print("timer start")
+		# log_print("timer start")
 
-		while True:
-			if self.shutdown:
-				break
+		# while True:
+		# 	if self.shutdown:
+		# 		break
 
-			now = datetime.now()
-			ts = now.hour*3600 + now.minute*60 + now.second
-			remain = timestamp - ts
-			#log_print(timestamp,ts)
-			minute = remain//60
-			seconds = remain%60
+		# 	now = datetime.now()
+		# 	ts = now.hour*3600 + now.minute*60 + now.second
+		# 	remain = timestamp - ts
+		# 	#log_print(timestamp,ts)
+		# 	minute = remain//60
+		# 	seconds = remain%60
 
-			if minute>0:
-				self.ui.algo_timer_string.set(str(minute)+" M : "+str(seconds)+" S")
-			else:
-				self.ui.algo_timer_string.set(str(seconds)+" seconds")
-			if remain<0:
-				log_print("Trigger")
-				break
+		# 	if minute>0:
+		# 		self.ui.algo_timer_string.set(str(minute)+" M : "+str(seconds)+" S")
+		# 	else:
+		# 		self.ui.algo_timer_string.set(str(seconds)+" seconds")
+		# 	if remain<0:
+		# 		log_print("Trigger")
+		# 		break
 
-			if self.shutdown:
-				break
+		# 	if self.shutdown:
+		# 		break
 
-			time.sleep(1)
+		# 	time.sleep(1)
 
 		#time.sleep(5)
-		self.ui.algo_timer_string.set("Deployed")
-		self.deploy_all()
+		# self.ui.algo_timer_string.set("Deployed")
+		# self.deploy_all()
 
 
-		timestamp = 600
-		cur_ts = 0
-		while True:
+		# timestamp = 600
+		# cur_ts = 0
+		# while True:
+		# 	if self.shutdown:
+		# 		break
 
+		# 	now = datetime.now()
+		# 	ts = now.hour*60 + now.minute
+		# 	remain = timestamp - ts
+		# 	#log_print(timestamp,ts)
+		# 	hour = remain//60
+		# 	minute = remain%60
 
-			if self.shutdown:
-				break
+		# 	if minute>0:
+		# 		self.ui.algo_timer_close_string.set(str(hour)+" H : "+str(minute)+" M")
+		# 	else:
+		# 		self.ui.algo_timer_close_string.set(str(minute)+" minutes")
+		# 	if remain<0:
+		# 		log_print("Trigger")
+		# 		self.withdraw_all()
+		# 		break
 
-			now = datetime.now()
-			ts = now.hour*60 + now.minute
-			remain = timestamp - ts
-			#log_print(timestamp,ts)
-			hour = remain//60
-			minute = remain%60
-
-			if minute>0:
-				self.ui.algo_timer_close_string.set(str(hour)+" H : "+str(minute)+" M")
-			else:
-				self.ui.algo_timer_close_string.set(str(minute)+" minutes")
-			if remain<0:
-				log_print("Trigger")
-				self.withdraw_all()
-				break
-
-			self.update_stats()
+		# 	self.update_stats()
 
 		
-			if ts!=cur_ts:
+		# 	if ts!=cur_ts:
 
-				checking = [i.is_alive() for i in self.processes]
-				log_print("Processes Checking:",checking)
+		# 		checking = [i.is_alive() for i in self.processes]
+		# 		log_print("Processes Checking:",checking)
 
-				cur_ts=ts
+		# 		cur_ts=ts
 
-			time.sleep(5)
+		# 	time.sleep(5)
 
 
-		timestamp = 955
-		while True:
+		# timestamp = 955
 
-			now = datetime.now()
-			ts = now.hour*60 + now.minute
-			remain = timestamp - ts
-			#log_print(timestamp,ts)
-			hour = remain//60
-			minute = remain%60
+		# while True:
 
-			if minute>0:
-				self.ui.algo_timer_close_string.set(str(hour)+" H : "+str(minute)+" M")
-			else:
-				self.ui.algo_timer_close_string.set(str(minute)+" minutes")
-			if remain<0:
-				log_print("Trigger")
-				self.flatten_all()
-				break
+		# 	now = datetime.now()
+		# 	ts = now.hour*60 + now.minute
+		# 	remain = timestamp - ts
+		# 	#log_print(timestamp,ts)
+		# 	hour = remain//60
+		# 	minute = remain%60
 
-			self.update_stats()
+		# 	if minute>0:
+		# 		self.ui.algo_timer_close_string.set(str(hour)+" H : "+str(minute)+" M")
+		# 	else:
+		# 		self.ui.algo_timer_close_string.set(str(minute)+" minutes")
+		# 	if remain<0:
+		# 		log_print("Trigger")
+		# 		self.flatten_all()
+		# 		break
 
-			if ts!=cur_ts:
+		# 	self.update_stats()
 
-				checking = [i.is_alive() for i in self.processes]
-				log_print("Processes Checking:",checking)
+		# 	if ts!=cur_ts:
 
-				cur_ts=ts
+		# 		checking = [i.is_alive() for i in self.processes]
+		# 		log_print("Processes Checking:",checking)
 
-			time.sleep(5)
+		# 		cur_ts=ts
 
-		try:
-			log_print("Algo manager complete")
-			#self.flatten_all()
-			#self.root.destroy()
-		except Exception as e:
-			pass
+		# 	time.sleep(5)
+
+		# try:
+		# 	log_print("Algo manager complete")
+		# 	#self.flatten_all()
+		# 	#self.root.destroy()
+		# except Exception as e:
+		# 	pass
+		pass
+
 
 	def update_stats(self):
 
@@ -371,7 +373,7 @@ class Manager:
 		self.u_winning = 0
 		self.u_losing = 0
 
-		for trade in list(self.tradingplan.values()):
+		for trade in list(self.baskets.values()):
 
 			if trade.data[STATUS] == RUNNING:
 				self.active_trade +=1 
@@ -521,6 +523,9 @@ class Manager:
 
 			#FIRST TWO CONNECTION CHECK
 
+
+
+
 			if d[0] =="ppro_in":
 				try:
 					self.ui.ppro_status.set(str(d[1]))
@@ -558,14 +563,20 @@ class Manager:
 
 			elif d[0] == POSITION_UPDATE:
 
-				positions = d[1]
-				user = d[2]
 
-				self.user.set("User:"+user)
-				self.current_positions = positions
+				try:
+					positions = d[1]
+					user = d[2]
 
+					# self.user.set("User:"+user)
+					self.current_positions = positions
 
-
+					self.ui.user.set(user)
+					self.ui.position_count.set(len(self.current_positions))
+					self.ui.account_status["background"] = "#97FEA8"
+					#log_print(user,len(positions))
+				except Exception as e:
+					PrintException(e, " POSITION UPDATE ERROR")
 			elif d[0] == SYMBOL_UPDATE:
 				# d= {}
 				# d['time'] = time_
@@ -574,11 +585,6 @@ class Manager:
 				# d['l1AskPrice'] = l1AskPrice
 				# d['l1BidPrice'] = l1BidPrice
 
-				data = d[1]
-				symbol = data["symbol"]
-				bid = data["l1BidPrice"]
-				ask = data["l1AskPrice"]
-				ts = data["timestamp"]
 
 				# here I update the symbol instead. 
 				# and then the symbol update each of the tradingplan bound to it. 
@@ -586,18 +592,48 @@ class Manager:
 				#print(symbol,bid,ask,ts)
 
 				try:
+
+					data = d[1]
+					symbol = data["symbol"]
+					bid = data["l1BidPrice"]
+					ask = data["l1AskPrice"]
+					ts = data["timestamp"]
+
 					if symbol in self.symbols:
 						self.symbol_data[symbol].update_price(bid,ask,ts)
+
+					#self.ui.ppro_last_update.set(ts)
 				except	Exception	as e:
 					PrintException(e,"Order update error")
 
 			elif d[0] == SUMMARY_UPDATE:
 
+				now = datetime.now()
+				cur_ts = now.hour*3600+now.minute*60+now.second
+
 				data = d[1]
+
+				# d['net'] = net
+				# d['fees'] = fees
+				# d['trades'] = trades
+				# d['sizeTraded'] = sizeTraded
+				# d['unrealizedPlusNet'] = unrealizedPlusNet
+				# d['timestamp'] = ts
+				# d['unrealized'] = unrealized	
 
 				try:
 					for key,val in data.items():
 						self.current_summary[key].set(val)
+
+					if abs(cur_ts-data['timestamp'])>5:
+
+						self.ui.ppro_last_update.set(str(abs(cur_ts-data['timestamp']))+" delay")
+
+						self.ui.timersx["background"] = "red"
+					else:
+						self.ui.ppro_last_update.set('REALTIME')
+
+						self.ui.timersx["background"] = "#97FEA8"
 				except Exception as e :
 					PrintException(e, " Updating Summary Problem")
 
@@ -838,23 +874,23 @@ if __name__ == '__main__':
 
 
 	root = tk.Tk()
-	root.title("GoodTrade Algo Manager v3 b2 TICK MANAGEMENT")
-	root.geometry("1500x1000")
+	root.title("GoodTrade Algo Manager v4")
+	root.geometry("950x800")
 
 	processes = [algo_voxcom,algo_voxcom2,ppro_in_manager,ppro_out_manager]
 	manager=Manager(root,goodtrade_pipe,ppro_out,ppro_in,TEST,processes)
 	#Tester(receive_pipe,ppro_pipe_end,ppro_pipe_end2)
-	print(len(sys.argv))
-	if len(sys.argv)==2:
-		BackTester(manager,receive_pipe,ppro_pipe_end,ppro_pipe_end2)
-	elif len(sys.argv)==3:
-		Tester(receive_pipe,ppro_pipe_end,ppro_pipe_end2)
-	else:
-		a=1
-		algo_voxcom.start()
-		algo_voxcom2.start()
-		ppro_out_manager.start()
-		ppro_in_manager.start()		
+	# print(len(sys.argv))
+	# if len(sys.argv)==2:
+	# 	BackTester(manager,receive_pipe,ppro_pipe_end,ppro_pipe_end2)
+	# elif len(sys.argv)==3:
+	# 	Tester(receive_pipe,ppro_pipe_end,ppro_pipe_end2)
+	# else:
+	a=1
+	algo_voxcom.start()
+	algo_voxcom2.start()
+	ppro_out_manager.start()
+	ppro_in_manager.start()		
 
 
 	# SWICH.  

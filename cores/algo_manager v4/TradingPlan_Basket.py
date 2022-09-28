@@ -66,6 +66,7 @@ class TradingPlan_Basket:
 
 		self.string_labels = [MIND,STATUS,POSITION,RISK_RATIO]
 
+		self.bool_labels= [SELECTED]
 
 		self.init_data(risk)
 
@@ -78,7 +79,9 @@ class TradingPlan_Basket:
 		for i in self.string_labels:
 			self.data[i] = ""
 			self.tkvars[i] = tk.StringVar(value="")
-
+		for i in self.bool_labels:
+			self.data[i] = False
+			self.tkvars[i] = tk.BooleanVar(value=False)
 		# for i in self.symbol.numeric_labels:
 		# 	self.tkvars[i] = tk.DoubleVar(value=self.symbol.data[i])
 		self.data[STATUS] = DEPLOYED

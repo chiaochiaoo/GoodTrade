@@ -341,7 +341,12 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 				pipe_status.send("terminated")
 				log_print("ppro out shutdown successful")
 				termination = True
+				
+			elif type_ == REGISTER:
 
+				symbol = d[1]
+				#register(symbol,port)
+				request_str,sucess_str,failure_str = register_web(symbol,port)
 			elif type_ == BUY:
 
 				symbol = d[1]

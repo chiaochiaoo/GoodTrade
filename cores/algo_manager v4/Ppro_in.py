@@ -10,6 +10,9 @@ from datetime import datetime
 
 import multiprocessing
 
+from psutil import process_iter
+import psutil
+
 global user 
 user = ""
 
@@ -64,9 +67,12 @@ def Ppro_in(port,pipe):
 	UDP_IP = "localhost"
 	UDP_PORT = port
 
+
+	force_close_port(port)
+
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	sock.bind((UDP_IP, UDP_PORT))
-
+	log_print("Ppro in moudule initializing")
 	pipe.send(["msg","algo_ppro working"])
 	#sock.settimeout()
 	work = False
@@ -142,14 +148,15 @@ def Ppro_in_old(port,pipe):
 
 	pipe.send(["msg","algo_ppro working"])
 	write_count = 0
-	sock.settimeout(5)
-
+	#sock.settimeout(5)
 
 	while True:
 
 		try:
 			rec= False
 			#print("restart")
+
+			log_print("waiting for input")
 			try:
 				data, addr = sock.recvfrom(1024)
 				#print(data)
@@ -164,7 +171,6 @@ def Ppro_in_old(port,pipe):
 				stream_data = str(data)
 				if work==False:
 					pipe.send(["ppro_in","Connected"])
-					#pipe.send(["msg","algo_ppro msg receive. all functional."])
 				work=True
 				type_ = find_between(stream_data, "Message=", ",")
 
@@ -190,8 +196,6 @@ def Ppro_in_old(port,pipe):
 	f.close()
 	
 
-
-
 def periodical_check(pipe,port):
 
 
@@ -216,13 +220,14 @@ def periodical_check(pipe,port):
 
 			### first step, get user and file location
 			if summary_being_read==False:
+				threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity")
 				user,file_location = get_env()
 			else:
-
-				log_print("periodcal new loop")
-				### 1. register OSTAT  
-				if c%5==0:
-					register_order_listener(port)
+				if c%50==0:
+					log_print("periodcal new loop")
+				# ### 1. register OSTAT  
+				# if c%5==0:
+				# 	register_order_listener(port)
 
 				### 2. Get open position 
 				positions = get_current_positions()
@@ -258,7 +263,7 @@ def get_env():
 			# print("directory",directory)
 
 			file_location = directory+"\\"+user+'_Summary_1.log'
-
+			log_print("Get ENV complete,",user,file_location)
 			return (user,file_location)
 		else:
 			return ('','')
@@ -277,7 +282,7 @@ def read_summary(pipe):
 	while True:
 
 		if os.path.exists(file_location):
-
+			log_print("summary file located.")
 			if file_found==False:
 				try:
 					os.remove(file_location)
@@ -318,7 +323,7 @@ def read_summary(pipe):
 										d['trades'] = trades
 										d['sizeTraded'] = sizeTraded
 										d['unrealizedPlusNet'] = unrealizedPlusNet
-										d['time'] = ts
+										d['timestamp'] = ts
 										d['unrealized'] = unrealized	
 
 										pipe.send([SUMMARY_UPDATE,d])
@@ -336,7 +341,7 @@ def read_summary(pipe):
 										d['lastPrice'] = lastPrice
 										d['l1AskPrice'] = l1AskPrice
 										d['l1BidPrice'] = l1BidPrice
-
+										d['timestamp'] = ts
 										pipe.send([SYMBOL_UPDATE,d])
 									# 4 net 
 									# 5 fees
@@ -351,8 +356,9 @@ def read_summary(pipe):
 					summary_being_read = False
 
 		else:
+			log_print("file_location_not detected:",file_location)
 			summary_being_read = False
-			time.sleep(5)
+			time.sleep(2)
 
 
 
@@ -381,6 +387,7 @@ def ppro_connection_service(pipe,port):
 
 
 def get_current_positions():
+
 	global user
 	try:
 		d = {}
@@ -707,6 +714,29 @@ def decode_l1_(stream_data,pipe,writer,l1data):
 		pipe.send(["order update",l1data[symbol]])
 		writer.writerow([symbol,mili_ts,bid,ask])
 
+def force_close_port(port, process_name=None):
+    """Terminate a process that is bound to a port.
+    
+    The process name can be set (eg. python), which will
+    ignore any other process that doesn't start with it.
+    """
+    for proc in psutil.process_iter():
+        for conn in proc.connections():
+            if conn.laddr[1] == port:
+                #Don't close if it belongs to SYSTEM
+                #On windows using .username() results in AccessDenied
+                #TODO: Needs testing on other operating systems
+                try:
+                    proc.username()
+                except psutil.AccessDenied:
+                    pass
+                else:
+                    if process_name is None or proc.name().startswith(process_name):
+                        try:
+                            proc.kill()
+                        except (psutil.NoSuchProcess, psutil.AccessDenied):
+                            pass 
+
 
 # x= "LocalTime=15:56:54.742,Message=OrderStatus,MarketDateTime=20210504-15:56:55.000,Currency=1,Symbol=QQQ.NQ,Gateway=2030,Side=T,OrderNumber=QIAOSUN_02000326M1791F8100000,Price=329.540000,Shares=70,Position=4,OrderState=Filled,CurrencyChargeGway=1,ChargeGway=0.21000,CurrencyChargeAct=1,ChargeAct=0.0096600,CurrencyChargeSec=1,ChargeSec=0.47750,CurrencyChargeExec=0,ChargeExec=0,CurrencyChargeClr=1,ChargeClr=0.012950,OrderFlags=129,CurrencyCharge=1,Account=1TRUENV001TNVQIAOSUN_USD1,InfoCode=255,InfoText=LiqFlags:^Tag30:14^Tag31:329.5400000^Tag150:2^Tag9730:"
 # log_print(find_between(x, "MarketDateTime=", ",")[9:-4])
@@ -733,16 +763,21 @@ def decode_l1_(stream_data,pipe,writer,l1data):
 # req.start()
 
 
-# periodical_check(None,4135)
+# test 1  get_env
+
+# print(get_env())
+
+# test 2 get_current_positions
+
+# user = "QIAOSUN"
+# print(get_current_positions())
+
+#test 3 periodical_check
 
 # multiprocessing.freeze_support()
-
 # send_pipe, receive_pipe = multiprocessing.Pipe()
 
-# port =4609
-
-
-# req = threading.Thread(target=Ppro_in,args=(port,send_pipe), daemon=True)
+# req = threading.Thread(target=Ppro_in,args=(4195,send_pipe), daemon=True)
 # req.start()
 
 
@@ -751,5 +786,11 @@ def decode_l1_(stream_data,pipe,writer,l1data):
 # 	d = receive_pipe.recv()
 
 # 	print(d)
+
+
+# port =4609
+
+
+
 
 
