@@ -171,25 +171,9 @@ class Manager:
 #
 	#data part, UI part
 
-	def init_record_writer(self):
-
-		try:
-			self.f = open(self.file, "r")
-		except:
-			self.f = open(self.file, "w")
-			self.recordwriter = csv.writer(self.f,lineterminator = '\n')
-			self.recordwriter.writerow(['DATE', 'TIME','ALGO','SYMBOL','POSITION','RISK','REALIZED'])
-
-		self.f.close()
-		log_print(("record file start"))
-
-
-
 	def shutdown_all_threads(self):
 
 		self.shutdown= True
-
-
 
 	def symbols_inspection(self):
 
@@ -227,28 +211,6 @@ class Manager:
 			# 	ts = cur_ts
 			time.sleep(5)
 
-	def new_record(self,tradingplan):
-
-		try:
-			self.f = open(self.file, "a")
-			self.recordwriter = csv.writer(self.f,lineterminator = '\n')
-
-			now = datetime.now()
-			DATE = now.strftime("%Y-%m-%d")
-			TIME = now.strftime("%H:%M:%S")
-
-
-			ALGO = tradingplan.algo_name
-			SYMBOL = tradingplan.symbol_name
-			SIDE = tradingplan.tkvars[POSITION].get()
-			RISK = tradingplan.data[ESTRISK]
-			real = tradingplan.data[REALIZED]
-
-			self.recordwriter.writerow([DATE, TIME,ALGO,SYMBOL,SIDE,RISK,real])
-			self.f.close()
-		except:
-
-			log_print("writing record failure for",tradingplan.symbol_name)
 
 
 	def apply_basket_cmd(self,basket_name,orders,risk):
@@ -268,7 +230,7 @@ class Manager:
 
 				print("processing",symbol,value)
 				if symbol not in self.symbol_data:
-					self.symbol_data[symbol] = Symbol(symbol,0,100,{},self.pipe_ppro_out)  #register in Symbol.
+					self.symbol_data[symbol] = Symbol(symbol,self.pipe_ppro_out)  #register in Symbol.
 					self.symbols.append(symbol)
 
 				self.baskets[basket_name].register_symbol(symbol,self.symbol_data[symbol])
@@ -693,7 +655,7 @@ class Manager:
 				except	Exception	as e:
 					PrintException(e,"Order confim error")
 
-			elif d[0] =="order update":
+			elif d[0] =="order update": ### DEPRECATED. 
 				data = d[1]
 				symbol = data["symbol"]
 				bid = data["bid"]
@@ -713,7 +675,7 @@ class Manager:
 				# if symbol in self.tradingplan:
 				# 	self.tradingplan[symbol].ppro_update_price(bid,ask,ts)
 
-			elif d[0] =='order update_m':
+			elif d[0] =='order update_m':### DEPRECATED. 
 				data = d[1]
 				symbol = data["symbol"]
 				bid = data["bid"]
@@ -784,13 +746,45 @@ class Manager:
 				d.adjusting_risk()
 				d.update_displays()
 				
-
 	def flatten_all(self):
 		for d in list(self.tradingplan.values()):
 			if d.in_use and d.data[STATUS]==RUNNING:
 				d.flatten_cmd()
 
-				
+	def init_record_writer(self):
+
+		try:
+			self.f = open(self.file, "r")
+		except:
+			self.f = open(self.file, "w")
+			self.recordwriter = csv.writer(self.f,lineterminator = '\n')
+			self.recordwriter.writerow(['DATE', 'TIME','ALGO','SYMBOL','POSITION','RISK','REALIZED'])
+
+		self.f.close()
+		log_print(("record file start"))
+	def new_record(self,tradingplan):
+
+		try:
+			self.f = open(self.file, "a")
+			self.recordwriter = csv.writer(self.f,lineterminator = '\n')
+
+			now = datetime.now()
+			DATE = now.strftime("%Y-%m-%d")
+			TIME = now.strftime("%H:%M:%S")
+
+
+			ALGO = tradingplan.algo_name
+			SYMBOL = tradingplan.symbol_name
+			SIDE = tradingplan.tkvars[POSITION].get()
+			RISK = tradingplan.data[ESTRISK]
+			real = tradingplan.data[REALIZED]
+
+			self.recordwriter.writerow([DATE, TIME,ALGO,SYMBOL,SIDE,RISK,real])
+			self.f.close()
+		except:
+
+			log_print("writing record failure for",tradingplan.symbol_name)
+		
 
 def force_close_port(port, process_name=None):
     """Terminate a process that is bound to a port.
