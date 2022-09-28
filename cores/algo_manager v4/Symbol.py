@@ -20,7 +20,7 @@ class Symbol:
 	"""
 	def __init__(self,manager,symbol,pproout):
 
-		self.ticker = symbol
+		self.symbol_name = symbol
 		self.manager = manager 
 
 		self.ppro_out = pproout
@@ -71,19 +71,19 @@ class Symbol:
 		For both load and unload
 		"""
 
-		difference = calc_total_imbalances()
+		difference = self.calc_total_imbalances()
 
 		if difference!=0:
 			self.deploy_orders(difference)
 
-			log_print(self.ticker," inspection complete, deploying:",difference)
+			log_print(self.symbol_name," inspection complete, deploying:",difference)
 
 		else:
-			log_print(self.ticker," inspection complete, no action needed.")
+			log_print(self.symbol_name," inspection complete, no action needed.")
 
 	def calc_total_imbalances(self):
 
-		current_shares = self.manager.get_position(self.ticker)[1]
+		current_shares = self.manager.get_position(self.symbol_name)[1]
 
 		expected = self.get_all_expected()
 
@@ -133,11 +133,15 @@ class Symbol:
 	def threading_order(self,share):
 
 			#lets add a bit of delay to it. 
-		self.ppro_out.send([CANCEL,self.ticker])
+		self.ppro_out.send([CANCEL,self.symbol_name])
 		time.sleep(0.5)
-		self.ppro_out.send([action,self.ticker,share,0])
+		self.ppro_out.send([action,self.symbol_name,share,0])
 
-	
+	def get_bid(self):
+		return self.data[BID]
+
+	def get_ask(self):
+		return self.data[ASK]
 
 
 # total_imbalance = sum(t.values())
@@ -182,7 +186,7 @@ class Symbol:
 	# 		for tp,val in self.incoming_request.items():
 
 	# 			if share >0 and val>0:
-	# 				self.tradingplans[tp].ppro_process_orders(price,abs(share),LONG,self.ticker)
+	# 				self.tradingplans[tp].ppro_process_orders(price,abs(share),LONG,self.symbol_name)
 
 	# 				self.load_confirmation(tp,share)
 
@@ -192,7 +196,7 @@ class Symbol:
 
 	# 				break
 	# 			elif share<0 and val<0:
-	# 				self.tradingplans[tp].ppro_process_orders(price,abs(share),SHORT,self.ticker)
+	# 				self.tradingplans[tp].ppro_process_orders(price,abs(share),SHORT,self.symbol_name)
 
 	# 				self.load_confirmation(tp,share)
 
@@ -202,7 +206,7 @@ class Symbol:
 
 	# 				break
 
-	# 	#log_print(self.ticker,"incoming shares",self.incoming_shares)
+	# 	#log_print(self.symbol_name,"incoming shares",self.incoming_shares)
 
 	# 	c = 0
 	# 	for i in paired:

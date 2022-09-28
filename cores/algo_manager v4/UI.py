@@ -538,13 +538,12 @@ class UI(pannel):
 
 		infos = {
 		SELECTED:"",\
-		'Strategy':"", \
+		'Symbol':"", \
 		STATUS:"",\
-		MIND:"",\
-		RISK_RATIO:"", \
-		'SzIn':"", \
-		'Position':"", \
-		'Stop':"",\
+		MIND: "",\
+
+		ESTRISK:"", \
+
 		UNREAL:"", \
 		REALIZED:"", \
 		TOTAL_REALIZED:"", \
@@ -695,14 +694,13 @@ class UI(pannel):
 			#"symbol","algo_status","description","break_at","position","act_r/est_r","stoplevel","average_price","shares","pxtgt1","pxtgt1","pxtgt1","unrealized_pshr","unrealized","realized"
 			
 			label_name = labels[j]
-			print(symbol,label_name,j,info)
+			#print(symbol,label_name,j,info,self.tk_labels_basket[symbol].keys())
 			#print(self.tk_labels_single[symbol])
 			if label_name == "Symbol":
-				self.tk_labels_basket[symbol][label_name]["text"] = info[j] #tk.Button(self.deployment_frame ,text=info[j],width=self.width[j],command=tradingplan.deploy)
-				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.deploy
+				self.tk_labels_basket[symbol][label_name]["text"] = info[j] 
 			elif label_name == STATUS:
 				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j] 
-				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.cancle_deployment
+				#self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.cancle_deployment
 				#= tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command=tradingplan.cancle_deployment)
 
 			# elif label_name =="Reload" or label_name==SELECTED:
@@ -720,7 +718,9 @@ class UI(pannel):
 
 
 			elif label_name =="flatten":
-				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.flatten_cmd
+
+				pass
+				#self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.flatten_cmd
 				#self.tk_labels_single[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command=tradingplan.flatten_cmd)
 
 			elif label_name == SUPPORT or label_name == RESISTENCE or label_name == "pxtgt1" or label_name == "pxtgt2" or label_name == "pxtgt3":
@@ -749,156 +749,6 @@ class UI(pannel):
 
 
 
-	def create_new_entry_systemB(self,tradingplan):
-
-
-		infos = {
-		SELECTED:tradingplan.tkvars[SELECTED],\
-		'Symbol':tradingplan.symbol_name, \
-		STATUS:tradingplan.tkvars[STATUS],\
-		MIND: tradingplan.tkvars[MIND],\
-		ENTRYPLAN:tradingplan.tkvars[ENTRYPLAN], \
-		ENTYPE:tradingplan.tkvars[ENTYPE], \
-		TIMER:tradingplan.tkvars[TIMER], \
-		MANAGEMENTPLAN:tradingplan.tkvars[MANAGEMENTPLAN], \
-		"Reload":tradingplan.tkvars[RELOAD], \
-		'AR':tradingplan.tkvars[AUTORANGE], \
-		SUPPORT:tradingplan.tkvars[SUPPORT], \
-		RESISTENCE:tradingplan.tkvars[RESISTENCE], \
-		RISK_RATIO:tradingplan.tkvars[RISK_RATIO], \
-		'SzIn':tradingplan.tkvars[SIZE_IN], \
-		'Position':tradingplan.tkvars[POSITION], \
-		'Stop':tradingplan.tkvars[STOP_LEVEL],\
-		'AvgPx':tradingplan.tkvars[AVERAGE_PRICE], \
-		PXT1: tradingplan.tkvars[PXT1], \
-		PXT2:tradingplan.tkvars[PXT2], \
-		PXT3:tradingplan.tkvars[PXT3], \
-		UNREAL_PSHR:tradingplan.tkvars[UNREAL_PSHR], \
-		UNREAL:tradingplan.tkvars[UNREAL], \
-		REALIZED:tradingplan.tkvars[REALIZED], \
-		TOTAL_REALIZED:tradingplan.tkvars[TOTAL_REALIZED], \
-		'flatten':"", \
-		'log':""}
-
-
-		#link the global variable 
-		tradingplan.tkvars[RISKTIMER] = self.risk_timer 
-
-
-		l = self.single_label_count
-
-		info = list(infos.values())
-		labels = list(infos.keys())
-		symbol = info[1]
-		self.tk_labels_single[symbol] = {}
-		for j in range(len(info)):
-			#"symbol","algo_status","description","break_at","position","act_r/est_r","stoplevel","average_price","shares","pxtgt1","pxtgt1","pxtgt1","unrealized_pshr","unrealized","realized"
-			label_name = labels[j]
-
-			if label_name == "Symbol":
-				self.tk_labels_single[symbol][label_name] = tk.Button(self.deployment_frame ,text=info[j],width=self.width[j],command=tradingplan.deploy)
-			elif label_name == STATUS:
-				self.tk_labels_single[symbol][label_name] = tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command=tradingplan.cancle_deployment)
-
-			elif label_name ==TIMER:
-				self.tk_labels_single[symbol][label_name] = tk.Entry(self.deployment_frame,textvariable=info[j],width=self.width[j])
-
-			elif label_name =="AR" :
-				self.tk_labels_single[symbol][label_name] = tk.Checkbutton(self.deployment_frame,variable=info[j],width=2,command=tradingplan.AR_toggle)
-			elif label_name =="Reload" or label_name==SELECTED:
-				self.tk_labels_single[symbol][label_name] = tk.Checkbutton(self.deployment_frame,variable=info[j],width=2)
-
-			elif label_name =="MIND":
-				self.tk_labels_single[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
-			elif label_name =="Stop":
-				self.tk_labels_single[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command= lambda tp=tradingplan:adjust_stop(tp))
-
-
-			elif label_name ==RISK_RATIO:
-				self.tk_labels_single[symbol][RISK_PER_SHARE]=tk.Entry(self.deployment_frame ,textvariable=tradingplan.tkvars[RISK_PER_SHARE],width=self.width[j])
-				tradingplan.tklabels[RISK_PER_SHARE] = self.tk_labels_single[symbol][RISK_PER_SHARE]
-				tradingplan.tklabels[RISK_PER_SHARE].grid(row= l+2, column=j,padx=0)
-
-				self.tk_labels_single[symbol][label_name]=tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
-
-			elif label_name =='SzIn':
-				self.tk_labels_single[symbol][TARGET_SHARE]=tk.Entry(self.deployment_frame ,textvariable=tradingplan.tkvars[INPUT_TARGET_SHARE],width=self.width[j])
-				tradingplan.tklabels[TARGET_SHARE] = self.tk_labels_single[symbol][TARGET_SHARE]
-				tradingplan.tklabels[TARGET_SHARE].grid(row= l+2, column=j,padx=0)
-
-				self.tk_labels_single[symbol][label_name]=tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
-
-			elif label_name =="flatten":
-				self.tk_labels_single[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command=tradingplan.flatten_cmd)
-
-			elif label_name == SUPPORT or label_name == RESISTENCE or label_name == "pxtgt1" or label_name == "pxtgt2" or label_name == "pxtgt3":
-				self.tk_labels_single[symbol][label_name] =tk.Entry(self.deployment_frame ,textvariable=info[j],width=self.width[j],state="disabled")	
-			else:
-				if str(type(info[j]))=="<class 'tkinter.StringVar'>" or str(type(info[j]))=="<class 'tkinter.DoubleVar'>":
-					self.tk_labels_single[symbol][label_name]=tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
-				else:
-					#print(self.tk_labels_single[symbol])
-					self.tk_labels_single[symbol][label_name]=tk.Button(self.deployment_frame ,text=info[j],width=self.width[j])
-			try:
-				self.label_default_configure(self.tk_labels_single[symbol][label_name])
-			except:
-				pass
-
-			tradingplan.tklabels[label_name] = self.tk_labels_single[symbol][label_name]
-
-			self.tk_labels_single[symbol][label_name].grid(row= l+2, column=j,padx=0)
-
-		self.single_label_count +=1
-
-		self.algo_count_number.set(self.single_label_count-1)
-		self.rebind(self.dev_canvas,self.deployment_frame)
-		#self.recreate_labels()
-		tradingplan.update_displays()
-
-
-	def create_example_trade(self):
-
-		info=['AAPL','STATUS', 'MIND', 'Bullish', 'EntryStrat', 'Timer', 'ManaStart', 'AR', 'Sup', 'Res', 'Act/Est R', 'Long', 'AvgPx', 'SzIn', 'UPshr', 'U', 'R', 'TR', 'flatten', 'log']
-		symbol = 'AAPL'
-		self.tk_labels_single[symbol]={}
-		self.tk_labels_single[symbol][1]=1
-		l = self.single_label_count
-		for j in range(len(info)):
-			#"symbol","algo_status","description","break_at","position","act_r/est_r","stoplevel","average_price","shares","pxtgt1","pxtgt1","pxtgt1","unrealized_pshr","unrealized","realized"
-			label_name = self.tk_labels[j]
-
-			if label_name == "Symbol":
-				self.tk_labels_single[symbol][label_name] = tk.Button(self.deployment_frame ,text=info[j],width=self.width[j],command = lambda s=symbol: self.deploy_stop_order(symbol))
-
-			elif label_name =="Timer":
-				self.tk_labels_single[symbol][label_name] = tk.Entry(self.deployment_frame,textvariable=info[j],width=self.width[j])
-
-			# elif label_name =="EntryStrat":
-			# 	self.tk_labels_single[symbol][label_name] = tk.OptionMenu(self.deployment_frame, textvariable="",set())
-
-			# elif label_name =="ManaStart":
-			# 	self.tk_labels_single[symbol][label_name] = tk.OptionMenu(self.deployment_frame, textvariable="",set())
-
-			elif label_name =="AR" or  label_name =="AM":
-				self.tk_labels_single[symbol][label_name] = tk.Checkbutton(self.deployment_frame,variable=info[j])
-			elif label_name =="MIND":
-				self.tk_labels_single[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command = lambda s=symbol: self.cancel_deployed(symbol))
-			elif label_name == "Sup" or label_name == "Res" or label_name == "pxtgt1" or label_name == "pxtgt2" or label_name == "pxtgt3":
-				self.tk_labels_single[symbol][label_name] =tk.Entry(self.deployment_frame ,textvariable=info[j],width=self.width[j])	
-			else:
-				if str(type(info[j]))=="<class 'tkinter.StringVar'>":
-					self.tk_labels_single[symbol][label_name]=tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
-				else:
-					#print(self.tk_labels_single[symbol])
-					self.tk_labels_single[symbol][label_name]=tk.Button(self.deployment_frame ,text=info[j],width=self.width[j])
-
-			try:
-				self.label_default_configure(self.tk_labels_single[symbol][label_name])
-			except:
-				pass
-			self.tk_labels_single[symbol][label_name].grid(row= l+2, column=j,padx=0)
-
-
 	def recreate_labels(self):
 
 		l = list(self.labels.keys())
@@ -917,8 +767,6 @@ class UI(pannel):
 			self.b.grid(row=1, column=i)
 
 
-	def add_symbol(self):
-		pass
 	def order_ui_creation(self,info):
 
 		#if they already exisit, just repace the old ones.

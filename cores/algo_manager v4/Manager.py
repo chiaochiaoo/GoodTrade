@@ -223,7 +223,7 @@ class Manager:
 				self.baskets[basket_name] = TradingPlan_Basket(basket_name,risk,self)
 				self.ui.create_new_single_entry(self.baskets[basket_name],"Basket",None)
 
-				self.baskets[basket_name].deploy(0)
+				self.baskets[basket_name].deploy()
 		
 
 		if self.baskets[basket_name].shut_down==False:

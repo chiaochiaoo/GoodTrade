@@ -84,8 +84,6 @@ class TradingPlan_Basket:
 			self.tkvars[i] = tk.BooleanVar(value=False)
 		# for i in self.symbol.numeric_labels:
 		# 	self.tkvars[i] = tk.DoubleVar(value=self.symbol.data[i])
-		self.data[STATUS] = DEPLOYED
-		self.tkvars[STATUS].set(DEPLOYED)
 
 
 	def internal(self):
@@ -264,15 +262,15 @@ class TradingPlan_Basket:
 		self.tkvars[REALIZED].set(str(self.data[REALIZED]))
 		self.tkvars[TOTAL_REALIZED].set(str(self.data[TOTAL_REALIZED]))
 		self.tkvars[UNREAL].set(str(self.data[UNREAL]))
-		self.tkvars[UNREAL_PSHR].set(str(self.data[UNREAL_PSHR]))
+		#self.tkvars[UNREAL_PSHR].set(str(self.data[UNREAL_PSHR]))
 		#self.tkvars[AVERAGE_PRICE].set(self.data[AVERAGE_PRICE])
 
 		#check color.f9f9f9
 
-		if self.data[UNREAL_PSHR]>0:
+		if self.data[UNREAL]>0:
 			#self.tklabels[UNREAL_PSHR]["background"] = STRONGGREEN
 			self.tklabels[UNREAL]["background"] = STRONGGREEN
-		elif self.data[UNREAL_PSHR]<0:
+		elif self.data[UNREAL]<0:
 			#self.tklabels[UNREAL_PSHR]["background"] = STRONGRED
 			self.tklabels[UNREAL]["background"] = STRONGRED
 		else:
@@ -322,3 +320,9 @@ class TradingPlan_Basket:
 		self.tkvars[MIND].set(str)
 		self.tklabels[MIND]["background"]=color
 
+
+	def deploy(self):
+
+
+		self.data[STATUS] = DEPLOYED
+		self.tkvars[STATUS].set(DEPLOYED)
