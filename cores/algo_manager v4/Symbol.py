@@ -71,6 +71,27 @@ class Symbol:
 		For both load and unload
 		"""
 
+		difference = calc_total_imbalances()
+
+		if difference!=0:
+			self.deploy_orders(difference)
+
+			log_print(self.ticker," inspection complete, deploying:",difference)
+
+		else:
+			log_print(self.ticker," inspection complete, no action needed.")
+
+	def calc_total_imbalances(self):
+
+		current_shares = self.manager.get_position(self.ticker)[1]
+
+		expected = self.get_all_expected()
+
+		difference = expected - current_shares
+
+
+		return difference
+
 	def get_all_expected(self):
 
 		"""
@@ -85,29 +106,7 @@ class Symbol:
 			expected +=  self.tradingplans[tp].get_current_expected(self.symbol_name)
 		return expected
 
-	def calc_total_imbalances(self):
 
-		current_shares = self.manager.get_position(self.ticker)[1]
-
-		expected = self.get_all_expected()
-
-		difference = expected - current_shares
-
-		if difference!=0:
-			self.deploy_orders(difference)
-
-			log_print(self.ticker," inspection complete, deploying:",difference)
-
-
-
-	def threading_order(self,share):
-
-			#lets add a bit of delay to it. 
-		self.ppro_out.send([CANCEL,self.ticker])
-		time.sleep(0.5)
-		self.ppro_out.send([action,self.ticker,share,0])
-
-	
 	def deploy_orders(self,difference):
 
 		# I NEED TO ADD A MECHANISM ON THIS
@@ -131,7 +130,14 @@ class Symbol:
 		handl.start()
 
 
+	def threading_order(self,share):
 
+			#lets add a bit of delay to it. 
+		self.ppro_out.send([CANCEL,self.ticker])
+		time.sleep(0.5)
+		self.ppro_out.send([action,self.ticker,share,0])
+
+	
 
 
 # total_imbalance = sum(t.values())
