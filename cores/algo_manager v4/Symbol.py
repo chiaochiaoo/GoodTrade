@@ -130,7 +130,6 @@ class Symbol:
 			price = self.get_bid()
 			coefficient = -1
 
-
 		else:
 			action = PASSIVESELL
 			price = self.get_ask()
@@ -145,7 +144,7 @@ class Symbol:
 			#lets add a bit of delay to it. 
 		self.ppro_out.send([CANCEL,self.symbol_name])
 		time.sleep(0.3)
-		self.ppro_out.send([action,self.symbol_name,share,0])
+		self.ppro_out.send([action,self.symbol_name,abs(share),0])
 
 	def get_bid(self):
 		return self.data[BID]

@@ -579,7 +579,7 @@ class Manager:
 					self.ui.user.set(user)
 					self.ui.position_count.set(len(self.current_positions))
 					self.ui.account_status["background"] = "#97FEA8"
-					#log_print(user,len(positions))
+					log_print("Position updates:",len(positions),positions)
 				except Exception as e:
 					PrintException(e, " POSITION UPDATE ERROR")
 			elif d[0] == SYMBOL_UPDATE:
@@ -639,6 +639,8 @@ class Manager:
 						self.ui.ppro_last_update.set('REALTIME')
 
 						self.ui.timersx["background"] = "#97FEA8"
+
+					self.ui.update_performance(data)
 				except Exception as e :
 					PrintException(e, " Updating Summary Problem")
 

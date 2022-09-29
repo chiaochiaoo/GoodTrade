@@ -318,13 +318,13 @@ def read_summary(pipe):
 										#print(time_,net,fees,trades,sizeTraded,unrealizedPlusNet)
 										# SymbolLayerDisplayData: 
 										d= {}
-										d['net'] = net
-										d['fees'] = fees
-										d['trades'] = trades
-										d['sizeTraded'] = sizeTraded
+										d['net'] = round(net,2)
+										d['fees'] = round(fees,2)
+										d['trades'] = int(trades)
+										d['sizeTraded'] = int(sizeTraded)
 										d['unrealizedPlusNet'] = unrealizedPlusNet
 										d['timestamp'] = ts
-										d['unrealized'] = unrealized	
+										d['unrealized'] = round(unrealized,2)	
 
 										pipe.send([SUMMARY_UPDATE,d])
 

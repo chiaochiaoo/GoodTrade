@@ -63,7 +63,7 @@ class UI(pannel):
 		self.algo_count_number = tk.DoubleVar(value=0)
 		self.algo_number = 0
 
-		self.position_count = tk.DoubleVar(value=0)
+		self.position_count = tk.IntVar(value=0)
 		self.position_number = 0
 
 		self.user_email = tk.StringVar()
@@ -154,40 +154,66 @@ class UI(pannel):
 		# self.deconstruct.grid(sticky="w",column=1,row=5)
 
 
+	def update_performance(self,d):
+
+		self.net.set(d['net'])
+
+		if d['net']>self.net_max.get():
+			self.net_max.set(d['net'])
+
+		if d['net']<self.net_min.get():
+			self.net_min.set(d['net'])
+
+
+		self.total_u.set(d['unrealized'] )
+
+		if d['unrealized']>self.total_u_max.get():
+			self.total_u_max.set(d['unrealized'])
+
+		if d['unrealized']<self.total_u_min.get():
+			self.total_u_min.set(d['unrealized'])
+
+		self.trade_count.set(d['sizeTraded'])
+		self.fees.set(d['fees'])
+		self.sizeTraded.set(d['sizeTraded'])
+
+
+
+				# d['fees'] = fees
+				# d['trades'] = trades
+				# d['sizeTraded'] = sizeTraded
+				# d['unrealizedPlusNet'] = unrealizedPlusNet
+				# d['timestamp'] = ts
+				# d['unrealized'] = unrealized	
 	def init_performance_pannel(self):
-
-
-		self.active_trade = tk.IntVar()
-		self.active_trade_max = tk.IntVar()
-
-		self.total_u = tk.DoubleVar()
-		self.total_u_max = tk.DoubleVar()
-		self.total_u_min = tk.DoubleVar()
-		self.total_r = tk.DoubleVar()
-		self.total_r_max = tk.DoubleVar()
-		self.total_r_min = tk.DoubleVar()
-
-		self.max_risk = tk.DoubleVar()
-
-		self.passive_aggregation = tk.BooleanVar()
-
-		self.tick_management = tk.BooleanVar(value=True)
-		self.current_total_risk = tk.DoubleVar()
-		self.current_downside = tk.DoubleVar()
 
 		self.net = tk.DoubleVar()
 		self.net_max = tk.DoubleVar()
 		self.net_min = tk.DoubleVar()
 
-		self.current_upside = tk.DoubleVar()
-
-		self.deltaspx = tk.DoubleVar()
-		self.longexp = tk.DoubleVar()
-		self.shortexp = tk.DoubleVar()
-		self.overallexp = tk.DoubleVar()
 
 
-		self.current_downside_max = tk.DoubleVar()
+		self.total_u = tk.DoubleVar()
+		self.total_u_max = tk.DoubleVar()
+		self.total_u_min = tk.DoubleVar()
+
+		self.current_total_risk = tk.DoubleVar()
+		self.max_risk = tk.DoubleVar()
+
+		#self.position_count = tk.IntVar()
+		self.position_count_max = tk.IntVar()
+
+		self.trade_count = tk.IntVar()
+
+		self.fees = tk.DoubleVar()
+		self.sizeTraded = tk.IntVar()
+
+
+
+
+
+
+
 		self.u_winning = tk.DoubleVar()
 		self.u_winning_min = tk.DoubleVar()
 		self.u_winning_max = tk.DoubleVar()
@@ -196,75 +222,87 @@ class UI(pannel):
 		self.u_losing_min = tk.DoubleVar()
 		self.u_losing_max = tk.DoubleVar()
 
-		self.x1 = ttk.Label(self.performance_pannel, text="Cur:")
-		self.x1.grid(sticky="w",column=2,row=1,padx=3)
-		self.x2 = ttk.Label(self.performance_pannel, text="Min:")
-		self.x2.grid(sticky="w",column=3,row=1,padx=3)
-		self.x3 = ttk.Label(self.performance_pannel, text="Max:")
-		self.x3.grid(sticky="w",column=4,row=1,padx=3)
-
-		row = 2 
-		self.t1 = ttk.Label(self.performance_pannel, text="Activated:")
-		self.t1.grid(sticky="w",column=1,row=row,padx=10)
-		self.t1_ = ttk.Label(self.performance_pannel, textvariable=self.active_trade)
-		self.t1_.grid(sticky="w",column=2,row=row)
-
-		ttk.Label(self.performance_pannel, textvariable=self.active_trade_max).grid(sticky="w",column=4,row=row)
-
-		row +=1 
-		self.t2 = ttk.Label(self.performance_pannel, text="Total Net:")
-		self.t2.grid(sticky="w",column=1,row=row,padx=10)
-		self.t2_ = ttk.Label(self.performance_pannel, textvariable=self.net)
-		self.t2_.grid(sticky="w",column=2,row=row)
-
-		ttk.Label(self.performance_pannel, textvariable=self.net_min).grid(sticky="w",column=3,row=row)
-		ttk.Label(self.performance_pannel, textvariable=self.net_max).grid(sticky="w",column=4,row=row)
+		self.x1 = ttk.Button(self.performance_pannel, text="")
+		self.x1.grid(sticky="w",column=1,row=1,padx=3)
+		self.x1 = ttk.Button(self.performance_pannel, text="Cur:")
+		self.x1.grid(sticky="w",column=1,row=2,padx=3)
+		self.x2 = ttk.Button(self.performance_pannel, text="Min:")
+		self.x2.grid(sticky="w",column=1,row=3,padx=3)
+		self.x3 = ttk.Button(self.performance_pannel, text="Max:")
+		self.x3.grid(sticky="w",column=1,row=4,padx=3)
 
 
-		row +=1 
-		self.t2 = ttk.Label(self.performance_pannel, text="Total U:")
-		self.t2.grid(sticky="w",column=1,row=row,padx=10)
-		self.t2_ = ttk.Label(self.performance_pannel, textvariable=self.total_u)
-		self.t2_.grid(sticky="w",column=2,row=row)
 
-		self.t2_ = ttk.Label(self.performance_pannel, textvariable=self.total_u_min)
-		self.t2_.grid(sticky="w",column=3,row=row)
+		col = 1
+		col +=1 
+		self.t2 = ttk.Button(self.performance_pannel, text="Net:")
+		self.t2.grid(sticky="w",column=col,row=1)
+		self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.net)
+		self.t2_.grid(sticky="w",column=col,row=2)
 
-		self.t2_ = ttk.Label(self.performance_pannel, textvariable=self.total_u_max)
-		self.t2_.grid(sticky="w",column=4,row=row)
+		ttk.Button(self.performance_pannel, textvariable=self.net_min).grid(sticky="w",column=col,row=3)
+		ttk.Button(self.performance_pannel, textvariable=self.net_max).grid(sticky="w",column=col,row=4)
 
-		row +=1 
-		self.t6 = ttk.Label(self.performance_pannel, text="Total Risk:")
-		self.t6.grid(sticky="w",column=1,row=row,padx=10)
-		self.t6_ = ttk.Label(self.performance_pannel, textvariable=self.current_total_risk)
-		self.t6_.grid(sticky="w",column=2,row=row)
-		self.t6_ = ttk.Label(self.performance_pannel, textvariable=self.max_risk)
-		self.t6_.grid(sticky="w",column=4,row=row)
 
-		row +=1 
-		self.t6 = ttk.Label(self.performance_pannel, text="Delta SPX:")
-		self.t6.grid(sticky="w",column=1,row=row,padx=10)
-		self.t6_ = ttk.Label(self.performance_pannel, textvariable=self.deltaspx)
-		self.t6_.grid(sticky="w",column=2,row=row)
-		# self.t6_ = ttk.Label(self.performance_pannel, textvariable=self.max_risk)
-		# self.t6_.grid(sticky="w",column=4,row=row)
-		row +=1 
-		self.t6 = ttk.Label(self.performance_pannel, text="LONG EXP:")
-		self.t6.grid(sticky="w",column=1,row=row,padx=10)
-		self.t6_ = ttk.Label(self.performance_pannel, textvariable=self.longexp)
-		self.t6_.grid(sticky="w",column=2,row=row)
 
-		row +=1 
-		self.t6 = ttk.Label(self.performance_pannel, text="SHORT EXP:")
-		self.t6.grid(sticky="w",column=1,row=row,padx=10)
-		self.t6_ = ttk.Label(self.performance_pannel, textvariable=self.shortexp)
-		self.t6_.grid(sticky="w",column=2,row=row)
+		col +=1 
+		self.t2 = ttk.Button(self.performance_pannel, text="Unreal:")
+		self.t2.grid(sticky="w",column=col,row=1)
+		self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.total_u)
+		self.t2_.grid(sticky="w",column=col,row=2)
 
-		row +=1 
-		self.t6 = ttk.Label(self.performance_pannel, text="OVERALL.EXP:")
-		self.t6.grid(sticky="w",column=1,row=row,padx=10)
-		self.t6_ = ttk.Label(self.performance_pannel, textvariable=self.overallexp)
-		self.t6_.grid(sticky="w",column=2,row=row)
+		ttk.Button(self.performance_pannel, textvariable=self.total_u_min).grid(sticky="w",column=col,row=3)
+		ttk.Button(self.performance_pannel, textvariable=self.total_u_max).grid(sticky="w",column=col,row=4)
+
+
+
+
+		col +=1 
+		self.t2 = ttk.Button(self.performance_pannel, text="Risk:")
+		self.t2.grid(sticky="w",column=col,row=1)
+		self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.current_total_risk)
+		self.t2_.grid(sticky="w",column=col,row=2)
+
+		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
+		ttk.Button(self.performance_pannel, textvariable=self.max_risk).grid(sticky="w",column=col,row=4)
+
+
+		col +=1 
+		self.t2 = ttk.Button(self.performance_pannel, text="Position:")
+		self.t2.grid(sticky="w",column=col,row=1)
+		self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.position_count)
+		self.t2_.grid(sticky="w",column=col,row=2)
+
+		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
+		ttk.Button(self.performance_pannel, textvariable=self.position_count_max).grid(sticky="w",column=col,row=4)
+
+		col +=1 
+		self.t2 = ttk.Button(self.performance_pannel, text="Trades:")
+		self.t2.grid(sticky="w",column=col,row=1)
+		self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.trade_count)
+		self.t2_.grid(sticky="w",column=col,row=2)
+
+		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
+		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=4)
+
+		col +=1 
+		self.t2 = ttk.Button(self.performance_pannel, text="fees:")
+		self.t2.grid(sticky="w",column=col,row=1)
+		self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.fees)
+		self.t2_.grid(sticky="w",column=col,row=2)
+
+		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
+		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=4)
+
+		col +=1 
+		self.t2 = ttk.Button(self.performance_pannel, text="SizeTraded:")
+		self.t2.grid(sticky="w",column=col,row=1)
+		self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.sizeTraded)
+		self.t2_.grid(sticky="w",column=col,row=2)
+
+		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
+		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=4)
+
 
 		# row +=1 
 	def init_deployment_pannel(self):
@@ -872,7 +910,7 @@ if __name__ == '__main__':
 
 	root = tk.Tk() 
 	root.title("GoodTrade Algo Manager v4") 
-	root.geometry("950x1080")
+	root.geometry("950x780")
 	UI(root)
 	# root.minsize(1600, 1000)
 	# root.maxsize(1800, 1200)
