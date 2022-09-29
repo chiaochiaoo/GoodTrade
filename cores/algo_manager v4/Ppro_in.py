@@ -238,7 +238,7 @@ def periodical_check(pipe,port):
 				c+=1
 				### 4. send request for each individual symbol PNL
 
-				if c%3==0:
+				if c%5==0:
 					for symbol in positions.keys():
 						threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity"+"^"+user+"^"+symbol)
 
@@ -247,7 +247,7 @@ def periodical_check(pipe,port):
 
 		except Exception as e:
 			PrintException(e,"periodical_check error ")
-		time.sleep(3)
+		time.sleep(1)
 
 def get_env():
 

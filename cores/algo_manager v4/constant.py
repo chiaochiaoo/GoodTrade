@@ -137,6 +137,7 @@ MATURING = "Maturing"
 RUNNING = "Running"
 REJECTED = "Rejected"
 CANCELED= "Canceled"
+
 #orders sies
 LONG  = "Long"
 SHORT = "Short"
@@ -223,6 +224,7 @@ LIMITBUY = "Litmit Buy"
 LIMITSELL = "Limit Sell"
 
 CANCEL = "Cancel"
+CANCELALL = "CancelAll"
 REGISTER = "Register"
 DEREGISTER = "Deregister"
 STOPBUY = "StopBuy"

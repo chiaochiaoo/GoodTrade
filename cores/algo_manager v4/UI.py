@@ -173,7 +173,7 @@ class UI(pannel):
 		if d['unrealized']<self.total_u_min.get():
 			self.total_u_min.set(d['unrealized'])
 
-		self.trade_count.set(d['sizeTraded'])
+		self.trade_count.set(d['trades'])
 		self.fees.set(d['fees'])
 		self.sizeTraded.set(d['sizeTraded'])
 

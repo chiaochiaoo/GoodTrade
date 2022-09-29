@@ -445,6 +445,13 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 				request_str,sucess_str,failure_str=cancel_all_oders(symbol)
 
 
+			elif type_ == CANCELALL:
+
+
+				request_str = "http://localhost:8080/CancelOrder?type=all&symbol=*.*&side=order"
+				sucess_str = "Cancell all sucess"
+				failure_str = "Cancell all failed"
+
 			elif type_ == FLATTEN:
 
 				symbol = d[1]

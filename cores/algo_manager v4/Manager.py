@@ -154,8 +154,10 @@ class Manager:
 
 		self.shutdown=False
 
-		handl = threading.Thread(target=self.symbols_inspection,daemon=True)
-		handl.start()
+		self.symbol_inspection_lock = threading.Lock()
+
+		# handl = threading.Thread(target=self.symbols_inspection,daemon=True)
+		# handl.start()
 
 		good = threading.Thread(target=self.goodtrade_in, daemon=True)
 		good.start()
@@ -178,44 +180,64 @@ class Manager:
 
 	def symbols_inspection(self):
 
-		#fro each of the symbols. look at imbalance. deal with it. 
+		if self.symbol_inspection_lock.locked()==False:
 
-		ts = 0
+			self.pipe_ppro_out.send([CANCELALL])
 
-		while True:
-			#create a cpy.
+			log_print("Manager: performing symbols inspection")
+			with self.symbol_inspection_lock:
+				symbols = list(self.symbol_data.values())
 
-			if self.shutdown:
-				break
+				for val in symbols:
 
-			register = 0
-			symbols = list(self.symbol_data.values())
+					try:
+						val.symbol_inspection()
 
-			for val in symbols:
+					except Exception as e:
+						PrintException(e,"inspection error")
+		else:
+			log_print("Manager: previous symbols inspection not finished. skip.")
+
+	# def symbols_inspection(self):
+
+	# 	#fro each of the symbols. look at imbalance. deal with it. 
+
+	# 	ts = 0
+
+	# 	while True:
+	# 		#create a cpy.
+
+	# 		if self.shutdown:
+	# 			break
+
+	# 		register = 0
+	# 		symbols = list(self.symbol_data.values())
+
+	# 		for val in symbols:
 
 
-				try:
-					val.symbol_inspection()
+	# 			try:
+	# 				val.symbol_inspection()
 
-				except Exception as e:
-					PrintException(e,"inspection error")
-				#log_print("inspecting:",val.ticker,"request:",val.get_management_request())
+	# 			except Exception as e:
+	# 				PrintException(e,"inspection error")
+	# 			#log_print("inspecting:",val.ticker,"request:",val.get_management_request())
 				
-				# if val.get_register()==True:
-				# 	register+=1
-				# if val.get_management_request()==True and val.get_market_making()==False:
+	# 			# if val.get_register()==True:
+	# 			# 	register+=1
+	# 			# if val.get_management_request()==True and val.get_market_making()==False:
 					
-					# stage 1, cancel each other out in the request book
-					# stage 2, granted request from the incoming book
-					# stage 3, handle imbalance request (just use market orders now.)
+	# 				# stage 1, cancel each other out in the request book
+	# 				# stage 2, granted request from the incoming book
+	# 				# stage 3, handle imbalance request (just use market orders now.)
 
-			# now = datetime.now()
-			# cur_ts = now.hour*60+now.minute 
+	# 		# now = datetime.now()
+	# 		# cur_ts = now.hour*60+now.minute 
 
-			# if cur_ts!= ts:#
-			# 	log_print("Registeriing ,",register,"total",len(symbols)," ts",cur_ts)
-			# 	ts = cur_ts
-			time.sleep(5)
+	# 		# if cur_ts!= ts:#
+	# 		# 	log_print("Registeriing ,",register,"total",len(symbols)," ts",cur_ts)
+	# 		# 	ts = cur_ts
+	# 		time.sleep(5)
 
 
 
@@ -523,6 +545,8 @@ class Manager:
 				break
 
 	def ppro_in(self):
+
+		count = 0
 		while True:
 			d = self.pipe_ppro_in.recv()
 
@@ -580,8 +604,15 @@ class Manager:
 					self.ui.position_count.set(len(self.current_positions))
 					self.ui.account_status["background"] = "#97FEA8"
 					log_print("Position updates:",len(positions),positions)
+
+					count +=1 
+
+					if count%3==0:
+						handl = threading.Thread(target=self.symbols_inspection,daemon=True)
+						handl.start()
 				except Exception as e:
 					PrintException(e, " POSITION UPDATE ERROR")
+
 			elif d[0] == SYMBOL_UPDATE:
 				# d= {}
 				# d['time'] = time_

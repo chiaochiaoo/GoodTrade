@@ -43,6 +43,15 @@ class Symbol:
 		self.current_shares = 0
 		self.total_expected = 0
 
+
+		"""
+
+		"""
+		self.expected = 0
+		self.difference = 0
+		self.action=""
+
+
 		self.current_imbalance = 0
 
 		# plus, minus, all the updates, all go here. 
@@ -81,26 +90,28 @@ class Symbol:
 		For both load and unload
 		"""
 
-		difference = self.calc_total_imbalances()
+		self.calc_total_imbalances()
 
-		if difference!=0:
-			self.deploy_orders(difference)
-
-			log_print(self.symbol_name," inspection complete, deploying:",difference)
-
+		if self.difference!=0:
+			self.deploy_orders()
 		else:
-			log_print(self.symbol_name," inspection complete, no action needed.")
+			self.action = ""
 
 	def calc_total_imbalances(self):
 
-		current_shares = self.manager.get_position(self.symbol_name)[1]
+		self.current_shares = self.manager.get_position(self.symbol_name)[1]
 
-		expected = self.get_all_expected()
+		self.expected = self.get_all_expected()
 
-		difference = expected - current_shares
+		self.difference = self.expected - self.current_shares
 
+		if self.difference!=0:
 
-		return difference
+			log_print(self.symbol_name," inspection complete,self.expected",self.expected," have",self.current_shares," deploying:",self.difference)
+		else:
+			log_print(self.symbol_name," inspection complete,self.expected",self.expected," have",self.current_shares)
+
+		
 
 	def get_all_expected(self):
 
@@ -108,16 +119,16 @@ class Symbol:
 		Doesnt matter if the TP is running or not, having request or not. it runs through. 
 		The less the parameter, the more generalizability 
 		"""
-		expected = 0
+		self.expected = 0
 
 		tps = list(self.tradingplans.keys())
 
 		for tp in tps:
-			expected +=  self.tradingplans[tp].get_current_expected(self.symbol_name)
-		return expected
+			self.expected +=  self.tradingplans[tp].get_current_expected(self.symbol_name)
+		return self.expected
 
 
-	def deploy_orders(self,difference):
+	def deploy_orders(self):
 
 		# I NEED TO ADD A MECHANISM ON THIS
 		# If passive orders still don't full fill the request everything within some minutes
@@ -125,26 +136,33 @@ class Symbol:
 
 		# ALL ORDERS AT ONCE. # First clear previous order. 
 
-		if difference>0:
-			action = PASSIVEBUY
-			price = self.get_bid()
-			coefficient = -1
+		if self.difference>0:
+			self.action = PASSIVEBUY
+			#price = self.get_bid()
+			#coefficient = -1
 
 		else:
-			action = PASSIVESELL
-			price = self.get_ask()
-			coefficient = 1
+			self.action = PASSIVESELL
+			#price = self.get_ask()
+			#coefficient = 1
 
-		handl = threading.Thread(target=self.threading_order,args=(action,difference,),daemon=True)
-		handl.start()
+		log_print("Symbol: ",self.symbol_name,self.action,self.difference)
+		# self.ppro_out.send([CANCEL,self.symbol_name])
+		# time.sleep(0.3)
+		self.ppro_out.send([self.action,self.symbol_name,abs(self.difference),0])
+
+		# handl = threading.Thread(target=self.threading_order,daemon=True)
+		# handl.start()
 
 
-	def threading_order(self,action,share):
+	def threading_order(self):
 
 			#lets add a bit of delay to it. 
-		self.ppro_out.send([CANCEL,self.symbol_name])
-		time.sleep(0.3)
-		self.ppro_out.send([action,self.symbol_name,abs(share),0])
+
+		log_print("Symbol: ",self.symbol_name,action,share)
+		# self.ppro_out.send([CANCEL,self.symbol_name])
+		# time.sleep(0.3)
+		self.ppro_out.send([self.action,self.symbol_name,abs(self.difference),0])
 
 	def get_bid(self):
 		return self.data[BID]
