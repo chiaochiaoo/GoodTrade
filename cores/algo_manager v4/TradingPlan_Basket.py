@@ -311,16 +311,19 @@ class TradingPlan_Basket:
 
 		for symbol,val in self.current_shares.items():
 
-			if val>0:
-				total_unreal +=  (self.stock_price[symbol] - self.average_price[symbol]) * abs(self.current_shares[symbol])  #self.data[AVERAGE_PRICE]-price
-			else:
-				total_unreal +=  (self.average_price[symbol] - self.stock_price[symbol]) * abs(self.current_shares[symbol]) #self.data[AVERAGE_PRICE]-price
+			if self.current_shares[symbol]!=0 and self.stock_price[symbol]!=0 and self.average_price[symbol]!=0:
+				if val>0:
+					total_unreal +=  (self.stock_price[symbol] - self.average_price[symbol]) * abs(self.current_shares[symbol])  #self.data[AVERAGE_PRICE]-price
+				else:
+					total_unreal +=  (self.average_price[symbol] - self.stock_price[symbol]) * abs(self.current_shares[symbol]) #self.data[AVERAGE_PRICE]-price
 
 		self.data[UNREAL] = round(total_unreal,2)
 		self.tkvars[UNREAL].set(self.data[UNREAL])
 
 		#log_print("cheking unreal",self.data[UNREAL] , "target",self.data[ESTRISK]*-1)
 		if self.data[UNREAL]<self.data[ESTRISK]*-1:
+
+			log_print("TradingPlan Risk Excceded, unreal",self.data[UNREAL] , "risk",self.data[ESTRISK]*-1)
 			self.flatten_cmd()
 			self.mark_algo_status(DONE)
 			self.shut_down = True
