@@ -244,12 +244,14 @@ class TradingPlan_Basket:
 		# else:
 
 		#self.deactive()
-
+		log_print(self.algo_name," flattening")
 		self.flatten_order=True
 
 		for symbol,item in self.symbols.items():
 			self.submit_expected_shares(symbol,0)
-			item.flatten_cmd(self.algo_name)
+
+			#if emergency.
+			#item.flatten_cmd(self.algo_name)
 
 
 	""" Deployment initialization """

@@ -185,6 +185,7 @@ class UI(pannel):
 				# d['unrealizedPlusNet'] = unrealizedPlusNet
 				# d['timestamp'] = ts
 				# d['unrealized'] = unrealized	
+
 	def init_performance_pannel(self):
 
 		self.net = tk.DoubleVar()
@@ -312,11 +313,11 @@ class UI(pannel):
 						"Status":10,\
 						"Updates":40,\
 						"Est R":8,\
-						"Delta":8,\
 						"U":8,\
 						"R":8,\
 						"TR":8,\
-						"flatten":8,}
+						"flatten":8,\
+						"log":8}
 		self.width = list(self.labels.values())
 
 
@@ -350,32 +351,6 @@ class UI(pannel):
 		self.init_system_pannel()
 		self.init_performance_pannel()
 		self.init_deployment_pannel()
-
-		# self.t6 = ttk.Label(self.performance_pannel, text="Locked in:")
-		# self.t6.grid(sticky="w",column=1,row=row,padx=10)
-		# self.t6_ = ttk.Label(self.performance_pannel, textvariable=self.current_upside)
-		# self.t6_.grid(sticky="w",column=2,row=row)
-
-
-
-
-		# self.config = ttk.LabelFrame(self.root,text="Config") 
-		# self.config.place(x=10,y=360,height=260,width=210)
-
-		# self.cmd = ttk.LabelFrame(self.root,text="Command") 
-		# self.cmd.place(x=10,y=360,height=500,width=210)
-
-
-		#self.init_config_pannel()
-		#self.init_command()
-		# self.log_panel = ttk.LabelFrame(self.root,text="Events") 
-		# self.log_panel.place(x=10,y=300,relheight=0.5,width=210)
-
-		# self.performance_pannel_panel = ttk.LabelFrame(self.root,text="Algo Stats") 
-		# self.performance_pannel_panel.place(x=210,y=10,height=50,width=1650)
-
-
-
 
 	def init_config_pannel(self):
 
@@ -440,113 +415,6 @@ class UI(pannel):
 		# #self.algo_deploy.place(x=5,y=25)
 
 
-	def set_command_text(self,string):
-		self.command_text.set(string)
-
-	def init_command(self):
-
-		self.receiving_algo = ttk.Label(self.cmd, text="Receiving Algo:")
-		self.receiving_algo["background"] = "#97FEA8"
-		self.receiving_algo.grid(sticky="w",column=1,row=1)
-
-		ttk.Checkbutton(self.cmd, variable=self.receiving_signals).grid(sticky="w",column=2,row=1)
-
-		#self.receiving_signals
-
-
-		row = 2
-
-		# self.algo_deploy = ttk.Button(self.cmd, text="Deploy all algo",command=self.manager.deploy_all)#,command=self.deploy_all_stoporders)
-		# self.algo_deploy.grid(sticky="w",column=1,row=row)
-
-		# self.algo_pend = ttk.Button(self.cmd, text="Withdraw all algo",command=self.manager.withdraw_all)#,command=self.cancel_all_stoporders)
-		# self.algo_pend.grid(sticky="w",column=2,row=row)
-
-		# row +=1 
-
-		self.flatten = ttk.Button(self.cmd, text="Flatten all algo",command=self.manager.flatten_all)
-		self.flatten.grid(sticky="w",column=1,row=row)
-
-		# self.algo_cancel = ttk.Button(self.cmd, text="Cancel all algo",command=self.manager.cancel_all)
-		# self.algo_cancel.grid(sticky="w",column=2,row=row)
-
-		row +=1 
-
-		self.weekkk = ttk.Button(self.cmd, text="Weekly Report",command=graphweekly)
-		self.weekkk.grid(sticky="w",column=1,row=row)
-
-		self.algo_cancel = ttk.Button(self.cmd, text="Daily Report" ) #command=self.manager.import_algos
-		self.algo_cancel.grid(sticky="w",column=2,row=row)
-
-		row=6
-
-		ttk.Label(self.cmd, text=" ").grid(sticky="w",column=1,row=row)
-		row+=2
-
-
-
-		row+=1
-		#self.command_text = tk.StringVar(value="Status:")
-		ttk.Label(self.cmd, textvariable=self.command_text).grid(sticky="w",column=1,row=row,columnspan =2)
-
-		row+=1
-
-		ttk.Label(self.cmd, text="TICK Management:").grid(sticky="w",column=1,row=row)
-		ttk.Checkbutton(self.cmd, variable=self.tick_management).grid(sticky="w",column=2,row=row)
-
-
-		row+=1
-
-		ttk.Label(self.cmd, text="Passive Fills:").grid(sticky="w",column=1,row=row)
-		ttk.Checkbutton(self.cmd, variable=self.passive_aggregation).grid(sticky="w",column=2,row=row)
-
-
-		row+=1
-		ttk.Button(self.cmd, text="Flatten LONGS",command= lambda action=MINUS,percent=1:self.manager.trades_aggregation(LONG,action,percent,False,self.passive_aggregation)).grid(sticky="w",column=1,row=row)
-		ttk.Button(self.cmd, text="Flatten SHORTS",command= lambda action=MINUS,percent=1:self.manager.trades_aggregation(SHORT,action,percent,False,self.passive_aggregation)).grid(sticky="w",column=2,row=row)
-
-		row+=1
-		ttk.Label(self.cmd, text="All Active Winnings:").grid(sticky="w",column=1,row=row)
-
-		row+=1
-		ttk.Button(self.cmd, text="Add 10%",command= lambda action=ADD,percent=0.1:self.manager.trades_aggregation(None,action,percent,True,self.passive_aggregation)).grid(sticky="w",column=1,row=row)
-		ttk.Button(self.cmd, text="Add 25%",command= lambda action=ADD,percent=0.25:self.manager.trades_aggregation(None,action,percent,True,self.passive_aggregation)).grid(sticky="w",column=2,row=row)
-
-		row+=1
-		ttk.Button(self.cmd, text="Minus 10%",command= lambda action=MINUS,percent=0.1:self.manager.trades_aggregation(None,action,percent,True,self.passive_aggregation)).grid(sticky="w",column=1,row=row)
-		ttk.Button(self.cmd, text="Minus 25%",command= lambda action=MINUS,percent=0.25:self.manager.trades_aggregation(None,action,percent,True,self.passive_aggregation)).grid(sticky="w",column=2,row=row)
-
-
-		ttk.Label(self.cmd, text=" ").grid(sticky="w",column=1,row=row)
-		row+=1
-		ttk.Label(self.cmd, text="All Active Longs:").grid(sticky="w",column=1,row=row)
-
-		row+=1
-		ttk.Button(self.cmd, text="Add 10%",command= lambda side=LONG,action=ADD,percent=0.1:self.manager.trades_aggregation(side,action,percent,False,self.passive_aggregation)).grid(sticky="w",column=1,row=row)
-		ttk.Button(self.cmd, text="Add 25%",command= lambda side=LONG,action=ADD,percent=0.25:self.manager.trades_aggregation(side,action,percent,False,self.passive_aggregation)).grid(sticky="w",column=2,row=row)
-
-		row+=1
-		ttk.Button(self.cmd, text="Minus 10%",command= lambda side=LONG,action=MINUS,percent=0.1:self.manager.trades_aggregation(side,action,percent,False,self.passive_aggregation)).grid(sticky="w",column=1,row=row)
-		ttk.Button(self.cmd, text="Minus 25%",command= lambda side=LONG,action=MINUS,percent=0.25:self.manager.trades_aggregation(side,action,percent,False,self.passive_aggregation)).grid(sticky="w",column=2,row=row)
-
-		row+=1
-		ttk.Label(self.cmd, text=" ").grid(sticky="w",column=1,row=row)
-		row+=1
-		ttk.Label(self.cmd, text="All Active Shorts:").grid(sticky="w",column=1,row=row)
-
-		row+=1
-		ttk.Button(self.cmd, text="Add 10%",command= lambda side=SHORT,action=ADD,percent=0.1:self.manager.trades_aggregation(side,action,percent,False,self.passive_aggregation)).grid(sticky="w",column=1,row=row)
-		ttk.Button(self.cmd, text="Add 25%",command= lambda side=SHORT,action=ADD,percent=0.25:self.manager.trades_aggregation(side,action,percent,False,self.passive_aggregation)).grid(sticky="w",column=2,row=row)
-
-		row+=1
-		ttk.Button(self.cmd, text="Minus 10%",command= lambda side=SHORT,action=MINUS,percent=0.1:self.manager.trades_aggregation(side,action,percent,False,self.passive_aggregation)).grid(sticky="w",column=1,row=row)
-		ttk.Button(self.cmd, text="Minus 25%",command= lambda side=SHORT,action=MINUS,percent=0.25:self.manager.trades_aggregation(side,action,percent,False,self.passive_aggregation)).grid(sticky="w",column=2,row=row)
-
-
-		#iterate all the trading plans.
-		#if position ="LONG"
-		#if shares>= 25.
-		#calculate the shares to be taken off. 
 
 	def init_entry_pannel(self):
 
@@ -574,6 +442,8 @@ class UI(pannel):
 		# 		"TR":8,\
 		# 		"flatten":8,}
 
+
+
 		infos = {
 		SELECTED:"",\
 		'Symbol':"", \
@@ -585,8 +455,8 @@ class UI(pannel):
 		UNREAL:"", \
 		REALIZED:"", \
 		TOTAL_REALIZED:"", \
-		'flatten':"", \
-		'log':""}
+		"flatten":"",\
+		"log":""}
 
 		info = list(infos.values())
 		labels = list(infos.keys())
@@ -612,19 +482,6 @@ class UI(pannel):
 
 				elif label_name =="MIND":
 					self.tk_labels_basket[l][label_name] =tk.Button(self.deployment_frame ,text=info[j],width=self.width[j])
-				elif label_name =="Stop":
-					self.tk_labels_basket[l][label_name] =tk.Button(self.deployment_frame ,text=info[j],width=self.width[j])
-
-				elif label_name ==RISK_RATIO:
-					self.tk_labels_basket[l][RISK_PER_SHARE]=tk.Entry(self.deployment_frame ,text=info[j],width=self.width[j])
-
-					self.tk_labels_basket[l][label_name]=tk.Button(self.deployment_frame ,text=info[j],width=self.width[j])
-
-				elif label_name =='SzIn':
-					self.tk_labels_basket[l][TARGET_SHARE]=tk.Entry(self.deployment_frame ,text=info[j],width=self.width[j])
-	
-
-					self.tk_labels_basket[l][label_name]=tk.Button(self.deployment_frame ,text=info[j],width=self.width[j])
 
 				elif label_name =="flatten":
 					self.tk_labels_basket[l][label_name] =tk.Button(self.deployment_frame ,text=info[j],width=self.width[j])
@@ -704,7 +561,8 @@ class UI(pannel):
 						"U":8,\
 						"R":8,\
 						"TR":8,\
-						"flatten":8,}
+						"flatten":8,
+						"log":4}
 
 		self.algo_count_number.set(self.algo_count_number.get()+1)
 
@@ -719,8 +577,7 @@ class UI(pannel):
 		UNREAL:tradingplan.tkvars[UNREAL], \
 		REALIZED:tradingplan.tkvars[REALIZED], \
 		TOTAL_REALIZED:tradingplan.tkvars[TOTAL_REALIZED], \
-		'flatten':"", \
-		'log':""}
+		'flatten':""}
 
 		#link the global variable 
 		tradingplan.tkvars[RISKTIMER] = self.risk_timer 
@@ -741,9 +598,9 @@ class UI(pannel):
 				#self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.cancle_deployment
 				#= tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command=tradingplan.cancle_deployment)
 
-			# elif label_name =="Reload" or label_name==SELECTED:
-			# 	self.tk_labels_basket[symbol][label_name]["variable"] = info[j]
-			# 	#self.tk_labels_single[symbol][label_name] = tk.Checkbutton(self.deployment_frame,variable=info[j],width=2)
+			elif label_name==SELECTED:
+				self.tk_labels_basket[symbol][label_name]["variable"] = info[j]
+				#self.tk_labels_single[symbol][label_name] = tk.Checkbutton(self.deployment_frame,variable=info[j],width=2)
 				 
 			elif label_name =="MIND":
 				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
@@ -757,15 +614,9 @@ class UI(pannel):
 
 			elif label_name =="flatten":
 
-				pass
-				#self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.flatten_cmd
+				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.flatten_cmd
+
 				#self.tk_labels_single[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command=tradingplan.flatten_cmd)
-
-			elif label_name == SUPPORT or label_name == RESISTENCE or label_name == "pxtgt1" or label_name == "pxtgt2" or label_name == "pxtgt3":
-				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
-				self.tk_labels_basket[symbol][label_name]["state"] = "disabled"
-
-				#self.tk_labels_single[symbol][label_name] =tk.Entry(self.deployment_frame ,textvariable=info[j],width=self.width[j],state="disabled")	
 			else:
 				if str(type(info[j]))=="<class 'tkinter.StringVar'>" or str(type(info[j]))=="<class 'tkinter.DoubleVar'>":
 					self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
