@@ -80,6 +80,9 @@ class TradingPlan_Basket:
 		for i in self.bool_labels:
 			self.data[i] = False
 			self.tkvars[i] = tk.BooleanVar(value=False)
+
+		self.data[ESTRISK] = risk
+		self.tkvars[ESTRISK].set(risk)
 		# for i in self.symbol.numeric_labels:
 		# 	self.tkvars[i] = tk.DoubleVar(value=self.symbol.data[i])
 
