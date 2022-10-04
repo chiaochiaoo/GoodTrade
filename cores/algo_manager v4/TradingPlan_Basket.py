@@ -17,8 +17,6 @@ class TradingPlan_Basket:
 
 	def __init__(self,algo_name="",risk=5,Manager=None):
 
-
-
 		self.algo_name = algo_name
 
 		self.name = algo_name
@@ -43,8 +41,8 @@ class TradingPlan_Basket:
 		self.expected_shares = {}
 		self.current_shares = {}
 		self.current_request = {}
-
 		self.average_price = {}
+
 		self.stock_price ={}
 
 		self.data = {}
@@ -119,7 +117,9 @@ class TradingPlan_Basket:
 
 			self.read_lock[symbol_name] = threading.Lock()
 
+	def update_stockprices(self,symbol,price):
 
+		self.stock_price[symbol] = price
 
 	def submit_expected_shares(self,symbol,shares):
 
@@ -127,17 +127,57 @@ class TradingPlan_Basket:
 
 		with self.read_lock[symbol]:
 			self.expected_shares[symbol] = shares
-			# self.current_request[symbol] = self.expected_shares[symbol] - self.current_shares[symbol]
-
+			
+			self.recalculate_current_request(symbol)
 
 			# self.notify_request(symbol)
+
+	def recalculate_current_request(self,symbol):
+		self.current_request[symbol] = self.expected_shares[symbol] - self.current_shares[symbol]
 
 	def get_current_expected(self,symbol):
 
 		return self.expected_shares[symbol]
 
+	def get_current_request(self,symbol):
+
+		return self.current_request[symbol]
 
 
+
+
+	def request_fufill(self,symbol,share,price):
+
+		# if it takes, return the remaining. otherwise return it back
+		prev_share = self.current_shares[symbol]
+		prev_price = self.average_price[symbol]
+		if self.current_request[symbol]*share<0:
+			# wu gui yuan zhu 
+			return share 
+		else:
+
+			if abs(self.current_request[symbol])>=abs(share):  # eats everything
+				self.current_shares[symbol] += share 
+
+				self.recalculate_current_request(symbol)
+
+				
+
+				ret = 0 
+			else:
+				self.current_shares[symbol] += self.current_request[symbol] 
+				
+				ret = share-self.current_request[symbol] 
+				self.recalculate_current_request(symbol)
+
+			if self.current_shares[symbol]!=0:
+				self.average_price[symbol] = (prev_share*self.average_price[symbol] + share*price)/self.current_shares[symbol]
+			else:
+				self.average_price[symbol] = 0 
+				
+			log_print(self.algo_name,symbol,"incmonig,",share,"want",self.current_request[symbol]," now have",self.current_shares[symbol],"return",ret, "prev p",prev_price,"cur price",self.average_price[symbol])
+
+			return ret
 
 
 
@@ -255,6 +295,37 @@ class TradingPlan_Basket:
 
 
 	""" Deployment initialization """
+
+	def check_pnl(self):
+
+
+		"""
+		PNL, STOP TRIGGER.  ONLY CHECK EVERY 3 SECONDS 
+		"""
+
+		#now = datetime.now()
+		#ts = now.hour*3600 + now.minute*60+ now.second
+		
+
+		total_unreal = 0
+
+		for symbol,val in self.current_shares.items():
+
+			if val>0:
+				total_unreal +=  (self.stock_price[symbol] - self.average_price[symbol]) * abs(self.current_shares[symbol])  #self.data[AVERAGE_PRICE]-price
+			else:
+				total_unreal +=  (self.average_price[symbol] - self.stock_price[symbol]) * abs(self.current_shares[symbol]) #self.data[AVERAGE_PRICE]-price
+
+		self.data[UNREAL] = round(total_unreal,2)
+		self.tkvars[UNREAL].set(self.data[UNREAL])
+
+		#log_print("cheking unreal",self.data[UNREAL] , "target",self.data[ESTRISK]*-1)
+		if self.data[UNREAL]<self.data[ESTRISK]*-1:
+			self.flatten_cmd()
+			self.mark_algo_status(DONE)
+			self.shut_down = True
+
+		self.update_displays()
 
 
 	def update_displays(self):

@@ -178,7 +178,16 @@ class Manager:
 
 		self.shutdown= True
 
+
+	def check_all_pnl(self):
+		tps = list(self.baskets.keys())
+		for tp in tps:
+			self.baskets[tp].check_pnl()
+
 	def symbols_inspection(self):
+
+
+
 
 		if self.symbol_inspection_lock.locked()==False:
 
@@ -246,7 +255,7 @@ class Manager:
 
 		if basket_name not in self.baskets:
 
-			if self.ui.basket_label_count<10:
+			if self.ui.basket_label_count<40:
 				self.baskets[basket_name] = TradingPlan_Basket(basket_name,risk,self)
 				self.ui.create_new_single_entry(self.baskets[basket_name],"Basket",None)
 
@@ -256,16 +265,20 @@ class Manager:
 		if self.baskets[basket_name].shut_down==False:
 			for symbol,value in orders.items():
 
-				print("processing",symbol,value)
-				if symbol not in self.symbol_data:
-					self.symbol_data[symbol] = Symbol(self,symbol,self.pipe_ppro_out)  #register in Symbol.
-					self.symbols.append(symbol)
+				if "." in symbol:
 
-				self.baskets[basket_name].register_symbol(symbol,self.symbol_data[symbol])
+					print("processing",symbol,value)
+					if symbol not in self.symbol_data:
+						self.symbol_data[symbol] = Symbol(self,symbol,self.pipe_ppro_out)  #register in Symbol.
+						self.symbols.append(symbol)
 
-				## now , submit the request.
+					self.baskets[basket_name].register_symbol(symbol,self.symbol_data[symbol])
 
-				self.baskets[basket_name].submit_expected_shares(symbol,value)
+					## now , submit the request.
+
+					self.baskets[basket_name].submit_expected_shares(symbol,value)
+				else:
+					log_print("Manager: Wrong Ticker format:",symbol)
 		else:
 			log_print(basket_name,"already shutdown")
 
@@ -672,6 +685,8 @@ class Manager:
 						self.ui.timersx["background"] = "#97FEA8"
 
 					self.ui.update_performance(data)
+
+					self.check_all_pnl()
 				except Exception as e :
 					PrintException(e, " Updating Summary Problem")
 

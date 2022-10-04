@@ -39,8 +39,13 @@ class Symbol:
 		UPGRADED PARTS
 
 		"""
+
+		self.previous_shares = 0
+		self.previous_avgprice = 0
+
 		self.active_tps = 0
 		self.current_shares = 0
+		self.current_avgprice = 0
 		self.total_expected = 0
 
 
@@ -90,6 +95,7 @@ class Symbol:
 		For both load and unload
 		"""
 
+		self.update_stockprices()
 		self.calc_total_imbalances()
 
 		if self.difference!=0:
@@ -97,9 +103,15 @@ class Symbol:
 		else:
 			self.action = ""
 
+	def update_stockprices(self):
+		tps = list(self.tradingplans.keys())
+		for tp in tps:
+			self.tradingplans[tp].update_stockprices(self.symbol_name,self.get_bid())
+
+
 	def calc_total_imbalances(self):
 
-		self.current_shares = self.manager.get_position(self.symbol_name)[1]
+		self.current_avgprice,self.current_shares = self.manager.get_position(self.symbol_name)
 
 		self.expected = self.get_all_expected()
 
@@ -111,7 +123,7 @@ class Symbol:
 		else:
 			log_print(self.symbol_name," inspection complete,self.expected",self.expected," have",self.current_shares)
 
-		
+
 
 	def get_all_expected(self):
 
@@ -123,9 +135,81 @@ class Symbol:
 
 		tps = list(self.tradingplans.keys())
 
+		want = []
 		for tp in tps:
 			self.expected +=  self.tradingplans[tp].get_current_expected(self.symbol_name)
+			want.append(self.tradingplans[tp].get_current_request(self.symbol_name))
+
+
+		self.pair_off(tps,want)
+		self.calc_inspection_differences(tps)
+
 		return self.expected
+
+
+
+	def pair_off(self,tps,want):
+		
+		p=0
+		n=0
+		for i in want:
+			if i>0:
+				p+=abs(i)
+			else:
+				n+=abs(i)
+		long_pair_off = min(p,n)
+
+		if long_pair_off>0:	
+
+			log_print("Symbol",self.symbol_name	,"pair off,",want," amount", long_pair_off)
+			short_pair_off = -long_pair_off
+			# use this amount to off set some longs and shorts. 
+
+			for tp in tps: 
+				long_pair_off = self.tradingplans[tp].request_fufill(self.symbol_name,long_pair_off,self.data[BID])
+				if long_pair_off<=0:
+					break
+
+			for tp in tps: 
+				short_pair_off = self.tradingplans[tp].request_fufill(self.symbol_name,short_pair_off,self.data[BID])
+				if short_pair_off>=0:
+					break
+
+
+	def calc_inspection_differences(self,tps):
+
+		share_difference = self.current_shares - self.previous_shares
+
+		# LOADING MORE
+		if abs(self.current_shares) > abs(self.previous_shares):
+
+			
+			share_price =  (abs(self.current_shares)*self.current_avgprice - abs(self.previous_shares)*self.previous_avgprice)/abs(share_difference)
+
+			# distribute this amongst the TPS. ... HOW?? 
+			# count each TP differences. and fill them with it. 
+
+			#tps = list(self.tradingplans.keys())
+
+			for tp in tps:
+				share_difference = self.tradingplans[tp].request_fufill(self.symbol_name,share_difference,share_price)
+					#feeeeed
+				if share_difference	==0:
+					break
+
+		else:
+
+			for tp in tps:
+				share_difference = self.tradingplans[tp].request_fufill(self.symbol_name,share_difference,self.data[BID])
+					#feeeeed
+				if share_difference	==0:
+					break
+
+
+
+		self.previous_shares,self.previous_avgprice = self.current_shares, self.current_avgprice
+		
+
 
 
 	def deploy_orders(self):
