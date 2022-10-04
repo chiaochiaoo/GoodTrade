@@ -173,6 +173,7 @@ class TradingPlan_Basket:
 				ret = share-self.current_request[symbol] 
 				self.recalculate_current_request(symbol)
 
+			### IT ONLY CHANGE THE AVG PRICE DURING LOADING UP. NO LOADING OFF. 
 			if self.current_shares[symbol]!=0:
 				self.average_price[symbol] = (prev_share*self.average_price[symbol] + share*price)/self.current_shares[symbol]
 			else:
