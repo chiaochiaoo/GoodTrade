@@ -224,7 +224,15 @@ def periodical_check(pipe,port):
 				user,file_location = get_env()
 			else:
 				if c%50==0:
-					log_print("periodcal new loop")
+
+					now = datetime.now()
+
+					cur_ts = now.hour*60+now.minute 
+					log_print("PPro in : periodcal new loop",cur_ts)
+					threading_request("http://localhost:8080/SetOutput?region=1&feedtype=OSTAT&output="+ str(port)+"&status=on") ## ORDER STATS.
+
+
+
 				# ### 1. register OSTAT  
 				# if c%5==0:
 				# 	register_order_listener(port)
