@@ -328,12 +328,12 @@ class TradingPlan_Basket:
 		self.tkvars[UNREAL].set(self.data[UNREAL])
 
 		#log_print("cheking unreal",self.data[UNREAL] , "target",self.data[ESTRISK]*-1)
-		if self.data[UNREAL]<self.data[ESTRISK]*-1:
+		# if self.data[UNREAL]<self.data[ESTRISK]*-1:
 
-			log_print("TradingPlan Risk Excceded, unreal",self.data[UNREAL] , "risk",self.data[ESTRISK]*-1)
-			self.flatten_cmd()
-			self.mark_algo_status(DONE)
-			self.shut_down = True
+		# 	log_print("TradingPlan Risk Excceded, unreal",self.data[UNREAL] , "risk",self.data[ESTRISK]*-1)
+		# 	self.flatten_cmd()
+		# 	self.mark_algo_status(DONE)
+		# 	self.shut_down = True
 
 		self.update_displays()
 
