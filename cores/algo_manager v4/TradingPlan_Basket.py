@@ -211,7 +211,9 @@ class TradingPlan_Basket:
 
 					for i in range(abs(share_added)):
 
-						self.data[REALIZED]+= price*coefficient - self.current_exposure[symbol].pop()
+
+						self.data[REALIZED]+= -1*price*coefficient - self.current_exposure[symbol].pop()
+
 
 						self.data[REALIZED] = round(self.data[REALIZED],2)
 					
