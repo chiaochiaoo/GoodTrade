@@ -41,6 +41,8 @@ class TradingPlan_Basket:
 		self.expected_shares = {}
 		self.current_shares = {}
 		self.current_request = {}
+
+		self.current_exposure = {}
 		self.average_price = {}
 
 		self.stock_price ={}
@@ -112,6 +114,7 @@ class TradingPlan_Basket:
 			self.expected_shares[symbol_name] = 0
 			self.current_shares[symbol_name] = 0
 			self.current_request[symbol_name] = 0
+			self.current_exposure[symbol_name] = []
 
 			self.average_price[symbol_name] = 0
 			self.stock_price[symbol_name] = 0
@@ -147,6 +150,10 @@ class TradingPlan_Basket:
 		return self.current_request[symbol]
 
 
+	def calculate_avg_price(self,symbol):
+
+		if self.current_shares[symbol]!=0:
+				self.average_price[symbol] = sum(self.current_exposure[symbol])/self.current_shares[symbol]
 
 
 	def request_fufill(self,symbol,share,price):
@@ -154,31 +161,72 @@ class TradingPlan_Basket:
 		# if it takes, return the remaining. otherwise return it back
 		prev_share = self.current_shares[symbol]
 		prev_price = self.average_price[symbol]
-
+		share_added = 0
 		if self.current_request[symbol]*share<0:
 			# wu gui yuan zhu 
 			return share 
 		else:
 
-			if abs(self.current_request[symbol])>=abs(share):  # eats everything
+			if abs(self.current_request[symbol])>=abs(share):  # eats everything from share 
 				self.current_shares[symbol] += share 
 
 				self.recalculate_current_request(symbol)
 
+				share_added = share
 				ret = 0 
 			else:
-				self.current_shares[symbol] += self.current_request[symbol] 
+
+				self.current_shares[symbol] += self.current_request[symbol]  # eats partially from share 
 				
 				ret = share-self.current_request[symbol] 
+
+				share_added = self.current_shares[symbol]
+
 				self.recalculate_current_request(symbol)
 
-			### IT ONLY CHANGE THE AVG PRICE DURING LOADING UP. NO LOADING OFF. 
-			if self.current_shares[symbol]!=0:
-				self.average_price[symbol] = (prev_share*self.average_price[symbol] + share*price)/self.current_shares[symbol]
+			### IT ONLY CHANGE THE AVG PRICE DURING LOADING UP. NO LOADING OFF. ? no it does. actually. 
+
+			### current share ==0 , or current share same sign as share, load.  else unload.
+
+			if share_added>0:
+				coefficient = 1
 			else:
-				self.average_price[symbol] = 0 
+				coefficient = -1
+
+			if prev_share==0 or prev_share*share>0:
+
+
+
+				for i in abs(share_added):
+					self.current_exposure[symbol].append(price*coefficient)
+
+				self.calculate_avg_price(symbol)
+
+				log_print(self.algo_name,symbol,"Loading up :incmonig,",share,"want",self.current_request[symbol]," now have",self.current_shares[symbol],"return",ret, "prev avg",prev_price,"cur price",self.average_price[symbol])
+
+			else:
+				try:
+					if len(self.current_exposure[symbol])<share:
+						log_print("WARNING:",self.algo_name,symbol,"does not have enough holding to load off.",len(self.current_exposure[symbol]),share)
+
+					for i in abs(share_added):
+
+						self.data[REALIZED]+= price*coefficient - self.current_exposure[symbol].pop()
+
+						self.data[REALIZED] = round(self.data[REALIZED],2)
+					
+				except	Exception	as e:
+					PrintException(e,"Basket Holding Update Error")
+
+				self.calculate_avg_price(symbol)
+				log_print(self.algo_name,symbol,"Loading off :incmonig,",share,"want",self.current_request[symbol]," now have",self.current_shares[symbol],"return",ret, "prev avg",prev_price,"cur price",self.average_price[symbol])
+
+				#realized it. 
+			# if self.current_shares[symbol]!=0:
+			# 	self.average_price[symbol] = (prev_share*self.average_price[symbol] + share*price)/self.current_shares[symbol]
+			# else:
+			# 	self.average_price[symbol] = 0 
 				
-			log_print(self.algo_name,symbol,"incmonig,",share,"want",self.current_request[symbol]," now have",self.current_shares[symbol],"return",ret, "prev avg",prev_price,"cur price",self.average_price[symbol])
 
 			return ret
 
