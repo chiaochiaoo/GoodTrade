@@ -311,7 +311,7 @@ class TradingPlan_Basket:
 		#ts = now.hour*3600 + now.minute*60+ now.second
 		
 
-		log_print(self.algo_name, " checking pnl")
+
 		total_unreal = 0
 
 		for symbol,val in self.current_shares.items():
@@ -327,6 +327,8 @@ class TradingPlan_Basket:
 					log_print(self.algo_name,symbol,"avg price",self.average_price[symbol],"cur price",self.stock_price[symbol],"share",val,"result",(self.average_price[symbol] - self.stock_price[symbol]) * abs(self.current_shares[symbol]))
 		self.data[UNREAL] = round(total_unreal,2)
 		self.tkvars[UNREAL].set(self.data[UNREAL])
+
+		log_print(self.algo_name, " checking pnl",total_unreal)
 
 		#log_print("cheking unreal",self.data[UNREAL] , "target",self.data[ESTRISK]*-1)
 		# if self.data[UNREAL]<self.data[ESTRISK]*-1:
