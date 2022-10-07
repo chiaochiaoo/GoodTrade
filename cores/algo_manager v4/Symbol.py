@@ -200,10 +200,12 @@ class Symbol:
 				if total!=0:
 
 					c=0
-					for key,item in a.items():
+					for key,item in self.incoming_shares.items():
 						c+=key*item
 
 					avg_price = c/total
+
+				self.incoming_shares = {}
 
 
 			if total>share_difference:
