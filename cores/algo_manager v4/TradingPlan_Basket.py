@@ -316,19 +316,21 @@ class TradingPlan_Basket:
 
 		for symbol,val in self.current_shares.items():
 
-			if self.current_shares[symbol]!=0 and self.stock_price[symbol]!=0 and self.average_price[symbol]!=0:
+			cur_stock_price = self.symbols[symbol].get_bid()
+			if self.current_shares[symbol]!=0 and cur_stock_price!=0 and self.average_price[symbol]!=0:
 
 				if val>0:
-					total_unreal +=  (self.stock_price[symbol] - self.average_price[symbol]) * abs(self.current_shares[symbol])  #self.data[AVERAGE_PRICE]-price
-					log_print(self.algo_name,symbol,"avg price",self.average_price[symbol],"cur price",self.stock_price[symbol],"share",val,"result", (self.stock_price[symbol] - self.average_price[symbol]) * abs(self.current_shares[symbol]))
+					total_unreal +=  (cur_stock_price - self.average_price[symbol]) * abs(self.current_shares[symbol])  #self.data[AVERAGE_PRICE]-price
+					log_print(self.algo_name,symbol,"avg price",self.average_price[symbol],"cur price",cur_stock_price,"share",val,"result", (cur_stock_price - self.average_price[symbol]) * abs(self.current_shares[symbol]))
 				else:
-					total_unreal +=  (self.average_price[symbol] - self.stock_price[symbol]) * abs(self.current_shares[symbol]) #self.data[AVERAGE_PRICE]-price
+					cur_stock_price = self.symbols[symbol].get_ask()
+					total_unreal +=  (self.average_price[symbol] - cur_stock_price) * abs(self.current_shares[symbol]) #self.data[AVERAGE_PRICE]-price
 
-					log_print(self.algo_name,symbol,"avg price",self.average_price[symbol],"cur price",self.stock_price[symbol],"share",val,"result",(self.average_price[symbol] - self.stock_price[symbol]) * abs(self.current_shares[symbol]))
+					log_print(self.algo_name,symbol,"avg price",self.average_price[symbol],"cur price",cur_stock_price,"share",val,"result",(self.average_price[symbol] - cur_stock_price) * abs(self.current_shares[symbol]))
 		self.data[UNREAL] = round(total_unreal,2)
 		self.tkvars[UNREAL].set(self.data[UNREAL])
 
-		log_print(self.algo_name, " checking pnl",total_unreal,self.average_price,self.current_shares,self.stock_price)
+		log_print(self.algo_name, " checking pnl",total_unreal,self.average_price,self.current_shares,cur_stock_price)
 
 		#log_print("cheking unreal",self.data[UNREAL] , "target",self.data[ESTRISK]*-1)
 		# if self.data[UNREAL]<self.data[ESTRISK]*-1:
