@@ -95,7 +95,18 @@ class Symbol:
 		For both load and unload
 		"""
 
-		self.update_stockprices()
+		tps = list(self.tradingplans.keys())
+
+		# no.1 update the current prices
+		self.update_stockprices(tps)
+
+		# no.2 pair off
+		self.pair_off(tps)
+		# no.3 pair orders 
+
+		self.calc_inspection_differences(tps)
+
+		# no.4 get all current imbalance
 		self.calc_total_imbalances()
 
 		if self.difference!=0:
@@ -103,17 +114,17 @@ class Symbol:
 		else:
 			self.action = ""
 
-	def update_stockprices(self):
-		tps = list(self.tradingplans.keys())
+	def update_stockprices(self,tps):
+		
 		for tp in tps:
 			self.tradingplans[tp].update_stockprices(self.symbol_name,self.get_bid())
 
 
-	def calc_total_imbalances(self):
+	def calc_total_imbalances(self,tps):
 
 		self.current_avgprice,self.current_shares = self.manager.get_position(self.symbol_name)
 
-		self.expected = self.get_all_expected()
+		self.expected = self.get_all_expected(tps)
 
 		self.difference = self.expected - self.current_shares
 
@@ -125,31 +136,29 @@ class Symbol:
 
 
 
-	def get_all_expected(self):
+	def get_all_expected(self,tps):
 
 		"""
 		Doesnt matter if the TP is running or not, having request or not. it runs through. 
 		The less the parameter, the more generalizability 
 		"""
 		self.expected = 0
-
-		tps = list(self.tradingplans.keys())
-
-		want = []
+		
 		for tp in tps:
 			self.expected +=  self.tradingplans[tp].get_current_expected(self.symbol_name)
-			want.append(self.tradingplans[tp].get_current_request(self.symbol_name))
-
-
-		self.pair_off(tps,want)
-		self.calc_inspection_differences(tps)
+		
 
 		return self.expected
 
 
 
-	def pair_off(self,tps,want):
+	def pair_off(self,tps):
 		
+		want = []
+
+		for tp in tps:
+			want.append(self.tradingplans[tp].get_current_request(self.symbol_name))
+			
 		p=0
 		n=0
 		for i in want:
@@ -180,35 +189,66 @@ class Symbol:
 
 		share_difference = self.current_shares - self.previous_shares
 
-		# LOADING MORE
-		if abs(self.current_shares) > abs(self.previous_shares):
 
-			
-			share_price =  (abs(self.current_shares)*self.current_avgprice - abs(self.previous_shares)*self.previous_avgprice)/abs(share_difference)
+		if share_difference!=0:
 
-			# distribute this amongst the TPS. ... HOW?? 
-			# count each TP differences. and fill them with it. 
+			avg_price = 0
+			with self.incoming_shares_lock:
+				total = sum(list(self.incoming_shares.values()))
+				#avg = mean(list(self.incoming_shares.keys()))
 
-			#tps = list(self.tradingplans.keys())
+				if total!=0:
 
-			for tp in tps:
-				share_difference = self.tradingplans[tp].request_fufill(self.symbol_name,share_difference,share_price)
-					#feeeeed
-				if share_difference	==0:
-					break
+					c=0
+					for key,item in a.items():
+						c+=key*item
 
-		else:
+					avg_price = c/total
 
-			for tp in tps:
-				share_difference = self.tradingplans[tp].request_fufill(self.symbol_name,share_difference,self.data[BID])
-					#feeeeed
-				if share_difference	==0:
-					break
+
+			if total>share_difference:
+				log_print(self.symbol_name," having MORE orders than actual share difference.",share_difference," orders:",total)
+			elif total<share_difference:
+				log_print(self.symbol_name," having LESS orders than actual share difference.",share_difference," orders:",total)
+
+
+			### Construct a share_difference with avg price. 
+
+
+			# LOADING MORE
+			if abs(self.current_shares) > abs(self.previous_shares):
+
+
+				# if orders not enough. manually calculate it. 
+				if avg_price!=0:
+					share_price = avg_price
+				else:
+					share_price =  (abs(self.current_shares)*self.current_avgprice - abs(self.previous_shares)*self.previous_avgprice)/abs(share_difference)
+
+
+				for tp in tps:
+					share_difference = self.tradingplans[tp].request_fufill(self.symbol_name,share_difference,share_price)
+						#feeeeed
+					if share_difference	==0:
+						break
+
+			else:
+
+				if avg_price!=0:
+					share_price = avg_price
+				else:
+					share_price =  self.data[BID]
+
+				for tp in tps:
+					share_difference = self.tradingplans[tp].request_fufill(self.symbol_name,share_difference,share_price)
+						#feeeeed
+					if share_difference	==0:
+						break
 
 
 
 		self.previous_shares,self.previous_avgprice = self.current_shares, self.current_avgprice
-		
+			
 
 
 
@@ -255,6 +295,19 @@ class Symbol:
 		return self.data[ASK]
 
 
+	def holdings_update(self,price,share):
+
+		with self.incoming_shares_lock:
+
+			if price not in self.incoming_shares:
+
+				self.incoming_shares[price] = share
+			else:
+				self.incoming_shares[price] += share
+
+			
+		#log_print("holding update - releasing lock")
+		#print("inc",self.incoming_shares)
 # total_imbalance = sum(t.values())
 
 
@@ -342,3 +395,13 @@ class Symbol:
 # 			break
 
 # print(a)
+# a={}
+# a[5]=2
+# a[6]=2
+
+# c=0
+# t=0
+# for key,item in a.items():
+# 	c+=key*item
+# 	t+=item
+# print(c/t)
