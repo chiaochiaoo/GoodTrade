@@ -311,6 +311,7 @@ class TradingPlan_Basket:
 		#ts = now.hour*3600 + now.minute*60+ now.second
 		
 
+		log_print(self.algo_name, " checking pnl")
 		total_unreal = 0
 
 		for symbol,val in self.current_shares.items():
