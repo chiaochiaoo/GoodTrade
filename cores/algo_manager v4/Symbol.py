@@ -107,7 +107,7 @@ class Symbol:
 		self.calc_inspection_differences(tps)
 
 		# no.4 get all current imbalance
-		self.calc_total_imbalances()
+		self.calc_total_imbalances(tps)
 
 		if self.difference!=0:
 			self.deploy_orders()
@@ -158,7 +158,7 @@ class Symbol:
 
 		for tp in tps:
 			want.append(self.tradingplans[tp].get_current_request(self.symbol_name))
-			
+
 		p=0
 		n=0
 		for i in want:
@@ -210,6 +210,7 @@ class Symbol:
 				log_print(self.symbol_name," having MORE orders than actual share difference.",share_difference," orders:",total)
 			elif total<share_difference:
 				log_print(self.symbol_name," having LESS orders than actual share difference.",share_difference," orders:",total)
+				#? not enough?
 
 
 			### Construct a share_difference with avg price. 
