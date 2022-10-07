@@ -8,7 +8,11 @@ import threading
 
 
 
+def sign_test(a,b):
 
+	return not ((a+b == abs(a)+abs(b)) or (a+b == -(abs(a)+abs(b))))
+
+	
 ### I NEED TO TRACK HOW MANY SYMBOLS IT IS RUNNING SIMULTANEOUSLY. ###
 
 class Symbol:

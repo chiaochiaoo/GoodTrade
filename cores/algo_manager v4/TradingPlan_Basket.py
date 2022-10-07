@@ -197,7 +197,7 @@ class TradingPlan_Basket:
 
 
 
-				for i in abs(share_added):
+				for i in range(abs(share_added)):
 					self.current_exposure[symbol].append(price*coefficient)
 
 				self.calculate_avg_price(symbol)
@@ -209,7 +209,7 @@ class TradingPlan_Basket:
 					if len(self.current_exposure[symbol])<share:
 						log_print("WARNING:",self.algo_name,symbol,"does not have enough holding to load off.",len(self.current_exposure[symbol]),share)
 
-					for i in abs(share_added):
+					for i in range(abs(share_added)):
 
 						self.data[REALIZED]+= price*coefficient - self.current_exposure[symbol].pop()
 
