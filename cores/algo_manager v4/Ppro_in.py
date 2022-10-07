@@ -246,10 +246,14 @@ def periodical_check(pipe,port):
 				c+=1
 				### 4. send request for each individual symbol PNL
 
-				if c%5==0:
+				if c%6==0:
 					for symbol in positions.keys():
-						log_print("aquiring",user,symbol)
 						threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity"+"^"+user+"^"+symbol)
+
+				if c%11==0:
+					for symbol in positions.keys():
+						threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity"+"^"+symbol)
+
 
 				### RETURN BUS. 
 				pipe.send([POSITION_UPDATE,positions,user])
