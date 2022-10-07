@@ -350,8 +350,8 @@ def read_summary(pipe):
 										l1AskPrice = float(find_between(i, "l1AskPrice=", ","))
 										l1BidPrice = float(find_between(i, "l1BidPrice=", ","))
 										
-										log_print("Symbol received:",symbol,l1AskPrice)
-										
+										#log_print("Symbol received:",symbol,l1AskPrice)
+
 										d= {}
 										d['time'] = ts
 										d['symbol'] = symbol
