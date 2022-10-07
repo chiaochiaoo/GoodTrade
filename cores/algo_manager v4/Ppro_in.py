@@ -248,6 +248,7 @@ def periodical_check(pipe,port):
 
 				if c%5==0:
 					for symbol in positions.keys():
+						log_print("aquiring",user,symbol)
 						threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity"+"^"+user+"^"+symbol)
 
 				### RETURN BUS. 
@@ -337,12 +338,15 @@ def read_summary(pipe):
 										pipe.send([SUMMARY_UPDATE,d])
 
 									elif l[1]=="SymbolLayerDisplayData:":
+
+
 										ms,ts,mili_ts = timestamp_mili_seconds(l[0])
 										symbol = find_between(i, "symbol=", ",")
 										lastPrice = float(find_between(i, "lastPrice=", ","))
 										l1AskPrice = float(find_between(i, "l1AskPrice=", ","))
 										l1BidPrice = float(find_between(i, "l1BidPrice=", ","))
 										
+										log_print("Symbol received:",symbol,lastPrice)
 										d= {}
 										d['time'] = ts
 										d['symbol'] = symbol
