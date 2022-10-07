@@ -328,7 +328,7 @@ class TradingPlan_Basket:
 		self.data[UNREAL] = round(total_unreal,2)
 		self.tkvars[UNREAL].set(self.data[UNREAL])
 
-		log_print(self.algo_name, " checking pnl",total_unreal)
+		log_print(self.algo_name, " checking pnl",total_unreal,self.average_price,self.current_shares,self.stock_price)
 
 		#log_print("cheking unreal",self.data[UNREAL] , "target",self.data[ESTRISK]*-1)
 		# if self.data[UNREAL]<self.data[ESTRISK]*-1:
