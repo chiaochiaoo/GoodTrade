@@ -154,6 +154,7 @@ class TradingPlan_Basket:
 		# if it takes, return the remaining. otherwise return it back
 		prev_share = self.current_shares[symbol]
 		prev_price = self.average_price[symbol]
+
 		if self.current_request[symbol]*share<0:
 			# wu gui yuan zhu 
 			return share 
@@ -163,8 +164,6 @@ class TradingPlan_Basket:
 				self.current_shares[symbol] += share 
 
 				self.recalculate_current_request(symbol)
-
-				
 
 				ret = 0 
 			else:
@@ -179,7 +178,7 @@ class TradingPlan_Basket:
 			else:
 				self.average_price[symbol] = 0 
 				
-			log_print(self.algo_name,symbol,"incmonig,",share,"want",self.current_request[symbol]," now have",self.current_shares[symbol],"return",ret, "prev p",prev_price,"cur price",self.average_price[symbol])
+			log_print(self.algo_name,symbol,"incmonig,",share,"want",self.current_request[symbol]," now have",self.current_shares[symbol],"return",ret, "prev avg",prev_price,"cur price",self.average_price[symbol])
 
 			return ret
 
@@ -317,6 +316,8 @@ class TradingPlan_Basket:
 		for symbol,val in self.current_shares.items():
 
 			cur_stock_price = self.symbols[symbol].get_bid()
+			self.stock_price[symbol] = cur_stock_price
+
 			if self.current_shares[symbol]!=0 and cur_stock_price!=0 and self.average_price[symbol]!=0:
 
 				if val>0:
@@ -330,7 +331,7 @@ class TradingPlan_Basket:
 		self.data[UNREAL] = round(total_unreal,2)
 		self.tkvars[UNREAL].set(self.data[UNREAL])
 
-		log_print(self.algo_name, " checking pnl",total_unreal,self.average_price,self.current_shares,cur_stock_price)
+		log_print(self.algo_name, " checking pnl",total_unreal,self.average_price,self.current_shares,self.stock_price)
 
 		#log_print("cheking unreal",self.data[UNREAL] , "target",self.data[ESTRISK]*-1)
 		# if self.data[UNREAL]<self.data[ESTRISK]*-1:

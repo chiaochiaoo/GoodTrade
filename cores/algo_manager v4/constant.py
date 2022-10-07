@@ -11,6 +11,13 @@ HIGH="high"
 LOW="low" 
 CLOSE = "close"
 
+# STATE
+
+READY = "ready"
+FILLING = "filling"
+EXITING = "exiting"
+FLAT = "flat"
+
 
 SUMMARY = "summary"
 SUMMARY_SYMBOL = "summary_symbol"

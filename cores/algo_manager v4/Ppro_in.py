@@ -246,11 +246,11 @@ def periodical_check(pipe,port):
 				c+=1
 				### 4. send request for each individual symbol PNL
 
-				if c%6==0:
+				if c%7==0:
 					for symbol in positions.keys():
 						threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity"+"^"+user+"^"+symbol)
 
-				if c%11==0:
+				if c%8==0:
 					for symbol in positions.keys():
 						threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity"+"^"+symbol)
 
@@ -350,7 +350,8 @@ def read_summary(pipe):
 										l1AskPrice = float(find_between(i, "l1AskPrice=", ","))
 										l1BidPrice = float(find_between(i, "l1BidPrice=", ","))
 										
-										log_print("Symbol received:",symbol,lastPrice)
+										log_print("Symbol received:",symbol,l1AskPrice)
+										
 										d= {}
 										d['time'] = ts
 										d['symbol'] = symbol
