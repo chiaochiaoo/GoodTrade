@@ -98,10 +98,65 @@ class processor:
 		#
 		#read the json file.
 
+		print(self.etfs_names)
+
 	def add_new_etf(self,etf,send_pipe):
 		#print(etf)
 		self.etfs[etf] = ETF(etf,send_pipe)
 		self.sendpipe.send([NEW_ETF,etf])
+
+
+
+	def process_data(self,row):
+
+					
+		Symbol = find_between(row, "Symbol=", ",")
+		symbol = Symbol[:-3]					
+
+		### ONLY PROCEED IF IT IS IN THE SYMBOL LIST ###57000
+		if symbol in self.symbols or symbol in self.etfs_names :
+			
+			market = Symbol[-2:]
+			source = find_between(row, "Source=", ",")
+			time_ = find_between(row, "MarketTime=", ",")[:-4]
+			ts=timestamp_seconds(time_)
+
+			cur_price = find_between(row, "Price=", ",")
+			auc_price = find_between(row, "AuctionPrice=", ",")
+			cont_price = find_between(row, "ContinuousPrice=", ",")
+			procced = False
+
+
+			if symbol in self.etfs_names:
+
+				self.etfs[symbol].new_price(symbol,cur_price,auc_price,cont_price)
+
+			if market =="NQ" and source =="NADQ"and ts>=57000: 
+				procced = True
+			elif market =="NY" and source =="CUTN" and ts<57000:
+				proceed = True
+			elif  market =="NY" and source =="NYSE" and ts>=57000: 
+				procced = True
+
+			if procced:
+				
+				side = find_between(row, "Side=", ",")
+				volume =  int(find_between(row, "Volume=", ","))
+
+				data = self.data[symbol]
+
+				for data in data["etf"]:
+					etf = data[0]
+					weight = data[1]
+
+					#print(symbol,etf,weight)
+					try:
+						#print(symbol,cur_price,auc_price,cont_price)
+						self.etfs[etf].new_imbalance(symbol,side,volume,weight,time_,ts,cur_price,auc_price,cont_price)
+					except Exception as e:
+						print(symbol,e)
+
+
 
 	def running_mode(self):
 
@@ -132,39 +187,8 @@ class processor:
 
 				writer.writerow([row])
 
-				
-				Symbol = find_between(row, "Symbol=", ",")
-				symbol = Symbol[:-3]
-				time_ = find_between(row, "MarketTime=", ",")[:-4]
-				ts=timestamp_seconds(time_)
-				count+=1
-				if count%1000 == 0 :
-					print(count)
-				### ONLY PROCEED IF IT IS IN THE SYMBOL LIST ###57000
-				if symbol in self.symbols :
-					
-					market = Symbol[-2:]
-					source = find_between(row, "Source=", ",")
-					time_ = find_between(row, "MarketTime=", ",")[:-4]
-					ts=timestamp_seconds(time_)
-					procced = False
-					if market =="NQ" and source =="NADQ" and ts>=57000: 
-						procced = True
-					elif market =="NY" and source =="CUTN" and ts<57000:
-						proceed = True
-					elif  market =="NY" and source =="NYSE" and ts>=57000: 
-						procced = True
+				self.process_data(row)
 
-					if procced:
-						
-						side = find_between(row, "Side=", ",")
-						volume =  int(find_between(row, "Volume=", ","))
-						#print(self.data[symbol])
-						for data in self.data[symbol]["etf"]:
-							etf = data[0]
-							weight = data[1]
-
-							self.etfs[etf].new_imbalance(symbol,side,volume,weight,time_,ts)
 
 	def test_mode(self):
 
@@ -176,40 +200,9 @@ class processor:
 				writer = csv.writer(csvfile2)
 				for row in csv_reader:
 					row = row[0]
-					Symbol = find_between(row, "Symbol=", ",")
-					symbol = Symbol[:-3]					
+					self.process_data(row)
 
-					### ONLY PROCEED IF IT IS IN THE SYMBOL LIST ###57000
-					if symbol in self.symbols :
-						
-						market = Symbol[-2:]
-						source = find_between(row, "Source=", ",")
-						time_ = find_between(row, "MarketTime=", ",")[:-4]
-						ts=timestamp_seconds(time_)
-						procced = False
-						if market =="NQ" and source =="NADQ"and ts>=57000: 
-							procced = True
-						elif market =="NY" and source =="CUTN" and ts<57000:
-							proceed = True
-						elif  market =="NY" and source =="NYSE" and ts>=57000: 
-							procced = True
 
-						if procced:
-							
-							side = find_between(row, "Side=", ",")
-							volume =  int(find_between(row, "Volume=", ","))
-
-							data = self.data[symbol]
-
-							for data in data["etf"]:
-								etf = data[0]
-								weight = data[1]
-
-								#print(symbol,etf,weight)
-								try:
-									self.etfs[etf].new_imbalance(symbol,side,volume,weight,time_,ts)
-								except Exception as e:
-									print(symbol,e)
 					#time.sleep(0.00001)
 
 		print("finished")
@@ -225,6 +218,11 @@ class ETF:
 		self.data["B/S"] = 0
 		self.data["ΔB/S"] = 0
 
+		self.data["Price"] = 0
+		self.data["AucPrice"] = 0
+		self.data["AucDiff"] = 0
+		self.data["ContPrice"] = 0
+
 		self.data["symbols"] = {}
 
 		self.time = ""
@@ -236,10 +234,20 @@ class ETF:
 		self.sell_1min_trailing = []
 		self.bsratio_1min_trailing = []
 
-	def new_imbalance(self,symbol,side,quantity,weight,time_,ts):
+	def new_price(self,symbol,price,auc_price,cont_price):
+
+		self.data["Price"] = float(price)
+		self.data["AucPrice"] = float(auc_price)
+		self.data["ContPrice"] = float(cont_price)
+		self.data["AucDiff"] = round(self.data["AucPrice"]-self.data["Price"],2)
+
+	def new_imbalance(self,symbol,side,quantity,weight,time_,ts,price,auc_price,cont_price):
 
 		try:
-			#print(self.data,quantity,weight)
+			# self.data["Price"] = float(price)
+			# self.data["AucPrice"] = float(auc_price)
+			# self.data["ContPrice"] = float(cont_price)
+			# self.data["AucPrice-Price"] = self.data["AucPrice"]-self.data["Price"]
 			if side =="B":
 				self.data["buy"]+=quantity*weight
 			elif side =="S":
@@ -290,7 +298,6 @@ class ETF:
 		if len(self.buy_1min_trailing)>7:
 			self.data["Δbuy"] = round((self.data["buy"] - self.buy_1min_trailing[-7])/(self.buy_1min_trailing[-7]+1),2)
 
-			#print(self.name,self.data["buy"],self.buy_1min_trailing)
 
 		if len(self.sell_1min_trailing)>7:
 			self.data["Δsell"] = round((self.data["sell"] - self.sell_1min_trailing[-7])/(self.sell_1min_trailing[-7]+1),2)
@@ -303,7 +310,7 @@ class ETF:
 		down = 0
 
 		for key,item in self.data["symbols"].items():
-			#print(key,item)
+	
 			if self.data["symbols"][key]["S"]>self.data["symbols"][key]["B"]:
 				up+=1
 			elif self.data["symbols"][key]["S"]<self.data["symbols"][key]["B"]:
@@ -348,6 +355,10 @@ class UI:
 						"Trend":11,\
 						"B/S":11,\
 						"ΔB/S":11,\
+						"Price":11,\
+						"AucPrice":11,\
+						"AucDiff":11,\
+						"ContPrice":11,\
 						}
 
 		self.width = list(self.labels.values())
@@ -403,7 +414,8 @@ class UI:
 
 		data = self.etfs[etf]
 
-		keys = ["name","buy","Δbuy","sell","Δsell","Trend","B/S","ΔB/S"]
+
+		keys = ["name","buy","Δbuy","sell","Δsell","Trend","B/S","ΔB/S","Price","AucPrice","AucDiff","ContPrice"]
 
 		for i in keys:
 			data[i] = tk.StringVar()
@@ -432,7 +444,9 @@ class UI:
 		#data = self.etfs[etf]
 
 		self.time.set(time_)
+		#print(self.etfs[etf])
 		for key,item in data.items():
+
 			if key in self.etfs[etf]:
 				if key== "buy" or key=="sell":
 					self.etfs[etf][key].set(str(round(item/1000000000,2))+"m")
@@ -468,6 +482,14 @@ class UI:
 						self.etfs_labels[etf][key]["background"] = PINK
 
 					self.etfs[etf][key].set(item)
+
+				elif key== "AucDiff":
+
+					if item>0:
+						self.etfs_labels[etf][key]["background"] = LIGHTGREEN
+					else:
+						self.etfs_labels[etf][key]["background"] = PINK
+					self.etfs[etf][key].set(item)
 				else:
 					self.etfs[etf][key].set(item)
 
@@ -499,7 +521,7 @@ if __name__ == '__main__':
 
 	root = tk.Tk() 
 	root.title("Imbalance viewer") 
-	root.geometry("900x900")
+	root.geometry("1100x900")
 
 	a= processor(send_pipe,TEST)
 	ui = UI(root,receive_pipe)
