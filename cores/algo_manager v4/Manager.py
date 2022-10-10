@@ -616,7 +616,7 @@ class Manager:
 					self.ui.user.set(user)
 					self.ui.position_count.set(len(self.current_positions))
 					self.ui.account_status["background"] = "#97FEA8"
-					log_print("Position updates:",len(positions),positions)
+					#log_print("Position updates:",len(positions),positions)
 
 					count +=1 
 
@@ -927,7 +927,7 @@ if __name__ == '__main__':
 
 
 	root = tk.Tk()
-	root.title("GoodTrade Algo Manager v4")
+	root.title("GoodTrade Algo Manager v4 b5")
 	root.geometry("950x800")
 
 	processes = [algo_voxcom,algo_voxcom2,ppro_in_manager,ppro_out_manager]
