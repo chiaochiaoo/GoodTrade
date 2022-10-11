@@ -127,14 +127,17 @@ class TradingPlan_Basket:
 
 		self.stock_price[symbol] = price
 
-	def submit_expected_shares(self,symbol,shares):
+	def submit_expected_shares(self,symbol,shares,aggresive=0):
 
 		log_print(self.algo_name,"expect",symbol,shares)
 
 		with self.read_lock[symbol]:
+
 			self.expected_shares[symbol] = shares
-			
 			self.recalculate_current_request(symbol)
+
+			if aggresive:
+				self.symbols[symbol].immediate_request(self.current_request[symbol])
 
 			# self.notify_request(symbol)
 

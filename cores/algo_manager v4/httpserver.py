@@ -135,6 +135,8 @@ class S(BaseHTTPRequestHandler):
 
 			risk = find_between(stream_data,"Risk=",",")
 
+			aggresive = find_between(stream_data,"Aggresive=",",")
+
 			print(stream_data)
 			d={}
 			for i in infos.split(","):
@@ -142,7 +144,7 @@ class S(BaseHTTPRequestHandler):
 				a,b = i.split(":")
 				d[a] = int(b)
 
-			self.send_basket(basket,d,risk)
+			self.send_basket(basket,d,risk,aggresive)
 
 
 		elif "Command" in stream_data:
@@ -202,14 +204,14 @@ class S(BaseHTTPRequestHandler):
 					# data["symbol1_statistics"]
 					# data["symbol2_statistics"]
 
-	def send_basket(self,basket_name,orders,risk):
+	def send_basket(self,basket_name,orders,risk,aggresive):
 
 		global pipec
 		#print("sending",msg,pipec)
 
-		print("sending:",basket_name,orders,risk)
+		print("sending:",basket_name,orders,risk,aggresive)
 
-		pipec.send(["basket",basket_name,orders,risk])
+		pipec.send(["basket",basket_name,orders,risk,aggresive])
 	def send_cmd(self,msg):
 
 		global pipec

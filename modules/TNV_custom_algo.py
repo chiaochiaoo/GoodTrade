@@ -67,6 +67,8 @@ class Custom_Algo():
 
 		self.create_algo_tabs()
 		self.create_each_algos()
+
+		self.load_all()
 	def load_algo_tabs(self):
 
 		# load each algo, create tab for them
@@ -196,6 +198,27 @@ class Custom_Algo():
 				self.algos[tab][key][MULTIPLIER].set(item[MULTIPLIER])
 			except:
 				pass
+
+	def load_all(self):
+
+		for tab in self.algo_groups:
+			with open('custom_algos_config/'+tab+'_setting.json', 'r') as myfile:
+				data=myfile.read()
+
+			# parse file
+			d = json.loads(data)
+			#print("loading",tab)
+
+			for key,item in d.items():
+				#print(self.algos[tab][key])
+				try:
+					self.algos[tab][key][ACTIVE].set(item[ACTIVE])
+					self.algos[tab][key][PASSIVE].set(item[PASSIVE])
+					self.algos[tab][key][RISK].set(item[RISK])
+					self.algos[tab][key][MULTIPLIER].set(item[MULTIPLIER])
+				except:
+					pass
+
 
 	def order_complier(self,data,multiplier,risk,aggresive):
 
