@@ -145,8 +145,8 @@ class TradingPlan_Basket:
 				now = datetime.now()
 				ts = now.hour*3600 + now.minute*60 + now.second
 
-				if ts - self.recent_action_ts[symbol_name] > 5:
-					self.recent_action_ts[symbol_name] = ts
+				if ts - self.recent_action_ts[symbol] > 5:
+					self.recent_action_ts[symbol] = ts
 					self.symbols[symbol].immediate_request(self.current_request[symbol])
 
 			# self.notify_request(symbol)
