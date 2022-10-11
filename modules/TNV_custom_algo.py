@@ -222,9 +222,9 @@ class Custom_Algo():
 		data += ","+"Risk="+str(risk__)+","
 
 		if aggresive:
-			data += "Aggresive=1"
+			data += "Aggresive=1"+","
 		else:
-			data += "Aggresive=0"
+			data += "Aggresive=0"+","
 		return data
 
 
