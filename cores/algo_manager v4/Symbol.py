@@ -12,7 +12,7 @@ def sign_test(a,b):
 
 	return not ((a+b == abs(a)+abs(b)) or (a+b == -(abs(a)+abs(b))))
 
-	
+
 ### I NEED TO TRACK HOW MANY SYMBOLS IT IS RUNNING SIMULTANEOUSLY. ###
 
 class Symbol:
@@ -257,8 +257,6 @@ class Symbol:
 		self.previous_shares,self.previous_avgprice = self.current_shares, self.current_avgprice
 			
 
-
-
 	def deploy_orders(self):
 
 		# I NEED TO ADD A MECHANISM ON THIS
@@ -315,6 +313,16 @@ class Symbol:
 			
 		#log_print("holding update - releasing lock")
 		#print("inc",self.incoming_shares)
+
+	def immediate_request(self,shares):
+
+		# I may need to cancel existing order first. for a 0.1 second delay.
+
+		if shares<0:
+			self.ppro_out.send([IOCSELL,self.symbol_name,abs(shares),self.get_bid()])
+		else:
+			self.ppro_out.send([IOCBUY,self.symbol_name,abs(shares),self.get_ask()])
+
 # total_imbalance = sum(t.values())
 
 

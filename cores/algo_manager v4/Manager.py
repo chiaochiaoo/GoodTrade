@@ -186,9 +186,6 @@ class Manager:
 
 	def symbols_inspection(self):
 
-
-
-
 		if self.symbol_inspection_lock.locked()==False:
 
 			self.pipe_ppro_out.send([CANCELALL])
@@ -207,50 +204,8 @@ class Manager:
 		else:
 			log_print("Manager: previous symbols inspection not finished. skip.")
 
-	# def symbols_inspection(self):
 
-	# 	#fro each of the symbols. look at imbalance. deal with it. 
-
-	# 	ts = 0
-
-	# 	while True:
-	# 		#create a cpy.
-
-	# 		if self.shutdown:
-	# 			break
-
-	# 		register = 0
-	# 		symbols = list(self.symbol_data.values())
-
-	# 		for val in symbols:
-
-
-	# 			try:
-	# 				val.symbol_inspection()
-
-	# 			except Exception as e:
-	# 				PrintException(e,"inspection error")
-	# 			#log_print("inspecting:",val.ticker,"request:",val.get_management_request())
-				
-	# 			# if val.get_register()==True:
-	# 			# 	register+=1
-	# 			# if val.get_management_request()==True and val.get_market_making()==False:
-					
-	# 				# stage 1, cancel each other out in the request book
-	# 				# stage 2, granted request from the incoming book
-	# 				# stage 3, handle imbalance request (just use market orders now.)
-
-	# 		# now = datetime.now()
-	# 		# cur_ts = now.hour*60+now.minute 
-
-	# 		# if cur_ts!= ts:#
-	# 		# 	log_print("Registeriing ,",register,"total",len(symbols)," ts",cur_ts)
-	# 		# 	ts = cur_ts
-	# 		time.sleep(5)
-
-
-
-	def apply_basket_cmd(self,basket_name,orders,risk):
+	def apply_basket_cmd(self,basket_name,orders,risk,aggresive):
 
 
 		if basket_name not in self.baskets:
@@ -276,7 +231,7 @@ class Manager:
 
 					## now , submit the request.
 
-					self.baskets[basket_name].submit_expected_shares(symbol,value)
+					self.baskets[basket_name].submit_expected_shares(symbol,value,aggresive)
 				else:
 					log_print("Manager: Wrong Ticker format:",symbol)
 		else:
@@ -481,9 +436,6 @@ class Manager:
 		if self.current_downside > self.max_risk:
 			self.max_risk = self.current_downside
 
-
-
-
 		self.ui.active_trade.set(self.active_trade)  
 		self.ui.active_trade_max.set(self.active_trade_max)  
 
@@ -547,8 +499,8 @@ class Manager:
 				try:
 					#d[1]   => basket name 
 					#d[2]   => share info. 
-
-					self.apply_basket_cmd(d[1],d[2],d[3])
+					print(d[1],d[2],d[3],d[4])
+					self.apply_basket_cmd(d[1],d[2],d[3],d[4])
 
 				except Exception as e:
 
