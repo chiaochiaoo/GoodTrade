@@ -8,6 +8,7 @@ import tkinter as tkvars
 import time
 import threading
 import random
+from datetime import datetime, timedelta
 
 # MAY THE MACHINE GOD BLESS THY AIM
 
@@ -22,11 +23,11 @@ class TradingPlan_Basket:
 		self.name = algo_name
 		self.symbols = {}
 
-
 		self.in_use = True
 		self.pair_plan = False
 		
 		self.shut_down = False
+
 		#self.symbol.set_tradingplan(self)
 
 		self.manager = Manager
@@ -46,6 +47,8 @@ class TradingPlan_Basket:
 		self.average_price = {}
 
 		self.stock_price ={}
+
+		self.recent_action_ts = {}
 
 		self.data = {}
 		self.tkvars = {}
@@ -119,6 +122,8 @@ class TradingPlan_Basket:
 			self.average_price[symbol_name] = 0
 			self.stock_price[symbol_name] = 0
 
+			self.recent_action_ts[symbol_name] = 0
+
 			self.holdings[symbol_name] = []
 
 			self.read_lock[symbol_name] = threading.Lock()
@@ -129,7 +134,7 @@ class TradingPlan_Basket:
 
 	def submit_expected_shares(self,symbol,shares,aggresive=0):
 
-		log_print(self.algo_name,"expect",symbol,shares," aggresive ", aggresive)
+		log_print(self.algo_name,"expect",symbol,shares," aggresive ", aggresive,"current have",self.current_shares[symbol])
 
 		with self.read_lock[symbol]:
 
@@ -137,7 +142,12 @@ class TradingPlan_Basket:
 			self.recalculate_current_request(symbol)
 
 			if aggresive:
-				self.symbols[symbol].immediate_request(self.current_request[symbol])
+				now = datetime.now()
+				ts = now.hour*3600 + now.minute*60 + now.second
+
+				if ts - self.recent_action_ts[symbol_name] > 5:
+					self.recent_action_ts[symbol_name] = ts
+					self.symbols[symbol].immediate_request(self.current_request[symbol])
 
 			# self.notify_request(symbol)
 
@@ -384,7 +394,7 @@ class TradingPlan_Basket:
 		self.data[UNREAL] = round(total_unreal,2)
 		self.tkvars[UNREAL].set(self.data[UNREAL])
 
-		log_print(self.algo_name, " checking pnl",total_unreal,self.average_price,self.current_shares,self.stock_price)
+		log_print("Tradingplan: ",self.algo_name, " Unreal",total_unreal,"Avg",self.average_price,"Shares:",self.current_shares,"Stock prices",self.stock_price)
 
 		#log_print("cheking unreal",self.data[UNREAL] , "target",self.data[ESTRISK]*-1)
 		# if self.data[UNREAL]<self.data[ESTRISK]*-1:

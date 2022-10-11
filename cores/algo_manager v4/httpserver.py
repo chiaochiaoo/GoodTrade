@@ -209,7 +209,7 @@ class S(BaseHTTPRequestHandler):
 		global pipec
 		#print("sending",msg,pipec)
 
-		print("sending:",basket_name,orders,risk,aggresive)
+		print("HTTP sending:",basket_name,orders,risk,aggresive)
 
 		pipec.send(["basket",basket_name,orders,risk,aggresive])
 	def send_cmd(self,msg):
@@ -217,7 +217,7 @@ class S(BaseHTTPRequestHandler):
 		global pipec
 		#print("sending",msg,pipec)
 
-		print("sending:",msg)
+		print("HTTP sending:",msg)
 
 		pipec.send(["cmd",msg])
 
@@ -226,7 +226,7 @@ class S(BaseHTTPRequestHandler):
 		global pipec
 		#print("sending",msg,pipec)
 
-		print("sending:",msg)
+		print("HTTP sending:",msg)
 
 		pipec.send(["pkg",[msg]])
 		#pipe.send(msg)
