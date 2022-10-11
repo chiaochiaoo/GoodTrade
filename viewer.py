@@ -49,12 +49,12 @@ from modules.ppro_process_manager import *
 
 from cores.algo_manager_comms import *
 from cores.algo_process_manager_client import *
-
+from cores.http_out import *
 from modules.TNV_http import *
 
 class viewer:
 
-	def __init__(self,root,util_process,ppro_process,algo_comm,authen_comm,util_request):
+	def __init__(self,root,util_process,ppro_process,algo_comm,authen_comm,util_request,http_out):
 
 		self.data = Symbol_data_manager()
 
@@ -129,7 +129,7 @@ class viewer:
 		
 		#self.pair =  spread_trader(self.tab12,self.data)
 
-		self.scanner_pannel = scanner(root,self.tm,util_process,self.data,util_request,algo_comm)
+		self.scanner_pannel = scanner(root,self.tm,util_process,self.data,util_request,algo_comm,http_out)
 
 		util_process.set_pannel(self.scanner_pannel)
 
@@ -401,7 +401,7 @@ def authentication(pipe):
 
 #Utility 
 
-def utils(algo_manager_receive_comm,util_response):
+def utils(algo_manager_receive_comm,util_response,http_out):
 
 		# db = threading.Thread(target=multi_processing_database,args=(db_sending_pipe,),daemon=True)
 		# db.start()
@@ -418,6 +418,8 @@ def utils(algo_manager_receive_comm,util_response):
 		http = threading.Thread(target=httpserver,args=(util_response,),daemon=True)
 		http.start()
 
+		http2 = threading.Thread(target=http_driver,args=(http_out,),daemon=True)
+		http2.start()
 
 		util_comms(util_response) #for nasdaq trader 
 
@@ -454,6 +456,7 @@ if __name__ == '__main__':
 	authen_comm, authen_clientside_comm = multiprocessing.Pipe()
 
 	#################
+	http_in, http_out = multiprocessing.Pipe()
 
 
 	util_request, util_response = multiprocessing.Pipe()
@@ -473,7 +476,7 @@ if __name__ == '__main__':
 
 	#algo_manager = algo_process_manager_client(algo_manager_process_comm,root)
 	
-	utility = multiprocessing.Process(name="utils",target=utils, args=(algo_manager_receive_comm,util_response),daemon=True)
+	utility = multiprocessing.Process(name="utils",target=utils, args=(algo_manager_receive_comm,util_response,http_out),daemon=True)
 	utility.daemon=True
 	#utility.name = "utility"
 	# receiver = multiprocessing.Process(target=algo_server,args=(util_response,),daemon=True)
@@ -496,7 +499,7 @@ if __name__ == '__main__':
 
 
 	
-	view = viewer(root,util_process,ppro,algo_manager_process_comm,authen_clientside_comm,util_request)
+	view = viewer(root,util_process,ppro,algo_manager_process_comm,authen_clientside_comm,util_request,http_in)
 	
 	# PPRO SECTION ##
 

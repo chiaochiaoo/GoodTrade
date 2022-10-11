@@ -45,9 +45,11 @@ def find_between(data, first, last):
 
 class Custom_Algo():
 
-	def __init__(self,root,TNV_scanner):
+	def __init__(self,root,TNV_scanner,http_out):
 
 		self.root = root 
+
+		self.http_out = http_out
 
 		self.tnv_scanner = TNV_scanner
 		self.entries = []
@@ -282,17 +284,20 @@ class Custom_Algo():
 				msg += data
 				print("Sending:",msg)
 
-				requests.get(msg)
-				reg1 = threading.Thread(target=request_post,args=(msg,), daemon=True)
-				reg1.start()
+				#requests.get(msg)
+
+				self.request_post(msg)
+				# reg1 = threading.Thread(target=request_post,args=(msg,), daemon=True)
+				# reg1.start()
 
 		else:
 			print("Not activated")
 
 
-def request_post(body):
+	def request_post(self,body):
 
-	requests.get(body,timeout=2)
+		#requests.get(body,timeout=2)
+		self.http_out.send(body)
 
 
 if __name__ == '__main__':

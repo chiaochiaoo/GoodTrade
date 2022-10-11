@@ -18,7 +18,7 @@ def status_change(var,label):
 
 class scanner(pannel):
 
-	def __init__(self,root,tickers_manager,scanner_process,data,scanner_request,algo_comm):
+	def __init__(self,root,tickers_manager,scanner_process,data,scanner_request,algo_comm,http_out):
 
 		super()
 
@@ -50,7 +50,7 @@ class scanner(pannel):
 
 		############## SACNNER ##############
 
-		self.TNVscanner = TNV_Scanner(self.tab1,self,algo_comm,data)
+		self.TNVscanner = TNV_Scanner(self.tab1,self,algo_comm,data,http_out)
 
 		############################### Nasdaq Trader ############################################
 

@@ -41,15 +41,15 @@ def init_driver():
 			driver.minimize_window()
 			return driver
 		except Exception as e:
-			log_print("Driver init failed. restarting.",e)
+			print("Driver init failed. restarting.",e)
 			time.sleep(1)
 			pass
 
 def http_driver(pipe): #a sperate process. GLOBALLY. 
 
-	driver = init_driver(pipe_status)
-	log_print("Orders output moudule online.")
-
+	driver = init_driver()
+	print("Orders output moudule online.")
+	termination = False
 	while True and not termination:
 		try:
 			d = pipe.recv()
@@ -59,13 +59,13 @@ def http_driver(pipe): #a sperate process. GLOBALLY.
 				#log_print(sucess_str)
 				sucessful = True
 			except Exception as e:
-				log_print(e,failure_str," driver restart")
+				print(e,failure_str," driver restart")
 				driver = init_driver()
 
 		except Exception as e:
-			log_print(e)
+			print(e)
 
-	log_print("ppro out terminated")
+	print("ppro out terminated")
 
 
 #return (find_between(r.text,"<Content>","</Content>"))

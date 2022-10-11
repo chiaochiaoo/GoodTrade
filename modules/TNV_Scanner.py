@@ -58,7 +58,7 @@ def find_between(data, first, last):
 
 class TNV_Scanner():
 
-	def __init__(self,root,NT,commlink,data):
+	def __init__(self,root,NT,commlink,data,http_out):
 
 		
 		self.root = root
@@ -97,7 +97,7 @@ class TNV_Scanner():
 
 		self.today_frame = tk.Canvas(self.TNV_TAB)
 		self.TNV_TAB.add(self.today_frame, text ='Custom Algo')
-		self.custom_algo = Custom_Algo(self.today_frame,self)
+		self.custom_algo = Custom_Algo(self.today_frame,self,http_out)
 
 		self.or_frame = tk.Canvas(self.TNV_TAB)
 		self.TNV_TAB.add(self.or_frame, text ='Open Reversal')
