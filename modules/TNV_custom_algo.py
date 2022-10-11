@@ -298,16 +298,16 @@ def request_post(body):
 if __name__ == '__main__':
 
 
-	# root = tk.Tk() 
-	# root.title("GoodTrade v489") 
-	# root.geometry("640x840")
+	root = tk.Tk() 
+	root.title("GoodTrade v489") 
+	root.geometry("640x840")
 
-	# # print(ratio_compute(0.8))
-	# # print(ratio_compute(1.2))
+	# print(ratio_compute(0.8))
+	# print(ratio_compute(1.2))
 
-	# Custom_Algo(root,fake_NT())
+	Custom_Algo(root,fake_NT())
 
-	# root.mainloop()
+	root.mainloop()
 
 	# print("h")
 	# body="http://localhost:4441/Basket=PUFTB,Order=*QQQ.NQ:0*,Risk=1,Aggresive=0,"
