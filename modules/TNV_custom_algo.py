@@ -292,7 +292,7 @@ class Custom_Algo():
 
 def request_post(body):
 
-	requests.get(body,timeout=0.5)
+	requests.get(body,timeout=2)
 
 
 if __name__ == '__main__':
