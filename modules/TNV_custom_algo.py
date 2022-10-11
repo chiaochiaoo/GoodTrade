@@ -239,6 +239,7 @@ class Custom_Algo():
 
 			for i in self.algo_groups:
 				for algo,item in self.algos[i].items():
+					print(algo,name,algo in name,item[ACTIVE].get())
 					if algo in name and item[ACTIVE].get()==True:
 						confimed=True
 						data = self.order_complier(data,item[MULTIPLIER].get(),item[RISK].get().item[PASSIVE].get())
