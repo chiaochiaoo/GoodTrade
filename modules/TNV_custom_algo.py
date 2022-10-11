@@ -186,13 +186,16 @@ class Custom_Algo():
 		# parse file
 		d = json.loads(data)
 		#print("loading",tab)
+
 		for key,item in d.items():
 			#print(self.algos[tab][key])
-			self.algos[tab][key][ACTIVE].set(item[ACTIVE])
-			self.algos[tab][key][PASSIVE].set(item[PASSIVE])
-			self.algos[tab][key][RISK].set(item[RISK])
-			self.algos[tab][key][MULTIPLIER].set(item[MULTIPLIER])
-
+			try:
+				self.algos[tab][key][ACTIVE].set(item[ACTIVE])
+				self.algos[tab][key][PASSIVE].set(item[PASSIVE])
+				self.algos[tab][key][RISK].set(item[RISK])
+				self.algos[tab][key][MULTIPLIER].set(item[MULTIPLIER])
+			except:
+				pass
 
 	def order_complier(self,data,multiplier,risk,aggresive):
 
