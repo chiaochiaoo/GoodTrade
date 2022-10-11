@@ -133,9 +133,9 @@ class S(BaseHTTPRequestHandler):
 
 			infos = find_between(stream_data,"Order=*","*")
 
-			risk = find_between(stream_data,"Risk=",",")
+			risk = int(find_between(stream_data,"Risk=",","))
 
-			aggresive = find_between(stream_data,"Aggresive=",",")
+			aggresive = int(find_between(stream_data,"Aggresive=",","))
 
 			print(stream_data)
 			d={}

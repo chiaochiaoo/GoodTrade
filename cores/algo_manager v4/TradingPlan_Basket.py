@@ -129,7 +129,7 @@ class TradingPlan_Basket:
 
 	def submit_expected_shares(self,symbol,shares,aggresive=0):
 
-		log_print(self.algo_name,"expect",symbol,shares)
+		log_print(self.algo_name,"expect",symbol,shares," aggresive ", aggresive)
 
 		with self.read_lock[symbol]:
 
