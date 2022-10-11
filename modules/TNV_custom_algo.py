@@ -245,7 +245,7 @@ class Custom_Algo():
 					print(algo,name,algo in name,item[ACTIVE].get())
 					if algo in name and item[ACTIVE].get()==True:
 						confimed=True
-						data = self.order_complier(data,item[MULTIPLIER].get(),item[RISK].get().item[PASSIVE].get())
+						data = self.order_complier(data,item[MULTIPLIER].get(),item[RISK].get(),item[PASSIVE].get())
 						break
 
 				if confimed:
