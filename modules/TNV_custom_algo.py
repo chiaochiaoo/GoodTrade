@@ -292,26 +292,29 @@ class Custom_Algo():
 
 def request_post(body):
 
-	requests.get(body)
+	requests.get(body,timeout=0.5)
 
 
 if __name__ == '__main__':
 
 
-	root = tk.Tk() 
-	root.title("GoodTrade v489") 
-	root.geometry("640x840")
+	# root = tk.Tk() 
+	# root.title("GoodTrade v489") 
+	# root.geometry("640x840")
 
-	# print(ratio_compute(0.8))
-	# print(ratio_compute(1.2))
+	# # print(ratio_compute(0.8))
+	# # print(ratio_compute(1.2))
 
-	Custom_Algo(root,fake_NT())
+	# Custom_Algo(root,fake_NT())
 
-	root.mainloop()
+	# root.mainloop()
 
+	# print("h")
+	# body="http://localhost:4441/Basket=PUFTB,Order=*QQQ.NQ:0*,Risk=1,Aggresive=0,"
 
+	# r=requests.get(body,timeout=2)
 
-
+	# print(r.status_code)
 
 
 	# 		info = [rank,avgv,relv,roc5,roc10,roc15,score,sc,so]
