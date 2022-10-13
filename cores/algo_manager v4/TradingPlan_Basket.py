@@ -252,7 +252,8 @@ class TradingPlan_Basket:
 				return ret
 
 
-
+		else:
+			return share
 
 
 
@@ -479,3 +480,6 @@ class TradingPlan_Basket:
 
 		self.data[STATUS] = DEPLOYED
 		self.tkvars[STATUS].set(DEPLOYED)
+
+
+
