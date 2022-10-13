@@ -21,3 +21,4 @@ tools/Customized_Processor/input.csv
 algo_records/
 *.dtmp
 *.bkp
+custom_algos_config/
