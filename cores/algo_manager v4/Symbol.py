@@ -217,6 +217,8 @@ class Symbol:
 			elif total<share_difference:
 				log_print(self.symbol_name," having LESS orders than actual share difference.",share_difference," orders:",total)
 				#? not enough?
+			else:
+				log_print(self.symbol_name," having share differences:",share_difference, " total:",total)
 
 
 			### Construct a share_difference with avg price. 
