@@ -175,6 +175,11 @@ class TradingPlan_Basket:
 		prev_share = self.current_shares[symbol]
 		prev_price = self.average_price[symbol]
 		share_added = 0
+
+
+		### 1. need to read if actually request anything
+		### 2. need to verify if it's the same sign as requested.
+
 		if self.current_request[symbol]*share<0:
 			# wu gui yuan zhu 
 			return share 
@@ -207,7 +212,6 @@ class TradingPlan_Basket:
 				coefficient = -1
 
 			if prev_share==0 or prev_share*share>0:
-
 
 
 				for i in range(abs(share_added)):
@@ -324,11 +328,6 @@ class TradingPlan_Basket:
 
 		self.data[STATUS] = PENDING
 		self.tkvars[STATUS].set(PENDING)
-
-
-
-
-
 
 	# need to know which symbol got rejected. cancel the request. 
 	def rejection_handling(self,symbol):
