@@ -339,11 +339,15 @@ class UI(pannel):
 		self.recreate_labels()
 
 	def init_pannel(self):
+
 		self.system_pannel = ttk.LabelFrame(self.root,text="System") 
 		self.system_pannel.place(x=10,y=10,height=260,width=210)
 
+		self.control_pannel = ttk.LabelFrame(self.root,text="Control") 
+		self.control_pannel.place(x=230,y=10,height=50,width=700)
+
 		self.performance_pannel = ttk.LabelFrame(self.root,text="Performance") 
-		self.performance_pannel.place(x=230,y=10,height=260,width=700)
+		self.performance_pannel.place(x=230,y=70,height=260,width=700)
 
 		self.deployment_panel = ttk.LabelFrame(self.root,text="Strategy Deployment") 
 		self.deployment_panel.place(x=10,y=260,height=500,width=920)
@@ -351,6 +355,24 @@ class UI(pannel):
 		self.init_system_pannel()
 		self.init_performance_pannel()
 		self.init_deployment_pannel()
+		self.init_control_pannel()
+
+	def init_control_pannel(self):
+
+		col = 1
+		ttk.Button(self.control_pannel, text="Flatten All (P)").grid(sticky="w",column=col,row=1)
+		col +=1
+		ttk.Button(self.control_pannel, text="Flatten All (A)").grid(sticky="w",column=col,row=1)
+
+		col +=1
+		ttk.Button(self.control_pannel, text="Weekly Report").grid(sticky="w",column=col,row=1)
+
+		col +=1
+		ttk.Button(self.control_pannel, text="Monthly Report").grid(sticky="w",column=col,row=1)
+
+
+
+
 
 	def init_config_pannel(self):
 
