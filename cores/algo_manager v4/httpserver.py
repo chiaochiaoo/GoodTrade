@@ -207,7 +207,9 @@ class S(BaseHTTPRequestHandler):
 							# data["symbol2_statistics"]
 
 			except Exception as e:
-				PrintException("HTTP SERVER processing message failure",e)
+				print("HTTP SERVER processing message failure",e)
+
+
 	def send_basket(self,basket_name,orders,risk,aggresive):
 
 		global pipec
