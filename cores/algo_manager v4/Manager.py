@@ -797,7 +797,7 @@ class Manager:
 		except:
 			self.f = open(self.file, "w")
 			self.recordwriter = csv.writer(self.f,lineterminator = '\n')
-			self.recordwriter.writerow(['DATE', 'TIME','ALGO','SYMBOL','POSITION','RISK','REALIZED'])
+			self.recordwriter.writerow(['DATE', 'TIME','ALGO','REALIZED'])
 
 		self.f.close()
 		log_print(("record file start"))
