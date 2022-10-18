@@ -235,6 +235,8 @@ class TradingPlan_Basket:
 
 
 							self.data[REALIZED] = round(self.data[REALIZED],2)
+
+						self.manager.new_record(self)
 						
 					except	Exception	as e:
 						PrintException(e,"Basket Holding Update Error")

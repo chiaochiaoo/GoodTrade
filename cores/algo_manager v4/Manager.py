@@ -27,6 +27,8 @@ import select
 from datetime import datetime, timedelta
 import json
 import os,sys
+import csv
+
 
 # from Tester import *
 from httpserver import *
@@ -147,10 +149,9 @@ class Manager:
 		#############################
 
 		now = datetime.now()
-		monday = now - timedelta(days = now.weekday())
-		self.file = "../../algo_records/"+monday.strftime("%Y_%m_%d")+".csv"
+		self.file = "../../algo_records/"+now.strftime("%Y_%m")+".csv"
 
-		#self.init_record_writer()
+		self.init_record_writer()
 
 		self.shutdown=False
 
@@ -800,6 +801,7 @@ class Manager:
 
 		self.f.close()
 		log_print(("record file start"))
+
 	def new_record(self,tradingplan):
 
 		try:
@@ -812,12 +814,9 @@ class Manager:
 
 
 			ALGO = tradingplan.algo_name
-			SYMBOL = tradingplan.symbol_name
-			SIDE = tradingplan.tkvars[POSITION].get()
-			RISK = tradingplan.data[ESTRISK]
 			real = tradingplan.data[REALIZED]
 
-			self.recordwriter.writerow([DATE, TIME,ALGO,SYMBOL,SIDE,RISK,real])
+			self.recordwriter.writerow([DATE, TIME,ALGO,real])
 			self.f.close()
 		except:
 
