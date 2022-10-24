@@ -131,12 +131,15 @@ class processor:
 
 				self.etfs[symbol].new_price(symbol,cur_price,auc_price,cont_price)
 
-			if market =="NQ" and source =="NADQ"and ts>=57000: 
+			if market =="NQ" and source =="NADQ"and ts>=50400: 
 				procced = True
-			elif market =="NY" and source =="CUTN" and ts<57000:
+			elif market =="NY" and source =="CUTN" and ts<50400:
 				proceed = True
-			elif  market =="NY" and source =="NYSE" and ts>=57000: 
+			elif  market =="NY" and source =="NYSE" and ts>=50400: 
 				procced = True
+
+			elif market =="AM" and ts>=50400:
+				proceed = True
 
 			if procced:
 				
@@ -211,6 +214,7 @@ class ETF:
 	def __init__(self,name,pipe):
 		self.name = name
 		self.data = {}
+		self.data["total"] = 0
 		self.data["buy"] = 0
 		self.data["sell"] = 0
 		self.data["Δbuy"] = 0
@@ -252,6 +256,8 @@ class ETF:
 				self.data["buy"]+=quantity*weight
 			elif side =="S":
 				self.data["sell"]+=quantity*weight
+
+			self.data["total"] = self.data["buy"]+self.data["sell"]
 
 			if symbol not in self.data["symbols"]:
 				self.data["symbols"][symbol] = {}
@@ -347,14 +353,17 @@ class UI:
 			#sav.start() 
 
 	def init_pannel(self):
+
+		#"ΔSell":11,\  //"ΔBuy":11,\
 		self.labels = {"ETF":11,\
+						"Total":11,\
 						"Buy":11,\
-						"ΔBuy":11,\
+						
 						"Sell":11,\
-						"ΔSell":11,\
+						
 						"Trend":11,\
-						"B/S":11,\
-						"ΔB/S":11,\
+						# "B/S":11,\
+						# "ΔB/S":11,\
 						"Price":11,\
 						"AucPrice":11,\
 						"AucDiff":11,\
@@ -414,8 +423,8 @@ class UI:
 
 		data = self.etfs[etf]
 
-
-		keys = ["name","buy","Δbuy","sell","Δsell","Trend","B/S","ΔB/S","Price","AucPrice","AucDiff","ContPrice"]
+		#/"B/S","ΔB/S",
+		keys = ["name","total","buy","sell","Trend","Price","AucPrice","AucDiff","ContPrice"]
 
 		for i in keys:
 			data[i] = tk.StringVar()
@@ -448,7 +457,7 @@ class UI:
 		for key,item in data.items():
 
 			if key in self.etfs[etf]:
-				if key== "buy" or key=="sell":
+				if key== "buy" or key=="sell" or key=="total":
 					self.etfs[etf][key].set(str(round(item/1000000000,2))+"m")
 				elif key== "Δbuy" or key== "Δsell":
 					if item >1:
