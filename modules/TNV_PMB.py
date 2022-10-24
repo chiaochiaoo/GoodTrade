@@ -456,7 +456,7 @@ class Premarket_breakout():
 	def filtering(self,data):
 
 		if self.condition_yc.get()== True:
-			data =  data.loc[((data["ycr"]>=0.75)|(data["ycr"]<=0.25))]
+			data =  data.loc[(((data["ycr"]>=0.75)&(data["SC"]>=1))|((data["ycr"]<=0.25)&(data["SC"]<=-1)))]
 			
 
 		return data
