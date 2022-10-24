@@ -342,12 +342,8 @@ class UI(pannel):
 		self.system_pannel = ttk.LabelFrame(self.root,text="System") 
 		self.system_pannel.place(x=10,y=10,height=260,width=210)
 
-
-		self.performance_pannel = ttk.LabelFrame(self.root,text="Control") 
-		self.performance_pannel.place(x=230,y=10,height=50,width=700)
-
 		self.performance_pannel = ttk.LabelFrame(self.root,text="Performance") 
-		self.performance_pannel.place(x=230,y=70,height=260,width=700)
+		self.performance_pannel.place(x=230,y=10,height=260,width=700)
 
 		self.deployment_panel = ttk.LabelFrame(self.root,text="Strategy Deployment") 
 		self.deployment_panel.place(x=10,y=260,height=500,width=920)
