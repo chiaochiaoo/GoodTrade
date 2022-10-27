@@ -203,23 +203,26 @@ class Custom_Algo():
 
 	def load_all(self):
 
-		for tab in self.algo_groups:
-			with open('custom_algos_config/'+tab+'_setting.json', 'r') as myfile:
-				data=myfile.read()
+		try:
+			for tab in self.algo_groups:
+				with open('custom_algos_config/'+tab+'_setting.json', 'r') as myfile:
+					data=myfile.read()
 
-			# parse file
-			d = json.loads(data)
-			#print("loading",tab)
+				# parse file
+				d = json.loads(data)
+				#print("loading",tab)
 
-			for key,item in d.items():
-				#print(self.algos[tab][key])
-				try:
-					self.algos[tab][key][ACTIVE].set(item[ACTIVE])
-					self.algos[tab][key][PASSIVE].set(item[PASSIVE])
-					self.algos[tab][key][RISK].set(item[RISK])
-					self.algos[tab][key][MULTIPLIER].set(item[MULTIPLIER])
-				except:
-					pass
+				for key,item in d.items():
+					#print(self.algos[tab][key])
+					try:
+						self.algos[tab][key][ACTIVE].set(item[ACTIVE])
+						self.algos[tab][key][PASSIVE].set(item[PASSIVE])
+						self.algos[tab][key][RISK].set(item[RISK])
+						self.algos[tab][key][MULTIPLIER].set(item[MULTIPLIER])
+					except:
+						pass
+		except:
+			pass
 
 
 	def order_complier(self,data,multiplier,risk,aggresive):
