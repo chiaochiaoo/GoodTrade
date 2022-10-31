@@ -301,6 +301,20 @@ class Symbol:
 	def get_ask(self):
 		return self.data[ASK]
 
+	def rejection_message(self,side):
+
+		## iterate through all the TPs request. check who is requesting. if it is not running withdraw and cancel it. 
+
+		if side == "Long":
+			coefficient = 1
+		elif side =="Short":
+			coefficient = -1
+
+		tps = list(self.tradingplans.keys())
+
+		for tp in tps:
+			if self.tradingplans[tp].having_request(self.symbol_name) and self.tradingplans[tp].get_holdings(self.symbol_name)==0:
+		 		self.tradingplans[tp].rejection_handling(self.ticker)
 
 	def holdings_update(self,price,share):
 

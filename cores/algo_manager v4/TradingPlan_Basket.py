@@ -279,7 +279,7 @@ class TradingPlan_Basket:
 
 	def having_request(self,symbol=None):
 
-		return self.have_request[symbol]
+		return self.current_request[symbol]!=0
 
 	def get_holdings(self,symbol=None):
 
