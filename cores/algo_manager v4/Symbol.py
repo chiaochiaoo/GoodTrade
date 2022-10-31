@@ -118,6 +118,8 @@ class Symbol:
 		else:
 			self.action = ""
 
+
+
 	def update_stockprices(self,tps):
 		
 		for tp in tps:
@@ -155,6 +157,8 @@ class Symbol:
 		return self.expected
 
 
+	def get_difference(self):
+		return self.difference
 
 	def pair_off(self,tps):
 		

@@ -60,6 +60,8 @@ class Manager:
 
 	def __init__(self,root,goodtrade_pipe=None,ppro_out=None,ppro_in=None,TEST_MODE=False,processes=[]):
 
+
+		self.total_difference = 0
 		self.root = root
 
 		self.termination = False
@@ -189,9 +191,13 @@ class Manager:
 
 		if self.symbol_inspection_lock.locked()==False:
 
-			self.pipe_ppro_out.send([CANCELALL])
+			if self.total_difference !=0:
+				self.pipe_ppro_out.send([CANCELALL])
 
-			log_print("Manager: performing symbols inspection")
+			self.total_difference = 0
+			
+			# residue.
+			# if residue is 0. no more cancel. 
 			with self.symbol_inspection_lock:
 				symbols = list(self.symbol_data.values())
 
@@ -199,9 +205,11 @@ class Manager:
 
 					try:
 						val.symbol_inspection()
-
+						self.total_difference+=abs(val.get_difference())
 					except Exception as e:
 						PrintException(e,"inspection error")
+
+			log_print("Manager: performing symbols inspection compelte, total difference:",self.total_difference)
 		else:
 			log_print("Manager: previous symbols inspection not finished. skip.")
 
