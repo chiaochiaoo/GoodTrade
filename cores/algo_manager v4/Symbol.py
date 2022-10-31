@@ -318,7 +318,7 @@ class Symbol:
 
 		for tp in tps:
 			if self.tradingplans[tp].having_request(self.symbol_name) and self.tradingplans[tp].get_holdings(self.symbol_name)==0:
-		 		self.tradingplans[tp].rejection_handling(self.ticker)
+		 		self.tradingplans[tp].rejection_handling(self.symbol_name)
 
 	def holdings_update(self,price,share):
 
