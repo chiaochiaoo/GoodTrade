@@ -48,7 +48,7 @@ def find_between(data, first, last):
 
 class Custom_Algo():
 
-	def __init__(self,root,TNV_scanner,http_out):
+	def __init__(self,root,TNV_scanner,http_out,Pipe=None):
 
 		self.root = root 
 
@@ -74,6 +74,31 @@ class Custom_Algo():
 		self.create_each_algos()
 
 		self.load_all()
+
+		if Pipe!=None:
+			self.pipe = Pipe 
+			db = threading.Thread(target=self.receive_request,args=(),daemon=True)
+			db.start()
+
+	def receive_request(self):
+
+		#self.util_request.send("HELLO!")
+		while True:
+			d = self.pipe.recv()
+			try:
+				if len(d)>0:
+
+					if d[0]=="http":
+						try:
+							self.http_order(d[1])
+						except Exception as e:
+							print("Error updating HTTP:",e)
+					else:
+						print("unkown server package:",d)
+
+			except Exception as e:
+				print("Util receive unkown:",e,d)
+
 	def load_algo_tabs(self):
 
 		# load each algo, create tab for them
@@ -114,6 +139,7 @@ class Custom_Algo():
 			row = 1
 			col = 0
 			for algo,item in self.algos[i].items():
+
 				ttk.Label(self.frames[i], text=algo).grid(sticky="w",column=col,row=row)
 				ttk.Checkbutton(self.frames[i], variable=item[ACTIVE]).grid(sticky="w",column=col+1,row=row)
 
@@ -134,43 +160,6 @@ class Custom_Algo():
 			t = i 
 			ttk.Button(self.frames[i], text="Save Config",command= lambda: self.save_setting()).grid(sticky="w",column=col,row=row)
 			ttk.Button(self.frames[i], text="Load Config",command= lambda: self.load_setting()).grid(sticky="w",column=col+2,row=row)
-
-	def market_timing_algos_pannel(self):
-
-		row = 0
-		col = 0
-
-		self.market_timing_per_risk = tk.IntVar(value=1)
-		self.market_timing_total_risk =tk.IntVar(value=1)
-
-		ttk.Label(self.market_timing_algos, text="Risk Per Trade:").grid(sticky="w",column=col+0,row=row)
-		ttk.Entry(self.market_timing_algos, textvariable=self.market_timing_per_risk).grid(sticky="w",column=col+1,row=row)
-
-		row +=1
-
-		ttk.Label(self.market_timing_algos, text="Stategy Total Risk:").grid(sticky="w",column=col+0,row=row)
-		ttk.Entry(self.market_timing_algos, textvariable=self.market_timing_total_risk).grid(sticky="w",column=col+1,row=row)
-
-		col +=2
-		row = 0
-		ttk.Label(self.market_timing_algos, text="Market Long Timing:").grid(sticky="w",column=col,row=row)
-		ttk.Checkbutton(self.market_timing_algos, variable=self.market_long).grid(sticky="w",column=col+1,row=row)
-
-		col +=2
-
-		ttk.Label(self.market_timing_algos, text="Market Short Timing:").grid(sticky="w",column=col,row=row)
-		ttk.Checkbutton(self.market_timing_algos, variable=self.market_short).grid(sticky="w",column=col+1,row=row)
-
-		row+=1
-		col -=2
-
-		ttk.Label(self.market_timing_algos, text="TICK Long:").grid(sticky="w",column=col,row=row)
-		ttk.Checkbutton(self.market_timing_algos, variable=self.tick_intraday_v1).grid(sticky="w",column=col+1,row=row)
-
-		col +=2
-
-		ttk.Label(self.market_timing_algos, text="TICK Short:").grid(sticky="w",column=col,row=row)
-		ttk.Checkbutton(self.market_timing_algos, variable=self.tick_intraday_v2).grid(sticky="w",column=col+1,row=row)
 
 	def save_setting(self):
 		d = {}
@@ -309,8 +298,20 @@ class Custom_Algo():
 if __name__ == '__main__':
 
 	from http_out import *
-	
+	from TNV_http import *
+
+	ACTIVE = 0
+	RISK = 1
+	MULTIPLIER = 2
+	PASSIVE = 3
+
 	http_in, http_out = multiprocessing.Pipe()
+	util_request, util_response = multiprocessing.Pipe()
+
+
+
+	http = threading.Thread(target=httpserver,args=(util_response,),daemon=True)
+	http.start()
 
 	http2 = threading.Thread(target=http_driver,args=(http_out,),daemon=True)
 	http2.start()
@@ -323,7 +324,7 @@ if __name__ == '__main__':
 	# print(ratio_compute(0.8))
 	# print(ratio_compute(1.2))
 
-	Custom_Algo(root,fake_NT(),http_in)
+	Custom_Algo(root,fake_NT(),http_in,util_request)
 
 	root.mainloop()
 
