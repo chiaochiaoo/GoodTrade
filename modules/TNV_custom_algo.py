@@ -1,11 +1,13 @@
 import tkinter as tk                     
 from tkinter import ttk 
 import threading
+import multiprocessing
 import pandas as pd
 import time
 from datetime import datetime
 
 import requests
+from http_out import *
 #from pannel import *
 #from modules.pannel import *
 
@@ -305,15 +307,20 @@ class Custom_Algo():
 
 if __name__ == '__main__':
 
+	http_in, http_out = multiprocessing.Pipe()
+
+	http2 = threading.Thread(target=http_driver,args=(http_out,),daemon=True)
+	http2.start()
+
 
 	root = tk.Tk() 
-	root.title("GoodTrade v489") 
+	root.title("GoodTrade Lite") 
 	root.geometry("640x840")
 
 	# print(ratio_compute(0.8))
 	# print(ratio_compute(1.2))
 
-	Custom_Algo(root,fake_NT())
+	Custom_Algo(root,fake_NT(),http_in)
 
 	root.mainloop()
 
