@@ -80,33 +80,37 @@ class S(BaseHTTPRequestHandler):
 
 	def do_GET(self):
 
-		self._set_response()
-		#self.wfile.write("received".encode('utf-8'))
+		try:
+			self._set_response()
+			#self.wfile.write("received".encode('utf-8'))
 
-		stream_data = self.path[1:]
+			stream_data = self.path[1:]
 
-		#self.send_message(stream_data)
+			#self.send_message(stream_data)
 
-		if "%20" in stream_data:
-			stream_data = stream_data.replace("%20"," ")
+			if "%20" in stream_data:
+				stream_data = stream_data.replace("%20"," ")
 
-		self.send_pkg(stream_data)
-
+			self.send_pkg(stream_data)
+		except Exception as e:
+			print(e)
 
 	def do_POST(self):
 
+		try:
+			self._set_response()
+			#self.wfile.write("received".encode('utf-8'))
 
-		self._set_response()
-		#self.wfile.write("received".encode('utf-8'))
+			stream_data = self.path[1:]
 
-		stream_data = self.path[1:]
+			#self.send_message(stream_data)
 
-		#self.send_message(stream_data)
+			if "%20" in stream_data:
+				stream_data = stream_data.replace("%20"," ")
 
-		if "%20" in stream_data:
-			stream_data = stream_data.replace("%20"," ")
-
-		self.send_pkg(stream_data)
+			self.send_pkg(stream_data)
+		except Exception as e:
+			print(e)
 
 	def send_pkg(self,msg):
 
@@ -154,8 +158,14 @@ def httpserver(pipex):
 	logging.info('Starting httpd...\n')
 	try:
 		httpd.serve_forever()
-	except KeyboardInterrupt:
-		pass
+	except Exception as e:
+		print(e)
+		force_close_port(4440)
+		logging.basicConfig(level=logging.INFO)
+		server_address = ('', port)
+		httpd = server_class(server_address, handler_class)
+		logging.info('Starting httpd...\n')
+		httpd.serve_forever()
 	httpd.server_close()
 	logging.info('Stopping httpd...\n')
 
