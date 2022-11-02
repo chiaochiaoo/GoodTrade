@@ -135,10 +135,9 @@ class Symbol:
 		self.difference = self.expected - self.current_shares
 
 		if self.difference!=0:
-
 			log_print(self.symbol_name," inspection complete,self.expected",self.expected," have",self.current_shares," deploying:",self.difference)
-		else:
-			log_print(self.symbol_name," inspection complete,self.expected",self.expected," have",self.current_shares)
+		# else:
+		# 	log_print(self.symbol_name," inspection complete,self.expected",self.expected," have",self.current_shares)
 
 
 
