@@ -369,8 +369,8 @@ def algo_manager_voxcom3(pipe):
 					s.setblocking(1)
 				except Exception as e:
 					pipe.send(["msg","Disconnected"])
-					log_print("Cannot connected. Try again in 2 seconds.",e)
-					time.sleep(2)
+					#log_print("Cannot connected. Try again in 2 seconds.",e)
+					time.sleep(120)
 
 			connection = True
 			pipe.send(["msg","Connected"])

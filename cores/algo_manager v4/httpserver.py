@@ -79,17 +79,19 @@ class S(BaseHTTPRequestHandler):
 	def do_GET(self):
 
 		self._set_response()
-		#self.wfile.write("received".encode('utf-8'))
+			#self.wfile.write("received".encode('utf-8'))
 
-		stream_data = self.path[1:]
+		try:
+			stream_data = self.path[1:]
 
-		#self.send_message(stream_data)
+			#self.send_message(stream_data)
 
-		if "%20" in stream_data:
-			stream_data = stream_data.replace("%20"," ")
+			if "%20" in stream_data:
+				stream_data = stream_data.replace("%20"," ")
 
-		self.process_msg(stream_data)
-
+			self.process_msg(stream_data)
+		except Exception as e:
+			print("HTTP SERVER processing message failure",e)
 
 	def do_POST(self):
 
@@ -97,14 +99,17 @@ class S(BaseHTTPRequestHandler):
 		self._set_response()
 		#self.wfile.write("received".encode('utf-8'))
 
-		stream_data = self.path[1:]
+		try:
+			stream_data = self.path[1:]
 
-		#self.send_message(stream_data)
+			#self.send_message(stream_data)
 
-		if "%20" in stream_data:
-			stream_data = stream_data.replace("%20"," ")
+			if "%20" in stream_data:
+				stream_data = stream_data.replace("%20"," ")
 
-		self.process_msg(stream_data)
+			self.process_msg(stream_data)
+		except Exception as e:
+			print("HTTP SERVER processing message failure",e)
 
 
 	def process_msg(self,stream_data):
@@ -346,3 +351,21 @@ def httpserver(pipex):
 # infos = find_between(stream_data,"Order={","}")
 # risk = find_between(stream_data,"Risk=",",")
 # print(basket,infos,risk)
+
+
+
+# stream_data = "Basket=MRQQQ,Risk=200,Order=*PDD.NQ:-3,ZM.NQ:-2,JD.NQ:-4,NTES.NQ:-3,CSCO.NQ:-8,ATVI.NQ:-8,AMD.NQ:-2,NVDA.NQ:-1,OKTA.NQ:-2,AMZN.NQ:-1,MCHP.NQ:-2,ADSK.NQ:-1,GOOGL.NQ:-2,EBAY.NQ:-6,PYPL.NQ:-2,INTC.NQ:-7,CRWD.NQ:-1,GOOG.NQ:-2,WDAY.NQ:-1,BIDU.NQ:-1,SIRI.NQ:-57,META.NQ:-1,DDOG.NQ:-1,EA.NQ:-2,CTSH.NQ:-4,ADI.NQ:-1,ABNB.NQ:-1,AZN.NQ:-6,CSX.NQ:-9,AAPL.NQ:-1,KHC.NQ:13,XEL.NQ:4,PCAR.NQ:3,AEP.NQ:2,CEG.NQ:2,EXC.NQ:6,SGEN.NQ:2,VRSK.NQ:1,PEP.NQ:1,DLTR.NQ:2,FAST.NQ:3,KDP.NQ:9,MDLZ.NQ:6,FISV.NQ:2,ADP.NQ:1,DXCM.NQ:1,NXPI.NQ:1,AMGN.NQ:1,VRSN.NQ:1,GILD.NQ:5,HON.NQ:1,ROST.NQ:2,SBUX.NQ:2,SWKS.NQ:1,CMCSA.NQ:7,MNST.NQ:2,PAYX.NQ:2,MTCH.NQ:3,CPRT.NQ:2,CDNS.NQ:1*Aggresive=0,"
+# basket = find_between(stream_data,"Basket=",",")
+
+# infos = find_between(stream_data,"Order=*","*")
+
+# risk = int(find_between(stream_data,"Risk=",","))
+
+# aggresive = int(find_between(stream_data,"Aggresive=",","))
+
+# print(stream_data)
+# d={}
+# for i in infos.split(","):
+
+# 	a,b = i.split(":")
+# 	d[a] = int(b)
