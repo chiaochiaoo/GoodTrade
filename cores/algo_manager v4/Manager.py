@@ -99,7 +99,7 @@ class Manager:
 		self.current_summary['timestamp'] = tk.StringVar()
 		self.current_summary['unrealized'] = tk.DoubleVar()	
 		self.current_summary['cur_exp'] = tk.DoubleVar()
-		self.current_summary['max_exp'] = tk.DoublarVar()
+		self.current_summary['max_exp'] = tk.DoubleVar()
 
 		self.user = tk.StringVar(value="User:")
 
