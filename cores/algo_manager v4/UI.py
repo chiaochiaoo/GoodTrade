@@ -177,8 +177,8 @@ class UI(pannel):
 		self.fees.set(d['fees'])
 		self.sizeTraded.set(d['sizeTraded'])
 
-		self.exposure.set(d['currentExposure'])
-		self.exposure_max.set(d['maxExposure'])
+		self.exposure.set(d['cur_exp'])
+		self.exposure_max.set(d['max_exp'])
 
 				# d['fees'] = fees
 				# d['trades'] = trades
