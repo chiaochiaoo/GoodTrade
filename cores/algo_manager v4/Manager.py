@@ -796,8 +796,8 @@ class Manager:
 				d.update_displays()
 				
 	def flatten_all(self):
-		for d in list(self.tradingplan.values()):
-			if d.in_use and d.data[STATUS]==RUNNING:
+		for d in list(self.baskets.values()):
+			if d.in_use:
 				d.flatten_cmd()
 
 	def init_record_writer(self):
