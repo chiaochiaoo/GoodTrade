@@ -623,7 +623,7 @@ class UI(pannel):
 		UNREAL_MIN: tradingplan.tkvars[UNREAL_MIN],\
 		UNREAL:tradingplan.tkvars[UNREAL], \
 		REALIZED:tradingplan.tkvars[REALIZED], \
-		TOTAL_REALIZED:tradingplan.tkvars[TOTAL_REALIZED], \
+		TOTAL_REALIZED:"", \
 		'flatten':""}
 
 		#link the global variable 
