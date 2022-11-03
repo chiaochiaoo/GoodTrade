@@ -276,4 +276,3 @@ DEEPGREEN = "#059a12"
 	# 			share = orders[key]
 	# 			self.ppro_out.send([action,self.symbol_name,price,share,"Exit price "])
 
-

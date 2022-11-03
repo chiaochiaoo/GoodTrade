@@ -329,8 +329,8 @@ def read_summary(pipe):
 										unrealizedPlusNet = float(find_between(i, "unrealizedPlusNet=", ","))
 										unrealized = unrealizedPlusNet	-net 
 
-										cur_exp  = int(find_between(i, "currentExposure=", ","))
-										max_exp = int(find_between(i, "maxExposure=", ","))
+										cur_exp  = round(float(find_between(i, "currentExposure=", ",")))
+										max_exp = round(float(find_between(i, "maxExposure=", ",")))
 										#print(time_,net,fees,trades,sizeTraded,unrealizedPlusNet)
 										# SymbolLayerDisplayData: 
 										d= {}

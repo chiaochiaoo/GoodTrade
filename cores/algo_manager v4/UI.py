@@ -493,8 +493,8 @@ class UI(pannel):
 		MIND: "",\
 
 		ESTRISK:"", \
-		"Max_U":"",\
-		"Min_U":"",\
+		UNREAL_MAX:"",\
+		UNREAL_MIN:"",\
 		UNREAL:"", \
 		REALIZED:"", \
 		TOTAL_REALIZED:"", \
