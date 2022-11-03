@@ -65,7 +65,7 @@ class TradingPlan_Basket:
 
 		self.last_ts = 0
 		
-		self.numeric_labels = [ESTRISK,UNREAL,REALIZED,TOTAL_REALIZED]
+		self.numeric_labels = [ESTRISK,UNREAL,REALIZED,TOTAL_REALIZED,UNREAL_MAX,UNREAL_MIN]
 
 		self.string_labels = [MIND,STATUS,POSITION,RISK_RATIO]
 
@@ -397,6 +397,14 @@ class TradingPlan_Basket:
 					#log_print(self.algo_name,symbol,"avg price",self.average_price[symbol],"cur price",cur_stock_price,"share",val,"result",(self.average_price[symbol] - cur_stock_price) * abs(self.current_shares[symbol]))
 		self.data[UNREAL] = round(total_unreal,2)
 		self.tkvars[UNREAL].set(self.data[UNREAL])
+
+		if self.data[UNREAL]<self.data[UNREAL_MIN]:
+			self.data[UNREAL_MIN] = self.data[UNREAL]
+			self.tkvars[UNREAL_MIN].set(self.data[UNREAL_MIN])
+
+		if self.data[UNREAL_MAX]<self.data[UNREAL]:
+			self.data[UNREAL_MAX] = self.data[UNREAL]
+			self.tkvars[UNREAL_MAX].set(self.data[UNREAL_MAX])
 
 		# log_print("Tradingplan: ",self.algo_name, " Unreal",total_unreal,"Avg",self.average_price,"Shares:",self.current_shares,"Stock prices",self.stock_price)
 
