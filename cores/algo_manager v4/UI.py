@@ -193,8 +193,8 @@ class UI(pannel):
 		self.net_max = tk.DoubleVar()
 		self.net_min = tk.DoubleVar()
 
-		self.exposure = tk.DoubleVar()
-		self.exposure_max = tk.DoubleVar()
+		self.exposure = tk.StringVar()
+		self.exposure_max = tk.StringVar()
 
 		self.total_u = tk.DoubleVar()
 		self.total_u_max = tk.DoubleVar()
