@@ -328,6 +328,9 @@ def read_summary(pipe):
 										sizeTraded = int(find_between(i, "sizeTraded=", ","))
 										unrealizedPlusNet = float(find_between(i, "unrealizedPlusNet=", ","))
 										unrealized = unrealizedPlusNet	-net 
+
+										cur_exp  = float(find_between(i, "currentExposure=", ","))
+										max_exp = float(find_between(i, "maxExposure=", ","))
 										#print(time_,net,fees,trades,sizeTraded,unrealizedPlusNet)
 										# SymbolLayerDisplayData: 
 										d= {}
@@ -338,7 +341,9 @@ def read_summary(pipe):
 										d['unrealizedPlusNet'] = unrealizedPlusNet
 										d['timestamp'] = ts
 										d['unrealized'] = round(unrealized,2)	
-
+										d["cur_exp"] = cur_exp
+										d["max_exp"] = max_exp
+										
 										pipe.send([SUMMARY_UPDATE,d])
 
 									elif l[1]=="SymbolLayerDisplayData:":

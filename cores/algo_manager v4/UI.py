@@ -156,7 +156,7 @@ class UI(pannel):
 
 	def update_performance(self,d):
 
-		self.net.set(d['net'])
+		self.net.set(d['unrealizedPlusNet'])
 
 		if d['net']>self.net_max.get():
 			self.net_max.set(d['net'])
@@ -177,7 +177,8 @@ class UI(pannel):
 		self.fees.set(d['fees'])
 		self.sizeTraded.set(d['sizeTraded'])
 
-
+		self.exposure.set(d['currentExposure'])
+		self.exposure_max.set(d['maxExposure'])
 
 				# d['fees'] = fees
 				# d['trades'] = trades
@@ -192,7 +193,8 @@ class UI(pannel):
 		self.net_max = tk.DoubleVar()
 		self.net_min = tk.DoubleVar()
 
-
+		self.exposure = tk.DoubleVar()
+		self.exposure_max = tk.DoubleVar()
 
 		self.total_u = tk.DoubleVar()
 		self.total_u_max = tk.DoubleVar()
@@ -274,8 +276,22 @@ class UI(pannel):
 		self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.position_count)
 		self.t2_.grid(sticky="w",column=col,row=2)
 
+
+
+
 		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
 		ttk.Button(self.performance_pannel, textvariable=self.position_count_max).grid(sticky="w",column=col,row=4)
+
+		col +=1 
+		self.t2 = ttk.Button(self.performance_pannel, text="Exposure:")
+		self.t2.grid(sticky="w",column=col,row=1)
+		self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.exposure)
+		self.t2_.grid(sticky="w",column=col,row=2)
+
+		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
+		ttk.Button(self.performance_pannel, textvariable=self.exposure_max).grid(sticky="w",column=col,row=4)
+
+
 
 		col +=1 
 		self.t2 = ttk.Button(self.performance_pannel, text="Trades:")
@@ -311,11 +327,12 @@ class UI(pannel):
 		self.labels = {"":4,\
 						"Strategy":8,\
 						"Status":10,\
-						"Updates":40,\
+						"Updates":26,\
 						"Est R":8,\
+						"MaxU":8,\
+						"MinU":8,\
 						"U":8,\
 						"R":8,\
-						"TR":8,\
 						"flatten":8,\
 						"log":8}
 		self.width = list(self.labels.values())
@@ -360,9 +377,12 @@ class UI(pannel):
 	def init_control_pannel(self):
 
 		col = 1
-		ttk.Button(self.control_pannel, text="Flatten All (P)").grid(sticky="w",column=col,row=1)
-		col +=1
-		ttk.Button(self.control_pannel, text="Flatten All (A)").grid(sticky="w",column=col,row=1)
+		try:
+			ttk.Button(self.control_pannel, text="Flatten All (P)",command=self.manager.flatten_all).grid(sticky="w",column=col,row=1)
+		except:
+			pass
+		# col +=1
+		# ttk.Button(self.control_pannel, text="Flatten All (A)",command=self.manager.flatten_all).grid(sticky="w",column=col,row=1)
 
 		col +=1
 		ttk.Button(self.control_pannel, text="Weekly Report").grid(sticky="w",column=col,row=1)
@@ -473,7 +493,8 @@ class UI(pannel):
 		MIND: "",\
 
 		ESTRISK:"", \
-
+		"Max_U":"",\
+		"Min_U":"",\
 		UNREAL:"", \
 		REALIZED:"", \
 		TOTAL_REALIZED:"", \
@@ -578,8 +599,10 @@ class UI(pannel):
 		self.labels = {"":4,\
 						"Strategy":8,\
 						"Status":10,\
-						"Updates":50,\
+						"Updates":26,\
 						"Est R":8,\
+						"Max_U":8,\
+						"Min_U":8,\
 						"U":8,\
 						"R":8,\
 						"TR":8,\
@@ -596,6 +619,8 @@ class UI(pannel):
 
 		ESTRISK:tradingplan.tkvars[ESTRISK], \
 
+		UNREAL_MAX: tradingplan.tkvars[UNREAL_MAX],\
+		UNREAL_MIN: tradingplan.tkvars[UNREAL_MIN],\
 		UNREAL:tradingplan.tkvars[UNREAL], \
 		REALIZED:tradingplan.tkvars[REALIZED], \
 		TOTAL_REALIZED:tradingplan.tkvars[TOTAL_REALIZED], \
