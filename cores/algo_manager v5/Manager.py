@@ -520,6 +520,17 @@ class Manager:
 
 					PrintException(e,"adding basket error")
 
+			elif d[0] =="flatten":
+
+				try:
+					if d[1] == "ALL":
+						self.flatten_all()
+					else:
+						l = len(d[1])
+						for d in list(self.baskets.keys()):
+							if d[1]==d[:l]:
+								self.baskets[d].flatten_cmd()
+
 			elif d[0] =="shutdown":
 				break
 
@@ -875,8 +886,8 @@ if __name__ == '__main__':
 
 
 
-	algo_voxcom2 = multiprocessing.Process(name="algo vox2",target=httpserver, args=(receive_pipe,),daemon=True)
-	algo_voxcom2.daemon=True
+	algo_voxcom = multiprocessing.Process(name="http server",target=httpserver, args=(receive_pipe,),daemon=True)
+	algo_voxcom.daemon=True
 
 
 
@@ -896,7 +907,7 @@ if __name__ == '__main__':
 	root.title("GoodTrade Algo Manager v5 b1 ")
 	root.geometry("1280x800")
 
-	processes = [algo_voxcom,algo_voxcom2,ppro_in_manager,ppro_out_manager]
+	processes = [algo_voxcom,ppro_in_manager,ppro_out_manager]
 	manager=Manager(root,goodtrade_pipe,ppro_out,ppro_in,TEST,processes)
 	#Tester(receive_pipe,ppro_pipe_end,ppro_pipe_end2)
 	# print(len(sys.argv))
@@ -907,7 +918,7 @@ if __name__ == '__main__':
 	# else:
 	a=1
 	algo_voxcom.start()
-	algo_voxcom2.start()
+
 	ppro_out_manager.start()
 	ppro_in_manager.start()		
 
