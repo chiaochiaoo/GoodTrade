@@ -1,6 +1,7 @@
 from pannel import *
 from constant import *
 from Util_functions import *
+from UI_custom_algo import * 
 
 class UI(pannel):
 	def __init__(self,root,manager=None,receiving_signals=None,cmd_text=None):
@@ -35,10 +36,13 @@ class UI(pannel):
 
 		self.risk_timer = tk.DoubleVar(value=300)
 
+		self.custom_algo = None 
+
 		self.init_pannel()
 
 		self.init_entry_pannel()
 
+		self.custom_algo_init()
 
 
 	def init_system_pannel(self):
@@ -81,14 +85,14 @@ class UI(pannel):
 
 		self.algo_count_string.set("Activated Algos:"+str(self.algo_count_number))
 
-		row = 1
-		self.main = ttk.Label(self.system_pannel, text="Main:")
-		self.main.grid(sticky="w",column=1,row=row,padx=10)
+		# row = 1
+		# self.main = ttk.Label(self.system_pannel, text="Main:")
+		# self.main.grid(sticky="w",column=1,row=row,padx=10)
 		
-		self.main_status = ttk.Label(self.system_pannel, textvariable=self.main_app_status)
-		self.main_status.grid(sticky="w",column=2,row=row)
+		# self.main_status = ttk.Label(self.system_pannel, textvariable=self.main_app_status)
+		# self.main_status.grid(sticky="w",column=2,row=row)
 
-		row += 1
+		row = 1
 		self.main = ttk.Label(self.system_pannel, text="Account ID:")
 		self.main.grid(sticky="w",column=1,row=row,padx=10)
 		
@@ -125,8 +129,6 @@ class UI(pannel):
 		self.al.grid(sticky="w",column=1,row=row,padx=10)
 		self.algo_count_ = ttk.Label(self.system_pannel,  textvariable=self.position_count)
 		self.algo_count_.grid(sticky="w",column=2,row=row,padx=10)
-
-
 
 
 		row +=1
@@ -357,17 +359,22 @@ class UI(pannel):
 
 	def init_pannel(self):
 
-		self.system_pannel = ttk.LabelFrame(self.root,text="System") 
-		self.system_pannel.place(x=10,y=10,height=260,width=210)
+		self.custom_algo_pannel = ttk.LabelFrame(self.root,text="Algo Authorization") 
+
+		self.custom_algo_pannel.place(x=10,y=220,height=650,width=350)
+
+
+		self.system_pannel = ttk.LabelFrame(self.root,text="System")
+		self.system_pannel.place(x=10,y=10,height=210,width=350)
 
 		self.control_pannel = ttk.LabelFrame(self.root,text="Control") 
-		self.control_pannel.place(x=230,y=10,height=50,width=700)
+		self.control_pannel.place(x=360,y=10,height=50,width=700)
 
 		self.performance_pannel = ttk.LabelFrame(self.root,text="Performance") 
-		self.performance_pannel.place(x=230,y=70,height=260,width=700)
+		self.performance_pannel.place(x=360,y=70,height=260,width=700)
 
 		self.deployment_panel = ttk.LabelFrame(self.root,text="Strategy Deployment") 
-		self.deployment_panel.place(x=10,y=260,height=500,width=920)
+		self.deployment_panel.place(x=360,y=260,height=500,width=920)
 
 		self.init_system_pannel()
 		self.init_performance_pannel()
@@ -389,10 +396,6 @@ class UI(pannel):
 
 		col +=1
 		ttk.Button(self.control_pannel, text="Monthly Report").grid(sticky="w",column=col,row=1)
-
-
-
-
 
 	def init_config_pannel(self):
 
@@ -455,8 +458,6 @@ class UI(pannel):
 		# self.algo_deploy = ttk.Button(self.config2, text="Apply All",command=self.manager.set_all_tp)#,command=self.deploy_all_stoporders)
 		# self.algo_deploy.grid(sticky="w",column=2,row=1,padx=10)
 		# #self.algo_deploy.place(x=5,y=25)
-
-
 
 	def init_entry_pannel(self):
 
@@ -590,7 +591,6 @@ class UI(pannel):
 			self.rebind(self.dev_canvas,self.deployment_frame)
 			tradingplan.update_displays()
 
-
 	def create_basket_entry(self,tradingplan,symbol):
 
 		self.algo_count_number.set(self.algo_count_number.get()+1)
@@ -683,8 +683,6 @@ class UI(pannel):
 		tradingplan.algo_ui_id = symbol
 
 
-
-
 	def recreate_labels(self):
 
 		l = list(self.labels.keys())
@@ -752,6 +750,192 @@ class UI(pannel):
 		self.rebind(self.dev_canvas,self.deployment_frame)
 	
 
+	def custom_algo_init(self):
+
+
+		self.TNV_TAB = ttk.Notebook(self.custom_algo_pannel)
+		self.TNV_TAB.place(x=0,rely=0.01,relheight=1,width=640)
+		self.frames = {}
+		self.algo_groups = []
+		self.algos ={}
+
+		self.load_algo_tabs()
+
+		self.create_algo_tabs()
+		self.create_each_algos()
+
+		self.load_all()
+
+	def load_algo_tabs(self):
+
+		# load each algo, create tab for them
+		# for each individual algo, create stuff
+
+		dir_name = "../../custom_algos"
+		directory = os.fsencode(dir_name)
+
+
+		count = 0
+		for file in os.listdir(directory):
+			filename = os.fsdecode(file)
+
+			strategy = filename[:-4]
+			self.algo_groups.append(strategy)
+			self.algos[strategy] = {}
+			if filename.endswith(".txt"): 
+				print(filename)
+				a_file = open(dir_name+"/"+filename)
+				lines = a_file.read().splitlines()
+				for i in lines:
+					self.algos[strategy][i] = [] 
+					self.algos[strategy][i].append(tk.BooleanVar(value=0))
+					self.algos[strategy][i].append(tk.IntVar(value=1))
+					self.algos[strategy][i].append(tk.IntVar(value=1))
+					self.algos[strategy][i].append(tk.BooleanVar(value=0))
+
+	def create_algo_tabs(self):
+
+		for i in self.algo_groups:
+			self.frames[i] = tk.Canvas(self.TNV_TAB)
+			self.TNV_TAB.add(self.frames[i], text =i)
+
+	def create_each_algos(self):
+
+		for i in self.algo_groups:
+			ttk.Label(self.frames[i], text="").grid(sticky="w",column=0,row=0)
+			row = 1
+			col = 0
+			for algo,item in self.algos[i].items():
+
+				ttk.Label(self.frames[i], text=algo).grid(sticky="w",column=col,row=row)
+				ttk.Checkbutton(self.frames[i], variable=item[ACTIVE]).grid(sticky="w",column=col+1,row=row)
+
+				ttk.Label(self.frames[i], text="Risk:").grid(sticky="w",column=col+4,row=row)
+				ttk.Entry(self.frames[i], textvariable=item[RISK],width=4).grid(sticky="w",column=col+5,row=row)
+
+				ttk.Label(self.frames[i], text="Multiplier:").grid(sticky="w",column=col+6,row=row)
+				ttk.Entry(self.frames[i], textvariable=item[MULTIPLIER],width=3).grid(sticky="w",column=col+7,row=row)
+
+
+				ttk.Label(self.frames[i], text="Aggresive:").grid(sticky="w",column=col+2,row=row)
+				ttk.Checkbutton(self.frames[i], variable=item[PASSIVE]).grid(sticky="w",column=col+3,row=row)
+
+
+				row+=1
+
+			#print("CUURR",i)
+			t = i 
+			ttk.Button(self.frames[i], text="Save Config",command= lambda: self.save_setting()).grid(sticky="w",column=col,row=row)
+			ttk.Button(self.frames[i], text="Load Config",command= lambda: self.load_setting()).grid(sticky="w",column=col+2,row=row)
+
+	def save_setting(self):
+		d = {}
+
+		tab =self.TNV_TAB.tab(self.TNV_TAB.select(),"text")
+		for algo,item in self.algos[tab].items():
+			d[algo]=[]
+			for i in item:
+				d[algo].append(i.get())
+		#print("saving",tab)
+		with open('../../custom_algos_config/'+tab+'_setting.json', 'w') as fp:
+			json.dump(d, fp)
+
+	def load_setting(self):
+		
+		tab =self.TNV_TAB.tab(self.TNV_TAB.select(),"text")
+		with open('../../custom_algos_config/'+tab+'_setting.json', 'r') as myfile:
+			data=myfile.read()
+
+		# parse file
+		d = json.loads(data)
+		#print("loading",tab)
+
+		for key,item in d.items():
+			#print(self.algos[tab][key])
+			try:
+				self.algos[tab][key][ACTIVE].set(item[ACTIVE])
+				self.algos[tab][key][PASSIVE].set(item[PASSIVE])
+				self.algos[tab][key][RISK].set(item[RISK])
+				self.algos[tab][key][MULTIPLIER].set(item[MULTIPLIER])
+			except:
+				pass
+
+	def load_all(self):
+
+		try:
+			for tab in self.algo_groups:
+				with open('custom_algos_config/'+tab+'_setting.json', 'r') as myfile:
+					data=myfile.read()
+
+				# parse file
+				d = json.loads(data)
+				#print("loading",tab)
+
+				for key,item in d.items():
+					#print(self.algos[tab][key])
+					try:
+						self.algos[tab][key][ACTIVE].set(item[ACTIVE])
+						self.algos[tab][key][PASSIVE].set(item[PASSIVE])
+						self.algos[tab][key][RISK].set(item[RISK])
+						self.algos[tab][key][MULTIPLIER].set(item[MULTIPLIER])
+					except:
+						pass
+		except:
+			pass
+
+	def order_complier(self,data,multiplier,risk,aggresive):
+
+
+		basket = find_between(data,"Basket=",",") 
+		symbol = find_between(data,"Order=*","*") 
+
+		new_order = "Order=*"
+
+		z = 0 
+		for i in symbol.split(","):
+			if z>=1:
+				new_order+=","
+			k = i.split(":")
+			new_order+= k[0]
+			new_order+= ":"+str(int(k[1])*multiplier)
+			z+=1
+
+		new_order+="*"
+
+		data = "Basket="+basket+","+new_order
+
+		risk__ = risk
+		data += ","+"Risk="+str(risk__)+","
+
+		if aggresive:
+			data += "Aggresive=1"+","
+		else:
+			data += "Aggresive=0"+","
+		return data
+
+	def order_confirmation(self,basket_name,orders):
+
+		print("RECEVING:",data)
+
+
+			## PARSE IT AND RE PARSE IT. ? ADD RISK TO IT. 
+
+		name = basket_name
+
+
+		for i in self.algo_groups:
+			for algo,item in self.algos[i].items():
+				print(algo,name,algo in name,item[ACTIVE].get())
+				if algo in name and item[ACTIVE].get()==True:
+
+					multiplier= item[MULTIPLIER].get()
+					for key in orders.keys():
+						orders[key] = orders[key]*multiplier
+					
+					return True,orders,item[RISK].get(),item[PASSIVE].get()
+					
+		return False,None,0,0
+
 class adjust_stop:
 	def __init__(self,tp):
 
@@ -807,8 +991,8 @@ class adjust_stop:
 if __name__ == '__main__':
 
 	root = tk.Tk() 
-	root.title("GoodTrade Algo Manager v4") 
-	root.geometry("950x780")
+	root.title("GoodTrade Algo Manager v5") 
+	root.geometry("1280x780")
 	UI(root)
 	# root.minsize(1600, 1000)
 	# root.maxsize(1800, 1200)

@@ -1,8 +1,10 @@
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import logging
-import Util_functions
+#import Util_functions
 
+from psutil import process_iter
+import psutil
 
 #message creation
 TRADETYPE = "Trade_type="
@@ -78,10 +80,10 @@ class S(BaseHTTPRequestHandler):
 
 	def do_GET(self):
 
-		self._set_response()
+		try:
+			self._set_response()
 			#self.wfile.write("received".encode('utf-8'))
 
-		try:
 			stream_data = self.path[1:]
 
 			#self.send_message(stream_data)
@@ -89,17 +91,16 @@ class S(BaseHTTPRequestHandler):
 			if "%20" in stream_data:
 				stream_data = stream_data.replace("%20"," ")
 
-			self.process_msg(stream_data)
+			self.send_pkg(stream_data)
 		except Exception as e:
-			print("HTTP SERVER processing message failure",e)
+			print(e)
 
 	def do_POST(self):
 
-
-		self._set_response()
-		#self.wfile.write("received".encode('utf-8'))
-
 		try:
+			self._set_response()
+			#self.wfile.write("received".encode('utf-8'))
+
 			stream_data = self.path[1:]
 
 			#self.send_message(stream_data)
@@ -107,71 +108,19 @@ class S(BaseHTTPRequestHandler):
 			if "%20" in stream_data:
 				stream_data = stream_data.replace("%20"," ")
 
-			self.process_msg(stream_data)
+			self.send_pkg(stream_data)
 		except Exception as e:
-			print("HTTP SERVER processing message failure",e)
-
-
-	def process_msg(self,stream_data):
-
-
-		# 3 TYPES OF Msg. 1. TV broadcast cmd. 2. trade placement. 3. TV trade placement. 
-
-
-			try:
-				if "Basket" in stream_data:
-
-					basket = find_between(stream_data,"Basket=",",")
-
-					infos = find_between(stream_data,"Order=*","*")
-
-					# risk = int(find_between(stream_data,"Risk=",","))
-
-					# aggresive = int(find_between(stream_data,"Aggresive=",","))
-
-					#print(stream_data)
-					d={}
-					for i in infos.split(","):
-
-						a,b = i.split(":")
-						d[a] = int(b)
-
-					self.send_basket(basket,d)
-
-			except Exception as e:
-				print("HTTP SERVER processing message failure",e)
-
-
-	def send_basket(self,basket_name,orders):
-		pipec.send(["basket",basket_name,orders])
-
-	# def send_basket(self,basket_name,orders,risk,aggresive):
-
-	# 	global pipec
-	# 	#print("sending",msg,pipec)
-
-	# 	print("HTTP sending:",basket_name,orders,risk,aggresive)
-
-	# 	pipec.send(["basket",basket_name,orders,risk,aggresive])
-
-	def send_cmd(self,msg):
-
-		global pipec
-		#print("sending",msg,pipec)
-
-		print("HTTP sending:",msg)
-
-		pipec.send(["cmd",msg])
+			print(e)
 
 	def send_pkg(self,msg):
 
 		global pipec
 		#print("sending",msg,pipec)
 
-		print("HTTP sending:",msg)
+		print("http receve:",msg)
 
-		pipec.send(["pkg",[msg]])
-		#pipe.send(msg)
+		pipec.send(["http",msg])
+
 
 		#msgid=xxx,Message=L1,MarketTime=14:24:38.206,Symbol=SNDL.NQ,BidPrice=0.828300,BidSize=13899,AskPrice=0.828400,AskSize=2364,Tick=?\n'
 
@@ -201,20 +150,47 @@ def httpserver(pipex):
 	pipec = pipex
 	server_class=HTTPServer
 	handler_class=S
-	port=4441
-
+	port=4440
+	force_close_port(4440)
 	logging.basicConfig(level=logging.INFO)
 	server_address = ('', port)
 	httpd = server_class(server_address, handler_class)
 	logging.info('Starting httpd...\n')
 	try:
 		httpd.serve_forever()
-	except KeyboardInterrupt:
-		pass
+	except Exception as e:
+		print(e)
+		force_close_port(4440)
+		logging.basicConfig(level=logging.INFO)
+		server_address = ('', port)
+		httpd = server_class(server_address, handler_class)
+		logging.info('Starting httpd...\n')
+		httpd.serve_forever()
 	httpd.server_close()
 	logging.info('Stopping httpd...\n')
 
-
+def force_close_port(port, process_name=None):
+    """Terminate a process that is bound to a port.
+    
+    The process name can be set (eg. python), which will
+    ignore any other process that doesn't start with it.
+    """
+    for proc in psutil.process_iter():
+        for conn in proc.connections():
+            if conn.laddr[1] == port:
+                #Don't close if it belongs to SYSTEM
+                #On windows using .username() results in AccessDenied
+                #TODO: Needs testing on other operating systems
+                try:
+                    proc.username()
+                except psutil.AccessDenied:
+                    pass
+                else:
+                    if process_name is None or proc.name().startswith(process_name):
+                        try:
+                            proc.kill()
+                        except (psutil.NoSuchProcess, psutil.AccessDenied):
+                            pass 
 
 # stream_data="Basket=koko,Order=AAPL.NQ:5,AMD.NQ*"
 # basket = find_between(stream_data,"Basket=",",")
@@ -282,21 +258,3 @@ def httpserver(pipex):
 # infos = find_between(stream_data,"Order={","}")
 # risk = find_between(stream_data,"Risk=",",")
 # print(basket,infos,risk)
-
-
-
-# stream_data = "Basket=MRQQQ,Risk=200,Order=*PDD.NQ:-3,ZM.NQ:-2,JD.NQ:-4,NTES.NQ:-3,CSCO.NQ:-8,ATVI.NQ:-8,AMD.NQ:-2,NVDA.NQ:-1,OKTA.NQ:-2,AMZN.NQ:-1,MCHP.NQ:-2,ADSK.NQ:-1,GOOGL.NQ:-2,EBAY.NQ:-6,PYPL.NQ:-2,INTC.NQ:-7,CRWD.NQ:-1,GOOG.NQ:-2,WDAY.NQ:-1,BIDU.NQ:-1,SIRI.NQ:-57,META.NQ:-1,DDOG.NQ:-1,EA.NQ:-2,CTSH.NQ:-4,ADI.NQ:-1,ABNB.NQ:-1,AZN.NQ:-6,CSX.NQ:-9,AAPL.NQ:-1,KHC.NQ:13,XEL.NQ:4,PCAR.NQ:3,AEP.NQ:2,CEG.NQ:2,EXC.NQ:6,SGEN.NQ:2,VRSK.NQ:1,PEP.NQ:1,DLTR.NQ:2,FAST.NQ:3,KDP.NQ:9,MDLZ.NQ:6,FISV.NQ:2,ADP.NQ:1,DXCM.NQ:1,NXPI.NQ:1,AMGN.NQ:1,VRSN.NQ:1,GILD.NQ:5,HON.NQ:1,ROST.NQ:2,SBUX.NQ:2,SWKS.NQ:1,CMCSA.NQ:7,MNST.NQ:2,PAYX.NQ:2,MTCH.NQ:3,CPRT.NQ:2,CDNS.NQ:1*Aggresive=0,"
-# basket = find_between(stream_data,"Basket=",",")
-
-# infos = find_between(stream_data,"Order=*","*")
-
-# risk = int(find_between(stream_data,"Risk=",","))
-
-# aggresive = int(find_between(stream_data,"Aggresive=",","))
-
-# print(stream_data)
-# d={}
-# for i in infos.split(","):
-
-# 	a,b = i.split(":")
-# 	d[a] = int(b)

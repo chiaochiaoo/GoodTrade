@@ -59,7 +59,7 @@ def http_driver(pipe): #a sperate process. GLOBALLY.
 				#log_print(sucess_str)
 				sucessful = True
 			except Exception as e:
-				print(e,failure_str," driver restart")
+				print(e," driver restart")
 				driver = init_driver()
 
 		except Exception as e:

@@ -10,6 +10,7 @@ from UI import *
 from Ppro_in import *
 from Ppro_out import *
 from constant import *
+#from TNV_http import *
 
 import os
 
@@ -216,8 +217,10 @@ class Manager:
 			log_print("Manager: previous symbols inspection not finished. skip.")
 
 
-	def apply_basket_cmd(self,basket_name,orders,risk,aggresive):
+	def apply_basket_cmd(self,basket_name,orders):
 
+
+		confirmation,orders,risk,aggresive = self.ui.order_confirmation(basket_name,orders)
 
 		if basket_name not in self.baskets:
 
@@ -510,8 +513,8 @@ class Manager:
 				try:
 					#d[1]   => basket name 
 					#d[2]   => share info. 
-					print(d[1],d[2],d[3],d[4])
-					self.apply_basket_cmd(d[1],d[2],d[3],d[4])
+					#print(d[1],d[2],d[3],d[4])
+					self.apply_basket_cmd(d[1],d[2])
 
 				except Exception as e:
 
@@ -866,8 +869,10 @@ if __name__ == '__main__':
 
 	goodtrade_pipe, receive_pipe = multiprocessing.Pipe()
 
-	algo_voxcom = multiprocessing.Process(name="algo vox1",target=algo_manager_voxcom3, args=(receive_pipe,),daemon=True)
-	algo_voxcom.daemon=True
+	# algo_voxcom = multiprocessing.Process(name="algo vox1",target=algo_manager_voxcom3, args=(receive_pipe,),daemon=True)
+	# algo_voxcom.daemon=True
+
+
 
 
 	algo_voxcom2 = multiprocessing.Process(name="algo vox2",target=httpserver, args=(receive_pipe,),daemon=True)
