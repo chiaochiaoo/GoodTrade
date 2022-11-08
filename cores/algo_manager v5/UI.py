@@ -326,15 +326,14 @@ class UI(pannel):
 		# row +=1 
 	def init_deployment_pannel(self):
 
-		self.labels = {"":4,\
-						"Strategy":8,\
+		self.labels = {"Strategy":8,\
 						"Status":10,\
-						"Updates":26,\
-						"Est R":8,\
-						"MaxU":8,\
-						"MinU":8,\
-						"U":8,\
-						"R":8,\
+						"Updates":15,\
+						"Est R":7,\
+						"MaxU":7,\
+						"MinU":7,\
+						"U":7,\
+						"R":7,\
 						"flatten":8,\
 						"log":8}
 		self.width = list(self.labels.values())
@@ -374,7 +373,7 @@ class UI(pannel):
 		self.performance_pannel.place(x=360,y=70,height=260,width=700)
 
 		self.deployment_panel = ttk.LabelFrame(self.root,text="Strategy Deployment") 
-		self.deployment_panel.place(x=360,y=260,height=500,width=920)
+		self.deployment_panel.place(x=360,y=260,height=500,width=720)
 
 		self.init_system_pannel()
 		self.init_performance_pannel()
@@ -488,7 +487,6 @@ class UI(pannel):
 
 
 		infos = {
-		SELECTED:"",\
 		'Symbol':"", \
 		STATUS:"",\
 		MIND: "",\
