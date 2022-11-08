@@ -766,6 +766,12 @@ class UI(pannel):
 
 		self.load_all()
 
+
+		try:
+			self.load_setting()
+		except:
+			pass
+
 	def load_algo_tabs(self):
 
 		# load each algo, create tab for them
@@ -936,57 +942,6 @@ class UI(pannel):
 					
 		return False,None,0,0
 
-class adjust_stop:
-	def __init__(self,tp):
-
-		
-		pos=tp.tkvars[POSITION]
-		if pos.get()!="":
-			self.symbol = tp.symbol_name
-			self.tp = tp
-			self.stopvalue = self.tp.data[STOP_LEVEL]
-			self.stopvaluetk = self.tp.tkvars[STOP_LEVEL]
-			self.root = tk.Toplevel(width=300,height=200)
-			self.root.title(self.symbol+" Stop Adjustment")
-			#self.label=ttk.LabelFrame(self.root).place(x=0,y=0,relheight=1,relwidth=1)
-			#		self.deployment_panel = ttk.LabelFrame(self.root,text="Algo deployment") 
-			ttk.Label(self.root, text="Current Stop: "+str(self.stopvalue),font=("Arial", 14)).place(x=40,y=15,height=35,width=200)#.grid(sticky="w",column=1,row=1,padx=10)
-			ttk.Label(self.root, text="New Stop:",font=("Arial", 14)).place(x=40,y=45,height=35,width=100)#.grid(sticky="w",column=1,row=2,padx=10)
-
-			self.new_stop = tk.DoubleVar(value=self.stopvalue)
-			self.input=tk.Entry(self.root,textvariable=self.new_stop,width=15,font=("Arial", 14))
-
-			self.input.place(x=150,y=45,height=35,width=80)
-			tk.Button(self.root ,text="Confirm",width=65,command=self.confirm,font=("Arial", 14)).place(x=40,y=120,height=35,width=100)
-			
-			tk.Button(self.root ,text="Cancel",width=65,command=self.cancel,font=("Arial", 14)).place(x=150,y=120,height=35,width=100)
-
-
-	def confirm(self):
-
-		try:
-			old = self.stopvalue
-			val = float(self.new_stop.get())
-
-
-			self.tp.data[STOP_LEVEL] = val
-			self.stopvaluetk.set(val) 
-			self.tp.adjusting_risk()
-			self.tp.update_displays()
-			log_print(self.symbol,"stop adjusted from",old,"to",val)
-			self.root.destroy()
-			# if abs(val-self.stopvalue)/val <0.02:
-
-			# else:
-			# 	self.input["background"] = "red"
-		except Exception as e:
-			print(e)
-			self.input["background"] = "red"
-			return False
-		
-
-	def cancel(self):
-		self.root.destroy()
 
 if __name__ == '__main__':
 
