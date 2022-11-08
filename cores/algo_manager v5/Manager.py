@@ -530,7 +530,8 @@ class Manager:
 						for d in list(self.baskets.keys()):
 							if d[1]==d[:l]:
 								self.baskets[d].flatten_cmd()
-
+				except Exception as e:
+					PrintException(e,"Flatten")
 			elif d[0] =="shutdown":
 				break
 
