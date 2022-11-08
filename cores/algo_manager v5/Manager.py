@@ -217,10 +217,10 @@ class Manager:
 			log_print("Manager: previous symbols inspection not finished. skip.")
 
 
-	def apply_basket_cmd(self,basket_name,orders):
+	def apply_basket_cmd(self,basket_name,orders,risk,aggresive):
 
 
-		confirmation,orders,risk,aggresive = self.ui.order_confirmation(basket_name,orders)
+		
 
 		if basket_name not in self.baskets:
 
@@ -514,7 +514,12 @@ class Manager:
 					#d[1]   => basket name 
 					#d[2]   => share info. 
 					#print(d[1],d[2],d[3],d[4])
-					self.apply_basket_cmd(d[1],d[2])
+
+					confirmation,orders,risk,aggresive = self.ui.order_confirmation(d[1],d[2])
+
+					log_print(d[1],confirmation,orders,risk,aggresive)
+					if confirmation:
+						self.apply_basket_cmd(d[1],orders,risk,aggresive)
 
 				except Exception as e:
 
@@ -874,7 +879,7 @@ def force_close_port(port, process_name=None):
 if __name__ == '__main__':
 
 
-	force_close_port(4441)
+	force_close_port(4440)
 	multiprocessing.freeze_support()
 
 	port =4609

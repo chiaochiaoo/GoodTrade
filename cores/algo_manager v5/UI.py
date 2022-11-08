@@ -921,7 +921,7 @@ class UI(pannel):
 
 	def order_confirmation(self,basket_name,orders):
 
-		print("RECEVING:",data)
+		print("RECEVING:",basket_name,orders)
 
 
 			## PARSE IT AND RE PARSE IT. ? ADD RISK TO IT. 

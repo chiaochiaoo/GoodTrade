@@ -119,6 +119,7 @@ class S(BaseHTTPRequestHandler):
 
 
 			try:
+				print("receive:",stream_data)
 				if "Basket" in stream_data:
 
 					basket = find_between(stream_data,"Basket=",",")
