@@ -120,7 +120,15 @@ class S(BaseHTTPRequestHandler):
 
 			try:
 				print("receive:",stream_data)
-				if "Basket" in stream_data:
+
+				if "Command" in stream_data:
+
+					cmd = find_between(stream_data,"Command=",",")
+					basket = find_between(stream_data,"Basket=",",")
+
+					if cmd == "FLATTEN":
+						self.flatten_basket(basket)
+				elif "Basket" in stream_data:
 
 					basket = find_between(stream_data,"Basket=",",")
 
@@ -139,13 +147,7 @@ class S(BaseHTTPRequestHandler):
 
 					self.send_basket(basket,d)
 
-				if "Command" in stream_data:
 
-					cmd = find_between(stream_data,"Command=",",")
-					basket = find_between(stream_data,"Basket=",",")
-
-					if cmd == "FLATTEN":
-						self.flatten_basket(basket)
 
 			except Exception as e:
 				print("HTTP SERVER processing message failure",e)
@@ -155,7 +157,7 @@ class S(BaseHTTPRequestHandler):
 		pipec.send(["basket",basket_name,orders])
 
 	def flatten_basket(self,basket_name):
-		pipe.csend(["flatten",basket_name])
+		pipec.csend(["flatten",basket_name])
 	# def send_basket(self,basket_name,orders,risk,aggresive):
 
 	# 	global pipec
