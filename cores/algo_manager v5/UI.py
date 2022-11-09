@@ -761,13 +761,13 @@ class UI(pannel):
 		self.create_algo_tabs()
 		self.create_each_algos()
 
-		self.load_all()
+		#self.load_all()
 
 
 		try:
-			self.load_setting()
-		except:
-			pass
+			self.load_all()
+		except Exception as e:
+			print("LOAD setting faliure",e)
 
 	def load_algo_tabs(self):
 
@@ -828,46 +828,64 @@ class UI(pannel):
 
 			#print("CUURR",i)
 			t = i 
-			ttk.Button(self.frames[i], text="Save Config",command= lambda: self.save_setting()).grid(sticky="w",column=col,row=row)
-			ttk.Button(self.frames[i], text="Load Config",command= lambda: self.load_setting()).grid(sticky="w",column=col+2,row=row)
+			ttk.Button(self.frames[i], text="Save Config",command= lambda: self.save_all()).grid(sticky="w",column=col,row=row)
+			ttk.Button(self.frames[i], text="Load Config",command= lambda: self.load_all()).grid(sticky="w",column=col+2,row=row)
 
-	def save_setting(self):
-		d = {}
+	# def save_setting(self):
+	# 	d = {}
 
-		tab =self.TNV_TAB.tab(self.TNV_TAB.select(),"text")
-		for algo,item in self.algos[tab].items():
-			d[algo]=[]
-			for i in item:
-				d[algo].append(i.get())
-		#print("saving",tab)
-		with open('../../custom_algos_config/'+tab+'_setting.json', 'w') as fp:
-			json.dump(d, fp)
+	# 	tab =self.TNV_TAB.tab(self.TNV_TAB.select(),"text")
+	# 	for algo,item in self.algos[tab].items():
+	# 		d[algo]=[]
+	# 		for i in item:
+	# 			d[algo].append(i.get())
+	# 	#print("saving",tab)
+	# 	with open('../../custom_algos_config/'+tab+'_setting.json', 'w') as fp:
+	# 		json.dump(d, fp)
 
-	def load_setting(self):
+	# def load_setting(self):
 		
-		tab =self.TNV_TAB.tab(self.TNV_TAB.select(),"text")
-		with open('../../custom_algos_config/'+tab+'_setting.json', 'r') as myfile:
-			data=myfile.read()
+	# 	tab =self.TNV_TAB.tab(self.TNV_TAB.select(),"text")
+	# 	with open('../../custom_algos_config/'+tab+'_setting.json', 'r') as myfile:
+	# 		data=myfile.read()
 
-		# parse file
-		d = json.loads(data)
-		#print("loading",tab)
+	# 	# parse file
+	# 	d = json.loads(data)
+	# 	#print("loading",tab)
 
-		for key,item in d.items():
-			#print(self.algos[tab][key])
+	# 	for key,item in d.items():
+	# 		#print(self.algos[tab][key])
+	# 		try:
+	# 			self.algos[tab][key][ACTIVE].set(item[ACTIVE])
+	# 			self.algos[tab][key][PASSIVE].set(item[PASSIVE])
+	# 			self.algos[tab][key][RISK].set(item[RISK])
+	# 			self.algos[tab][key][MULTIPLIER].set(item[MULTIPLIER])
+	# 		except:
+	# 			pass
+
+	def save_all(self):
+
+		for tab in self.algo_groups:
+
 			try:
-				self.algos[tab][key][ACTIVE].set(item[ACTIVE])
-				self.algos[tab][key][PASSIVE].set(item[PASSIVE])
-				self.algos[tab][key][RISK].set(item[RISK])
-				self.algos[tab][key][MULTIPLIER].set(item[MULTIPLIER])
-			except:
-				pass
+				d = {}
+
+				for algo,item in self.algos[tab].items():
+					d[algo]=[]
+					for i in item:
+						d[algo].append(i.get())
+				#print("saving",tab)
+				with open('../../custom_algos_config/'+tab+'_setting.json', 'w') as fp:
+					json.dump(d, fp)
+			except Exception as e:
+				print("saving error",e,tab)
 
 	def load_all(self):
 
-		try:
-			for tab in self.algo_groups:
-				with open('custom_algos_config/'+tab+'_setting.json', 'r') as myfile:
+		for tab in self.algo_groups:
+
+			try:
+				with open('../../custom_algos_config/'+tab+'_setting.json', 'r') as myfile:
 					data=myfile.read()
 
 				# parse file
@@ -881,10 +899,10 @@ class UI(pannel):
 						self.algos[tab][key][PASSIVE].set(item[PASSIVE])
 						self.algos[tab][key][RISK].set(item[RISK])
 						self.algos[tab][key][MULTIPLIER].set(item[MULTIPLIER])
-					except:
-						pass
-		except:
-			pass
+					except Exception	as e:
+						print(key,e)
+			except Exception	as e:
+				print("loading error ",tab,e)
 
 	def order_complier(self,data,multiplier,risk,aggresive):
 
