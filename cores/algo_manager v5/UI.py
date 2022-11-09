@@ -610,7 +610,6 @@ class UI(pannel):
 		self.algo_count_number.set(self.algo_count_number.get()+1)
 
 		infos = {
-		SELECTED:tradingplan.tkvars[SELECTED],\
 		'Symbol':tradingplan.algo_name, \
 		STATUS:tradingplan.tkvars[STATUS],\
 		MIND: tradingplan.tkvars[MIND],\
