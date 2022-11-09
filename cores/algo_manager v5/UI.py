@@ -607,7 +607,7 @@ class UI(pannel):
 						"flatten":8,
 						"log":4}
 
-		self.algo_count_number.set(self.algo_count_number.get()+1)
+		#self.algo_count_number.set(self.algo_count_number.get()+1)
 
 		infos = {
 		'Symbol':tradingplan.algo_name, \
