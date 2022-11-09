@@ -942,7 +942,6 @@ if __name__ == '__main__':
 
 	time.sleep(2)
 
-	algo_voxcom2.terminate()
 	algo_voxcom.terminate()
 	ppro_in_manager.terminate()
 	ppro_out_manager.terminate()

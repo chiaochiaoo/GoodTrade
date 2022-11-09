@@ -157,7 +157,7 @@ class S(BaseHTTPRequestHandler):
 		pipec.send(["basket",basket_name,orders])
 
 	def flatten_basket(self,basket_name):
-		pipec.csend(["flatten",basket_name])
+		pipec.send(["flatten",basket_name])
 	# def send_basket(self,basket_name,orders,risk,aggresive):
 
 	# 	global pipec
