@@ -533,6 +533,7 @@ class Manager:
 					else:
 						l = len(d[1])
 						for d in list(self.baskets.keys()):
+							print("trying to flat",d[1],"checking:",d[:l])
 							if d[1]==d[:l]:
 								self.baskets[d].flatten_cmd()
 				except Exception as e:
