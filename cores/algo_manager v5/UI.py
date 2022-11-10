@@ -64,7 +64,7 @@ class UI(pannel):
 		self.ppro_out_status = tk.StringVar()
 		self.ppro_out_status.set("")
 
-		self.algo_count_number = tk.DoubleVar(value=0)
+		self.algo_count_number = tk.IntVar(value=0)
 		self.algo_number = 0
 
 		self.position_count = tk.IntVar(value=0)
