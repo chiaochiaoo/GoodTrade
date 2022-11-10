@@ -531,11 +531,14 @@ class Manager:
 					if d[1] == "ALL":
 						self.flatten_all()
 					else:
-						l = len(d[1])
-						for d in list(self.baskets.keys()):
-							print("trying to flat",d[1],"checking:",d[:l])
-							if d[1]==d[:l]:
-								self.baskets[d].flatten_cmd()
+
+						if d[1] in list(self.baskets.keys()):
+							self.baskets[d].flatten_cmd()
+						# l = len(d[1])
+						# for d in list(self.baskets.keys()):
+						# 	print("trying to flat",d[1],"checking:",d[:l])
+						# 	if d[1]==d[:l]:
+						# 		self.baskets[d].flatten_cmd()
 				except Exception as e:
 					PrintException(e,"Flatten")
 			elif d[0] =="shutdown":
