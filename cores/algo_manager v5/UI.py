@@ -159,7 +159,8 @@ class UI(pannel):
 	def update_performance(self,d):
 
 		self.net.set(d['unrealizedPlusNet'])
-
+		d['net'] = d['unrealizedPlusNet']
+		
 		if d['net']>self.net_max.get():
 			self.net_max.set(d['net'])
 
