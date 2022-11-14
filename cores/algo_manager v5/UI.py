@@ -323,6 +323,25 @@ class UI(pannel):
 		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
 		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=4)
 
+		col +=1 
+		self.t2 = ttk.Button(self.performance_pannel, text="WeeklyTotal:")
+		self.t2.grid(sticky="w",column=col,row=1)
+		self.t2_ = ttk.Button(self.performance_pannel, text="0")
+		self.t2_.grid(sticky="w",column=col,row=2)
+
+		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
+		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=4)
+
+
+
+		col +=1 
+		self.t2 = ttk.Button(self.performance_pannel, text="MonthlyTotal:")
+		self.t2.grid(sticky="w",column=col,row=1)
+		self.t2_ = ttk.Button(self.performance_pannel,text="0")
+		self.t2_.grid(sticky="w",column=col,row=2)
+
+		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
+		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=4)
 
 		# row +=1 
 	def init_deployment_pannel(self):
@@ -368,13 +387,13 @@ class UI(pannel):
 		self.system_pannel.place(x=10,y=10,height=210,width=350)
 
 		self.control_pannel = ttk.LabelFrame(self.root,text="Control") 
-		self.control_pannel.place(x=360,y=10,height=50,width=700)
+		self.control_pannel.place(x=360,y=10,height=50,width=900)
 
 		self.performance_pannel = ttk.LabelFrame(self.root,text="Performance") 
-		self.performance_pannel.place(x=360,y=70,height=260,width=700)
+		self.performance_pannel.place(x=360,y=70,height=260,width=900)
 
 		self.deployment_panel = ttk.LabelFrame(self.root,text="Strategy Deployment") 
-		self.deployment_panel.place(x=360,y=260,height=500,width=720)
+		self.deployment_panel.place(x=360,y=260,height=500,width=900)
 
 		self.init_system_pannel()
 		self.init_performance_pannel()
