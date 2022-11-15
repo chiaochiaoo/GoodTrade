@@ -848,7 +848,8 @@ class Manager:
 			idx=389
 		try:
 
-			self.record['total'] = self.current_summary
+			for key,item in self.current_summary.items():
+				self.record['total'][key] = item.get()
 
 			for tradingplan in list(self.baskets.values()):
 
@@ -865,7 +866,7 @@ class Manager:
 
 			with open(self.file, 'w') as f:
 				json.dump(self.record, f)
-
+			print(self.record)
 		except Exception as e:
 			PrintException(e,"record error")
 		# 	now = datetime.now()
