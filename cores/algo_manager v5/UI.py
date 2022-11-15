@@ -349,11 +349,13 @@ class UI(pannel):
 		self.labels = {"Strategy":8,\
 						"Status":10,\
 						"Updates":15,\
-						"Est R":7,\
-						"MaxU":7,\
-						"MinU":7,\
-						"U":7,\
-						"R":7,\
+						"MaxU":8,\
+						"MinU":8,\
+						"U":8,\
+						"R":8,\
+						"WR":8,\
+						"MR":8,\
+						"TR":8,\
 						"flatten":8,\
 						"log":8}
 		self.width = list(self.labels.values())
@@ -481,44 +483,26 @@ class UI(pannel):
 	def init_entry_pannel(self):
 
 
-		"""
-				ENTRYPLAN:"", \
-		ENTYPE:"", \
-		TIMER:"", \
-		MANAGEMENTPLAN:"", \
-
-
-		"Reload":"", \
-		'AR':"", \
-		SUPPORT:"", \
-		RESISTENCE:"", \
-		"""
-
-		# self.labels = {"":4,\
-		# 		"Strategy":8,\
-		# 		"Status":10,\
-		# 		"INFO":20,\
-		# 		"Est R":8,\
-		# 		"U":8,\
-		# 		"R":8,\
-		# 		"TR":8,\
-		# 		"flatten":8,}
 
 
 
-		infos = {
-		'Symbol':"", \
-		STATUS:"",\
-		MIND: "",\
+		# infos = {
+		# 'Symbol':"", \
+		# STATUS:"",\
+		# MIND: "",\
 
-		ESTRISK:"", \
-		UNREAL_MAX:"",\
-		UNREAL_MIN:"",\
-		UNREAL:"", \
-		REALIZED:"", \
-		TOTAL_REALIZED:"", \
-		"flatten":"",\
-		"log":""}
+		# ESTRISK:"", \
+		# UNREAL_MAX:"",\
+		# UNREAL_MIN:"",\
+		# UNREAL:"", \
+		# REALIZED:"", \
+		# TOTAL_REALIZED:"", \
+		# "flatten":"",\
+		# "log":""}
+
+		infos = {}
+		for key in self.labels.keys():
+			infos[key] = ""
 
 		info = list(infos.values())
 		labels = list(infos.keys())
@@ -613,19 +597,18 @@ class UI(pannel):
 
 		self.algo_count_number.set(self.algo_count_number.get()+1)
 
-
-		self.labels = {"":4,\
-						"Strategy":8,\
-						"Status":10,\
-						"Updates":26,\
-						"Est R":8,\
-						"Max_U":8,\
-						"Min_U":8,\
-						"U":8,\
-						"R":8,\
-						"TR":8,\
-						"flatten":8,
-						"log":4}
+		# self.labels = {"Strategy":8,\
+		# 				"Status":10,\
+		# 				"Updates":15,\
+		# 				"MaxU":7,\
+		# 				"MinU":7,\
+		# 				"U":7,\
+		# 				"R":7,\
+		# 				"WR":7,\
+		# 				"MR":7,\
+		# 				"TR":7,\
+		# 				"flatten":8,\
+		# 				"log":8}
 
 		#self.algo_count_number.set(self.algo_count_number.get()+1)
 
@@ -640,8 +623,11 @@ class UI(pannel):
 		UNREAL_MIN: tradingplan.tkvars[UNREAL_MIN],\
 		UNREAL:tradingplan.tkvars[UNREAL], \
 		REALIZED:tradingplan.tkvars[REALIZED], \
-		TOTAL_REALIZED:"", \
-		'flatten':""}
+		WR:tradingplan.tkvars[WR], \
+		MR:tradingplan.tkvars[MR], \
+		TR:tradingplan.tkvars[TR], \
+		'flatten':"",\
+		'log':""}
 
 		#link the global variable 
 		tradingplan.tkvars[RISKTIMER] = self.risk_timer 

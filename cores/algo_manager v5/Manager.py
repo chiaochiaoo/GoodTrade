@@ -29,7 +29,11 @@ from datetime import datetime, timedelta
 import json
 import os,sys
 import csv
+import pandas as pd 
+import numpy as np
 
+import os 
+import json
 
 # from Tester import *
 from httpserver import *
@@ -163,7 +167,13 @@ class Manager:
 		self.record["detes"] = {}
 
 		#self.init_record_writer()
+		self.load_record()
+		
+		self.weekly_record = self.take_records(5)
+		self.monthly_record = self.take_records(20)
+		self.total_record = self.take_records(200)
 
+		print(self.total_record)
 		self.shutdown=False
 
 		self.symbol_inspection_lock = threading.Lock()
@@ -832,6 +842,59 @@ class Manager:
 		for d in list(self.baskets.values()):
 			if d.in_use:
 				d.flatten_cmd()
+
+	def get_record(self,algo_name):
+
+		w,m,r = 0,0,0
+
+		if algo_name in self.weekly_record['total']:
+			w = self.weekly_record['total'][algo_name]
+		if algo_name in self.monthly_record['total']:
+			m = self.weekly_record['total'][algo_name]
+		if algo_name in self.total_record['total']:
+			r = self.weekly_record['total'][algo_name]
+
+		return w,m,r
+
+	def load_record(self):
+
+		self.record_files = []
+		try:				
+			for file in os.listdir("../../algo_records/"):
+				if file[-4:]=='json':
+					print(file)
+					symbol = file[:-5]
+					self.record_files.append(symbol)
+
+		except	Exception	as e:
+			PrintException(e,"record loading error")
+
+	def take_records(self,x):
+		
+		t = {}
+		ind = {}
+		
+		try:
+			for i in self.record_files[-x:]:
+				with open("../../algo_records/"+i+'.json') as f:
+					data = json.load(f)
+				for key,items in data.items():
+					if key not in t:
+						t[key]=float(items)
+						ind[key]=[round(float(items),2)]
+					else:
+						t[key]+=float(items)
+						ind[key].append(round(float(items),2))
+						
+			for key in t.keys():
+				t[key] = round(t[key],2)
+
+		except	Exception	as e:
+			PrintException(e,"take_records error")   
+		d = {}
+		d['total'] = t
+		d['byday'] = ind
+		return d
 
 
 	def record_update(self):

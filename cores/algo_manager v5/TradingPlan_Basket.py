@@ -65,7 +65,7 @@ class TradingPlan_Basket:
 
 		self.last_ts = 0
 		
-		self.numeric_labels = [ESTRISK,UNREAL,REALIZED,TOTAL_REALIZED,UNREAL_MAX,UNREAL_MIN]
+		self.numeric_labels = [ESTRISK,UNREAL,REALIZED,TOTAL_REALIZED,UNREAL_MAX,UNREAL_MIN,WR,MR,TR]
 
 		self.string_labels = [MIND,STATUS,POSITION,RISK_RATIO]
 
@@ -88,6 +88,12 @@ class TradingPlan_Basket:
 
 		self.data[ESTRISK] = float(risk)
 		self.tkvars[ESTRISK].set(float(risk))
+
+		wr,mr,tr = self.manager.get_record(self.algo_name)
+
+		self.tkvars[WR].set(wr)
+		self.tkvars[MR].set(mr)
+		self.tkvars[TR].set(tr)
 		# for i in self.symbol.numeric_labels:
 		# 	self.tkvars[i] = tk.DoubleVar(value=self.symbol.data[i])
 

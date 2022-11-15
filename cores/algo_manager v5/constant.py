@@ -51,6 +51,9 @@ ESTRISK="estrisk"
 RISK_RATIO = "risk_ratio"
 SIZE_IN = "size_in"
 
+WR = "WR"
+MR = "MR"
+TR = "TR"
 
 SYMBOL1_SHARE = "Symbol1_share"
 SYMBOL2_SHARE = "Symbol2_share"
