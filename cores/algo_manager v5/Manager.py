@@ -854,7 +854,7 @@ class Manager:
 			for tradingplan in list(self.baskets.values()):
 
 				ALGO = tradingplan.algo_name
-				real = tradingplan.data[REALIZED]
+				real = tradingplan.data[REALIZED] + tradingplan.data[UNREAL]
 
 				self.record["algos"][ALGO] = real
 
