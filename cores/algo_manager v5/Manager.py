@@ -154,9 +154,15 @@ class Manager:
 		#############################
 
 		now = datetime.now()
-		self.file = "../../algo_records/"+now.strftime("%Y_%m")+".csv"
+		self.file = "../../algo_records/"+now.strftime("%Y-%m-%d")+".json"
 
-		self.init_record_writer()
+		# this is today's 
+		self.record = {}
+		self.record["total"] = {}
+		self.record["algos"] = {}
+		self.record["detes"] = {}
+
+		#self.init_record_writer()
 
 		self.shutdown=False
 
@@ -610,6 +616,9 @@ class Manager:
 					if count%3==0:
 						handl = threading.Thread(target=self.symbols_inspection,daemon=True)
 						handl.start()
+
+						rec = threading.Thread(target=self.record_update,daemon=True)
+						rec.start()
 				except Exception as e:
 					PrintException(e, " POSITION UPDATE ERROR")
 
@@ -824,61 +833,66 @@ class Manager:
 			if d.in_use:
 				d.flatten_cmd()
 
-	def init_record_writer(self):
 
+	def record_update(self):
+
+		# self.record["total"] = {}
+		# self.record["algos"] = {}
+		# self.record["detes"] = {}
+		now = datetime.now()
+		ts = now.hour*60 + now.minute
+		idx = ts-390
+		if idx<0:
+			idx=0
+		if idx>389:
+			idx=389
 		try:
-			self.f = open(self.file, "r")
-		except:
-			self.f = open(self.file, "w")
-			self.recordwriter = csv.writer(self.f,lineterminator = '\n')
-			self.recordwriter.writerow(['DATE', 'TIME','ALGO','REALIZED'])
 
-		self.f.close()
-		log_print(("record file start"))
+			self.record['total'] = self.current_summary
 
-	def new_record(self,tradingplan):
+			for tradingplan in list(self.baskets.values()):
 
-		try:
-			self.f = open(self.file, "a")
-			self.recordwriter = csv.writer(self.f,lineterminator = '\n')
+				ALGO = tradingplan.algo_name
+				real = tradingplan.data[REALIZED]
 
-			now = datetime.now()
-			DATE = now.strftime("%Y-%m-%d")
-			TIME = now.strftime("%H:%M:%S")
+				self.record["algos"][ALGO] = real
 
+				if ALGO not in self.record["detes"]:
+					self.record["detes"][ALGO] = [0 for i in range(390)]
+					self.record["detes"][ALGO][idx] =real
+				else:
+					self.record["detes"][ALGO][idx] =real
 
-			ALGO = tradingplan.algo_name
-			real = tradingplan.data[REALIZED]
+			with open(self.file, 'w') as f:
+				json.dump(self.record, f)
 
-			self.recordwriter.writerow([DATE, TIME,ALGO,real])
-			self.f.close()
-		except:
-
-			log_print("writing record failure for",tradingplan.symbol_name)
-		
+		except Exception as e:
+			PrintException(e,"record error")
+		# 	now = datetime.now()
+		# 	ts = now.hour*3600 + now.minute*60 + now.second
 
 def force_close_port(port, process_name=None):
-    """Terminate a process that is bound to a port.
-    
-    The process name can be set (eg. python), which will
-    ignore any other process that doesn't start with it.
-    """
-    for proc in psutil.process_iter():
-        for conn in proc.connections():
-            if conn.laddr[1] == port:
-                #Don't close if it belongs to SYSTEM
-                #On windows using .username() results in AccessDenied
-                #TODO: Needs testing on other operating systems
-                try:
-                    proc.username()
-                except psutil.AccessDenied:
-                    pass
-                else:
-                    if process_name is None or proc.name().startswith(process_name):
-                        try:
-                            proc.kill()
-                        except (psutil.NoSuchProcess, psutil.AccessDenied):
-                            pass 
+	"""Terminate a process that is bound to a port.
+	
+	The process name can be set (eg. python), which will
+	ignore any other process that doesn't start with it.
+	"""
+	for proc in psutil.process_iter():
+		for conn in proc.connections():
+			if conn.laddr[1] == port:
+				#Don't close if it belongs to SYSTEM
+				#On windows using .username() results in AccessDenied
+				#TODO: Needs testing on other operating systems
+				try:
+					proc.username()
+				except psutil.AccessDenied:
+					pass
+				else:
+					if process_name is None or proc.name().startswith(process_name):
+						try:
+							proc.kill()
+						except (psutil.NoSuchProcess, psutil.AccessDenied):
+							pass 
 
 if __name__ == '__main__':
 
@@ -950,7 +964,6 @@ if __name__ == '__main__':
 	ppro_in_manager.terminate()
 	ppro_out_manager.terminate()
 
-	algo_voxcom2.join()
 	algo_voxcom.join()
 	ppro_in_manager.join()
 	ppro_out_manager.join()
