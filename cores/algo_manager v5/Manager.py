@@ -871,7 +871,7 @@ class Manager:
 					self.record["detes"][ALGO][idx] =self.record['total']['net']
 			with open(self.file, 'w') as f:
 				json.dump(self.record, f)
-			print(self.record)
+			#print(self.record)
 		except Exception as e:
 			PrintException(e,"record error")
 		# 	now = datetime.now()
