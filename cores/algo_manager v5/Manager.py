@@ -841,7 +841,7 @@ class Manager:
 		# self.record["detes"] = {}
 		now = datetime.now()
 		ts = now.hour*60 + now.minute
-		idx = ts-390
+		idx = ts-570
 		if idx<0:
 			idx=0
 		if idx>389:
