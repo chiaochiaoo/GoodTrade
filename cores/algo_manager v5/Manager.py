@@ -864,6 +864,11 @@ class Manager:
 				else:
 					self.record["detes"][ALGO][idx] =real
 
+				if "TOTAL" not in self.record["detes"]:
+					self.record["detes"][ALGO] = [0 for i in range(390)]
+					self.record["detes"][ALGO][idx] =self.record['total']['net']
+				else:
+					self.record["detes"][ALGO][idx] =self.record['total']['net']
 			with open(self.file, 'w') as f:
 				json.dump(self.record, f)
 			print(self.record)
