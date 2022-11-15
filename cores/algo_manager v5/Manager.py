@@ -878,7 +878,7 @@ class Manager:
 			for i in self.record_files[-x:]:
 				with open("../../algo_records/"+i+'.json') as f:
 					data = json.load(f)
-				for key,items in data.items():
+				for key,items in data["algos"].items():
 					if key not in t:
 						t[key]=float(items)
 						ind[key]=[round(float(items),2)]
