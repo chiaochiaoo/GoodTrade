@@ -173,7 +173,7 @@ class Manager:
 		self.monthly_record = self.take_records(20)
 		self.total_record = self.take_records(200)
 
-		print(self.total_record)
+		#print(self.total_record)
 		self.shutdown=False
 
 		self.symbol_inspection_lock = threading.Lock()
@@ -193,6 +193,8 @@ class Manager:
 		self.pipe_ppro_out.send(["Register","QQQ.NQ"])
 		# self.pipe_ppro_out.send(["Register","SPY.AM"])
 		#self.pipe_ppro_out.send(["Register","SQQQ.NQ"])
+
+		#self.apply_basket_cmd("OB1",{"SPY":1,},1,1)
 #
 	#data part, UI part
 
@@ -234,9 +236,6 @@ class Manager:
 
 
 	def apply_basket_cmd(self,basket_name,orders,risk,aggresive):
-
-
-		
 
 		if basket_name not in self.baskets:
 
@@ -849,10 +848,11 @@ class Manager:
 
 		if algo_name in self.weekly_record['total']:
 			w = self.weekly_record['total'][algo_name]
+
 		if algo_name in self.monthly_record['total']:
-			m = self.weekly_record['total'][algo_name]
+			m = self.monthly_record['total'][algo_name]
 		if algo_name in self.total_record['total']:
-			r = self.weekly_record['total'][algo_name]
+			r = self.total_record['total'][algo_name]
 
 		return w,m,r
 

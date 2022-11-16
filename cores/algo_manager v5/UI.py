@@ -16,7 +16,26 @@ class UI(pannel):
 
 		self.tk_strings=["algo_status","realized","shares","unrealized","unrealized_pshr","average_price"]
 		
-		self.tk_labels=[SYMBOL,STATUS,MIND, 'EntryPlan', 'EntryType', 'ETmr', 'Management','Reload', 'AR', 'Sup', 'Res', 'Act/Est R', 'Position', 'AvgPx', 'SzIn', 'UPshr', 'U', 'R', 'TR', 'flatten', 'log']
+		self.tk_labels=['Strategy',"Status","Updates" , "MaxU", "MinU", "U", "R", "WR", "MR", "TR", 'flatten', 'log']
+
+
+		# infos = {
+		# 'Strategy':tradingplan.algo_name, \
+		# STATUS:tradingplan.tkvars[STATUS],\
+		# MIND: tradingplan.tkvars[MIND],\
+
+		# ESTRISK:tradingplan.tkvars[ESTRISK], \
+
+		# UNREAL_MAX: tradingplan.tkvars[UNREAL_MAX],\
+		# UNREAL_MIN: tradingplan.tkvars[UNREAL_MIN],\
+		# UNREAL:tradingplan.tkvars[UNREAL], \
+		# REALIZED:tradingplan.tkvars[REALIZED], \
+		# WR:tradingplan.tkvars[WR], \
+		# MR:tradingplan.tkvars[MR], \
+		# TR:tradingplan.tkvars[TR], \
+		# 'flatten':"",\
+		# 'log':""}
+
 
 		self.tk_labels_single = {}
 
@@ -351,8 +370,8 @@ class UI(pannel):
 						"Updates":15,\
 						"MaxU":8,\
 						"MinU":8,\
-						"U":8,\
-						"R":8,\
+						UNREAL:8,\
+						REALIZED:8,\
 						"WR":8,\
 						"MR":8,\
 						"TR":8,\
@@ -484,22 +503,6 @@ class UI(pannel):
 
 
 
-
-
-		# infos = {
-		# 'Symbol':"", \
-		# STATUS:"",\
-		# MIND: "",\
-
-		# ESTRISK:"", \
-		# UNREAL_MAX:"",\
-		# UNREAL_MIN:"",\
-		# UNREAL:"", \
-		# REALIZED:"", \
-		# TOTAL_REALIZED:"", \
-		# "flatten":"",\
-		# "log":""}
-
 		infos = {}
 		for key in self.labels.keys():
 			infos[key] = ""
@@ -613,19 +616,15 @@ class UI(pannel):
 		#self.algo_count_number.set(self.algo_count_number.get()+1)
 
 		infos = {
-		'Symbol':tradingplan.algo_name, \
-		STATUS:tradingplan.tkvars[STATUS],\
-		MIND: tradingplan.tkvars[MIND],\
-
-		ESTRISK:tradingplan.tkvars[ESTRISK], \
-
-		UNREAL_MAX: tradingplan.tkvars[UNREAL_MAX],\
-		UNREAL_MIN: tradingplan.tkvars[UNREAL_MIN],\
+		'Strategy':tradingplan.algo_name, \
+		"Status":tradingplan.tkvars[STATUS],\
+		"MaxU": tradingplan.tkvars[UNREAL_MAX],\
+		"MinU": tradingplan.tkvars[UNREAL_MIN],\
 		UNREAL:tradingplan.tkvars[UNREAL], \
 		REALIZED:tradingplan.tkvars[REALIZED], \
-		WR:tradingplan.tkvars[WR], \
-		MR:tradingplan.tkvars[MR], \
-		TR:tradingplan.tkvars[TR], \
+		"WR":tradingplan.tkvars[WR], \
+		"MR":tradingplan.tkvars[MR], \
+		"TR":tradingplan.tkvars[TR], \
 		'flatten':"",\
 		'log':""}
 
@@ -635,6 +634,7 @@ class UI(pannel):
 		info = list(infos.values())
 		labels = list(infos.keys())	
 
+		print(self.tk_labels_basket[symbol].keys())
 		for j in range(len(info)):
 			#"symbol","algo_status","description","break_at","position","act_r/est_r","stoplevel","average_price","shares","pxtgt1","pxtgt1","pxtgt1","unrealized_pshr","unrealized","realized"
 			

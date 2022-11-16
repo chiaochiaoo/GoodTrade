@@ -65,7 +65,7 @@ class TradingPlan_Basket:
 
 		self.last_ts = 0
 		
-		self.numeric_labels = [ESTRISK,UNREAL,REALIZED,TOTAL_REALIZED,UNREAL_MAX,UNREAL_MIN,WR,MR,TR]
+		self.numeric_labels = [ESTRISK,UNREAL,REALIZED,UNREAL_MAX,UNREAL_MIN,WR,MR,TR]
 
 		self.string_labels = [MIND,STATUS,POSITION,RISK_RATIO]
 
@@ -430,7 +430,7 @@ class TradingPlan_Basket:
 
 		#self.tkvars[SIZE_IN].set(str(self.data[CURRENT_SHARE])+"/"+str(self.data[TARGET_SHARE]))
 		self.tkvars[REALIZED].set(str(self.data[REALIZED]))
-		self.tkvars[TOTAL_REALIZED].set(str(self.data[TOTAL_REALIZED]))
+
 		self.tkvars[UNREAL].set(str(self.data[UNREAL]))
 		#self.tkvars[UNREAL_PSHR].set(str(self.data[UNREAL_PSHR]))
 		#self.tkvars[AVERAGE_PRICE].set(self.data[AVERAGE_PRICE])
@@ -453,14 +453,6 @@ class TradingPlan_Basket:
 			self.tklabels[REALIZED]["background"] = STRONGGREEN
 		elif self.data[REALIZED]<0:
 			self.tklabels[REALIZED]["background"] = STRONGRED
-
-		if self.data[TOTAL_REALIZED]==0:
-			self.tklabels[TOTAL_REALIZED]["background"] = DEFAULT
-		elif self.data[TOTAL_REALIZED]>0:
-			self.tklabels[TOTAL_REALIZED]["background"] = STRONGGREEN
-		elif self.data[TOTAL_REALIZED]<0:
-			self.tklabels[TOTAL_REALIZED]["background"] = STRONGRED
-
 
 	def mark_algo_status(self,status):
 
