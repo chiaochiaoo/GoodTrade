@@ -59,7 +59,12 @@ f.close()
 
 TEST = True
 
-
+def request(post):
+	#print("sending ",post)
+	try:
+		requests.post(post)
+	except:
+		print(symbol, "failed")
 
 class Manager:
 
@@ -233,6 +238,39 @@ class Manager:
 			log_print("Manager: performing symbols inspection compelte, total difference:",self.total_difference)
 		else:
 			log_print("Manager: previous symbols inspection not finished. skip.")
+
+
+	def moo_apply_basket_cmd(self,basket_name,orders,risk,aggresive):
+
+		if basket_name not in self.baskets:
+
+			if self.ui.basket_label_count<40:
+				self.baskets[basket_name] = TradingPlan_Basket(basket_name,risk,self)
+				self.ui.create_new_single_entry(self.baskets[basket_name],"Basket",None)
+
+				self.baskets[basket_name].deploy()
+		
+		for symbol,share in orders.items():
+			
+			share = int(share)
+			print(symbol,share)
+			if share<0:
+				reque = "http://localhost:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Sell->Short%20ARCX%20MOO%20OnOpen&shares="+str(abs(share))
+			else:
+				reque = "http://localhost:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Buy%20ARCX%20MOO%20OnOpen&shares="+str(share)
+			req = threading.Thread(target=request, args=(reque,),daemon=True)
+			req.start()
+		#moo orders here.
+		
+		while True:
+
+			now = datetime.now()
+			cur_ts = now.hour*60+now.minute 
+
+			if cur_ts >=571:
+				break 
+
+		self.apply_basket_cmd(basket_name,orders,risk,aggresive)
 
 
 	def apply_basket_cmd(self,basket_name,orders,risk,aggresive):
@@ -529,12 +567,20 @@ class Manager:
 					#d[1]   => basket name 
 					#d[2]   => share info. 
 					#print(d[1],d[2],d[3],d[4])
+					now = datetime.now()
+					cur_ts = now.hour*60+now.minute
 
 					confirmation,orders,risk,aggresive = self.ui.order_confirmation(d[1],d[2])
 
 					log_print(d[1],confirmation,orders,risk,aggresive)
 					if confirmation:
-						self.apply_basket_cmd(d[1],orders,risk,aggresive)
+
+						if "OB" in d[1] and cur_ts<570:
+							handl = threading.Thread(target=self.moo_apply_basket_cmd,args=(d[1],orders,risk,aggresive,),daemon=True)
+							handl.start()
+							#self.moo_apply_basket_cmd(d[1],orders,risk,aggresive)
+						else:
+							self.apply_basket_cmd(d[1],orders,risk,aggresive)
 
 				except Exception as e:
 
@@ -548,7 +594,7 @@ class Manager:
 					else:
 
 						if d[1] in list(self.baskets.keys()):
-							self.baskets[d].flatten_cmd()
+							self.baskets[d[1]].flatten_cmd()
 						# l = len(d[1])
 						# for d in list(self.baskets.keys()):
 						# 	print("trying to flat",d[1],"checking:",d[:l])
