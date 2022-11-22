@@ -592,7 +592,7 @@ class Manager:
 					if d[1] == "ALL":
 						self.flatten_all()
 					else:
-
+						log_print("flattening ",d[1],list(self.baskets.keys()))
 						if d[1] in list(self.baskets.keys()):
 							self.baskets[d[1]].flatten_cmd()
 						# l = len(d[1])
