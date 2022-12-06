@@ -952,7 +952,7 @@ class UI(pannel):
 
 		for i in self.algo_groups:
 			for algo,item in self.algos[i].items():
-				print(algo,name,algo in name,item[ACTIVE].get())
+				#print(algo,name,algo in name,item[ACTIVE].get())
 				if algo in name and item[ACTIVE].get()==True:
 
 					multiplier= item[MULTIPLIER].get()
