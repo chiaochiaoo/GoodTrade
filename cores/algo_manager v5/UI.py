@@ -510,7 +510,7 @@ class UI(pannel):
 		info = list(infos.values())
 		labels = list(infos.keys())
 
-		for l in range(30):
+		for l in range(45):
 			self.tk_labels_basket[l]={}
 			for j in range(len(self.labels)):
 				#"symbol","algo_status","description","break_at","position","act_r/est_r","stoplevel","average_price","shares","pxtgt1","pxtgt1","pxtgt1","unrealized_pshr","unrealized","realized"
