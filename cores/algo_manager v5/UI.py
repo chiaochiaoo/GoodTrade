@@ -414,7 +414,7 @@ class UI(pannel):
 		self.performance_pannel.place(x=360,y=70,height=260,width=900)
 
 		self.deployment_panel = ttk.LabelFrame(self.root,text="Strategy Deployment") 
-		self.deployment_panel.place(x=360,y=260,height=500,width=900)
+		self.deployment_panel.place(x=360,y=260,height=800,width=900)
 
 		self.init_system_pannel()
 		self.init_performance_pannel()
