@@ -401,7 +401,7 @@ class UI(pannel):
 
 		self.custom_algo_pannel = ttk.LabelFrame(self.root,text="Algo Authorization") 
 
-		self.custom_algo_pannel.place(x=10,y=220,height=650,width=350)
+		self.custom_algo_pannel.place(x=10,y=220,height=950,width=350)
 
 
 		self.system_pannel = ttk.LabelFrame(self.root,text="System")
