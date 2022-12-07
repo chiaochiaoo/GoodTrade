@@ -250,20 +250,23 @@ class Manager:
 
 				self.baskets[basket_name].deploy()
 		
+		c = 0 
 		for symbol,share in orders.items():
 			
 			share = int(share)
 			print(symbol,share)
 			if share<0:
-				reque = "http://localhost:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Sell->Short%20ARCX%20MOO%20OnOpen&shares="+str(abs(share))
-				reque = "http://localhost:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Sell->Short NSDQ MOO Regular OnOpen&shares="+str(abs(share))
+				if c%2==0:
+					reque = "http://localhost:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Sell->Short%20ARCX%20MOO%20OnOpen&shares="+str(abs(share))
+				else:
+					reque = "http://localhost:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Sell->Short NSDQ MOO Regular OnOpen&shares="+str(abs(share))
 			else:
-
-
-
-				reque = "http://localhost:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Buy%20ARCX%20MOO%20OnOpen&shares="+str(share)
-
-				reque = "http://localhost:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Buy NSDQ MOO Regular OnOpen&shares="+str(share)
+				if c%2==0:
+					reque = "http://localhost:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Buy%20ARCX%20MOO%20OnOpen&shares="+str(share)
+				else:
+					reque = "http://localhost:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Buy NSDQ MOO Regular OnOpen&shares="+str(share)
+			
+			c+=1 
 			req = threading.Thread(target=request, args=(reque,),daemon=True)
 			req.start()
 		#moo orders here.
