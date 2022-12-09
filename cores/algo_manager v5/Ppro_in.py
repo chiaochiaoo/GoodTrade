@@ -13,6 +13,8 @@ import multiprocessing
 from psutil import process_iter
 import psutil
 
+import json
+
 global user 
 user = ""
 
@@ -195,6 +197,29 @@ def Ppro_in_old(port,pipe):
 			PrintException(e,"PPRO IN error")
 	f.close()
 	
+def get_symbol_price(symbols,pipe,lock):
+
+	with lock:
+
+		if len(symbols)>0:
+			s = ''
+			for i in symbols:
+				s+=i+','
+			s=s[:-1]
+
+			b = "https://financialmodelingprep.com/api/v3/quote-short/"+s+"?apikey=a901e6d3dd9c97c657d40a2701374d2a"
+
+			res=requests.get(b)
+			d= json.loads(res.text)
+
+			x = {}
+			for i in d:
+				x[i['symbol']] = i['price']
+
+			pipe.send([SYMBOL_UPDATE,x])
+			print("price update complete.. symbols:",len(symbols))
+	
+
 
 def periodical_check(pipe,port):
 
@@ -211,6 +236,7 @@ def periodical_check(pipe,port):
 	global file_location
 	global summary_being_read
 
+	lock = threading.Lock()
 
 	c = 0
 
@@ -231,8 +257,6 @@ def periodical_check(pipe,port):
 					log_print("PPro in : periodcal new loop",cur_ts)
 					threading_request("http://localhost:8080/SetOutput?region=1&feedtype=OSTAT&output="+ str(port)+"&status=on") ## ORDER STATS.
 
-
-
 				# ### 1. register OSTAT  
 				# if c%5==0:
 				# 	register_order_listener(port)
@@ -243,19 +267,26 @@ def periodical_check(pipe,port):
 				### 3. send request for summary PNL
 				threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity")
 
-				c+=1
+				symbols = list(positions.keys())
+				symbols = [i[:-3] for i in symbols]
+
+				if c%2==0:
+					req = threading.Thread(target=get_symbol_price,args=(symbols,pipe,lock,), daemon=True)
+					req.start()
+
 				### 4. send request for each individual symbol PNL
 
-				if c%7==0:
-					for symbol in positions.keys():
-						threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity"+"^"+user+"^"+symbol)
+				# if c%7==0:
+				# 	for symbol in positions.keys():
+				# 		threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity"+"^"+user+"^"+symbol)
 
-				if c%8==0:
-					for symbol in positions.keys():
-						threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity"+"^"+symbol)
+				# if c%8==0:
+				# 	for symbol in positions.keys():
+				# 		threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity"+"^"+symbol)
 
 
 				### RETURN BUS. 
+				c+=1
 				pipe.send([POSITION_UPDATE,positions,user])
 
 		except Exception as e:
@@ -355,25 +386,25 @@ def read_summary(pipe):
 										
 										pipe.send([SUMMARY_UPDATE,d])
 
-									elif l[1]=="SymbolLayerDisplayData:":
+									# elif l[1]=="SymbolLayerDisplayData:":
 
 
-										ms,ts,mili_ts = timestamp_mili_seconds(l[0])
-										symbol = find_between(i, "symbol=", ",")
-										lastPrice = float(find_between(i, "lastPrice=", ","))
-										l1AskPrice = float(find_between(i, "l1AskPrice=", ","))
-										l1BidPrice = float(find_between(i, "l1BidPrice=", ","))
+									# 	ms,ts,mili_ts = timestamp_mili_seconds(l[0])
+									# 	symbol = find_between(i, "symbol=", ",")
+									# 	lastPrice = float(find_between(i, "lastPrice=", ","))
+									# 	l1AskPrice = float(find_between(i, "l1AskPrice=", ","))
+									# 	l1BidPrice = float(find_between(i, "l1BidPrice=", ","))
 										
-										#log_print("Symbol received:",symbol,l1AskPrice)
+									# 	#log_print("Symbol received:",symbol,l1AskPrice)
 
-										d= {}
-										d['time'] = ts
-										d['symbol'] = symbol
-										d['lastPrice'] = lastPrice
-										d['l1AskPrice'] = l1AskPrice
-										d['l1BidPrice'] = l1BidPrice
-										d['timestamp'] = ts
-										pipe.send([SYMBOL_UPDATE,d])
+									# 	d= {}
+									# 	d['time'] = ts
+									# 	d['symbol'] = symbol
+									# 	d['lastPrice'] = lastPrice
+									# 	d['l1AskPrice'] = l1AskPrice
+									# 	d['l1BidPrice'] = l1BidPrice
+									# 	d['timestamp'] = ts
+									# 	pipe.send([SYMBOL_UPDATE,d])
 									# 4 net 
 									# 5 fees
 									# 6 trades
@@ -767,6 +798,10 @@ def force_close_port(port, process_name=None):
                             proc.kill()
                         except (psutil.NoSuchProcess, psutil.AccessDenied):
                             pass 
+
+
+#https://financialmodelingprep.com/api/v3/quote-short/AAPL,MSFT,AMZN,CSCO,INTC?apikey=a901e6d3dd9c97c657d40a2701374d2a
+
 
 
 # x= "LocalTime=15:56:54.742,Message=OrderStatus,MarketDateTime=20210504-15:56:55.000,Currency=1,Symbol=QQQ.NQ,Gateway=2030,Side=T,OrderNumber=QIAOSUN_02000326M1791F8100000,Price=329.540000,Shares=70,Position=4,OrderState=Filled,CurrencyChargeGway=1,ChargeGway=0.21000,CurrencyChargeAct=1,ChargeAct=0.0096600,CurrencyChargeSec=1,ChargeSec=0.47750,CurrencyChargeExec=0,ChargeExec=0,CurrencyChargeClr=1,ChargeClr=0.012950,OrderFlags=129,CurrencyCharge=1,Account=1TRUENV001TNVQIAOSUN_USD1,InfoCode=255,InfoText=LiqFlags:^Tag30:14^Tag31:329.5400000^Tag150:2^Tag9730:"

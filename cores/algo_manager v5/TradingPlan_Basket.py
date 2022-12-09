@@ -381,8 +381,6 @@ class TradingPlan_Basket:
 
 		#now = datetime.now()
 		#ts = now.hour*3600 + now.minute*60+ now.second
-		
-
 
 		total_unreal = 0
 

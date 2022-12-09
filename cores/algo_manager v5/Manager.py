@@ -83,6 +83,7 @@ class Manager:
 		self.test_mode = TEST_MODE
 
 		self.symbols = []
+		self.symbols_short = {}
 		self.symbol_data = {}
 
 		self.baskets = {}
@@ -302,6 +303,7 @@ class Manager:
 					if symbol not in self.symbol_data:
 						self.symbol_data[symbol] = Symbol(self,symbol,self.pipe_ppro_out)  #register in Symbol.
 						self.symbols.append(symbol)
+						self.symbols_short[symbol[:-3]] = symbol
 
 					self.baskets[basket_name].register_symbol(symbol,self.symbol_data[symbol])
 
@@ -714,14 +716,21 @@ class Manager:
 
 				try:
 
-					data = d[1]
-					symbol = data["symbol"]
-					bid = data["l1BidPrice"]
-					ask = data["l1AskPrice"]
-					ts = data["timestamp"]
+					#print(d[1])
+					for symbol,price in d[1].items():
 
-					if symbol in self.symbols:
-						self.symbol_data[symbol].update_price(bid,ask,ts)
+						if symbol in self.symbols_short:
+							self.symbol_data[self.symbols_short[symbol]].update_price(price,price,0)
+
+
+					# data = d[1]
+					# symbol = data["symbol"]
+					# bid = data["l1BidPrice"]
+					# ask = data["l1AskPrice"]
+					# ts = data["timestamp"]
+
+					# if symbol in self.symbols:
+					# 	self.symbol_data[symbol].update_price(bid,ask,ts)
 
 					#self.ui.ppro_last_update.set(ts)
 				except	Exception	as e:
