@@ -455,7 +455,8 @@ def get_current_positions():
 		d = {}
 		p="http://localhost:8080/GetOpenPositions?user="+user
 		r= requests.get(p)
-
+		symbol=""
+		share=""
 		for i in r.text.splitlines():
 			if "Position Symbol" in i:
 
@@ -466,7 +467,7 @@ def get_current_positions():
 
 				
 				d[symbol] = (price,share) 
-		
+		log_print("get positions:",symbol,share)
 		return d
 	except Exception as e:
 		PrintException(e)
