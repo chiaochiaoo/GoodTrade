@@ -59,6 +59,8 @@ f.close()
 
 TEST = True
 
+
+
 def request(post):
 	#print("sending ",post)
 	try:
@@ -179,9 +181,15 @@ class Manager:
 		self.monthly_record = self.take_records(20)
 		self.total_record = self.take_records(200)
 
+
+
+		######
+		self.moo_orders = {}
+		self.moo_algos = []
+		self.moo_lock = threading.Lock()
+
 		#print(self.total_record)
 		self.shutdown=False
-
 		self.symbol_inspection_lock = threading.Lock()
 
 		# handl = threading.Thread(target=self.symbols_inspection,daemon=True)
@@ -277,10 +285,35 @@ class Manager:
 			now = datetime.now()
 			cur_ts = now.hour*60+now.minute 
 
-			if cur_ts >=571:
+			if cur_ts >=572:
 				break 
 
 		self.apply_basket_cmd(basket_name,orders,risk,aggresive)
+
+
+	def moo_apply_basket_cmd2(self,basket_name,orders,risk,aggresive):
+
+		if basket_name not in self.baskets:
+
+			if self.ui.basket_label_count<40:
+				self.baskets[basket_name] = TradingPlan_Basket(basket_name,risk,self)
+				self.ui.create_new_single_entry(self.baskets[basket_name],"Basket",None)
+
+				self.baskets[basket_name].deploy()
+		
+		c = 0 
+
+		total_orders = {}
+
+		with self.moo_lock:
+			for symbol,share in orders.items():
+				
+				if symbol not in self.moo_orders:
+					self.moo_orders[symbol] = share 
+				else:
+					self.moo_orders[symbol] += share 
+
+			self.moo_algos.append([basket_name,orders,risk,aggresive])
 
 
 	def apply_basket_cmd(self,basket_name,orders,risk,aggresive):
@@ -319,6 +352,58 @@ class Manager:
 
 	def timer(self):
 
+		moo_release = False 
+		pair_release = False 
+
+		MOO_send_out_timer = 560
+		MOO_pairing_timer = 572
+
+		c = 0 
+		log_print("Timer: functional and counting")
+		while True:
+			now = datetime.now()
+			ts = now.hour*60 + now.minute
+
+
+			if ts>=MOO_send_out_timer and moo_release==False :
+				### TRIGGER. Realese the moo orders. 
+
+				log_print("Timer: timer triggered for MOO")
+				with self.moo_lock:
+					for symbol,share in self.moo_orders.items():
+						
+						share = int(share)
+						print("sending",symbol,share)
+						if share<0:
+							if c%2==0:
+								reque = "http://localhost:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Sell->Short%20ARCX%20MOO%20OnOpen&shares="+str(abs(share))
+							else:
+								reque = "http://localhost:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Sell->Short NSDQ MOO Regular OnOpen&shares="+str(abs(share))
+						else:
+							if c%2==0:
+								reque = "http://localhost:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Buy%20ARCX%20MOO%20OnOpen&shares="+str(share)
+							else:
+								reque = "http://localhost:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Buy NSDQ MOO Regular OnOpen&shares="+str(share)
+						c+=1 
+						req = threading.Thread(target=request, args=(reque,),daemon=True)
+						req.start()
+
+				moo_release = True
+
+			if ts>=MOO_pairing_timer and pair_release==False :
+
+				log_print("Timer: pair realease complelte")
+
+				pair_release=True 
+				break
+				### TRIGGER. PAIR UP the algos. 
+
+
+			time.sleep(20)
+
+
+
+		log_print("Timer: completed")
 		# #570  34200
 		# #960  57600 
 		# time.sleep(2)
