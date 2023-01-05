@@ -188,7 +188,7 @@ class processor:
 				row = str(data)
 
 
-				writer.writerow([row])
+				#writer.writerow([row])
 
 				self.process_data(row)
 
@@ -227,6 +227,11 @@ class ETF:
 		self.data["AucDiff"] = 0
 		self.data["ContPrice"] = 0
 
+		self.data["pre_55_buy"]= 0
+		self.data["pre_55_sell"]= 0
+
+		self.data["post_55_buy"]= 0
+		self.data["post_55_sell"]= 0
 		self.data["symbols"] = {}
 
 		self.time = ""
@@ -248,14 +253,25 @@ class ETF:
 	def new_imbalance(self,symbol,side,quantity,weight,time_,ts,price,auc_price,cont_price):
 
 		try:
+			#print(ts)
 			# self.data["Price"] = float(price)
 			# self.data["AucPrice"] = float(auc_price)
 			# self.data["ContPrice"] = float(cont_price)
 			# self.data["AucPrice-Price"] = self.data["AucPrice"]-self.data["Price"]
 			if side =="B":
 				self.data["buy"]+=quantity*weight
+
+				if ts<57300:
+					self.data["pre_55_buy"]+=quantity*weight
+				else:
+					self.data["post_55_buy"]+=quantity*weight
 			elif side =="S":
 				self.data["sell"]+=quantity*weight
+
+				if ts<57300:
+					self.data["pre_55_sell"]+=quantity*weight
+				else:
+					self.data["post_55_sell"]+=quantity*weight
 
 			self.data["total"] = self.data["buy"]+self.data["sell"]
 
@@ -364,6 +380,12 @@ class UI:
 						"Trend":11,\
 						# "B/S":11,\
 						# "ΔB/S":11,\
+						"Pre 55B":11,\
+						"Pre 55S":11,\
+						"Post 55B":11,\
+						"Post 55S":11,\
+
+
 						"Price":11,\
 						"AucPrice":11,\
 						"AucDiff":11,\
@@ -424,7 +446,17 @@ class UI:
 		data = self.etfs[etf]
 
 		#/"B/S","ΔB/S",
-		keys = ["name","total","buy","sell","Trend","Price","AucPrice","AucDiff","ContPrice"]
+						# 		"Pre 55B":11,\
+						# "Pre 55S":11,\
+						# "Post 55B":11,\
+						# "Post 55S":11,\
+
+		# self.data["pre_55_b"]= 0
+		# self.data["pre_55_s"]= 0
+
+		# self.data["post_55_b"]= 0
+		# self.data["post_55_s"]= 0
+		keys = ["name","total","buy","sell","Trend","pre_55_buy","pre_55_sell","post_55_buy","post_55_sell","Price","AucPrice","AucDiff","ContPrice"]
 
 		for i in keys:
 			data[i] = tk.StringVar()
@@ -453,12 +485,16 @@ class UI:
 		#data = self.etfs[etf]
 
 		self.time.set(time_)
+
+		ke = ["pre_55_sell","pre_55_buy","post_55_sell","post_55_buy"]
+
 		#print(self.etfs[etf])
 		for key,item in data.items():
 
 			if key in self.etfs[etf]:
-				if key== "buy" or key=="sell" or key=="total":
+				if key== "buy" or key=="sell" or key=="total" or key in ke:
 					self.etfs[etf][key].set(str(round(item/1000000000,2))+"m")
+
 				elif key== "Δbuy" or key== "Δsell":
 					if item >1:
 						self.etfs_labels[etf][key]["background"] = YELLOW
@@ -530,7 +566,7 @@ if __name__ == '__main__':
 
 	root = tk.Tk() 
 	root.title("Imbalance viewer") 
-	root.geometry("1100x900")
+	root.geometry("1300x900")
 
 	a= processor(send_pipe,TEST)
 	ui = UI(root,receive_pipe)
