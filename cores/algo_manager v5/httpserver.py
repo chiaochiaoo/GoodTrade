@@ -119,7 +119,7 @@ class S(BaseHTTPRequestHandler):
 
 
 			try:
-				print("receive:",stream_data)
+				#print("receive:",stream_data)
 
 				if "Command" in stream_data:
 
