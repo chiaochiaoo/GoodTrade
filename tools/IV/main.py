@@ -107,7 +107,7 @@ class processor:
 
 
 
-	def process_data(self,row):
+	def process_data(self,row,writer):
 
 					
 		Symbol = find_between(row, "Symbol=", ",")
@@ -147,6 +147,8 @@ class processor:
 				volume =  int(find_between(row, "Volume=", ","))
 
 				data = self.data[symbol]
+
+				writer.writerow([row])
 
 				for data in data["etf"]:
 					etf = data[0]
@@ -190,7 +192,7 @@ class processor:
 
 				#writer.writerow([row])
 
-				self.process_data(row)
+				self.process_data(row,writer)
 
 
 	def test_mode(self):
@@ -203,7 +205,7 @@ class processor:
 				writer = csv.writer(csvfile2)
 				for row in csv_reader:
 					row = row[0]
-					self.process_data(row)
+					self.process_data(row,writer)
 
 
 					#time.sleep(0.00001)
