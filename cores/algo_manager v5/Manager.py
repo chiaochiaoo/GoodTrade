@@ -249,7 +249,7 @@ class Manager:
 			log_print("Manager: previous symbols inspection not finished. skip.")
 
 
-	def moo_apply_basket_cmd(self,basket_name,orders,risk,aggresive):
+	def moo_apply_basket_cmd2(self,basket_name,orders,risk,aggresive):
 
 		if basket_name not in self.baskets:
 
@@ -291,7 +291,7 @@ class Manager:
 		self.apply_basket_cmd(basket_name,orders,risk,aggresive)
 
 
-	def moo_apply_basket_cmd2(self,basket_name,orders,risk,aggresive):
+	def moo_apply_basket_cmd(self,basket_name,orders,risk,aggresive):
 
 		if basket_name not in self.baskets:
 
@@ -395,7 +395,18 @@ class Manager:
 				log_print("Timer: pair realease complelte")
 
 				pair_release=True 
-				break
+
+
+				#self.apply_basket_cmd(basket_name,orders,risk,aggresive)
+
+				# here i kinda want a mechanism which blocks symbol from checking. 
+
+				with self.symbol_inspection_lock:
+					for i in self.moo_algos:
+						basket_name,orders,risk,aggresive = i[0],i[1],i[2],i[3]
+						self.apply_basket_cmd(basket_name,orders,risk,aggresive)
+
+				time.sleep(5)
 				### TRIGGER. PAIR UP the algos. 
 
 
