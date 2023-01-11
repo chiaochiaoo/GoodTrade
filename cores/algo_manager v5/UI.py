@@ -424,6 +424,15 @@ class UI(pannel):
 	def init_control_pannel(self):
 
 		col = 1
+
+		style = ttk.Style()
+		style.configure('K.TButton', background = 'red')
+
+		
+		ttk.Button(self.control_pannel,text="STOP ALL",style='K.TButton').grid(sticky="w",column=col,row=1)
+
+
+		col +=1
 		try:
 			ttk.Button(self.control_pannel, text="Flatten All (P)",command=self.manager.flatten_all).grid(sticky="w",column=col,row=1)
 		except:
