@@ -134,7 +134,7 @@ def sell_market_order(symbol,share):
 
 	return r,sucess,failure
 
-def buy_limit_order(symbol, price,share,gateway=0):
+def buy_limit_order(symbol, price,share,gateway=1):
 
 	price = round(float(price),2)
 
@@ -154,7 +154,7 @@ def buy_limit_order(symbol, price,share,gateway=0):
 
 	return r,sucess,failure
 
-def sell_limit_order(symbol, price,share,gateway=0):
+def sell_limit_order(symbol, price,share,gateway=1):
 	price = round(float(price),2)
 
 	if gateway ==0:
