@@ -668,7 +668,7 @@ class Manager:
 
 			elif d[0] =="basket":
 
-				log_print("basket update:",d)
+				
 
 				try:
 					#d[1]   => basket name 
@@ -679,9 +679,10 @@ class Manager:
 
 					confirmation,orders,risk,aggresive = self.ui.order_confirmation(d[1],d[2])
 
-					log_print(d[1],confirmation,orders,risk,aggresive)
+					
 					if confirmation:
-
+						log_print("basket update:",d)
+						log_print(d[1],confirmation,orders,risk,aggresive)
 						if "OB" in d[1] and cur_ts<570:
 							handl = threading.Thread(target=self.moo_apply_basket_cmd,args=(d[1],orders,risk,aggresive,),daemon=True)
 							handl.start()
