@@ -408,7 +408,13 @@ class UI(pannel):
 		self.system_pannel.place(x=10,y=10,height=210,width=350)
 
 		self.control_pannel = ttk.LabelFrame(self.root,text="Control") 
-		self.control_pannel.place(x=360,y=10,height=50,width=900)
+		self.control_pannel.place(x=360,y=10,height=50,width=300)
+
+		self.gateway_pannel = ttk.LabelFrame(self.root,text="Default Gateway") 
+		self.gateway_pannel.place(x=560,y=10,height=50,width=300)
+
+		self.bansymbol_pannel = ttk.LabelFrame(self.root,text="Ban Symbols") 
+		self.bansymbol_pannel.place(x=860,y=10,height=50,width=300)
 
 		self.performance_pannel = ttk.LabelFrame(self.root,text="Performance") 
 		self.performance_pannel.place(x=360,y=70,height=260,width=900)
@@ -421,6 +427,26 @@ class UI(pannel):
 		self.init_deployment_pannel()
 		self.init_control_pannel()
 
+		self.init_control_pannel()
+
+		self.init_gateway()
+
+	def init_gateway(self):
+
+		self.gateway = tk.StringVar()
+		self.gateway.set("MEMX")
+
+		options = [
+		    "MEMX",
+		    "ARCA",
+		]
+
+
+		drop = tk.OptionMenu(self.gateway_pannel , self.gateway , *options )
+		drop.grid(row=1, column=1)
+
+
+		ttk.Button(self.gateway_pannel, text="Set Change").grid(sticky="w",column=2,row=1)
 	def init_control_pannel(self):
 
 		col = 1
@@ -440,11 +466,11 @@ class UI(pannel):
 		# col +=1
 		# ttk.Button(self.control_pannel, text="Flatten All (A)",command=self.manager.flatten_all).grid(sticky="w",column=col,row=1)
 
-		col +=1
-		ttk.Button(self.control_pannel, text="Weekly Report").grid(sticky="w",column=col,row=1)
+		# col +=1
+		# ttk.Button(self.control_pannel, text="Weekly Report").grid(sticky="w",column=col,row=1)
 
-		col +=1
-		ttk.Button(self.control_pannel, text="Monthly Report").grid(sticky="w",column=col,row=1)
+		# col +=1
+		# ttk.Button(self.control_pannel, text="Monthly Report").grid(sticky="w",column=col,row=1)
 
 	def init_config_pannel(self):
 
