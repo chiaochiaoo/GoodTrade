@@ -227,12 +227,21 @@ class Manager:
 
 		if self.ui.gateway.get()=="MEMX":
 			self.gateway = 0
+			self.ui.set_gateway["text"] = "Set Change:MEMX"
+
 		elif  self.ui.gateway.get()=="ARCA":
+
 			self.gateway = 1
+			self.ui.set_gateway["text"] = "Set Change:ARCA"
+
 		elif  self.ui.gateway.get()=="BATS":
+
 			self.gateway = 2
+			self.ui.set_gateway["text"] = "Set Change:BATS"
 		elif  self.ui.gateway.get()=="EDGA":
+
 			self.gateway = 3
+			self.ui.set_gateway["text"] = "Set Change:EDGA"
 
 	def symbols_inspection(self):
 

@@ -448,7 +448,8 @@ class UI(pannel):
 		drop.grid(row=1, column=1)
 
 
-		ttk.Button(self.gateway_pannel, text="Set Change:MEMX",command=self.manager.set_gateway).grid(sticky="w",column=2,row=1)
+		self.set_gateway = ttk.Button(self.gateway_pannel, text="Set Change:MEMX",command=self.manager.set_gateway)
+		self.set_gateway.grid(sticky="w",column=2,row=1)
 
 
 
