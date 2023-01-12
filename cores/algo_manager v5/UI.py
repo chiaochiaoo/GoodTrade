@@ -413,7 +413,7 @@ class UI(pannel):
 		self.gateway_pannel = ttk.LabelFrame(self.root,text="Default Gateway") 
 		self.gateway_pannel.place(x=560,y=10,height=50,width=300)
 
-		self.bansymbol_pannel = ttk.LabelFrame(self.root,text="Ban Symbols") 
+		self.bansymbol_pannel = ttk.LabelFrame(self.root,text="Bad Symbols") 
 		self.bansymbol_pannel.place(x=860,y=10,height=50,width=300)
 
 		self.performance_pannel = ttk.LabelFrame(self.root,text="Performance") 
@@ -439,6 +439,8 @@ class UI(pannel):
 		options = [
 		    "MEMX",
 		    "ARCA",
+		    "BATS",
+		    "EDGA",
 		]
 
 
@@ -446,7 +448,10 @@ class UI(pannel):
 		drop.grid(row=1, column=1)
 
 
-		ttk.Button(self.gateway_pannel, text="Set Change").grid(sticky="w",column=2,row=1)
+		ttk.Button(self.gateway_pannel, text="Set Change:MEMX",command=self.manager.set_gateway).grid(sticky="w",column=2,row=1)
+
+
+
 	def init_control_pannel(self):
 
 		col = 1

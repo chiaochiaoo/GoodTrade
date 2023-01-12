@@ -283,7 +283,7 @@ class Symbol:
 		log_print("Symbol: ",self.symbol_name,self.action,self.difference)
 		# self.ppro_out.send([CANCEL,self.symbol_name])
 		# time.sleep(0.3)
-		self.ppro_out.send([self.action,self.symbol_name,abs(self.difference),0])
+		self.ppro_out.send([self.action,self.symbol_name,abs(self.difference),self.manager.gateway])
 
 		# handl = threading.Thread(target=self.threading_order,daemon=True)
 		# handl.start()

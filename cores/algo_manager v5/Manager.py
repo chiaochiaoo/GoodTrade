@@ -181,7 +181,7 @@ class Manager:
 		self.monthly_record = self.take_records(20)
 		self.total_record = self.take_records(200)
 
-
+		self.gateway = 0
 
 		######
 		self.moo_orders = {}
@@ -221,6 +221,18 @@ class Manager:
 		tps = list(self.baskets.keys())
 		for tp in tps:
 			self.baskets[tp].check_pnl()
+
+
+	def set_gateway(self):
+
+		if self.ui.gateway.get()=="MEMX":
+			self.gateway = 0
+		elif  self.ui.gateway.get()=="ARCA":
+			self.gateway = 1
+		elif  self.ui.gateway.get()=="BATS":
+			self.gateway = 2
+		elif  self.ui.gateway.get()=="EDGA":
+			self.gateway = 3
 
 	def symbols_inspection(self):
 
