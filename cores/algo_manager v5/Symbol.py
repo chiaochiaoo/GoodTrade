@@ -29,6 +29,9 @@ class Symbol:
 
 		self.ppro_out = pproout
 
+
+		self.banned = False 
+
 		self.numeric_labels = [TRADE_TIMESTAMP,TIMESTAMP,BID,ASK,RESISTENCE,SUPPORT,OPEN,HIGH,LOW,PREMARKETLOW,STOP,EXIT,ENTRY,CUSTOM]
 		self.tech_indicators = [EMACOUNT,EMA8H,EMA8L,EMA8C,EMA5H,EMA5L,EMA5C,EMA21H,EMA21L,EMA21C,CLOSE]
 
@@ -307,7 +310,7 @@ class Symbol:
 	def rejection_message(self,side):
 
 		## iterate through all the TPs request. check who is requesting. if it is not running withdraw and cancel it. 
-
+		
 		if side == "Long":
 			coefficient = 1
 		elif side =="Short":

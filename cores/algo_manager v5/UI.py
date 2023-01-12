@@ -413,8 +413,8 @@ class UI(pannel):
 		self.gateway_pannel = ttk.LabelFrame(self.root,text="Default Gateway") 
 		self.gateway_pannel.place(x=560,y=10,height=50,width=300)
 
-		self.bansymbol_pannel = ttk.LabelFrame(self.root,text="Bad Symbols") 
-		self.bansymbol_pannel.place(x=860,y=10,height=50,width=300)
+		self.badsymbol_pannel = ttk.LabelFrame(self.root,text="Bad Symbols") 
+		self.badsymbol_pannel.place(x=860,y=10,height=50,width=300)
 
 		self.performance_pannel = ttk.LabelFrame(self.root,text="Performance") 
 		self.performance_pannel.place(x=360,y=70,height=260,width=900)
@@ -430,6 +430,20 @@ class UI(pannel):
 		self.init_control_pannel()
 
 		self.init_gateway()
+		self.init_bad_symbol_pannel()
+
+
+	def init_bad_symbol_pannel(self):
+
+		self.bad_symbol = tk.StringVar()
+		ttk.Entry(self.badsymbol_pannel,textvariable=self.bad_symbol,width=15).grid(sticky="w",column=1,row=1)
+
+		try:
+			self.submit_bad_symbol = ttk.Button(self.badsymbol_pannel, text="Submit",command=self.manager.submit_badsymbol)
+			self.submit_bad_symbol.grid(sticky="w",column=2,row=1)
+		except Exception as e:
+			pass
+
 
 	def init_gateway(self):
 
@@ -447,9 +461,11 @@ class UI(pannel):
 		drop = tk.OptionMenu(self.gateway_pannel , self.gateway , *options )
 		drop.grid(row=1, column=1)
 
-
-		self.set_gateway = ttk.Button(self.gateway_pannel, text="Set Change:MEMX",command=self.manager.set_gateway)
-		self.set_gateway.grid(sticky="w",column=2,row=1)
+		try:
+			self.set_gateway = ttk.Button(self.gateway_pannel, text="Set Change:MEMX",command=self.manager.set_gateway)
+			self.set_gateway.grid(sticky="w",column=2,row=1)
+		except:
+			pass
 
 
 

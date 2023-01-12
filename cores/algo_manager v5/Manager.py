@@ -216,6 +216,19 @@ class Manager:
 
 		self.shutdown= True
 
+	def submit_badsymbol(self):
+
+
+		symbol = self.ui.bad_symbol.get()
+
+		if symbol in self.symbol_data:
+
+			log_print("baning symbol",symbol)
+			self.symbol_data[symbol].rejection_message("Long")
+			self.symbol_data[symbol].rejection_message("Short")
+		
+
+
 
 	def check_all_pnl(self):
 		tps = list(self.baskets.keys())
