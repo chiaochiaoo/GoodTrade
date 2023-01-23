@@ -8,7 +8,8 @@ import threading
 import requests
 import socket
 from datetime import datetime
-
+from psutil import process_iter
+import psutil
 import pickle
 
 NEW_ETF ="New ETF"
@@ -559,11 +560,35 @@ class UI:
 				self.update_etf(etf,data,ts)
 
 
-
+def force_close_port(port, process_name=None):
+    """Terminate a process that is bound to a port.
+    
+    The process name can be set (eg. python), which will
+    ignore any other process that doesn't start with it.
+    """
+    print("killing 4135",port)
+    for proc in psutil.process_iter():
+        for conn in proc.connections():
+            if conn.laddr[1] == port:
+                #Don't close if it belongs to SYSTEM
+                #On windows using .username() results in AccessDenied
+                #TODO: Needs testing on other operating systems
+                try:
+                    proc.username()
+                except psutil.AccessDenied:
+                    pass
+                else:
+                    if process_name is None or proc.name().startswith(process_name):
+                        try:
+                            proc.kill()
+                        except (psutil.NoSuchProcess, psutil.AccessDenied):
+                            pass 
 
 if __name__ == '__main__':
 
 	multiprocessing.freeze_support()
+
+	force_close_port(4135)
 	send_pipe, receive_pipe = multiprocessing.Pipe()
 
 	root = tk.Tk() 
