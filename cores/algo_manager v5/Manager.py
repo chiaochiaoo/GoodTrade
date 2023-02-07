@@ -388,9 +388,14 @@ class Manager:
 
 		moo_release = False 
 		pair_release = False 
+		moc_release = False 
+		moc_pair_release = False
 
 		MOO_send_out_timer = 560
 		MOO_pairing_timer = 572
+
+		MOC_send_out_timer = 959
+		MOC_pairing_timer = 960
 
 		c = 0 
 		log_print("Timer: functional and counting")
@@ -441,8 +446,34 @@ class Manager:
 						self.apply_basket_cmd(basket_name,orders,risk,aggresive)
 
 				time.sleep(5)
-				### TRIGGER. PAIR UP the algos. 
+				### TRIGGER. PAIR UP the algos.
 
+			if ts>=MOC_send_out_timer and moc_release==False:
+
+				log_print("Timer: MOC begins")
+
+				with self.symbol_inspection_lock: 
+					for ticker in self.current_positions.keys():
+						share = self.current_positions[ticker][1]
+
+						if share<0:
+							reque = "http://localhost:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Buy ARCX MOC DAY&shares="+str(abs(share))
+						else:
+							reque = "http://localhost:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Sell->Short ARCX MOC DAY&shares="+str(share)
+
+						req = threading.Thread(target=request, args=(reque,),daemon=True)
+						req.start()
+
+				moc_release=True
+
+			if ts>MOC_pairing_timer and moc_pair_release==False:
+
+				#every tp's symbol no clear.
+				log_print("last paring.")
+				for name,basket in self.baskets.items():
+					basket.flatten_cmd()
+
+				moc_pair_release=True
 
 			time.sleep(20)
 

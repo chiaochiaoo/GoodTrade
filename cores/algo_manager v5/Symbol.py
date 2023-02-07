@@ -116,7 +116,11 @@ class Symbol:
 		# no.4 get all current imbalance
 		self.calc_total_imbalances(tps)
 
-		if self.difference!=0:
+
+		now = datetime.now()
+		ts = now.hour*60 + now.minute
+
+		if self.difference!=0 and ts<=955:
 			self.deploy_orders()
 		else:
 			self.action = ""
