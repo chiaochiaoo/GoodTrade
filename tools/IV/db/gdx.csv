@@ -1,58 +1,54 @@
-Symbol,Name,"% Holding",Shares
-NEM,"Newmont Mining Corp",12.36%,N/A
-GOLD,"Barrick Gold Corp",10.15%,N/A
-FNV,"Franco Nev Corp",8.64%,N/A
-AEM,"Agnico-Eagle Mines Ltd",6.90%,N/A
-WPM,"Wheaton Precious Metals",5.10%,N/A
-NCM.AX,"Newcrest Mining Ltd",4.46%,N/A
-GFI,"Gold Fields Ltd ADR",4.10%,N/A
-,N/A,3.47%,N/A
-RGLD,"Royal Gold Inc",3.38%,N/A
-NST.AX,"Northern Star Resources Ltd",3.32%,N/A
-AU,"Anglogold Ashanti Ltd ADR",3.31%,N/A
-EDV.TO,"Endeavour Mining Corp",2.68%,N/A
-AUY,"Yamana Gold",2.41%,N/A
-KGC,"Kinross Gold Corp",2.27%,N/A
-PAAS,"Pan Amer Silver Corp",1.82%,N/A
-BTG,"B2Gold Corp",1.81%,N/A
-EVN.AX,"Evolution Mining Ltd",1.74%,N/A
-SSRM,"Ssr Mining Inc",1.61%,N/A
-AGI,"Alamos Gold Inc",1.55%,N/A
-,N/A,1.27%,N/A
-HL,"Hecla Mining Company",1.18%,N/A
-HMY,"Harmony Gold Mining ADR",1.05%,N/A
-AG,"First Majestic Silver",1.03%,N/A
-OR,"Osisko Gold Royalties Ltd",0.96%,N/A
-PRU.AX,"Perseus Mining Ltd",0.83%,N/A
-BVN,"Compania Mina Buenaventura S.A. ADR",0.73%,N/A
-CG.TO,"Centerra Gold Inc",0.72%,N/A
-KNT.TO,"K92 Mining Inc",0.70%,N/A
-CEY.LN,"Centamin Plc",0.66%,N/A
-EQX,"Equinox Gold Corp",0.61%,N/A
-OGC.TO,"Oceanagold Corp",0.58%,N/A
-SAND,"Sandstorm Gold Ltd",0.58%,N/A
-EGO,"Eldorado Gold Corp",0.58%,N/A
-CMM.AX,"Capricorn Metals Ltd",0.54%,N/A
-WDO.TO,"Wesdome Gold Mines Ltd",0.49%,N/A
-DPM.TO,"Dundee Precious Metals Inc",0.49%,N/A
-WAF.AX,"West African Resources Ltd",0.49%,N/A
-SLR.AX,"Silver Lake Resources Ltd",0.48%,N/A
-RRL.AX,"Regis Resources Ltd",0.47%,N/A
-GOR.AX,"Gold Road Resources Ltd",0.44%,N/A
-CDE,"Coeur Mining Inc",0.44%,N/A
-FSM,"Fortuna Silver Mines",0.38%,N/A
-TXG.TO,"Torex Gold Resources Inc",0.36%,N/A
-IAG,"Iamgold Corp",0.33%,N/A
-AYA.TO,"Aya Gold and Silver Inc",0.32%,N/A
-RMS.AX,"Ramelius Resources Ltd",0.31%,N/A
-SBM.AX,"ST Barbara Ltd",0.30%,N/A
-EXK,"Endeavour Silver Corp",0.30%,N/A
-GGD.TO,"Gogold Resources Inc",0.28%,N/A
-DRD,"Drdgold Ltd ADR",0.26%,N/A
-NGD,"New Gold Inc",0.25%,N/A
-VGCX.TO,"Victoria Gold Corp",0.24%,N/A
-SVM,"Silvercorp Metals Inc",0.23%,N/A
-KRR.TO,"Karora Resources Inc",0.19%,N/A
-GDX,"Vaneck Gold Miners ETF",0.00%,N/A
-,Other/Cash,-0.15%,N/A
-"Downloaded from Barchart.com as of 02-08-2023 12:15pm CST"
+Symbol,Name,% Holding,Shares
+NEM,Newmont Mining Corp,12.36%,N/A
+GOLD,Barrick Gold Corp,10.15%,N/A
+FNV,Franco Nev Corp,8.64%,N/A
+AEM,Agnico-Eagle Mines Ltd,6.90%,N/A
+WPM,Wheaton Precious Metals,5.10%,N/A
+NCM.AX,Newcrest Mining Ltd,4.46%,N/A
+GFI,Gold Fields Ltd ADR,4.10%,N/A
+RGLD,Royal Gold Inc,3.38%,N/A
+NST.AX,Northern Star Resources Ltd,3.32%,N/A
+AU,Anglogold Ashanti Ltd ADR,3.31%,N/A
+EDV.TO,Endeavour Mining Corp,2.68%,N/A
+AUY,Yamana Gold,2.41%,N/A
+KGC,Kinross Gold Corp,2.27%,N/A
+PAAS,Pan Amer Silver Corp,1.82%,N/A
+BTG,B2Gold Corp,1.81%,N/A
+EVN.AX,Evolution Mining Ltd,1.74%,N/A
+SSRM,Ssr Mining Inc,1.61%,N/A
+AGI,Alamos Gold Inc,1.55%,N/A
+HL,Hecla Mining Company,1.18%,N/A
+HMY,Harmony Gold Mining ADR,1.05%,N/A
+AG,First Majestic Silver,1.03%,N/A
+OR,Osisko Gold Royalties Ltd,0.96%,N/A
+PRU.AX,Perseus Mining Ltd,0.83%,N/A
+BVN,Compania Mina Buenaventura S.A. ADR,0.73%,N/A
+CG.TO,Centerra Gold Inc,0.72%,N/A
+KNT.TO,K92 Mining Inc,0.70%,N/A
+CEY.LN,Centamin Plc,0.66%,N/A
+EQX,Equinox Gold Corp,0.61%,N/A
+OGC.TO,Oceanagold Corp,0.58%,N/A
+SAND,Sandstorm Gold Ltd,0.58%,N/A
+EGO,Eldorado Gold Corp,0.58%,N/A
+CMM.AX,Capricorn Metals Ltd,0.54%,N/A
+WDO.TO,Wesdome Gold Mines Ltd,0.49%,N/A
+DPM.TO,Dundee Precious Metals Inc,0.49%,N/A
+WAF.AX,West African Resources Ltd,0.49%,N/A
+SLR.AX,Silver Lake Resources Ltd,0.48%,N/A
+RRL.AX,Regis Resources Ltd,0.47%,N/A
+GOR.AX,Gold Road Resources Ltd,0.44%,N/A
+CDE,Coeur Mining Inc,0.44%,N/A
+FSM,Fortuna Silver Mines,0.38%,N/A
+TXG.TO,Torex Gold Resources Inc,0.36%,N/A
+IAG,Iamgold Corp,0.33%,N/A
+AYA.TO,Aya Gold and Silver Inc,0.32%,N/A
+RMS.AX,Ramelius Resources Ltd,0.31%,N/A
+SBM.AX,ST Barbara Ltd,0.30%,N/A
+EXK,Endeavour Silver Corp,0.30%,N/A
+GGD.TO,Gogold Resources Inc,0.28%,N/A
+DRD,Drdgold Ltd ADR,0.26%,N/A
+NGD,New Gold Inc,0.25%,N/A
+VGCX.TO,Victoria Gold Corp,0.24%,N/A
+SVM,Silvercorp Metals Inc,0.23%,N/A
+KRR.TO,Karora Resources Inc,0.19%,N/A
+GDX,Vaneck Gold Miners ETF,0.00%,N/A

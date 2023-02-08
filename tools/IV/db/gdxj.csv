@@ -1,106 +1,105 @@
-Symbol,Name,"% Holding",Shares
-AUY,"Yamana Gold",5.96%,N/A
-KGC,"Kinross Gold Corp",5.22%,N/A
-PAAS,"Pan Amer Silver Corp",4.60%,N/A
-EDV.LN,"Endeavour Mining Plc",3.99%,N/A
-EVN.AX,"Evolution Mining Ltd",3.76%,N/A
-BTG,"B2Gold Corp",3.60%,N/A
-SSRM,"Ssr Mining Inc",3.48%,N/A
-AGI,"Alamos Gold Inc",3.39%,N/A
-HL,"Hecla Mining Company",2.42%,N/A
-AG,"First Majestic Silver",2.31%,N/A
-FRES.LN,"Fresnillo Plc",2.29%,N/A
-PRU.AX,"Perseus Mining Ltd",2.10%,N/A
-HMY,"Harmony Gold Mining ADR",1.91%,N/A
+Symbol,Name,% Holding,Shares
+AUY,Yamana Gold,5.96%,N/A
+KGC,Kinross Gold Corp,5.22%,N/A
+PAAS,Pan Amer Silver Corp,4.60%,N/A
+EDV.LN,Endeavour Mining Plc,3.99%,N/A
+EVN.AX,Evolution Mining Ltd,3.76%,N/A
+BTG,B2Gold Corp,3.60%,N/A
+SSRM,Ssr Mining Inc,3.48%,N/A
+AGI,Alamos Gold Inc,3.39%,N/A
+HL,Hecla Mining Company,2.42%,N/A
+AG,First Majestic Silver,2.31%,N/A
+FRES.LN,Fresnillo Plc,2.29%,N/A
+PRU.AX,Perseus Mining Ltd,2.10%,N/A
+HMY,Harmony Gold Mining ADR,1.91%,N/A
 ,N/A,1.80%,N/A
 ,N/A,1.56%,N/A
-BVN,"Compania Mina Buenaventura S.A. ADR",1.49%,N/A
-SAND,"Sandstorm Gold Ltd",1.47%,N/A
-OR,"Osisko Gold Royalties Ltd",1.46%,N/A
-EQX,"Equinox Gold Corp",1.42%,N/A
-KNT.TO,"K92 Mining Inc",1.40%,N/A
-SA,"Seabridge Gold",1.35%,N/A
-CEY.LN,"Centamin Plc",1.33%,N/A
-OGC.TO,"Oceanagold Corp",1.33%,N/A
-MAG,"MAG Silver Corp",1.32%,N/A
-NG,"Novagold Resources Inc",1.29%,N/A
+BVN,Compania Mina Buenaventura S.A. ADR,1.49%,N/A
+SAND,Sandstorm Gold Ltd,1.47%,N/A
+OR,Osisko Gold Royalties Ltd,1.46%,N/A
+EQX,Equinox Gold Corp,1.42%,N/A
+KNT.TO,K92 Mining Inc,1.40%,N/A
+SA,Seabridge Gold,1.35%,N/A
+CEY.LN,Centamin Plc,1.33%,N/A
+OGC.TO,Oceanagold Corp,1.33%,N/A
+MAG,MAG Silver Corp,1.32%,N/A
+NG,Novagold Resources Inc,1.29%,N/A
 ,N/A,1.28%,N/A
-EGO,"Eldorado Gold Corp",1.18%,N/A
-WDO.TO,"Wesdome Gold Mines Ltd",1.16%,N/A
-CMM.AX,"Capricorn Metals Ltd",1.16%,N/A
-SLR.AX,"Silver Lake Resources Ltd",1.15%,N/A
-WAF.AX,"West African Resources Ltd",1.13%,N/A
-GOR.AX,"Gold Road Resources Ltd",1.10%,N/A
-CG.TO,"Centerra Gold Inc",1.09%,N/A
-RRL.AX,"Regis Resources Ltd",1.04%,N/A
-SILV,"Silvercrest Metals Inc",1.03%,N/A
-DEG.AX,"DE Grey Mining Ltd",0.99%,N/A
-FSM,"Fortuna Silver Mines",0.96%,N/A
-DPM.TO,"Dundee Precious Metals Inc",0.90%,N/A
-LUG.TO,"Lundin Gold Inc",0.87%,N/A
-CDE,"Coeur Mining Inc",0.86%,N/A
-RMS.AX,"Ramelius Resources Ltd",0.78%,N/A
-EXK,"Endeavour Silver Corp",0.75%,N/A
-GGP.LN,"Greatland Gold Plc",0.74%,N/A
-AYA.TO,"Aya Gold and Silver Inc",0.74%,N/A
-OSK.TO,"Osisko Mining Inc",0.73%,N/A
-TXG.TO,"Torex Gold Resources Inc",0.72%,N/A
-IAG,"Iamgold Corp",0.71%,N/A
-OLA.TO,"Orla Mining Ltd",0.69%,N/A
-GGD.TO,"Gogold Resources Inc",0.67%,N/A
-SBM.AX,"ST Barbara Ltd",0.65%,N/A
+EGO,Eldorado Gold Corp,1.18%,N/A
+WDO.TO,Wesdome Gold Mines Ltd,1.16%,N/A
+CMM.AX,Capricorn Metals Ltd,1.16%,N/A
+SLR.AX,Silver Lake Resources Ltd,1.15%,N/A
+WAF.AX,West African Resources Ltd,1.13%,N/A
+GOR.AX,Gold Road Resources Ltd,1.10%,N/A
+CG.TO,Centerra Gold Inc,1.09%,N/A
+RRL.AX,Regis Resources Ltd,1.04%,N/A
+SILV,Silvercrest Metals Inc,1.03%,N/A
+DEG.AX,DE Grey Mining Ltd,0.99%,N/A
+FSM,Fortuna Silver Mines,0.96%,N/A
+DPM.TO,Dundee Precious Metals Inc,0.90%,N/A
+LUG.TO,Lundin Gold Inc,0.87%,N/A
+CDE,Coeur Mining Inc,0.86%,N/A
+RMS.AX,Ramelius Resources Ltd,0.78%,N/A
+EXK,Endeavour Silver Corp,0.75%,N/A
+GGP.LN,Greatland Gold Plc,0.74%,N/A
+AYA.TO,Aya Gold and Silver Inc,0.74%,N/A
+OSK.TO,Osisko Mining Inc,0.73%,N/A
+TXG.TO,Torex Gold Resources Inc,0.72%,N/A
+IAG,Iamgold Corp,0.71%,N/A
+OLA.TO,Orla Mining Ltd,0.69%,N/A
+GGD.TO,Gogold Resources Inc,0.67%,N/A
+SBM.AX,ST Barbara Ltd,0.65%,N/A
 ,N/A,0.58%,N/A
-BGL.AX,"Bellevue Gold Ltd",0.57%,N/A
-SVM,"Silvercorp Metals Inc",0.57%,N/A
-NGD,"New Gold Inc",0.55%,N/A
+BGL.AX,Bellevue Gold Ltd,0.57%,N/A
+SVM,Silvercorp Metals Inc,0.57%,N/A
+NGD,New Gold Inc,0.55%,N/A
 ,N/A,0.55%,N/A
-SBB.TO,"Sabina Gold and Silver Corp",0.52%,N/A
-AMC.TO,"Arizona Metals Corp",0.49%,N/A
-RED.AX,"Red 5 Ltd",0.47%,N/A
-KRR.TO,"Karora Resources Inc",0.42%,N/A
-GROY,"Gold Royalty Corp",0.42%,N/A
-HOC.LN,"Hochschild Mining Plc",0.42%,N/A
-VGCX.TO,"Victoria Gold Corp",0.39%,N/A
+SBB.TO,Sabina Gold and Silver Corp,0.52%,N/A
+AMC.TO,Arizona Metals Corp,0.49%,N/A
+RED.AX,Red 5 Ltd,0.47%,N/A
+KRR.TO,Karora Resources Inc,0.42%,N/A
+GROY,Gold Royalty Corp,0.42%,N/A
+HOC.LN,Hochschild Mining Plc,0.42%,N/A
+VGCX.TO,Victoria Gold Corp,0.39%,N/A
 ,N/A,0.38%,N/A
-DRD,"Drdgold Ltd ADR",0.37%,N/A
-MOZ.TO,"Marathon Gold Corp",0.37%,N/A
-KCN.AX,"Kingsgate Consolidated Ltd",0.35%,N/A
-NUAG.TO,"New Pacific Metals Corp",0.35%,N/A
-CXB.TO,"Calibre Mining Corp",0.35%,N/A
-IAU.TO,"I-80 Gold Corp",0.34%,N/A
+DRD,Drdgold Ltd ADR,0.37%,N/A
+MOZ.TO,Marathon Gold Corp,0.37%,N/A
+KCN.AX,Kingsgate Consolidated Ltd,0.35%,N/A
+NUAG.TO,New Pacific Metals Corp,0.35%,N/A
+CXB.TO,Calibre Mining Corp,0.35%,N/A
+IAU.TO,I-80 Gold Corp,0.34%,N/A
 ,N/A,0.34%,N/A
-WGX.AX,"Westgold Resources Ltd",0.34%,N/A
-AMI.AX,"Aurelia Metals Ltd",0.33%,N/A
-SKE.TO,"Skeena Resources Ltd",0.33%,N/A
-DC,"Dakota Gold Corp",0.31%,N/A
-GCM.TO,"Gran Colombia Gold Corp",0.31%,N/A
-ALK.AX,"Alkane Resources Ltd",0.30%,N/A
-MMX,"Maverix Metals Inc",0.28%,N/A
-MTA,"Metalla Royalty and Streaming Ltd",0.26%,N/A
+WGX.AX,Westgold Resources Ltd,0.34%,N/A
+AMI.AX,Aurelia Metals Ltd,0.33%,N/A
+SKE.TO,Skeena Resources Ltd,0.33%,N/A
+DC,Dakota Gold Corp,0.31%,N/A
+GCM.TO,Gran Colombia Gold Corp,0.31%,N/A
+ALK.AX,Alkane Resources Ltd,0.30%,N/A
+MMX,Maverix Metals Inc,0.28%,N/A
+MTA,Metalla Royalty and Streaming Ltd,0.26%,N/A
 ,Other/Cash,0.26%,N/A
-DSV.TO,"Discovery Silver Corp",0.25%,N/A
-RSG.AX,"Resolute Mining Ltd",0.24%,N/A
-FFX.AX,"Firefinch Ltd",0.22%,N/A
-SVL.AX,"Silver Mines Ltd",0.22%,N/A
-GORO,"Gold Resource Corp",0.22%,N/A
-GLDG,"Goldmining Inc",0.19%,N/A
-GATO,"Gatos Silver Inc",0.18%,N/A
-MUX,"Mcewen Mining Inc",0.18%,N/A
+DSV.TO,Discovery Silver Corp,0.25%,N/A
+RSG.AX,Resolute Mining Ltd,0.24%,N/A
+FFX.AX,Firefinch Ltd,0.22%,N/A
+SVL.AX,Silver Mines Ltd,0.22%,N/A
+GORO,Gold Resource Corp,0.22%,N/A
+GLDG,Goldmining Inc,0.19%,N/A
+GATO,Gatos Silver Inc,0.18%,N/A
+MUX,Mcewen Mining Inc,0.18%,N/A
 ,N/A,0.17%,N/A
-ORLA,"Orla Mining",0.14%,N/A
-AR.TO,"Argonaut Gold Inc",0.13%,N/A
-CMCL,"Caledonia Mining Cp",0.13%,N/A
-LGD.TO,"Liberty Gold Corp",0.12%,N/A
-WM.TO,"Wallbridge Mining Company Ltd",0.12%,N/A
-USAS,"Americas Silver Corp",0.11%,N/A
-NVO.TO,"Novo Resources Corp",0.11%,N/A
-AXU,"Alexco Resource Corp",0.10%,N/A
-GAU,"Galiano Gold Inc",0.09%,N/A
-DCN.AX,"Dacian Gold Ltd",0.09%,N/A
-JAG.TO,"Jaguar Mining Inc",0.08%,N/A
-GPL,"Great Panther Mining Ltd",0.06%,N/A
-GDXJ,"Vaneck Junior Gold Miners ETF",0.00%,N/A
-SMC.TO,"Sulliden Mining Capital Inc",0.00%,N/A
-ASM.AX,"Australian Strategic Materials Ltd",0.00%,N/A
+ORLA,Orla Mining,0.14%,N/A
+AR.TO,Argonaut Gold Inc,0.13%,N/A
+CMCL,Caledonia Mining Cp,0.13%,N/A
+LGD.TO,Liberty Gold Corp,0.12%,N/A
+WM.TO,Wallbridge Mining Company Ltd,0.12%,N/A
+USAS,Americas Silver Corp,0.11%,N/A
+NVO.TO,Novo Resources Corp,0.11%,N/A
+AXU,Alexco Resource Corp,0.10%,N/A
+GAU,Galiano Gold Inc,0.09%,N/A
+DCN.AX,Dacian Gold Ltd,0.09%,N/A
+JAG.TO,Jaguar Mining Inc,0.08%,N/A
+GPL,Great Panther Mining Ltd,0.06%,N/A
+GDXJ,Vaneck Junior Gold Miners ETF,0.00%,N/A
+SMC.TO,Sulliden Mining Capital Inc,0.00%,N/A
+ASM.AX,Australian Strategic Materials Ltd,0.00%,N/A
 ,N/A,0.00%,N/A
-"Downloaded from Barchart.com as of 02-08-2023 12:15pm CST"

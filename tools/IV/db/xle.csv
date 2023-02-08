@@ -1,30 +1,24 @@
-Symbol,Name,"% Holding",Shares
-XOM,"Exxon Mobil Corp",23.70%,N/A
-CVX,"Chevron Corp",19.35%,N/A
-SLB,"Schlumberger N.V.",4.86%,N/A
-EOG,"Eog Resources",4.37%,N/A
+Symbol,Name,% Holding,Shares
+XOM,Exxon Mobil Corp,23.70%,N/A
+CVX,Chevron Corp,19.35%,N/A
+SLB,Schlumberger N.V.,4.86%,N/A
+EOG,Eog Resources,4.37%,N/A
 COP,Conocophillips,4.20%,N/A
-MPC,"Marathon Petroleum Corp",3.95%,N/A
-PXD,"Pioneer Natural Resources Company",3.76%,N/A
-VLO,"Valero Energy Corp",3.58%,N/A
-PSX,"Phillips 66",3.36%,N/A
-OXY,"Occidental Petroleum Corp",3.24%,N/A
-DVN,"Devon Energy Corp",2.85%,N/A
-WMB,"Williams Companies",2.80%,N/A
-HES,"Hess Corp",2.76%,N/A
-KMI,"Kinder Morgan",2.60%,N/A
-HAL,"Halliburton Company",2.52%,N/A
-BKR,"Baker Hughes Company",2.30%,N/A
-OKE,"Oneok Inc",2.21%,N/A
-FANG,"Diamondback Energy",1.75%,N/A
-CTRA,"Coterra Energy Inc",1.36%,N/A
-TRGP,"Targa Resources",1.19%,N/A
-MRO,"Marathon Oil Corp",1.19%,N/A
-APA,"Apa Corp",0.98%,N/A
-EQT,"Eqt Corp",0.80%,N/A
-,N/A,0.25%,N/A
-,"U.S. Dollar",0.10%,N/A
-XLE,"S&P 500 Energy Sector SPDR",0.00%,N/A
-,N/A,0.00%,N/A
-,N/A,0.00%,N/A
-"Downloaded from Barchart.com as of 02-08-2023 12:17pm CST"
+MPC,Marathon Petroleum Corp,3.95%,N/A
+PXD,Pioneer Natural Resources Company,3.76%,N/A
+VLO,Valero Energy Corp,3.58%,N/A
+PSX,Phillips 66,3.36%,N/A
+OXY,Occidental Petroleum Corp,3.24%,N/A
+DVN,Devon Energy Corp,2.85%,N/A
+WMB,Williams Companies,2.80%,N/A
+HES,Hess Corp,2.76%,N/A
+KMI,Kinder Morgan,2.60%,N/A
+HAL,Halliburton Company,2.52%,N/A
+BKR,Baker Hughes Company,2.30%,N/A
+OKE,Oneok Inc,2.21%,N/A
+FANG,Diamondback Energy,1.75%,N/A
+CTRA,Coterra Energy Inc,1.36%,N/A
+TRGP,Targa Resources,1.19%,N/A
+MRO,Marathon Oil Corp,1.19%,N/A
+APA,Apa Corp,0.98%,N/A
+EQT,Eqt Corp,0.80%,N/A

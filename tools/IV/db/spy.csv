@@ -1,508 +1,507 @@
-Symbol,Name,"% Holding",Shares
-AAPL,"Apple Inc",6.59%,N/A
-MSFT,"Microsoft Corp",5.56%,N/A
-AMZN,"Amazon.com Inc",2.63%,N/A
-GOOGL,"Alphabet Cl A",1.79%,N/A
-BRK.B,"Berkshire Hathaway Cl B",1.61%,N/A
-GOOG,"Alphabet Cl C",1.59%,N/A
-NVDA,"Nvidia Corp",1.53%,N/A
-TSLA,"Tesla Inc",1.52%,N/A
-XOM,"Exxon Mobil Corp",1.34%,N/A
-UNH,"Unitedhealth Group Inc",1.29%,N/A
-JNJ,"Johnson & Johnson",1.24%,N/A
-META,"Meta Platforms Inc",1.22%,N/A
-JPM,"JP Morgan Chase & Company",1.21%,N/A
-V,"Visa Inc",1.09%,N/A
-HD,"Home Depot",0.98%,N/A
-PG,"Procter & Gamble Company",0.97%,N/A
-MA,"Mastercard Inc",0.92%,N/A
-CVX,"Chevron Corp",0.88%,N/A
-LLY,"Eli Lilly and Company",0.77%,N/A
-MRK,"Merck & Company",0.77%,N/A
-ABBV,"Abbvie Inc",0.75%,N/A
-BAC,"Bank of America Corp",0.74%,N/A
-PFE,"Pfizer Inc",0.71%,N/A
-AVGO,"Broadcom Ltd",0.71%,N/A
-PEP,"Pepsico Inc",0.69%,N/A
-KO,"Coca-Cola Company",0.68%,N/A
-COST,"Costco Wholesale",0.66%,N/A
-TMO,"Thermo Fisher Scientific Inc",0.66%,N/A
-DIS,"Walt Disney Company",0.58%,N/A
-WMT,"Walmart Inc",0.58%,N/A
-MCD,"McDonald's Corp",0.57%,N/A
-CSCO,"Cisco Systems Inc",0.57%,N/A
-ABT,"Abbott Laboratories",0.56%,N/A
-WFC,"Wells Fargo & Company",0.53%,N/A
-ACN,"Accenture Plc",0.52%,N/A
-ADBE,"Adobe Systems Inc",0.51%,N/A
-VZ,"Verizon Communications Inc",0.50%,N/A
-DHR,"Danaher Corp",0.50%,N/A
-CMCSA,"Comcast Corp A",0.50%,N/A
-CRM,"Salesforce Inc",0.49%,N/A
-TXN,"Texas Instruments",0.48%,N/A
-NFLX,"Netflix Inc",0.47%,N/A
-LIN,"Linde Plc",0.46%,N/A
-BMY,"Bristol-Myers Squibb Company",0.46%,N/A
-NKE,"Nike Inc",0.46%,N/A
-PM,"Philip Morris International Inc",0.46%,N/A
-NEE,"Nextera Energy",0.44%,N/A
-QCOM,"Qualcomm Inc",0.43%,N/A
-RTX,"Raytheon Technologies Corp",0.42%,N/A
-T,"AT&T Inc",0.41%,N/A
-UPS,"United Parcel Service",0.40%,N/A
-HON,"Honeywell International Inc",0.40%,N/A
-ORCL,"Oracle Corp",0.40%,N/A
-AMD,"Adv Micro Devices",0.39%,N/A
-LOW,"Lowe's Companies",0.39%,N/A
+Symbol,Name,% Holding,Shares
+AAPL,Apple Inc,6.59%,N/A
+MSFT,Microsoft Corp,5.56%,N/A
+AMZN,Amazon.com Inc,2.63%,N/A
+GOOGL,Alphabet Cl A,1.79%,N/A
+BRK.B,Berkshire Hathaway Cl B,1.61%,N/A
+GOOG,Alphabet Cl C,1.59%,N/A
+NVDA,Nvidia Corp,1.53%,N/A
+TSLA,Tesla Inc,1.52%,N/A
+XOM,Exxon Mobil Corp,1.34%,N/A
+UNH,Unitedhealth Group Inc,1.29%,N/A
+JNJ,Johnson & Johnson,1.24%,N/A
+META,Meta Platforms Inc,1.22%,N/A
+JPM,JP Morgan Chase & Company,1.21%,N/A
+V,Visa Inc,1.09%,N/A
+HD,Home Depot,0.98%,N/A
+PG,Procter & Gamble Company,0.97%,N/A
+MA,Mastercard Inc,0.92%,N/A
+CVX,Chevron Corp,0.88%,N/A
+LLY,Eli Lilly and Company,0.77%,N/A
+MRK,Merck & Company,0.77%,N/A
+ABBV,Abbvie Inc,0.75%,N/A
+BAC,Bank of America Corp,0.74%,N/A
+PFE,Pfizer Inc,0.71%,N/A
+AVGO,Broadcom Ltd,0.71%,N/A
+PEP,Pepsico Inc,0.69%,N/A
+KO,Coca-Cola Company,0.68%,N/A
+COST,Costco Wholesale,0.66%,N/A
+TMO,Thermo Fisher Scientific Inc,0.66%,N/A
+DIS,Walt Disney Company,0.58%,N/A
+WMT,Walmart Inc,0.58%,N/A
+MCD,McDonald's Corp,0.57%,N/A
+CSCO,Cisco Systems Inc,0.57%,N/A
+ABT,Abbott Laboratories,0.56%,N/A
+WFC,Wells Fargo & Company,0.53%,N/A
+ACN,Accenture Plc,0.52%,N/A
+ADBE,Adobe Systems Inc,0.51%,N/A
+VZ,Verizon Communications Inc,0.50%,N/A
+DHR,Danaher Corp,0.50%,N/A
+CMCSA,Comcast Corp A,0.50%,N/A
+CRM,Salesforce Inc,0.49%,N/A
+TXN,Texas Instruments,0.48%,N/A
+NFLX,Netflix Inc,0.47%,N/A
+LIN,Linde Plc,0.46%,N/A
+BMY,Bristol-Myers Squibb Company,0.46%,N/A
+NKE,Nike Inc,0.46%,N/A
+PM,Philip Morris International Inc,0.46%,N/A
+NEE,Nextera Energy,0.44%,N/A
+QCOM,Qualcomm Inc,0.43%,N/A
+RTX,Raytheon Technologies Corp,0.42%,N/A
+T,AT&T Inc,0.41%,N/A
+UPS,United Parcel Service,0.40%,N/A
+HON,Honeywell International Inc,0.40%,N/A
+ORCL,Oracle Corp,0.40%,N/A
+AMD,Adv Micro Devices,0.39%,N/A
+LOW,Lowe's Companies,0.39%,N/A
 COP,Conocophillips,0.39%,N/A
-CAT,"Caterpillar Inc",0.38%,N/A
-MS,"Morgan Stanley",0.38%,N/A
-AMGN,"Amgen Inc",0.38%,N/A
-UNP,"Union Pacific Corp",0.37%,N/A
-GS,"Goldman Sachs Group",0.37%,N/A
-IBM,"International Business Machines",0.36%,N/A
-SPGI,"S&P Global Inc",0.36%,N/A
-SCHW,"The Charles Schwab Corp",0.35%,N/A
-PLD,"Prologis Inc",0.35%,N/A
-SBUX,"Starbucks Corp",0.35%,N/A
-INTC,"Intel Corp",0.34%,N/A
-INTU,"Intuit Inc",0.34%,N/A
-BA,"Boeing Company",0.34%,N/A
-ELV,"Elevance Health Inc",0.33%,N/A
-MDT,"Medtronic Inc",0.33%,N/A
-DE,"Deere & Company",0.33%,N/A
-CVS,"CVS Corp",0.33%,N/A
-BLK,"Blackrock Inc",0.32%,N/A
-LMT,"Lockheed Martin Corp",0.32%,N/A
-GILD,"Gilead Sciences Inc",0.31%,N/A
-AXP,"American Express Company",0.31%,N/A
-AMT,"American Tower Corp",0.30%,N/A
-AMAT,"Applied Materials",0.29%,N/A
-C,"Citigroup Inc",0.29%,N/A
-BKNG,"Booking Holdings Inc",0.28%,N/A
-PYPL,"Paypal Holdings",0.27%,N/A
-TJX,"TJX Companies",0.27%,N/A
-ADP,"Automatic Data Procs",0.27%,N/A
-ADI,"Analog Devices",0.27%,N/A
-NOW,"Servicenow Inc",0.27%,N/A
-SYK,"Stryker Corp",0.26%,N/A
-MDLZ,"Mondelez Intl Inc",0.26%,N/A
-GE,"General Electric Company",0.26%,N/A
-CB,"Chubb Ltd",0.26%,N/A
-ISRG,"Intuitive Surg Inc",0.26%,N/A
-CI,"Cigna Corp",0.26%,N/A
-MMC,"Marsh & Mclennan Companies",0.25%,N/A
-TMUS,"T-Mobile US",0.25%,N/A
-MO,"Altria Group",0.24%,N/A
-REGN,"Regeneron Pharmaceuticals",0.24%,N/A
-PGR,"Progressive Corp",0.23%,N/A
-TGT,"Target Corp",0.23%,N/A
-DUK,"Duke Energy Corp",0.23%,N/A
-VRTX,"Vertex Pharmaceutic",0.23%,N/A
-ZTS,"Zoetis Inc Cl A",0.22%,N/A
-SLB,"Schlumberger N.V.",0.22%,N/A
-SO,"Southern Company",0.21%,N/A
-EOG,"Eog Resources",0.21%,N/A
-LRCX,"Lam Research Corp",0.21%,N/A
-BDX,"Becton Dickinson and Company",0.21%,N/A
-BSX,"Boston Scientific Corp",0.20%,N/A
-ITW,"Illinois Tool Works Inc",0.20%,N/A
-FISV,"Fiserv Inc",0.20%,N/A
-CSX,"CSX Corp",0.20%,N/A
-EQIX,"Equinix Inc",0.19%,N/A
-USB,"U.S. Bancorp",0.19%,N/A
-TFC,"Truist Financial Corp",0.19%,N/A
-PNC,"PNC Bank",0.19%,N/A
-AON,"AON Plc",0.19%,N/A
-MU,"Micron Technology",0.19%,N/A
-NOC,"Northrop Grumman Corp",0.19%,N/A
-ETN,"Eaton Corp",0.19%,N/A
-MMM,"3M Company",0.19%,N/A
-CCI,"Crown Castle Inc",0.18%,N/A
-CME,"CME Group Inc",0.18%,N/A
-APD,"Air Products and Chemicals",0.18%,N/A
-HUM,"Humana Inc",0.18%,N/A
-CL,"Colgate-Palmolive Company",0.18%,N/A
-FCX,"Freeport-Mcmoran Inc",0.18%,N/A
-ICE,"Intercontinental Exchange",0.17%,N/A
-EL,"Estee Lauder Companies",0.17%,N/A
-GM,"General Motors Company",0.17%,N/A
-KLAC,"K L A-Tencor Corp",0.17%,N/A
-SHW,"Sherwin-Williams Company",0.17%,N/A
-NSC,"Norfolk Southern Corp",0.17%,N/A
-WM,"Waste Management",0.17%,N/A
-MRNA,"Moderna Inc",0.16%,N/A
-SNPS,"Synopsys Inc",0.16%,N/A
-MPC,"Marathon Petroleum Corp",0.16%,N/A
-HCA,"Hca Holdings Inc",0.16%,N/A
-EMR,"Emerson Electric Company",0.16%,N/A
-GD,"General Dynamics Corp",0.15%,N/A
-PXD,"Pioneer Natural Resources Company",0.15%,N/A
-F,"Ford Motor Company",0.15%,N/A
-DG,"Dollar General Corp",0.15%,N/A
-MCK,"Mckesson Corp",0.15%,N/A
-D,"Dominion Resources",0.15%,N/A
-ATVI,"Activision Blizzard",0.15%,N/A
-CDNS,"Cadence Design Sys",0.15%,N/A
-ORLY,"O'Reilly Automotive",0.15%,N/A
-FDX,"Fedex Corp",0.15%,N/A
+CAT,Caterpillar Inc,0.38%,N/A
+MS,Morgan Stanley,0.38%,N/A
+AMGN,Amgen Inc,0.38%,N/A
+UNP,Union Pacific Corp,0.37%,N/A
+GS,Goldman Sachs Group,0.37%,N/A
+IBM,International Business Machines,0.36%,N/A
+SPGI,S&P Global Inc,0.36%,N/A
+SCHW,The Charles Schwab Corp,0.35%,N/A
+PLD,Prologis Inc,0.35%,N/A
+SBUX,Starbucks Corp,0.35%,N/A
+INTC,Intel Corp,0.34%,N/A
+INTU,Intuit Inc,0.34%,N/A
+BA,Boeing Company,0.34%,N/A
+ELV,Elevance Health Inc,0.33%,N/A
+MDT,Medtronic Inc,0.33%,N/A
+DE,Deere & Company,0.33%,N/A
+CVS,CVS Corp,0.33%,N/A
+BLK,Blackrock Inc,0.32%,N/A
+LMT,Lockheed Martin Corp,0.32%,N/A
+GILD,Gilead Sciences Inc,0.31%,N/A
+AXP,American Express Company,0.31%,N/A
+AMT,American Tower Corp,0.30%,N/A
+AMAT,Applied Materials,0.29%,N/A
+C,Citigroup Inc,0.29%,N/A
+BKNG,Booking Holdings Inc,0.28%,N/A
+PYPL,Paypal Holdings,0.27%,N/A
+TJX,TJX Companies,0.27%,N/A
+ADP,Automatic Data Procs,0.27%,N/A
+ADI,Analog Devices,0.27%,N/A
+NOW,Servicenow Inc,0.27%,N/A
+SYK,Stryker Corp,0.26%,N/A
+MDLZ,Mondelez Intl Inc,0.26%,N/A
+GE,General Electric Company,0.26%,N/A
+CB,Chubb Ltd,0.26%,N/A
+ISRG,Intuitive Surg Inc,0.26%,N/A
+CI,Cigna Corp,0.26%,N/A
+MMC,Marsh & Mclennan Companies,0.25%,N/A
+TMUS,T-Mobile US,0.25%,N/A
+MO,Altria Group,0.24%,N/A
+REGN,Regeneron Pharmaceuticals,0.24%,N/A
+PGR,Progressive Corp,0.23%,N/A
+TGT,Target Corp,0.23%,N/A
+DUK,Duke Energy Corp,0.23%,N/A
+VRTX,Vertex Pharmaceutic,0.23%,N/A
+ZTS,Zoetis Inc Cl A,0.22%,N/A
+SLB,Schlumberger N.V.,0.22%,N/A
+SO,Southern Company,0.21%,N/A
+EOG,Eog Resources,0.21%,N/A
+LRCX,Lam Research Corp,0.21%,N/A
+BDX,Becton Dickinson and Company,0.21%,N/A
+BSX,Boston Scientific Corp,0.20%,N/A
+ITW,Illinois Tool Works Inc,0.20%,N/A
+FISV,Fiserv Inc,0.20%,N/A
+CSX,CSX Corp,0.20%,N/A
+EQIX,Equinix Inc,0.19%,N/A
+USB,U.S. Bancorp,0.19%,N/A
+TFC,Truist Financial Corp,0.19%,N/A
+PNC,PNC Bank,0.19%,N/A
+AON,AON Plc,0.19%,N/A
+MU,Micron Technology,0.19%,N/A
+NOC,Northrop Grumman Corp,0.19%,N/A
+ETN,Eaton Corp,0.19%,N/A
+MMM,3M Company,0.19%,N/A
+CCI,Crown Castle Inc,0.18%,N/A
+CME,CME Group Inc,0.18%,N/A
+APD,Air Products and Chemicals,0.18%,N/A
+HUM,Humana Inc,0.18%,N/A
+CL,Colgate-Palmolive Company,0.18%,N/A
+FCX,Freeport-Mcmoran Inc,0.18%,N/A
+ICE,Intercontinental Exchange,0.17%,N/A
+EL,Estee Lauder Companies,0.17%,N/A
+GM,General Motors Company,0.17%,N/A
+KLAC,K L A-Tencor Corp,0.17%,N/A
+SHW,Sherwin-Williams Company,0.17%,N/A
+NSC,Norfolk Southern Corp,0.17%,N/A
+WM,Waste Management,0.17%,N/A
+MRNA,Moderna Inc,0.16%,N/A
+SNPS,Synopsys Inc,0.16%,N/A
+MPC,Marathon Petroleum Corp,0.16%,N/A
+HCA,Hca Holdings Inc,0.16%,N/A
+EMR,Emerson Electric Company,0.16%,N/A
+GD,General Dynamics Corp,0.15%,N/A
+PXD,Pioneer Natural Resources Company,0.15%,N/A
+F,Ford Motor Company,0.15%,N/A
+DG,Dollar General Corp,0.15%,N/A
+MCK,Mckesson Corp,0.15%,N/A
+D,Dominion Resources,0.15%,N/A
+ATVI,Activision Blizzard,0.15%,N/A
+CDNS,Cadence Design Sys,0.15%,N/A
+ORLY,O'Reilly Automotive,0.15%,N/A
+FDX,Fedex Corp,0.15%,N/A
 SRE,Sempra,0.14%,N/A
-MCO,"Moody's Corp",0.14%,N/A
-VLO,"Valero Energy Corp",0.14%,N/A
-NXPI,"Nxp Semiconductors",0.14%,N/A
-EW,"Edwards Lifesciences Corp",0.14%,N/A
-APH,"Amphenol Corp",0.14%,N/A
-PSA,"Public Storage",0.14%,N/A
-AEP,"American Electric Power Company",0.14%,N/A
-ADSK,"Autodesk Inc",0.14%,N/A
-CMG,"Chipotle Mexican Grill",0.14%,N/A
-PSX,"Phillips 66",0.14%,N/A
-MET,"Metlife Inc",0.14%,N/A
-MAR,"Marriot Int Cl A",0.13%,N/A
-MCHP,"Microchip Technology",0.13%,N/A
+MCO,Moody's Corp,0.14%,N/A
+VLO,Valero Energy Corp,0.14%,N/A
+NXPI,Nxp Semiconductors,0.14%,N/A
+EW,Edwards Lifesciences Corp,0.14%,N/A
+APH,Amphenol Corp,0.14%,N/A
+PSA,Public Storage,0.14%,N/A
+AEP,American Electric Power Company,0.14%,N/A
+ADSK,Autodesk Inc,0.14%,N/A
+CMG,Chipotle Mexican Grill,0.14%,N/A
+PSX,Phillips 66,0.14%,N/A
+MET,Metlife Inc,0.14%,N/A
+MAR,Marriot Int Cl A,0.13%,N/A
+MCHP,Microchip Technology,0.13%,N/A
 AZO,Autozone,0.13%,N/A
-GIS,"General Mills",0.13%,N/A
-ROP,"Roper Industries",0.13%,N/A
-ADM,"Archer Daniels Midland",0.13%,N/A
-A,"Agilent Technologies",0.13%,N/A
-JCI,"Johnson Controls Intl",0.13%,N/A
-COF,"Capital One Financial Corp",0.13%,N/A
-OXY,"Occidental Petroleum Corp",0.13%,N/A
-MSCI,"MSCI Inc",0.13%,N/A
-AIG,"American International Group",0.13%,N/A
-PH,"Parker-Hannifin Corp",0.13%,N/A
-NUE,"Nucor Corp",0.13%,N/A
-TRV,"The Travelers Companies Inc",0.13%,N/A
-KMB,"Kimberly-Clark Corp",0.13%,N/A
-CHTR,"Charter Communications Inc",0.13%,N/A
-CTVA,"Corteva Inc",0.13%,N/A
-FIS,"Fidelity National Information Services",0.13%,N/A
-IQV,"Iqvia Holdings Inc",0.13%,N/A
-DOW,"Dow Inc",0.12%,N/A
-MSI,"Motorola Solutions",0.12%,N/A
-TT,"Trane Technologies Plc",0.12%,N/A
-O,"Realty Income Corp",0.12%,N/A
-TEL,"Te Connectivity Ltd",0.12%,N/A
-SPG,"Simon Property Group",0.12%,N/A
-BIIB,"Biogen Inc",0.12%,N/A
-DXCM,"Dexcom Inc",0.12%,N/A
-AJG,"Arthur J. Gallagher & Company",0.12%,N/A
-EXC,"Exelon Corp",0.12%,N/A
-CNC,"Centene Corp",0.12%,N/A
-LHX,"L3Harris Technologies Inc",0.12%,N/A
-ROST,"Ross Stores Inc",0.12%,N/A
-IDXX,"Idexx Laboratories",0.12%,N/A
-HLT,"Hilton Inc",0.12%,N/A
-AFL,"Aflac Inc",0.12%,N/A
-MNST,"Monster Beverage Cp",0.11%,N/A
-DVN,"Devon Energy Corp",0.11%,N/A
-SYY,"Sysco Corp",0.11%,N/A
-CARR,"Carrier Global Corp",0.11%,N/A
-WMB,"Williams Companies",0.11%,N/A
-PCAR,"Paccar Inc",0.11%,N/A
-AMP,"Ameriprise Financial Services",0.11%,N/A
-PRU,"Prudential Financial Inc",0.11%,N/A
-HES,"Hess Corp",0.11%,N/A
-STZ,"Constellation Brands Inc",0.11%,N/A
-XEL,"XCEL Energy Inc",0.11%,N/A
-CTAS,"Cintas Corp",0.11%,N/A
-NEM,"Newmont Mining Corp",0.11%,N/A
-PAYX,"Paychex Inc",0.11%,N/A
-ECL,"Ecolab Inc",0.11%,N/A
-BK,"Bank of New York Mellon Corp",0.11%,N/A
-TDG,"Transdigm Group Inc",0.11%,N/A
-YUM,"Yum! Brands",0.11%,N/A
-ALL,"Allstate Corp",0.11%,N/A
-DD,"Dupont Denemours Inc",0.10%,N/A
-KMI,"Kinder Morgan",0.10%,N/A
-CMI,"Cummins Inc",0.10%,N/A
-WELL,"Welltower Inc",0.10%,N/A
-HSY,"Hershey Foods Corp",0.10%,N/A
-OTIS,"Otis Worldwide Corp",0.10%,N/A
-MTD,"Mettler-Toledo International",0.10%,N/A
-HAL,"Halliburton Company",0.10%,N/A
-ON,"On Semiconductor",0.10%,N/A
-CTSH,"Cognizant Tech Sol",0.10%,N/A
-FTNT,"Fortinet Inc",0.10%,N/A
-ODFL,"Old Dominion Freight Line Inc",0.10%,N/A
-WBD,"Discovery Inc Series A",0.10%,N/A
-AME,"Ametek Inc",0.10%,N/A
-STT,"State Street Corp",0.10%,N/A
-ED,"Consolidated Edison Company",0.10%,N/A
-VICI,"Vici Properties Inc",0.10%,N/A
-ROK,"Rockwell Automation Inc",0.10%,N/A
-ILMN,"Illumina Inc",0.10%,N/A
-DLR,"Digital Realty Trust",0.10%,N/A
-RMD,"Resmed Inc",0.09%,N/A
-ALB,"Albemarle Corp",0.09%,N/A
-KEYS,"Keysight Technologies Inc",0.09%,N/A
-BKR,"Baker Hughes Company",0.09%,N/A
-DFS,"Discover Financial Services",0.09%,N/A
-ANET,"Arista Networks Inc",0.09%,N/A
-DLTR,"Dollar Tree Inc",0.09%,N/A
-SBAC,"SBA Communications",0.09%,N/A
-KHC,"Kraft Heinz Company",0.09%,N/A
-URI,"United Rentals",0.09%,N/A
-APTV,"Aptiv Plc",0.09%,N/A
-DHI,"D.R. Horton",0.09%,N/A
-CSGP,"Costar Group Inc",0.09%,N/A
-GPN,"Global Payments Inc",0.09%,N/A
-PEG,"Public Service Enterprise Group Inc",0.09%,N/A
-OKE,"Oneok Inc",0.09%,N/A
-GWW,"W.W. Grainger",0.09%,N/A
-PPG,"PPG Industries",0.09%,N/A
-FAST,"Fastenal Company",0.09%,N/A
-ENPH,"Enphase Energy Inc",0.09%,N/A
-KDP,"Keurig Dr Pepper Inc",0.09%,N/A
-WEC,"Wisconsin Energy Corp",0.09%,N/A
-EA,"Electronic Arts Inc",0.09%,N/A
-CPRT,"Copart Inc",0.08%,N/A
-KR,"Kroger Company",0.08%,N/A
-IFF,"International Flavors & Fragrances",0.08%,N/A
-AWK,"American Water Works",0.08%,N/A
-ES,"Eversource Energy",0.08%,N/A
-WTW,"Willis Towers Watson Public Ltd",0.08%,N/A
-VRSK,"Verisk Analytics Inc",0.08%,N/A
-MTB,"M&T Bank Corp",0.08%,N/A
-TROW,"T Rowe Price Group",0.08%,N/A
-CBRE,"CBRE Group Inc",0.08%,N/A
-EBAY,"Ebay Inc",0.08%,N/A
-CEG,"Constellation Energy Corp",0.08%,N/A
-EFX,"Equifax Inc",0.08%,N/A
-HPQ,"HP Inc",0.08%,N/A
-ZBH,"Zimmer Biomet Holdings",0.08%,N/A
-ULTA,"Ulta Beauty Inc",0.08%,N/A
-IT,"Gartner Inc",0.08%,N/A
-CDW,"CDW Corp",0.08%,N/A
-GLW,"Corning Inc",0.08%,N/A
-LEN,"Lennar Corp",0.08%,N/A
-GEHC,"Ge Healthcare Technologies Inc",0.08%,N/A
-WBA,"Walgreens Boots Alliance",0.08%,N/A
-FRC,"First Republic Bank",0.08%,N/A
-EIX,"Edison International",0.08%,N/A
-TSCO,"Tractor Supply Company",0.07%,N/A
-FITB,"Fifth Third Bancorp",0.07%,N/A
-RSG,"Republic Services",0.07%,N/A
-WY,"Weyerhaeuser Company",0.07%,N/A
-PCG,"Pacific Gas & Electric Company",0.07%,N/A
-LYB,"Lyondellbasell Industries NV",0.07%,N/A
-DAL,"Delta Air Lines Inc",0.07%,N/A
-ABC,"Amerisourcebergen Corp",0.07%,N/A
-AVB,"Avalonbay Communities",0.07%,N/A
-ALGN,"Align Technology",0.07%,N/A
-ARE,"Alexandria Real Estate Equities",0.07%,N/A
-FTV,"Fortive Corp",0.07%,N/A
-FANG,"Diamondback Energy",0.07%,N/A
-HIG,"Hartford Financial Services Group",0.07%,N/A
-VMC,"Vulcan Materials Company",0.07%,N/A
-GPC,"Genuine Parts Company",0.07%,N/A
-ANSS,"Ansys Inc",0.07%,N/A
-ACGL,"Arch Capital Grp Ltd",0.07%,N/A
-BAX,"Baxter International Inc",0.07%,N/A
-IR,"Ingersoll Rand Inc",0.07%,N/A
-DOV,"Dover Corp",0.06%,N/A
-RF,"Regions Financial Corp",0.06%,N/A
-AEE,"Ameren Corp",0.06%,N/A
-EXR,"Extra Space Storage Inc",0.06%,N/A
-LH,"Laboratory Corp of America Holdings",0.06%,N/A
-MLM,"Martin Marietta Materials",0.06%,N/A
-ETR,"Entergy Corp",0.06%,N/A
-HBAN,"Huntington Bcshs",0.06%,N/A
-DTE,"Dte Energy Company",0.06%,N/A
-RJF,"Raymond James Financial",0.06%,N/A
-PWR,"Quanta Services",0.06%,N/A
-EQR,"Equity Residential",0.06%,N/A
-FE,"Firstenergy Corp",0.06%,N/A
-CFG,"Citizens Financial Group Inc/Ri",0.06%,N/A
-LUV,"Southwest Airlines Company",0.06%,N/A
-STE,"Steris Corp",0.06%,N/A
-PFG,"Principal Financial Group Inc",0.06%,N/A
-PPL,"PPL Corp",0.06%,N/A
-HOLX,"Hologic Inc",0.06%,N/A
-EPAM,"Epam Systems Inc",0.06%,N/A
-HPE,"Hewlett Packard Enterprise Comp",0.06%,N/A
-STLD,"Steel Dynamics Inc",0.06%,N/A
-VTR,"Ventas Inc",0.06%,N/A
-CAH,"Cardinal Health",0.06%,N/A
-WAT,"Waters Corp",0.06%,N/A
-CHD,"Church & Dwight Company",0.06%,N/A
-NTRS,"Northern Trust Corp",0.06%,N/A
-NDAQ,"Nasdaq Inc",0.06%,N/A
-TDY,"Teledyne Technologies Inc",0.06%,N/A
-MPWR,"Monolithic Power Sys",0.06%,N/A
-VRSN,"Verisign Inc",0.06%,N/A
-MAA,"Mid-America Apartment Communities",0.06%,N/A
-WST,"West Pharmaceutical Services",0.06%,N/A
-INVH,"Invitation Homes Inc",0.06%,N/A
-WAB,"Wabtec Corp",0.06%,N/A
-LVS,"Las Vegas Sands",0.06%,N/A
-MKC,"Mccormick & Company",0.05%,N/A
-CTRA,"Coterra Energy Inc",0.05%,N/A
-EXPD,"Expeditors Intl",0.05%,N/A
-OMC,"Omnicom Group Inc",0.05%,N/A
-XYL,"Xylem Inc",0.05%,N/A
-CLX,"Clorox Company",0.05%,N/A
-BALL,"Ball Corporation",0.05%,N/A
-DRI,"Darden Restaurants",0.05%,N/A
-SIVB,"Svb Financial Group",0.05%,N/A
-CINF,"Cincinnati Financial",0.05%,N/A
-CNP,"Centerpoint Energy Inc",0.05%,N/A
+GIS,General Mills,0.13%,N/A
+ROP,Roper Industries,0.13%,N/A
+ADM,Archer Daniels Midland,0.13%,N/A
+A,Agilent Technologies,0.13%,N/A
+JCI,Johnson Controls Intl,0.13%,N/A
+COF,Capital One Financial Corp,0.13%,N/A
+OXY,Occidental Petroleum Corp,0.13%,N/A
+MSCI,MSCI Inc,0.13%,N/A
+AIG,American International Group,0.13%,N/A
+PH,Parker-Hannifin Corp,0.13%,N/A
+NUE,Nucor Corp,0.13%,N/A
+TRV,The Travelers Companies Inc,0.13%,N/A
+KMB,Kimberly-Clark Corp,0.13%,N/A
+CHTR,Charter Communications Inc,0.13%,N/A
+CTVA,Corteva Inc,0.13%,N/A
+FIS,Fidelity National Information Services,0.13%,N/A
+IQV,Iqvia Holdings Inc,0.13%,N/A
+DOW,Dow Inc,0.12%,N/A
+MSI,Motorola Solutions,0.12%,N/A
+TT,Trane Technologies Plc,0.12%,N/A
+O,Realty Income Corp,0.12%,N/A
+TEL,Te Connectivity Ltd,0.12%,N/A
+SPG,Simon Property Group,0.12%,N/A
+BIIB,Biogen Inc,0.12%,N/A
+DXCM,Dexcom Inc,0.12%,N/A
+AJG,Arthur J. Gallagher & Company,0.12%,N/A
+EXC,Exelon Corp,0.12%,N/A
+CNC,Centene Corp,0.12%,N/A
+LHX,L3Harris Technologies Inc,0.12%,N/A
+ROST,Ross Stores Inc,0.12%,N/A
+IDXX,Idexx Laboratories,0.12%,N/A
+HLT,Hilton Inc,0.12%,N/A
+AFL,Aflac Inc,0.12%,N/A
+MNST,Monster Beverage Cp,0.11%,N/A
+DVN,Devon Energy Corp,0.11%,N/A
+SYY,Sysco Corp,0.11%,N/A
+CARR,Carrier Global Corp,0.11%,N/A
+WMB,Williams Companies,0.11%,N/A
+PCAR,Paccar Inc,0.11%,N/A
+AMP,Ameriprise Financial Services,0.11%,N/A
+PRU,Prudential Financial Inc,0.11%,N/A
+HES,Hess Corp,0.11%,N/A
+STZ,Constellation Brands Inc,0.11%,N/A
+XEL,XCEL Energy Inc,0.11%,N/A
+CTAS,Cintas Corp,0.11%,N/A
+NEM,Newmont Mining Corp,0.11%,N/A
+PAYX,Paychex Inc,0.11%,N/A
+ECL,Ecolab Inc,0.11%,N/A
+BK,Bank of New York Mellon Corp,0.11%,N/A
+TDG,Transdigm Group Inc,0.11%,N/A
+YUM,Yum! Brands,0.11%,N/A
+ALL,Allstate Corp,0.11%,N/A
+DD,Dupont Denemours Inc,0.10%,N/A
+KMI,Kinder Morgan,0.10%,N/A
+CMI,Cummins Inc,0.10%,N/A
+WELL,Welltower Inc,0.10%,N/A
+HSY,Hershey Foods Corp,0.10%,N/A
+OTIS,Otis Worldwide Corp,0.10%,N/A
+MTD,Mettler-Toledo International,0.10%,N/A
+HAL,Halliburton Company,0.10%,N/A
+ON,On Semiconductor,0.10%,N/A
+CTSH,Cognizant Tech Sol,0.10%,N/A
+FTNT,Fortinet Inc,0.10%,N/A
+ODFL,Old Dominion Freight Line Inc,0.10%,N/A
+WBD,Discovery Inc Series A,0.10%,N/A
+AME,Ametek Inc,0.10%,N/A
+STT,State Street Corp,0.10%,N/A
+ED,Consolidated Edison Company,0.10%,N/A
+VICI,Vici Properties Inc,0.10%,N/A
+ROK,Rockwell Automation Inc,0.10%,N/A
+ILMN,Illumina Inc,0.10%,N/A
+DLR,Digital Realty Trust,0.10%,N/A
+RMD,Resmed Inc,0.09%,N/A
+ALB,Albemarle Corp,0.09%,N/A
+KEYS,Keysight Technologies Inc,0.09%,N/A
+BKR,Baker Hughes Company,0.09%,N/A
+DFS,Discover Financial Services,0.09%,N/A
+ANET,Arista Networks Inc,0.09%,N/A
+DLTR,Dollar Tree Inc,0.09%,N/A
+SBAC,SBA Communications,0.09%,N/A
+KHC,Kraft Heinz Company,0.09%,N/A
+URI,United Rentals,0.09%,N/A
+APTV,Aptiv Plc,0.09%,N/A
+DHI,D.R. Horton,0.09%,N/A
+CSGP,Costar Group Inc,0.09%,N/A
+GPN,Global Payments Inc,0.09%,N/A
+PEG,Public Service Enterprise Group Inc,0.09%,N/A
+OKE,Oneok Inc,0.09%,N/A
+GWW,W.W. Grainger,0.09%,N/A
+PPG,PPG Industries,0.09%,N/A
+FAST,Fastenal Company,0.09%,N/A
+ENPH,Enphase Energy Inc,0.09%,N/A
+KDP,Keurig Dr Pepper Inc,0.09%,N/A
+WEC,Wisconsin Energy Corp,0.09%,N/A
+EA,Electronic Arts Inc,0.09%,N/A
+CPRT,Copart Inc,0.08%,N/A
+KR,Kroger Company,0.08%,N/A
+IFF,International Flavors & Fragrances,0.08%,N/A
+AWK,American Water Works,0.08%,N/A
+ES,Eversource Energy,0.08%,N/A
+WTW,Willis Towers Watson Public Ltd,0.08%,N/A
+VRSK,Verisk Analytics Inc,0.08%,N/A
+MTB,M&T Bank Corp,0.08%,N/A
+TROW,T Rowe Price Group,0.08%,N/A
+CBRE,CBRE Group Inc,0.08%,N/A
+EBAY,Ebay Inc,0.08%,N/A
+CEG,Constellation Energy Corp,0.08%,N/A
+EFX,Equifax Inc,0.08%,N/A
+HPQ,HP Inc,0.08%,N/A
+ZBH,Zimmer Biomet Holdings,0.08%,N/A
+ULTA,Ulta Beauty Inc,0.08%,N/A
+IT,Gartner Inc,0.08%,N/A
+CDW,CDW Corp,0.08%,N/A
+GLW,Corning Inc,0.08%,N/A
+LEN,Lennar Corp,0.08%,N/A
+GEHC,Ge Healthcare Technologies Inc,0.08%,N/A
+WBA,Walgreens Boots Alliance,0.08%,N/A
+FRC,First Republic Bank,0.08%,N/A
+EIX,Edison International,0.08%,N/A
+TSCO,Tractor Supply Company,0.07%,N/A
+FITB,Fifth Third Bancorp,0.07%,N/A
+RSG,Republic Services,0.07%,N/A
+WY,Weyerhaeuser Company,0.07%,N/A
+PCG,Pacific Gas & Electric Company,0.07%,N/A
+LYB,Lyondellbasell Industries NV,0.07%,N/A
+DAL,Delta Air Lines Inc,0.07%,N/A
+ABC,Amerisourcebergen Corp,0.07%,N/A
+AVB,Avalonbay Communities,0.07%,N/A
+ALGN,Align Technology,0.07%,N/A
+ARE,Alexandria Real Estate Equities,0.07%,N/A
+FTV,Fortive Corp,0.07%,N/A
+FANG,Diamondback Energy,0.07%,N/A
+HIG,Hartford Financial Services Group,0.07%,N/A
+VMC,Vulcan Materials Company,0.07%,N/A
+GPC,Genuine Parts Company,0.07%,N/A
+ANSS,Ansys Inc,0.07%,N/A
+ACGL,Arch Capital Grp Ltd,0.07%,N/A
+BAX,Baxter International Inc,0.07%,N/A
+IR,Ingersoll Rand Inc,0.07%,N/A
+DOV,Dover Corp,0.06%,N/A
+RF,Regions Financial Corp,0.06%,N/A
+AEE,Ameren Corp,0.06%,N/A
+EXR,Extra Space Storage Inc,0.06%,N/A
+LH,Laboratory Corp of America Holdings,0.06%,N/A
+MLM,Martin Marietta Materials,0.06%,N/A
+ETR,Entergy Corp,0.06%,N/A
+HBAN,Huntington Bcshs,0.06%,N/A
+DTE,Dte Energy Company,0.06%,N/A
+RJF,Raymond James Financial,0.06%,N/A
+PWR,Quanta Services,0.06%,N/A
+EQR,Equity Residential,0.06%,N/A
+FE,Firstenergy Corp,0.06%,N/A
+CFG,Citizens Financial Group Inc/Ri,0.06%,N/A
+LUV,Southwest Airlines Company,0.06%,N/A
+STE,Steris Corp,0.06%,N/A
+PFG,Principal Financial Group Inc,0.06%,N/A
+PPL,PPL Corp,0.06%,N/A
+HOLX,Hologic Inc,0.06%,N/A
+EPAM,Epam Systems Inc,0.06%,N/A
+HPE,Hewlett Packard Enterprise Comp,0.06%,N/A
+STLD,Steel Dynamics Inc,0.06%,N/A
+VTR,Ventas Inc,0.06%,N/A
+CAH,Cardinal Health,0.06%,N/A
+WAT,Waters Corp,0.06%,N/A
+CHD,Church & Dwight Company,0.06%,N/A
+NTRS,Northern Trust Corp,0.06%,N/A
+NDAQ,Nasdaq Inc,0.06%,N/A
+TDY,Teledyne Technologies Inc,0.06%,N/A
+MPWR,Monolithic Power Sys,0.06%,N/A
+VRSN,Verisign Inc,0.06%,N/A
+MAA,Mid-America Apartment Communities,0.06%,N/A
+WST,West Pharmaceutical Services,0.06%,N/A
+INVH,Invitation Homes Inc,0.06%,N/A
+WAB,Wabtec Corp,0.06%,N/A
+LVS,Las Vegas Sands,0.06%,N/A
+MKC,Mccormick & Company,0.05%,N/A
+CTRA,Coterra Energy Inc,0.05%,N/A
+EXPD,Expeditors Intl,0.05%,N/A
+OMC,Omnicom Group Inc,0.05%,N/A
+XYL,Xylem Inc,0.05%,N/A
+CLX,Clorox Company,0.05%,N/A
+BALL,Ball Corporation,0.05%,N/A
+DRI,Darden Restaurants,0.05%,N/A
+SIVB,Svb Financial Group,0.05%,N/A
+CINF,Cincinnati Financial,0.05%,N/A
+CNP,Centerpoint Energy Inc,0.05%,N/A
 KEY,Keycorp,0.05%,N/A
-CMS,"Cms Energy Corp",0.05%,N/A
-ETSY,"Etsy Inc",0.05%,N/A
-AMCR,"Amcor Plc",0.05%,N/A
-TSN,"Tyson Foods",0.05%,N/A
-EXPE,"Expedia Group Inc",0.05%,N/A
-BBY,"Best Buy Company",0.05%,N/A
-K,"Kellogg Company",0.05%,N/A
-SEDG,"Solaredge Tech",0.05%,N/A
-BR,"Broadridge Financial Solutions Llc",0.05%,N/A
-CAG,"Conagra Brands Inc",0.05%,N/A
-SWKS,"Skyworks Solutions",0.05%,N/A
-MOH,"Molina Healthcare Inc",0.05%,N/A
-MOS,"Mosaic Company",0.05%,N/A
-AES,"The Aes Corp",0.05%,N/A
+CMS,Cms Energy Corp,0.05%,N/A
+ETSY,Etsy Inc,0.05%,N/A
+AMCR,Amcor Plc,0.05%,N/A
+TSN,Tyson Foods,0.05%,N/A
+EXPE,Expedia Group Inc,0.05%,N/A
+BBY,Best Buy Company,0.05%,N/A
+K,Kellogg Company,0.05%,N/A
+SEDG,Solaredge Tech,0.05%,N/A
+BR,Broadridge Financial Solutions Llc,0.05%,N/A
+CAG,Conagra Brands Inc,0.05%,N/A
+SWKS,Skyworks Solutions,0.05%,N/A
+MOH,Molina Healthcare Inc,0.05%,N/A
+MOS,Mosaic Company,0.05%,N/A
+AES,The Aes Corp,0.05%,N/A
 PKI,Perkinelmer,0.05%,N/A
-CF,"Cf Industries Holdings",0.05%,N/A
-,"U.S. Dollar",0.05%,N/A
-IEX,"Idex Corp",0.05%,N/A
-DGX,"Quest Diagnostics Inc",0.05%,N/A
-COO,"Cooper Companies",0.05%,N/A
-ZBRA,"Zebra Technologies",0.05%,N/A
-TER,"Teradyne Inc",0.05%,N/A
-UAL,"United Airlines Holdings Inc",0.05%,N/A
-FSLR,"First Solar Inc",0.05%,N/A
-TTWO,"Take-Two Interactive",0.05%,N/A
-SYF,"Synchrony Financial",0.05%,N/A
-MRO,"Marathon Oil Corp",0.05%,N/A
-JBHT,"J B Hunt Transport",0.05%,N/A
-TRGP,"Targa Resources",0.05%,N/A
-ATO,"Atmos Energy Corp",0.05%,N/A
-SJM,"J.M. Smucker Company",0.05%,N/A
-J,"Jacobs Engineering Group Inc",0.05%,N/A
-PAYC,"Paycom Software Inc",0.05%,N/A
-FDS,"Factset Research Systems Inc",0.05%,N/A
-NVR,"NVR Inc",0.05%,N/A
-FMC,"FMC Corp",0.05%,N/A
-IRM,"Iron Mountain Inc",0.05%,N/A
-FLT,"Fleetcor Technologies",0.05%,N/A
-INCY,"Incyte Corp",0.05%,N/A
-TXT,"Textron Inc",0.05%,N/A
-POOL,"Pool Corp",0.05%,N/A
-IPG,"Interpublic Group of Companies",0.04%,N/A
-GRMN,"Garmin Ltd",0.04%,N/A
-RCL,"Royal Caribbean Cruises Ltd",0.04%,N/A
-HWM,"Howmet Aerospace Inc",0.04%,N/A
-LKQ,"LKQ Corp",0.04%,N/A
-TRMB,"Trimble Navigation",0.04%,N/A
-NTAP,"Netapp Inc",0.04%,N/A
-IP,"International Paper Company",0.04%,N/A
-AVY,"Avery Dennison Corp",0.04%,N/A
-PEAK,"Healthpeak Properties Inc",0.04%,N/A
-ESS,"Essex Property Trust",0.04%,N/A
-VTRS,"Viatris Inc",0.04%,N/A
-LW,"Lamb Weston Holdings Inc",0.04%,N/A
-EVRG,"Evergy Inc",0.04%,N/A
-WRB,"W.R. Berkley Corp",0.04%,N/A
-AKAM,"Akamai Technologies",0.04%,N/A
-PTC,"Ptc Inc",0.04%,N/A
-SNA,"Snap-On Inc",0.04%,N/A
-APA,"Apa Corp",0.04%,N/A
-TYL,"Tyler Technologies",0.04%,N/A
-KIM,"Kimco Realty Corp",0.04%,N/A
-BRO,"Brown & Brown",0.04%,N/A
-RE,"Everest Re Group",0.04%,N/A
-STX,"Seagate Technology Hldgs Plc",0.04%,N/A
-SWK,"Stanley Black & Decker Inc",0.04%,N/A
-MGM,"MGM Resorts International",0.04%,N/A
-PKG,"Packaging Corp of America",0.04%,N/A
-LDOS,"Leidos Holdings Inc",0.04%,N/A
-LNT,"Alliant Energy Corp",0.04%,N/A
-CBOE,"CBOE Global Markets Inc",0.04%,N/A
-MTCH,"Match Group Inc",0.04%,N/A
+CF,Cf Industries Holdings,0.05%,N/A
+,U.S. Dollar,0.05%,N/A
+IEX,Idex Corp,0.05%,N/A
+DGX,Quest Diagnostics Inc,0.05%,N/A
+COO,Cooper Companies,0.05%,N/A
+ZBRA,Zebra Technologies,0.05%,N/A
+TER,Teradyne Inc,0.05%,N/A
+UAL,United Airlines Holdings Inc,0.05%,N/A
+FSLR,First Solar Inc,0.05%,N/A
+TTWO,Take-Two Interactive,0.05%,N/A
+SYF,Synchrony Financial,0.05%,N/A
+MRO,Marathon Oil Corp,0.05%,N/A
+JBHT,J B Hunt Transport,0.05%,N/A
+TRGP,Targa Resources,0.05%,N/A
+ATO,Atmos Energy Corp,0.05%,N/A
+SJM,J.M. Smucker Company,0.05%,N/A
+J,Jacobs Engineering Group Inc,0.05%,N/A
+PAYC,Paycom Software Inc,0.05%,N/A
+FDS,Factset Research Systems Inc,0.05%,N/A
+NVR,NVR Inc,0.05%,N/A
+FMC,FMC Corp,0.05%,N/A
+IRM,Iron Mountain Inc,0.05%,N/A
+FLT,Fleetcor Technologies,0.05%,N/A
+INCY,Incyte Corp,0.05%,N/A
+TXT,Textron Inc,0.05%,N/A
+POOL,Pool Corp,0.05%,N/A
+IPG,Interpublic Group of Companies,0.04%,N/A
+GRMN,Garmin Ltd,0.04%,N/A
+RCL,Royal Caribbean Cruises Ltd,0.04%,N/A
+HWM,Howmet Aerospace Inc,0.04%,N/A
+LKQ,LKQ Corp,0.04%,N/A
+TRMB,Trimble Navigation,0.04%,N/A
+NTAP,Netapp Inc,0.04%,N/A
+IP,International Paper Company,0.04%,N/A
+AVY,Avery Dennison Corp,0.04%,N/A
+PEAK,Healthpeak Properties Inc,0.04%,N/A
+ESS,Essex Property Trust,0.04%,N/A
+VTRS,Viatris Inc,0.04%,N/A
+LW,Lamb Weston Holdings Inc,0.04%,N/A
+EVRG,Evergy Inc,0.04%,N/A
+WRB,W.R. Berkley Corp,0.04%,N/A
+AKAM,Akamai Technologies,0.04%,N/A
+PTC,Ptc Inc,0.04%,N/A
+SNA,Snap-On Inc,0.04%,N/A
+APA,Apa Corp,0.04%,N/A
+TYL,Tyler Technologies,0.04%,N/A
+KIM,Kimco Realty Corp,0.04%,N/A
+BRO,Brown & Brown,0.04%,N/A
+RE,Everest Re Group,0.04%,N/A
+STX,Seagate Technology Hldgs Plc,0.04%,N/A
+SWK,Stanley Black & Decker Inc,0.04%,N/A
+MGM,MGM Resorts International,0.04%,N/A
+PKG,Packaging Corp of America,0.04%,N/A
+LDOS,Leidos Holdings Inc,0.04%,N/A
+LNT,Alliant Energy Corp,0.04%,N/A
+CBOE,CBOE Global Markets Inc,0.04%,N/A
+MTCH,Match Group Inc,0.04%,N/A
 PHM,Pultegroup,0.04%,N/A
-HRL,"Hormel Foods Corp",0.04%,N/A
-MKTX,"Marketaxess Holdings",0.04%,N/A
-NDSN,"Nordson Corp",0.04%,N/A
-WDC,"Western Digital Cp",0.04%,N/A
-UDR,"United Dominion Realty Trust",0.04%,N/A
-HST,"Host Marriott Financial Trust",0.04%,N/A
-CPT,"Camden Property Trust",0.04%,N/A
-JKHY,"Jack Henry & Assoc",0.04%,N/A
-DPZ,"Domino's Pizza Inc",0.04%,N/A
-CHRW,"C.H. Robinson Ww",0.04%,N/A
-KMX,"Carmax Inc",0.04%,N/A
-CRL,"Charles River Laboratories Intl",0.04%,N/A
-GEN,"Gen Digital Inc",0.04%,N/A
-MAS,"Masco Corp",0.04%,N/A
-CE,"Celanese Corp",0.04%,N/A
-PARA,"Paramount Global Cl B",0.04%,N/A
-BF.B,"Brown Forman Inc Cl B",0.03%,N/A
-L,"Loews Corp",0.03%,N/A
-HSIC,"Henry Schein Inc",0.03%,N/A
-CTLT,"Catalent Inc",0.03%,N/A
-TFX,"Teleflex Inc",0.03%,N/A
-TECH,"Bio-Techne Cp",0.03%,N/A
-CCL,"Carnival Corp",0.03%,N/A
-CZR,"Caesars Entertainment Inc",0.03%,N/A
-LYV,"Live Nation Entertainment",0.03%,N/A
-CDAY,"Ceridian Hcm Holding Inc",0.03%,N/A
-TPR,"Tapestry Inc",0.03%,N/A
-BWA,"Borgwarner Inc",0.03%,N/A
-EMN,"Eastman Chemical Company",0.03%,N/A
-NI,"NiSource Inc",0.03%,N/A
-GL,"Globe Life Inc",0.03%,N/A
-EQT,"Eqt Corp",0.03%,N/A
-AAL,"American Airlines Gp",0.03%,N/A
-WYNN,"Wynn Resorts Ltd",0.03%,N/A
-ALLE,"Allegion Plc",0.03%,N/A
-QRVO,"Qorvo Inc",0.03%,N/A
-CPB,"Campbell Soup Company",0.03%,N/A
-BBWI,"Bath & Body Works Inc",0.03%,N/A
-FOXA,"Fox Corp Cl A",0.03%,N/A
-BXP,"Boston Properties",0.03%,N/A
-TAP,"Molson Coors Brewing Company",0.03%,N/A
-REG,"Regency Centers Corp",0.03%,N/A
-BIO,"Bio-Rad Laboratories",0.03%,N/A
-JNPR,"Juniper Networks",0.03%,N/A
-CMA,"Comerica Inc",0.03%,N/A
-UHS,"Universal Health Services",0.03%,N/A
-PNR,"Pentair Ltd",0.03%,N/A
-RHI,"Robert Half International Inc",0.03%,N/A
-VFC,"V.F. Corp",0.03%,N/A
-AAP,"Advance Auto Parts Inc",0.03%,N/A
-IVZ,"Invesco Plc",0.03%,N/A
-HII,"Huntington Ingalls Industries",0.03%,N/A
-BEN,"Franklin Resources",0.03%,N/A
-FFIV,"F5 Inc",0.03%,N/A
-WRK,"Westrock Company",0.03%,N/A
-AOS,"Smith A.O. Corp",0.03%,N/A
-PNW,"Pinnacle West Capital Corp",0.02%,N/A
-SBNY,"Signature Bank",0.02%,N/A
-ROL,"Rollins Inc",0.02%,N/A
-XRAY,"Dentsply Sirona Inc",0.02%,N/A
-FRT,"Federal Realty Investment Trust",0.02%,N/A
-WHR,"Whirlpool Corp",0.02%,N/A
-NRG,"NRG Energy",0.02%,N/A
-ZION,"Zions Bancorp",0.02%,N/A
-NWSA,"News Corp Cl A",0.02%,N/A
-SEE,"Sealed Air Corp",0.02%,N/A
-HAS,"Hasbro Inc",0.02%,N/A
-GNRC,"Generac Holdings Inc",0.02%,N/A
-OGN,"Organon & Co.",0.02%,N/A
-AIZ,"Assurant Inc",0.02%,N/A
-NCLH,"Norwegian Cruise Ord",0.02%,N/A
-ALK,"Alaska Air Group",0.02%,N/A
-DXC,"Dxc Technology Company",0.02%,N/A
-MHK,"Mohawk Industries",0.02%,N/A
-NWL,"Newell Rubbermaid Inc",0.02%,N/A
-LNC,"Lincoln National Corp",0.02%,N/A
-RL,"Ralph Lauren Corp",0.02%,N/A
-DVA,"Davita Healthcare Partners Inc",0.01%,N/A
-FOX,"Fox Corp Cl B",0.01%,N/A
-LUMN,"Lumen Technologies Inc",0.01%,N/A
-DISH,"Dish Network Corp",0.01%,N/A
-NWS,"News Corp Cl B",0.01%,N/A
-SPY,"S&P 500 SPDR",0.00%,N/A
+HRL,Hormel Foods Corp,0.04%,N/A
+MKTX,Marketaxess Holdings,0.04%,N/A
+NDSN,Nordson Corp,0.04%,N/A
+WDC,Western Digital Cp,0.04%,N/A
+UDR,United Dominion Realty Trust,0.04%,N/A
+HST,Host Marriott Financial Trust,0.04%,N/A
+CPT,Camden Property Trust,0.04%,N/A
+JKHY,Jack Henry & Assoc,0.04%,N/A
+DPZ,Domino's Pizza Inc,0.04%,N/A
+CHRW,C.H. Robinson Ww,0.04%,N/A
+KMX,Carmax Inc,0.04%,N/A
+CRL,Charles River Laboratories Intl,0.04%,N/A
+GEN,Gen Digital Inc,0.04%,N/A
+MAS,Masco Corp,0.04%,N/A
+CE,Celanese Corp,0.04%,N/A
+PARA,Paramount Global Cl B,0.04%,N/A
+BF.B,Brown Forman Inc Cl B,0.03%,N/A
+L,Loews Corp,0.03%,N/A
+HSIC,Henry Schein Inc,0.03%,N/A
+CTLT,Catalent Inc,0.03%,N/A
+TFX,Teleflex Inc,0.03%,N/A
+TECH,Bio-Techne Cp,0.03%,N/A
+CCL,Carnival Corp,0.03%,N/A
+CZR,Caesars Entertainment Inc,0.03%,N/A
+LYV,Live Nation Entertainment,0.03%,N/A
+CDAY,Ceridian Hcm Holding Inc,0.03%,N/A
+TPR,Tapestry Inc,0.03%,N/A
+BWA,Borgwarner Inc,0.03%,N/A
+EMN,Eastman Chemical Company,0.03%,N/A
+NI,NiSource Inc,0.03%,N/A
+GL,Globe Life Inc,0.03%,N/A
+EQT,Eqt Corp,0.03%,N/A
+AAL,American Airlines Gp,0.03%,N/A
+WYNN,Wynn Resorts Ltd,0.03%,N/A
+ALLE,Allegion Plc,0.03%,N/A
+QRVO,Qorvo Inc,0.03%,N/A
+CPB,Campbell Soup Company,0.03%,N/A
+BBWI,Bath & Body Works Inc,0.03%,N/A
+FOXA,Fox Corp Cl A,0.03%,N/A
+BXP,Boston Properties,0.03%,N/A
+TAP,Molson Coors Brewing Company,0.03%,N/A
+REG,Regency Centers Corp,0.03%,N/A
+BIO,Bio-Rad Laboratories,0.03%,N/A
+JNPR,Juniper Networks,0.03%,N/A
+CMA,Comerica Inc,0.03%,N/A
+UHS,Universal Health Services,0.03%,N/A
+PNR,Pentair Ltd,0.03%,N/A
+RHI,Robert Half International Inc,0.03%,N/A
+VFC,V.F. Corp,0.03%,N/A
+AAP,Advance Auto Parts Inc,0.03%,N/A
+IVZ,Invesco Plc,0.03%,N/A
+HII,Huntington Ingalls Industries,0.03%,N/A
+BEN,Franklin Resources,0.03%,N/A
+FFIV,F5 Inc,0.03%,N/A
+WRK,Westrock Company,0.03%,N/A
+AOS,Smith A.O. Corp,0.03%,N/A
+PNW,Pinnacle West Capital Corp,0.02%,N/A
+SBNY,Signature Bank,0.02%,N/A
+ROL,Rollins Inc,0.02%,N/A
+XRAY,Dentsply Sirona Inc,0.02%,N/A
+FRT,Federal Realty Investment Trust,0.02%,N/A
+WHR,Whirlpool Corp,0.02%,N/A
+NRG,NRG Energy,0.02%,N/A
+ZION,Zions Bancorp,0.02%,N/A
+NWSA,News Corp Cl A,0.02%,N/A
+SEE,Sealed Air Corp,0.02%,N/A
+HAS,Hasbro Inc,0.02%,N/A
+GNRC,Generac Holdings Inc,0.02%,N/A
+OGN,Organon & Co.,0.02%,N/A
+AIZ,Assurant Inc,0.02%,N/A
+NCLH,Norwegian Cruise Ord,0.02%,N/A
+ALK,Alaska Air Group,0.02%,N/A
+DXC,Dxc Technology Company,0.02%,N/A
+MHK,Mohawk Industries,0.02%,N/A
+NWL,Newell Rubbermaid Inc,0.02%,N/A
+LNC,Lincoln National Corp,0.02%,N/A
+RL,Ralph Lauren Corp,0.02%,N/A
+DVA,Davita Healthcare Partners Inc,0.01%,N/A
+FOX,Fox Corp Cl B,0.01%,N/A
+LUMN,Lumen Technologies Inc,0.01%,N/A
+DISH,Dish Network Corp,0.01%,N/A
+NWS,News Corp Cl B,0.01%,N/A
+SPY,S&P 500 SPDR,0.00%,N/A
 ,N/A,0.00%,N/A
-"Downloaded from Barchart.com as of 02-08-2023 12:13pm CST"
