@@ -247,7 +247,7 @@ def running_mode(all_symbols):
 			row = str(data)
 			#writer.writerow([row])
 
-			self.process_data(row,writer,all_symbols)
+			process_data(row,writer,all_symbols)
 
 
 if __name__ == '__main__':
