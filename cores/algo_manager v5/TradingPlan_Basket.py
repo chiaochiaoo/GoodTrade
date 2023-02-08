@@ -384,6 +384,7 @@ class TradingPlan_Basket:
 
 		total_unreal = 0
 
+		check = {}
 		for symbol,val in self.current_shares.items():
 
 			cur_stock_price = self.symbols[symbol].get_bid()
@@ -397,8 +398,11 @@ class TradingPlan_Basket:
 				else:
 					cur_stock_price = self.symbols[symbol].get_ask()
 					total_unreal +=  ((self.average_price[symbol] - cur_stock_price)-0.01) * abs(self.current_shares[symbol]) #self.data[AVERAGE_PRICE]-price
-
+					check[symbol] = [cur_stock_price,self.average_price[symbol],self.current_shares[symbol]]
 					#log_print(self.algo_name,symbol,"avg price",self.average_price[symbol],"cur price",cur_stock_price,"share",val,"result",(self.average_price[symbol] - cur_stock_price) * abs(self.current_shares[symbol]))
+		
+		log_print("PNL checking",self.algo_name,check)
+		
 		self.data[UNREAL] = round(total_unreal,2)
 		self.tkvars[UNREAL].set(self.data[UNREAL])
 
