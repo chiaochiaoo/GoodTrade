@@ -1,0 +1,103 @@
+Symbol,Name,"% Holding",Shares
+AAPL,"Apple Inc",12.17%,N/A
+MSFT,"Microsoft Corp",11.80%,N/A
+AMZN,"Amazon.com Inc",6.49%,N/A
+NVDA,"Nvidia Corp",4.14%,N/A
+GOOG,"Alphabet Cl C",3.94%,N/A
+GOOGL,"Alphabet Cl A",3.93%,N/A
+TSLA,"Tesla Inc",3.69%,N/A
+META,"Meta Platforms Inc",3.35%,N/A
+AVGO,"Broadcom Ltd",1.93%,N/A
+PEP,"Pepsico Inc",1.86%,N/A
+COST,"Costco Wholesale",1.82%,N/A
+CSCO,"Cisco Systems Inc",1.60%,N/A
+TMUS,"T-Mobile US",1.44%,N/A
+ADBE,"Adobe Systems Inc",1.41%,N/A
+CMCSA,"Comcast Corp A",1.38%,N/A
+TXN,"Texas Instruments",1.32%,N/A
+NFLX,"Netflix Inc",1.30%,N/A
+QCOM,"Qualcomm Inc",1.21%,N/A
+AMD,"Adv Micro Devices",1.11%,N/A
+HON,"Honeywell International Inc",1.09%,N/A
+AMGN,"Amgen Inc",1.04%,N/A
+INTC,"Intel Corp",0.99%,N/A
+SBUX,"Starbucks Corp",0.96%,N/A
+INTU,"Intuit Inc",0.95%,N/A
+GILD,"Gilead Sciences Inc",0.85%,N/A
+AMAT,"Applied Materials",0.82%,N/A
+PYPL,"Paypal Holdings",0.78%,N/A
+BKNG,"Booking Holdings Inc",0.76%,N/A
+ADP,"Automatic Data Procs",0.75%,N/A
+ADI,"Analog Devices",0.73%,N/A
+MDLZ,"Mondelez Intl Inc",0.72%,N/A
+ISRG,"Intuitive Surg Inc",0.72%,N/A
+REGN,"Regeneron Pharmaceuticals",0.67%,N/A
+VRTX,"Vertex Pharmaceutic",0.62%,N/A
+LRCX,"Lam Research Corp",0.58%,N/A
+MU,"Micron Technology",0.54%,N/A
+CSX,"CSX Corp",0.54%,N/A
+FISV,"Fiserv Inc",0.54%,N/A
+MRNA,"Moderna Inc",0.53%,N/A
+CHTR,"Charter Communications Inc",0.51%,N/A
+ASML,"Asml Holdings NY Reg ADR",0.48%,N/A
+MELI,"Mercadolibre Inc",0.48%,N/A
+ATVI,"Activision Blizzard",0.47%,N/A
+KLAC,"K L A-Tencor Corp",0.46%,N/A
+SNPS,"Synopsys Inc",0.44%,N/A
+MAR,"Marriot Int Cl A",0.44%,N/A
+MNST,"Monster Beverage Cp",0.42%,N/A
+CDNS,"Cadence Design Sys",0.41%,N/A
+KDP,"Keurig Dr Pepper Inc",0.40%,N/A
+ORLY,"O'Reilly Automotive",0.40%,N/A
+NXPI,"Nxp Semiconductors",0.40%,N/A
+PANW,"Palo Alto Networks Inc",0.39%,N/A
+ADSK,"Autodesk Inc",0.39%,N/A
+KHC,"Kraft Heinz Company",0.39%,N/A
+AEP,"American Electric Power Company",0.38%,N/A
+ABNB,"Airbnb Inc Cl A",0.38%,N/A
+MCHP,"Microchip Technology",0.38%,N/A
+CTAS,"Cintas Corp",0.36%,N/A
+PDD,"Pinduoduo Inc ADR",0.36%,N/A
+PAYX,"Paychex Inc",0.34%,N/A
+DXCM,"Dexcom Inc",0.33%,N/A
+FTNT,"Fortinet Inc",0.33%,N/A
+ODFL,"Old Dominion Freight Line Inc",0.33%,N/A
+BIIB,"Biogen Inc",0.33%,N/A
+EXC,"Exelon Corp",0.32%,N/A
+ROST,"Ross Stores Inc",0.32%,N/A
+IDXX,"Idexx Laboratories",0.32%,N/A
+MRVL,"Marvell Technology Inc",0.32%,N/A
+LULU,"Lululemon Athletica",0.31%,N/A
+AZN,"Astrazeneca Plc ADR",0.31%,N/A
+PCAR,"Paccar Inc",0.31%,N/A
+WDAY,"Workday Inc",0.30%,N/A
+WBD,"Discovery Inc Series A",0.30%,N/A
+XEL,"XCEL Energy Inc",0.30%,N/A
+CTSH,"Cognizant Tech Sol",0.28%,N/A
+GFS,"Globalfoundries Inc",0.28%,N/A
+ILMN,"Illumina Inc",0.27%,N/A
+DLTR,"Dollar Tree Inc",0.27%,N/A
+CPRT,"Copart Inc",0.26%,N/A
+WBA,"Walgreens Boots Alliance",0.26%,N/A
+EA,"Electronic Arts Inc",0.25%,N/A
+BKR,"Baker Hughes Company",0.25%,N/A
+CSGP,"Costar Group Inc",0.25%,N/A
+FAST,"Fastenal Company",0.25%,N/A
+ENPH,"Enphase Energy Inc",0.24%,N/A
+VRSK,"Verisk Analytics Inc",0.23%,N/A
+JD,"Jd.com Inc ADR",0.22%,N/A
+EBAY,"Ebay Inc",0.22%,N/A
+CEG,"Constellation Energy Corp",0.22%,N/A
+ALGN,"Align Technology",0.21%,N/A
+SGEN,"Seagen Inc",0.21%,N/A
+TEAM,"Atlassian Corp",0.20%,N/A
+CRWD,"Crowdstrike Holdings Inc",0.20%,N/A
+FANG,"Diamondback Energy",0.19%,N/A
+ANSS,"Ansys Inc",0.19%,N/A
+DDOG,"Datadog Inc Cl A",0.19%,N/A
+SIRI,"Sirius XM Holdings",0.16%,N/A
+ZM,"Zoom Video Communications Cl A",0.16%,N/A
+LCID,"Lucid Group Inc",0.16%,N/A
+ZS,"Zscaler Inc",0.16%,N/A
+QQQ,"Nasdaq QQQ Invesco ETF",0.00%,N/A
+"Downloaded from Barchart.com as of 02-08-2023 12:14pm CST"
