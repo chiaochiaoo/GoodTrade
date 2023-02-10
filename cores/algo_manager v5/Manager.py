@@ -753,7 +753,7 @@ class Manager:
 							handl.start()
 							#self.moo_apply_basket_cmd(d[1],orders,risk,aggresive)
 
-						elif "COPN" in d[1] and cur_ts<570:
+						elif "COP" in d[1] and cur_ts<570:
 							handl = threading.Thread(target=self.moo_apply_basket_cmd,args=(d[1],orders,risk,aggresive,),daemon=True)
 							handl.start()
 							
