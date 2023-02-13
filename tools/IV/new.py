@@ -25,12 +25,14 @@ def find_between(data, first, last):
 		return data
 def timestamp_seconds(s):
 
-	p = s.split(":")
+	p = s[:-4].split(":")
+	dec = s.split(".")
 	try:
-		x = int(p[0])*3600+int(p[1])*60+int(p[2])
+		x = int(p[0])*3600+int(p[1])*60+int(p[2])+int(dec[1])/1000
+		#print(x)
 		return x
 	except Exception as e:
-		print("Timestamp conversion error:",e)
+		print("Timestamp conversion error:",e,int(dec[1])/1000)
 		return 0
 def timestamp(s):
 	p = s.split(":")
@@ -115,7 +117,7 @@ class processor:
 				print("activating.....data collection")
 				self.open_file()
 
-				process_ppro = multiprocessing.Process(target=running_mode, args=(self.all_symbols,),daemon=True)
+				process_ppro = multiprocessing.Process(target=running_mode, args=(),daemon=True)
 				process_ppro.daemon=True
 				process_ppro.start()
 
@@ -153,28 +155,28 @@ class processor:
 
 
 def force_close_port(port, process_name=None):
-    """Terminate a process that is bound to a port.
-    
-    The process name can be set (eg. python), which will
-    ignore any other process that doesn't start with it.
-    """
-    print("killing 4135",port)
-    for proc in psutil.process_iter():
-        for conn in proc.connections():
-            if conn.laddr[1] == port:
-                #Don't close if it belongs to SYSTEM
-                #On windows using .username() results in AccessDenied
-                #TODO: Needs testing on other operating systems
-                try:
-                    proc.username()
-                except psutil.AccessDenied:
-                    pass
-                else:
-                    if process_name is None or proc.name().startswith(process_name):
-                        try:
-                            proc.kill()
-                        except (psutil.NoSuchProcess, psutil.AccessDenied):
-                            pass 
+	"""Terminate a process that is bound to a port.
+	
+	The process name can be set (eg. python), which will
+	ignore any other process that doesn't start with it.
+	"""
+	print("killing 4135",port)
+	for proc in psutil.process_iter():
+		for conn in proc.connections():
+			if conn.laddr[1] == port:
+				#Don't close if it belongs to SYSTEM
+				#On windows using .username() results in AccessDenied
+				#TODO: Needs testing on other operating systems
+				try:
+					proc.username()
+				except psutil.AccessDenied:
+					pass
+				else:
+					if process_name is None or proc.name().startswith(process_name):
+						try:
+							proc.kill()
+						except (psutil.NoSuchProcess, psutil.AccessDenied):
+							pass 
 
 
 def process_data(row,writer,all_symbols):
@@ -218,19 +220,65 @@ def process_data(row,writer,all_symbols):
 		# 	writer.writerow([row])
 
 
+def writer(pipe_in):
+	print("Writer functional")
+	lst  = ["LocalTime=",
+	"MarketTime=",
+	"Side=",
+	"Type=",
+	"Status=",
+	"Symbol=",
+	"Price=",
+	"Volume=",
+	"Source=",
+	"AuctionPrice=",
+	"ContinuousPrice=",
+	"PairedVolume=",
+	"MktOrdVolume=",
+	"MktOrdSide=",
+	"NearIndicativeClosingPx=",
+	"FarIndicativeClosingPx=",
+	"PxVariation=",]
+	header = [i[:-1] for i in lst]
+	with open("saves/"+datetime.now().strftime("%m-%d")+".csv", 'a',newline='') as csvfile2:
+		writer = csv.writer(csvfile2)
+		writer.writerow(header)
+		while True:
+			r = pipe_in.recv()
+			d=[]
+			for i in lst:
+				if i in ["Price=","Volume=","AuctionPrice=","ContinuousPrice=","PairedVolume=","MktOrdVolume="]:
+					try:
+						d.append(float(find_between(r,i,",")))
+					except:
+						print(len(row))
+				elif i in ["LocalTime=","MarketTime="]:
+				  d.append(timestamp_seconds(find_between(r, i, ",")))
+				elif i =="PxVariation=":
+				  d.append(float(find_between(r,i,"\\")))
+				  #print(find_between(r,i,"\\"))
+				else:
+				  d.append(find_between(r,i,","))
+			writer.writerow(d)
 
-def running_mode(all_symbols):
+def running_mode():
 
 	print("running mode starts ")
+
+	send_pipe, receive_pipe = multiprocessing.Pipe()
+	good = threading.Thread(target=writer,args=(receive_pipe,),daemon=True)
+	good.start()
+
+
 	postbody = "http://localhost:8080/SetOutput?region=1&feedtype=IMBALANCE&output=4135&status=on"
 	r= requests.post(postbody)
+
 
 	while r.status_code !=200:
 		r= requests.post(postbody)
 		print("request failed")
 		break
 		
-
 	print("request successful")
 	UDP_IP = "localhost"
 	UDP_PORT = 4135
@@ -239,19 +287,32 @@ def running_mode(all_symbols):
 	sock.bind((UDP_IP, UDP_PORT))
 
 	count = 0
-	with open("saves/"+datetime.now().strftime("%m-%d")+".csv", 'a',newline='') as csvfile2:
-		writer = csv.writer(csvfile2)
 
-		while True:
-			data, addr = sock.recvfrom(1024)
-			row = str(data)
-			#writer.writerow([row])
+	while True:
 
-			process_data(row,writer,all_symbols)
 
+		# #### TEST MODE ####
+
+		# with open('test.csv', 'r', encoding='UTF8') as f:
+		# 	spamreader = csv.reader(f, delimiter=' ', quotechar='|')
+		# 	for row in spamreader:
+		# 		r = "".join(row)
+		# 		send_pipe.send(r)
+
+		# os._exit(1)
+
+		# #######################
+
+
+		data, addr = sock.recvfrom(1024)
+		row = str(data)
+		#writer.writerow([row])
+
+		## TOSS IT ONTO THE THREAD VIA PIPE>
+		#process_data(row,writer,all_symbols)
+		send_pipe.send(row)
 
 if __name__ == '__main__':
 
 	multiprocessing.freeze_support()
 	processor()
-
