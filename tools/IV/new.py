@@ -117,10 +117,16 @@ class processor:
 				print("activating.....data collection")
 				self.open_file()
 
-				process_ppro = multiprocessing.Process(target=running_mode, args=(),daemon=True)
+
+				send_pipe, receive_pipe = multiprocessing.Pipe()
+
+				process_ppro = multiprocessing.Process(target=running_mode, args=(send_pipe,),daemon=True)
 				process_ppro.daemon=True
 				process_ppro.start()
 
+				process_ppro2 = multiprocessing.Process(target=writer, args=(receive_pipe,),daemon=True)
+				process_ppro2.daemon=True
+				process_ppro2.start()
 				# open a multile processing 
 
 				#print("saving",ts)
@@ -132,8 +138,13 @@ class processor:
 			if ts>= 965 and self.termination == False:
 
 				print("terminating....")
+
+				send_pipe.send("good")
+				time.sleep(5)
 				process_ppro.terminate()
 				process_ppro.join()
+				process_ppro2.terminate()
+				process_ppro2.join()				
 				self.termination = True
 
 
@@ -220,7 +231,7 @@ def process_data(row,writer,all_symbols):
 		# 	writer.writerow([row])
 
 
-def writer(pipe_in):
+def writer(receive_pipe):
 	print("Writer functional")
 	lst  = ["LocalTime=",
 	"MarketTime=",
@@ -240,11 +251,16 @@ def writer(pipe_in):
 	"FarIndicativeClosingPx=",
 	"PxVariation=",]
 	header = [i[:-1] for i in lst]
-	with open("saves/"+datetime.now().strftime("%m-%d")+".csv", 'a',newline='') as csvfile2:
+	count = 0
+	with open("saves/"+datetime.now().strftime("%m-%d")+".csv", 'w',newline='') as csvfile2:
 		writer = csv.writer(csvfile2)
 		writer.writerow(header)
 		while True:
-			r = pipe_in.recv()
+			r = receive_pipe.recv()
+			count+=1
+			if r =="good":
+				break
+
 			d=[]
 			for i in lst:
 				if i in ["Price=","Volume=","AuctionPrice=","ContinuousPrice=","PairedVolume=","MktOrdVolume="]:
@@ -259,16 +275,17 @@ def writer(pipe_in):
 				  #print(find_between(r,i,"\\"))
 				else:
 				  d.append(find_between(r,i,","))
-			writer.writerow(d)
 
-def running_mode():
+
+			writer.writerow(d)
+			if count%1000==0:
+				print("writer:",count)
+
+	print("writer finished")
+
+def running_mode(send_pipe):
 
 	print("running mode starts ")
-
-	send_pipe, receive_pipe = multiprocessing.Pipe()
-	good = threading.Thread(target=writer,args=(receive_pipe,),daemon=True)
-	good.start()
-
 
 	postbody = "http://localhost:8080/SetOutput?region=1&feedtype=IMBALANCE&output=4135&status=on"
 	r= requests.post(postbody)
@@ -288,31 +305,60 @@ def running_mode():
 
 	count = 0
 
-	while True:
+
+	with open("saves/"+datetime.now().strftime("%m-%d")+"_original.csv", 'w',newline='') as csvfile2:
+		writer = csv.writer(csvfile2)
+		while True:
 
 
-		# #### TEST MODE ####
+			# #### TEST MODE ####
+			# c= 0 
+			# with open('test.csv', 'r', encoding='UTF8') as f:
+			# 	spamreader = csv.reader(f, delimiter=' ', quotechar='|')
+			# 	for row in spamreader:
+			# 		r = "".join(row)
+			# 		send_pipe.send(r)
+			# 		writer.writerow([r])
+			# 		c+=1
+			# 		#print(c)
+			# 		if c%1000==0:
+			# 			print(c)
+			# 	send_pipe.send("good")
+				
+			# print("all_finished")
+			
+			# time.sleep(10)
+			# os._exit(1)
+			# #######################
 
-		# with open('test.csv', 'r', encoding='UTF8') as f:
-		# 	spamreader = csv.reader(f, delimiter=' ', quotechar='|')
-		# 	for row in spamreader:
-		# 		r = "".join(row)
-		# 		send_pipe.send(r)
+			data, addr = sock.recvfrom(1024)
+			row = str(data)
+			writer.writerow([row])
 
-		# os._exit(1)
+			## TOSS IT ONTO THE THREAD VIA PIPE>
+			#process_data(row,writer,all_symbols)
+			send_pipe.send(row)
 
-		# #######################
+			count+=1
 
-
-		data, addr = sock.recvfrom(1024)
-		row = str(data)
-		#writer.writerow([row])
-
-		## TOSS IT ONTO THE THREAD VIA PIPE>
-		#process_data(row,writer,all_symbols)
-		send_pipe.send(row)
+			if count%1000==0:
+				print("reader:",count)
 
 if __name__ == '__main__':
 
 	multiprocessing.freeze_support()
 	processor()
+
+
+	# send_pipe, receive_pipe = multiprocessing.Pipe()
+
+	# process_ppro2 = multiprocessing.Process(target=writer, args=(receive_pipe,),daemon=True)
+	# process_ppro2.daemon=True
+	# process_ppro2.start()
+
+	# running_mode(send_pipe)
+
+	# df = pd.read_csv("saves/02-14.csv")
+	# print(len(df))
+	# df = pd.read_csv("saves/02-14_original.csv")
+	# print(len(df))
