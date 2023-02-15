@@ -333,7 +333,7 @@ def running_mode(send_pipe):
 
 			data, addr = sock.recvfrom(1024)
 			row = str(data)
-			writer.writerow([row])
+			#writer.writerow([row])
 
 			## TOSS IT ONTO THE THREAD VIA PIPE>
 			#process_data(row,writer,all_symbols)
@@ -358,7 +358,3 @@ if __name__ == '__main__':
 
 	# running_mode(send_pipe)
 
-	# df = pd.read_csv("saves/02-14.csv")
-	# print(len(df))
-	# df = pd.read_csv("saves/02-14_original.csv")
-	# print(len(df))
