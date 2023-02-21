@@ -418,7 +418,7 @@ def read_summary(pipe):
 					summary_being_read = False
 
 		else:
-			log_print("file_location_not detected:",file_location)
+			log_print("Ppro_in:, file_location_not detected:",file_location)
 			summary_being_read = False
 			time.sleep(2)
 
@@ -467,7 +467,7 @@ def get_current_positions():
 
 				
 				d[symbol] = (price,share) 
-		log_print("get positions:",symbol,share)
+		log_print("Ppro_in:, get positions:",d)
 		return d
 	except Exception as e:
 		PrintException(e)

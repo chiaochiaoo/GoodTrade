@@ -24,6 +24,7 @@ class Symbol:
 	"""
 	def __init__(self,manager,symbol,pproout):
 
+		self.source = "Symbol: "
 		self.symbol_name = symbol
 		self.manager = manager 
 
@@ -142,7 +143,7 @@ class Symbol:
 		self.difference = self.expected - self.current_shares
 
 		if self.difference!=0:
-			log_print(self.symbol_name," inspection complete,self.expected",self.expected," have",self.current_shares," deploying:",self.difference)
+			log_print(self.source,self.symbol_name," inspection complete,self.expected",self.expected," have",self.current_shares," deploying:",self.difference)
 		# else:
 		# 	log_print(self.symbol_name," inspection complete,self.expected",self.expected," have",self.current_shares)
 
@@ -184,7 +185,8 @@ class Symbol:
 
 		if long_pair_off>0:	
 
-			log_print("Symbol",self.symbol_name	,"pair off,",want," amount", long_pair_off)
+			log_print(self.source,self.symbol_name	,"pair off,",want," amount", long_pair_off)
+
 			short_pair_off = -long_pair_off
 			# use this amount to off set some longs and shorts. 
 
@@ -197,6 +199,8 @@ class Symbol:
 				short_pair_off = self.tradingplans[tp].request_fufill(self.symbol_name,short_pair_off,self.data[BID])
 				if short_pair_off>=0:
 					break
+
+			log_print(self.source,self.symbol_name	,"pair off,",want," amount", long_pair_off,short_pair_off)
 
 
 	def calc_inspection_differences(self,tps):
@@ -223,12 +227,12 @@ class Symbol:
 
 
 			if total>share_difference:
-				log_print(self.symbol_name," having MORE orders than actual share difference.",share_difference," orders:",total)
+				log_print(self.source,self.symbol_name," having MORE orders than actual share difference.",share_difference," orders:",total)
 			elif total<share_difference:
-				log_print(self.symbol_name," having LESS orders than actual share difference.",share_difference," orders:",total)
+				log_print(self.source,self.symbol_name," having LESS orders than actual share difference.",share_difference," orders:",total)
 				#? not enough?
 			else:
-				log_print(self.symbol_name," having share differences:",share_difference, " total:",total)
+				log_print(self.source,self.symbol_name," having share differences:",share_difference, " total:",total)
 
 
 			### Construct a share_difference with avg price. 
@@ -287,7 +291,7 @@ class Symbol:
 			#price = self.get_ask()
 			#coefficient = 1
 
-		log_print("Symbol: ",self.symbol_name,self.action,self.difference)
+		log_print(self.source,self.symbol_name,self.action,self.difference)
 		# self.ppro_out.send([CANCEL,self.symbol_name])
 		# time.sleep(0.3)
 		self.ppro_out.send([self.action,self.symbol_name,abs(self.difference),self.manager.gateway])
@@ -300,7 +304,7 @@ class Symbol:
 
 			#lets add a bit of delay to it. 
 
-		log_print("Symbol: ",self.symbol_name,action,share)
+		log_print(self.source,self.symbol_name,action,share)
 		# self.ppro_out.send([CANCEL,self.symbol_name])
 		# time.sleep(0.3)
 		self.ppro_out.send([self.action,self.symbol_name,abs(self.difference),0])

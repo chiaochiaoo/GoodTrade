@@ -18,6 +18,9 @@ class TradingPlan_Basket:
 
 	def __init__(self,algo_name="",risk=5,Manager=None):
 
+
+		self.source = "TP Basket: "
+
 		self.algo_name = algo_name
 
 		self.name = algo_name
@@ -99,7 +102,7 @@ class TradingPlan_Basket:
 
 
 	def internal(self):
-		log_print(self.name,"holding:",self.current_shares ,"expected:",self.expected_shares,"requested:",self.current_request)
+		log_print(self.source,self.name,"holding:",self.current_shares ,"expected:",self.expected_shares,"requested:",self.current_request)
 
 	def activate(self):
 		self.in_use	 = True
@@ -140,7 +143,7 @@ class TradingPlan_Basket:
 
 	def submit_expected_shares(self,symbol,shares,aggresive=0):
 
-		log_print(self.algo_name,"expect",symbol,shares," aggresive ", aggresive,"current have",self.current_shares[symbol])
+		log_print(self.source,self.algo_name,"expect",symbol,shares," aggresive ", aggresive,"current have",self.current_shares[symbol])
 
 		with self.read_lock[symbol]:
 
@@ -227,12 +230,12 @@ class TradingPlan_Basket:
 
 					self.calculate_avg_price(symbol)
 
-					log_print(self.algo_name,symbol,"Loading up :incmonig,",share,"want",self.current_request[symbol]," now have",self.current_shares[symbol],"return",ret, "prev avg",prev_price,"cur price",self.average_price[symbol])
+					log_print(self.source,self.algo_name,symbol,"Loading up :incmonig,",share,"want",self.current_request[symbol]," now have",self.current_shares[symbol],"return",ret, "prev avg",prev_price,"cur price",self.average_price[symbol])
 
 				else:
 					try:
 						if len(self.current_exposure[symbol])<share:
-							log_print("WARNING:",self.algo_name,symbol,"does not have enough holding to load off.",len(self.current_exposure[symbol]),share)
+							log_print(self.source,"WARNING:",self.algo_name,symbol,"does not have enough holding to load off.",len(self.current_exposure[symbol]),share)
 
 						for i in range(abs(share_added)):
 
@@ -245,10 +248,10 @@ class TradingPlan_Basket:
 						#self.manager.new_record(self)
 						
 					except	Exception	as e:
-						PrintException(e,"Basket Holding Update Error")
+						PrintException(self.source,e,"Basket Holding Update Error")
 
 					self.calculate_avg_price(symbol)
-					log_print(self.algo_name,symbol,"Loading off :incmonig,",share,"want",self.current_request[symbol]," now have",self.current_shares[symbol],"return",ret, "prev avg",prev_price,"cur price",self.average_price[symbol])
+					log_print(self.source,self.algo_name,symbol,"Loading off :incmonig,",share,"want",self.current_request[symbol]," now have",self.current_shares[symbol],"return",ret, "prev avg",prev_price,"cur price",self.average_price[symbol])
 
 					#realized it. 
 				# if self.current_shares[symbol]!=0:
@@ -293,7 +296,7 @@ class TradingPlan_Basket:
 
 	def notify_request(self,symbol=None):
 
-		log_print(self.algo_name," ",symbol,"have:",self.current_shares[symbol],"want:",self.expected_shares[symbol],"change:",self.current_request[symbol])
+		log_print(self.source,self.algo_name," ",symbol,"have:",self.current_shares[symbol],"want:",self.expected_shares[symbol],"change:",self.current_request[symbol])
 		self.have_request[symbol] = True
 		self.symbols[symbol].request_notified()
 
@@ -346,7 +349,7 @@ class TradingPlan_Basket:
 			self.submit_expected_shares(symbol,0)
 		else:
 
-			log_print("rejection messge received on ",self.name)
+			log_print(self.source,"rejection messge received on ",self.name)
 
 
 	def get_flatten_order(self):
@@ -360,7 +363,7 @@ class TradingPlan_Basket:
 		# else:
 
 		#self.deactive()
-		log_print(self.algo_name," flattening")
+		log_print(self.source,self.algo_name," flattening")
 		self.flatten_order=True
 
 		for symbol,item in self.symbols.items():
@@ -402,7 +405,7 @@ class TradingPlan_Basket:
 					check[symbol] = [cur_stock_price,self.average_price[symbol],self.current_shares[symbol],((self.average_price[symbol] - cur_stock_price)-0.01) * abs(self.current_shares[symbol])]
 					#log_print(self.algo_name,symbol,"avg price",self.average_price[symbol],"cur price",cur_stock_price,"share",val,"result",(self.average_price[symbol] - cur_stock_price) * abs(self.current_shares[symbol]))
 		
-		log_print("PNL checking",self.algo_name,check)
+		log_print(self.source,"PNL checking",self.algo_name,check)
 		
 		self.data[UNREAL] = round(total_unreal,2)
 		self.tkvars[UNREAL].set(self.data[UNREAL])
