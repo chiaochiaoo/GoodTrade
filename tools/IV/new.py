@@ -121,7 +121,7 @@ class processor:
 				process_ppro2.terminate()
 				process_ppro2.join()				
 
-				self.registered = True 
+				self.termination = True 
 
 			print("current ts:",ts,	self.registered,self.termination,k)
 
