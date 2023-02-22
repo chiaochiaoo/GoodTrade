@@ -60,63 +60,42 @@ class processor:
 
 		#additionals = ["FXI","USO","GLD"]
 		self.all_symbols = ["FXI","USO","GLD"]
+		
 		# open db folder . find each file. 
-		directory = os.fsencode("db")
-
-		for file in os.listdir(directory):
-
-			filename = os.fsdecode(file)
-
-			# red it. gets the symbols. 
-
-			symbol = filename.upper()[:-4]
-
-			a=pd.read_csv("./db/"+filename)
-
-			self.all_symbols.extend(a['Symbol'].tolist())
 
 
 		self.all_symbols = list(set(self.all_symbols))
 
+		self.registered = True 
+		self.termination = True 
 
-
-			# for index, row in a.iterrows():
-			# #iterate through, add the 
-			# 	print(row["Symbol"])
-				# if str(type(row["Symbol"])) == "<class 'str'>":
-				# 	if len(row["Symbol"])<10:
-				# 		if row["Symbol"] not in d:
-				# 			print(row["Symbol"])
-
-
-		self.registered = False 
-		self.processing = False 
-		self.termination = False 
+		now = datetime.now()
+		ts = now.hour*60 + now.minute
 
 		c = 0
+		k = 0 
+
 		while True:
 
 			now = datetime.now()
 			ts = now.hour*60 + now.minute
 
-			if (ts >= 930 and ts<=940) and self.registered==False:
+			if (ts >=525 and ts<=530) or (ts>935 and ts<940):
+				k = 0 
+				self.registered = False 
+				self.termination = False 
+			else:
+				k +=1 
 
-				print("registering",ts)
+			if k>5 and self.registered==False:
+
 				force_close_port(4135)
 				postbody = "http://localhost:8080/SetOutput?region=1&feedtype=IMBALANCE&output=4135&status=on"
+
 				try:
 					r= requests.post(postbody)
 				except Exception as e:
 					print(e)
-				
-				self.processing = False  
-				self.registered = True 
-
-			if ts >= 945 and self.processing == False:
-
-				print("activating.....data collection")
-				self.open_file()
-
 
 				send_pipe, receive_pipe = multiprocessing.Pipe()
 
@@ -127,15 +106,11 @@ class processor:
 				process_ppro2 = multiprocessing.Process(target=writer, args=(receive_pipe,),daemon=True)
 				process_ppro2.daemon=True
 				process_ppro2.start()
-				# open a multile processing 
 
-				#print("saving",ts)
+				self.registered=True
 
-				self.registered = False 
-				self.processing = True 
-				self.termination = False 
+			if k>30 and self.termination==False:
 
-			if ts>= 965 and self.termination == False:
 
 				print("terminating....")
 
@@ -145,10 +120,10 @@ class processor:
 				process_ppro.join()
 				process_ppro2.terminate()
 				process_ppro2.join()				
-				self.termination = True
 
+				self.registered = True 
 
-			print("current ts:",ts,	self.registered ,self.processing,self.termination)
+			print("current ts:",ts,	self.registered,self.termination,k)
 
 			time.sleep(60)
 
@@ -190,49 +165,10 @@ def force_close_port(port, process_name=None):
 							pass 
 
 
-def process_data(row,writer,all_symbols):
-
-				
-	Symbol = find_between(row, "Symbol=", ",")
-	symbol = Symbol[:-3]					
-
-	### ONLY PROCEED IF IT IS IN THE SYMBOL LIST ###57000
-	if symbol in all_symbols:
-		
-		writer.writerow([row])
-
-
-		# market = Symbol[-2:]
-		# source = find_between(row, "Source=", ",")
-		# time_ = find_between(row, "MarketTime=", ",")[:-4]
-		# ts=timestamp_seconds(time_)
-
-		# cur_price = find_between(row, "Price=", ",")
-		# auc_price = find_between(row, "AuctionPrice=", ",")
-		# cont_price = find_between(row, "ContinuousPrice=", ",")
-		# procced = False
-
-		# if market =="NQ" and source =="NADQ"and ts>=50400: 
-		# 	procced = True
-
-		# elif  market =="NY" and source =="NYSE" and ts>=50400: 
-		# 	procced = True
-
-		# elif market =="AM" and ts>=50400:
-		# 	proceed = True
-
-		# if procced:
-			
-		# 	side = find_between(row, "Side=", ",")
-		# 	volume =  int(find_between(row, "Volume=", ","))
-
-		# 	data = self.data[symbol]
-
-		# 	writer.writerow([row])
 
 
 def writer(receive_pipe):
-	print("Writer functional")
+
 	lst  = ["LocalTime=",
 	"MarketTime=",
 	"Side=",
@@ -252,7 +188,24 @@ def writer(receive_pipe):
 	"PxVariation=",]
 	header = [i[:-1] for i in lst]
 	count = 0
-	with open("saves/"+datetime.now().strftime("%m-%d")+".csv", 'w',newline='') as csvfile2:
+
+	now = datetime.now()
+	ts = now.hour*60 + now.minute
+
+
+	file = ""
+	if ts<800:
+		file = "saves/M_"+datetime.now().strftime("%m-%d")+".csv"
+	else:
+		file = "saves/N_"+datetime.now().strftime("%m-%d")+".csv"
+
+	print("Writer functional",file)
+
+	### if morning 
+
+	### if night 
+
+	with open(file, 'w',newline='') as csvfile2:
 		writer = csv.writer(csvfile2)
 		writer.writerow(header)
 		while True:
@@ -306,43 +259,42 @@ def running_mode(send_pipe):
 	count = 0
 
 
-	with open("saves/"+datetime.now().strftime("%m-%d")+"_original.csv", 'w',newline='') as csvfile2:
-		writer = csv.writer(csvfile2)
-		while True:
+
+	while True:
 
 
-			# #### TEST MODE ####
-			# c= 0 
-			# with open('test.csv', 'r', encoding='UTF8') as f:
-			# 	spamreader = csv.reader(f, delimiter=' ', quotechar='|')
-			# 	for row in spamreader:
-			# 		r = "".join(row)
-			# 		send_pipe.send(r)
-			# 		writer.writerow([r])
-			# 		c+=1
-			# 		#print(c)
-			# 		if c%1000==0:
-			# 			print(c)
-			# 	send_pipe.send("good")
-				
-			# print("all_finished")
+		# #### TEST MODE ####
+		# c= 0 
+		# with open('test.csv', 'r', encoding='UTF8') as f:
+		# 	spamreader = csv.reader(f, delimiter=' ', quotechar='|')
+		# 	for row in spamreader:
+		# 		r = "".join(row)
+		# 		send_pipe.send(r)
+		# 		writer.writerow([r])
+		# 		c+=1
+		# 		#print(c)
+		# 		if c%1000==0:
+		# 			print(c)
+		# 	send_pipe.send("good")
 			
-			# time.sleep(10)
-			# os._exit(1)
-			# #######################
+		# print("all_finished")
+		
+		# time.sleep(10)
+		# os._exit(1)
+		# #######################
 
-			data, addr = sock.recvfrom(1024)
-			row = str(data)
-			#writer.writerow([row])
+		data, addr = sock.recvfrom(1024)
+		row = str(data)
+		#writer.writerow([row])
 
-			## TOSS IT ONTO THE THREAD VIA PIPE>
-			#process_data(row,writer,all_symbols)
-			send_pipe.send(row)
+		## TOSS IT ONTO THE THREAD VIA PIPE>
+		#process_data(row,writer,all_symbols)
+		send_pipe.send(row)
 
-			count+=1
+		count+=1
 
-			if count%1000==0:
-				print("reader:",count)
+		if count%1000==0:
+			print("reader:",count)
 
 if __name__ == '__main__':
 
