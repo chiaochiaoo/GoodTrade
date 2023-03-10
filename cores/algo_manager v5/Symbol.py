@@ -103,29 +103,34 @@ class Symbol:
 		For both load and unload
 		"""
 
-		tps = list(self.tradingplans.keys())
-
-		# no.1 update the current prices
-		self.update_stockprices(tps)
-
-		# no.2 pair off
-		self.pair_off(tps)
-		# no.3 pair orders 
-
-		self.calc_inspection_differences(tps)
-
-		# no.4 get all current imbalance
-		self.calc_total_imbalances(tps)
+		# checking if priced. if not ask for it .
 
 
-		now = datetime.now()
-		ts = now.hour*60 + now.minute
+		if self.data[BID]!=0:
+			tps = list(self.tradingplans.keys())
 
-		if self.difference!=0 and ts<=955:
-			self.deploy_orders()
+			# no.1 update the current prices
+			self.update_stockprices(tps)
+
+			# no.2 pair off
+			self.pair_off(tps)
+			# no.3 pair orders 
+
+			self.calc_inspection_differences(tps)
+
+			# no.4 get all current imbalance
+			self.calc_total_imbalances(tps)
+
+
+			now = datetime.now()
+			ts = now.hour*60 + now.minute
+
+			if self.difference!=0 and ts<=955:
+				self.deploy_orders()
+			else:
+				self.action = ""
 		else:
-			self.action = ""
-
+			log_print("Symbol:",self.symbol_name, " current price 0. wait one.")
 
 
 	def update_stockprices(self,tps):
@@ -185,7 +190,7 @@ class Symbol:
 
 		if long_pair_off>0:	
 
-			log_print(self.source,self.symbol_name	,"pair off,",want," amount", long_pair_off)
+			log_print(self.source,self.symbol_name	,"pair off,",want," amount", long_pair_off,short_pair_off)
 
 			short_pair_off = -long_pair_off
 			# use this amount to off set some longs and shorts. 
@@ -342,7 +347,7 @@ class Symbol:
 
 			
 		#log_print("holding update - releasing lock")
-		#print("inc",self.incoming_shares)
+		print("Symbol",self.symbol_name," holding update:",price,share)
 
 	def immediate_request(self,shares):
 
