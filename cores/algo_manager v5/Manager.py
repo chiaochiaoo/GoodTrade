@@ -963,7 +963,7 @@ class Manager:
 				side = data["side"]
 
 				## HERE. Append it to the new symbol warehouse system. 
-				#print("HOLDING UPDATE",symbol,price,shares,side)
+				print("Manager: Holding update:",symbol,price,shares,side)
 
 				try:
 					if symbol in self.symbols:
