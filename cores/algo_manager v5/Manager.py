@@ -1016,7 +1016,7 @@ class Manager:
 					for i in d:
 						x[i['symbol']] = i['price']
 
-					for symbol,price in d[1].items():
+					for symbol,price in x.items():
 
 						if symbol in self.symbols_short:
 							self.symbol_data[self.symbols_short[symbol]].update_price(price,price,0)
