@@ -106,31 +106,30 @@ class Symbol:
 		# checking if priced. if not ask for it .
 
 
-		if self.data[BID]!=0:
-			tps = list(self.tradingplans.keys())
+		
+		tps = list(self.tradingplans.keys())
 
-			# no.1 update the current prices
-			self.update_stockprices(tps)
+		# no.1 update the current prices
+		self.update_stockprices(tps)
 
-			# no.2 pair off
-			self.pair_off(tps)
-			# no.3 pair orders 
+		# no.2 pair off
+		self.pair_off(tps)
+		# no.3 pair orders 
 
-			self.calc_inspection_differences(tps)
+		self.calc_inspection_differences(tps)
 
-			# no.4 get all current imbalance
-			self.calc_total_imbalances(tps)
+		# no.4 get all current imbalance
+		self.calc_total_imbalances(tps)
 
 
-			now = datetime.now()
-			ts = now.hour*60 + now.minute
+		now = datetime.now()
+		ts = now.hour*60 + now.minute
 
-			if self.difference!=0 and ts<=955:
-				self.deploy_orders()
-			else:
-				self.action = ""
+		if self.difference!=0 and ts<=955:
+			self.deploy_orders()
 		else:
-			log_print("Symbol:",self.symbol_name, " current price 0. wait one.")
+			self.action = ""
+
 
 
 	def update_stockprices(self,tps):
@@ -194,6 +193,10 @@ class Symbol:
 
 			short_pair_off = -long_pair_off
 			# use this amount to off set some longs and shorts. 
+
+			# if price is 0, use impcming
+
+
 
 			for tp in tps: 
 				long_pair_off = self.tradingplans[tp].request_fufill(self.symbol_name,long_pair_off,self.data[BID])
