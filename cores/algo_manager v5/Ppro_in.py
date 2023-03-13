@@ -53,8 +53,6 @@ def request(request_str):
 	requests.get(request_str)
 
 
-
-
 def Ppro_in(port,pipe):
 
 	p1 = threading.Thread(target=periodical_check,args=(pipe,port), daemon=True)
@@ -102,6 +100,11 @@ def Ppro_in(port,pipe):
 
 				if type_ == "OrderStatus":
 					decode_order(stream_data,pipe)
+
+				#### CAN USE THIS TO TAKE CURRENT SYMBOLS ####
+
+
+
 
 				#now = datetime.now()
 
@@ -236,7 +239,7 @@ def periodical_check(pipe,port):
 	global file_location
 	global summary_being_read
 
-	lock = threading.Lock()
+	#lock = threading.Lock()
 
 	c = 0
 
@@ -267,12 +270,18 @@ def periodical_check(pipe,port):
 				### 3. send request for summary PNL
 				threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity")
 
-				symbols = list(positions.keys())
-				symbols = [i[:-3] for i in symbols]
 
-				if c%2==0:
-					req = threading.Thread(target=get_symbol_price,args=(symbols,pipe,lock,), daemon=True)
-					req.start()
+				#############################THIS PART IS MOVED TO MANAGER #############################################################
+
+				# symbols = list(positions.keys())
+				# symbols = [i[:-3] for i in symbols]
+
+				# if c%2==0:
+				# 	req = threading.Thread(target=get_symbol_price,args=(symbols,pipe,lock,), daemon=True)
+				# 	req.start()
+
+
+				#####################################################################################################################
 
 				### 4. send request for each individual symbol PNL
 
@@ -466,7 +475,7 @@ def get_current_positions():
 				share = int(find_between(i, "Volume=", " ")[1:-1])
 
 				
-				d[symbol] = (price,share) 
+				d[symbol] = (0,share) 
 		log_print("Ppro_in:, get positions:",d)
 		return d
 	except Exception as e:

@@ -10,7 +10,7 @@ from UI import *
 from Ppro_in import *
 from Ppro_out import *
 from constant import *
-#from TNV_http import *
+#from TNV_http import *	
 
 import os
 
@@ -67,6 +67,10 @@ def request(post):
 		requests.post(post)
 	except:
 		print(symbol, "failed")
+
+
+
+
 
 class Manager:
 
@@ -183,6 +187,9 @@ class Manager:
 
 		self.gateway = 0
 
+		######
+
+		self.get_price_lock = threading.Lock()
 		######
 		self.moo_orders = {}
 		self.moo_algos = []
@@ -733,8 +740,6 @@ class Manager:
 
 			elif d[0] =="basket":
 
-				
-
 				try:
 					#d[1]   => basket name 
 					#d[2]   => share info. 
@@ -798,9 +803,6 @@ class Manager:
 
 			#FIRST TWO CONNECTION CHECK
 
-
-
-
 			if d[0] =="ppro_in":
 				try:
 					self.ui.ppro_status.set(str(d[1]))
@@ -854,49 +856,29 @@ class Manager:
 					count +=1 
 
 					if count%3==0:
+
+						req = threading.Thread(target=self.get_symbol_price, daemon=True)
+						req.start()
+
 						handl = threading.Thread(target=self.symbols_inspection,daemon=True)
 						handl.start()
 
 						rec = threading.Thread(target=self.record_update,daemon=True)
 						rec.start()
+
 				except Exception as e:
 					PrintException(e, " POSITION UPDATE ERROR")
 
-			elif d[0] == SYMBOL_UPDATE:
-				# d= {}
-				# d['time'] = time_
-				# d['symbol'] = symbol
-				# d['lastPrice'] = lastPrice
-				# d['l1AskPrice'] = l1AskPrice
-				# d['l1BidPrice'] = l1BidPrice
+			# elif d[0] == SYMBOL_UPDATE:
+			# 	try:
 
+			# 		for symbol,price in d[1].items():
 
-				# here I update the symbol instead. 
-				# and then the symbol update each of the tradingplan bound to it. 
+			# 			if symbol in self.symbols_short:
+			# 				self.symbol_data[self.symbols_short[symbol]].update_price(price,price,0)
 
-				#print(symbol,bid,ask,ts)
-
-				try:
-
-					#print(d[1])
-					for symbol,price in d[1].items():
-
-						if symbol in self.symbols_short:
-							self.symbol_data[self.symbols_short[symbol]].update_price(price,price,0)
-
-
-					# data = d[1]
-					# symbol = data["symbol"]
-					# bid = data["l1BidPrice"]
-					# ask = data["l1AskPrice"]
-					# ts = data["timestamp"]
-
-					# if symbol in self.symbols:
-					# 	self.symbol_data[symbol].update_price(bid,ask,ts)
-
-					#self.ui.ppro_last_update.set(ts)
-				except	Exception	as e:
-					PrintException(e,"Order update error")
+			# 	except	Exception	as e:
+			# 		PrintException(e,"Order update error")
 
 			elif d[0] == SUMMARY_UPDATE:
 
@@ -904,14 +886,6 @@ class Manager:
 				cur_ts = now.hour*3600+now.minute*60+now.second
 
 				data = d[1]
-
-				# d['net'] = net
-				# d['fees'] = fees
-				# d['trades'] = trades
-				# d['sizeTraded'] = sizeTraded
-				# d['unrealizedPlusNet'] = unrealizedPlusNet
-				# d['timestamp'] = ts
-				# d['unrealized'] = unrealized	
 
 				try:
 					for key,val in data.items():
@@ -954,7 +928,7 @@ class Manager:
 				break
 
 
-			elif d[0] =="order confirm":  ### DEPRECATED. 
+			elif d[0] =="order confirm":  ### IN USE. 
 
 				data = d[1]
 				symbol = data["symbol"]
@@ -1020,6 +994,36 @@ class Manager:
 
 			# 	self.ppro_append_new_stoporder(d[1])
 
+	def get_symbol_price(self):
+
+		try:
+			with self.get_price_lock:
+
+				symbols = list(self.symbols_short.keys())
+
+				if len(symbols)>0:
+					s = ''
+					for i in symbols:
+						s+=i+','
+					s=s[:-1]
+
+					b = "https://financialmodelingprep.com/api/v3/quote-short/"+s+"?apikey=a901e6d3dd9c97c657d40a2701374d2a"
+
+					res=requests.get(b)
+					d= json.loads(res.text)
+
+					x = {}
+					for i in d:
+						x[i['symbol']] = i['price']
+
+					for symbol,price in d[1].items():
+
+						if symbol in self.symbols_short:
+							self.symbol_data[self.symbols_short[symbol]].update_price(price,price,0)
+									
+					print("price update complete.. symbols:",len(symbols),x)
+		except	Exception	as e:
+			PrintException("Updating prices error",e)
 
 	def get_position(self,ticker):
 
