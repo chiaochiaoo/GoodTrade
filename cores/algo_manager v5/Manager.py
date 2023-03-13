@@ -350,17 +350,6 @@ class Manager:
 			self.moo_algos.append([basket_name,orders,risk,aggresive])
 
 
-		#### ADDING STEPS: symbols ####
-		for symbol,value in orders.items():
-			if symbol not in self.symbol_data:
-				self.symbol_data[symbol] = Symbol(self,symbol,self.pipe_ppro_out)  #register in Symbol.
-				self.symbols.append(symbol)
-				self.symbols_short[symbol[:-3]] = symbol
-
-			if symbol not in self.basket_name:
-				self.baskets[basket_name].register_symbol(symbol,self.symbol_data[symbol])
-
-
 	def apply_basket_cmd(self,basket_name,orders,risk,aggresive):
 
 		if basket_name not in self.baskets:
@@ -382,7 +371,6 @@ class Manager:
 						self.symbol_data[symbol] = Symbol(self,symbol,self.pipe_ppro_out)  #register in Symbol.
 						self.symbols.append(symbol)
 						self.symbols_short[symbol[:-3]] = symbol
-
 
 					self.baskets[basket_name].register_symbol(symbol,self.symbol_data[symbol])
 
@@ -1299,4 +1287,3 @@ if __name__ == '__main__':
 	os._exit(1)
 
 	print("exit")
-
