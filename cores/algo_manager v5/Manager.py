@@ -383,8 +383,8 @@ class Manager:
 						self.symbols.append(symbol)
 						self.symbols_short[symbol[:-3]] = symbol
 
-					if symbol not in self.basket_name:
-						self.baskets[basket_name].register_symbol(symbol,self.symbol_data[symbol])
+
+					self.baskets[basket_name].register_symbol(symbol,self.symbol_data[symbol])
 
 					## now , submit the request.
 
