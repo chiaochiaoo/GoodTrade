@@ -196,8 +196,6 @@ class Symbol:
 
 			# if price is 0, use impcming
 
-
-
 			for tp in tps: 
 				long_pair_off = self.tradingplans[tp].request_fufill(self.symbol_name,long_pair_off,self.data[BID])
 				if long_pair_off<=0:
@@ -254,7 +252,8 @@ class Symbol:
 				if avg_price!=0:
 					share_price = avg_price
 				else:
-					share_price =  (abs(self.current_shares)*self.current_avgprice - abs(self.previous_shares)*self.previous_avgprice)/abs(share_difference)
+					#### DONT USE THIS. DEPRECATED. ### NO MORE AVG PRICE BECAUSE INACCURACY. 
+					share_price =  self.data[BID] #(abs(self.current_shares)*self.current_avgprice - abs(self.previous_shares)*self.previous_avgprice)/abs(share_difference)
 
 
 				for tp in tps:
