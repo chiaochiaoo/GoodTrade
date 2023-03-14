@@ -189,7 +189,7 @@ class Symbol:
 
 		if long_pair_off>0:	
 
-			log_print(self.source,self.symbol_name	,"pair off,",want," amount", long_pair_off,short_pair_off)
+			#log_print(self.source,self.symbol_name	,"pair off,",want," amount", long_pair_off,short_pair_off)
 
 			short_pair_off = -long_pair_off
 			# use this amount to off set some longs and shorts. 
