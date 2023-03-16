@@ -198,7 +198,7 @@ class Manager:
 		#print(self.total_record)
 		self.shutdown=False
 		self.symbol_inspection_lock = threading.Lock()
-
+		self.symbol_inspection_start = False
 		# handl = threading.Thread(target=self.symbols_inspection,daemon=True)
 		# handl.start()
 
@@ -342,20 +342,27 @@ class Manager:
 
 				self.baskets[basket_name].deploy()
 		
-		c = 0 
+				c = 0 
 
-		total_orders = {}
+				total_orders = {}
 
-		with self.moo_lock:
-			for symbol,share in orders.items():
-				
-				if symbol not in self.moo_orders:
-					self.moo_orders[symbol] = share 
-				else:
-					self.moo_orders[symbol] += share 
+				with self.moo_lock:
+					for symbol,share in orders.items():
+						
+						if symbol not in self.moo_orders:
+							self.moo_orders[symbol] = share 
+						else:
+							self.moo_orders[symbol] += share 
 
-			self.moo_algos.append([basket_name,orders,risk,aggresive])
+					self.moo_algos.append([basket_name,orders,risk,aggresive])
 
+				for symbol,value in orders.items():
+					if symbol not in self.symbol_data:
+						self.symbol_data[symbol] = Symbol(self,symbol,self.pipe_ppro_out)  #register in Symbol.
+						self.symbols.append(symbol)
+						self.symbols_short[symbol[:-3]] = symbol
+
+					self.baskets[basket_name].register_symbol(symbol,self.symbol_data[symbol])
 
 	def apply_basket_cmd(self,basket_name,orders,risk,aggresive):
 
@@ -399,7 +406,7 @@ class Manager:
 		moc_pair_release = False
 
 		MOO_send_out_timer = 560
-		MOO_pairing_timer = 572
+		MOO_pairing_timer = 571
 
 		MOC_send_out_timer = 959
 		MOC_pairing_timer = 960
@@ -413,8 +420,8 @@ class Manager:
 
 			if ts>=MOO_send_out_timer and moo_release==False :
 				### TRIGGER. Realese the moo orders. 
-
-				log_print("Timer: timer triggered for MOO")
+				self.symbol_inspection_start = False 
+				log_print("Timer: timer triggered for MOO",self.moo_orders)
 				with self.moo_lock:
 					for symbol,share in self.moo_orders.items():
 						
@@ -451,7 +458,7 @@ class Manager:
 					for i in self.moo_algos:
 						basket_name,orders,risk,aggresive = i[0],i[1],i[2],i[3]
 						self.apply_basket_cmd(basket_name,orders,risk,aggresive)
-
+				self.symbol_inspection_start = True
 				time.sleep(5)
 				### TRIGGER. PAIR UP the algos.
 
@@ -860,8 +867,11 @@ class Manager:
 						req = threading.Thread(target=self.get_symbol_price, daemon=True)
 						req.start()
 
-						handl = threading.Thread(target=self.symbols_inspection,daemon=True)
-						handl.start()
+						if self.symbol_inspection_start:
+							handl = threading.Thread(target=self.symbols_inspection,daemon=True)
+							handl.start()
+						else:
+							log_print("inspection wait one")
 
 						rec = threading.Thread(target=self.record_update,daemon=True)
 						rec.start()
