@@ -154,7 +154,9 @@ class UI(pannel):
 		ttk.Label(self.system_pannel, text="Maximum Risk:").grid(sticky="w",column=1,row=row,padx=10)
 		tk.Entry(self.system_pannel,textvariable=self.risk_timer,width=7).grid(sticky="w",column=2,row=row,padx=10)
 
-
+		self.risk_set = ttk.Button(self.system_pannel, text="Set Risk")
+		self.risk_set.grid(sticky="w",column=3,row=row)
+		#,command=self.manager.terminateGT
 		row +=1
 		self.timerc = ttk.Label(self.system_pannel, text="User Email:")
 		self.timerc.grid(sticky="w",column=1,row=row,padx=10)
