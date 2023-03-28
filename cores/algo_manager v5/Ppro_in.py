@@ -257,7 +257,7 @@ def periodical_check(pipe,port):
 					now = datetime.now()
 
 					cur_ts = now.hour*60+now.minute 
-					log_print("PPro in : periodcal new loop",cur_ts)
+					#log_print("PPro in : periodcal new loop",cur_ts)
 					threading_request("http://localhost:8080/SetOutput?region=1&feedtype=OSTAT&output="+ str(port)+"&status=on") ## ORDER STATS.
 
 				# ### 1. register OSTAT  
@@ -476,7 +476,7 @@ def get_current_positions():
 
 				
 				d[symbol] = (0,share) 
-		log_print("Ppro_in:, get positions:",d)
+		#log_print("Ppro_in:, get positions:",d)
 		return d
 	except Exception as e:
 		PrintException(e)

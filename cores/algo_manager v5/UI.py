@@ -57,6 +57,9 @@ class UI(pannel):
 
 		self.custom_algo = None 
 
+
+		
+
 		self.init_pannel()
 
 		self.init_entry_pannel()
@@ -183,7 +186,7 @@ class UI(pannel):
 
 			risk_ = int(self.risk_amount.get())
 			self.risk_set["text"] = "Risk Set: "+str(risk_)
-
+			self.manager.set_risk(risk_)
 		except Exception as e:
 
 			print(e)
@@ -192,6 +195,7 @@ class UI(pannel):
 	def update_performance(self,d):
 
 		self.net.set(d['unrealizedPlusNet'])
+
 		d['net'] = d['unrealizedPlusNet']
 		
 		if d['net']>self.net_max.get():

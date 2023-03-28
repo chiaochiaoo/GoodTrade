@@ -141,6 +141,9 @@ class Manager:
 		self.total_r_max =0
 		self.total_r_min = 0
 
+		self.set_risk = 5000
+
+
 		self.net = 0
 		self.net_max = 0
 		self.net_min = 0
@@ -234,7 +237,10 @@ class Manager:
 			self.symbol_data[symbol].rejection_message("Long")
 			self.symbol_data[symbol].rejection_message("Short")
 		
+	def set_risk(self,risk_):
 
+		log_print("Manager Updating Risk:",risk_)
+		self.set_risk = int(risk_)
 
 
 	def check_all_pnl(self):
@@ -756,21 +762,23 @@ class Manager:
 
 					confirmation,orders,risk,aggresive = self.ui.order_confirmation(d[1],d[2])
 
-					
-					if confirmation:
-						log_print("basket update:",d)
-						log_print(d[1],confirmation,orders,risk,aggresive)
-						if "OB" in d[1] and cur_ts<570:
-							handl = threading.Thread(target=self.moo_apply_basket_cmd,args=(d[1],orders,risk,aggresive,),daemon=True)
-							handl.start()
-							#self.moo_apply_basket_cmd(d[1],orders,risk,aggresive)
+					if self.net > self.set_risk*-1:
+						if confirmation:
+							log_print("basket update:",d)
+							log_print(d[1],confirmation,orders,risk,aggresive)
+							if "OB" in d[1] and cur_ts<570:
+								handl = threading.Thread(target=self.moo_apply_basket_cmd,args=(d[1],orders,risk,aggresive,),daemon=True)
+								handl.start()
+								#self.moo_apply_basket_cmd(d[1],orders,risk,aggresive)
 
-						elif "COP" in d[1] and cur_ts<570:
-							handl = threading.Thread(target=self.moo_apply_basket_cmd,args=(d[1],orders,risk,aggresive,),daemon=True)
-							handl.start()
-							
-						else:
-							self.apply_basket_cmd(d[1],orders,risk,aggresive)
+							elif "COP" in d[1] and cur_ts<570:
+								handl = threading.Thread(target=self.moo_apply_basket_cmd,args=(d[1],orders,risk,aggresive,),daemon=True)
+								handl.start()
+								
+							else:
+								self.apply_basket_cmd(d[1],orders,risk,aggresive)
+					else:
+						log_print("Manager:","Risk exceeded, skip. ",self.net,self.set_risk*-1)
 
 				except Exception as e:
 

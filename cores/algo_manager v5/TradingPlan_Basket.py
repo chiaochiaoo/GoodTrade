@@ -405,7 +405,7 @@ class TradingPlan_Basket:
 					check[symbol] = [cur_stock_price,self.average_price[symbol],self.current_shares[symbol],((self.average_price[symbol] - cur_stock_price)-0.01) * abs(self.current_shares[symbol])]
 					#log_print(self.algo_name,symbol,"avg price",self.average_price[symbol],"cur price",cur_stock_price,"share",val,"result",(self.average_price[symbol] - cur_stock_price) * abs(self.current_shares[symbol]))
 		
-		log_print(self.source,"PNL checking",self.algo_name,check,self.current_shares[symbol],cur_stock_price, self.average_price[symbol])
+		#log_print(self.source,"PNL checking",self.algo_name,check,self.current_shares[symbol],cur_stock_price, self.average_price[symbol])
 		
 		self.data[UNREAL] = round(total_unreal,2)
 		self.tkvars[UNREAL].set(self.data[UNREAL])
