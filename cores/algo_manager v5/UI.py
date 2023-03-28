@@ -152,9 +152,10 @@ class UI(pannel):
 
 		row +=1
 		ttk.Label(self.system_pannel, text="Maximum Risk:").grid(sticky="w",column=1,row=row,padx=10)
-		tk.Entry(self.system_pannel,textvariable=self.risk_timer,width=7).grid(sticky="w",column=2,row=row,padx=10)
+		self.risk_amount = tk.Entry(self.system_pannel,textvariable=self.risk_timer,width=7)
+		self.risk_amount.grid(sticky="w",column=2,row=row,padx=10)
 
-		self.risk_set = ttk.Button(self.system_pannel, text="Set Risk")
+		self.risk_set = ttk.Button(self.system_pannel, text="Set Risk",command=self.set_risk)
 		self.risk_set.grid(sticky="w",column=3,row=row)
 		#,command=self.manager.terminateGT
 		row +=1
@@ -175,6 +176,17 @@ class UI(pannel):
 
 		# self.deconstruct = ttk.Button(self.system_pannel, text="Terminate GT",command=self.manager.terminateGT)#,command=self.deploy_all_stoporders)
 		# self.deconstruct.grid(sticky="w",column=1,row=5)
+
+	def set_risk(self):
+
+		try:
+
+			risk_ = int(self.risk_amount.get())
+			self.risk_set["text"] = "Risk Set: "+str(risk_)
+
+		except Exception as e:
+
+			print(e)
 
 
 	def update_performance(self,d):
