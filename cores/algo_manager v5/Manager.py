@@ -414,7 +414,7 @@ class Manager:
 		MOO_send_out_timer = 560
 		MOO_pairing_timer = 571
 
-		MOC_send_out_timer = 959
+		MOC_send_out_timer = 955
 		MOC_pairing_timer = 960
 
 		c = 0 
@@ -469,7 +469,8 @@ class Manager:
 				### TRIGGER. PAIR UP the algos.
 
 			if ts>=MOC_send_out_timer and moc_release==False:
-
+				# ROSN Buy RosenblattDQuoteClose MOC DAY
+				# ROSN Sell->Short RosenblattDQuoteClose MOC DAY
 				log_print("Timer: MOC begins")
 
 				with self.symbol_inspection_lock: 
@@ -497,120 +498,7 @@ class Manager:
 
 			time.sleep(20)
 
-
-
 		log_print("Timer: completed")
-		# #570  34200
-		# #960  57600 
-		# time.sleep(2)
-		# #now = datetime.now()
-		# timestamp = 34200
-
-		# log_print("timer start")
-
-		# while True:
-		# 	if self.shutdown:
-		# 		break
-
-		# 	now = datetime.now()
-		# 	ts = now.hour*3600 + now.minute*60 + now.second
-		# 	remain = timestamp - ts
-		# 	#log_print(timestamp,ts)
-		# 	minute = remain//60
-		# 	seconds = remain%60
-
-		# 	if minute>0:
-		# 		self.ui.algo_timer_string.set(str(minute)+" M : "+str(seconds)+" S")
-		# 	else:
-		# 		self.ui.algo_timer_string.set(str(seconds)+" seconds")
-		# 	if remain<0:
-		# 		log_print("Trigger")
-		# 		break
-
-		# 	if self.shutdown:
-		# 		break
-
-		# 	time.sleep(1)
-
-		#time.sleep(5)
-		# self.ui.algo_timer_string.set("Deployed")
-		# self.deploy_all()
-
-
-		# timestamp = 600
-		# cur_ts = 0
-		# while True:
-		# 	if self.shutdown:
-		# 		break
-
-		# 	now = datetime.now()
-		# 	ts = now.hour*60 + now.minute
-		# 	remain = timestamp - ts
-		# 	#log_print(timestamp,ts)
-		# 	hour = remain//60
-		# 	minute = remain%60
-
-		# 	if minute>0:
-		# 		self.ui.algo_timer_close_string.set(str(hour)+" H : "+str(minute)+" M")
-		# 	else:
-		# 		self.ui.algo_timer_close_string.set(str(minute)+" minutes")
-		# 	if remain<0:
-		# 		log_print("Trigger")
-		# 		self.withdraw_all()
-		# 		break
-
-		# 	self.update_stats()
-
-		
-		# 	if ts!=cur_ts:
-
-		# 		checking = [i.is_alive() for i in self.processes]
-		# 		log_print("Processes Checking:",checking)
-
-		# 		cur_ts=ts
-
-		# 	time.sleep(5)
-
-
-		# timestamp = 955
-
-		# while True:
-
-		# 	now = datetime.now()
-		# 	ts = now.hour*60 + now.minute
-		# 	remain = timestamp - ts
-		# 	#log_print(timestamp,ts)
-		# 	hour = remain//60
-		# 	minute = remain%60
-
-		# 	if minute>0:
-		# 		self.ui.algo_timer_close_string.set(str(hour)+" H : "+str(minute)+" M")
-		# 	else:
-		# 		self.ui.algo_timer_close_string.set(str(minute)+" minutes")
-		# 	if remain<0:
-		# 		log_print("Trigger")
-		# 		self.flatten_all()
-		# 		break
-
-		# 	self.update_stats()
-
-		# 	if ts!=cur_ts:
-
-		# 		checking = [i.is_alive() for i in self.processes]
-		# 		log_print("Processes Checking:",checking)
-
-		# 		cur_ts=ts
-
-		# 	time.sleep(5)
-
-		# try:
-		# 	log_print("Algo manager complete")
-		# 	#self.flatten_all()
-		# 	#self.root.destroy()
-		# except Exception as e:
-		# 	pass
-		pass
-
 
 	def update_stats(self):
 
