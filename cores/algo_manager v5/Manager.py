@@ -927,7 +927,7 @@ class Manager:
 						if symbol in self.symbols_short:
 							self.symbol_data[self.symbols_short[symbol]].update_price(price,price,0)
 
-					log_print("Manager: price update complete.. symbols:",len(symbols),x,symbol,self.symbols_short[symbol],self.symbol_data[self.symbols_short[symbol]].get_bid())
+					#log_print("Manager: price update complete.. symbols:",len(symbols),x,symbol,self.symbols_short[symbol],self.symbol_data[self.symbols_short[symbol]].get_bid())
 		except	Exception	as e:
 			PrintException("Updating prices error",e)
 
