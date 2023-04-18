@@ -112,11 +112,16 @@ class Symbol:
 		# no.1 update the current prices
 		self.update_stockprices(tps)
 
-		# no.2 pair off
-		self.pair_off(tps)
-		# no.3 pair orders 
+		# no.2 pair off diff side. need.. hmm price .....!!!
+
+		if self.get_bid()!=0:
+			self.pair_off(tps)
+
+
+		# no.3 pair orders. fill it in. 
 
 		self.calc_inspection_differences(tps)
+
 
 		# no.4 get all current imbalance
 		self.calc_total_imbalances(tps)
@@ -125,7 +130,7 @@ class Symbol:
 		now = datetime.now()
 		ts = now.hour*60 + now.minute
 
-		if self.difference!=0 and ts<=955:
+		if self.difference!=0 and ts<=956:
 			self.deploy_orders()
 		else:
 			self.action = ""
@@ -253,7 +258,7 @@ class Symbol:
 					share_price = avg_price
 				else:
 					#### DONT USE THIS. DEPRECATED. ### NO MORE AVG PRICE BECAUSE INACCURACY. 
-					share_price =  self.data[BID] #(abs(self.current_shares)*self.current_avgprice - abs(self.previous_shares)*self.previous_avgprice)/abs(share_difference)
+					share_price =  self.get_bid() #(abs(self.current_shares)*self.current_avgprice - abs(self.previous_shares)*self.previous_avgprice)/abs(share_difference)
 
 
 				for tp in tps:
@@ -267,7 +272,7 @@ class Symbol:
 				if avg_price!=0:
 					share_price = avg_price
 				else:
-					share_price =  self.data[BID]
+					share_price = self.get_bid()
 
 				for tp in tps:
 					share_difference = self.tradingplans[tp].request_fufill(self.symbol_name,share_difference,share_price)
