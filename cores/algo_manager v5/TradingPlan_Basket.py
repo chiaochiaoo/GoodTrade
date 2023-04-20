@@ -251,7 +251,7 @@ class TradingPlan_Basket:
 						#self.manager.new_record(self)
 						
 					except	Exception	as e:
-						PrintException(e,"Basket Holding Update Error")
+						PrintException(e,"Basket Holding Update Error:"+self.source+symbol)
 
 					self.calculate_avg_price(symbol)
 					log_print(self.source,self.algo_name,symbol,"Loading off :incmonig,",share,"want",self.current_request[symbol]," now have",self.current_shares[symbol],"return",ret, "prev avg",prev_price,"cur price",self.average_price[symbol])
