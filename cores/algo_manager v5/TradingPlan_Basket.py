@@ -74,6 +74,8 @@ class TradingPlan_Basket:
 
 		self.bool_labels= [SELECTED]
 
+		self.display_count = 0
+
 		self.init_data(risk)
 
 	def init_data(self,risk):
@@ -434,7 +436,10 @@ class TradingPlan_Basket:
 					check[symbol] = [cur_stock_price,self.average_price[symbol],self.current_shares[symbol],((self.average_price[symbol] - cur_stock_price)-0.01) * abs(self.current_shares[symbol])]
 					#log_print(self.algo_name,symbol,"avg price",self.average_price[symbol],"cur price",cur_stock_price,"share",val,"result",(self.average_price[symbol] - cur_stock_price) * abs(self.current_shares[symbol]))
 		
-		log_print(self.source,"PNL checking",self.algo_name,check,total_unreal,self.current_shares, self.average_price)
+		self.display_count +=1
+
+		if self.display_count %3==0:
+			log_print(self.source,"PNL checking",self.algo_name,check,total_unreal,self.current_shares, self.average_price)
 		
 		self.data[UNREAL] = round(total_unreal,2)
 		self.tkvars[UNREAL].set(self.data[UNREAL])
