@@ -360,10 +360,11 @@ class Symbol:
 
 		# I may need to cancel existing order first. for a 0.1 second delay.
 
-		if shares<0:
-			self.ppro_out.send([IOCSELL,self.symbol_name,abs(shares),self.get_bid()])
-		else:
-			self.ppro_out.send([IOCBUY,self.symbol_name,abs(shares),self.get_ask()])
+		if shares!=0:
+			if shares<0:
+				self.ppro_out.send([IOCSELL,self.symbol_name,abs(shares),self.get_bid()])
+			else:
+				self.ppro_out.send([IOCBUY,self.symbol_name,abs(shares),self.get_ask()])
 
 # total_imbalance = sum(t.values())
 
