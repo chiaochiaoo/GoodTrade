@@ -18,7 +18,8 @@ class UI(pannel):
 		
 		self.tk_labels=['Strategy',"Status","Updates" , "MaxU", "MinU", "U", "R", "WR", "MR", "TR", 'flatten', 'log']
 
-
+		self.algo_limit = 100
+		
 		# infos = {
 		# 'Strategy':tradingplan.algo_name, \
 		# STATUS:tradingplan.tkvars[STATUS],\
@@ -585,7 +586,7 @@ class UI(pannel):
 		info = list(infos.values())
 		labels = list(infos.keys())
 
-		for l in range(45):
+		for l in range(self.algo_limit):
 			self.tk_labels_basket[l]={}
 			for j in range(len(self.labels)):
 				#"symbol","algo_status","description","break_at","position","act_r/est_r","stoplevel","average_price","shares","pxtgt1","pxtgt1","pxtgt1","unrealized_pshr","unrealized","realized"

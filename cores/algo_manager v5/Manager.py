@@ -100,7 +100,7 @@ class Manager:
 
 		self.manage_lock = 0
 
-
+		self.algo_limit = 100
 
 		""" POSITION DATA """
 
@@ -342,7 +342,7 @@ class Manager:
 
 		if basket_name not in self.baskets:
 
-			if self.ui.basket_label_count<40:
+			if self.ui.basket_label_count<self.algo_limit:
 				self.baskets[basket_name] = TradingPlan_Basket(basket_name,risk,self)
 				self.ui.create_new_single_entry(self.baskets[basket_name],"Basket",None)
 
@@ -374,7 +374,7 @@ class Manager:
 
 		if basket_name not in self.baskets:
 
-			if self.ui.basket_label_count<40:
+			if self.ui.basket_label_count<self.algo_limit:
 				self.baskets[basket_name] = TradingPlan_Basket(basket_name,risk,self)
 				self.ui.create_new_single_entry(self.baskets[basket_name],"Basket",None)
 
