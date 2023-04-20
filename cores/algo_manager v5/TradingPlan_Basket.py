@@ -178,6 +178,30 @@ class TradingPlan_Basket:
 				self.average_price[symbol] = sum(self.current_exposure[symbol])/self.current_shares[symbol]
 
 
+	def holding_update(self,symbol,share_added,price):
+
+		if share_added<0:
+			price=price*-1
+
+		for i in range(abs(share_added)):
+
+			if len(self.current_exposure[symbol])==0:
+				self.current_exposure[symbol].append(price)
+
+			elif self.current_exposure[symbol][-1]*price >0: #same side.
+				self.current_exposure[symbol].append(price)
+
+			elif self.current_exposure[symbol][-1]*price <0:
+
+				self.data[REALIZED]+= -1*price - self.current_exposure[symbol].pop()
+				
+				#self.manager.new_record(self)
+			else:
+				log_print("HOLDING UPDATE ERROR")
+
+		self.data[REALIZED] = round(self.data[REALIZED],2)
+		#self.manager.new_record(self)
+
 	def request_fufill(self,symbol,share,price):
 
 		# if it takes, return the remaining. otherwise return it back
@@ -220,11 +244,16 @@ class TradingPlan_Basket:
 
 				### current share ==0 , or current share same sign as share, load.  else unload.
 
-				if share_added>0:
-					coefficient = 1
-				else:
-					coefficient = -1
 
+				# This process has a problem. if the shares causing the position flip, then it's first calcualte realized, then recaculate avg price. then it's fucked. 
+
+				try:
+					self.holding_update(symbol,share_added,price)
+				except	Exception	as e:
+					PrintException(e,"Basket Holding Update Error:"+self.source+symbol)
+				self.calculate_avg_price(symbol)
+
+				"""
 				if prev_share==0 or prev_share*share>0:  #this is adding to positions. 
 
 
@@ -237,15 +266,12 @@ class TradingPlan_Basket:
 
 				else:
 					try:
-						if len(self.current_exposure[symbol])<share:
+						if len(self.current_exposure[symbol])<abs(share):
 							log_print(self.source,"WARNING:",self.algo_name,symbol,"does not have enough holding to load off.",len(self.current_exposure[symbol]),share)
 
 						for i in range(abs(share_added)):
 
-
 							self.data[REALIZED]+= -1*price*coefficient - self.current_exposure[symbol].pop()
-
-
 							self.data[REALIZED] = round(self.data[REALIZED],2)
 
 						#self.manager.new_record(self)
@@ -256,12 +282,12 @@ class TradingPlan_Basket:
 					self.calculate_avg_price(symbol)
 					log_print(self.source,self.algo_name,symbol,"Loading off :incmonig,",share,"want",self.current_request[symbol]," now have",self.current_shares[symbol],"return",ret, "prev avg",prev_price,"cur price",self.average_price[symbol])
 
-					#realized it. 
-				# if self.current_shares[symbol]!=0:
-				# 	self.average_price[symbol] = (prev_share*self.average_price[symbol] + share*price)/self.current_shares[symbol]
-				# else:
-				# 	self.average_price[symbol] = 0 
-					
+					realized it. 
+				if self.current_shares[symbol]!=0:
+					self.average_price[symbol] = (prev_share*self.average_price[symbol] + share*price)/self.current_shares[symbol]
+				else:
+					self.average_price[symbol] = 0 
+				"""
 
 				return ret
 
