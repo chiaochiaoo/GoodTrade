@@ -306,7 +306,9 @@ class Symbol:
 		log_print(self.source,self.symbol_name,self.action,self.difference)
 		# self.ppro_out.send([CANCEL,self.symbol_name])
 		# time.sleep(0.3)
-		self.ppro_out.send([self.action,self.symbol_name,abs(self.difference),self.manager.gateway])
+
+		if self.difference!=0:
+			self.ppro_out.send([self.action,self.symbol_name,abs(self.difference),self.manager.gateway])
 
 		# handl = threading.Thread(target=self.threading_order,daemon=True)
 		# handl.start()
@@ -319,7 +321,9 @@ class Symbol:
 		log_print(self.source,self.symbol_name,action,share)
 		# self.ppro_out.send([CANCEL,self.symbol_name])
 		# time.sleep(0.3)
-		self.ppro_out.send([self.action,self.symbol_name,abs(self.difference),0])
+
+		if self.difference!=0:
+			self.ppro_out.send([self.action,self.symbol_name,abs(self.difference),0])
 
 	def get_bid(self):
 		return self.data[BID]
