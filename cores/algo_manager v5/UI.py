@@ -527,9 +527,9 @@ class UI(pannel):
 		share1 = dic["multiplier"].get()*dic["ratio"][0]*coe
 		share2 = dic["multiplier"].get()*dic["ratio"][1]*coe
 
-		print(share1,share2)
+		print(dic['symbol'],share1,share2)
 
-		self.apply_basket_cmd(dic['name'],{dic['symbol'][0]:share1,dic['symbol'][1]:share2},0,1)
+		self.manager.apply_basket_cmd(dic['name'],{dic['symbol'][0]:share1,dic['symbol'][1]:share2},0,1)
 	def init_bad_symbol_pannel(self):
 
 		self.bad_symbol = tk.StringVar()
