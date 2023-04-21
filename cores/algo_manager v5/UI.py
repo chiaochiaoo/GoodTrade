@@ -418,10 +418,26 @@ class UI(pannel):
 
 	def init_pannel(self):
 
-		self.custom_algo_pannel = ttk.LabelFrame(self.root,text="Algo Authorization") 
 
-		self.custom_algo_pannel.place(x=10,y=220,height=950,width=350)
+		self.sub_pannel = ttk.LabelFrame(self.root,text="") 
+		self.sub_pannel.place(x=0,y=220,height=950,width=350)
 
+		self.SUB_TAB = ttk.Notebook(self.sub_pannel)
+		self.SUB_TAB.place(x=0,rely=0.01,relheight=1,width=640)
+
+
+
+		self.quick_spread_pannel = ttk.LabelFrame(self.SUB_TAB,text="") 
+
+
+		self.custom_algo_pannel = ttk.LabelFrame(self.SUB_TAB,text="") 
+		#self.custom_algo_pannel.place(x=0,y=0,height=950,width=350)
+
+		#self.quick_spread_pannel.place(x=0,y=0,height=950,width=350)
+		self.SUB_TAB.add(self.custom_algo_pannel,text="AlgoAuthorization")
+		self.SUB_TAB.add(self.quick_spread_pannel,text="QuickSread")
+		# self.TNV_TAB = ttk.Notebook(self.custom_algo_pannel)
+		# self.TNV_TAB.place(x=0,rely=0.01,relheight=1,width=640)
 
 		self.system_pannel = ttk.LabelFrame(self.root,text="System")
 		self.system_pannel.place(x=10,y=10,height=210,width=350)
@@ -450,8 +466,70 @@ class UI(pannel):
 
 		self.init_gateway()
 		self.init_bad_symbol_pannel()
+		self.init_quick_spread()
+
+	def init_quick_spread(self):
+
+		labels =		{"SPREAD":15,\
+						"MULTIPLIER":10,\
+						
+						"LONG":8,\
+						
+						"FLAT":8,\
+						"SHORT":8,\
+}
 
 
+		spyqqq = {"name":"SPYQQQ","symbol":["SPY.AM","QQQ.NQ"],"ratio":[1,-1],"multiplier":tk.IntVar()}
+		total = [spyqqq]
+
+		c=1
+		t=2
+
+		for key,val, in labels.items():
+			ttk.Label(self.quick_spread_pannel, text=key,width=val).grid(sticky="w",column=c,row=1)
+			c+=1
+
+		for i in total:
+			ttk.Label(self.quick_spread_pannel, text=i['name']+str(i['ratio']),width=labels['SPREAD']).grid(sticky="w",column=1,row=t)
+
+			spyqqq["flat"] = ttk.Button(self.quick_spread_pannel, text="    ",command=lambda s=i,side="flat": self.submit_spread(s,side),width=labels['FLAT'])
+			spyqqq["flat"].grid(sticky="w",column=4,row=t)
+
+			spyqqq["long"] =ttk.Button(self.quick_spread_pannel, text="    ",command=lambda s=i,side="long": self.submit_spread(s,side),width=labels['FLAT'])
+			spyqqq["long"].grid(sticky="w",column=3,row=t)
+
+			spyqqq["short"] =ttk.Button(self.quick_spread_pannel, text="    ",command=lambda s=i,side="short": self.submit_spread(s,side),width=labels['FLAT'])
+			spyqqq["short"].grid(sticky="w",column=5,row=t)
+
+			ttk.Entry(self.quick_spread_pannel,textvariable=i['multiplier'],width=labels['MULTIPLIER']).grid(sticky="w",column=2,row=t)
+			t+=1
+
+	def submit_spread(self,dic,side):
+	
+		if side =="flat":
+			coe= 0
+			dic["flat"]["text"]="selected"
+			dic["long"]["text"]=""
+			dic["short"]["text"]=""
+			#dic["short"]["bg"]="grey"
+		elif side =="long":
+			coe=1
+			dic["flat"]["text"]=""
+			dic["long"]["text"]="selected"
+			dic["short"]["text"]=""
+		elif side =="short":
+			coe=-1
+			dic["flat"]["text"]=""
+			dic["long"]["text"]=""
+			dic["short"]["text"]="selected"
+
+		share1 = dic["multiplier"].get()*dic["ratio"][0]*coe
+		share2 = dic["multiplier"].get()*dic["ratio"][1]*coe
+
+		print(share1,share2)
+
+		self.apply_basket_cmd(dic['name'],{dic['symbol'][0]:share1,dic['symbol'][1]:share2},0,1)
 	def init_bad_symbol_pannel(self):
 
 		self.bad_symbol = tk.StringVar()
@@ -470,10 +548,10 @@ class UI(pannel):
 		self.gateway.set("MEMX")
 
 		options = [
-		    "MEMX",
-		    "ARCA",
-		    "BATS",
-		    "EDGA",
+			"MEMX",
+			"ARCA",
+			"BATS",
+			"EDGA",
 		]
 
 
