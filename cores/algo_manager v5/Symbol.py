@@ -368,7 +368,9 @@ class Symbol:
 				else:
 					self.incoming_shares[price] += share
 
-			self.calc_inspection_differences()
+
+			tps = list(self.tradingplans.keys())
+			self.calc_inspection_differences(tps)
 
 
 			log_print("Symbol",self.symbol_name," holding update:",price,share)
