@@ -65,13 +65,16 @@ class Symbol:
 		self.difference = 0
 		self.action=""
 
-		self.market_out = 0
 
 		self.current_imbalance = 0
 
 		# plus, minus, all the updates, all go here. 
 		self.incoming_shares_lock = threading.Lock()
 		self.incoming_shares = {}
+
+
+		self.symbol_inspection_lock = threading.Lock()
+
 
 		#self.tradingplan_lock = threading.Lock()
 		self.tradingplans = {}
@@ -108,41 +111,42 @@ class Symbol:
 		# checking if priced. if not ask for it .
 
 
-		
-		tps = list(self.tradingplans.keys())
+		# try to see if it can obtain the lock? 
 
-		# no.1 update the current prices
-		self.update_stockprices(tps)
+		if self.symbol_inspection_lock.locked()==False:
 
-		# no.2 pair off diff side. need.. hmm price .....!!!
+			tps = list(self.tradingplans.keys())
 
-		if self.get_bid()!=0:
-			self.pair_off(tps)
+			# no.1 update the current prices
+			self.update_stockprices(tps)
 
+			# no.2 pair off diff side. need.. hmm price .....!!!
 
-		# no.3 pair orders. fill it in. 
-
-		self.calc_inspection_differences(tps)
+			if self.get_bid()!=0:
+				self.pair_off(tps)
 
 
-		# no.4 get all current imbalance
-		self.calc_total_imbalances(tps)
+			# no.3 pair orders. fill it in. 
+
+			self.calc_inspection_differences(tps)
 
 
-		now = datetime.now()
-		ts = now.hour*60 + now.minute
+			# no.4 get all current imbalance
+			self.calc_total_imbalances(tps)
 
 
-		## JUST HAD MARKET OPERATIN ##
+			now = datetime.now()
+			ts = now.hour*60 + now.minute
 
-		if self.market_out!=0:
+
+			## JUST HAD MARKET OPERATIN ##
+
+
 
 			if self.difference!=0 and ts<=956:
 				self.deploy_orders()
 			else:
 				self.action = ""
-
-		self.market_out = 0
 
 
 
@@ -357,17 +361,17 @@ class Symbol:
 
 	def holdings_update(self,price,share):
 
-		with self.incoming_shares_lock:
+		with self.symbol_inspection_lock:
+			with self.incoming_shares_lock:
+				if price not in self.incoming_shares:
+					self.incoming_shares[price] = share
+				else:
+					self.incoming_shares[price] += share
 
-			if price not in self.incoming_shares:
+			self.calc_inspection_differences()
 
-				self.incoming_shares[price] = share
-			else:
-				self.incoming_shares[price] += share
 
-			
-		#log_print("holding update - releasing lock")
-		print("Symbol",self.symbol_name," holding update:",price,share)
+			log_print("Symbol",self.symbol_name," holding update:",price,share)
 
 	def immediate_request(self,shares):
 
@@ -379,7 +383,7 @@ class Symbol:
 			else:
 				self.ppro_out.send([IOCBUY,self.symbol_name,abs(shares),self.get_ask()])
 
-			self.market_out = shares
+
 
 # total_imbalance = sum(t.values())
 
