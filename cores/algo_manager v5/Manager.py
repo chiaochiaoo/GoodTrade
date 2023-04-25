@@ -386,7 +386,7 @@ class Manager:
 
 				if "." in symbol:
 
-					print("Manager: Applying basket command",symbol,value)
+					log_print("Manager: Applying basket command",symbol,value)
 					if symbol not in self.symbol_data:
 						self.symbol_data[symbol] = Symbol(self,symbol,self.pipe_ppro_out)  #register in Symbol.
 						self.symbols.append(symbol)
