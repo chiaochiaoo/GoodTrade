@@ -255,6 +255,10 @@ class TradingPlan_Basket:
 					PrintException(e,"Basket Holding Update Error:"+self.source+symbol)
 				self.calculate_avg_price(symbol)
 
+
+				log_print(self.source,self.algo_name,symbol,"Loading up :incmonig,",share,"want",self.expected_shares[symbol]," now have",self.current_shares[symbol],"return",ret, "prev avg",prev_price,"cur price",self.average_price[symbol])
+
+
 				"""
 				if prev_share==0 or prev_share*share>0:  #this is adding to positions. 
 
