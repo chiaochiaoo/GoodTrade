@@ -132,10 +132,17 @@ class Symbol:
 		now = datetime.now()
 		ts = now.hour*60 + now.minute
 
-		if self.difference!=0 and ts<=956:
-			self.deploy_orders()
-		else:
-			self.action = ""
+
+		## JUST HAD MARKET OPERATIN ##
+
+		if self.market_out!=0:
+
+			if self.difference!=0 and ts<=956:
+				self.deploy_orders()
+			else:
+				self.action = ""
+
+		self.market_out = 0
 
 
 
@@ -151,12 +158,10 @@ class Symbol:
 
 		self.expected = self.get_all_expected(tps)
 
-		self.difference = self.expected - self.current_shares - self.market_out
-
-		self.market_out = 0
+		self.difference = self.expected - self.current_shares 
 
 		if self.difference!=0:
-			log_print(self.source,self.symbol_name," inspection complete,self.expected",self.expected," have",self.current_shares," deploying:",self.difference)
+			log_print(self.source,self.symbol_name," inspection complete,expected",self.expected," have",self.current_shares," deploying:",self.difference)
 		# else:
 		# 	log_print(self.symbol_name," inspection complete,self.expected",self.expected," have",self.current_shares)
 
