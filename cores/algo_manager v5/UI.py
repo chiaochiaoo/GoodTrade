@@ -435,7 +435,7 @@ class UI(pannel):
 
 		#self.quick_spread_pannel.place(x=0,y=0,height=950,width=350)
 		self.SUB_TAB.add(self.custom_algo_pannel,text="AlgoAuthorization")
-		self.SUB_TAB.add(self.quick_spread_pannel,text="QuickSread")
+		self.SUB_TAB.add(self.quick_spread_pannel,text="QuickSpread")
 		# self.TNV_TAB = ttk.Notebook(self.custom_algo_pannel)
 		# self.TNV_TAB.place(x=0,rely=0.01,relheight=1,width=640)
 
@@ -455,7 +455,7 @@ class UI(pannel):
 		self.performance_pannel.place(x=360,y=70,height=260,width=900)
 
 		self.deployment_panel = ttk.LabelFrame(self.root,text="Strategy Deployment") 
-		self.deployment_panel.place(x=360,y=260,height=800,width=900)
+		self.deployment_panel.place(x=360,y=260,height=700,width=900)
 
 		self.init_system_pannel()
 		self.init_performance_pannel()
@@ -512,7 +512,6 @@ class UI(pannel):
 			dic["flat"]["text"]="selected"
 			dic["long"]["text"]=""
 			dic["short"]["text"]=""
-			#dic["short"]["bg"]="grey"
 		elif side =="long":
 			coe=1
 			dic["flat"]["text"]=""
@@ -527,9 +526,10 @@ class UI(pannel):
 		share1 = dic["multiplier"].get()*dic["ratio"][0]*coe
 		share2 = dic["multiplier"].get()*dic["ratio"][1]*coe
 
-		print(dic['symbol'],share1,share2)
+		if share1!=0 and share2!=0 and side!="flat":
+			log_print("Quick Spread:",dic['symbol'],share1,share2)
 
-		self.manager.apply_basket_cmd(dic['name'],{dic['symbol'][0]:share1,dic['symbol'][1]:share2},0,1)
+			self.manager.apply_basket_cmd(dic['name'],{dic['symbol'][0]:share1,dic['symbol'][1]:share2},0,1)
 	def init_bad_symbol_pannel(self):
 
 		self.bad_symbol = tk.StringVar()
@@ -788,7 +788,7 @@ class UI(pannel):
 		info = list(infos.values())
 		labels = list(infos.keys())	
 
-		print(self.tk_labels_basket[symbol].keys())
+		log_print(self.tk_labels_basket[symbol].keys())
 		for j in range(len(info)):
 			#"symbol","algo_status","description","break_at","position","act_r/est_r","stoplevel","average_price","shares","pxtgt1","pxtgt1","pxtgt1","unrealized_pshr","unrealized","realized"
 			

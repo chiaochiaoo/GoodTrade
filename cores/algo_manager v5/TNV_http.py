@@ -117,7 +117,7 @@ class S(BaseHTTPRequestHandler):
 		global pipec
 		#print("sending",msg,pipec)
 
-		print("http receve:",msg)
+		#print("http receve:",msg)
 
 		pipec.send(["http",msg])
 
