@@ -1147,7 +1147,7 @@ if __name__ == '__main__':
 
 	root = tk.Tk()
 	root.title("GoodTrade Algo Manager v5 b1 ")
-	root.geometry("1280x800")
+	root.geometry("1280x1000")
 
 	processes = [algo_voxcom,ppro_in_manager,ppro_out_manager]
 	manager=Manager(root,goodtrade_pipe,ppro_out,ppro_in,TEST,processes)
