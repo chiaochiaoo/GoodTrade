@@ -57,6 +57,7 @@ class Symbol:
 		self.total_expected = 0
 
 
+
 		"""
 
 		"""
@@ -64,6 +65,7 @@ class Symbol:
 		self.difference = 0
 		self.action=""
 
+		self.market_out = 0
 
 		self.current_imbalance = 0
 
@@ -149,7 +151,9 @@ class Symbol:
 
 		self.expected = self.get_all_expected(tps)
 
-		self.difference = self.expected - self.current_shares
+		self.difference = self.expected - self.current_shares - self.market_out
+
+		self.market_out = 0
 
 		if self.difference!=0:
 			log_print(self.source,self.symbol_name," inspection complete,self.expected",self.expected," have",self.current_shares," deploying:",self.difference)
@@ -369,6 +373,8 @@ class Symbol:
 				self.ppro_out.send([IOCSELL,self.symbol_name,abs(shares),self.get_bid()])
 			else:
 				self.ppro_out.send([IOCBUY,self.symbol_name,abs(shares),self.get_ask()])
+
+			self.market_out = shares
 
 # total_imbalance = sum(t.values())
 
