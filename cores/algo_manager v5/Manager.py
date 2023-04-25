@@ -663,7 +663,7 @@ class Manager:
 								handl = threading.Thread(target=self.moo_apply_basket_cmd,args=(d[1],orders,risk,aggresive,),daemon=True)
 								handl.start()
 								
-							else:
+							elif cur_ts<=957:
 								self.apply_basket_cmd(d[1],orders,risk,aggresive)
 					else:
 						log_print("Manager:","Risk exceeded, skip. ",self.net,self.set_risk*-1)
