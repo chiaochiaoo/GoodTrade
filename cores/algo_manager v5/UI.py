@@ -2,6 +2,8 @@ from pannel import *
 from constant import *
 from Util_functions import *
 from UI_custom_algo import * 
+import time
+
 
 class UI(pannel):
 	def __init__(self,root,manager=None,receiving_signals=None,cmd_text=None):
@@ -472,13 +474,13 @@ class UI(pannel):
 
 		labels =		{"SPREAD":15,\
 						"MULTIPLIER":10,\
-						
 						"LONG":8,\
-						
 						"FLAT":8,\
 						"SHORT":8,\
-}
+		}
 
+
+		self.spread_timer = 0
 
 		spyqqq = {"name":"SPYQQQ","symbol":["SPY.AM","QQQ.NQ"],"ratio":[1,-1],"multiplier":tk.IntVar()}
 		total = [spyqqq]
@@ -509,27 +511,37 @@ class UI(pannel):
 	
 		if side =="flat":
 			coe= 0
-			dic["flat"]["text"]="selected"
+			dic["flat"]["text"]="0"
 			dic["long"]["text"]=""
 			dic["short"]["text"]=""
 		elif side =="long":
 			coe=1
 			dic["flat"]["text"]=""
-			dic["long"]["text"]="selected"
+			dic["long"]["text"]=str(dic["multiplier"].get())
 			dic["short"]["text"]=""
 		elif side =="short":
 			coe=-1
 			dic["flat"]["text"]=""
 			dic["long"]["text"]=""
-			dic["short"]["text"]="selected"
+			dic["short"]["text"]=str(dic["multiplier"].get()*-1)
 
 		share1 = dic["multiplier"].get()*dic["ratio"][0]*coe
 		share2 = dic["multiplier"].get()*dic["ratio"][1]*coe
 
-		if share1!=0 and share2!=0 and side!="flat":
+		now = datetime.now()
+		ts = now.hour*3600 + now.minute*60 + now.second
+
+		if ts-self.spread_timer>=10:
+			self.spread_timer = ts
+
 			log_print("Quick Spread:",dic['symbol'],share1,share2)
 
 			self.manager.apply_basket_cmd(dic['name'],{dic['symbol'][0]:share1,dic['symbol'][1]:share2},0,1)
+		else:
+			dic["flat"]["text"]="WAIT"
+			dic["long"]["text"]="WAIT"
+			dic["short"]["text"]="WAIT"
+
 	def init_bad_symbol_pannel(self):
 
 		self.bad_symbol = tk.StringVar()
