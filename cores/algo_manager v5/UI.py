@@ -531,7 +531,7 @@ class UI(pannel):
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second
 
-		if ts-self.spread_timer>=10:
+		if ts-self.spread_timer>=20:
 			self.spread_timer = ts
 
 			log_print("Quick Spread:",dic['symbol'],share1,share2)
