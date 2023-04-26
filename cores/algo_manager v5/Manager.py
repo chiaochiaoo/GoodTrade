@@ -758,7 +758,7 @@ class Manager:
 
 					count +=1 
 
-					if count%3==0:
+					if count%2==0:
 
 						req = threading.Thread(target=self.get_symbol_price, daemon=True)
 						req.start()
@@ -843,7 +843,7 @@ class Manager:
 				side = data["side"]
 
 				## HERE. Append it to the new symbol warehouse system. 
-				print("Manager: Holding update:",symbol,price,shares,side)
+				log_print("Manager: Holding update:",symbol,price,shares,side)
 
 				try:
 					if symbol in self.symbols:

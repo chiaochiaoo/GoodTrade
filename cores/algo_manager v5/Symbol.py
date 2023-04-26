@@ -53,6 +53,8 @@ class Symbol:
 
 		self.active_tps = 0
 		self.current_shares = 0
+		self.theoritical_shares = 0
+		
 		self.current_avgprice = 0
 		self.total_expected = 0
 
@@ -137,7 +139,7 @@ class Symbol:
 			else:
 				self.action = ""
 		else:
-			log_print(self.symbol_name," just had makret order. passing inspection. ")
+			log_print(self.symbol_name," just had makret order. passing inspection. suspect difference:",self.difference)
 			self.market_out=0
 
 
