@@ -176,10 +176,15 @@ class Manager:
 		self.file = "../../algo_records/"+now.strftime("%Y-%m-%d")+".json"
 
 		# this is today's 
-		self.record = {}
-		self.record["total"] = {}
-		self.record["algos"] = {}
-		self.record["detes"] = {}
+
+		try:
+			with open(self.file) as f:
+				self.record = json.load(f)
+		except Exception as e:
+			self.record = {}
+			self.record["total"] = {}
+			self.record["algos"] = {}
+			self.record["detes"] = {}
 
 		#self.init_record_writer()
 		self.load_record()
