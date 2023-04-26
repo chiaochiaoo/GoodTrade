@@ -54,7 +54,7 @@ class Symbol:
 		self.active_tps = 0
 		self.current_shares = 0
 		self.theoritical_shares = 0
-		
+
 		self.current_avgprice = 0
 		self.total_expected = 0
 
@@ -362,7 +362,7 @@ class Symbol:
 
 			
 		#log_print("holding update - releasing lock")
-		print("Symbol",self.symbol_name," holding update:",price,share)
+		log_print("Symbol",self.symbol_name," holding update:",price,share)
 
 	def immediate_request(self,shares):
 
@@ -376,6 +376,7 @@ class Symbol:
 
 
 			self.market_out = shares
+
 
 # total_imbalance = sum(t.values())
 

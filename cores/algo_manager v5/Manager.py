@@ -759,7 +759,7 @@ class Manager:
 					self.ui.user.set(user)
 					self.ui.position_count.set(len(self.current_positions))
 					self.ui.account_status["background"] = "#97FEA8"
-					#log_print("Position updates:",len(positions),positions)
+					log_print("Position updates:",len(positions),positions)
 
 					count +=1 
 
