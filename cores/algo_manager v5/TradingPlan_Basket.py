@@ -167,7 +167,9 @@ class TradingPlan_Basket:
 
 	def get_current_expected(self,symbol):
 
-		return self.expected_shares[symbol]
+		with self.read_lock[symbol]:
+			ret = self.expected_shares[symbol]
+		return ret
 
 	def get_current_request(self,symbol):
 

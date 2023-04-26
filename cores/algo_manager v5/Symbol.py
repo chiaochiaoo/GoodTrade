@@ -64,6 +64,7 @@ class Symbol:
 		self.difference = 0
 		self.action=""
 
+		self.market_out = 0
 
 		self.current_imbalance = 0
 
@@ -130,11 +131,14 @@ class Symbol:
 		now = datetime.now()
 		ts = now.hour*60 + now.minute
 
-		if self.difference!=0 and ts<=956:
-			self.deploy_orders()
+		if self.market_out==0:
+			if self.difference!=0 and ts<=956:
+				self.deploy_orders()
+			else:
+				self.action = ""
 		else:
-			self.action = ""
-
+			log_print(self.symbol_name," just had makret order. passing inspection. ")
+			self.market_out=0
 
 
 	def update_stockprices(self,tps):
@@ -168,7 +172,6 @@ class Symbol:
 		
 		for tp in tps:
 			self.expected +=  self.tradingplans[tp].get_current_expected(self.symbol_name)
-		
 
 		return self.expected
 
@@ -281,7 +284,6 @@ class Symbol:
 						break
 
 
-
 		self.previous_shares,self.previous_avgprice = self.current_shares, self.current_avgprice
 			
 
@@ -369,6 +371,9 @@ class Symbol:
 				self.ppro_out.send([IOCSELL,self.symbol_name,abs(shares),self.get_bid()])
 			else:
 				self.ppro_out.send([IOCBUY,self.symbol_name,abs(shares),self.get_ask()])
+
+
+			self.market_out = shares
 
 # total_imbalance = sum(t.values())
 
