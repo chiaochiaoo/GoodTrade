@@ -538,9 +538,9 @@ class UI(pannel):
 
 			self.manager.apply_basket_cmd(dic['name'],{dic['symbol'][0]:share1,dic['symbol'][1]:share2},0,1)
 		else:
-			dic["flat"]["text"]="WAIT"
-			dic["long"]["text"]="WAIT"
-			dic["short"]["text"]="WAIT"
+			dic["flat"]["text"]="WAIT:"+str(20-(ts-self.spread_timer))+"s"
+			dic["long"]["text"]="WAIT:"+str(20-(ts-self.spread_timer))+"s"
+			dic["short"]["text"]="WAIT:"+str(20-(ts-self.spread_timer))+"s"
 
 	def init_bad_symbol_pannel(self):
 
