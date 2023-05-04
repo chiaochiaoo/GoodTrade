@@ -5,6 +5,26 @@ from UI_custom_algo import *
 import time
 
 
+def trace_func(d):
+
+	if d['lock'].get()==0:
+		d['set_entry']["state"] = DISABLED
+		d['set_button']["state"] = DISABLED
+		d['flat_button']["state"] = DISABLED
+		
+		d['set_current']["state"] = DISABLED
+		d['set_max']["state"] = DISABLED
+		d['passive_button']["state"] = DISABLED
+
+
+	else:
+		d['set_entry']["state"] = "normal"
+		d['set_button']["state"] = "normal"
+		d['flat_button']["state"] = "normal"
+		d['set_current']["state"] = "normal"
+		d['set_max']["state"] = "normal"
+		d['passive_button']["state"] = "normal"
+
 class UI(pannel):
 	def __init__(self,root,manager=None,receiving_signals=None,cmd_text=None):
 
@@ -472,7 +492,7 @@ class UI(pannel):
 
 	def init_quick_spread(self):
 
-		labels =		{"entry":3,\
+		labels =		{"entry":4,\
 						"button":5,\
 						"checker":8,\
 						"long_label":8,\
@@ -483,7 +503,7 @@ class UI(pannel):
 
 		self.spread_timer = 0
 
-		spyqqq = {"name":"SPYQQQ","symbol":["SPY.AM","QQQ.NQ"],"ratio":[1,-1],"current":tk.IntVar(),"increment":tk.IntVar(),"lock":tk.IntVar(value=0)}
+		spyqqq = {"name":"SPYQQQ","symbol":["SPY.AM","QQQ.NQ"],"ratio":[1,-1],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		total = [spyqqq]
 
 		c=1
@@ -506,40 +526,24 @@ class UI(pannel):
 			tk.Label(self.quick_spread_pannel, text=i['name']+str(i['ratio'])).grid(sticky="w",column=c,row=t)
 			c+=1
 
-
-			# LOCK:
-			tk.Label(self.quick_spread_pannel, text="Holding:").grid(sticky="w",column=c,row=t)
+			tk.Label(self.quick_spread_pannel, text=" ").grid(sticky="w",column=c,row=t)
 			c+=1
 
-			# row 1 entry
-			i['set_entry']=tk.Entry(self.quick_spread_pannel,textvariable=i['current'],width=labels['entry'])
-			i['set_entry']["state"] = DISABLED
-			i['set_entry'].grid(sticky="w",column=c,row=t)	
-			c+=1
-
-			# row 1 set 
-
-			i["set_button"] =tk.Button(self.quick_spread_pannel, text="SET",command=lambda s=i,side="long": self.submit_spread(s,side),width=labels['button'])
-			i['set_button']["state"] = DISABLED
-			i["set_button"].grid(sticky="w",column=c,row=t)
+			i['status_bar'] = tk.Label(self.quick_spread_pannel, textvariable=i['status'])
+			i['status_bar'].grid(sticky="w",column=c,row=t)
 			c+=1
 
 
-			tk.Label(self.quick_spread_pannel, text="   ",width=5).grid(sticky="w",column=c,row=t)
-			c+=1
-			# row 1 flat 
-			tk.Button(self.quick_spread_pannel, text="FLAT", bg="yellow",command=lambda s=i,side="flat": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
+			t+=1 
+			c =1 
+
+			tk.Label(self.quick_spread_pannel, text="SET LOCK:",).grid(sticky="w",column=c,row=t)
 			c+=1
 
-			t+=1
-			c=1
-			# LOCK:
-			# tk.Label(self.quick_spread_pannel, text="SET LOCK:").grid(sticky="w",column=c,row=t)
-			# c+=1
-
-			# row 1 cheker 
-			tk.Checkbutton(self.quick_spread_pannel,text="SET LOCK:",variable=i['lock']).grid(sticky="w",column=c,row=t)
+			tk.Checkbutton(self.quick_spread_pannel,text=" ",variable=i['lock']).grid(sticky="w",column=c,row=t)
 			c+=1
+
+
 
 			# LOCK:
 			tk.Label(self.quick_spread_pannel, text="Increment:").grid(sticky="w",column=c,row=t)
@@ -550,6 +554,63 @@ class UI(pannel):
 			i['set_entry']["state"] = DISABLED
 			i['set_entry'].grid(sticky="w",column=c,row=t)	
 			c+=1
+
+			# row 1 set 
+
+			i["set_button"] =tk.Button(self.quick_spread_pannel, text="SET",command=lambda s=i,side="direct": self.submit_spread(s,side),width=labels['button'])
+			i['set_button']["state"] = DISABLED
+			i["set_button"].grid(sticky="w",column=c,row=t)
+			c+=1
+
+			i["flat_button"] =tk.Button(self.quick_spread_pannel, text="FLAT",command=lambda s=i,side="flat": self.submit_spread(s,side),width=labels['button'])
+			i['flat_button']["state"] = DISABLED
+			i["flat_button"].grid(sticky="w",column=c,row=t)
+			c+=1
+
+
+			t+=1
+			c=1
+			# LOCK:
+			# tk.Label(self.quick_spread_pannel, text="SET LOCK:").grid(sticky="w",column=c,row=t)
+			# c+=1
+
+
+			tk.Label(self.quick_spread_pannel, text="PASSIVE:").grid(sticky="w",column=c,row=t)
+			c+=1
+			# row 1 cheker 
+			i["passive_button"] = tk.Checkbutton(self.quick_spread_pannel,text=" ",variable=i['passive'])
+			i['passive_button']["state"] = DISABLED
+			i['passive_button'].grid(sticky="w",column=c,row=t)
+			c+=1
+
+
+			tk.Label(self.quick_spread_pannel, text="Holding:").grid(sticky="w",column=c,row=t)
+			c+=1
+
+			# row 1 entry
+			i['set_current']=tk.Entry(self.quick_spread_pannel,textvariable=i['current'],width=labels['entry'])
+			i['set_current']["state"] = DISABLED
+			i['set_current'].grid(sticky="w",column=c,row=t)	
+			c+=1
+
+
+			# LOCK:
+			tk.Label(self.quick_spread_pannel, text="Max:").grid(sticky="w",column=c,row=t)
+			c+=1
+
+			# row 1 entry
+			i['set_max']=tk.Entry(self.quick_spread_pannel,textvariable=i['max'],width=labels['entry'])
+			i['set_max']["state"] = DISABLED
+			i['set_max'].grid(sticky="w",column=c,row=t)	
+			c+=1
+
+
+
+			# tk.Label(self.quick_spread_pannel, text="   ",width=5).grid(sticky="w",column=c,row=t)
+			# c+=1
+			# # row 1 flat 
+			# tk.Button(self.quick_spread_pannel, text="FLAT", bg="yellow",command=lambda s=i,side="flat": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
+			# c+=1
 
 
 
@@ -563,7 +624,7 @@ class UI(pannel):
 
 			tk.Button(self.quick_spread_pannel, text="+",command=lambda s=i,side="long": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
 			c+=1
-			tk.Button(self.quick_spread_pannel, text="-",command=lambda s=i,side="long": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
+			tk.Button(self.quick_spread_pannel, text="-",command=lambda s=i,side="short": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
 			c+=1
 
 			#t+=1
@@ -574,44 +635,73 @@ class UI(pannel):
 			tk.Label(self.quick_spread_pannel, text="SHORT:",bg="pink").grid(sticky="w",column=c,row=t)
 			c+=1
 
-			tk.Button(self.quick_spread_pannel, text="+",command=lambda s=i,side="long": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
+			tk.Button(self.quick_spread_pannel, text="+",command=lambda s=i,side="short": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
 			c+=1
 			tk.Button(self.quick_spread_pannel, text="-",command=lambda s=i,side="long": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
 			c+=1
-	def submit_spread(self,dic,side):
-	
-		if side =="flat":
-			coe= 0
-			dic["flat"]["text"]="0"
-			dic["long"]["text"]=""
-			dic["short"]["text"]=""
-		elif side =="long":
-			coe=1
-			dic["flat"]["text"]=""
-			dic["long"]["text"]=str(dic["multiplier"].get())
-			dic["short"]["text"]=""
-		elif side =="short":
-			coe=-1
-			dic["flat"]["text"]=""
-			dic["long"]["text"]=""
-			dic["short"]["text"]=str(dic["multiplier"].get()*-1)
 
-		share1 = dic["multiplier"].get()*dic["ratio"][0]*coe
-		share2 = dic["multiplier"].get()*dic["ratio"][1]*coe
+
+			i['lock'].trace("w", lambda *_, d=i: trace_func(d) )
+
+
+			## ADD TRACE
+
+
+	def submit_spread(self,dic,type_):
+	
 
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second
 
-		if ts-self.spread_timer>=20:
+		if ts-self.spread_timer>=18:
+
+			if type_ =="flat":
+				dic["current"].set(0)
+
+			elif type_ =="long": #add 
+
+				dic["current"].set(dic["current"].get()+dic['increment'].get())
+
+
+			elif type_ =="short": #minus
+	
+				dic["current"].set(dic["current"].get()-dic['increment'].get())
+
+			elif type_ =="direct":
+
+				if abs(dic["current"].get())>dic["max"].get():
+
+					if dic["current"].get()>0:
+						coe = 1 
+					else:
+						coe = -1 
+
+					dic["current"].set(dic['max'].get()*coe)
+
+				dic["current"].set(dic["current"].get())
+				dic['lock'].set(0)
+
+
+			share1 = dic["current"].get()*dic["ratio"][0]
+			share2 = dic["current"].get()*dic["ratio"][1]
+
+
 			self.spread_timer = ts
 
 			log_print("Quick Spread:",dic['symbol'],share1,share2)
 
-			self.manager.apply_basket_cmd(dic['name'],{dic['symbol'][0]:share1,dic['symbol'][1]:share2},0,1)
+
+			try:
+				self.manager.apply_basket_cmd(dic['name'],{dic['symbol'][0]:share1,dic['symbol'][1]:share2},0,1)
+			except:
+				pass
+
+			dic["status"].set("Confirmed")
+			dic['status_bar']['bg'] = 'lightgreen'
 		else:
-			dic["flat"]["text"]="WAIT:"+str(20-(ts-self.spread_timer))+"s"
-			dic["long"]["text"]="WAIT:"+str(20-(ts-self.spread_timer))+"s"
-			dic["short"]["text"]="WAIT:"+str(20-(ts-self.spread_timer))+"s"
+			dic["status"].set("WAIT: "+str(18-(ts-self.spread_timer))+"s")
+			dic['status_bar']['bg'] = 'red'
+
 
 	def init_bad_symbol_pannel(self):
 
