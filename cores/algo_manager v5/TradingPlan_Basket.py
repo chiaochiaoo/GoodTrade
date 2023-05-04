@@ -38,6 +38,10 @@ class TradingPlan_Basket:
 		self.expect_orders = ""
 		self.flatten_order = False
 
+		#### BANED SYMBOL
+
+		self.banned = []
+
 		# First time its expected is fullfilled. shall the management starts.
 		self.read_lock = {}
 		self.have_request = {}
@@ -147,20 +151,21 @@ class TradingPlan_Basket:
 
 		log_print(self.source,self.algo_name,"expect",symbol,shares," aggresive ", aggresive,"current have",self.current_shares[symbol])
 
-		with self.read_lock[symbol]:
+		if symbol not in self.banned:
+			with self.read_lock[symbol]:
 
-			self.expected_shares[symbol] = shares
-			self.recalculate_current_request(symbol)
+				self.expected_shares[symbol] = shares
+				self.recalculate_current_request(symbol)
 
-			if aggresive:
-				now = datetime.now()
-				ts = now.hour*3600 + now.minute*60 + now.second
+				if aggresive:
+					now = datetime.now()
+					ts = now.hour*3600 + now.minute*60 + now.second
 
-				if ts - self.recent_action_ts[symbol] > 5:
-					self.recent_action_ts[symbol] = ts
-					self.symbols[symbol].immediate_request(self.current_request[symbol])
+					if ts - self.recent_action_ts[symbol] > 5:
+						self.recent_action_ts[symbol] = ts
+						self.symbols[symbol].immediate_request(self.current_request[symbol])
 
-			# self.notify_request(symbol)
+				# self.notify_request(symbol)
 
 	def recalculate_current_request(self,symbol):
 		self.current_request[symbol] = self.expected_shares[symbol] - self.current_shares[symbol]
@@ -382,11 +387,13 @@ class TradingPlan_Basket:
 
 	# need to know which symbol got rejected. cancel the request. 
 	def rejection_handling(self,symbol):
-		if self.data[STATUS] == DEPLOYED:
-			self.submit_expected_shares(symbol,0)
-		else:
 
-			log_print(self.source,"rejection messge received on ",self.name)
+		#self.submit_expected_shares(symbol,0)
+		
+		self.expected_shares[symbol] = 0
+		self.banned.append(symbol)
+
+		log_print(self.source," BANNED:",symbol)
 
 
 	def get_flatten_order(self):
