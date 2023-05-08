@@ -504,7 +504,9 @@ class UI(pannel):
 		self.spread_timer = 0
 
 		spyqqq = {"name":"SPYQQQ","symbol":["SPY.AM","QQQ.NQ"],"ratio":[1,-1],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		total = [spyqqq]
+		gldslv = {"name":"GLDSLV","symbol":["GLD.AM","SLV.AM"],"ratio":[1,-4],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		
+		total = [spyqqq,gldslv]
 
 		c=1
 		t=1
@@ -523,6 +525,7 @@ class UI(pannel):
 		for i in total:
 
 			# ROW 1  name 
+			c=1
 			tk.Label(self.quick_spread_pannel, text=i['name']+str(i['ratio'])).grid(sticky="w",column=c,row=t)
 			c+=1
 
@@ -641,10 +644,18 @@ class UI(pannel):
 			c+=1
 
 
+			
+			c=1
+			t+=1
+			tk.Label(self.quick_spread_pannel, text="      ").grid(sticky="w",column=c,row=t)
+
 			i['lock'].trace("w", lambda *_, d=i: trace_func(d) )
 
 
+			t+=1
+			c+=1
 			## ADD TRACE
+
 
 
 	def submit_spread(self,dic,type_):
