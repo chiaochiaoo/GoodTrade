@@ -10,7 +10,7 @@ def trace_func(d):
 	if d['lock'].get()==0:
 		d['set_entry']["state"] = DISABLED
 		d['set_button']["state"] = DISABLED
-		d['flat_button']["state"] = DISABLED
+		#d['flat_button']["state"] = DISABLED
 		
 		d['set_current']["state"] = DISABLED
 		d['set_max']["state"] = DISABLED
@@ -20,7 +20,7 @@ def trace_func(d):
 	else:
 		d['set_entry']["state"] = "normal"
 		d['set_button']["state"] = "normal"
-		d['flat_button']["state"] = "normal"
+		#d['flat_button']["state"] = "normal"
 		d['set_current']["state"] = "normal"
 		d['set_max']["state"] = "normal"
 		d['passive_button']["state"] = "normal"
@@ -568,7 +568,7 @@ class UI(pannel):
 			c+=1
 
 			i["flat_button"] =tk.Button(self.quick_spread_pannel, text="FLAT",command=lambda s=i,side="flat": self.submit_spread(s,side),width=labels['button'])
-			i['flat_button']["state"] = DISABLED
+			#i['flat_button']["state"] = DISABLED
 			i["flat_button"].grid(sticky="w",column=c,row=t)
 			c+=1
 
@@ -644,7 +644,6 @@ class UI(pannel):
 			c+=1
 			tk.Button(self.quick_spread_pannel, text="-",command=lambda s=i,side="long": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
 			c+=1
-
 
 			
 			c=1
