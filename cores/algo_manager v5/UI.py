@@ -665,7 +665,7 @@ class UI(pannel):
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second
 
-		if ts-self.spread_timer>=18:
+		if ts-self.spread_timer>=5:
 
 			if type_ =="flat":
 				dic["current"].set(0)
@@ -711,7 +711,7 @@ class UI(pannel):
 			dic["status"].set("Confirmed")
 			dic['status_bar']['bg'] = 'lightgreen'
 		else:
-			dic["status"].set("WAIT: "+str(18-(ts-self.spread_timer))+"s")
+			dic["status"].set("WAIT: "+str(5-(ts-self.spread_timer))+"s")
 			dic['status_bar']['bg'] = 'red'
 
 
