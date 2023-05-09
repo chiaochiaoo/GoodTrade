@@ -161,10 +161,11 @@ class TradingPlan_Basket:
 					now = datetime.now()
 					ts = now.hour*3600 + now.minute*60 + now.second
 
-					if ts - self.recent_action_ts[symbol] > 5:
+					if ts - self.recent_action_ts[symbol] >= 2:
 						self.recent_action_ts[symbol] = ts
 						self.symbols[symbol].immediate_request(self.current_request[symbol])
-
+					else:
+						log_print(self.source,self.algo_name,symbol," AGGRESIVE TOO FREQUENT.")
 				# self.notify_request(symbol)
 
 	def recalculate_current_request(self,symbol):
@@ -175,6 +176,10 @@ class TradingPlan_Basket:
 		with self.read_lock[symbol]:
 			ret = self.expected_shares[symbol]
 		return ret
+
+	def get_current_share(self,symbol):
+
+		return self.current_shares[symbol]
 
 	def get_current_request(self,symbol):
 
@@ -389,7 +394,7 @@ class TradingPlan_Basket:
 	def rejection_handling(self,symbol):
 
 		#self.submit_expected_shares(symbol,0)
-		
+
 		self.expected_shares[symbol] = 0
 		self.banned.append(symbol)
 

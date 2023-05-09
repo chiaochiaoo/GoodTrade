@@ -30,6 +30,7 @@ class Symbol:
 
 		self.ppro_out = pproout
 
+		self.fill_lock =  threading.Lock()
 
 		self.banned = False 
 
@@ -123,7 +124,7 @@ class Symbol:
 
 		# no.3 pair orders. fill it in. 
 
-		self.calc_inspection_differences(tps)
+		#self.calc_inspection_differences(tps)
 
 
 		# no.4 get all current imbalance
@@ -151,17 +152,35 @@ class Symbol:
 
 	def calc_total_imbalances(self,tps):
 
-		self.current_avgprice,self.current_shares = self.manager.get_position(self.symbol_name)
+		self.current_avgprice,current_shares = self.manager.get_position(self.symbol_name)
 
+		self.current_shares = self.get_all_current(tps)
 		self.expected = self.get_all_expected(tps)
-
 		self.difference = self.expected - self.current_shares
+
+		if current_shares!=self.current_shares:
+
+			log_print(self.source,self.symbol_name," inspection discrepancy:"," PPRO:",current_shares,self.current_shares, " account imbalance:",self.current_imbalance)
+
+			if self.current_imbalance == current_shares-self.current_shares:
+				self.difference += self.current_imbalance * -1
+			else:
+				log_print(self.source,self.symbol_name," inspection discrepancy uknown error",self.current_imbalance,current_shares-self.current_shares)
 
 		if self.difference!=0:
 			log_print(self.source,self.symbol_name," inspection complete,self.expected",self.expected," have",self.current_shares," deploying:",self.difference)
 		# else:
 		# 	log_print(self.symbol_name," inspection complete,self.expected",self.expected," have",self.current_shares)
 
+
+	def get_all_current(self,tps):
+
+		current_shares = 0
+		
+		for tp in tps:
+			current_shares +=  self.tradingplans[tp].get_current_share(self.symbol_name)
+
+		return current_shares
 
 
 	def get_all_expected(self,tps):
@@ -241,7 +260,6 @@ class Symbol:
 
 				self.incoming_shares = {}
 
-
 			if total>share_difference:
 				log_print(self.source,self.symbol_name," having MORE orders than actual share difference.",share_difference," orders:",total)
 			elif total<share_difference:
@@ -257,7 +275,6 @@ class Symbol:
 			# LOADING MORE
 			if abs(self.current_shares) > abs(self.previous_shares):
 
-
 				# if orders not enough. manually calculate it. 
 				if avg_price!=0:
 					share_price = avg_price
@@ -265,13 +282,11 @@ class Symbol:
 					#### DONT USE THIS. DEPRECATED. ### NO MORE AVG PRICE BECAUSE INACCURACY. 
 					share_price =  self.get_bid() #(abs(self.current_shares)*self.current_avgprice - abs(self.previous_shares)*self.previous_avgprice)/abs(share_difference)
 
-
 				for tp in tps:
 					share_difference = self.tradingplans[tp].request_fufill(self.symbol_name,share_difference,share_price)
 						#feeeeed
 					if share_difference	==0:
 						break
-
 			else:
 
 				if avg_price!=0:
@@ -349,7 +364,7 @@ class Symbol:
 		for tp in tps:
 			if self.tradingplans[tp].having_request(self.symbol_name) and self.tradingplans[tp].get_holdings(self.symbol_name)==0:
 		 		self.tradingplans[tp].rejection_handling(self.symbol_name)
-		 		
+
 
 	def holdings_update(self,price,share):
 
@@ -365,6 +380,52 @@ class Symbol:
 		#log_print("holding update - releasing lock")
 		log_print("Symbol",self.symbol_name," holding update:",price,share)
 
+
+		hold_fill = threading.Thread(target=self.holdings_fill,daemon=True)
+		hold_fill.start()
+
+	def holdings_fill(self):
+
+		if not self.fill_lock.locked():
+			with self.fill_lock:
+
+				#first wait for few seconds. 
+				time.sleep(1)
+
+				tps = list(self.tradingplans.keys())
+				with self.incoming_shares_lock:
+
+					#for each piece feed it.. to the requested.
+
+					remaining = 0
+					for price,share in self.incoming_shares.items():
+
+						share_difference = share
+						for tp in tps:
+							share_difference = self.tradingplans[tp].request_fufill(self.symbol_name,share_difference,price)
+
+							if share_difference==0:
+								break
+
+						if share_difference!=0:
+							remaining += share_difference
+
+
+					self.incoming_shares = {}
+
+					if remaining!=0:
+						
+						self.current_imbalance += remaining
+
+						if self.current_imbalance!=0:
+							log_print(self.source,self.symbol_name," Unmatched incoming shares: ",remaining, "total imblance:",self.current_imbalance ," USER INTERVENTION? SYSTEM VIOLATION!")
+						else:
+							log_print(self.source,self.symbol_name," account holding restored.")
+			
+
+
+
+
 	def immediate_request(self,shares):
 
 		# I may need to cancel existing order first. for a 0.1 second delay.
@@ -377,6 +438,7 @@ class Symbol:
 
 
 			self.market_out = shares
+
 
 
 # total_imbalance = sum(t.values())
