@@ -682,18 +682,18 @@ class UI(pannel):
 
 			elif type_ =="direct":
 
-				if abs(dic["current"].get())>dic["max"].get():
-
-					if dic["current"].get()>0:
-						coe = 1 
-					else:
-						coe = -1 
-
-					dic["current"].set(dic['max'].get()*coe)
-
 				dic["current"].set(dic["current"].get())
 				dic['lock'].set(0)
 
+
+			if abs(dic["current"].get())>dic["max"].get():
+
+				if dic["current"].get()>0:
+					coe = 1 
+				else:
+					coe = -1 
+
+				dic["current"].set(dic['max'].get()*coe)
 
 			share1 = dic["current"].get()*dic["ratio"][0]
 			share2 = dic["current"].get()*dic["ratio"][1]
