@@ -455,6 +455,14 @@ class Manager:
 							else:
 								reque = "http://localhost:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Buy NSDQ MOO Regular OnOpen&shares="+str(share)
 						c+=1 
+
+
+						with self.symbol_inspection_lock:
+							for i in self.moo_algos:
+								basket_name,orders,risk,aggresive = i[0],i[1],i[2],i[3]
+								self.apply_basket_cmd(basket_name,orders,risk,aggresive)
+
+						
 						req = threading.Thread(target=request, args=(reque,),daemon=True)
 						req.start()
 
@@ -465,16 +473,9 @@ class Manager:
 				log_print("Timer: pair realease complelte")
 
 				pair_release=True 
-
-
 				#self.apply_basket_cmd(basket_name,orders,risk,aggresive)
-
 				# here i kinda want a mechanism which blocks symbol from checking. 
 
-				with self.symbol_inspection_lock:
-					for i in self.moo_algos:
-						basket_name,orders,risk,aggresive = i[0],i[1],i[2],i[3]
-						self.apply_basket_cmd(basket_name,orders,risk,aggresive)
 				self.symbol_inspection_start = True
 				time.sleep(5)
 				### TRIGGER. PAIR UP the algos.
@@ -765,7 +766,7 @@ class Manager:
 					self.ui.user.set(user)
 					self.ui.position_count.set(len(self.current_positions))
 					self.ui.account_status["background"] = "#97FEA8"
-					log_print("Position updates:",len(positions),positions)
+					#log_print("Position updates:",len(positions),positions)
 
 					count +=1 
 
