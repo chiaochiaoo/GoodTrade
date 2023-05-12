@@ -484,7 +484,7 @@ class Manager:
 				# ROSN Buy RosenblattDQuoteClose MOC DAY
 				# ROSN Sell->Short RosenblattDQuoteClose MOC DAY
 				log_print("Timer: MOC begins")
-
+				self.symbol_inspection_start = False
 				with self.symbol_inspection_lock: 
 					for ticker in self.current_positions.keys():
 						share = self.current_positions[ticker][1]
