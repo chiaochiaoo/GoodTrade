@@ -418,6 +418,7 @@ class Symbol:
 
 
 			self.market_out = shares
+			self.holding_update = True
 
 
 	# deprecated 
