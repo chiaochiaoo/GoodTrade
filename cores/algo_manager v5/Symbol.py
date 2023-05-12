@@ -135,7 +135,7 @@ class Symbol:
 
 		# Check again if there is any update. if there is, call it off. 
 
-		if self.holding_update:
+		if self.holding_update==False:
 			if self.difference!=0 and ts<=956:
 				self.deploy_orders()
 			else:
