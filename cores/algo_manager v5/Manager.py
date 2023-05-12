@@ -787,17 +787,6 @@ class Manager:
 				except Exception as e:
 					PrintException(e, " POSITION UPDATE ERROR")
 
-			# elif d[0] == SYMBOL_UPDATE:
-			# 	try:
-
-			# 		for symbol,price in d[1].items():
-
-			# 			if symbol in self.symbols_short:
-			# 				self.symbol_data[self.symbols_short[symbol]].update_price(price,price,0)
-
-			# 	except	Exception	as e:
-			# 		PrintException(e,"Order update error")
-
 			elif d[0] == SUMMARY_UPDATE:
 
 				now = datetime.now()
