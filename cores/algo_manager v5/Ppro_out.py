@@ -50,13 +50,13 @@ def register(symbol,port):
 
 def register_web(symbol,port):
 
-	postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&feedtype=L1&output=" + str(port)+"&status=on"
+	postbody = "http://127.0.0.1:8080/SetOutput?symbol=" + symbol + "&feedtype=L1&output=" + str(port)+"&status=on"
 
 	return postbody,"register "+symbol,"register failed "+symbol
 
 def deregister_web(symbol,port):
 
-	postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&feedtype=L1&output=" + str(port)+"&status=off"
+	postbody = "http://127.0.0.1:8080/SetOutput?symbol=" + symbol + "&feedtype=L1&output=" + str(port)+"&status=off"
 
 	return postbody,"register "+symbol,"register failed "+symbol
 	
@@ -64,9 +64,9 @@ def register_to_ppro(symbol,status,port):
 
 	#log_print("Registering",symbol,status)
 	if status == True:
-		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&feedtype=L1&output=" + str(port)+"&status=on"
+		postbody = "http://127.0.0.1:8080/SetOutput?symbol=" + symbol + "&feedtype=L1&output=" + str(port)+"&status=on"
 	else:
-		postbody = "http://localhost:8080/SetOutput?symbol=" + symbol + "&feedtype=L1&output=" + str(port)+"&status=off"
+		postbody = "http://127.0.0.1:8080/SetOutput?symbol=" + symbol + "&feedtype=L1&output=" + str(port)+"&status=off"
 
 	try:
 		r= requests.get(postbody)
@@ -80,7 +80,7 @@ def register_to_ppro(symbol,status,port):
 
 def flatten_symbol(symbol):
 
-	r = 'http://localhost:8080/Flatten?symbol='+str(symbol)
+	r = 'http://127.0.0.1:8080/Flatten?symbol='+str(symbol)
 	sucess='flatten '+symbol+' Success!'
 	failure='flatten '+symbol+' Failure.'
 
@@ -93,7 +93,7 @@ def breakup_order(symbol,share,break_price):
 
 	limprice = round(break_price+0.05,2)
 	break_price = round(break_price,2)
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(limprice)+'&ordername=EDGX Buy ROUC StopLimit DAY&shares='+str(share)+'&stopprice='+str(break_price)
+	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(limprice)+'&ordername=EDGX Buy ROUC StopLimit DAY&shares='+str(share)+'&stopprice='+str(break_price)
 	
 	sucess='buy market order success on'+symbol
 	failure="Error buy order on"+symbol
@@ -104,7 +104,7 @@ def breakdown_order(symbol,share,break_price):
 
 	limprice = round(break_price-0.05,2)
 	break_price = round(break_price,2)
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(limprice)+'&ordername=EDGX Sell->Short ROUC StopLimit DAY&shares='+str(share)+'&stopprice='+str(break_price)
+	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(limprice)+'&ordername=EDGX Sell->Short ROUC StopLimit DAY&shares='+str(share)+'&stopprice='+str(break_price)
 	
 	sucess='buy market order success on'+symbol
 	failure="Error buy order on"+symbol
@@ -113,8 +113,8 @@ def breakdown_order(symbol,share,break_price):
 
 def buy_market_order(symbol,share):
 
-	#r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=EDGX Buy ROUC Market DAY&shares='+str(share)
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Buy ARCX Market DAY&shares='+str(share)
+	#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=EDGX Buy ROUC Market DAY&shares='+str(share)
+	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Buy ARCX Market DAY&shares='+str(share)
 	sucess='buy market order success on'+symbol
 	failure="Error buy order on"+symbol
 
@@ -127,8 +127,8 @@ def sell_market_order(symbol,share):
 
 
 
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(share)
-	#r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=EDGX Sell->Short ROUC Market DAY&shares='+str(share)
+	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(share)
+	#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=EDGX Sell->Short ROUC Market DAY&shares='+str(share)
 	sucess='sell market order success on'+symbol
 	failure="Error sell order on"+symbol
 
@@ -139,16 +139,16 @@ def buy_limit_order(symbol, price,share,gateway=0):
 	price = round(float(price),2)
 
 	if gateway ==0:
-		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit Visible DAY&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit Visible DAY&shares='+str(share)
 	elif gateway ==1:
-		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Buy ARCX Limit DAY&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Buy ARCX Limit DAY&shares='+str(share)
 	elif gateway ==2:
-		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=BATS Buy Parallel-2D Limit DAY&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=BATS Buy Parallel-2D Limit DAY&shares='+str(share)
 	elif gateway ==3:
-		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=EDGA Buy EDGA Limit PostMarket DAY Regular'+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=EDGA Buy EDGA Limit PostMarket DAY Regular'+str(share)
 	else:
-		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit Visible DAY&shares='+str(share)
-	#r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit DAY BookOnly&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit Visible DAY&shares='+str(share)
+	#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit DAY BookOnly&shares='+str(share)
 	sucess='buy limit order success on '+symbol
 	failure="Error buy limit order on "+symbol
 
@@ -158,16 +158,16 @@ def sell_limit_order(symbol, price,share,gateway=0):
 	price = round(float(price),2)
 
 	if gateway ==0:
-		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit Visible DAY&shares='+str(share)
-	#r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit DAY BookOnly&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit Visible DAY&shares='+str(share)
+	#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit DAY BookOnly&shares='+str(share)
 	elif gateway ==1:
-		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Sell->Short ARCX Limit DAY&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Sell->Short ARCX Limit DAY&shares='+str(share)
 	elif gateway ==2:
-		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=BATS Sell->Short Parallel-2D Limit DAY'+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=BATS Sell->Short Parallel-2D Limit DAY'+str(share)
 	elif gateway ==3:
-		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=EDGA Sell->Short EDGA Limit PostMarket DAY Regular'+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=EDGA Sell->Short EDGA Limit PostMarket DAY Regular'+str(share)
 	else:
-		r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit Visible DAY&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit Visible DAY&shares='+str(share)
 
 
 	sucess='sell limit order success on '+symbol
@@ -182,9 +182,9 @@ def passive_buy(symbol	,share,offset):
 
 	# BATS Buy BATSPostOnly Limit DAY
 	# MEMX Buy MEMX Limit Visible DAY PostOnly
-	# 	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Buy MEMX Pegged Near DAY MidPoint&shares='+str(share)
+	# 	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Buy MEMX Pegged Near DAY MidPoint&shares='+str(share)
 
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Buy MEMX Limit Near Visible DAY PostOnly&shares='+str(share)
+	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Buy MEMX Limit Near Visible DAY PostOnly&shares='+str(share)
 	sucess='passive buy limit order success on '+symbol
 	failure="Error passive buy limit order on "+symbol
 
@@ -196,9 +196,9 @@ def passive_sell(symbol	,share,offset):
 
 	# MEMX Sell->Short MEMX Limit Visible DAY PostOnly
 	# BATS Sell->Short BATSPostOnly Limit DAY
-	#	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Sell->Short MEMX Pegged Near DAY MidPoint&shares='+str(share)
+	#	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Sell->Short MEMX Pegged Near DAY MidPoint&shares='+str(share)
 
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Sell->Short MEMX Limit Near Visible DAY PostOnly&shares='+str(share)
+	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Sell->Short MEMX Limit Near Visible DAY PostOnly&shares='+str(share)
 
 	sucess='passive sell limit order success on '+symbol
 	failure="Error passive sell limit order on "+symbol
@@ -215,7 +215,7 @@ def passive_sell(symbol	,share,offset):
 
 # 	# BATS Buy BATSPostOnly Limit DAY
 # 	# MEMX Buy MEMX Limit Visible DAY PostOnly
-# 	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit Visible DAY PostOnly&shares='+str(share)
+# 	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit Visible DAY PostOnly&shares='+str(share)
 # 	sucess='passive buy limit order success on'+symbol
 # 	failure="Error passive buy limit order on"+symbol
 
@@ -227,7 +227,7 @@ def passive_sell(symbol	,share,offset):
 
 # 	# MEMX Sell->Short MEMX Limit Visible DAY PostOnly
 # 	# BATS Sell->Short BATSPostOnly Limit DAY
-# 	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit Visible DAY PostOnly&shares='+str(share)
+# 	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit Visible DAY PostOnly&shares='+str(share)
 
 # 	sucess='passive sell limit order success on'+symbol
 # 	failure="Error passive sell limit order on"+symbol
@@ -247,7 +247,7 @@ def buy_aggressive_limit_order(symbol,share,ask):
 	elif ask>100:
 		ask = round((ask+0.2),2)
 
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(ask)+'&ordername=ARCA Buy ARCX Limit IOC&shares='+str(share)
+	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(ask)+'&ordername=ARCA Buy ARCX Limit IOC&shares='+str(share)
 	sucess='Agrresive limit buy order success on'+symbol
 	failure="Error buy order on"+symbol
 
@@ -266,7 +266,7 @@ def short_aggressive_limit_order(symbol,share,bid):
 	elif bid>100:
 		bid = round((bid-0.2),2)
 
-	r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(bid)+'&ordername=ARCA Sell->Short ARCX Limit IOC&shares='+str(share)
+	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(bid)+'&ordername=ARCA Sell->Short ARCX Limit IOC&shares='+str(share)
 	sucess='Aggresive limit sell order success on'+symbol
 	failure="Error buy order on"+symbol
 
@@ -275,7 +275,7 @@ def short_aggressive_limit_order(symbol,share,bid):
 def stoporder_to_market_buy(symbol,price,share):
 
 	price = round(float(price),2)
-	r='http://localhost:8080/SendSwiftStop?symbol='+symbol+'&limitprice=0&ordername=ARCA%20Buy%20ARCX%20Market%20DAY&shares='+str(share)+'&referenceprice=ask&swiftstopprice='+str(price)
+	r='http://127.0.0.1:8080/SendSwiftStop?symbol='+symbol+'&limitprice=0&ordername=ARCA%20Buy%20ARCX%20Market%20DAY&shares='+str(share)+'&referenceprice=ask&swiftstopprice='+str(price)
 	sucess='stoporder buy market order success on '+symbol
 	failure="Error stoporder buy market"+symbol
    
@@ -285,7 +285,7 @@ def stoporder_to_market_sell(symbol,price,share):
 
 	price = round(float(price),2)
 
-	r= 'http://localhost:8080/SendSwiftStop?symbol='+symbol+'&ordername=ARCA%20Sell-%3EShort%20ARCX%20Market%20DAY&shares='+str(share)+'&referenceprice=bid&swiftstopprice='+str(price)
+	r= 'http://127.0.0.1:8080/SendSwiftStop?symbol='+symbol+'&ordername=ARCA%20Sell-%3EShort%20ARCX%20Market%20DAY&shares='+str(share)+'&referenceprice=bid&swiftstopprice='+str(price)
 	sucess='stoporder sell market order success on '+symbol
 	failure="Error sell order on"+symbol
    
@@ -293,8 +293,8 @@ def stoporder_to_market_sell(symbol,price,share):
 
 def cancel_all_oders(symbol):
 
-	r = 'http://localhost:8080/CancelOrder?type=all&symbol='+str(symbol)+'&side=order'
-	#r = 'http://localhost:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit DAY BookOnly&shares='+str(share)
+	r = 'http://127.0.0.1:8080/CancelOrder?type=all&symbol='+str(symbol)+'&side=order'
+	#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit DAY BookOnly&shares='+str(share)
 	sucess='cancel success on '+symbol
 	failure="cancel error on "+symbol
 
@@ -450,7 +450,7 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 			elif type_ == CANCELALL:
 
 
-				request_str = "http://localhost:8080/CancelOrder?type=all&symbol=*.*&side=order"
+				request_str = "http://127.0.0.1:8080/CancelOrder?type=all&symbol=*.*&side=order"
 				sucess_str = "Cancell all sucess"
 				failure_str = "Cancell all failed"
 
@@ -469,7 +469,8 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 			if request_str!="":
 				while not sucessful:
 					try:
-						req = "http://127.0.0.1:8080/"+str(request_str)
+
+						req = str(request_str)
 						r = requests.get(req)
 						sucessful = True
 						log_print("POSTING:",request_str)
@@ -511,7 +512,7 @@ def ppro_request(request,success=None,failure=None,wait=0,traceid=False,symbol=N
 def get_order_id(request_number,symbol,side,pipe):
 	count=0
 	while True:
-		req = "http://localhost:8080/GetOrderNumber?requestid="+str(request_number)
+		req = "http://127.0.0.1:8080/GetOrderNumber?requestid="+str(request_number)
 		r = requests.post(req)
 		if r.status_code ==200:
 			#return id, symbol, and side. 
@@ -526,14 +527,14 @@ def get_order_id(request_number,symbol,side,pipe):
 
 def get_stoporder_status(id_):
 
-	req = 'http://localhost:8080/GetScriptState?scriptid='+id_
+	req = 'http://127.0.0.1:8080/GetScriptState?scriptid='+id_
 	r = requests.post(req)
 
 	return (find_between(r.text,"<Content>","</Content>"))
 
 def cancel_stoporder(id_):
 
-	r="http://localhost:8080/CancelScript?scriptid="+str(id_)
+	r="http://127.0.0.1:8080/CancelScript?scriptid="+str(id_)
 	sucess='cancellation successful'
 	failure="cancellation failed"
 
@@ -541,3 +542,6 @@ def cancel_stoporder(id_):
 	req.start()	
 
 
+# print("start")
+# req = "http://127.0.0.1:8080/ExecuteOrder?symbol=SPY.AM&ordername=ARCA%20Buy%20ARCX%20Market%20DAY&shares=5"
+# r = requests.get(req)
