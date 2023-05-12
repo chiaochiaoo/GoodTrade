@@ -423,9 +423,6 @@ class Symbol:
 							log_print(self.source,self.symbol_name," account holding restored.")
 			
 
-
-
-
 	def immediate_request(self,shares):
 
 		# I may need to cancel existing order first. for a 0.1 second delay.
