@@ -186,7 +186,7 @@ class Symbol:
 			log_print(self.source,self.symbol_name," inspection complete, expected",self.expected,\
 				" have",self.current_shares,\
 				" deploying:",self.difference,\
-				"holding imbalance,",self.current_imbalance\
+				"holding imbalance,",self.current_imbalance,\
 				"ppro shares matchd:",shares_matched)
 
 
