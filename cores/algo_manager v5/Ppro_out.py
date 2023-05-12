@@ -473,7 +473,7 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 						req = str(request_str)
 						r = requests.get(req)
 						sucessful = True
-						log_print("POSTING:",request_str)
+						#log_print("POSTING:",request_str)
 					except Exception as e:
 						log_print(e,failure_str," driver restart")
 						time.sleep(0.05)
