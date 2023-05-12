@@ -30,6 +30,7 @@ class Symbol:
 
 		self.ppro_out = pproout
 
+		# make sure only 1 process goes.
 		self.fill_lock =  threading.Lock()
 
 		self.banned = False 
@@ -41,8 +42,9 @@ class Symbol:
 		self.tkvars = {}
 
 
-		self.passive_request_ts = 0
-		self.passive_price = 0
+		self.holding_update = False 
+		self.previous_sync_share = 0
+
 
 		"""
 		UPGRADED PARTS
@@ -72,6 +74,8 @@ class Symbol:
 		self.current_imbalance = 0
 
 		# plus, minus, all the updates, all go here. 
+		# 1. on adding shares
+		# 2. on fullfilling. 
 		self.incoming_shares_lock = threading.Lock()
 		self.incoming_shares = {}
 
@@ -106,42 +110,39 @@ class Symbol:
 		"""
 		For both load and unload
 		"""
-
-		# checking if priced. if not ask for it .
-
-
-		
+		self.holding_update=False
 		tps = list(self.tradingplans.keys())
-
-		# no.1 update the current prices
 		self.update_stockprices(tps)
 
-		# no.2 pair off diff side. need.. hmm price .....!!!
 
-		if self.get_bid()!=0:
-			self.pair_off(tps)
-
-
-		# no.3 pair orders. fill it in. 
-
-		#self.calc_inspection_differences(tps)
+		# CRITICAL SECTION. 
+		with self.incoming_shares_lock:
+			if self.get_bid()!=0:
+				# no.2 pair off diff side. need.. hmm price .....!!!
+				self.pair_off(tps)
 
 
-		# no.4 get all current imbalance
-		self.calc_total_imbalances(tps)
+			# no.3 pair orders. fill it in. 
+			#self.calc_inspection_differences(tps)
+
+
+			# no.4 get all current imbalance
+			self.calc_total_imbalances(tps)
 
 
 		now = datetime.now()
 		ts = now.hour*60 + now.minute
 
-		if self.market_out==0:
+		# Check again if there is any update. if there is, call it off. 
+
+		if self.holding_update:
 			if self.difference!=0 and ts<=956:
 				self.deploy_orders()
 			else:
 				self.action = ""
 		else:
-			log_print(self.symbol_name," just had makret order. passing inspection. suspect difference:",self.difference)
-			self.market_out=0
+			log_print(self.symbol_name," holding change detected. skipping ordering. estimate difference:",self.difference)
+			self.holding_update=False 
 
 
 	def update_stockprices(self,tps):
@@ -152,25 +153,71 @@ class Symbol:
 
 	def calc_total_imbalances(self,tps):
 
+		### STAGE 1. JUST UPDATE THE TPs. 
 		self.current_avgprice,current_shares = self.manager.get_position(self.symbol_name)
-
 		self.current_shares = self.get_all_current(tps)
 		self.expected = self.get_all_expected(tps)
 		self.difference = self.expected - self.current_shares
 
-		if current_shares!=self.current_shares:
 
-			log_print(self.source,self.symbol_name," inspection discrepancy:"," PPRO:",current_shares,self.current_shares, " account imbalance:",self.current_imbalance)
 
-			if self.current_imbalance == current_shares-self.current_shares:
-				self.difference += self.current_imbalance * -1
-			else:
-				log_print(self.source,self.symbol_name," inspection discrepancy uknown error",self.current_imbalance,current_shares-self.current_shares)
+		### STAGE 2. ONLY if TPs are taken care off.
 
+		### FOUR cases. 
+		### 1. ppro indicate over fill and holdings not detected. -> potential MISSING orders notification. -> ppro_true then recalibrate. 
+		### 2. holding detect there is a problem, but ppro side and tps are all ok. -> sync error? RESET if ppro_true. 
+		### 3. ppro indicate over fill, and holdings also detect over fill, they match. -> update self.difference 
+		###	4. 																They don't match.  -> wait for ppro_true then recalibrate. 
+		### 
+
+		ppro_true = False 
+		if current_shares == self.previous_shares:
+			ppro_true = True 
+		self.previous_shares = current_shares
+
+		recalibrate = False 
+		shares_matched = False 
+
+		if current_shares==self.current_shares:
+			shares_matched = True 
+
+		
 		if self.difference!=0:
-			log_print(self.source,self.symbol_name," inspection complete,self.expected",self.expected," have",self.current_shares," deploying:",self.difference)
-		# else:
-		# 	log_print(self.symbol_name," inspection complete,self.expected",self.expected," have",self.current_shares)
+			log_print(self.source,self.symbol_name," inspection complete, expected",self.expected,\
+				" have",self.current_shares,\
+				" deploying:",self.difference,\
+				"holding imbalance,",self.current_imbalance\
+				"ppro shares matchd:",shares_matched)
+
+
+		if self.difference==0 and ppro_true: # i now know i can trust the ppro share is true.. 
+
+
+			# IF THERE IS A PROBLEM. 
+			if shares_matched!=True or self.current_imbalance!=0:
+
+				log_print(self.source,self.symbol_name," inspection discrepancy:"," PPRO:",current_shares," TPs:",self.current_shares, " account imbalance:",self.current_imbalance)
+
+				if shares_matched==True and self.current_imbalance!=0:
+					self.current_imbalance = 0 
+					log_print(self.source,self.symbol_name," inspection discrepancy: ppro matched but holding says imbalance. delusional? reset.")
+
+				if shares_matched!=True: # I CAN SAFELY ASSUME THERE IS A PROBLEM. 
+
+					#only 2 cases. matched, or not matched. 
+
+
+					if self.current_imbalance == current_shares-self.current_shares:
+						log_print(self.source,self.symbol_name," inspection discrepancy: discrepancy matched. ",self.current_imbalance,current_shares-self.current_shares)
+						self.difference += self.current_imbalance * -1
+					else:
+						self.difference += (current_shares-self.current_shares) * -1
+						log_print(self.source,self.symbol_name," inspection discrepancy: discrepancy UNMATCHED potential missing order fills. ",self.current_imbalance,current_shares-self.current_shares)
+						self.current_imbalance = current_shares-self.current_shares
+
+
+
+
 
 
 	def get_all_current(self,tps):
@@ -238,6 +285,142 @@ class Symbol:
 			log_print(self.source,self.symbol_name	,"pair off,",want," amount", long_pair_off,short_pair_off)
 
 
+
+			
+
+
+	def holdings_update(self,price,share):
+
+		with self.incoming_shares_lock:
+
+			if price not in self.incoming_shares:
+
+				self.incoming_shares[price] = share
+			else:
+				self.incoming_shares[price] += share
+
+			
+		#log_print("holding update - releasing lock")
+		log_print("Symbol",self.symbol_name," holding update:",price,share)
+		self.holding_update = True 
+
+		hold_fill = threading.Thread(target=self.holdings_fill,daemon=True)
+		hold_fill.start()
+
+	def holdings_fill(self):
+
+		if not self.fill_lock.locked():
+			with self.fill_lock:
+
+				#first wait for few seconds. 
+				time.sleep(0.2)
+
+				tps = list(self.tradingplans.keys())
+				with self.incoming_shares_lock:
+
+					#for each piece feed it.. to the requested.
+
+					remaining = 0
+					for price,share in self.incoming_shares.items():
+
+						share_difference = share
+						for tp in tps:
+							share_difference = self.tradingplans[tp].request_fufill(self.symbol_name,share_difference,price)
+
+							if share_difference==0:
+								break
+
+						if share_difference!=0:
+							remaining += share_difference
+
+
+					self.incoming_shares = {}
+
+					if remaining!=0:
+						
+						self.current_imbalance += remaining
+
+						if self.current_imbalance!=0:
+							log_print(self.source,self.symbol_name," Unmatched incoming shares: ",remaining, "total imblance:",self.current_imbalance ," USER INTERVENTION? SYSTEM VIOLATION!")
+						else:
+							log_print(self.source,self.symbol_name," account holding restored.")
+			
+	def deploy_orders(self):
+
+		# I NEED TO ADD A MECHANISM ON THIS
+		# If passive orders still don't full fill the request everything within some minutes
+		# Cancel all the requests. (or market in )
+
+		# ALL ORDERS AT ONCE. # First clear previous order. 
+
+		if self.difference>0:
+			self.action = PASSIVEBUY
+			#price = self.get_bid()
+			#coefficient = -1
+
+		else:
+			self.action = PASSIVESELL
+			#price = self.get_ask()
+			#coefficient = 1
+
+		log_print(self.source,self.symbol_name,self.action,self.difference)
+		# self.ppro_out.send([CANCEL,self.symbol_name])
+		# time.sleep(0.3)
+
+		if self.difference!=0:
+			self.ppro_out.send([self.action,self.symbol_name,abs(self.difference),self.manager.gateway])
+
+		# handl = threading.Thread(target=self.threading_order,daemon=True)
+		# handl.start()
+
+
+	def threading_order(self):
+
+			#lets add a bit of delay to it. 
+
+		log_print(self.source,self.symbol_name,action,share)
+		# self.ppro_out.send([CANCEL,self.symbol_name])
+		# time.sleep(0.3)
+
+		if self.difference!=0:
+			self.ppro_out.send([self.action,self.symbol_name,abs(self.difference),0])
+
+	def get_bid(self):
+		return self.data[BID]
+
+	def get_ask(self):
+		return self.data[ASK]
+
+	def rejection_message(self,side):
+
+		## iterate through all the TPs request. check who is requesting. if it is not running withdraw and cancel it. 
+		
+		if side == "Long":
+			coefficient = 1
+		elif side =="Short":
+			coefficient = -1
+
+		tps = list(self.tradingplans.keys())
+
+		for tp in tps:
+			if self.tradingplans[tp].having_request(self.symbol_name) and self.tradingplans[tp].get_holdings(self.symbol_name)==0:
+		 		self.tradingplans[tp].rejection_handling(self.symbol_name)
+
+	def immediate_request(self,shares):
+
+		# I may need to cancel existing order first. for a 0.1 second delay.
+
+		if shares!=0:
+			if shares<0:
+				self.ppro_out.send([IOCSELL,self.symbol_name,abs(shares),self.get_bid()])
+			else:
+				self.ppro_out.send([IOCBUY,self.symbol_name,abs(shares),self.get_ask()])
+
+
+			self.market_out = shares
+
+
+	# deprecated 
 	def calc_inspection_differences(self,tps):
 
 		share_difference = self.current_shares - self.previous_shares
@@ -302,136 +485,3 @@ class Symbol:
 
 
 		self.previous_shares,self.previous_avgprice = self.current_shares, self.current_avgprice
-			
-
-	def deploy_orders(self):
-
-		# I NEED TO ADD A MECHANISM ON THIS
-		# If passive orders still don't full fill the request everything within some minutes
-		# Cancel all the requests. (or market in )
-
-		# ALL ORDERS AT ONCE. # First clear previous order. 
-
-		if self.difference>0:
-			self.action = PASSIVEBUY
-			#price = self.get_bid()
-			#coefficient = -1
-
-		else:
-			self.action = PASSIVESELL
-			#price = self.get_ask()
-			#coefficient = 1
-
-		log_print(self.source,self.symbol_name,self.action,self.difference)
-		# self.ppro_out.send([CANCEL,self.symbol_name])
-		# time.sleep(0.3)
-
-		if self.difference!=0:
-			self.ppro_out.send([self.action,self.symbol_name,abs(self.difference),self.manager.gateway])
-
-		# handl = threading.Thread(target=self.threading_order,daemon=True)
-		# handl.start()
-
-
-	def threading_order(self):
-
-			#lets add a bit of delay to it. 
-
-		log_print(self.source,self.symbol_name,action,share)
-		# self.ppro_out.send([CANCEL,self.symbol_name])
-		# time.sleep(0.3)
-
-		if self.difference!=0:
-			self.ppro_out.send([self.action,self.symbol_name,abs(self.difference),0])
-
-	def get_bid(self):
-		return self.data[BID]
-
-	def get_ask(self):
-		return self.data[ASK]
-
-	def rejection_message(self,side):
-
-		## iterate through all the TPs request. check who is requesting. if it is not running withdraw and cancel it. 
-		
-		if side == "Long":
-			coefficient = 1
-		elif side =="Short":
-			coefficient = -1
-
-		tps = list(self.tradingplans.keys())
-
-		for tp in tps:
-			if self.tradingplans[tp].having_request(self.symbol_name) and self.tradingplans[tp].get_holdings(self.symbol_name)==0:
-		 		self.tradingplans[tp].rejection_handling(self.symbol_name)
-
-
-	def holdings_update(self,price,share):
-
-		with self.incoming_shares_lock:
-
-			if price not in self.incoming_shares:
-
-				self.incoming_shares[price] = share
-			else:
-				self.incoming_shares[price] += share
-
-			
-		#log_print("holding update - releasing lock")
-		log_print("Symbol",self.symbol_name," holding update:",price,share)
-
-
-		hold_fill = threading.Thread(target=self.holdings_fill,daemon=True)
-		hold_fill.start()
-
-	def holdings_fill(self):
-
-		if not self.fill_lock.locked():
-			with self.fill_lock:
-
-				#first wait for few seconds. 
-				time.sleep(1)
-
-				tps = list(self.tradingplans.keys())
-				with self.incoming_shares_lock:
-
-					#for each piece feed it.. to the requested.
-
-					remaining = 0
-					for price,share in self.incoming_shares.items():
-
-						share_difference = share
-						for tp in tps:
-							share_difference = self.tradingplans[tp].request_fufill(self.symbol_name,share_difference,price)
-
-							if share_difference==0:
-								break
-
-						if share_difference!=0:
-							remaining += share_difference
-
-
-					self.incoming_shares = {}
-
-					if remaining!=0:
-						
-						self.current_imbalance += remaining
-
-						if self.current_imbalance!=0:
-							log_print(self.source,self.symbol_name," Unmatched incoming shares: ",remaining, "total imblance:",self.current_imbalance ," USER INTERVENTION? SYSTEM VIOLATION!")
-						else:
-							log_print(self.source,self.symbol_name," account holding restored.")
-			
-
-	def immediate_request(self,shares):
-
-		# I may need to cancel existing order first. for a 0.1 second delay.
-
-		if shares!=0:
-			if shares<0:
-				self.ppro_out.send([IOCSELL,self.symbol_name,abs(shares),self.get_bid()])
-			else:
-				self.ppro_out.send([IOCBUY,self.symbol_name,abs(shares),self.get_ask()])
-
-
-			self.market_out = shares
