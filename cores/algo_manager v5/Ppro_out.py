@@ -470,7 +470,7 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 				while not sucessful:
 					try:
 						req = "http://127.0.0.1:8080/"+str(request_str)
-						r = requests.post(req)
+						r = requests.get(req)
 						sucessful = True
 						log_print("POSTING:",request_str)
 					except Exception as e:
