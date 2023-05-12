@@ -1147,7 +1147,7 @@ if __name__ == '__main__':
 
 
 	root = tk.Tk()
-	root.title("GoodTrade Algo Manager v5 b2 HEAVY DUTY")
+	root.title("GoodTrade Algo Manager v5 b2 HEAVY METAL")
 	root.geometry("1280x1000")
 
 	processes = [algo_voxcom,ppro_in_manager,ppro_out_manager]
