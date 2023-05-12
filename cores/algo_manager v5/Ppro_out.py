@@ -327,7 +327,7 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 	sucess_str= ""
 	failure_str = ""
 	termination = False
-
+	pipe_status.send(["ppro_out","Connected"])
 	while True and not termination:
 		try:
 			request_str = ""
