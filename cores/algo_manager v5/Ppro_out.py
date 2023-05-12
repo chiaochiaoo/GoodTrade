@@ -9,21 +9,21 @@ from datetime import datetime
 import numpy as np
 import socket
 
-try:
-	from bs4 import BeautifulSoup
-except ImportError:
-	import pip
-	pip.main(['install', 'BeautifulSoup4'])
-	from bs4 import BeautifulSoup
+# try:
+# 	from bs4 import BeautifulSoup
+# except ImportError:
+# 	import pip
+# 	pip.main(['install', 'BeautifulSoup4'])
+# 	from bs4 import BeautifulSoup
 
-try:
-	from selenium import webdriver
-	#from webdriver_manager.chrome import ChromeDriverManager
-except ImportError:
-	import pip
-	#pip.main(['install', 'webdriver-manager'])
-	pip.main(['install', 'selenium'])
-	from selenium import webdriver
+# try:
+# 	from selenium import webdriver
+# 	#from webdriver_manager.chrome import ChromeDriverManager
+# except ImportError:
+# 	import pip
+# 	#pip.main(['install', 'webdriver-manager'])
+# 	pip.main(['install', 'selenium'])
+# 	from selenium import webdriver
 
 #Thoughts:
 #Combine PPRO sutff with VOXCOM into one process.
@@ -319,12 +319,15 @@ def init_driver(pipe_status):
 
 def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY. 
 
-	driver = init_driver(pipe_status)
+	#driver = init_driver(pipe_status)
+
 	log_print("Orders output moudule online.")
+
 	request_str = ""
 	sucess_str= ""
 	failure_str = ""
 	termination = False
+
 	while True and not termination:
 		try:
 			request_str = ""
@@ -337,7 +340,6 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 
 			if type_ == "shutdown":
 				log_print("ppro out termination")
-				driver.close()
 				pipe_status.send("terminated")
 				log_print("ppro out shutdown successful")
 				termination = True
@@ -345,8 +347,8 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 			elif type_ == REGISTER:
 
 				symbol = d[1]
-				#register(symbol,port)
 				request_str,sucess_str,failure_str = register_web(symbol,port)
+
 			elif type_ == BUY:
 
 				symbol = d[1]
@@ -462,15 +464,17 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 
 			sucessful = False
 
+
+			
 			if request_str!="":
 				while not sucessful:
 					try:
-						driver.get(request_str)
-						#log_print(sucess_str)
+						req = "http://127.0.0.1:8080/"+str(request_str)
+						r = requests.post(req)
 						sucessful = True
 					except Exception as e:
 						log_print(e,failure_str," driver restart")
-						driver = init_driver(pipe_status)
+						time.sleep(0.05)
 
 		except Exception as e:
 			log_print(e)
