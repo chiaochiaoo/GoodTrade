@@ -147,11 +147,30 @@ class S(BaseHTTPRequestHandler):
 
 					self.send_basket(basket,d)
 
+				elif "Pair" in stream_data:
 
+					pair = find_between(stream_data,"Pair=",",")
 
+					symbol1 = find_between(stream_data,"Symbol1=",",")
+					symbol2 = find_between(stream_data,"Symbol2=",",")
+					amount = find_between(stream_data,"Amount=",",")
+
+					ratio = find_between(stream_data,"Ratio=",",")
+					passive = find_between(stream_data,"Passive=",",")
+
+					d['pair'] = pair
+					d['symbol1'] = symbol1
+					d['symbol2'] = symbol2
+					d['amount'] = int(amount)
+					d['ratio'] = ratio.split(",")
+					d['passive'] = int(passive)
+
+					self.send_pair(d)
 			except Exception as e:
 				print("HTTP SERVER processing message failure",e)
 
+	def send_pair(self,infos):
+		pipec.send(['pair',info])
 
 	def send_basket(self,basket_name,orders):
 		pipec.send(["basket",basket_name,orders])

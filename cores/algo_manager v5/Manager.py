@@ -143,7 +143,7 @@ class Manager:
 		self.total_r_max =0
 		self.total_r_min = 0
 
-		self.set_risk = 5000
+		self.set_risk = 500
 
 
 		self.net = 0
@@ -379,6 +379,46 @@ class Manager:
 						self.symbols_short[symbol[:-3]] = symbol
 
 					self.baskets[basket_name].register_symbol(symbol,self.symbol_data[symbol])
+
+
+	def apply_pair_cmd(self,pairs):
+
+		pair = d['pair'] 
+		# d['symbol1'] 
+		# d['symbol2']
+		# d['amount'] 
+		# d['ratio'] 
+		# d['passive'] 
+
+		TradingPlan_Pair
+		if pair not in self.baskets:
+
+			if self.ui.basket_label_count<self.algo_limit:
+				self.baskets[pair] = TradingPlan_Pair(pair,risk,self,pair)
+				self.ui.create_new_single_entry(self.baskets[pair],"Basket",None)
+
+				self.baskets[pair].deploy()
+		
+
+		if self.baskets[pair].shut_down==False:
+			for symbol,value in orders.items():
+				if "." in symbol and symbol not in self.bad_symbols:
+				
+					log_print("Manager: Applying basket command",symbol,value)
+					if symbol not in self.symbol_data:
+						self.symbol_data[symbol] = Symbol(self,symbol,self.pipe_ppro_out)  #register in Symbol.
+						self.symbols.append(symbol)
+						self.symbols_short[symbol[:-3]] = symbol
+
+					self.baskets[pair].register_symbol(symbol,self.symbol_data[symbol])
+
+					## now , submit the request.
+
+					self.baskets[pair].submit_expected_shares(symbol,value,aggresive)
+				else:
+					log_print("Manager: Wrong Ticker format or BANNED:",symbol)
+		else:
+			log_print(pair,"already shutdown")
 
 	def apply_basket_cmd(self,basket_name,orders,risk,aggresive):
 
@@ -683,6 +723,15 @@ class Manager:
 				except Exception as e:
 
 					PrintException(e,"adding basket error")
+
+			elif [0] =="pair":
+
+					now = datetime.now()
+					cur_ts = now.hour*60+now.minute
+
+					if self.net > self.set_risk*-1 and cur_ts<=957:
+
+						self.apply_pair_cmd(d)
 
 			elif d[0] =="flatten":
 
@@ -1045,7 +1094,6 @@ class Manager:
 		d['total'] = t
 		d['byday'] = ind
 		return d
-
 
 	def record_update(self):
 
