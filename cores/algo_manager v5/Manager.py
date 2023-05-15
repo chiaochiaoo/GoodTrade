@@ -281,6 +281,7 @@ class Manager:
 
 	def symbols_inspection(self):
 
+		# HERE I NEED. A. HARD LIMIT.... 40 ??? 
 		if self.symbol_inspection_lock.locked()==False:
 
 			if self.total_difference !=0:
@@ -292,16 +293,19 @@ class Manager:
 			# if residue is 0. no more cancel. 
 			with self.symbol_inspection_lock:
 				symbols = list(self.symbol_data.values())
-
+				c= 0
 				for val in symbols:
 
 					try:
-						val.symbol_inspection()
+						c+=val.symbol_inspection()
 						self.total_difference+=abs(val.get_difference())
+
+						if c>=5:
+							break
 					except Exception as e:
 						PrintException(e,"inspection error")
 
-			log_print("Manager: performing symbols inspection compelte, total difference:",self.total_difference)
+			log_print("Manager: performing symbols inspection compelte, total difference:",self.total_difference, "order counts:",c)
 		else:
 			log_print("Manager: previous symbols inspection not finished. skip.")
 
@@ -828,7 +832,7 @@ class Manager:
 
 					count +=1 
 
-					if count%3==0:
+					if count%2==0:
 
 						req = threading.Thread(target=self.get_symbol_price, daemon=True)
 						req.start()

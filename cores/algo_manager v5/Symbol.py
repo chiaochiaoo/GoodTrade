@@ -138,11 +138,14 @@ class Symbol:
 		if self.holding_update==False:
 			if self.difference!=0 and ts<=956:
 				self.deploy_orders()
+				return 1
 			else:
 				self.action = ""
 		else:
 			log_print(self.symbol_name," holding change detected. skipping ordering. estimate difference:",self.difference)
 			self.holding_update=False 
+
+		return 0
 
 
 	def update_stockprices(self,tps):
