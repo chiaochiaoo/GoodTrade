@@ -4,7 +4,7 @@ import tkinter as tk
 from Symbol import *
 
 from TradingPlan_Basket import *
-
+from TradingPlan_Pair import *
 
 from UI import *
 from Ppro_in import *
@@ -381,7 +381,7 @@ class Manager:
 					self.baskets[basket_name].register_symbol(symbol,self.symbol_data[symbol])
 
 
-	def apply_pair_cmd(self,pairs):
+	def apply_pair_cmd(self,d):
 
 		pair = d['pair'] 
 		# d['symbol1'] 
@@ -390,11 +390,12 @@ class Manager:
 		# d['ratio'] 
 		# d['passive'] 
 
+		risk=10
 	
 		if pair not in self.baskets:
 
 			if self.ui.basket_label_count<self.algo_limit:
-				self.baskets[pair] = TradingPlan_Pair(pair,risk,self,pair)
+				self.baskets[pair] = TradingPlan_Pair(pair,risk,self,d)
 				self.ui.create_new_single_entry(self.baskets[pair],"Basket",None)
 
 				self.baskets[pair].deploy()
@@ -732,7 +733,7 @@ class Manager:
 					log_print("Deploying:",d)
 					if self.net > self.set_risk*-1 and cur_ts<=957:
 
-						self.apply_pair_cmd(d)
+						self.apply_pair_cmd(d[1])
 
 			elif d[0] =="flatten":
 
