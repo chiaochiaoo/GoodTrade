@@ -299,9 +299,9 @@ class Manager:
 					try:
 						c+=val.symbol_inspection()
 						self.total_difference+=abs(val.get_difference())
-
-						if c>=5:
+						if c>=30:
 							break
+							log_print("ORDERING LIMIT REACHED.")
 					except Exception as e:
 						PrintException(e,"inspection error")
 
