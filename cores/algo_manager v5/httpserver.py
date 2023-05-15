@@ -158,11 +158,12 @@ class S(BaseHTTPRequestHandler):
 					ratio = find_between(stream_data,"Ratio=",",")
 					passive = find_between(stream_data,"Passive=",",")
 
+					d={}
 					d['pair'] = pair
 					d['symbol1'] = symbol1
 					d['symbol2'] = symbol2
 					d['amount'] = int(amount)
-					d['ratio'] = ratio.split(",")
+					d['ratio'] = ratio.split(":")
 					d['passive'] = int(passive)
 
 					self.send_pair(d)
