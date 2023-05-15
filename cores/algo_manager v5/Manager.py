@@ -390,7 +390,7 @@ class Manager:
 		# d['ratio'] 
 		# d['passive'] 
 
-		TradingPlan_Pair
+	
 		if pair not in self.baskets:
 
 			if self.ui.basket_label_count<self.algo_limit:
