@@ -367,7 +367,7 @@ class Symbol:
 		# self.ppro_out.send([CANCEL,self.symbol_name])
 		# time.sleep(0.3)
 
-		if self.difference!=0:
+		if self.difference!=0 and self.holding_update==False:
 			self.ppro_out.send([self.action,self.symbol_name,abs(self.difference),self.manager.gateway])
 
 		# handl = threading.Thread(target=self.threading_order,daemon=True)
