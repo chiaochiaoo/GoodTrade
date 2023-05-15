@@ -158,19 +158,21 @@ class S(BaseHTTPRequestHandler):
 					ratio = find_between(stream_data,"Ratio=",",")
 					passive = find_between(stream_data,"Passive=",",")
 
+					print(amount,ratio,passive)
+
 					d={}
 					d['pair'] = pair
 					d['symbol1'] = symbol1
 					d['symbol2'] = symbol2
 					d['amount'] = int(amount)
-					d['ratio'] = ratio.split(":")
+					d['ratio'] = [int(i) for i in ratio.split(":")]
 					d['passive'] = int(passive)
 
 					self.send_pair(d)
 			except Exception as e:
 				print("HTTP SERVER processing message failure",e)
 
-	def send_pair(self,infos):
+	def send_pair(self,info):
 		pipec.send(['pair',info])
 
 	def send_basket(self,basket_name,orders):

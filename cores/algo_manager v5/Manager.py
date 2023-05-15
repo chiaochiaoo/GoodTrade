@@ -674,7 +674,7 @@ class Manager:
 		count = 0
 		while True:
 			d = self.pipe_goodtrade.recv()
-			print(d)
+			print("GT:",d,d[0])
 			if d[0] =="msg":
 				try:
 					self.ui.main_app_status.set(str(d[1]))
@@ -724,11 +724,12 @@ class Manager:
 
 					PrintException(e,"adding basket error")
 
-			elif [0] =="pair":
+			elif d[0] =="pair":
 
 					now = datetime.now()
 					cur_ts = now.hour*60+now.minute
 
+					log_print("Deploying:",d)
 					if self.net > self.set_risk*-1 and cur_ts<=957:
 
 						self.apply_pair_cmd(d)
