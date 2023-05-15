@@ -402,24 +402,31 @@ class Manager:
 		
 
 		if self.baskets[pair].shut_down==False:
-			for symbol,value in orders.items():
-				if "." in symbol and symbol not in self.bad_symbols:
-				
-					log_print("Manager: Applying basket command",symbol,value)
-					if symbol not in self.symbol_data:
-						self.symbol_data[symbol] = Symbol(self,symbol,self.pipe_ppro_out)  #register in Symbol.
-						self.symbols.append(symbol)
-						self.symbols_short[symbol[:-3]] = symbol
 
-					self.baskets[pair].register_symbol(symbol,self.symbol_data[symbol])
+			if d['symbol1'] not in self.bad_symbols and d['symbol2'] not in self.bad_symbols:
+			
 
-					## now , submit the request.
+				if d['symbol1']  not in self.symbol_data:
+					self.symbol_data[d['symbol1']] = Symbol(self,d['symbol1'],self.pipe_ppro_out)  #register in Symbol.
+					self.symbols.append(d['symbol1'])
+					self.symbols_short[d['symbol1'][:-3]] = d['symbol1']
 
-					self.baskets[pair].submit_expected_shares(symbol,value,aggresive)
-				else:
-					log_print("Manager: Wrong Ticker format or BANNED:",symbol)
+				self.baskets[pair].register_symbol(d['symbol1'],self.symbol_data[d['symbol1']])
+
+				if d['symbol2']  not in self.symbol_data:
+					self.symbol_data[d['symbol2']] = Symbol(self,d['symbol2'],self.pipe_ppro_out)  #register in Symbol.
+					self.symbols.append(d['symbol2'])
+					self.symbols_short[d['symbol2'][:-3]] = d['symbol2']
+
+				self.baskets[pair].register_symbol(d['symbol2'],self.symbol_data[d['symbol2']])
+
+				## now , submit the request.
+
+				self.baskets[pair].submit_expected_pair(d['amount'],d['passive'] )
+			else:
+				log_print("Manager: Wrong Ticker format or BANNED:",d)
 		else:
-			log_print(pair,"already shutdown")
+			log_print(d,"already shutdown")
 
 	def apply_basket_cmd(self,basket_name,orders,risk,aggresive):
 

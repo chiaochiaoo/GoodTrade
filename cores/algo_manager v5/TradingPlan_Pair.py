@@ -23,6 +23,11 @@ class TradingPlan_Pair(TradingPlan_Basket):
 		log_print("TP working?")
 		self.source = "TP Pair: "
 
+		self.symbol1 = infos['symbol1']
+		self.symbol2 = infos['symbol2']
+
+		self.ratio = infos['ratio']
+
 		# self.algo_name = algo_name
 
 		# self.name = algo_name
@@ -83,3 +88,13 @@ class TradingPlan_Pair(TradingPlan_Basket):
 		# self.display_count = 0
 
 		# self.init_data(risk)
+
+
+	def submit_expected_pair(self,amount,passive):
+
+
+		if passive:
+
+			self.submit_expected_shares(self.symbol1,amount*self.ratio[0],False)
+		else:
+			self.submit_expected_shares(self.symbol1,amount*self.ratio[0],True)
