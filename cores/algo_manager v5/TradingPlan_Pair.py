@@ -16,7 +16,7 @@ class TradingPlan_Pair(TradingPlan_Basket):
 
 	#symbols:Symbols,risk=None
 
-	def __init__(self,algo_name="",risk=5,Manager=None,infos):
+	def __init__(self,algo_name="",risk=5,Manager=None,infos=None):
 
 		super().__init__(algo_name,risk,Manager)
 
