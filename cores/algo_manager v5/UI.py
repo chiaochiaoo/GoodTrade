@@ -703,6 +703,7 @@ class UI(pannel):
 			log_print("Quick Spread:",dic['symbol'],share1,share2)
 
 			d={}
+			d['pair'] = dic['name']
 			d['symbol1'] = dic['symbol'][0]
 			d['symbol2'] = dic['symbol'][1]
 			d['amount'] = dic["current"].get()
@@ -715,8 +716,8 @@ class UI(pannel):
 				print(d)
 				self.manager.apply_pair_cmd(d)
 				#self.manager.apply_basket_cmd(dic['name'],{dic['symbol'][0]:share1,dic['symbol'][1]:share2},0,1)
-			except:
-				pass
+			except Exception as e:
+				PrintException("QS error:",e)
 
 			dic["status"].set("Confirmed")
 			dic['status_bar']['bg'] = 'lightgreen'

@@ -330,6 +330,7 @@ class Symbol:
 						for tp in tps:
 							share_difference = self.tradingplans[tp].request_fufill(self.symbol_name,share_difference,price)
 
+							self.tradingplans[tp].notify_holding_change(self.symbol_name)
 							if share_difference==0:
 								break
 
@@ -347,6 +348,8 @@ class Symbol:
 							log_print(self.source,self.symbol_name," Unmatched incoming shares: ",remaining, "total imblance:",self.current_imbalance ," USER INTERVENTION? SYSTEM VIOLATION!")
 						else:
 							log_print(self.source,self.symbol_name," account holding restored.")
+
+
 			
 	def deploy_orders(self):
 

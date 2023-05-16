@@ -216,6 +216,9 @@ class TradingPlan_Basket:
 		self.data[REALIZED] = round(self.data[REALIZED],2)
 		#self.manager.new_record(self)
 
+	def notify_holding_change(self,symbol):
+		pass 
+		
 	def request_fufill(self,symbol,share,price):
 
 		# if it takes, return the remaining. otherwise return it back

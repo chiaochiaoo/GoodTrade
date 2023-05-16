@@ -393,7 +393,7 @@ class Manager:
 		# d['amount'] 
 		# d['ratio'] 
 		# d['passive'] 
-
+		log_print("Pair applying:",d)
 		risk=10
 	
 		if pair not in self.baskets:

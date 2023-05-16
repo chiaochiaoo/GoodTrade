@@ -89,9 +89,7 @@ class TradingPlan_Pair(TradingPlan_Basket):
 
 		# self.init_data(risk)
 
-
 	def submit_expected_pair(self,amount,passive):
-
 
 		if passive:
 
@@ -99,33 +97,16 @@ class TradingPlan_Pair(TradingPlan_Basket):
 		else:
 			self.submit_expected_shares(self.symbol1,amount*self.ratio[0],True)
 
+	def notify_holding_change(self,symbol):
 
-	def request_fufill(self,symbol,share,price):
-
-		super().request_fufill(symbol,share,price)
-
-		## MATCHING BEGINS. 
 		if symbol == self.symbol1:
-
 			# get expected on the other side .
 
-			self.expected_shares[self.symbol2] = ((self.current_shares[self.symbol1])*self.ratio[0])//self.ratio[1]
+			if self.expected_shares[self.symbol1]==0:
+				self.submit_expected_shares(self.symbol20,1) 
+			else:
+				self.expected_shares[self.symbol2] = ((self.current_shares[self.symbol1])//self.ratio[0])*self.ratio[1]
 
-			self.submit_expected_shares(self.symbol2,0,1)
-
-
-	def request_granted(self,symbol=None):
-
-		# if request becomes 0  . match off. 
-
-		with self.read_lock[symbol]:
-
-			self.current_request[symbol] = self.expected_shares[symbol] - self.current_shares[symbol]
-
-			if self.current_request[symbol] ==0:
-				self.have_request[symbol] = False
+				self.submit_expected_shares(self.symbol2,self.expected_shares[self.symbol2],1) 
 
 
-			# matching
-
-			self.submit_expected_shares(self.symbol2,0,1)
