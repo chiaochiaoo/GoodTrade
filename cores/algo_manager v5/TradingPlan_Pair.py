@@ -105,7 +105,7 @@ class TradingPlan_Pair(TradingPlan_Basket):
 
 			self.submit_expected_shares(self.symbol2,self.expected_shares[self.symbol2],1) 
 			# if self.expected_shares[self.symbol1]==0:
-			# 	self.submit_expected_shares(self.symbol20,1) 
+			# 	self.submit_expected_shares(self.symbol2,0,1) 
 			# else:
 			# 	self.expected_shares[self.symbol2] = ((self.current_shares[self.symbol1])//self.ratio[0])*self.ratio[1]
 
