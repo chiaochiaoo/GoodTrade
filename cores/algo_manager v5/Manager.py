@@ -246,6 +246,9 @@ class Manager:
 			log_print("baning symbol",symbol)
 			self.symbol_data[symbol].rejection_message("Long")
 			self.symbol_data[symbol].rejection_message("Short")
+
+
+		self.symbol_data[symbol].cancel_all()
 		
 	def set_risk(self,risk_):
 
