@@ -684,7 +684,7 @@ class UI(pannel):
 			elif type_ =="direct":
 
 				dic["current"].set(dic["current"].get())
-				dic['lock'].set(0)
+				#dic['lock'].set(0)
 
 
 			if abs(dic["current"].get())>dic["max"].get():
