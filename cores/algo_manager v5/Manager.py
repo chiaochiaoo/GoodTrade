@@ -290,7 +290,7 @@ class Manager:
 			if self.total_difference !=0:
 				self.pipe_ppro_out.send([CANCELALL])
 
-			self.total_difference = 0
+			# self.total_difference = 0
 			
 			# residue.
 			# if residue is 0. no more cancel. 
@@ -301,12 +301,14 @@ class Manager:
 
 					try:
 						c+=val.symbol_inspection()
-						self.total_difference+=abs(val.get_difference())
+						#self.total_difference+=abs(val.get_difference())
 						if c>=30:
 							break
 							log_print("ORDERING LIMIT REACHED.")
 					except Exception as e:
 						PrintException(e,"inspection error")
+
+				self.total_difference = c 
 
 			log_print("Manager: performing symbols inspection compelte, total difference:",self.total_difference, "order counts:",c)
 		else:
@@ -429,7 +431,14 @@ class Manager:
 
 				## now , submit the request.
 
-				self.baskets[pair].submit_expected_pair(d['amount'],d['passive'] )
+
+				self.baskets[pair].submit_expected_pair(d['amount'],d['passive'])
+
+				## INSTANT INSPECTION if passive.
+				if passive:
+					self.symbol_data[d['symbol1']].symbol_inspection()
+
+					self.total_difference+=1
 			else:
 				log_print("Manager: Wrong Ticker format or BANNED:",d)
 		else:
