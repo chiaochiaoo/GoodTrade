@@ -291,7 +291,7 @@ class Manager:
 				self.pipe_ppro_out.send([CANCELALL])
 
 			# self.total_difference = 0
-			
+			time.sleep(0.5)
 			# residue.
 			# if residue is 0. no more cancel. 
 			with self.symbol_inspection_lock:
