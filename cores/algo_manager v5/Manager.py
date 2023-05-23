@@ -435,7 +435,7 @@ class Manager:
 				self.baskets[pair].submit_expected_pair(d['amount'],d['passive'])
 
 				## INSTANT INSPECTION if passive.
-				if passive:
+				if d['passive']:
 					self.symbol_data[d['symbol1']].symbol_inspection()
 
 					self.total_difference+=1
