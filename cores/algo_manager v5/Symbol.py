@@ -45,6 +45,8 @@ class Symbol:
 		self.holding_update = False 
 		self.previous_sync_share = 0
 
+		self.just_had_instant_inspection = False 
+
 
 		"""
 		UPGRADED PARTS
@@ -105,11 +107,18 @@ class Symbol:
 			self.data[ASK] = ask
 			self.data[TIMESTAMP] = ts
 
+	def instant_inspection(self):
+
+		self.just_had_instant_inspection= True 
+		self.symbol_inspection()
+
 	def symbol_inspection(self):
 
 		"""
 		For both load and unload
 		"""
+
+		
 		self.holding_update=False
 		tps = list(self.tradingplans.keys())
 		self.update_stockprices(tps)
@@ -147,12 +156,10 @@ class Symbol:
 
 		return 0
 
-
 	def update_stockprices(self,tps):
 		
 		for tp in tps:
 			self.tradingplans[tp].update_stockprices(self.symbol_name,self.get_bid())
-
 
 	def calc_total_imbalances(self,tps):
 
@@ -218,11 +225,6 @@ class Symbol:
 						log_print(self.source,self.symbol_name," inspection discrepancy: discrepancy UNMATCHED potential missing order fills. ",self.current_imbalance,current_shares-self.current_shares)
 						self.current_imbalance = current_shares-self.current_shares
 
-
-
-
-
-
 	def get_all_current(self,tps):
 
 		current_shares = 0
@@ -231,7 +233,6 @@ class Symbol:
 			current_shares +=  self.tradingplans[tp].get_current_share(self.symbol_name)
 
 		return current_shares
-
 
 	def get_all_expected(self,tps):
 
@@ -245,7 +246,6 @@ class Symbol:
 			self.expected +=  self.tradingplans[tp].get_current_expected(self.symbol_name)
 
 		return self.expected
-
 
 	def get_difference(self):
 		return self.difference
@@ -286,11 +286,6 @@ class Symbol:
 					break
 
 			log_print(self.source,self.symbol_name	,"pair off,",want," amount", long_pair_off,short_pair_off)
-
-
-
-			
-
 
 	def holdings_update(self,price,share):
 
@@ -349,7 +344,6 @@ class Symbol:
 						else:
 							log_print(self.source,self.symbol_name," account holding restored.")
 
-
 			
 	def deploy_orders(self):
 
@@ -378,7 +372,6 @@ class Symbol:
 
 		# handl = threading.Thread(target=self.threading_order,daemon=True)
 		# handl.start()
-
 
 	def threading_order(self):
 
@@ -411,6 +404,13 @@ class Symbol:
 		for tp in tps:
 			if self.tradingplans[tp].having_request(self.symbol_name) and self.tradingplans[tp].get_holdings(self.symbol_name)==0:
 		 		self.tradingplans[tp].rejection_handling(self.symbol_name)
+
+	def cancel_all(self):
+
+		tps = list(self.tradingplans.keys())
+
+		for tp in tps:
+			self.tradingplans[tp].submit_expected_shares(self.symbol_name,0,0)
 
 	def immediate_request(self,shares):
 
