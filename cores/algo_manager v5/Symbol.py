@@ -121,7 +121,7 @@ class Symbol:
 		timestamp = now.hour*3600 + now.minute*60 + now.second
 
 		
-		self.inspection_timestamp = timestamp
+		
 		self.holding_update=False
 		tps = list(self.tradingplans.keys())
 		self.update_stockprices(tps)
@@ -149,6 +149,7 @@ class Symbol:
 		if self.holding_update==False:
 			if self.difference!=0 and ts<=956:
 				if (timestamp - self.inspection_timestamp>2):
+					self.inspection_timestamp = timestamp
 					self.deploy_orders()
 					return 1
 				else:
