@@ -486,7 +486,7 @@ class Manager:
 		moc_release = False 
 		moc_pair_release = False
 
-		MOO_send_out_timer = 560
+		MOO_send_out_timer = 565
 		MOO_pairing_timer = 571
 
 		MOC_send_out_timer = 958
