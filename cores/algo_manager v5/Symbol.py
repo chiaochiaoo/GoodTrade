@@ -148,7 +148,7 @@ class Symbol:
 
 		if self.holding_update==False:
 			if self.difference!=0 and ts<=956:
-				if (timestamp - self.inspection_timestamp>10):
+				if (timestamp - self.inspection_timestamp>2):
 					self.deploy_orders()
 					return 1
 				else:
