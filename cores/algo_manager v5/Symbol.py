@@ -45,7 +45,7 @@ class Symbol:
 		self.holding_update = False 
 		self.previous_sync_share = 0
 
-		self.just_had_instant_inspection = False 
+		self.inspection_timestamp = 0
 
 
 		"""
@@ -117,44 +117,51 @@ class Symbol:
 		"""
 		For both load and unload
 		"""
-
-		
-		self.holding_update=False
-		tps = list(self.tradingplans.keys())
-		self.update_stockprices(tps)
-
-
-		# CRITICAL SECTION. 
-		with self.incoming_shares_lock:
-			if self.get_bid()!=0:
-				# no.2 pair off diff side. need.. hmm price .....!!!
-				self.pair_off(tps)
-
-
-			# no.3 pair orders. fill it in. 
-			#self.calc_inspection_differences(tps)
-
-
-			# no.4 get all current imbalance
-			self.calc_total_imbalances(tps)
-
-
 		now = datetime.now()
-		ts = now.hour*60 + now.minute
+		timestamp = now.hour*3600 + now.minute*60 + now.second
 
-		# Check again if there is any update. if there is, call it off. 
+		if timestamp - self.inspection_timestamp>2:
+			self.inspection_timestamp = timestamp
+			self.holding_update=False
+			tps = list(self.tradingplans.keys())
+			self.update_stockprices(tps)
 
-		if self.holding_update==False:
-			if self.difference!=0 and ts<=956:
-				self.deploy_orders()
-				return 1
+
+			# CRITICAL SECTION. 
+			with self.incoming_shares_lock:
+				if self.get_bid()!=0:
+					# no.2 pair off diff side. need.. hmm price .....!!!
+					self.pair_off(tps)
+
+
+				# no.3 pair orders. fill it in. 
+				#self.calc_inspection_differences(tps)
+
+
+				# no.4 get all current imbalance
+				self.calc_total_imbalances(tps)
+
+
+			ts = now.hour*60 + now.minute
+
+			# Check again if there is any update. if there is, call it off. 
+
+			if self.holding_update==False:
+				if self.difference!=0 and ts<=956:
+					self.deploy_orders()
+					return 1
+				else:
+					self.action = ""
 			else:
-				self.action = ""
-		else:
-			log_print(self.symbol_name," holding change detected. skipping ordering. estimate difference:",self.difference)
-			self.holding_update=False 
+				log_print(self.symbol_name," holding change detected. skipping ordering. estimate difference:",self.difference)
+				self.holding_update=False 
 
-		return 0
+			return 0
+
+		else:
+			log_print(self.symbol_name,"just had inspection.")
+			return 0
+
 
 	def update_stockprices(self,tps):
 		
