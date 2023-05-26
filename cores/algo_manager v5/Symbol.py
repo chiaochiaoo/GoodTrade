@@ -120,7 +120,7 @@ class Symbol:
 		now = datetime.now()
 		timestamp = now.hour*3600 + now.minute*60 + now.second
 
-		if timestamp - self.inspection_timestamp>2:
+		if timestamp - self.inspection_timestamp>5:
 			self.inspection_timestamp = timestamp
 			self.holding_update=False
 			tps = list(self.tradingplans.keys())
