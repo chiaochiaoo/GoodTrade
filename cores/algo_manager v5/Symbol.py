@@ -120,47 +120,46 @@ class Symbol:
 		now = datetime.now()
 		timestamp = now.hour*3600 + now.minute*60 + now.second
 
-		if timestamp - self.inspection_timestamp>5:
-			self.inspection_timestamp = timestamp
-			self.holding_update=False
-			tps = list(self.tradingplans.keys())
-			self.update_stockprices(tps)
+		
+		self.inspection_timestamp = timestamp
+		self.holding_update=False
+		tps = list(self.tradingplans.keys())
+		self.update_stockprices(tps)
 
 
-			# CRITICAL SECTION. 
-			with self.incoming_shares_lock:
-				if self.get_bid()!=0:
-					# no.2 pair off diff side. need.. hmm price .....!!!
-					self.pair_off(tps)
+		# CRITICAL SECTION. 
+		with self.incoming_shares_lock:
+			if self.get_bid()!=0:
+				# no.2 pair off diff side. need.. hmm price .....!!!
+				self.pair_off(tps)
 
 
-				# no.3 pair orders. fill it in. 
-				#self.calc_inspection_differences(tps)
+			# no.3 pair orders. fill it in. 
+			#self.calc_inspection_differences(tps)
 
 
-				# no.4 get all current imbalance
-				self.calc_total_imbalances(tps)
+			# no.4 get all current imbalance
+			self.calc_total_imbalances(tps)
 
 
-			ts = now.hour*60 + now.minute
+		ts = now.hour*60 + now.minute
 
-			# Check again if there is any update. if there is, call it off. 
+		# Check again if there is any update. if there is, call it off. 
 
-			if self.holding_update==False:
-				if self.difference!=0 and ts<=956:
+		if self.holding_update==False:
+			if self.difference!=0 and ts<=956:
+				if (timestamp - self.inspection_timestamp>10):
 					self.deploy_orders()
 					return 1
 				else:
-					self.action = ""
+					log_print(self.symbol_name,"just had inspection")
 			else:
-				log_print(self.symbol_name," holding change detected. skipping ordering. estimate difference:",self.difference)
-				self.holding_update=False 
-
-			return 0
-
+				self.action = ""
 		else:
-			log_print(self.symbol_name,"just had inspection.")
-			return 0
+			log_print(self.symbol_name," holding change detected. skipping ordering. estimate difference:",self.difference)
+			self.holding_update=False 
+
+		return 0
 
 
 	def update_stockprices(self,tps):
