@@ -510,7 +510,9 @@ class UI(pannel):
 		
 		xlfkre = {"name":"XLFKRE","symbol":["XLF.AM","KRE.AM"],"ratio":[3,-1],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		
-		total = [spyqqq,gldslv,xlfkre]
+		smhqqq = {"name":"SMHQQQ","symbol":["SMH.NQ","QQQ.NQ"],"ratio":[17,-10],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		
+		total = [spyqqq,gldslv,xlfkre,smhqqq]
 
 		c=1
 		t=1
