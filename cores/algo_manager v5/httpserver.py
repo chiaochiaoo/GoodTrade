@@ -128,6 +128,7 @@ class S(BaseHTTPRequestHandler):
 
 					if cmd == "FLATTEN":
 						self.flatten_basket(basket)
+
 				elif "Basket" in stream_data:
 
 					basket = find_between(stream_data,"Basket=",",")
@@ -145,7 +146,16 @@ class S(BaseHTTPRequestHandler):
 						a,b = i.split(":")
 						d[a] = int(b)
 
-					self.send_basket(basket,d)
+					info = {}
+
+					if "Profit" in stream_data:
+						profit = find_between(stream_data,"Profit=",",")
+						info['Profit'] = int(profit)
+					if "Stop" in stream_data:
+						stop = find_between(stream_data,"Stop=",",")
+						info['Stop'] = int(stop)
+
+					self.send_basket(basket,d,info)
 
 				elif "Pair" in stream_data:
 
@@ -175,8 +185,8 @@ class S(BaseHTTPRequestHandler):
 	def send_pair(self,info):
 		pipec.send(['pair',info])
 
-	def send_basket(self,basket_name,orders):
-		pipec.send(["basket",basket_name,orders])
+	def send_basket(self,basket_name,orders,info):
+		pipec.send(["basket",basket_name,orders,info])
 
 	def flatten_basket(self,basket_name):
 		pipec.send(["flatten",basket_name])

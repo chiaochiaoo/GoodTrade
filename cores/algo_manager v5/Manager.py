@@ -315,54 +315,14 @@ class Manager:
 			log_print("Manager: previous symbols inspection not finished. skip.")
 
 
-	def moo_apply_basket_cmd2(self,basket_name,orders,risk,aggresive):
-
-		if basket_name not in self.baskets:
-
-			if self.ui.basket_label_count<40:
-				self.baskets[basket_name] = TradingPlan_Basket(basket_name,risk,self)
-				self.ui.create_new_single_entry(self.baskets[basket_name],"Basket",None)
-
-				self.baskets[basket_name].deploy()
-		
-		c = 0 
-		for symbol,share in orders.items():
-			
-			share = int(share)
-			print(symbol,share)
-			if share<0:
-				if c%2==0:
-					reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Sell->Short%20ARCX%20MOO%20OnOpen&shares="+str(abs(share))
-				else:
-					reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Sell->Short NSDQ MOO Regular OnOpen&shares="+str(abs(share))
-			else:
-				if c%2==0:
-					reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Buy%20ARCX%20MOO%20OnOpen&shares="+str(share)
-				else:
-					reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Buy NSDQ MOO Regular OnOpen&shares="+str(share)
-			
-			c+=1 
-			req = threading.Thread(target=request, args=(reque,),daemon=True)
-			req.start()
-		#moo orders here.
-		
-		while True:
-
-			now = datetime.now()
-			cur_ts = now.hour*60+now.minute 
-
-			if cur_ts >=572:
-				break 
-
-		self.apply_basket_cmd(basket_name,orders,risk,aggresive)
 
 
-	def moo_apply_basket_cmd(self,basket_name,orders,risk,aggresive):
+	def moo_apply_basket_cmd(self,basket_name,orders,risk,aggresive,info):
 
 		if basket_name not in self.baskets:
 
 			if self.ui.basket_label_count<self.algo_limit:
-				self.baskets[basket_name] = TradingPlan_Basket(basket_name,risk,self)
+				self.baskets[basket_name] = TradingPlan_Basket(basket_name,risk,self,info)
 				self.ui.create_new_single_entry(self.baskets[basket_name],"Basket",None)
 
 				self.baskets[basket_name].deploy()
@@ -444,12 +404,12 @@ class Manager:
 		else:
 			log_print(d,"already shutdown")
 
-	def apply_basket_cmd(self,basket_name,orders,risk,aggresive):
+	def apply_basket_cmd(self,basket_name,orders,risk,aggresive,info):
 
 		if basket_name not in self.baskets:
 
 			if self.ui.basket_label_count<self.algo_limit:
-				self.baskets[basket_name] = TradingPlan_Basket(basket_name,risk,self)
+				self.baskets[basket_name] = TradingPlan_Basket(basket_name,risk,self,info)
 				self.ui.create_new_single_entry(self.baskets[basket_name],"Basket",None)
 
 				self.baskets[basket_name].deploy()
@@ -537,8 +497,7 @@ class Manager:
 				log_print("Timer: pair realease complelte")
 
 				pair_release=True 
-				#self.apply_basket_cmd(basket_name,orders,risk,aggresive)
-				# here i kinda want a mechanism which blocks symbol from checking. 
+ 
 
 				self.symbol_inspection_start = True
 				time.sleep(5)
@@ -724,23 +683,25 @@ class Manager:
 					now = datetime.now()
 					cur_ts = now.hour*60+now.minute
 
-					confirmation,orders,risk,aggresive = self.ui.order_confirmation(d[1],d[2])
+					confirmation,orders,risk,aggresive,multiplier = self.ui.order_confirmation(d[1],d[2])
+
+					info = d[3]
 
 					if self.net > self.set_risk*-1:
 						if confirmation:
 							log_print("basket update:",d)
 							log_print(d[1],confirmation,orders,risk,aggresive)
 							if "OB" in d[1] and cur_ts<570:
-								handl = threading.Thread(target=self.moo_apply_basket_cmd,args=(d[1],orders,risk,aggresive,),daemon=True)
+								handl = threading.Thread(target=self.moo_apply_basket_cmd,args=(d[1],orders,risk,aggresive,info,),daemon=True)
 								handl.start()
 								#self.moo_apply_basket_cmd(d[1],orders,risk,aggresive)
 
 							elif "COP" in d[1] and cur_ts<570:
-								handl = threading.Thread(target=self.moo_apply_basket_cmd,args=(d[1],orders,risk,aggresive,),daemon=True)
+								handl = threading.Thread(target=self.moo_apply_basket_cmd,args=(d[1],orders,risk,aggresive,info,),daemon=True)
 								handl.start()
 								
 							elif cur_ts<=957:
-								self.apply_basket_cmd(d[1],orders,risk,aggresive)
+								self.apply_basket_cmd(d[1],orders,risk,aggresive,info)
 					else:
 						log_print("Manager:","Risk exceeded, skip. ",self.net,self.set_risk*-1)
 

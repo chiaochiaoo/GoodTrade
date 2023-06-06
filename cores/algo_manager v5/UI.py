@@ -1311,9 +1311,9 @@ class UI(pannel):
 					for key in orders.keys():
 						orders[key] = orders[key]*multiplier
 					
-					return True,orders,item[RISK].get(),item[PASSIVE].get()
+					return True,orders,item[RISK].get(),item[PASSIVE].get(),multiplier
 					
-		return False,None,0,0
+		return False,None,0,0,multiplier
 
 
 if __name__ == '__main__':

@@ -16,7 +16,7 @@ class TradingPlan_Basket:
 
 	#symbols:Symbols,risk=None
 
-	def __init__(self,algo_name="",risk=5,Manager=None):
+	def __init__(self,algo_name="",risk=5,Manager=None,info={}):
 
 
 		self.source = "TP Basket: "
@@ -38,6 +38,16 @@ class TradingPlan_Basket:
 		self.expect_orders = ""
 		self.flatten_order = False
 
+
+		self.stop = 0
+		self.profit = 0
+
+		if "Profit" in info:
+			self.profit = int(info["Profit"])
+		if "Stop" in info:
+			self.stop = int(info["Stop"])
+
+		log_print(algo_name,"  profit & stop : ",self.profit,self.stop)
 		#### BANED SYMBOL
 
 		self.banned = []
@@ -416,7 +426,7 @@ class TradingPlan_Basket:
 
 		#self.deactive()
 		log_print(self.source,self.algo_name," flattening")
-		self.flatten_order=True
+		
 
 		for symbol,item in self.symbols.items():
 			self.submit_expected_shares(symbol,0)
@@ -424,6 +434,7 @@ class TradingPlan_Basket:
 			#if emergency.
 			#item.flatten_cmd(self.algo_name)
 
+		self.flatten_order=True
 
 	""" Deployment initialization """
 
@@ -462,6 +473,13 @@ class TradingPlan_Basket:
 		# if self.display_count %3==0:
 		# 	log_print(self.source,"PNL checking",self.algo_name,check,total_unreal,self.current_shares, self.average_price)
 		
+
+		if total_unreal>self.profit:
+			log_print(self.source, self.algo_name, " MEET PROFIT TARGET",self.profit)
+			self.flatten_cmd()
+		if total_unreal*-1 > self.stop:
+			log_print(self.source, self.algo_name, " MEET STOP ",self.stop)
+			self.flatten_cmd()
 		self.data[UNREAL] = round(total_unreal,2)
 		self.tkvars[UNREAL].set(self.data[UNREAL])
 
