@@ -473,13 +473,14 @@ class TradingPlan_Basket:
 		# if self.display_count %3==0:
 		# 	log_print(self.source,"PNL checking",self.algo_name,check,total_unreal,self.current_shares, self.average_price)
 		
-
-		if total_unreal>self.profit:
-			log_print(self.source, self.algo_name, " MEET PROFIT TARGET",self.profit)
-			self.flatten_cmd()
-		if total_unreal*-1 > self.stop:
-			log_print(self.source, self.algo_name, " MEET STOP ",self.stop)
-			self.flatten_cmd()
+		if self.profit!=0:
+			if total_unreal>self.profit:
+				log_print(self.source, self.algo_name, " MEET PROFIT TARGET",self.profit)
+				self.flatten_cmd()
+		if self.stop!=0:
+			if total_unreal*-1 > self.stop:
+				log_print(self.source, self.algo_name, " MEET STOP ",self.stop)
+				self.flatten_cmd()
 		self.data[UNREAL] = round(total_unreal,2)
 		self.tkvars[UNREAL].set(self.data[UNREAL])
 
