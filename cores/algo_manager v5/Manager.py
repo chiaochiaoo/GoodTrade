@@ -339,7 +339,7 @@ class Manager:
 						else:
 							self.moo_orders[symbol] += share 
 
-					self.moo_algos.append([basket_name,orders,risk,aggresive])
+					self.moo_algos.append([basket_name,orders,risk,aggresive,info])
 
 				for symbol,value in orders.items():
 					if symbol not in self.symbol_data:
@@ -483,8 +483,8 @@ class Manager:
 
 						with self.symbol_inspection_lock:
 							for i in self.moo_algos:
-								basket_name,orders,risk,aggresive = i[0],i[1],i[2],i[3]
-								self.apply_basket_cmd(basket_name,orders,risk,aggresive)
+								basket_name,orders,risk,aggresive,info = i[0],i[1],i[2],i[3],i[4]
+								self.apply_basket_cmd(basket_name,orders,risk,aggresive,info)
 
 						
 						req = threading.Thread(target=request, args=(reque,),daemon=True)
