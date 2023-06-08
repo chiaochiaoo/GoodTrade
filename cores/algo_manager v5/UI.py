@@ -1315,7 +1315,7 @@ class UI(pannel):
 					
 					return True,orders,item[RISK].get(),item[PASSIVE].get(),multiplier
 					
-		return False,None,0,0,multiplier
+		return False,None,0,0,1
 
 
 if __name__ == '__main__':
