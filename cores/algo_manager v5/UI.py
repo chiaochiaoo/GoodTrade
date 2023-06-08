@@ -490,6 +490,41 @@ class UI(pannel):
 		self.init_bad_symbol_pannel()
 		self.init_quick_spread()
 
+
+	def save_quick_spread(self):
+
+		d = {}
+
+		tab =self.TNV_TAB.tab(self.TNV_TAB.select(),"text")
+
+		for algo,item in self.qs.items():
+			d[algo]=[item['increment'].get(),item['max'].get()]
+
+		with open('quickspread_setting.json', 'w') as fp:
+			json.dump(d, fp)
+
+
+	def load_quick_spread(self):
+
+		try:
+			with open('quickspread_setting.json', 'r') as myfile:
+				data=myfile.read()
+
+			# parse file
+			d = json.loads(data)
+			#print("loading",tab)
+
+			for key,item in d.items():
+				#print(self.algos[tab][key])
+				try:
+					increment,max_ = item[0],item[1]
+					self.qs[key]['increment'].set(increment)
+					self.qs[key]['max'].set(max_)
+				except Exception as e:
+					print(e)
+		except Exception as e:
+			print(e)
+
 	def init_quick_spread(self):
 
 		labels =		{"entry":4,\
@@ -514,8 +549,18 @@ class UI(pannel):
 		
 		total = [spyqqq,gldslv,xlfkre,smhqqq]
 
+		self.qs = {}
+		for i in total:
+			self.qs[i['name']] = i
+
+
+		self.load_quick_spread()
+
 		c=1
-		t=1
+		t=2
+
+
+		ttk.Button(self.quick_spread_pannel, text="Save",command=self.save_quick_spread).grid(sticky="w",column=1,row=1)
 
 
 		style = ttk.Style()
