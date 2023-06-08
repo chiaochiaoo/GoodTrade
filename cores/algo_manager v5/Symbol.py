@@ -375,7 +375,12 @@ class Symbol:
 		# time.sleep(0.3)
 
 		if self.difference!=0 and self.holding_update==False:
-			self.ppro_out.send([self.action,self.symbol_name,abs(self.difference),self.manager.gateway])
+
+			total = abs(self.difference)
+			if total>=200:
+				total = 200
+				log_print(self.source,self.symbol_name,self.action," adjusted to 200 instead of",self.difference)
+			self.ppro_out.send([self.action,self.symbol_name,total,self.manager.gateway])
 
 		# handl = threading.Thread(target=self.threading_order,daemon=True)
 		# handl.start()
