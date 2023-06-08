@@ -25,3 +25,4 @@ algo_records/
 custom_algos_config/
 custom_algos_config/CoreyAlgos_setting.json
 custom_algos_config/CoreyAlgos_setting.json
+*.json
