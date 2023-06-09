@@ -504,7 +504,8 @@ class TradingPlan_Basket:
 
 		self.update_displays()
 
-
+	def shutdown(self):
+		self.shutdown = True 
 	def update_displays(self):
 
 

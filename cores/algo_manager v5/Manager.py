@@ -446,7 +446,11 @@ class Manager:
 		moc_release = False 
 		moc_pair_release = False
 
-		MOO_send_out_timer = 565
+
+		premarket_timer_start = 350
+		premarket_timer_stop = 555 
+
+		MOO_send_out_timer = 560
 		MOO_pairing_timer = 571
 
 		MOC_send_out_timer = 958
@@ -458,6 +462,8 @@ class Manager:
 			now = datetime.now()
 			ts = now.hour*60 + now.minute
 
+			if ts>premarket_timer_start and ts<premarket_timer_stop:
+				self.symbol_inspection_start = True 
 
 			if ts>=MOO_send_out_timer and moo_release==False :
 				### TRIGGER. Realese the moo orders. 
@@ -491,6 +497,23 @@ class Manager:
 						req.start()
 
 				moo_release = True
+
+
+				### PRE RELEASE. 
+
+				for basket,item in self.baskets.items():
+					if basket[:3]=="PRE":
+						for symbol,share in item.current_shares.items():	
+							if share<0:
+								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Sell->Short%20ARCX%20MOO%20OnOpen&shares="+str(abs(share))
+							else:
+								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Buy%20ARCX%20MOO%20OnOpen&shares="+str(share)
+							req = threading.Thread(target=request, args=(reque,),daemon=True)
+							req.start()
+
+					#flat and then shut down. 
+					item.flatten_cmd()
+					item.shutdown()
 
 			if ts>=MOO_pairing_timer and pair_release==False :
 
