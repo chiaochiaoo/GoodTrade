@@ -505,15 +505,16 @@ class Manager:
 					if basket[:3]=="PRE":
 						for symbol,share in item.current_shares.items():	
 							if share<0:
-								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Sell->Short%20ARCX%20MOO%20OnOpen&shares="+str(abs(share))
-							else:
 								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Buy%20ARCX%20MOO%20OnOpen&shares="+str(share)
+							else:
+								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Sell->Short%20ARCX%20MOO%20OnOpen&shares="+str(abs(share))
+								
 							req = threading.Thread(target=request, args=(reque,),daemon=True)
 							req.start()
 
-					#flat and then shut down. 
-					item.flatten_cmd()
-					item.shutdown()
+						#flat and then shut down. 
+						item.flatten_cmd()
+						item.shutdown()
 
 			if ts>=MOO_pairing_timer and pair_release==False :
 
