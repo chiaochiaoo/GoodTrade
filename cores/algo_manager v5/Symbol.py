@@ -121,11 +121,8 @@ class Symbol:
 		timestamp = now.hour*3600 + now.minute*60 + now.second
 
 		
-		
-		self.holding_update=False
 		tps = list(self.tradingplans.keys())
 		self.update_stockprices(tps)
-
 
 		# CRITICAL SECTION. 
 		with self.incoming_shares_lock:
