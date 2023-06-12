@@ -377,7 +377,7 @@ class Symbol:
 			if total>=200:
 				total = 200
 				log_print(self.source,self.symbol_name,self.action," adjusted to 200 instead of",self.difference)
-			self.ppro_out.send([self.action,self.symbol_name,total,self.manager.gateway])
+			self.ppro_out.send([self.action,self.symbol_name,total,0,self.manager.gateway])
 
 		# handl = threading.Thread(target=self.threading_order,daemon=True)
 		# handl.start()
