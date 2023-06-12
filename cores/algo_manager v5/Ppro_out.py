@@ -471,7 +471,7 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 						time.sleep(0.05)
 
 		except Exception as e:
-			log_print(e)
+			PrintException("PPro out:",e)
 
 	log_print("ppro out terminated")
 
