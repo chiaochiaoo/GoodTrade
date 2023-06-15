@@ -548,6 +548,7 @@ class Manager:
 							else:
 								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Sell->Short ARCX MOC DAY&shares="+str(share)
 
+						log_print("Sending,"reque)
 						req = threading.Thread(target=request, args=(reque,),daemon=True)
 						req.start()
 
