@@ -447,20 +447,20 @@ class Manager:
 		moc_pair_release = False
 
 
-		premarket_timer_start = 350
-		premarket_timer_stop = 550 
+		premarket_timer_start = 350*60
+		premarket_timer_stop = 550 *60
 
-		MOO_send_out_timer = 565
-		MOO_pairing_timer = 571
+		MOO_send_out_timer = 565*60
+		MOO_pairing_timer = 571*60
 
-		MOC_send_out_timer = 958
-		MOC_pairing_timer = 961
+		MOC_send_out_timer = 958*60+50
+		MOC_pairing_timer = 961*60
 
 		c = 0 
 		log_print("Timer: functional and counting")
 		while True:
 			now = datetime.now()
-			ts = now.hour*60 + now.minute
+			ts = now.hour*3600 + now.minute*60 + now.second
 
 			if ts>premarket_timer_start and ts<premarket_timer_stop:
 				self.symbol_inspection_start = True 
@@ -536,10 +536,17 @@ class Manager:
 					for ticker in self.current_positions.keys():
 						share = self.current_positions[ticker][1]
 
-						if share<0:
-							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Buy ARCX MOC DAY&shares="+str(abs(share))
+
+						if ticker[-2:]=="NY":
+							if share<0:
+								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ROSN Buy RosenblattDQuoteClose MOC DAY&shares="+str(abs(share))
+							else:
+								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ROSN Sell->Short RosenblattDQuoteClose MOC DAY&shares="+str(share)
 						else:
-							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Sell->Short ARCX MOC DAY&shares="+str(share)
+							if share<0:
+								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Buy ARCX MOC DAY&shares="+str(abs(share))
+							else:
+								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Sell->Short ARCX MOC DAY&shares="+str(share)
 
 						req = threading.Thread(target=request, args=(reque,),daemon=True)
 						req.start()
