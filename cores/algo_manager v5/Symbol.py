@@ -374,8 +374,8 @@ class Symbol:
 		if self.difference!=0 and self.holding_update==False:
 
 			total = abs(self.difference)
-			if total>=200:
-				total = 200
+			if total>=500:
+				total = 500
 				log_print(self.source,self.symbol_name,self.action," adjusted to 200 instead of",self.difference)
 			self.ppro_out.send([self.action,self.symbol_name,total,0,self.manager.gateway])
 
