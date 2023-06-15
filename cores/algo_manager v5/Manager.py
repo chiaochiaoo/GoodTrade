@@ -448,9 +448,9 @@ class Manager:
 
 
 		premarket_timer_start = 350
-		premarket_timer_stop = 555 
+		premarket_timer_stop = 550 
 
-		MOO_send_out_timer = 560
+		MOO_send_out_timer = 565
 		MOO_pairing_timer = 571
 
 		MOC_send_out_timer = 958
