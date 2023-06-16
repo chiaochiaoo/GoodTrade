@@ -144,7 +144,7 @@ class Symbol:
 		# Check again if there is any update. if there is, call it off. 
 
 		if self.holding_update==False:
-			if self.difference!=0 and ts<=956:
+			if self.difference!=0 and ts<=957:
 				if (timestamp - self.inspection_timestamp>2):
 					self.inspection_timestamp = timestamp
 					self.deploy_orders()
