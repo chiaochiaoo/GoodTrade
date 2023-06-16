@@ -64,7 +64,7 @@ TEST = True
 def request(post):
 	#print("sending ",post)
 	try:
-		requests.post(post)
+		requests.get(post)
 	except:
 		print(symbol, "failed")
 
@@ -453,7 +453,7 @@ class Manager:
 		MOO_send_out_timer = 565*60
 		MOO_pairing_timer = 571*60
 
-		MOC_send_out_timer = 958*60+50
+		MOC_send_out_timer = 958*60+40 #958*60+50
 		MOC_pairing_timer = 961*60
 
 		c = 0 
