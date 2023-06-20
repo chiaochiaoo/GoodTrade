@@ -226,7 +226,7 @@ class Symbol:
 				"ppro shares matchd:",shares_matched)
 
 
-		if self.difference==0 and ppro_true: # i now know i can trust the ppro share is true.. 
+		if self.difference==0 and ppro_true: # i now know i can trust the ppro share is true.. ? NO!!!???/
 
 
 			# IF THERE IS A PROBLEM. 
@@ -247,9 +247,14 @@ class Symbol:
 						log_print(self.source,self.symbol_name," inspection discrepancy: discrepancy matched. ",self.current_imbalance,current_shares-self.current_shares)
 						self.difference += self.current_imbalance * -1
 					else:
-						self.difference += (current_shares-self.current_shares) * -1
-						log_print(self.source,self.symbol_name," inspection discrepancy: discrepancy UNMATCHED potential missing order fills. ",self.current_imbalance,current_shares-self.current_shares)
-						self.current_imbalance = current_shares-self.current_shares
+						pass 
+						### IF it's a actively manged, bypass this?    ###
+						###                                            ###
+						##################################################
+						# self.difference += (current_shares-self.current_shares) * -1
+						# log_print(self.source,self.symbol_name," inspection discrepancy: discrepancy UNMATCHED potential missing order fills. ",self.current_imbalance,current_shares-self.current_shares)
+						# self.current_imbalance = current_shares-self.current_shares
+
 
 	def get_all_current(self,tps):
 
