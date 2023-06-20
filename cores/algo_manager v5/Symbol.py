@@ -43,16 +43,16 @@ class Symbol:
 
 
 
-
-		self.sent_orders = False 
-
-
+		self.sent_orders = False
 
 		self.holding_update = False 
+
+
 		self.previous_sync_share = 0
 
 		self.inspection_timestamp = 0
 
+		self.enabled_insepction = True 
 
 		"""
 		UPGRADED PARTS
@@ -92,6 +92,10 @@ class Symbol:
 
 		self.init_data()
 		
+	def turn_off_insepction(self):
+		self.enabled_insepction = False 
+
+
 	def init_data(self):
 
 		for i in self.numeric_labels:
@@ -123,62 +127,64 @@ class Symbol:
 		"""
 		For both load and unload
 		"""
-		now = datetime.now()
-		timestamp = now.hour*3600 + now.minute*60 + now.second
 
-		
-		tps = list(self.tradingplans.keys())
-		self.update_stockprices(tps)
+		if self.enabled_insepction:
+			now = datetime.now()
+			timestamp = now.hour*3600 + now.minute*60 + now.second
 
-		# CRITICAL SECTION. 
-		with self.incoming_shares_lock:
-			if self.get_bid()!=0:
-				# no.2 pair off diff side. need.. hmm price .....!!!
-				self.pair_off(tps)
+			
+			tps = list(self.tradingplans.keys())
+			self.update_stockprices(tps)
 
-
-			# no.3 pair orders. fill it in. 
-			#self.calc_inspection_differences(tps)
+			# CRITICAL SECTION. 
+			with self.incoming_shares_lock:
+				if self.get_bid()!=0:
+					# no.2 pair off diff side. need.. hmm price .....!!!
+					self.pair_off(tps)
 
 
-			# no.4 get all current imbalance
-			self.calc_total_imbalances(tps)
+				# no.3 pair orders. fill it in. 
+				#self.calc_inspection_differences(tps)
 
 
-		ts = now.hour*60 + now.minute
+				# no.4 get all current imbalance
+				self.calc_total_imbalances(tps)
 
-		# Check again if there is any update. if there is, call it off. 
+
+			ts = now.hour*60 + now.minute
+
+			# Check again if there is any update. if there is, call it off. 
 
 
-		#self.sent_orders
+			#self.sent_orders
 
-		if self.difference!=0 and ts<=957:
-			if (timestamp - self.inspection_timestamp>2):
-				self.inspection_timestamp = timestamp
-				self.deploy_orders()
-				return 1
+			if self.difference!=0 and ts<=957:
+				if (timestamp - self.inspection_timestamp>2):
+					self.inspection_timestamp = timestamp
+					self.deploy_orders()
+					return 1
+				else:
+					log_print(self.symbol_name,"just had inspection")
 			else:
-				log_print(self.symbol_name,"just had inspection")
-		else:
-			self.action = ""
+				self.action = ""
 
-		# if self.holding_update==False:
-		# 	if self.difference!=0 and ts<=957:
-		# 		if (timestamp - self.inspection_timestamp>2):
-		# 			self.inspection_timestamp = timestamp
-		# 			self.deploy_orders()
-		# 			return 1
-		# 		else:
-		# 			log_print(self.symbol_name,"just had inspection")
-		# 	else:
-		# 		self.action = ""
-		# else:
-		# 	log_print(self.symbol_name," holding change detected. skipping ordering. estimate difference:",self.difference)
-		# 	self.holding_update=False 
+			# if self.holding_update==False:
+			# 	if self.difference!=0 and ts<=957:
+			# 		if (timestamp - self.inspection_timestamp>2):
+			# 			self.inspection_timestamp = timestamp
+			# 			self.deploy_orders()
+			# 			return 1
+			# 		else:
+			# 			log_print(self.symbol_name,"just had inspection")
+			# 	else:
+			# 		self.action = ""
+			# else:
+			# 	log_print(self.symbol_name," holding change detected. skipping ordering. estimate difference:",self.difference)
+			# 	self.holding_update=False 
 
-		if self.sent_orders==True:
-			#self.ppro_out.send([CANCEL,self.symbol_name]) 
-			self.sent_orders = False 
+			if self.sent_orders==True:
+				#self.ppro_out.send([CANCEL,self.symbol_name]) 
+				self.sent_orders = False 
 		return 0
 
 

@@ -28,6 +28,8 @@ class TradingPlan_Pair(TradingPlan_Basket):
 
 		self.ratio = infos['ratio']
 
+
+
 		# self.algo_name = algo_name
 
 		# self.name = algo_name
@@ -91,8 +93,9 @@ class TradingPlan_Pair(TradingPlan_Basket):
 
 	def submit_expected_pair(self,amount,passive):
 
-		if passive:
+		self.symbols[self.symbol2].turn_off_insepction()
 
+		if passive:
 			self.submit_expected_shares(self.symbol1,amount*self.ratio[0],False)
 		else:
 			self.submit_expected_shares(self.symbol1,amount*self.ratio[0],True)
