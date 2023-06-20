@@ -689,7 +689,7 @@ class Manager:
 		count = 0
 		while True:
 			d = self.pipe_goodtrade.recv()
-			print("GT:",d,d[0])
+			#print("GT:",d,d[0])
 			if d[0] =="msg":
 				try:
 					self.ui.main_app_status.set(str(d[1]))
