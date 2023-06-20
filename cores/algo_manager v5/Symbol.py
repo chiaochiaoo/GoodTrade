@@ -177,7 +177,7 @@ class Symbol:
 		# 	self.holding_update=False 
 
 		if self.sent_orders==True:
-			self.ppro_out.send([CANCEL,self.symbol_name]) 
+			#self.ppro_out.send([CANCEL,self.symbol_name]) 
 			self.sent_orders = False 
 		return 0
 
