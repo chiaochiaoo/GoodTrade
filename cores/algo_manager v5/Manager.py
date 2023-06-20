@@ -287,8 +287,8 @@ class Manager:
 		# HERE I NEED. A. HARD LIMIT.... 40 ??? 
 		if self.symbol_inspection_lock.locked()==False:
 
-			if self.total_difference !=0:
-				self.pipe_ppro_out.send([CANCELALL])
+			# if self.total_difference !=0:
+			# 	self.pipe_ppro_out.send([CANCELALL])
 
 			# self.total_difference = 0
 			time.sleep(0.5)
