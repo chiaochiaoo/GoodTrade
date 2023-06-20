@@ -397,9 +397,11 @@ class Symbol:
 
 
 
-		if self.sent_orders==True:
-			self.ppro_out.send([CANCEL,self.symbol_name]) 
+		#if self.sent_orders==True:
+		self.ppro_out.send([CANCEL,self.symbol_name]) 
 
+		time.sleep(0.1)
+		
 		if self.difference>0:
 			self.action = PASSIVEBUY
 			#price = self.get_bid()
