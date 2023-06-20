@@ -156,35 +156,20 @@ class Symbol:
 			# Check again if there is any update. if there is, call it off. 
 
 
-			#self.sent_orders
-
-			if self.difference!=0 and ts<=957:
-				if (timestamp - self.inspection_timestamp>2):
-					self.inspection_timestamp = timestamp
-					self.deploy_orders()
-					return 1
+			if self.holding_update==False:
+				if self.difference!=0 and ts<=957:
+					if (timestamp - self.inspection_timestamp>2):
+						self.inspection_timestamp = timestamp
+						self.deploy_orders()
+						return 1
+					else:
+						log_print(self.symbol_name,"just had inspection")
 				else:
-					log_print(self.symbol_name,"just had inspection")
+					self.action = ""
 			else:
-				self.action = ""
+				log_print(self.symbol_name," holding change detected. skipping ordering. estimate difference:",self.difference)
+				self.holding_update=False 
 
-			# if self.holding_update==False:
-			# 	if self.difference!=0 and ts<=957:
-			# 		if (timestamp - self.inspection_timestamp>2):
-			# 			self.inspection_timestamp = timestamp
-			# 			self.deploy_orders()
-			# 			return 1
-			# 		else:
-			# 			log_print(self.symbol_name,"just had inspection")
-			# 	else:
-			# 		self.action = ""
-			# else:
-			# 	log_print(self.symbol_name," holding change detected. skipping ordering. estimate difference:",self.difference)
-			# 	self.holding_update=False 
-
-			if self.sent_orders==True:
-				#self.ppro_out.send([CANCEL,self.symbol_name]) 
-				self.sent_orders = False 
 		return 0
 
 
@@ -200,7 +185,6 @@ class Symbol:
 		self.current_shares = self.get_all_current(tps)
 		self.expected = self.get_all_expected(tps)
 		self.difference = self.expected - self.current_shares
-
 
 
 		### STAGE 2. ONLY if TPs are taken care off.
@@ -401,7 +385,7 @@ class Symbol:
 		self.ppro_out.send([CANCEL,self.symbol_name]) 
 
 		time.sleep(0.1)
-		
+
 		if self.difference>0:
 			self.action = PASSIVEBUY
 			#price = self.get_bid()
@@ -416,7 +400,7 @@ class Symbol:
 		# self.ppro_out.send([CANCEL,self.symbol_name])
 		# time.sleep(0.3)
 
-		if self.difference!=0:
+		if self.difference!=0 and self.holding_update==False :
 
 			total = abs(self.difference)
 			if total>=500:
