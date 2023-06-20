@@ -175,7 +175,10 @@ class Symbol:
 		# else:
 		# 	log_print(self.symbol_name," holding change detected. skipping ordering. estimate difference:",self.difference)
 		# 	self.holding_update=False 
-		self.sent_orders = False 
+
+		if self.sent_orders==True:
+			self.ppro_out.send([CANCEL,self.symbol_name]) 
+			self.sent_orders = False 
 		return 0
 
 
@@ -384,7 +387,6 @@ class Symbol:
 
 
 		if self.sent_orders==True:
-
 			self.ppro_out.send([CANCEL,self.symbol_name]) 
 
 		if self.difference>0:
