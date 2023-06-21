@@ -169,7 +169,7 @@ class Symbol:
 					# no.4 get all current imbalance
 					self.calc_total_imbalances(tps)
 
-
+				now = datetime.now()
 				ts = now.hour*60 + now.minute
 
 				# Check again if there is any update. if there is, call it off. 
