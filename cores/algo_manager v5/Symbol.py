@@ -33,6 +33,9 @@ class Symbol:
 		# make sure only 1 process goes.
 		self.fill_lock =  threading.Lock()
 
+
+		self.inspection_lock = threading.Lock()
+
 		self.banned = False 
 
 		self.numeric_labels = [TRADE_TIMESTAMP,TIMESTAMP,BID,ASK,RESISTENCE,SUPPORT,OPEN,HIGH,LOW,PREMARKETLOW,STOP,EXIT,ENTRY,CUSTOM]
@@ -124,60 +127,70 @@ class Symbol:
 		self.just_had_instant_inspection= True 
 		self.symbol_inspection()
 
+	def get_ts(self):
+		now = datetime.now()
+		timestamp = now.hour*3600 + now.minute*60 + now.second
+
+		return timestamp
+
 	def symbol_inspection(self):
 
 		"""
 		For both load and unload
 		"""
 
-		log_print(self.symbol_name,"Inspecting:")
+		
 
-		if self.enabled_insepction:
-
-
-			now = datetime.now()
-			timestamp = now.hour*3600 + now.minute*60 + now.second
-			while (timestamp - self.last_order_timestamp<=2) or (timestamp -self.inspection_timestamp<=2):
-				log_print(self.symbol_name,"inspection: inspection wait:",timestamp - self.last_order_timestamp,timestamp -self.inspection_timestamp)
-				time.sleep(1)
-
-			
-			tps = list(self.tradingplans.keys())
-			self.update_stockprices(tps)
-
-			# CRITICAL SECTION. 
-			with self.incoming_shares_lock:
-				if self.get_bid()!=0:
-					# no.2 pair off diff side. need.. hmm price .....!!!
-					self.pair_off(tps)
+		if not self.inspection_lock.locked():
+			log_print(self.symbol_name,"Inspecting:")
+			with self.inspection_lock:
+				timestamp = get_ts()
+				while (timestamp - self.last_order_timestamp<=2) or (timestamp -self.inspection_timestamp<=2):
+					log_print(self.symbol_name,"inspection: inspection wait:",timestamp - self.last_order_timestamp,timestamp -self.inspection_timestamp)
+					time.sleep(1)
+					timestamp = get_ts()
 
 
-				# no.3 pair orders. fill it in. 
-				#self.calc_inspection_differences(tps)
+				
+				tps = list(self.tradingplans.keys())
+				self.update_stockprices(tps)
+
+				# CRITICAL SECTION. 
+				with self.incoming_shares_lock:
+					if self.get_bid()!=0:
+						# no.2 pair off diff side. need.. hmm price .....!!!
+						self.pair_off(tps)
 
 
-				# no.4 get all current imbalance
-				self.calc_total_imbalances(tps)
+					# no.3 pair orders. fill it in. 
+					#self.calc_inspection_differences(tps)
 
 
-			ts = now.hour*60 + now.minute
+					# no.4 get all current imbalance
+					self.calc_total_imbalances(tps)
 
-			# Check again if there is any update. if there is, call it off. 
+
+				ts = now.hour*60 + now.minute
+
+				# Check again if there is any update. if there is, call it off. 
 
 
-			if self.holding_update==False:
-				if self.difference!=0 and ts<=957:
-					self.inspection_timestamp = timestamp
-					self.deploy_orders()
-					return 1
+				if self.holding_update==False:
+					if self.difference!=0 and ts<=957:
+						self.inspection_timestamp = timestamp
+						self.deploy_orders()
+						return 1
 
+					else:
+						self.action = ""
 				else:
-					self.action = ""
-			else:
-				log_print(self.symbol_name," holding change detected. skipping ordering. estimate difference:",self.difference)
-				self.holding_update=False 
+					log_print(self.symbol_name," holding change detected. skipping ordering. estimate difference:",self.difference)
+					self.holding_update=False 
 
-		return 0
+			return 0
+		else:
+			log_print(self.symbol_name,"Inspection LOCKED")
+			return 0 
 
 
 	def update_stockprices(self,tps):
