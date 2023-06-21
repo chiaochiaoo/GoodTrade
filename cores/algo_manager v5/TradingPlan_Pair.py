@@ -93,7 +93,7 @@ class TradingPlan_Pair(TradingPlan_Basket):
 
 	def submit_expected_pair(self,amount,passive):
 
-		self.symbols[self.symbol2].turn_off_insepction()
+		self.symbols[self.symbol2].turn_on_aggresive_only()
 
 		if passive:
 			self.submit_expected_shares(self.symbol1,amount*self.ratio[0],False)

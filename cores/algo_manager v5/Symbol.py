@@ -41,12 +41,9 @@ class Symbol:
 		self.data = {}
 		self.tkvars = {}
 
-
-
 		self.sent_orders = False
-
+		self.aggresive_only = False 
 		self.holding_update = False 
-
 
 		self.previous_sync_share = 0
 
@@ -92,6 +89,9 @@ class Symbol:
 
 		self.init_data()
 		
+	def turn_on_aggresive_only(self):
+		self.aggresive_only = True 
+
 	def turn_off_insepction(self):
 		self.enabled_insepction = False 
 
@@ -400,13 +400,20 @@ class Symbol:
 		# self.ppro_out.send([CANCEL,self.symbol_name])
 		# time.sleep(0.3)
 
+
 		if self.difference!=0 and self.holding_update==False :
 
 			total = abs(self.difference)
 			if total>=500:
 				total = 500
 				log_print(self.source,self.symbol_name,self.action," adjusted to 200 instead of",self.difference)
-			self.ppro_out.send([self.action,self.symbol_name,total,0,self.manager.gateway])
+
+
+
+			if self.aggresive_only==True:
+				self.immediate_request(self.difference)
+			else:
+				self.ppro_out.send([self.action,self.symbol_name,total,0,self.manager.gateway])
 
 
 			self.sent_orders = True 
