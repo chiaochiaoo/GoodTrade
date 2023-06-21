@@ -135,7 +135,7 @@ class Symbol:
 
 			now = datetime.now()
 			timestamp = now.hour*3600 + now.minute*60 + now.second
-			while timestamp - self.last_order_timestamp<=2:
+			while (timestamp - self.last_order_timestamp<=2) or (timestamp -self.inspection_timestamp<=2):
 				log_print(self.symbol_name,"inspection: inspection wait")
 				time.sleep(1)
 
@@ -165,12 +165,10 @@ class Symbol:
 
 			if self.holding_update==False:
 				if self.difference!=0 and ts<=957:
-					if (timestamp - self.inspection_timestamp>2):
-						self.inspection_timestamp = timestamp
-						self.deploy_orders()
-						return 1
-					else:
-						log_print(self.symbol_name,"just had inspection")
+					self.inspection_timestamp = timestamp
+					self.deploy_orders()
+					return 1
+
 				else:
 					self.action = ""
 			else:
