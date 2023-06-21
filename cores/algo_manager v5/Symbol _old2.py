@@ -131,13 +131,8 @@ class Symbol:
 		"""
 
 		if self.enabled_insepction:
-
-
 			now = datetime.now()
-			cur_ts = now.hour*3600 + now.minute*60 + now.second
-			while cur_ts - self.last_order_timestamp<=2:
-				log_print(self.symbol_name,"inspection: inspection wait")
-				time.sleep(1)
+			timestamp = now.hour*3600 + now.minute*60 + now.second
 
 			
 			tps = list(self.tradingplans.keys())
@@ -371,12 +366,6 @@ class Symbol:
 							log_print(self.source,self.symbol_name," Unmatched incoming shares: ",remaining, "total imblance:",self.current_imbalance ," USER INTERVENTION? SYSTEM VIOLATION!")
 						else:
 							log_print(self.source,self.symbol_name," account holding restored.")
-
-
-				now = datetime.now()
-				self.last_order_timestamp = now.hour*3600 + now.minute*60 + now.second
-
-				self.symbol_inspection()
 
 			
 	def deploy_orders(self):
