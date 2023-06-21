@@ -138,7 +138,7 @@ class Symbol:
 			now = datetime.now()
 			timestamp = now.hour*3600 + now.minute*60 + now.second
 			while (timestamp - self.last_order_timestamp<=2) or (timestamp -self.inspection_timestamp<=2):
-				log_print(self.symbol_name,"inspection: inspection wait")
+				log_print(self.symbol_name,"inspection: inspection wait:",timestamp - self.last_order_timestamp,timestamp -self.inspection_timestamp)
 				time.sleep(1)
 
 			
