@@ -130,6 +130,8 @@ class Symbol:
 		For both load and unload
 		"""
 
+		log_print(self.symbol_name,"Inspecting:")
+
 		if self.enabled_insepction:
 
 
