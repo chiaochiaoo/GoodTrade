@@ -543,13 +543,13 @@ class UI(pannel):
 		spytlt = {"name":"SPYTLT","symbol":["SPY.AM","TLT.AM"],"ratio":[1,-4],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		spyuso = {"name":"SPYUSO","symbol":["SPY.AM","USO.AM"],"ratio":[1,-3],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		
-		xlfkre = {"name":"XLFKRE","symbol":["XLF.AM","KRE.AM"],"ratio":[3,-1],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		tlsaqqq = {"name":"TSLAQQQ","symbol":["TSLA.NQ","QQQ.NQ"],"ratio":[10,-17],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		
 		smhqqq = {"name":"SMHQQQ","symbol":["SMH.NQ","QQQ.NQ"],"ratio":[17,-10],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		
 		gdx = {"name":"GDXGDXJ","symbol":["GDX.AM","GDXJ.AM"],"ratio":[10,-7],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		
-		total = [spyqqq,gldslv,xlfkre,smhqqq,gdx]
+		total = [spyqqq,gldslv,tlsaqqq,smhqqq,gdx]
 
 		self.qs = {}
 		for i in total:
