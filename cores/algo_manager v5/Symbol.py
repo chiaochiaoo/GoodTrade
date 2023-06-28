@@ -261,9 +261,9 @@ class Symbol:
 						### IF it's a actively manged, bypass this?    ###
 						###                                            ###
 						##################################################
-						# self.difference += (current_shares-self.current_shares) * -1
-						# log_print(self.source,self.symbol_name," inspection discrepancy: discrepancy UNMATCHED potential missing order fills. ",self.current_imbalance,current_shares-self.current_shares)
-						# self.current_imbalance = current_shares-self.current_shares
+						self.difference += (current_shares-self.current_shares) * -1
+						log_print(self.source,self.symbol_name," inspection discrepancy: discrepancy UNMATCHED potential missing order fills. ",self.current_imbalance,current_shares-self.current_shares)
+						self.current_imbalance = current_shares-self.current_shares
 
 
 	def get_all_current(self,tps):
