@@ -454,7 +454,7 @@ class Manager:
 		MOO_pairing_timer = 571*60
 
 		MOC_send_out_timer = 958*60+40 #958*60+50
-		MOC_pairing_timer = 959*60+40
+		MOC_pairing_timer = 959*60+30
 
 		c = 0 
 		log_print("Timer: functional and counting")
