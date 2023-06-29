@@ -89,6 +89,8 @@ class Symbol:
 		self.incoming_shares_lock = threading.Lock()
 		self.incoming_shares = {}
 
+		self.order_processing_timer = 0
+
 		#self.tradingplan_lock = threading.Lock()
 		self.tradingplans = {}
 
@@ -354,10 +356,16 @@ class Symbol:
 				#first wait for few seconds. 
 				time.sleep(0.2)
 
+				while self.order_processing_timer>0:
+					time.sleep(0.1)
+					self.order_processing_timer	-=0.1
+
 				tps = list(self.tradingplans.keys())
 				with self.incoming_shares_lock:
 
 					#for each piece feed it.. to the requested.
+
+					log_print(self.source,self.symbol_name," holding processing total:",sum(self.incoming_shares.values()))
 
 					remaining = 0
 					for price,share in self.incoming_shares.items():
@@ -388,8 +396,11 @@ class Symbol:
 
 				now = datetime.now()
 				self.last_order_timestamp = now.hour*3600 + now.minute*60 + now.second
-
+				self.order_processing_timer = 0
 				self.symbol_inspection()
+		else:
+			if self.order_processing_timer<0.2:
+				self.order_processing_timer=0.2
 
 			
 	def deploy_orders(self):
@@ -566,3 +577,64 @@ class Symbol:
 
 
 		self.previous_shares,self.previous_avgprice = self.current_shares, self.current_avgprice
+
+
+# def holdings_update(self,price,share):
+
+# 	with self.incoming_shares_lock:
+
+# 		if price not in self.incoming_shares:
+
+# 			self.incoming_shares[price] = share
+# 		else:
+# 			self.incoming_shares[price] += share
+
+		
+# 	#log_print("holding update - releasing lock")
+# 	log_print("Symbol",self.symbol_name," holding update:",price,share)
+# 	self.holding_update = True 
+
+# 	hold_fill = threading.Thread(target=self.holdings_fill,daemon=True)
+# 	hold_fill.start()
+
+# def holdings_fill(self):
+
+# 	if not self.fill_lock.locked():
+# 		with self.fill_lock:
+# global wait_timer
+# global d 
+# wait_timer = 0
+# incoming_shares_lock = threading.Lock()
+# d = []
+
+# def incoming(x):
+
+# 	d.append(x)
+# 	hold_fill = threading.Thread(target=holdings_fill,daemon=True)
+# 	hold_fill.start()
+
+# def holdings_fill():
+
+# 	global wait_timer	
+# 	global d
+# 	if not incoming_shares_lock.locked():
+# 		with incoming_shares_lock:
+
+# 			time.sleep(0.1)# wait default time.
+
+# 			while wait_timer>0:
+# 				time.sleep(0.1)
+# 				wait_timer-=0.1
+# 			#goal: end needs to be printed.
+
+# 			print(d)
+# 			d=[]
+# 	else:
+# 		wait_timer+=0.1
+
+# for i in range(5):
+
+# 	incoming(i)
+# 	time.sleep(0.08)
+
+# time.sleep(5)
