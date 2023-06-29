@@ -171,7 +171,7 @@ class TradingPlan_Basket:
 					now = datetime.now()
 					ts = now.hour*3600 + now.minute*60 + now.second
 
-					if ts - self.recent_action_ts[symbol] >= 2:
+					if ts - self.recent_action_ts[symbol] >= 2 and ts<959*60:
 						self.recent_action_ts[symbol] = ts
 						self.symbols[symbol].immediate_request(self.current_request[symbol])
 					else:
