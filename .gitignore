@@ -16,7 +16,7 @@ list.txt
 signals/
 algo_orders/
 cores/commlink.json
-
+*.csv
 tools/Customized_Processor/input.csv
 tools/IV/saves
 algo_records/
