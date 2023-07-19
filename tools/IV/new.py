@@ -75,57 +75,70 @@ class processor:
 		c = 0
 		k = 0 
 
+		register_ts = 0
 		while True:
 
-			now = datetime.now()
-			ts = now.hour*60 + now.minute
+			try:
+				now = datetime.now()
+				ts = now.hour*60 + now.minute
 
-			if (ts >=525 and ts<=530) or (ts>935 and ts<940):
-				k = 0 
-				self.registered = False 
-				self.termination = False 
-			else:
-				k +=1 
+				if (ts >=525 and ts<=530) or (ts>935 and ts<940):
+					k = 0 
+					self.registered = False 
+					self.termination = False 
+				else:
+					k +=1 
 
-			if k>5 and self.registered==False:
+				if k>5 and self.registered==False:
 
-				force_close_port(4135)
-				postbody = "http://localhost:8080/SetOutput?region=1&feedtype=IMBALANCE&output=4135&status=on"
+					force_close_port(4135)
+					postbody = "http://localhost:8080/SetOutput?region=1&feedtype=IMBALANCE&output=4135&status=on"
 
-				try:
-					r= requests.post(postbody)
-				except Exception as e:
-					print(e)
+					try:
+						r= requests.post(postbody)
+					except Exception as e:
+						print(e)
 
-				send_pipe, receive_pipe = multiprocessing.Pipe()
+					send_pipe, receive_pipe = multiprocessing.Pipe()
 
-				process_ppro = multiprocessing.Process(target=running_mode, args=(send_pipe,),daemon=True)
-				process_ppro.daemon=True
-				process_ppro.start()
+					process_ppro = multiprocessing.Process(target=running_mode, args=(send_pipe,),daemon=True)
+					process_ppro.daemon=True
+					process_ppro.start()
 
-				process_ppro2 = multiprocessing.Process(target=writer, args=(receive_pipe,),daemon=True)
-				process_ppro2.daemon=True
-				process_ppro2.start()
+					process_ppro2 = multiprocessing.Process(target=writer, args=(receive_pipe,),daemon=True)
+					process_ppro2.daemon=True
+					process_ppro2.start()
 
-				self.registered=True
+					self.registered=True
 
-			if k>30 and self.termination==False:
+				if k>5 and self.registered==True and self.termination==False:
+					postbody = "http://localhost:8080/SetOutput?region=1&feedtype=IMBALANCE&output=4135&status=on"
+
+					try:
+						r= requests.post(postbody)
+					except Exception as e:
+						print(e)
+
+				if k>50 and self.termination==False:
 
 
-				print("terminating....")
+					print("terminating....")
 
-				send_pipe.send("good")
-				time.sleep(5)
-				process_ppro.terminate()
-				process_ppro.join()
-				process_ppro2.terminate()
-				process_ppro2.join()				
+					send_pipe.send("good")
+					time.sleep(5)
+					process_ppro.terminate()
+					process_ppro.join()
+					process_ppro2.terminate()
+					process_ppro2.join()				
 
-				self.termination = True 
+					self.termination = True 
 
-			print("current ts:",ts,	self.registered,self.termination,k)
+				print("current ts:",ts,	self.registered,self.termination,k)
 
-			time.sleep(60)
+				time.sleep(60)
+
+			except Exception as e :
+				print(e)
 
 	def open_file(self):
 
@@ -205,7 +218,7 @@ def writer(receive_pipe):
 
 	### if night 
 
-	with open(file, 'w',newline='') as csvfile2:
+	with open(file, 'a+',newline='') as csvfile2:
 		writer = csv.writer(csvfile2)
 		writer.writerow(header)
 		while True:
@@ -230,6 +243,21 @@ def writer(receive_pipe):
 				  d.append(find_between(r,i,","))
 
 
+			try:
+				symbol = find_between(r,"Symbol=",",")
+				pair = float(find_between(r,"PairedVolume=",","))
+				size = float(find_between(r,"Volume=",","))
+				time_ = timestamp_seconds(find_between(r, "MarketTime=", ","))
+				side = find_between(r,"Side=",",")
+
+				if time_>57000:
+
+					if pair>1000000 or size >800000:
+
+						print(symbol,pair,size,side)
+
+			except Exception as e:
+				print(e)
 			writer.writerow(d)
 			if count%1000==0:
 				print("writer:",count)
@@ -238,64 +266,43 @@ def writer(receive_pipe):
 
 def running_mode(send_pipe):
 
-	print("running mode starts ")
+	try:
+		print("running mode starts ")
 
-	postbody = "http://localhost:8080/SetOutput?region=1&feedtype=IMBALANCE&output=4135&status=on"
-	r= requests.post(postbody)
-
-
-	while r.status_code !=200:
+		postbody = "http://localhost:8080/SetOutput?region=1&feedtype=IMBALANCE&output=4135&status=on"
 		r= requests.post(postbody)
-		print("request failed")
-		break
-		
-	print("request successful")
-	UDP_IP = "localhost"
-	UDP_PORT = 4135
-
-	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	sock.bind((UDP_IP, UDP_PORT))
-
-	count = 0
 
 
-
-	while True:
-
-
-		# #### TEST MODE ####
-		# c= 0 
-		# with open('test.csv', 'r', encoding='UTF8') as f:
-		# 	spamreader = csv.reader(f, delimiter=' ', quotechar='|')
-		# 	for row in spamreader:
-		# 		r = "".join(row)
-		# 		send_pipe.send(r)
-		# 		writer.writerow([r])
-		# 		c+=1
-		# 		#print(c)
-		# 		if c%1000==0:
-		# 			print(c)
-		# 	send_pipe.send("good")
+		while r.status_code !=200:
+			r= requests.post(postbody)
+			print("request failed")
+			break
 			
-		# print("all_finished")
-		
-		# time.sleep(10)
-		# os._exit(1)
-		# #######################
+		print("request successful")
+		UDP_IP = "localhost"
+		UDP_PORT = 4135
 
-		data, addr = sock.recvfrom(1024)
-		row = str(data)
-		#writer.writerow([row])
+		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		sock.bind((UDP_IP, UDP_PORT))
 
-		## TOSS IT ONTO THE THREAD VIA PIPE>
-		#process_data(row,writer,all_symbols)
-		send_pipe.send(row)
+		count = 0
 
-		count+=1
+		while True:
+			data, addr = sock.recvfrom(1024)
+			row = str(data)
+			#writer.writerow([row])
 
-		if count%1000==0:
-			print("reader:",count)
+			## TOSS IT ONTO THE THREAD VIA PIPE>
+			#process_data(row,writer,all_symbols)
+			send_pipe.send(row)
 
+			count+=1
+
+			if count%1000==0:
+				print("reader:",count)
+
+	except Exception as e:
+		print(e)
 if __name__ == '__main__':
 
 	multiprocessing.freeze_support()
