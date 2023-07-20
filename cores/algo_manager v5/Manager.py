@@ -453,7 +453,7 @@ class Manager:
 		MOO_send_out_timer = 565*60
 		MOO_pairing_timer = 571*60
 
-		MOC_send_out_timer = 958*60+40 #958*60+50
+		MOC_send_out_timer = 958*60+30 #958*60+50
 		MOC_pairing_timer = 959*60+30
 
 		c = 0 
