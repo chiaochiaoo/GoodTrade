@@ -542,18 +542,26 @@ class UI(pannel):
 		gldslv = {"name":"GLDSLV","symbol":["GLD.AM","SLV.AM"],"ratio":[1,-4],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		spytlt = {"name":"SPYTLT","symbol":["SPY.AM","TLT.AM"],"ratio":[1,-4],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		spyuso = {"name":"SPYUSO","symbol":["SPY.AM","USO.AM"],"ratio":[1,-3],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		
-		tlsaqqq = {"name":"TSLAQQQ","symbol":["TSLA.NQ","QQQ.NQ"],"ratio":[10,-17],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		
+		tlsaqqq = {"name":"TSLAQQQ","symbol":["TSLA.NQ","QQQ.NQ"],"ratio":[1,-2],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		smhqqq = {"name":"SMHQQQ","symbol":["SMH.NQ","QQQ.NQ"],"ratio":[17,-10],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		
-		gdx = {"name":"GDXGDXJ","symbol":["GDX.AM","GDXJ.AM"],"ratio":[10,-7],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		
-		total = [spyqqq,gldslv,tlsaqqq,smhqqq,gdx]
+	
+		gdxgdxj = {"name":"GDXGDXJ","symbol":["GDX.AM","GDXJ.AM"],"ratio":[10,-7],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		gdxgld = {"name":"GDXGLD","symbol":["GDX.AM","GLD.AM"],"ratio":[2,-1],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+			
 
+		xleqqq = {"name":"XLEQQQ","symbol":["XLE.AM","QQQ.NQ"],"ratio":[4,1],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		
+		total = [spyqqq,gldslv,tlsaqqq,smhqqq,gdxgdxj]
+
+		spy = [spyqqq,spytlt,spyuso]
+		qqq = [tlsaqqq,smhqqq,xleqqq]
+		gld = [gldslv,gdxgdxj,gdxgld]
+
+		total = [spy,qqq,gld]
 		self.qs = {}
-		for i in total:
-			self.qs[i['name']] = i
+		for j in total:
+			for i in j:
+				self.qs[i['name']] = i
 
 
 		self.load_quick_spread()
@@ -575,140 +583,165 @@ class UI(pannel):
 		# 	ttk.Label(self.quick_spread_pannel, text=key,width=val).grid(sticky="w",column=c,row=1)
 		# 	c+=1
 
-		for i in total:
+		self.qs_subtab = ttk.Notebook(self.quick_spread_pannel)
+		#self.qs_subtab.place(x=0,rely=0.05,relheight=1,relwidth=1)
+		self.qs_subtab.grid(column=1,row=2)
 
-			# ROW 1  name 
-			c=1
-			tk.Label(self.quick_spread_pannel, text=i['name']+str(i['ratio'])).grid(sticky="w",column=c,row=t)
-			c+=1
+		self.qs_subp1 = ttk.LabelFrame(self.qs_subtab,text="") 
+		self.qs_subp2 = ttk.LabelFrame(self.qs_subtab,text="")
+		self.qs_subp3 = ttk.LabelFrame(self.qs_subtab,text="")
+		#self.custom_algo_pannel.place(x=0,y=0,height=950,width=350)
 
-			tk.Label(self.quick_spread_pannel, text=" ").grid(sticky="w",column=c,row=t)
-			c+=1
+		#self.quick_spread_pannel.place(x=0,y=0,height=950,width=350)
+		self.qs_subtab.add(self.qs_subp1,text="SPY")
+		self.qs_subtab.add(self.qs_subp2,text="QQQ")
+		self.qs_subtab.add(self.qs_subp3,text="GLD")
 
-			i['status_bar'] = tk.Label(self.quick_spread_pannel, textvariable=i['status'])
-			i['status_bar'].grid(sticky="w",column=c,row=t)
-			c+=1
+		x = 0 
 
+		for j in total:
 
-			t+=1 
-			c =1 
+			if x==0:
+				tab = self.qs_subp1
+			elif x==1:
+				tab = self.qs_subp2
+			elif x==2:
+				tab = self.qs_subp3
 
-			tk.Label(self.quick_spread_pannel, text="SET LOCK:",).grid(sticky="w",column=c,row=t)
-			c+=1
+			for i in j:
 
-			tk.Checkbutton(self.quick_spread_pannel,text=" ",variable=i['lock']).grid(sticky="w",column=c,row=t)
-			c+=1
+				c=1
+				tk.Label(tab, text=i['name']+str(i['ratio'])).grid(sticky="w",column=c,row=t)
+				c+=1
 
+				tk.Label(tab, text=" ").grid(sticky="w",column=c,row=t)
+				c+=1
 
-
-			# LOCK:
-			tk.Label(self.quick_spread_pannel, text="Increment:").grid(sticky="w",column=c,row=t)
-			c+=1
-
-			# row 1 entry
-			i['set_entry']=tk.Entry(self.quick_spread_pannel,textvariable=i['increment'],width=labels['entry'])
-			i['set_entry']["state"] = DISABLED
-			i['set_entry'].grid(sticky="w",column=c,row=t)	
-			c+=1
-
-			# row 1 set 
-
-			i["set_button"] =tk.Button(self.quick_spread_pannel, text="SET",command=lambda s=i,side="direct": self.submit_spread(s,side),width=labels['button'])
-			i['set_button']["state"] = DISABLED
-			i["set_button"].grid(sticky="w",column=c,row=t)
-			c+=1
-
-			i["flat_button"] =tk.Button(self.quick_spread_pannel, text="FLAT",command=lambda s=i,side="flat": self.submit_spread(s,side),width=labels['button'])
-			#i['flat_button']["state"] = DISABLED
-			i["flat_button"].grid(sticky="w",column=c,row=t)
-			c+=1
+				i['status_bar'] = tk.Label(tab, textvariable=i['status'])
+				i['status_bar'].grid(sticky="w",column=c,row=t)
+				c+=1
 
 
-			t+=1
-			c=1
-			# LOCK:
-			# tk.Label(self.quick_spread_pannel, text="SET LOCK:").grid(sticky="w",column=c,row=t)
-			# c+=1
+				t+=1 
+				c =1 
 
+				tk.Label(tab, text="SET LOCK:",).grid(sticky="w",column=c,row=t)
+				c+=1
 
-			tk.Label(self.quick_spread_pannel, text="PASSIVE:").grid(sticky="w",column=c,row=t)
-			c+=1
-			# row 1 cheker 
-			i["passive_button"] = tk.Checkbutton(self.quick_spread_pannel,text=" ",variable=i['passive'])
-			i['passive_button']["state"] = DISABLED
-			i['passive_button'].grid(sticky="w",column=c,row=t)
-			c+=1
-
-
-			tk.Label(self.quick_spread_pannel, text="Holding:").grid(sticky="w",column=c,row=t)
-			c+=1
-
-			# row 1 entry
-			i['set_current']=tk.Entry(self.quick_spread_pannel,textvariable=i['current'],width=labels['entry'])
-			i['set_current']["state"] = DISABLED
-			i['set_current'].grid(sticky="w",column=c,row=t)	
-			c+=1
-
-
-			# LOCK:
-			tk.Label(self.quick_spread_pannel, text="Max:").grid(sticky="w",column=c,row=t)
-			c+=1
-
-			# row 1 entry
-			i['set_max']=tk.Entry(self.quick_spread_pannel,textvariable=i['max'],width=labels['entry'])
-			i['set_max']["state"] = DISABLED
-			i['set_max'].grid(sticky="w",column=c,row=t)	
-			c+=1
+				tk.Checkbutton(tab,text=" ",variable=i['lock']).grid(sticky="w",column=c,row=t)
+				c+=1
 
 
 
-			# tk.Label(self.quick_spread_pannel, text="   ",width=5).grid(sticky="w",column=c,row=t)
-			# c+=1
-			# # row 1 flat 
-			# tk.Button(self.quick_spread_pannel, text="FLAT", bg="yellow",command=lambda s=i,side="flat": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
-			# c+=1
+				# LOCK:
+				tk.Label(tab, text="Increment:").grid(sticky="w",column=c,row=t)
+				c+=1
+
+				# row 1 entry
+				i['set_entry']=tk.Entry(tab,textvariable=i['increment'],width=labels['entry'])
+				i['set_entry']["state"] = DISABLED
+				i['set_entry'].grid(sticky="w",column=c,row=t)	
+				c+=1
+
+				# row 1 set 
+
+				i["set_button"] =tk.Button(tab, text="SET",command=lambda s=i,side="direct": self.submit_spread(s,side),width=labels['button'])
+				i['set_button']["state"] = DISABLED
+				i["set_button"].grid(sticky="w",column=c,row=t)
+				c+=1
+
+				i["flat_button"] =tk.Button(tab, text="FLAT",command=lambda s=i,side="flat": self.submit_spread(s,side),width=labels['button'])
+				#i['flat_button']["state"] = DISABLED
+				i["flat_button"].grid(sticky="w",column=c,row=t)
+				c+=1
+
+
+				t+=1
+				c=1
+				# LOCK:
+				# tk.Label(self.quick_spread_pannel, text="SET LOCK:").grid(sticky="w",column=c,row=t)
+				# c+=1
+
+
+				tk.Label(tab, text="PASSIVE:").grid(sticky="w",column=c,row=t)
+				c+=1
+				# row 1 cheker 
+				i["passive_button"] = tk.Checkbutton(tab,text=" ",variable=i['passive'])
+				i['passive_button']["state"] = DISABLED
+				i['passive_button'].grid(sticky="w",column=c,row=t)
+				c+=1
+
+
+				tk.Label(tab, text="Holding:").grid(sticky="w",column=c,row=t)
+				c+=1
+
+				# row 1 entry
+				i['set_current']=tk.Entry(tab,textvariable=i['current'],width=labels['entry'])
+				i['set_current']["state"] = DISABLED
+				i['set_current'].grid(sticky="w",column=c,row=t)	
+				c+=1
+
+
+				# LOCK:
+				tk.Label(tab, text="Max:").grid(sticky="w",column=c,row=t)
+				c+=1
+
+				# row 1 entry
+				i['set_max']=tk.Entry(tab,textvariable=i['max'],width=labels['entry'])
+				i['set_max']["state"] = DISABLED
+				i['set_max'].grid(sticky="w",column=c,row=t)	
+				c+=1
 
 
 
-			t+=1
-
-			c = 1
-
-			# LONG:
-			tk.Label(self.quick_spread_pannel, text="LONG:",bg="lightgreen").grid(sticky="w",column=c,row=t)
-			c+=1
-
-			tk.Button(self.quick_spread_pannel, text="+",command=lambda s=i,side="long": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
-			c+=1
-			tk.Button(self.quick_spread_pannel, text="-",command=lambda s=i,side="short": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
-			c+=1
-
-			#t+=1
-
-			#c = 1
-
-			# LONG:
-			tk.Label(self.quick_spread_pannel, text="SHORT:",bg="pink").grid(sticky="w",column=c,row=t)
-			c+=1
-
-			tk.Button(self.quick_spread_pannel, text="+",command=lambda s=i,side="short": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
-			c+=1
-			tk.Button(self.quick_spread_pannel, text="-",command=lambda s=i,side="long": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
-			c+=1
-
-			
-			c=1
-			t+=1
-			tk.Label(self.quick_spread_pannel, text="      ").grid(sticky="w",column=c,row=t)
-
-			i['lock'].trace("w", lambda *_, d=i: trace_func(d) )
+				# tk.Label(self.quick_spread_pannel, text="   ",width=5).grid(sticky="w",column=c,row=t)
+				# c+=1
+				# # row 1 flat 
+				# tk.Button(self.quick_spread_pannel, text="FLAT", bg="yellow",command=lambda s=i,side="flat": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
+				# c+=1
 
 
-			t+=1
-			c+=1
-			## ADD TRACE
+
+				t+=1
+
+				c = 1
+
+				# LONG:
+				tk.Label(tab, text="LONG:",bg="lightgreen").grid(sticky="w",column=c,row=t)
+				c+=1
+
+				tk.Button(tab, text="+",command=lambda s=i,side="long": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
+				c+=1
+				tk.Button(tab, text="-",command=lambda s=i,side="short": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
+				c+=1
+
+				#t+=1
+
+				#c = 1
+
+				# LONG:
+				tk.Label(tab, text="SHORT:",bg="pink").grid(sticky="w",column=c,row=t)
+				c+=1
+
+				tk.Button(tab, text="+",command=lambda s=i,side="short": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
+				c+=1
+				tk.Button(tab, text="-",command=lambda s=i,side="long": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
+				c+=1
+
+				
+				c=1
+				t+=1
+				tk.Label(tab, text="      ").grid(sticky="w",column=c,row=t)
+
+				i['lock'].trace("w", lambda *_, d=i: trace_func(d) )
 
 
+				t+=1
+				c+=1
+				## ADD TRACE
+
+
+			x+=1
 
 	def submit_spread(self,dic,type_):
 	
