@@ -172,13 +172,13 @@ class Symbol:
 					self.calc_total_imbalances(tps)
 
 				now = datetime.now()
-				ts = now.hour*60 + now.minute
+				ts = now.hour*3600 + now.minute*60 + now.second
 
 				# Check again if there is any update. if there is, call it off. 
 
 
 				if self.holding_update==False:
-					if self.difference!=0 and ts<=958:
+					if self.difference!=0 and ts<=57510:
 						self.inspection_timestamp = timestamp
 						self.deploy_orders()
 						return 1
@@ -199,6 +199,11 @@ class Symbol:
 		
 		for tp in tps:
 			self.tradingplans[tp].update_stockprices(self.symbol_name,self.get_bid())
+
+	def as_is(self):
+
+		pass 
+
 
 	def calc_total_imbalances(self,tps):
 
