@@ -549,7 +549,7 @@ class UI(pannel):
 		gdxgld = {"name":"GDXGLD","symbol":["GDX.AM","GLD.AM"],"ratio":[2,-1],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 			
 
-		xleqqq = {"name":"XLEQQQ","symbol":["XLE.AM","QQQ.NQ"],"ratio":[4,1],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		xleqqq = {"name":"XLEQQQ","symbol":["XLE.AM","QQQ.NQ"],"ratio":[4,-1],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		
 		total = [spyqqq,gldslv,tlsaqqq,smhqqq,gdxgdxj]
 
