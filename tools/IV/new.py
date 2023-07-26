@@ -75,6 +75,9 @@ class processor:
 		c = 0
 		k = 0 
 
+		self.registered = False 
+
+		
 		register_ts = 0
 		while True:
 
@@ -89,7 +92,7 @@ class processor:
 				else:
 					k +=1 
 
-				if k>5 and self.registered==False:
+				if k>1 and self.registered==False:
 
 					force_close_port(4135)
 					postbody = "http://localhost:8080/SetOutput?region=1&feedtype=IMBALANCE&output=4135&status=on"
