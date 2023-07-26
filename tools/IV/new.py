@@ -291,7 +291,7 @@ def writer(receive_pipe):
 						cmdstr= cmdstr[:-1]
 						cmdstr+="*"
 						requests.get(cmdstr)
-						
+
 			except Exception as e:
 				print(e)
 			writer.writerow(d)
@@ -343,6 +343,8 @@ if __name__ == '__main__':
 
 	multiprocessing.freeze_support()
 	processor()
+
+
 
 
 	# send_pipe, receive_pipe = multiprocessing.Pipe()
