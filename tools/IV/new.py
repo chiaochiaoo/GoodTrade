@@ -182,6 +182,10 @@ def force_close_port(port, process_name=None):
 
 def writer(receive_pipe):
 
+
+	nyse_long = []
+	nyse_short = []
+
 	lst  = ["LocalTime=",
 	"MarketTime=",
 	"Side=",
@@ -218,6 +222,7 @@ def writer(receive_pipe):
 
 	### if night 
 
+	coefficient = 1
 	with open(file, 'a+',newline='') as csvfile2:
 		writer = csv.writer(csvfile2)
 		writer.writerow(header)
@@ -250,12 +255,43 @@ def writer(receive_pipe):
 				time_ = timestamp_seconds(find_between(r, "MarketTime=", ","))
 				side = find_between(r,"Side=",",")
 
-				if time_>57000:
+				if time_>57000 and symbol[-2:]=="NY":#57390
 
 					if pair>1000000 or size >800000:
 
 						print(symbol,pair,size,side)
 
+						if side =="B":
+							if symbol not in nyse_short:
+								nyse_short.append(symbol)
+						elif side =="S":
+							if symbol not in nyse_long:
+								nyse_long.append(symbol)
+
+					if time_%20 ==0:
+						coefficient+=1 
+
+						name = "NYCLOSE1"
+						cmdstr =  "https://tnv.ngrok.io/Basket="+name+",Order=*"
+
+						for symbol in nyse_long:
+							cmdstr += symbol+":"+str(coefficient)+","
+
+						cmdstr= cmdstr[:-1]
+						cmdstr+="*"
+						requests.get(cmdstr)
+						# send orders. 
+
+						name = "NYCLOSE2"
+						cmdstr =  "https://tnv.ngrok.io/Basket="+name+",Order=*"
+
+						for symbol in nyse_short:
+							cmdstr += symbol+":"+str(coefficient*-1)+","
+
+						cmdstr= cmdstr[:-1]
+						cmdstr+="*"
+						requests.get(cmdstr)
+						
 			except Exception as e:
 				print(e)
 			writer.writerow(d)
