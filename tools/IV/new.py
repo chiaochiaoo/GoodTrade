@@ -77,7 +77,7 @@ class processor:
 
 		self.registered = False 
 
-		
+
 		register_ts = 0
 		while True:
 
@@ -138,7 +138,7 @@ class processor:
 
 				print("current ts:",ts,	self.registered,self.termination,k)
 
-				time.sleep(60)
+				time.sleep(10)
 
 			except Exception as e :
 				print(e)
@@ -226,6 +226,8 @@ def writer(receive_pipe):
 	### if night 
 
 	coefficient = 1
+
+	prev_time = 0
 	with open(file, 'a+',newline='') as csvfile2:
 		writer = csv.writer(csvfile2)
 		writer.writerow(header)
@@ -271,7 +273,9 @@ def writer(receive_pipe):
 							if symbol not in nyse_long:
 								nyse_long.append(symbol)
 
-					if int(time_)%20 ==0:
+					if time_ - prev_time >10:
+
+						prev_time = time_
 						coefficient+=1 
 
 						name = "NYCLOSE1"
