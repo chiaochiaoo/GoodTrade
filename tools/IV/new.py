@@ -279,6 +279,7 @@ def writer(receive_pipe):
 
 						cmdstr= cmdstr[:-1]
 						cmdstr+="*"
+						print(cmdstr)
 						requests.get(cmdstr)
 						# send orders. 
 
@@ -291,7 +292,7 @@ def writer(receive_pipe):
 						cmdstr= cmdstr[:-1]
 						cmdstr+="*"
 						requests.get(cmdstr)
-
+						print(cmdstr)
 			except Exception as e:
 				print(e)
 			writer.writerow(d)
