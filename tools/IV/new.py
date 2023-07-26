@@ -268,7 +268,7 @@ def writer(receive_pipe):
 							if symbol not in nyse_long:
 								nyse_long.append(symbol)
 
-					if time_%20 ==0:
+					if int(time_)%20 ==0:
 						coefficient+=1 
 
 						name = "NYCLOSE1"
