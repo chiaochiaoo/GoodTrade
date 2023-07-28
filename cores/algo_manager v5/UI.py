@@ -554,6 +554,8 @@ class UI(pannel):
 		arkkqqq = {"name":"ARKKQQQ","symbol":["ARKK.AM","QQQ.NQ"],"ratio":[4,-1],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		
 		drivqqq = {"name":"DRIVQQQ","symbol":["DRIV.NQ","QQQ.NQ"],"ratio":[12,-1],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+
+		fxixpev = {"name":"FXIXPEV","symbol":["FXI.AM","XPEV.NQ"],"ratio":[2,-1],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		
 
 		total = [spyqqq,gldslv,tlsaqqq,smhqqq,gdxgdxj]
@@ -561,8 +563,10 @@ class UI(pannel):
 		spy = [spyqqq,spytlt,spyuso]
 		qqq = [tlsaqqq,smhqqq,xleqqq,arkkqqq,drivqqq]
 		gld = [gldslv,gdxgdxj,gdxgld]
+		misc =[fxixpev]
 
-		total = [spy,qqq,gld]
+		total = [spy,qqq,gld,misc]
+		
 		self.qs = {}
 		for j in total:
 			for i in j:
@@ -595,12 +599,14 @@ class UI(pannel):
 		self.qs_subp1 = ttk.LabelFrame(self.qs_subtab,text="") 
 		self.qs_subp2 = ttk.LabelFrame(self.qs_subtab,text="")
 		self.qs_subp3 = ttk.LabelFrame(self.qs_subtab,text="")
+		self.qs_subp4 = ttk.LabelFrame(self.qs_subtab,text="")
 		#self.custom_algo_pannel.place(x=0,y=0,height=950,width=350)
 
 		#self.quick_spread_pannel.place(x=0,y=0,height=950,width=350)
 		self.qs_subtab.add(self.qs_subp1,text="SPY")
 		self.qs_subtab.add(self.qs_subp2,text="QQQ")
 		self.qs_subtab.add(self.qs_subp3,text="GLD")
+		self.qs_subtab.add(self.qs_subp4,text="MISC")
 
 		x = 0 
 
@@ -612,6 +618,8 @@ class UI(pannel):
 				tab = self.qs_subp2
 			elif x==2:
 				tab = self.qs_subp3
+			elif x==3:
+				tab = self.qs_subp4	
 
 			for i in j:
 
