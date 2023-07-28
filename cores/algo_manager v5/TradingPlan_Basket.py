@@ -161,7 +161,7 @@ class TradingPlan_Basket:
 
 		log_print(self.source,self.algo_name,"expect",symbol,shares," aggresive ", aggresive,"current have",self.current_shares[symbol])
 
-		if symbol not in self.banned:
+		if symbol not in self.banned and self.flatten_order!=True:
 			with self.read_lock[symbol]:
 
 				self.expected_shares[symbol] = shares

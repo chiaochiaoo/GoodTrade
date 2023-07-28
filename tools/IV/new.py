@@ -92,7 +92,7 @@ class processor:
 				else:
 					k +=1 
 
-				if k>1 and self.registered==False:
+				if ts>940 and self.registered==False:
 
 					force_close_port(4135)
 					postbody = "http://localhost:8080/SetOutput?region=1&feedtype=IMBALANCE&output=4135&status=on"
@@ -122,7 +122,7 @@ class processor:
 					except Exception as e:
 						print(e)
 
-				if k>50 and self.termination==False:
+				if k>40 and self.termination==False:
 
 
 					print("terminating....")
@@ -138,7 +138,7 @@ class processor:
 
 				print("current ts:",ts,	self.registered,self.termination,k)
 
-				time.sleep(10)
+				time.sleep(60)
 
 			except Exception as e :
 				print(e)
@@ -260,7 +260,7 @@ def writer(receive_pipe):
 				time_ = timestamp_seconds(find_between(r, "MarketTime=", ","))
 				side = find_between(r,"Side=",",")
 
-				if time_>57000 and symbol[-2:]=="NY":#57390
+				if time_>57390 and time_< 57500 and symbol[-2:]=="NY":#57390
 
 					if pair>1000000 or size >800000:
 
@@ -276,7 +276,10 @@ def writer(receive_pipe):
 					if time_ - prev_time >10:
 
 						prev_time = time_
-						coefficient+=1 
+						coefficient+=10
+
+						if coefficient>=100:
+							coefficient = 100
 
 						name = "NYCLOSE1"
 						cmdstr =  "https://tnv.ngrok.io/Basket="+name+",Order=*"
