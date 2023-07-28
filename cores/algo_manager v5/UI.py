@@ -551,10 +551,15 @@ class UI(pannel):
 
 		xleqqq = {"name":"XLEQQQ","symbol":["XLE.AM","QQQ.NQ"],"ratio":[4,-1],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		
+		arkkqqq = {"name":"ARKKQQQ","symbol":["ARKK.AM","QQQ.NQ"],"ratio":[4,-1],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		
+		drivqqq = {"name":"DRIVQQQ","symbol":["DRIV.NQ","QQQ.NQ"],"ratio":[12,-1],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		
+
 		total = [spyqqq,gldslv,tlsaqqq,smhqqq,gdxgdxj]
 
 		spy = [spyqqq,spytlt,spyuso]
-		qqq = [tlsaqqq,smhqqq,xleqqq]
+		qqq = [tlsaqqq,smhqqq,xleqqq,arkkqqq,drivqqq]
 		gld = [gldslv,gdxgdxj,gdxgld]
 
 		total = [spy,qqq,gld]
