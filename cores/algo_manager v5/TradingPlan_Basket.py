@@ -161,7 +161,10 @@ class TradingPlan_Basket:
 
 		log_print(self.source,self.algo_name,"expect",symbol,shares," aggresive ", aggresive,"current have",self.current_shares[symbol])
 
-		if symbol not in self.banned and self.flatten_order!=True:
+		now = datetime.now()
+		ts = now.hour*3600 + now.minute*60 + now.second
+
+		if symbol not in self.banned and self.flatten_order!=True and ts<57600-60:
 			with self.read_lock[symbol]:
 
 				self.expected_shares[symbol] = shares
