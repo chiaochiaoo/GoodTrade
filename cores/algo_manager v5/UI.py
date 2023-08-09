@@ -78,6 +78,8 @@ class UI(pannel):
 
 		self.risk_timer = tk.DoubleVar(value=300)
 
+
+
 		self.custom_algo = None 
 
 
@@ -184,22 +186,34 @@ class UI(pannel):
 		self.risk_set = ttk.Button(self.system_pannel, text="Set Risk",command=self.set_risk)
 		self.risk_set.grid(sticky="w",column=3,row=row)
 		#,command=self.manager.terminateGT
+		# row +=1
+		# self.timerc = ttk.Label(self.system_pannel, text="User Email:")
+		# self.timerc.grid(sticky="w",column=1,row=row,padx=10)
+
+
+		# ttk.Label(self.system_pannel, text="User Email:").grid(sticky="w",column=1,row=row,padx=10)
+		# tk.Entry(self.system_pannel,textvariable=self.user_email,width=7).grid(sticky="w",column=2,row=row,padx=10)
+
+
+		# row +=1
+		# self.timerc = ttk.Label(self.system_pannel, text="User Phone:")
+		# self.timerc.grid(sticky="w",column=1,row=row,padx=10)
+
+		# ttk.Label(self.system_pannel, text="User Phone:").grid(sticky="w",column=1,row=row,padx=10)
+		# tk.Entry(self.system_pannel,textvariable=self.user_phone,width=7).grid(sticky="w",column=2,row=row,padx=10)
+
+
 		row +=1
-		self.timerc = ttk.Label(self.system_pannel, text="User Email:")
-		self.timerc.grid(sticky="w",column=1,row=row,padx=10)
+		# self.tamoc = ttk.Label(self.system_pannel, text="TA-MOC:")
+		# self.tamoc.grid(sticky="w",column=1,row=row,padx=10)
 
+		ttk.Label(self.system_pannel, text="TA-MOC:").grid(sticky="w",column=1,row=row,padx=10)
+		#tk.Entry(self.system_pannel,textvariable=self.user_phone,width=7).grid(sticky="w",column=2,row=row,padx=10)
 
-		ttk.Label(self.system_pannel, text="User Email:").grid(sticky="w",column=1,row=row,padx=10)
-		tk.Entry(self.system_pannel,textvariable=self.user_email,width=7).grid(sticky="w",column=2,row=row,padx=10)
-
-
-		row +=1
-		self.timerc = ttk.Label(self.system_pannel, text="User Phone:")
-		self.timerc.grid(sticky="w",column=1,row=row,padx=10)
-
-		ttk.Label(self.system_pannel, text="User Phone:").grid(sticky="w",column=1,row=row,padx=10)
-		tk.Entry(self.system_pannel,textvariable=self.user_phone,width=7).grid(sticky="w",column=2,row=row,padx=10)
-
+		try:
+			ttk.Checkbutton(self.system_pannel, variable=self.manager.ta_moc).grid(sticky="w",column=2,row=row)
+		except:
+			pass 
 		# self.deconstruct = ttk.Button(self.system_pannel, text="Terminate GT",command=self.manager.terminateGT)#,command=self.deploy_all_stoporders)
 		# self.deconstruct.grid(sticky="w",column=1,row=5)
 

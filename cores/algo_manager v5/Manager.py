@@ -126,6 +126,9 @@ class Manager:
 		self.receiving_signals = tk.BooleanVar(value=True)
 		self.cmd_text = tk.StringVar(value="Status:")
 
+		
+		self.ta_moc = tk.BooleanVar(value=1)
+
 		self.ui = UI(root,self,self.receiving_signals,self.cmd_text)
 
 		m=self.receiving_signals.trace('w', lambda *_: self.receiving())
