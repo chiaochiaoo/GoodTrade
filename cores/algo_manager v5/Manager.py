@@ -126,7 +126,7 @@ class Manager:
 		self.receiving_signals = tk.BooleanVar(value=True)
 		self.cmd_text = tk.StringVar(value="Status:")
 
-		
+
 		self.ta_moc = tk.BooleanVar(value=1)
 
 		self.ui = UI(root,self,self.receiving_signals,self.cmd_text)
@@ -531,11 +531,17 @@ class Manager:
 				### TRIGGER. PAIR UP the algos.
 
 			if ts>=MOC_send_out_timer and moc_release==False:
-				# ROSN Buy RosenblattDQuoteClose MOC DAY
-				# ROSN Sell->Short RosenblattDQuoteClose MOC DAY
+
+				########################################################################################################################
+				############### ROSN Buy RosenblattDQuoteClose MOC DAY             #####################################################
+				############### ROSN Sell->Short RosenblattDQuoteClose MOC DAY     #####################################################
+				########################################################################################################################
+
 				log_print("Timer: MOC begins")
 				self.symbol_inspection_start = False
+
 				with self.symbol_inspection_lock: 
+					
 					for ticker in self.current_positions.keys():
 						share = self.current_positions[ticker][1]
 
