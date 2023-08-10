@@ -164,6 +164,7 @@ class TradingPlan_Basket:
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second
 
+
 		if symbol not in self.banned and self.flatten_order!=True and ts<57600-60:
 			with self.read_lock[symbol]:
 
@@ -171,14 +172,12 @@ class TradingPlan_Basket:
 				self.recalculate_current_request(symbol)
 
 				if aggresive:
-					now = datetime.now()
-					ts = now.hour*60 + now.minute#*60 + now.second
 
-					if ts - self.recent_action_ts[symbol] >= 1 and ts<959*60:
+					if ts - self.recent_action_ts[symbol] >= 1:
 						self.recent_action_ts[symbol] = ts
 						self.symbols[symbol].immediate_request(self.current_request[symbol])
 					else:
-						log_print(self.source,self.algo_name,symbol," AGGRESIVE TOO FREQUENT.")
+						log_print(self.source,self.algo_name,symbol," AGGRESIVE TOO FREQUENT : ",ts - self.recent_action_ts[symbol])
 				# self.notify_request(symbol)
 
 	def recalculate_current_request(self,symbol):

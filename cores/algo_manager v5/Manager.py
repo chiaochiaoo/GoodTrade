@@ -846,7 +846,7 @@ class Manager:
 
 					count +=1 
 
-					if count%2==0:# and count%20!=0:
+					if count%4==0:# and count%20!=0:
 
 						req = threading.Thread(target=self.get_symbol_price, daemon=True)
 						req.start()

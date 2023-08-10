@@ -141,17 +141,15 @@ class Symbol:
 		For both load and unload
 		"""
 
-		
 
 		if not self.inspection_lock.locked():
-			#log_print(self.symbol_name,"Inspecting:")
+			log_print(self.symbol_name,"Inspecting:")
 			with self.inspection_lock:
-				timestamp = self.get_ts()
-				while (timestamp - self.last_order_timestamp<=2) or (timestamp -self.inspection_timestamp<=2):
-					log_print(self.symbol_name,"inspection: inspection wait:",timestamp - self.last_order_timestamp,timestamp -self.inspection_timestamp)
-					time.sleep(1)
-					timestamp = self.get_ts()
-
+				# timestamp = self.get_ts()
+				# while (timestamp - self.last_order_timestamp<=2) or (timestamp -self.inspection_timestamp<=2):
+				# 	log_print(self.symbol_name,"inspection: inspection wait:",timestamp - self.last_order_timestamp,timestamp -self.inspection_timestamp)
+				# 	time.sleep(1)
+				# 	timestamp = self.get_ts()
 
 				
 				tps = list(self.tradingplans.keys())
@@ -179,14 +177,14 @@ class Symbol:
 
 				if self.holding_update==False:
 					if self.difference!=0 and ts<=57500:
-						self.inspection_timestamp = timestamp
+						self.inspection_timestamp = ts
 						self.deploy_orders()
 						return 1
 
 					else:
 						self.action = ""
 				else:
-					log_print(self.symbol_name," holding change detected. skipping ordering. estimate difference:",self.difference)
+					#log_print(self.symbol_name," holding change detected. skipping ordering. estimate difference:",self.difference)
 					self.holding_update=False 
 
 			return 0
@@ -214,6 +212,25 @@ class Symbol:
 		self.difference = self.expected - self.current_shares
 
 
+		### ISSUE: lagging imblance issue later occur. i need to reset it when it's GOOD. ###
+
+		### OK NEW SYSTEM.
+
+		### ONLY HANDLE IMBALNCE WHEN -> TP-EXPECT == PPRO-EXPECT. THERE IS NO IMBLANCE RESET.
+
+		
+
+		if self.difference==0 and self.current_imbalance!=0:
+
+			if self.current_imbalance + self.current_shares == current_shares:
+				log_print(self.source,self.symbol_name," inspection discrepancy: discrepancy matched. ",self.current_imbalance,current_shares-self.current_shares)
+				self.difference += self.current_imbalance * -1
+
+
+		######################################################################################
+
+		### need at least 3 seconds delay.
+
 		### STAGE 2. ONLY if TPs are taken care off.
 
 		### FOUR cases. 
@@ -222,6 +239,8 @@ class Symbol:
 		### 3. ppro indicate over fill, and holdings also detect over fill, they match. -> update self.difference 
 		###	4. 																They don't match.  -> wait for ppro_true then recalibrate. 
 		### 
+
+		"""
 
 		ppro_true = False 
 		if current_shares == self.previous_shares:
@@ -235,12 +254,12 @@ class Symbol:
 			shares_matched = True 
 
 		
-		if self.difference!=0:
-			log_print(self.source,self.symbol_name," inspection complete, expected",self.expected,\
-				" have",self.current_shares,\
-				" deploying:",self.difference,\
-				"holding imbalance,",self.current_imbalance,\
-				"ppro shares matchd:",shares_matched)
+		# if self.difference!=0:
+		# 	log_print(self.source,self.symbol_name," inspection complete, expected",self.expected,\
+		# 		" have",self.current_shares,\
+		# 		" deploying:",self.difference,\
+		# 		"holding imbalance,",self.current_imbalance,\
+		# 		"ppro shares matchd:",shares_matched)
 
 
 		if self.difference==0 and ppro_true: # i now know i can trust the ppro share is true.. ? NO!!!???/
@@ -249,16 +268,17 @@ class Symbol:
 			# IF THERE IS A PROBLEM. 
 			if shares_matched!=True or self.current_imbalance!=0:
 
-				log_print(self.source,self.symbol_name," inspection discrepancy:"," PPRO:",current_shares," TPs:",self.current_shares, " account imbalance:",self.current_imbalance)
+				#log_print(self.source,self.symbol_name," inspection discrepancy:"," PPRO:",current_shares," TPs:",self.current_shares, " account imbalance:",self.current_imbalance)
 
 				if shares_matched==True and self.current_imbalance!=0:
 					self.current_imbalance = 0 
-					log_print(self.source,self.symbol_name," inspection discrepancy: ppro matched but holding says imbalance. delusional? reset.")
+					#log_print(self.source,self.symbol_name," inspection discrepancy: ppro matched but holding says imbalance. delusional? reset.")
 
 				if shares_matched!=True: # I CAN SAFELY ASSUME THERE IS A PROBLEM. 
 
 					#only 2 cases. matched, or not matched. 
 
+					### RULE OF THUMB. ONLY ADJUST WHEN BOTH TPS & PPRO agree with the imbalances. 
 
 					if self.current_imbalance == current_shares-self.current_shares:
 						log_print(self.source,self.symbol_name," inspection discrepancy: discrepancy matched. ",self.current_imbalance,current_shares-self.current_shares)
@@ -269,9 +289,10 @@ class Symbol:
 						###                                            ###
 						##################################################
 						self.difference += (current_shares-self.current_shares) * -1
-						log_print(self.source,self.symbol_name," inspection discrepancy: discrepancy UNMATCHED potential missing order fills. ",self.current_imbalance,current_shares-self.current_shares)
+						#log_print(self.source,self.symbol_name," inspection discrepancy: discrepancy UNMATCHED potential missing order fills. ",self.current_imbalance,current_shares-self.current_shares)
 						self.current_imbalance = current_shares-self.current_shares
 
+		"""
 
 	def get_all_current(self,tps):
 
@@ -417,10 +438,7 @@ class Symbol:
 		# ALL ORDERS AT ONCE. # First clear previous order. 
 
 
-
-
 		# if there might be already an order: #
-
 
 
 		#if self.sent_orders==True:

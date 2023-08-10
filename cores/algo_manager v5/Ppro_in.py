@@ -249,7 +249,7 @@ def periodical_check(pipe,port):
 
 			### first step, get user and file location
 			if summary_being_read==False:
-				threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity")
+				threading_request("http://127.0.0.1:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity")
 				user,file_location = get_env()
 			else:
 				if c%50==0:
@@ -258,7 +258,7 @@ def periodical_check(pipe,port):
 
 					cur_ts = now.hour*60+now.minute 
 					#log_print("PPro in : periodcal new loop",cur_ts)
-					threading_request("http://localhost:8080/SetOutput?region=1&feedtype=OSTAT&output="+ str(port)+"&status=on") ## ORDER STATS.
+					threading_request("http://127.0.0.1:8080/SetOutput?region=1&feedtype=OSTAT&output="+ str(port)+"&status=on") ## ORDER STATS.
 
 				# ### 1. register OSTAT  
 				# if c%5==0:
@@ -268,7 +268,7 @@ def periodical_check(pipe,port):
 				positions = get_current_positions()
 
 				### 3. send request for summary PNL
-				threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity")
+				threading_request("http://127.0.0.1:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity")
 
 
 				#############################THIS PART IS MOVED TO MANAGER #############################################################
@@ -462,7 +462,7 @@ def get_current_positions():
 	global user
 	try:
 		d = {}
-		p="http://localhost:8080/GetOpenPositions?user="+user
+		p="http://127.0.0.1:8080/GetOpenPositions?user="+user
 		r= requests.get(p)
 		symbol=""
 		share=""
