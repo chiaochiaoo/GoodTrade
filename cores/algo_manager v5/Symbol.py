@@ -143,7 +143,7 @@ class Symbol:
 
 
 		if not self.inspection_lock.locked():
-			log_print(self.symbol_name,"Inspecting:")
+			#log_print(self.symbol_name,"Inspecting:")
 			with self.inspection_lock:
 				# timestamp = self.get_ts()
 				# while (timestamp - self.last_order_timestamp<=2) or (timestamp -self.inspection_timestamp<=2):
