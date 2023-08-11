@@ -288,7 +288,7 @@ class Manager:
 	def symbols_inspection(self):
 
 		# HERE I NEED. A. HARD LIMIT.... 40 ??? 
-		if self.symbol_inspection_lock.locked()==False:
+		if self.symbol_inspection_lock.locked()==False and self.symbol_inspection_start==True:
 
 			# if self.total_difference !=0:
 			# 	self.pipe_ppro_out.send([CANCELALL])
@@ -472,6 +472,7 @@ class Manager:
 				### TRIGGER. Realese the moo orders. 
 				self.symbol_inspection_start = False 
 				log_print("Timer: timer triggered for MOO",self.moo_orders)
+				# with self.symbol_inspection_lock  THIS IS NOT A PERMENANT SOLUTION> 
 				with self.moo_lock:
 					for symbol,share in self.moo_orders.items():
 						
@@ -492,6 +493,8 @@ class Manager:
 
 						with self.symbol_inspection_lock:
 							for i in self.moo_algos:
+
+								log_print("APPLYING MOO ALOGS:",i)
 								basket_name,orders,risk,aggresive,info = i[0],i[1],i[2],i[3],i[4]
 								self.apply_basket_cmd(basket_name,orders,risk,aggresive,info)
 
