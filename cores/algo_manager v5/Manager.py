@@ -205,7 +205,7 @@ class Manager:
 		self.get_price_lock = threading.Lock()
 		######
 		self.moo_orders = {}
-		self.moo_algos = []
+		self.moo_algos = {}
 		self.moo_lock = threading.Lock()
 
 		#print(self.total_record)
@@ -342,7 +342,8 @@ class Manager:
 						else:
 							self.moo_orders[symbol] += share 
 
-					self.moo_algos.append([basket_name,orders,risk,aggresive,info])
+					self.moo_algos[basket_name] = [basket_name,orders,risk,aggresive,info]
+					#self.moo_algos.append([basket_name,orders,risk,aggresive,info])
 
 				for symbol,value in orders.items():
 					if symbol not in self.symbol_data:
@@ -492,7 +493,7 @@ class Manager:
 
 
 						with self.symbol_inspection_lock:
-							for i in self.moo_algos:
+							for i in self.moo_algos.values():
 
 								log_print("APPLYING MOO ALOGS:",i)
 								basket_name,orders,risk,aggresive,info = i[0],i[1],i[2],i[3],i[4]
