@@ -198,6 +198,9 @@ class Manager:
 		self.monthly_record = self.take_records(20)
 		self.total_record = self.take_records(200)
 
+		self.concept_record = self.take_records_concept()
+
+
 		self.gateway = 0
 
 		######
@@ -1099,6 +1102,35 @@ class Manager:
 		except	Exception	as e:
 			PrintException(e,"record loading error")
 
+
+	def take_records_concept(self):
+		### COUNT ALL EXISTING CONCEPT ###.
+
+		concept = self.ui.get_all_algo_names()
+
+		### MATCHING EACH ###
+		try:
+			for i in self.record_files[-200:]:
+				with open("../../algo_records/"+i+'.json') as f:
+					data = json.load(f)
+				for key,items in data["algos"].items():
+					###
+
+					for k in concept.keys():
+						if k == key[:len(k)]:
+							concept[k] += float(items)
+						
+		except	Exception	as e:
+			PrintException(e,"take_records error")   
+
+		for key in concept.keys():
+			concept[key] = round(concept[key],2)
+
+		log_print(concept)
+
+		return concept
+
+
 	def take_records(self,x):
 		
 		t = {}
@@ -1121,6 +1153,7 @@ class Manager:
 
 		except	Exception	as e:
 			PrintException(e,"take_records error")   
+
 		d = {}
 		d['total'] = t
 		d['byday'] = ind

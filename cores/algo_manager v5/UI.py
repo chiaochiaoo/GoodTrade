@@ -82,9 +82,6 @@ class UI(pannel):
 
 		self.custom_algo = None 
 
-
-		
-
 		self.init_pannel()
 
 		self.init_entry_pannel()
@@ -94,9 +91,6 @@ class UI(pannel):
 
 	def init_system_pannel(self):
 
-
-
-	
 		self.main_app_status = tk.StringVar()
 		self.main_app_status.set("")
 
@@ -1400,6 +1394,18 @@ class UI(pannel):
 		else:
 			data += "Aggresive=0"+","
 		return data
+
+
+	def get_all_algo_names(self):
+
+		total = {}
+		for i in self.algo_groups:
+			for algo in self.algos[i].keys():
+				#print(algo)
+
+				total[algo] = 0
+
+		return total
 
 	def order_confirmation(self,basket_name,orders):
 
