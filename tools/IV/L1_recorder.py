@@ -72,15 +72,15 @@ class processor:
 
 					#### L1s .
 					#postbody = "http://localhost:8080/SetOutput?region=1&feedtype=IMBALANCE&output=6666&status=on"
-					postbody1 = "http://localhost:8080/SetOutput?symbol=QQQ.NQ&feedtype=L1&output=6666&status=on"
-					postbody2 = "http://localhost:8080/SetOutput?symbol=QQQ.NQ&feedtype=L2&output=6666&status=off"
-					postbody3 = "http://localhost:8080/SetOutput?symbol=QQQ.NQ&feedtype=TOS&output=6666&status=on"
 
-					ps = [postbody1,postbody2,postbody3]
 					####
-					for postbody in ps:
+					for symbol in self.symbols:
 						try:
-							r= requests.post(postbody)
+							postbody1 = "http://localhost:8080/SetOutput?symbol="+symbol+"&feedtype=L1&output=6666&status=on"
+							postbody2 = "http://localhost:8080/SetOutput?symbol="+symbol+"&feedtype=TOS&output=6666&status=on"
+
+							r= requests.post(postbody1)
+							r= requests.post(postbody2)
 						except Exception as e:
 							print(e)
 
@@ -98,11 +98,15 @@ class processor:
 
 				if k>5 and self.registered==True and self.termination==False:
 					#postbody = "http://localhost:8080/SetOutput?region=1&feedtype=IMBALANCE&output=6666&status=on"
-					postbody = "http://localhost:8080/SetOutput?symbol=QQQ.NQ&feedtype=L1&output=6666&status=on"
-					try:
-						r= requests.post(postbody)
-					except Exception as e:
-						print(e)
+					for symbol in self.symbols:
+						try:
+							postbody1 = "http://localhost:8080/SetOutput?symbol="+symbol+"&feedtype=L1&output=6666&status=on"
+							postbody2 = "http://localhost:8080/SetOutput?symbol="+symbol+"&feedtype=TOS&output=6666&status=on"
+
+							r= requests.post(postbody1)
+							r= requests.post(postbody2)
+						except Exception as e:
+							print(e)
 
 				if ts>1000:
 
