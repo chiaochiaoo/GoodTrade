@@ -56,6 +56,9 @@ class processor:
 
 		self.registered = False 
 
+		self.symbols = ['SPY.AM','QQQ.NQ','IWM.AM']
+		
+
 		register_ts = 0
 		while True:
 
@@ -69,14 +72,17 @@ class processor:
 
 					#### L1s .
 					#postbody = "http://localhost:8080/SetOutput?region=1&feedtype=IMBALANCE&output=6666&status=on"
-					#postbody = "http://localhost:8080/SetOutput?symbol=QQQ.NQ&feedtype=L1&output=6666&status=on"
-					#postbody = "http://localhost:8080/SetOutput?symbol=QQQ.NQ&feedtype=L2&output=6666&status=on"
-					postbody = "http://localhost:8080/SetOutput?symbol=QQQ.NQ&feedtype=TOS&output=6666&status=on"
+					postbody1 = "http://localhost:8080/SetOutput?symbol=QQQ.NQ&feedtype=L1&output=6666&status=on"
+					postbody2 = "http://localhost:8080/SetOutput?symbol=QQQ.NQ&feedtype=L2&output=6666&status=off"
+					postbody3 = "http://localhost:8080/SetOutput?symbol=QQQ.NQ&feedtype=TOS&output=6666&status=on"
+
+					ps = [postbody1,postbody2,postbody3]
 					####
-					try:
-						r= requests.post(postbody)
-					except Exception as e:
-						print(e)
+					for postbody in ps:
+						try:
+							r= requests.post(postbody)
+						except Exception as e:
+							print(e)
 
 					send_pipe, receive_pipe = multiprocessing.Pipe()
 
@@ -120,14 +126,14 @@ class processor:
 			except Exception as e :
 				print(e)
 
-	def open_file(self):
+	# def open_file(self):
 
-		try:
-			self.f = open("l1/"+datetime.now().strftime("%m-%d")+".csv", "x")
-		except:
-			self.f = open("l1/"+datetime.now().strftime("%m-%d")+".csv", "w")
+	# 	try:
+	# 		self.f = open("l1/"+datetime.now().strftime("%m-%d")+".csv", "x")
+	# 	except:
+	# 		self.f = open("l1/"+datetime.now().strftime("%m-%d")+".csv", "w")
 
-		self.f.close()
+	# 	self.f.close()
 
 
 
@@ -166,16 +172,28 @@ def writer(receive_pipe):
 	nyse_long = []
 	nyse_short = []
 
-	lst  = ["Message","LocalTime=",
-	"MarketTime=","Symbol=",
+	l1  = ["MarketTime=","Symbol=",
 	"BidPrice=","BidSize=","AskPrice=","AskSize="]
-	header = [i[:-1] for i in lst]
+	l1_header = [i[:-1] for i in l1]
+
+
+	# l2  = ["MarketTime=","Symbol=",
+	# "Side=","Price=","Volume="]
+	# l2_header = [i[:-1] for i in lst]
+
+	tos  = ["MarketTime=","Symbol=",
+	"Price=","Size="]
+	tos_header = [i[:-1] for i in tos]
+
+
 	count = 0
 
 	now = datetime.now()
 	ts = now.hour*60 + now.minute
 
-	file = "l1/"+datetime.now().strftime("%y-%m-%d")+".csv"
+	l1_file = "l1/"+datetime.now().strftime("%y-%m-%d")+".csv"
+	tos_file = "tos/"+datetime.now().strftime("%y-%m-%d")+".csv"
+	#l2_file = "l2/"+datetime.now().strftime("%y-%m-%d")+".csv"
 
 	print("Writer functional",file)
 
@@ -185,35 +203,63 @@ def writer(receive_pipe):
 
 
 	prev_time = 0
-	with open(file, 'a+',newline='') as csvfile2:
-		writer = csv.writer(csvfile2)
-		writer.writerow(header)
-		while True:
-			r = receive_pipe.recv()
-			count+=1
-			if r =="good":
-				break
 
-			d=[]
-			print(r)
+	#my_file = open("hello.txt")
+	l1 = open(l1_file, 'a+',newline='') 
+	#l2 =open(l2_file, 'a+',newline='') 
+	tos =open(tos_file, 'a+',newline='') 
+
+	l1_writer = csv.writer(l1)
+	#l2_writer = csv.writer(l2)
+	tos_writer = csv.writer(tos)
+
+	l1_writer.writerow(l1_header)
+	tos_writer.writerow(tos_header)
+
+
+	while True:
+		r = receive_pipe.recv()
+		count+=1
+		if r =="good":
+			break
+
+		d=[]
+
+		type_ = find_between(r,"Message=",",")
+		
+
+		if type_ =="L1":
+
+		for i in lst:
+			if i in ["BidPrice=","BidSize=","AskPrice=","AskSize="]:
+				try:
+					d.append(float(find_between(r,i,",")))
+				except Exception as e:
+					print(len(i),e)
+			elif i in ["LocalTime=","MarketTime="]:
+			  d.append(timestamp_seconds(find_between(r, i, ",")))
+			else:
+			  d.append(find_between(r,i,","))
+
+			l1_writer.writerow(d)
+		elif type_ =="TOS":
+
+
 			for i in lst:
-				if i in ["BidPrice=","BidSize=","AskPrice=","AskSize="]:
+				if i in ["Price"]:
 					try:
 						d.append(float(find_between(r,i,",")))
 					except Exception as e:
 						print(len(i),e)
 				elif i in ["LocalTime=","MarketTime="]:
 				  d.append(timestamp_seconds(find_between(r, i, ",")))
-				elif i =="PxVariation=":
-				  d.append(float(find_between(r,i,"\\")))
-				  #print(find_between(r,i,"\\"))
 				else:
 				  d.append(find_between(r,i,","))
 
 
-			writer.writerow(d)
-			if count%1000==0:
-				print("writer:",count)
+			tos_writer.writerow(d)
+		if count%1000==0:
+			print("writer:",count)
 
 	print("writer finished")
 
