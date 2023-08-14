@@ -63,12 +63,15 @@ class processor:
 				now = datetime.now()
 				ts = now.hour*60 + now.minute
 
-				if (ts >=400 and ts<=1000) and self.registered=False:
+				if (ts >=400 and ts<=1000) and self.registered==False:
 
-					force_close_port(4135)
+					force_close_port(6666)
 
 					#### L1s .
-					postbody = "http://localhost:8080/SetOutput?region=1&feedtype=IMBALANCE&output=4135&status=on"
+					#postbody = "http://localhost:8080/SetOutput?region=1&feedtype=IMBALANCE&output=6666&status=on"
+					#postbody = "http://localhost:8080/SetOutput?symbol=QQQ.NQ&feedtype=L1&output=6666&status=on"
+					#postbody = "http://localhost:8080/SetOutput?symbol=QQQ.NQ&feedtype=L2&output=6666&status=on"
+					postbody = "http://localhost:8080/SetOutput?symbol=QQQ.NQ&feedtype=TOS&output=6666&status=on"
 					####
 					try:
 						r= requests.post(postbody)
@@ -88,8 +91,8 @@ class processor:
 					self.registered=True
 
 				if k>5 and self.registered==True and self.termination==False:
-					postbody = "http://localhost:8080/SetOutput?region=1&feedtype=IMBALANCE&output=4135&status=on"
-
+					#postbody = "http://localhost:8080/SetOutput?region=1&feedtype=IMBALANCE&output=6666&status=on"
+					postbody = "http://localhost:8080/SetOutput?symbol=QQQ.NQ&feedtype=L1&output=6666&status=on"
 					try:
 						r= requests.post(postbody)
 					except Exception as e:
@@ -136,7 +139,7 @@ def force_close_port(port, process_name=None):
 	The process name can be set (eg. python), which will
 	ignore any other process that doesn't start with it.
 	"""
-	print("killing 4135",port)
+	print("killing 6666",port)
 	for proc in psutil.process_iter():
 		for conn in proc.connections():
 			if conn.laddr[1] == port:
@@ -163,35 +166,16 @@ def writer(receive_pipe):
 	nyse_long = []
 	nyse_short = []
 
-	lst  = ["LocalTime=",
-	"MarketTime=",
-	"Side=",
-	"Type=",
-	"Status=",
-	"Symbol=",
-	"Price=",
-	"Volume=",
-	"Source=",
-	"AuctionPrice=",
-	"ContinuousPrice=",
-	"PairedVolume=",
-	"MktOrdVolume=",
-	"MktOrdSide=",
-	"NearIndicativeClosingPx=",
-	"FarIndicativeClosingPx=",
-	"PxVariation=",]
+	lst  = ["Message","LocalTime=",
+	"MarketTime=","Symbol=",
+	"BidPrice=","BidSize=","AskPrice=","AskSize="]
 	header = [i[:-1] for i in lst]
 	count = 0
 
 	now = datetime.now()
 	ts = now.hour*60 + now.minute
 
-
-	file = ""
-	if ts<800:
-		file = "l1/M_"+datetime.now().strftime("%m-%d")+".csv"
-	else:
-		file = "l1/N_"+datetime.now().strftime("%m-%d")+".csv"
+	file = "l1/"+datetime.now().strftime("%y-%m-%d")+".csv"
 
 	print("Writer functional",file)
 
@@ -211,12 +195,13 @@ def writer(receive_pipe):
 				break
 
 			d=[]
+			print(r)
 			for i in lst:
-				if i in ["Price=","Volume=","AuctionPrice=","ContinuousPrice=","PairedVolume=","MktOrdVolume="]:
+				if i in ["BidPrice=","BidSize=","AskPrice=","AskSize="]:
 					try:
 						d.append(float(find_between(r,i,",")))
-					except:
-						print(len(row))
+					except Exception as e:
+						print(len(i),e)
 				elif i in ["LocalTime=","MarketTime="]:
 				  d.append(timestamp_seconds(find_between(r, i, ",")))
 				elif i =="PxVariation=":
@@ -237,7 +222,9 @@ def running_mode(send_pipe):
 	try:
 		print("running mode starts ")
 
-		postbody = "http://localhost:8080/SetOutput?region=1&feedtype=IMBALANCE&output=4135&status=on"
+		postbody = "http://localhost:8080/SetOutput?symbol=QQQ.NQ&feedtype=L1&output=6666&status=on" 
+		#"http://localhost:8080/SetOutput?region=1&feedtype=IMBALANCE&output=6666&status=on"
+		#
 		r= requests.post(postbody)
 
 
@@ -248,7 +235,7 @@ def running_mode(send_pipe):
 			
 		print("request successful")
 		UDP_IP = "localhost"
-		UDP_PORT = 4135
+		UDP_PORT = 6666
 
 		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		sock.bind((UDP_IP, UDP_PORT))
