@@ -571,7 +571,7 @@ class Manager:
 
 
 						for symbol,data in self.symbol_data.items():
-							total_moc[symbol] = data.get_all_future_remaining()
+							total_moc[symbol] = [symbol,data.get_all_future_remaining()]
 
 						log_print(total_moc)
 
