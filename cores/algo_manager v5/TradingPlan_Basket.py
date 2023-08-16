@@ -227,7 +227,7 @@ class TradingPlan_Basket:
 		
 		for symbol,item in self.symbols.items():
 			#self.submit_expected_shares(symbol,0)
-			self.submit_incremental_expected(symbol,int(self.current_shares[symbol]*percentage),timetakes,aggresive)
+			self.submit_incremental_expected(symbol,int(self.current_shares[symbol]*percentage),timetakes,True)
 
 
 
