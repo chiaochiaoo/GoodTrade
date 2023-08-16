@@ -275,7 +275,7 @@ class TradingPlan_Basket:
 					self.incremental_expected_shares_increments[symbol] = increments
 					self.incremental_expected_shares_deadline[symbol] = ts+time_takes
 					self.incremental_expected_shares_last_register[symbol] = ts
-
+					self.expected_shares[symbol] = self.current_shares[symbol]
 
 					if increments ==1 or increments==-1:
 						self.incremental_expected_shares_intervals[symbol] = 4 * abs(period_number//difference)
