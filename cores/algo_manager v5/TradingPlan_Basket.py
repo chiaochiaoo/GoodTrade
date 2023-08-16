@@ -9,6 +9,7 @@ import time
 import threading
 import random
 from datetime import datetime, timedelta
+import math
 
 # MAY THE MACHINE GOD BLESS THY AIM
 
@@ -220,8 +221,17 @@ class TradingPlan_Basket:
 
 
 
+	def reduce_everything_by_half_ta(self,timetakes,percentage,aggresive):
 
-	def submit_incremental_expected(self,symbol,shares,time_takes):
+		log_print(self.source,self.algo_name," TA-MOC initiating")
+		
+		for symbol,item in self.symbols.items():
+			#self.submit_expected_shares(symbol,0)
+			self.submit_incremental_expected(symbol,int(self.current_shares[symbol]*percentage),timetakes,aggresive)
+
+
+
+	def submit_incremental_expected(self,symbol,shares,time_takes,aggresive):
 
 		if symbol not in self.banned and self.flatten_order!=True:
 			with self.read_lock[symbol]:
@@ -244,7 +254,7 @@ class TradingPlan_Basket:
 
 				if difference!=0:
 
-					increments = difference//(time_takes//5)
+					increments = math.ceil(difference/(time_takes//5))
 
 					if increments>0 and increments<1:
 						increments = 1 
@@ -258,17 +268,18 @@ class TradingPlan_Basket:
 					self.incremental_expected_shares_last_register[symbol] = ts
 					self.incremental_expected_shares_intervals[symbol] = 5
 
+					if aggresive:
+						self.symbols[symbol].turn_on_aggresive_only()
+					else:
+						self.symbols[symbol].turn_off_aggresive_only()
 
-					log_print(self.source,self.algo_name," incrementally expect",symbol,shares,"expect: ",shares," in:",time_takes)
+					log_print(self.source,self.algo_name," incrementally expect",symbol,shares,"expect: ",shares," in:",time_takes, "increments:",increments)
 
 					##########
 
 	def submit_expected_shares(self,symbol,shares,aggresive=0):
 
 		log_print(self.source,self.algo_name,"expect",symbol,shares," aggresive ", aggresive,"current have",self.current_shares[symbol])
-
-
-
 
 		##################################################################################################
 		##############     I THINK THIS IS WHY. ORDER STILL PROCESS UNTIL 1600   #########################
@@ -679,8 +690,6 @@ class TradingPlan_Basket:
 
 		self.data[STATUS] = DEPLOYED
 		self.tkvars[STATUS].set(DEPLOYED)
-
-
 
 
 

@@ -440,7 +440,7 @@ class Manager:
 
 					if "TA" in info:
 						if info['TA']>10:
-							self.baskets[basket_name].submit_incremental_expected(symbol,value,info['TA'])
+							self.baskets[basket_name].submit_incremental_expected(symbol,value,info['TA'],aggresive)
 						else:
 							self.baskets[basket_name].submit_expected_shares(symbol,value,aggresive)
 					else:

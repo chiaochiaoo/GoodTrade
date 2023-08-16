@@ -99,6 +99,9 @@ class Symbol:
 	def turn_on_aggresive_only(self):
 		self.aggresive_only = True 
 
+	def turn_off_aggresive_only(self):
+		self.aggresive_only = False 
+
 	def turn_off_insepction(self):
 		self.enabled_insepction = False 
 
@@ -180,9 +183,9 @@ class Symbol:
 
 
 				if self.holding_update==False:
-					if self.difference!=0 and ts<=57500:
+					if self.difference!=0 and ts<=57600:
 						self.inspection_timestamp = ts
-						self.deploy_orders()
+						self.deploy_orders(ts)
 						return 1
 
 					else:
@@ -450,7 +453,7 @@ class Symbol:
 				self.order_processing_timer=0.2
 
 			
-	def deploy_orders(self):
+	def deploy_orders(self,ts):
 
 		# I NEED TO ADD A MECHANISM ON THIS
 		# If passive orders still don't full fill the request everything within some minutes
@@ -489,9 +492,7 @@ class Symbol:
 				total = 500
 				log_print(self.source,self.symbol_name,self.action," adjusted to 200 instead of",self.difference)
 
-
-
-			if self.aggresive_only==True:
+			if self.aggresive_only==True or ts>57500: ### LAST 100 seconds market only.
 				self.immediate_request(self.difference)
 			else:
 				self.ppro_out.send([self.action,self.symbol_name,total,0,self.manager.gateway])
@@ -567,7 +568,7 @@ class Symbol:
 			avg_price = 0
 			with self.incoming_shares_lock:
 				total = sum(list(self.incoming_shares.values()))
-				#avg = mean(list(self.incoming_shares.keys()))
+				#avg = mean(list(self.incoming_shares.keys()))`
 
 				if total!=0:
 
