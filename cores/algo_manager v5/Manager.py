@@ -316,7 +316,7 @@ class Manager:
 
 				self.total_difference = c 
 
-			log_print("Manager: performing symbols inspection compelte, total difference:",self.total_difference, "order counts:",c)
+			#log_print("Manager: performing symbols inspection compelte, total difference:",self.total_difference, "order counts:",c)
 		else:
 			log_print("Manager: previous symbols inspection not finished. skip.")
 
