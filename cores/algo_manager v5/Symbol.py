@@ -482,7 +482,9 @@ class Symbol:
 
 
 		#if self.sent_orders==True:
-		self.ppro_out.send([CANCEL,self.symbol_name]) 
+
+		if self.aggresive_only!=True and ts<57500:
+			self.ppro_out.send([CANCEL,self.symbol_name]) 
 
 		time.sleep(0.1)
 
