@@ -211,7 +211,8 @@ class TradingPlan_Basket:
 				else:
 					self.expected_shares[symbol] += self.incremental_expected_shares_increments[symbol]
 
-
+			self.recalculate_current_request(symbol)
+			
 			if self.incremental_state[symbol]:
 				log_print(self.source,self.algo_name,symbol," now increase to",self.expected_shares[symbol], " to",self.incremental_expected_shares[symbol])
 			else:
