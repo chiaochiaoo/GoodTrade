@@ -157,6 +157,10 @@ class Symbol:
 
 				# CRITICAL SECTION. 
 				with self.incoming_shares_lock:
+
+
+					self.check_all_incrementals()
+					
 					if self.get_bid()!=0:
 						# no.2 pair off diff side. need.. hmm price .....!!!
 						self.pair_off(tps)
@@ -316,6 +320,15 @@ class Symbol:
 
 		return self.expected
 
+	def check_all_incrementals(self):
+
+		now = datetime.now()
+		ts = now.hour*3600 + now.minute*60 + now.second
+
+		for tp in tps:
+			self.tradingplans[tp].check_incremental(self.symbol_name,ts)
+
+
 	def get_difference(self):
 		return self.difference
 
@@ -406,6 +419,14 @@ class Symbol:
 
 						if share_difference!=0:
 							remaining += share_difference
+
+					######################################SECONDARY REQUEST FILL #########################################################################
+
+
+
+
+
+					######################################################################################################################################
 
 
 					self.incoming_shares = {}
