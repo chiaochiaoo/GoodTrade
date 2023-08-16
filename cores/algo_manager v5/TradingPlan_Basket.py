@@ -47,7 +47,7 @@ class TradingPlan_Basket:
 		if "Risk" in info:
 			self.stop = int(info["Risk"])
 
-		log_print(algo_name,"  profit & Risk : ",self.profit,self.stop)
+		log_print(algo_name,"  profit & risk : ",self.profit,self.stop)
 		#### BANED SYMBOL
 
 		self.banned = []
