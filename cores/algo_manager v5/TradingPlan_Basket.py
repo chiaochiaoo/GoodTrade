@@ -221,7 +221,7 @@ class TradingPlan_Basket:
 
 
 
-	def reduce_everything_by_half_ta(self,timetakes,percentage,aggresive):
+	def reduce_everything_by_half_ta(self,timetakes,percentage):
 
 		log_print(self.source,self.algo_name," TA-MOC initiating")
 		
@@ -229,7 +229,9 @@ class TradingPlan_Basket:
 			#self.submit_expected_shares(symbol,0)
 			self.submit_incremental_expected(symbol,int(self.current_shares[symbol]*percentage),timetakes,True)
 
+	def get_future_remaining(self,symbol):
 
+		return self.incremental_expected_shares[symbol]
 
 	def submit_incremental_expected(self,symbol,shares,time_takes,aggresive):
 
@@ -277,7 +279,7 @@ class TradingPlan_Basket:
 						self.incremental_expected_shares_intervals[symbol] = 4 * abs(period_number//difference)
 					else:
 						self.incremental_expected_shares_intervals[symbol] = 4
-						
+
 					if aggresive:
 						self.symbols[symbol].turn_on_aggresive_only()
 					else:

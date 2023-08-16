@@ -77,6 +77,9 @@ class Symbol:
 		"""
 		self.expected = 0
 		self.difference = 0
+
+		self.all_remaining = 0 
+
 		self.action=""
 
 		self.market_out = 0
@@ -205,6 +208,19 @@ class Symbol:
 		for tp in tps:
 			self.tradingplans[tp].update_stockprices(self.symbol_name,self.get_bid())
 
+
+	def get_all_future_remaining(self):
+
+		remaining = 0
+
+		tps = list(self.tradingplans.keys())
+
+		for tp in tps:
+			remaining+= self.tradingplans[tp].get_future_remaining(symbol)
+
+		log_print(self.symbol_name,"would remain:",remaining)
+
+		return remaining
 	def as_is(self):
 
 		pass 

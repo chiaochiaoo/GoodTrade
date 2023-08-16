@@ -561,6 +561,24 @@ class Manager:
 					if self.ta_moc.get()==False:
 						total_moc = self.current_positions
 
+					else:
+
+						total_moc = {}
+
+						for trade in list(self.baskets.values()):
+							trade.reduce_everything_by_half_ta(60,0.5)
+
+
+						for symbol,data in self.symbol_data.items():
+							total_moc[symbol] = data.get_future_remaining()
+
+						log_print(total_moc)
+
+						## all symbols call get_all_future_remaining
+						## all tps call half
+
+						#reduce_everything_by_half_ta(self,timetakes,percentage)
+
 					for ticker in total_moc.keys():
 						share = total_moc[ticker][1]
 
