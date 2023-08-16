@@ -258,10 +258,12 @@ class TradingPlan_Basket:
 
 					period_number = (time_takes//4)
 
+					increments = math.ceil(abs(difference)/period_number)
+
 					if difference>0:
-						increments = math.ceil(difference/period_number)
+						increments = abs(increments)
 					else:
-						increments = math.floor(difference/period_number)
+						increments = increments*-1
 
 					if increments>0 and increments<1:
 						increments = 1 
