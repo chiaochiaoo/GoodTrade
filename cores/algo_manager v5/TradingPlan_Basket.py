@@ -271,14 +271,14 @@ class TradingPlan_Basket:
 					self.incremental_expected_shares_increments[symbol] = increments
 					self.incremental_expected_shares_deadline[symbol] = ts+time_takes
 					self.incremental_expected_shares_last_register[symbol] = ts
-					self.incremental_expected_shares_intervals[symbol] = min(4,4 * abs(period_number//increments))
+					self.incremental_expected_shares_intervals[symbol] = max(4,4 * abs(period_number//increments))
 
 					if aggresive:
 						self.symbols[symbol].turn_on_aggresive_only()
 					else:
 						self.symbols[symbol].turn_off_aggresive_only()
 
-					log_print(self.source,self.algo_name," incrementally expect",symbol,shares,"expect: ",shares," in:",time_takes, "increments:",increments)
+					log_print(self.source,self.algo_name," incrementally expect",symbol,shares,"expect: ",shares," in:",time_takes, "increments:",increments,'interval',self.incremental_expected_shares_intervals[symbol])
 
 					##########
 
