@@ -749,7 +749,7 @@ class Manager:
 								handl.start()
 								
 							elif cur_ts<=958:
-								log_print("basket update:",d)
+								log_print("basket update:",d,info)
 								self.apply_basket_cmd(d[1],orders,risk,aggresive,info)
 					else:
 						log_print("Manager:","Risk exceeded, skip. ",self.net,self.set_risk*-1)

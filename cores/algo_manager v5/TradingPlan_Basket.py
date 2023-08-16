@@ -60,6 +60,18 @@ class TradingPlan_Basket:
 		self.current_shares = {}
 		self.current_request = {}
 
+		####################################################################################
+
+		self.incremental_state = {}
+		self.incremental_expected_shares = {}
+		self.incremental_expected_shares_increments = {}
+		self.incremental_expected_shares_last_register = {}
+		self.incremental_expected_shares_intervals = {}
+		self.incremental_expected_shares_deadline = {}
+
+		####################################################################################
+
+
 		self.current_exposure = {}
 		self.average_price = {}
 
@@ -144,6 +156,15 @@ class TradingPlan_Basket:
 			self.current_request[symbol_name] = 0
 			self.current_exposure[symbol_name] = []
 
+			################################################################
+			self.incremental_state[symbol_name] = False
+			self.incremental_expected_shares[symbol_name] = 0
+			self.incremental_expected_shares_increments[symbol_name] = 0
+			self.incremental_expected_shares_last_register[symbol_name] = 0
+			self.incremental_expected_shares_intervals[symbol_name] = 0
+			self.incremental_expected_shares_deadline[symbol_name] = 0
+			#################################################################
+
 			self.average_price[symbol_name] = 0
 			self.stock_price[symbol_name] = 0
 
@@ -157,12 +178,95 @@ class TradingPlan_Basket:
 
 		self.stock_price[symbol] = price
 
+
+	def check_incremental(self,symbol,ts):
+
+		#################################
+
+		#### STEP 1 : check if it already matches ###
+
+		if self.incremental_state[symbol] ==True:
+
+			if self.incremental_expected_shares[symbol] == self.expected_shares[symbol]:
+
+				### TURN OFF. 
+				self.incremental_state[symbol] = False 
+				return 
+
+			#### SENARIO 1, expired ####
+			elif ts>self.incremental_expected_shares_deadline[symbol]:
+
+				self.expected_shares[symbol] = self.incremental_expected_shares[symbol]
+				self.incremental_state[symbol] = False 
+
+
+			elif ts-self.incremental_expected_shares_last_register[symbol] >= self.incremental_expected_shares_intervals[symbol]:
+
+				self.incremental_expected_shares_last_register[symbol] = ts
+
+				if abs(self.incremental_expected_shares[symbol]-self.expected_shares[symbol]) < self.incremental_expected_shares_increments[symbol]:
+					self.expected_shares[symbol] = self.incremental_expected_shares[symbol]
+
+
+				else:
+					self.expected_shares[symbol] += self.incremental_expected_shares_increments[symbol]
+
+
+			if self.incremental_state[symbol]:
+				log_print(self.source,self.algo_name,symbol," now increase to",self.expected_shares[symbol], " to",self.incremental_expected_shares[symbol])
+			else:
+				log_print(self.source,self.algo_name,symbol," increment done.")
+
+
+
+
+	def submit_incremental_expected(self,symbol,shares,time_takes):
+
+		if symbol not in self.banned and self.flatten_order!=True:
+			with self.read_lock[symbol]:
+				now = datetime.now()
+				ts = now.hour*3600 + now.minute*60 + now.second 
+
+				################################################
+				# EVERYTHING HERE DEAL WITH EXPECT. OVERWRITE ALL. 
+
+				####
+				# self.incremental_state[symbol_name] = False
+				# self.incremental_expected_shares[symbol_name] = 0
+				# self.incremental_expected_shares_increments[symbol_name] = 0
+				# self.incremental_expected_shares_last_register[symbol_name] = 0
+				# self.incremental_expected_shares_intervals[symbol_name] = 0
+				# self.incremental_expected_shares_deadline[symbol_name] = 0
+
+				# STEP 1 CALC EACH INCREMENT. 
+				difference = shares-self.current_shares[symbol]
+
+				if difference!=0:
+
+					increments = difference//5
+
+					if increments>0 and increments<1:
+						increments = 1 
+					if increments<0 and increments>-1:
+						increments = -1
+
+					self.incremental_state[symbol] = True 
+					self.incremental_expected_shares[symbol] = shares 
+					self.incremental_expected_shares_increments[symbol] = increments
+					self.incremental_expected_shares_deadline[symbol] = ts+time_takes
+					self.incremental_expected_shares_last_register[symbol_name] = ts
+					self.incremental_expected_shares_intervals[symbol] = 5
+
+
+					log_print(self.source,self.algo_name," incrementally expect",symbol,shares,"expect: ",shares," in:",time_takes)
+
+					##########
+
 	def submit_expected_shares(self,symbol,shares,aggresive=0):
 
 		log_print(self.source,self.algo_name,"expect",symbol,shares," aggresive ", aggresive,"current have",self.current_shares[symbol])
 
-		now = datetime.now()
-		ts = now.hour*3600 + now.minute*60 + now.second
+
 
 
 		##################################################################################################
@@ -171,6 +275,9 @@ class TradingPlan_Basket:
 
 		if symbol not in self.banned and self.flatten_order!=True:
 			with self.read_lock[symbol]:
+				now = datetime.now()
+				ts = now.hour*3600 + now.minute*60 + now.second
+				self.incremental_state[symbol] = False
 
 				self.expected_shares[symbol] = shares
 				self.recalculate_current_request(symbol)
@@ -333,7 +440,6 @@ class TradingPlan_Basket:
 			return share
 
 
-
 	def cancel_request(self,symbol=None):
 
 		with self.read_lock[symbol]:
@@ -388,14 +494,11 @@ class TradingPlan_Basket:
 
 		self.symbols[symbol].immediate_request(shares)
 
-
 	def read_current_request(self,symbol=None):
 
 		return self.current_request[symbol]
 
-
 	# absolute sense. 
-
 
 	def set_data(self):
 		#default values.
@@ -418,7 +521,6 @@ class TradingPlan_Basket:
 		self.banned.append(symbol)
 
 		log_print(self.source," BANNED:",symbol)
-
 
 	def get_flatten_order(self):
 
@@ -512,6 +614,7 @@ class TradingPlan_Basket:
 
 	def shutdown(self):
 		self.shutdown = True 
+
 	def update_displays(self):
 
 
