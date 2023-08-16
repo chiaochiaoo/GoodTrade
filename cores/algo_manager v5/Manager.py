@@ -555,9 +555,14 @@ class Manager:
 
 				with self.symbol_inspection_lock: 
 					
-					for ticker in self.current_positions.keys():
-						share = self.current_positions[ticker][1]
 
+					#reduce_everything_by_half_ta
+
+					if self.ta_moc.get()==False:
+						total_moc = self.current_positions
+
+					for ticker in total_moc.keys():
+						share = total_moc[ticker][1]
 
 						if ticker[-2:]=="NY":
 							if share<0:

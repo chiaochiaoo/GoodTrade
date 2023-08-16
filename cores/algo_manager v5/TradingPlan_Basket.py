@@ -254,7 +254,12 @@ class TradingPlan_Basket:
 
 				if difference!=0:
 
-					increments = math.ceil(difference/(time_takes//4))
+					period_number = (time_takes//4)
+
+					if difference>0:
+						increments = math.ceil(difference/period_number)
+					else:
+						increments = math.floor(difference/period_number)
 
 					if increments>0 and increments<1:
 						increments = 1 
@@ -266,7 +271,7 @@ class TradingPlan_Basket:
 					self.incremental_expected_shares_increments[symbol] = increments
 					self.incremental_expected_shares_deadline[symbol] = ts+time_takes
 					self.incremental_expected_shares_last_register[symbol] = ts
-					self.incremental_expected_shares_intervals[symbol] = 3
+					self.incremental_expected_shares_intervals[symbol] = min(4,4 * abs(period_number//increments))
 
 					if aggresive:
 						self.symbols[symbol].turn_on_aggresive_only()
@@ -690,8 +695,6 @@ class TradingPlan_Basket:
 
 		self.data[STATUS] = DEPLOYED
 		self.tkvars[STATUS].set(DEPLOYED)
-
-
 
 
 
