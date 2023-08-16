@@ -216,7 +216,7 @@ class Symbol:
 		tps = list(self.tradingplans.keys())
 
 		for tp in tps:
-			remaining+= self.tradingplans[tp].get_future_remaining(symbol)
+			remaining+= self.tradingplans[tp].get_future_remaining(self.symbol_name)
 
 		log_print(self.symbol_name,"would remain:",remaining)
 

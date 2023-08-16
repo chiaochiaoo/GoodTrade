@@ -467,6 +467,7 @@ class Manager:
 		MOO_pairing_timer = 571*60
 
 		MOC_send_out_timer = 958*60+30 #958*60+50
+		#MOC_send_out_timer = 944*60+30
 		MOC_pairing_timer = 959*60+30
 
 		c = 0 
@@ -551,7 +552,7 @@ class Manager:
 				########################################################################################################################
 
 				log_print("Timer: MOC begins")
-				self.symbol_inspection_start = False
+				#self.symbol_inspection_start = False
 
 				with self.symbol_inspection_lock: 
 					
