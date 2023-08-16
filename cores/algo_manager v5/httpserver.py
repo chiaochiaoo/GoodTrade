@@ -155,6 +155,11 @@ class S(BaseHTTPRequestHandler):
 						stop = find_between(stream_data,"Stop=",",")
 						info['Stop'] = int(stop)
 
+					if "TA" in stream_data:
+						TA = find_between(stream_data,"TA=",",")
+						info['TA'] = int(TA)
+
+
 					self.send_basket(basket,d,info)
 
 				elif "Pair" in stream_data:
