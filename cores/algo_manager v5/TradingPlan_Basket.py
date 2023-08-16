@@ -212,7 +212,7 @@ class TradingPlan_Basket:
 					self.expected_shares[symbol] += self.incremental_expected_shares_increments[symbol]
 
 			self.recalculate_current_request(symbol)
-			
+
 			if self.incremental_state[symbol]:
 				log_print(self.source,self.algo_name,symbol," now increase to",self.expected_shares[symbol], " to",self.incremental_expected_shares[symbol])
 			else:
@@ -244,7 +244,7 @@ class TradingPlan_Basket:
 
 				if difference!=0:
 
-					increments = difference//5
+					increments = difference//(time_takes//5)
 
 					if increments>0 and increments<1:
 						increments = 1 
@@ -679,6 +679,13 @@ class TradingPlan_Basket:
 
 		self.data[STATUS] = DEPLOYED
 		self.tkvars[STATUS].set(DEPLOYED)
+
+
+
+
+
+
+
 
 
 
