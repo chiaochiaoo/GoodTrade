@@ -477,7 +477,7 @@ class Symbol:
 			#price = self.get_ask()
 			#coefficient = 1
 
-		log_print(self.source,self.symbol_name,self.action,self.difference)
+		#log_print(self.source,self.symbol_name,self.action,self.difference)
 		# self.ppro_out.send([CANCEL,self.symbol_name])
 		# time.sleep(0.3)
 
