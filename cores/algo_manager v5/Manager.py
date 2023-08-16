@@ -737,8 +737,8 @@ class Manager:
 
 					if self.net > self.set_risk*-1:
 						if confirmation:
-							log_print("basket update:",d)
-							log_print(d[1],confirmation,orders,risk,aggresive)
+							#log_print("basket update:",d)
+							#log_print(d[1],confirmation,orders,risk,aggresive)
 							if "OB" in d[1] and cur_ts<570:
 								handl = threading.Thread(target=self.moo_apply_basket_cmd,args=(d[1],orders,risk,aggresive,info,),daemon=True)
 								handl.start()
@@ -749,6 +749,7 @@ class Manager:
 								handl.start()
 								
 							elif cur_ts<=958:
+								log_print("basket update:",d)
 								self.apply_basket_cmd(d[1],orders,risk,aggresive,info)
 					else:
 						log_print("Manager:","Risk exceeded, skip. ",self.net,self.set_risk*-1)

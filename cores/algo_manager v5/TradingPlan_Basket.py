@@ -165,7 +165,11 @@ class TradingPlan_Basket:
 		ts = now.hour*3600 + now.minute*60 + now.second
 
 
-		if symbol not in self.banned and self.flatten_order!=True and ts<57600-60:
+		##################################################################################################
+		##############     I THINK THIS IS WHY. ORDER STILL PROCESS UNTIL 1600   #########################
+		##################################################################################################
+
+		if symbol not in self.banned and self.flatten_order!=True:
 			with self.read_lock[symbol]:
 
 				self.expected_shares[symbol] = shares
@@ -173,7 +177,7 @@ class TradingPlan_Basket:
 
 				if aggresive:
 
-					if ts - self.recent_action_ts[symbol] >= 1:
+					if ts - self.recent_action_ts[symbol] >= 1 and ts<57600-30:
 						self.recent_action_ts[symbol] = ts
 						self.symbols[symbol].immediate_request(self.current_request[symbol])
 					else:
