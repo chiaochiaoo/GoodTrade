@@ -468,7 +468,7 @@ class Manager:
 
 		MOC_send_out_timer = 958*60+30 #958*60+50
 		#MOC_send_out_timer = 950*60
-		MOC_pairing_timer = 959*60+30
+		MOC_pairing_timer = 959*60+50
 
 		c = 0 
 		log_print("Timer: functional and counting")
