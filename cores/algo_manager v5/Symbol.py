@@ -159,8 +159,8 @@ class Symbol:
 				with self.incoming_shares_lock:
 
 
-					self.check_all_incrementals()
-					
+					self.check_all_incrementals(tps)
+
 					if self.get_bid()!=0:
 						# no.2 pair off diff side. need.. hmm price .....!!!
 						self.pair_off(tps)
@@ -320,7 +320,7 @@ class Symbol:
 
 		return self.expected
 
-	def check_all_incrementals(self):
+	def check_all_incrementals(self,tps):
 
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second

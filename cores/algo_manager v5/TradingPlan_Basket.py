@@ -254,7 +254,7 @@ class TradingPlan_Basket:
 					self.incremental_expected_shares[symbol] = shares 
 					self.incremental_expected_shares_increments[symbol] = increments
 					self.incremental_expected_shares_deadline[symbol] = ts+time_takes
-					self.incremental_expected_shares_last_register[symbol_name] = ts
+					self.incremental_expected_shares_last_register[symbol] = ts
 					self.incremental_expected_shares_intervals[symbol] = 5
 
 
