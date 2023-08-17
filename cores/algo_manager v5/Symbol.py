@@ -467,7 +467,6 @@ class Symbol:
 		else:
 			if self.order_processing_timer<0.2:
 				self.order_processing_timer=0.2
-
 			
 	def deploy_orders(self,ts):
 
@@ -476,11 +475,7 @@ class Symbol:
 		# Cancel all the requests. (or market in )
 
 		# ALL ORDERS AT ONCE. # First clear previous order. 
-
-
 		# if there might be already an order: #
-
-
 		#if self.sent_orders==True:
 
 		if self.aggresive_only!=True and ts<57500:
