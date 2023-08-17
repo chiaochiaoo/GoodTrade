@@ -216,6 +216,7 @@ class TradingPlan_Basket:
 
 			if self.incremental_state[symbol]:
 				log_print(self.source,self.algo_name,symbol," now increase to",self.expected_shares[symbol], " to",self.incremental_expected_shares[symbol])
+				self.tkvars[MIND].set(str(self.expected_shares[symbol])+"/"+str(self.incremental_expected_shares[symbol]))
 			else:
 				log_print(self.source,self.algo_name,symbol," increment done.")
 
@@ -288,6 +289,7 @@ class TradingPlan_Basket:
 						self.symbols[symbol].turn_off_aggresive_only()
 
 					log_print(self.source,self.algo_name," incrementally expect",symbol,shares,"expect: ",shares," in:",time_takes, "increments:",increments,'interval',self.incremental_expected_shares_intervals[symbol])
+
 
 					##########
 
