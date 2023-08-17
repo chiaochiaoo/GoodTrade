@@ -822,7 +822,7 @@ class UI(pannel):
 			d['amount'] = dic["current"].get()
 			d['ratio'] = dic["ratio"]
 			d['passive'] = dic['passive'].get()
-			
+			d['timer'] = timer
 
 
 			try:
