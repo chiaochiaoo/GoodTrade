@@ -810,7 +810,7 @@ class UI(pannel):
 			share1 = dic["current"].get()*dic["ratio"][0]
 			share2 = dic["current"].get()*dic["ratio"][1]
 
-			timer = dic['TA'].get()
+			timer = int(dic['TA'].get())
 			self.spread_timer = ts
 
 			log_print("Quick Spread:",dic['symbol'],share1,share2,'time:',timer)
