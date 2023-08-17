@@ -234,6 +234,16 @@ class TradingPlan_Basket:
 
 		return self.incremental_expected_shares[symbol]
 
+
+	def reset_incremental_data(self,symbol):
+
+		self.incremental_state[symbol] = False
+		self.incremental_expected_shares[symbol] = 0
+		self.incremental_expected_shares_increments[symbol] = 0
+		self.incremental_expected_shares_last_register[symbol] = 0
+		self.incremental_expected_shares_intervals[symbol] = 0
+		self.incremental_expected_shares_deadline[symbol] = 0
+
 	def submit_incremental_expected(self,symbol,shares,time_takes,aggresive):
 
 		if symbol not in self.banned and self.flatten_order!=True:
@@ -309,7 +319,8 @@ class TradingPlan_Basket:
 
 				self.expected_shares[symbol] = shares
 				self.recalculate_current_request(symbol)
-
+				self.reset_incremental_data(symbol)
+				
 				if aggresive:
 
 					if ts - self.recent_action_ts[symbol] >= 1 and ts<57600-30:
