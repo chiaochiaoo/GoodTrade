@@ -399,7 +399,7 @@ class Manager:
 				## now , submit the request.
 
 
-				self.baskets[pair].submit_expected_pair(d['amount'],d['passive'])
+				self.baskets[pair].submit_expected_pair(d['amount'],d['passive'],d['TA'])
 
 				## INSTANT INSPECTION if passive.
 				if d['passive']:

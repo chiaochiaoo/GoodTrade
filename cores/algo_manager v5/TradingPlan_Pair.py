@@ -91,14 +91,18 @@ class TradingPlan_Pair(TradingPlan_Basket):
 
 		# self.init_data(risk)
 
-	def submit_expected_pair(self,amount,passive):
+	def submit_expected_pair(self,amount,passive,ta):
 
 		self.symbols[self.symbol2].turn_on_aggresive_only()
 
-		if passive:
-			self.submit_expected_shares(self.symbol1,amount*self.ratio[0],False)
+		if ta==0:
+			if passive:
+				self.submit_expected_shares(self.symbol1,amount*self.ratio[0],False)
+			else:
+				self.submit_expected_shares(self.symbol1,amount*self.ratio[0],True)
 		else:
-			self.submit_expected_shares(self.symbol1,amount*self.ratio[0],True)
+			#symbol,shares,time_takes,aggresive
+			self.submit_incremental_expected(self.symbol1,amount*self.ratio[0],ta,passive)
 
 	def notify_holding_change(self,symbol):
 

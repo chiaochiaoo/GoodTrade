@@ -546,24 +546,24 @@ class UI(pannel):
 
 		self.spread_timer = 0
 
-		spyqqq = {"name":"SPYQQQ","symbol":["SPY.AM","QQQ.NQ"],"ratio":[1,-1],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		gldslv = {"name":"GLDSLV","symbol":["GLD.AM","SLV.AM"],"ratio":[1,-4],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		spytlt = {"name":"TLTSPY","symbol":["TLT.NQ","SPY.AM"],"ratio":[4,-1],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		spyuso = {"name":"SPYUSO","symbol":["SPY.AM","USO.AM"],"ratio":[1,-3],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		tlsaqqq = {"name":"TSLAQQQ","symbol":["TSLA.NQ","QQQ.NQ"],"ratio":[1,-2],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		smhqqq = {"name":"SMHQQQ","symbol":["SMH.NQ","QQQ.NQ"],"ratio":[17,-10],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyqqq = {"name":"SPYQQQ","symbol":["SPY.AM","QQQ.NQ"],"ratio":[1,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		gldslv = {"name":"GLDSLV","symbol":["GLD.AM","SLV.AM"],"ratio":[1,-4],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spytlt = {"name":"TLTSPY","symbol":["TLT.NQ","SPY.AM"],"ratio":[4,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyuso = {"name":"SPYUSO","symbol":["SPY.AM","USO.AM"],"ratio":[1,-3],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		tlsaqqq = {"name":"TSLAQQQ","symbol":["TSLA.NQ","QQQ.NQ"],"ratio":[1,-2],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		smhqqq = {"name":"SMHQQQ","symbol":["SMH.NQ","QQQ.NQ"],"ratio":[17,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 	
-		gdxgdxj = {"name":"GDXGDXJ","symbol":["GDX.AM","GDXJ.AM"],"ratio":[10,-7],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		gdxgld = {"name":"GDXGLD","symbol":["GDX.AM","GLD.AM"],"ratio":[2,-1],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		gdxgdxj = {"name":"GDXGDXJ","symbol":["GDX.AM","GDXJ.AM"],"ratio":[10,-7],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		gdxgld = {"name":"GDXGLD","symbol":["GDX.AM","GLD.AM"],"ratio":[2,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 			
 
-		xleqqq = {"name":"XLEQQQ","symbol":["XLE.AM","QQQ.NQ"],"ratio":[4,-1],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		xleqqq = {"name":"XLEQQQ","symbol":["XLE.AM","QQQ.NQ"],"ratio":[4,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		
-		arkkqqq = {"name":"ARKKQQQ","symbol":["ARKK.AM","QQQ.NQ"],"ratio":[4,-1],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		arkkqqq = {"name":"ARKKQQQ","symbol":["ARKK.AM","QQQ.NQ"],"ratio":[4,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		
-		drivqqq = {"name":"DRIVQQQ","symbol":["DRIV.NQ","QQQ.NQ"],"ratio":[12,-1],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		drivqqq = {"name":"DRIVQQQ","symbol":["DRIV.NQ","QQQ.NQ"],"ratio":[12,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 
-		fxixpev = {"name":"FXIXPEV","symbol":["FXI.AM","XPEV.NQ"],"ratio":[2,-1],"status":tk.StringVar(value="Status:"),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		fxixpev = {"name":"FXIXPEV","symbol":["FXI.AM","XPEV.NQ"],"ratio":[2,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		
 
 		total = [spyqqq,gldslv,tlsaqqq,smhqqq,gdxgdxj]
@@ -640,7 +640,15 @@ class UI(pannel):
 
 				i['status_bar'] = tk.Label(tab, textvariable=i['status'])
 				i['status_bar'].grid(sticky="w",column=c,row=t)
+				c+=2
+
+				tk.Label(tab, text="TA:").grid(sticky="w",column=c,row=t)
 				c+=1
+
+				# row 1 entry
+				i['TA']=tk.Entry(tab,textvariable=i['timer'],width=labels['entry'])
+				#i['TA']["state"] = DISABLED
+				i['TA'].grid(sticky="w",column=c,row=t)	
 
 
 				t+=1 
@@ -802,10 +810,10 @@ class UI(pannel):
 			share1 = dic["current"].get()*dic["ratio"][0]
 			share2 = dic["current"].get()*dic["ratio"][1]
 
-
+			timer = dic['TA'].get()
 			self.spread_timer = ts
 
-			log_print("Quick Spread:",dic['symbol'],share1,share2)
+			log_print("Quick Spread:",dic['symbol'],share1,share2,'time:',timer)
 
 			d={}
 			d['pair'] = dic['name']
@@ -814,7 +822,7 @@ class UI(pannel):
 			d['amount'] = dic["current"].get()
 			d['ratio'] = dic["ratio"]
 			d['passive'] = dic['passive'].get()
-
+			
 
 
 			try:
