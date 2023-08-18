@@ -131,7 +131,7 @@ class S(BaseHTTPRequestHandler):
 
 				elif "Basket" in stream_data:
 
-					print("....",stream_data,"...")
+					#print("....",stream_data,"...")
 					basket = find_between(stream_data,"Basket=",",")
 
 					infos = find_between(stream_data,"Order=*","*")
@@ -174,7 +174,7 @@ class S(BaseHTTPRequestHandler):
 					ratio = find_between(stream_data,"Ratio=",",")
 					passive = find_between(stream_data,"Passive=",",")
 
-					print(amount,ratio,passive)
+					#print(amount,ratio,passive)
 
 					d={}
 					d['pair'] = pair
@@ -210,7 +210,7 @@ class S(BaseHTTPRequestHandler):
 		global pipec
 		#print("sending",msg,pipec)
 
-		print("HTTP sending:",msg)
+		#print("HTTP sending:",msg)
 
 		pipec.send(["cmd",msg])
 
@@ -219,7 +219,7 @@ class S(BaseHTTPRequestHandler):
 		global pipec
 		#print("sending",msg,pipec)
 
-		print("HTTP sending:",msg)
+		#print("HTTP sending:",msg)
 
 		pipec.send(["pkg",[msg]])
 		#pipe.send(msg)
