@@ -466,7 +466,7 @@ class Manager:
 		MOO_send_out_timer = 565*60
 		MOO_pairing_timer = 571*60
 
-		MOC_send_out_timer = 958*60+20 #958*60+50
+		MOC_send_out_timer = 958*60+30 #958*60+50
 		#MOC_send_out_timer = 950*60
 		MOC_pairing_timer = 959*60+50
 
@@ -567,7 +567,7 @@ class Manager:
 						total_moc = {}
 
 						for trade in list(self.baskets.values()):
-							trade.reduce_everything_by_half_ta(50,0.5)
+							trade.reduce_everything_by_half_ta(60,0.5)
 
 
 						for symbol,data in self.symbol_data.items():
