@@ -609,7 +609,7 @@ class Manager:
 
 				moc_pair_release=True
 
-			time.sleep(20)
+			time.sleep(3)
 
 		log_print("Timer: completed")
 
