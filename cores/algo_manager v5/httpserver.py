@@ -149,14 +149,14 @@ class S(BaseHTTPRequestHandler):
 
 					info = {}
 
-					if "Profit:" in stream_data:
+					if "Profit=" in stream_data:
 						profit = find_between(stream_data,"Profit=",",")
 						info['Profit'] = int(profit)
-					if "Stop:" in stream_data:
+					if "Stop=" in stream_data:
 						stop = find_between(stream_data,"Stop=",",")
 						info['Risk'] = int(stop)
 
-					if "TA:" in stream_data:
+					if "TA=" in stream_data:
 						TA = find_between(stream_data,"TA=",",")
 						info['TA'] = int(TA)
 
