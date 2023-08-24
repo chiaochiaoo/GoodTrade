@@ -763,12 +763,21 @@ class Manager:
 
 					confirmation,orders,risk,aggresive,multiplier = self.ui.order_confirmation(d[1],d[2])
 
-					info = d[3]
+
+						# stop,
 
 					if self.net > self.set_risk*-1:
 						if confirmation:
 							#log_print("basket update:",d)
 							#log_print(d[1],confirmation,orders,risk,aggresive)
+
+							info = d[3]
+
+							for key in info.keys():
+								if type(info[key])==int  or type(info[key])==float:
+									info[key] =info[key]*multiplier
+
+
 							if "OB" in d[1] and cur_ts<570:
 								handl = threading.Thread(target=self.moo_apply_basket_cmd,args=(d[1],orders,risk,aggresive,info,),daemon=True)
 								handl.start()
