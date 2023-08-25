@@ -127,7 +127,7 @@ class Manager:
 		self.cmd_text = tk.StringVar(value="Status:")
 
 
-		self.ta_moc = tk.BooleanVar(value=1)
+		self.ta_moc = tk.BooleanVar(value=0)
 
 		self.ui = UI(root,self,self.receiving_signals,self.cmd_text)
 
