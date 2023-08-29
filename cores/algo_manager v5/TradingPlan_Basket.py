@@ -55,8 +55,6 @@ class TradingPlan_Basket:
 		if "Flattable" in info:
 			self.manual_flattable = True 
 
-		self.manual_addable = True 
-		self.manual_flattable = True
 
 		log_print(algo_name,"  profit & risk : ",self.profit,self.stop)
 		#### BANED SYMBOL
@@ -500,11 +498,14 @@ class TradingPlan_Basket:
 			if change:
 
 				try:
-
 					self.holding_update(symbol,share_added,price)
 				except	Exception	as e:
 					PrintException(e,"Basket Holding Update Error:"+self.source+symbol)
 				self.calculate_avg_price(symbol)
+
+				if sum(self.current_shares.values())==0:
+					### COMPLETELY FLAT. ###
+					self.flatten_order = True 
 
 				return ret 
 
@@ -751,9 +752,4 @@ class TradingPlan_Basket:
 
 		self.data[STATUS] = DEPLOYED
 		self.tkvars[STATUS].set(DEPLOYED)
-
-
-
-
-
 
