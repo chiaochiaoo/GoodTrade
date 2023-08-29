@@ -134,7 +134,7 @@ class S(BaseHTTPRequestHandler):
 					#print("....",stream_data,"...")
 					basket = find_between(stream_data,"Basket=",",")
 
-					infos = find_between(stream_data,"Order=*","*")
+					orders = find_between(stream_data,"Order=*","*")
 
 					# risk = int(find_between(stream_data,"Risk=",","))
 
@@ -142,23 +142,33 @@ class S(BaseHTTPRequestHandler):
 
 					#print(stream_data)
 					d={}
-					for i in infos.split(","):
+					for i in orders.split(","):
 
 						a,b = i.split(":")
 						d[a] = int(b)
 
 					info = {}
 
-					if "Profit=" in stream_data:
-						profit = find_between(stream_data,"Profit=",",")
-						info['Profit'] = int(profit)
-					if "Stop=" in stream_data:
-						stop = find_between(stream_data,"Stop=",",")
-						info['Risk'] = int(stop)
+					if "Infos" in stream_data:
+						infos = find_between(stream_data,"Infos=(",")") 
+								
 
-					if "TA=" in stream_data:
-						TA = find_between(stream_data,"TA=",",")
-						info['TA'] = int(TA)
+						for i in infos.split(","):
+
+							if "=" in i:
+								a,b = i.split("=")
+								info[a] = int(b)
+
+					# if "Profit=" in stream_data:
+					# 	profit = find_between(stream_data,"Profit=",",")
+					# 	info['Profit'] = int(profit)
+					# if "Stop=" in stream_data:
+					# 	stop = find_between(stream_data,"Stop=",",")
+					# 	info['Risk'] = int(stop)
+
+					# if "TA=" in stream_data:
+					# 	TA = find_between(stream_data,"TA=",",")
+					# 	info['TA'] = int(TA)
 
 
 					self.send_basket(basket,d,info)
@@ -283,10 +293,37 @@ def httpserver(pipex):
 # print(d)
 
 
+# stream_data = "https://tnv.ngrok.io/Basket=TEST2,Order=*SPY.AM:5,QQQ.NQ:5*,Infos=(Profit=5,Stop=5,)=Infos"
+# #print("....",stream_data,"...")
+# basket = find_between(stream_data,"Basket=",",")
+
+# orders = find_between(stream_data,"Order=*","*")
+
+# # risk = int(find_between(stream_data,"Risk=",","))
+
+# # aggresive = int(find_between(stream_data,"Aggresive=",","))
+
+# #print(stream_data)
+# d={}
+# for i in orders.split(","):
+
+# 	a,b = i.split(":")
+# 	d[a] = int(b)
+
+# info = {}
+
+# if "Infos" in stream_data:
+# 	infos = find_between(stream_data,"Infos=(",")=Infos") 
+			
+
+# 	for i in infos.split(","):
+# 		#print(i)
+# 		if "=" in i:
+# 			a,b = i.split("=")
+# 			info[a] = int(b)
 
 
-
-
+# print(basket,orders,info)
 # s=" /Trade_type=Single,Algo_id=Manual_LCID.NQ944,Algo_name=Manual%20Trade,Symbol=LCID.NQ,Entry_typeInstant%20Short,Support0,Resistance22.0,Risk=3.0,Side=Short,Deploy=T,Management=FullManual"
 
 

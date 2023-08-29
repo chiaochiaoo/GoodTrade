@@ -55,6 +55,9 @@ class TradingPlan_Basket:
 		if "Flattable" in info:
 			self.manual_flattable = True 
 
+		self.manual_addable = True 
+		self.manual_flattable = True
+
 		log_print(algo_name,"  profit & risk : ",self.profit,self.stop)
 		#### BANED SYMBOL
 
@@ -81,6 +84,7 @@ class TradingPlan_Basket:
 
 
 		self.current_exposure = {}
+
 		self.average_price = {}
 
 		self.stock_price ={}
@@ -181,6 +185,8 @@ class TradingPlan_Basket:
 			self.holdings[symbol_name] = []
 
 			self.read_lock[symbol_name] = threading.Lock()
+
+			##################################################################
 
 	def update_stockprices(self,symbol,price):
 
@@ -446,7 +452,7 @@ class TradingPlan_Basket:
 
 			### MANUAL CONTROL SIDE ###
 			change = False 
-			if self.manual_addable: ### NEED ON SAME SIDE. AND LESS THAN THE LIMIT. 
+			if self.manual_addable and self.flatten_order!=True: ### NEED ON SAME SIDE. AND LESS THAN THE LIMIT. 
 				if self.expected_shares[symbol]*share>=0:
 
 					### WHATS THE MAXIUM TO ADD??? Infinity.
@@ -457,6 +463,8 @@ class TradingPlan_Basket:
 					ret = 0 
 
 					change = True 
+
+					log_print(self.source,self.algo_name,symbol,"Manual Loading UP :incmonig,",share," now have",self.current_shares[symbol],"return",ret)
 
 			if self.manual_flattable: ### NEED ON DIFF SIDE
 				if self.expected_shares[symbol]*share<=0:
@@ -485,12 +493,14 @@ class TradingPlan_Basket:
 						self.expected_shares[symbol] += share_added 
 						self.current_shares[symbol] += share_added 
 
+					log_print(self.source,self.algo_name,symbol,"Manual Loading off :incmonig,",share," now have",self.current_shares[symbol],"return",ret)
 
 					change = True 
 
 			if change:
 
 				try:
+
 					self.holding_update(symbol,share_added,price)
 				except	Exception	as e:
 					PrintException(e,"Basket Holding Update Error:"+self.source+symbol)
