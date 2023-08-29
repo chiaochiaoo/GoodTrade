@@ -481,7 +481,7 @@ class Manager:
 
 			if ts>=MOO_send_out_timer and moo_release==False :
 				### TRIGGER. Realese the moo orders. 
-				self.symbol_inspection_start = False 
+				#self.symbol_inspection_start = False 
 				log_print("Timer: timer triggered for MOO",self.moo_orders)
 				# with self.symbol_inspection_lock  THIS IS NOT A PERMENANT SOLUTION> 
 				with self.moo_lock:
@@ -507,7 +507,7 @@ class Manager:
 
 								log_print("APPLYING MOO ALOGS:",i)
 								basket_name,orders,risk,aggresive,info = i[0],i[1],i[2],i[3],i[4]
-								self.apply_basket_cmd(basket_name,orders,risk,aggresive,info)
+								#self.apply_basket_cmd(basket_name,orders,risk,aggresive,info)
 
 						
 						req = threading.Thread(target=request, args=(reque,),daemon=True)

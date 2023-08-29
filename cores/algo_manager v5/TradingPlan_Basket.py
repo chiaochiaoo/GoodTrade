@@ -45,8 +45,15 @@ class TradingPlan_Basket:
 
 		if "Profit" in info:
 			self.profit = int(info["Profit"])
+
 		if "Risk" in info:
 			self.stop = int(info["Risk"])
+
+		if "Addable" in info:
+			self.manual_addable = True 
+
+		if "Flattable" in info:
+			self.manual_flattable = True 
 
 		log_print(algo_name,"  profit & risk : ",self.profit,self.stop)
 		#### BANED SYMBOL
@@ -388,7 +395,6 @@ class TradingPlan_Basket:
 		prev_price = self.average_price[symbol]
 		share_added = 0
 
-
 		### 1. need to read if actually request anything
 		### 2. need to verify if it's the same sign as requested.
 		### WHAT HAPPENS IF PRICE IS 0 ????? ######################
@@ -403,6 +409,7 @@ class TradingPlan_Basket:
 			else:
 
 				if abs(self.current_request[symbol])>=abs(share):  # eats everything from share 
+
 					self.current_shares[symbol] += share 
 
 					self.recalculate_current_request(symbol)
@@ -423,7 +430,6 @@ class TradingPlan_Basket:
 
 				### current share ==0 , or current share same sign as share, load.  else unload.
 
-
 				# This process has a problem. if the shares causing the position flip, then it's first calcualte realized, then recaculate avg price. then it's fucked. 
 
 				try:
@@ -432,50 +438,67 @@ class TradingPlan_Basket:
 					PrintException(e,"Basket Holding Update Error:"+self.source+symbol)
 				self.calculate_avg_price(symbol)
 
-
 				log_print(self.source,self.algo_name,symbol,"Loading up :incmonig,",share,"want",self.expected_shares[symbol]," now have",self.current_shares[symbol],"return",ret, "prev avg",prev_price,"cur price",self.average_price[symbol])
-
-
-				"""
-				if prev_share==0 or prev_share*share>0:  #this is adding to positions. 
-
-
-					for i in range(abs(share_added)):
-						self.current_exposure[symbol].append(price*coefficient)
-
-					self.calculate_avg_price(symbol)
-
-					log_print(self.source,self.algo_name,symbol,"Loading up :incmonig,",share,"want",self.expected_shares[symbol]," now have",self.current_shares[symbol],"return",ret, "prev avg",prev_price,"cur price",self.average_price[symbol])
-
-				else:
-					try:
-						if len(self.current_exposure[symbol])<abs(share):
-							log_print(self.source,"WARNING:",self.algo_name,symbol,"does not have enough holding to load off.",len(self.current_exposure[symbol]),share)
-
-						for i in range(abs(share_added)):
-
-							self.data[REALIZED]+= -1*price*coefficient - self.current_exposure[symbol].pop()
-							self.data[REALIZED] = round(self.data[REALIZED],2)
-
-						#self.manager.new_record(self)
-						
-					except	Exception	as e:
-						PrintException(e,"Basket Holding Update Error:"+self.source+symbol)
-
-					self.calculate_avg_price(symbol)
-					log_print(self.source,self.algo_name,symbol,"Loading off :incmonig,",share,"want",self.current_request[symbol]," now have",self.current_shares[symbol],"return",ret, "prev avg",prev_price,"cur price",self.average_price[symbol])
-
-					realized it. 
-				if self.current_shares[symbol]!=0:
-					self.average_price[symbol] = (prev_share*self.average_price[symbol] + share*price)/self.current_shares[symbol]
-				else:
-					self.average_price[symbol] = 0 
-				"""
 
 				return ret
 
-
 		else:
+
+			### MANUAL CONTROL SIDE ###
+			change = False 
+			if self.manual_addable: ### NEED ON SAME SIDE. AND LESS THAN THE LIMIT. 
+				if self.expected_shares[symbol]*share>=0:
+
+					### WHATS THE MAXIUM TO ADD??? Infinity.
+					self.expected_shares[symbol] += share 
+					self.current_shares[symbol] += share 
+
+					share_added = share
+					ret = 0 
+
+					change = True 
+
+			if self.manual_flattable: ### NEED ON DIFF SIDE
+				if self.expected_shares[symbol]*share<=0:
+
+					### AT MOST REDUCE IT TO 0. 
+
+					if abs(self.current_shares[symbol]) > abs(share):
+
+						### has remainer 
+						self.expected_shares[symbol] += share 
+						self.current_shares[symbol] += share 
+
+						share_added = share
+						ret = 0 
+
+						change = True 
+
+					else:
+						### no remainder or even overflow.  
+
+						# self.current_shares[symbol] += self.current_request[symbol]  # eats partially from share 
+						# ret = share-self.current_request[symbol] 
+						# share_added = self.current_request[symbol]
+						ret = share + self.current_shares[symbol]
+						share_added = self.current_shares[symbol] * -1 #share + self.current_shares[symbol]
+						self.expected_shares[symbol] += share_added 
+						self.current_shares[symbol] += share_added 
+
+
+					change = True 
+
+			if change:
+
+				try:
+					self.holding_update(symbol,share_added,price)
+				except	Exception	as e:
+					PrintException(e,"Basket Holding Update Error:"+self.source+symbol)
+				self.calculate_avg_price(symbol)
+
+				return ret 
+
+
 			return share
 
 
@@ -522,6 +545,7 @@ class TradingPlan_Basket:
 			self.expect_orders = LONG
 		else:
 			self.expect_orders = SHORT
+
 		self.current_request = shares
 		self.expected_shares = shares
 		self.notify_immediate_request(shares)
