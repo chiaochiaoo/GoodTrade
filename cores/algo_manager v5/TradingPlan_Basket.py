@@ -44,7 +44,7 @@ class TradingPlan_Basket:
 		self.profit = 0
 
 		self.manual_addable = False 
-		self.manual_flattabl = False 
+		self.manual_flattable = False 
 		if "Profit" in info:
 			self.profit = int(info["Profit"])
 
