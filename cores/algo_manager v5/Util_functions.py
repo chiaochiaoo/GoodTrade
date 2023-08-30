@@ -126,7 +126,7 @@ def log_print(*args):
 		listToStr = ' '.join([str(elem) for elem in args])
 
 		if len(listToStr)>5:
-			f = open("../../algo_logs/"+datetime.now().strftime("%m-%d")+".txt", "a+")
+			f = open("../../algo_logs/"+datetime.now().strftime("%m-%d")+".txt", "a")
 			time_ = datetime.now().strftime("%H:%M:%S : ")
 			f.write("\n"+time_+listToStr)
 			f.close()
