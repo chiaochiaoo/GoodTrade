@@ -1,4 +1,7 @@
-RG_Tick,,test3
-RG_Tickv2, test2
-RG_Tickv3,
+RG_Tick:test3gege
+RG_Tickv2:test2egeg
+RG_Tickv3:
 RG_Tickv4
+950Rv1
+955R
+9505R

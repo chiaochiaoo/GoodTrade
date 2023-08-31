@@ -21,6 +21,7 @@ ACTIVE = 0
 RISK = 1
 MULTIPLIER = 2
 PASSIVE = 3
+DESCRIPTION = 4
 # from modules.TNV_OR import *
 # from modules.TNV_Trend import *
 

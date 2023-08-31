@@ -5,6 +5,17 @@ from UI_custom_algo import *
 import time
 
 
+
+
+try:
+	from ttkwidgets.frames import Tooltip
+except ImportError:
+	import pip
+	pip.main(['install', 'ttkwidgets'])
+	from ttkwidgets.frames import Tooltip
+
+
+
 def trace_func(d):
 
 	if d['lock'].get()==0:
@@ -24,6 +35,22 @@ def trace_func(d):
 		d['set_current']["state"] = "normal"
 		d['set_max']["state"] = "normal"
 		d['passive_button']["state"] = "normal"
+
+
+
+def show_tooltip(event, widget,root,label,text):
+    x, y, _, _ = widget.bbox("insert")
+    x += widget.winfo_rootx() + 25
+    y += widget.winfo_rooty() - 25
+    
+    root.geometry("+{}+{}".format(x, y))
+    label.config(text=text)
+    root.deiconify()
+
+def hide_tooltip(event,root):
+    root.withdraw()
+
+
 
 class UI(pannel):
 	def __init__(self,root,manager=None,receiving_signals=None,cmd_text=None):
@@ -1259,12 +1286,26 @@ class UI(pannel):
 				a_file = open(dir_name+"/"+filename)
 				lines = a_file.read().splitlines()
 				for i in lines:
-					self.algos[strategy][i] = [] 
-					self.algos[strategy][i].append(tk.BooleanVar(value=0))
-					self.algos[strategy][i].append(tk.IntVar(value=1))
-					self.algos[strategy][i].append(tk.IntVar(value=1))
-					self.algos[strategy][i].append(tk.BooleanVar(value=0))
 
+					#"if , then seperate name with despriton"
+
+					if ":" not in i:
+						self.algos[strategy][i] = [] 
+						self.algos[strategy][i].append(tk.BooleanVar(value=0))
+						self.algos[strategy][i].append(tk.IntVar(value=1))
+						self.algos[strategy][i].append(tk.IntVar(value=1))
+						self.algos[strategy][i].append(tk.BooleanVar(value=0))
+						self.algos[strategy][i].append("")
+					else:
+						split = i.split(':')
+						i = split[0]
+						description = split[1]
+						self.algos[strategy][i] = [] 
+						self.algos[strategy][i].append(tk.BooleanVar(value=0))
+						self.algos[strategy][i].append(tk.IntVar(value=1))
+						self.algos[strategy][i].append(tk.IntVar(value=1))
+						self.algos[strategy][i].append(tk.BooleanVar(value=0))
+						self.algos[strategy][i].append(description)
 	def create_algo_tabs(self):
 
 		for i in self.algo_groups:
@@ -1273,13 +1314,22 @@ class UI(pannel):
 
 	def create_each_algos(self):
 
+
+
+
 		for i in self.algo_groups:
-			ttk.Label(self.frames[i], text="").grid(sticky="w",column=0,row=0)
+
+
+
+
+			#ttk.Label(self.frames[i], text="").grid(sticky="w",column=0,row=0)
 			row = 1
 			col = 0
 			for algo,item in self.algos[i].items():
 
-				ttk.Label(self.frames[i], text=algo).grid(sticky="w",column=col,row=row)
+
+				label =ttk.Label(self.frames[i], text=algo)
+				label.grid(sticky="w",column=col,row=row)
 				ttk.Checkbutton(self.frames[i], variable=item[ACTIVE]).grid(sticky="w",column=col+1,row=row)
 
 				ttk.Label(self.frames[i], text="Risk:").grid(sticky="w",column=col+4,row=row)
@@ -1292,6 +1342,17 @@ class UI(pannel):
 				ttk.Label(self.frames[i], text="Aggresive:").grid(sticky="w",column=col+2,row=row)
 				ttk.Checkbutton(self.frames[i], variable=item[PASSIVE]).grid(sticky="w",column=col+3,row=row)
 
+
+
+				if item[DESCRIPTION]!="":
+					print("BIND ",item[DESCRIPTION])
+					tip= Tooltip(label,"Algo info",item[DESCRIPTION])
+					# tooltip_label = tk.Label(self.frames[i], text="", background="yellow", relief="solid", borderwidth=1)
+					# # tooltip_label.pack()
+					# label.bind("<Enter>", lambda event, widget=label,root=self.frames[i],label=tooltip_label: show_tooltip(event, widget,root,label,item[DESCRIPTION]))
+					# label.bind("<Leave>",  lambda event,root=self.frames[i]: hide_tooltip(event,root))
+					#label.bind("<Enter>", lambda event, widget=label: show_tooltip(event, widget,item[DESCRIPTION]))
+					#label.bind("<Leave>", hide_tooltip)
 
 				row+=1
 
