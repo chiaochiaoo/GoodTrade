@@ -1,7 +1,4 @@
-RG_Tick:test3gege
-RG_Tickv2:test2egeg
-RG_Tickv3:
-RG_Tickv4
-950Rv1
-955R
-9505R
+Tick_RG_v1: Algo will at most enter 3 time. Exit only via MOC.
+Tick_RG_v2: Algo will at most enter 3 time. Partial exit on Tick hitting opposite band. Exit rest via MOC.
+Tick_950
+Tick_955
