@@ -114,8 +114,8 @@ def breakdown_order(symbol,share,break_price):
 def buy_market_order(symbol,share):
 
 	#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=EDGX Buy ROUC Market DAY&shares='+str(share)
-	#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Buy ARCX Market DAY&shares='+str(share)
-	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=NSDQ Buy SCAN Market DAY&shares='+str(share)
+	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Buy ARCX Market DAY&shares='+str(share)
+	#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=NSDQ Buy SCAN Market DAY&shares='+str(share)
 
 
 	sucess='buy market order success on'+symbol
@@ -129,8 +129,8 @@ def buy_market_order(symbol,share):
 def sell_market_order(symbol,share):
 
 
-	#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(share)
-	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=NSDQ Sell->Short SCAN Market DAY&shares='+str(share)
+	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(share)
+	#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=NSDQ Sell->Short SCAN Market DAY&shares='+str(share)
 	#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=EDGX Sell->Short ROUC Market DAY&shares='+str(share)
 	sucess='sell market order success on'+symbol
 	failure="Error sell order on"+symbol
@@ -237,8 +237,11 @@ def buy_aggressive_limit_order(symbol,share,ask):
 		ask = round((ask+0.1),2)  
 	elif ask>100:
 		ask = round((ask+0.2),2)
+		#ARCA Buy ARCX Limit Near DAY Reserve
+
 
 	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(ask)+'&ordername=ARCA Buy ARCX Limit IOC&shares='+str(share)
+	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&priceadjust=0.05&ordername=ARCA Buy ARCX Limit Near IOC&shares='+str(share)
 	sucess='Agrresive limit buy order success on'+symbol
 	failure="Error buy order on"+symbol
 
@@ -258,6 +261,9 @@ def short_aggressive_limit_order(symbol,share,bid):
 		bid = round((bid-0.2),2)
 
 	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(bid)+'&ordername=ARCA Sell->Short ARCX Limit IOC&shares='+str(share)
+
+	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&priceadjust=-0.05&ordername=ARCA Sell->Short ARCX Limit Near IOC&shares='+str(share)
+
 	sucess='Aggresive limit sell order success on'+symbol
 	failure="Error buy order on"+symbol
 
@@ -324,6 +330,9 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 			request_str = ""
 			sucess_str= ""
 			failure_str = ""
+			symbol = ""
+			
+			is_order = False
 			d = pipe.recv()
 			type_ = d[0]
 
@@ -347,14 +356,14 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 				rationale = d[3]
 
 				request_str,sucess_str,failure_str=buy_market_order(symbol,share)
-
+				is_order = True
 			elif type_ ==SELL:
 
 				symbol = d[1]
 				share = d[2]
 				rationale = d[3]
 				request_str,sucess_str,failure_str=sell_market_order(symbol,share)
-
+				is_order = True
 			elif type_ == PASSIVEBUY:
 
 				symbol = d[1]
@@ -362,7 +371,7 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 				offset = d[3]
 				gateway = d[4]
 				request_str,sucess_str,failure_str=passive_buy(symbol,share,offset,gateway)
-
+				is_order = True
 			elif type_ == PASSIVESELL:
 
 				symbol = d[1]
@@ -370,14 +379,14 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 				offset = d[3]
 				gateway = d[4]
 				request_str,sucess_str,failure_str=passive_sell(symbol,share,offset,gateway)
-
+				is_order = True
 			elif type_ ==BREAKUPBUY:
 				symbol = d[1]
 				share = d[2]
 				stop = d[3]
 
 				request_str,sucess_str,failure_str=breakup_order(symbol,share,stop)
-
+				is_order = True
 			elif type_ ==BREAKDOWNSELL:
 
 				symbol = d[1]
@@ -385,7 +394,7 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 				stop = d[3]
 
 				request_str,sucess_str,failure_str=breakdown_order(symbol,share,stop)
-
+				is_order = True
 			elif type_ ==IOCBUY:
 				symbol = d[1]
 				share = d[2]
@@ -398,7 +407,7 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 					request_str,sucess_str,failure_str=buy_aggressive_limit_order(symbol,share,ask)
 				else:
 					request_str,sucess_str,failure_str=buy_market_order(symbol,share)
-
+				is_order = True
 			elif type_ ==IOCSELL:	
 				symbol = d[1]
 				share = d[2]
@@ -411,7 +420,7 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 					request_str,sucess_str,failure_str=short_aggressive_limit_order(symbol,share,bid)
 				else:
 					request_str,sucess_str,failure_str=sell_market_order(symbol,share)
-					
+				is_order = True
 			elif type_ == LIMITBUY:
 
 				symbol = d[1]
@@ -420,7 +429,7 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 				gateway = d[4]
 				rationale = d[5]
 				request_str,sucess_str,failure_str=buy_limit_order(symbol,price,share,gateway)
-
+				is_order = True
 			elif type_ == LIMITSELL:
 
 				symbol = d[1]
@@ -430,7 +439,7 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 				rationale = d[5]
 
 				request_str,sucess_str,failure_str=sell_limit_order(symbol,price,share,gateway)
-
+				is_order = True
 			elif type_ == CANCEL:
 
 				symbol = d[1]
@@ -439,7 +448,6 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 
 
 			elif type_ == CANCELALL:
-
 
 				request_str = "http://127.0.0.1:8080/CancelOrder?type=all&symbol=*.*&side=order"
 				sucess_str = "Cancell all sucess"
@@ -455,19 +463,23 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 
 			sucessful = False
 
-
-			
 			if request_str!="":
-				while not sucessful:
-					try:
 
-						req = str(request_str)
-						r = requests.get(req)
-						sucessful = True
-						#log_print("POSTING:",request_str)
-					except Exception as e:
-						log_print(e,failure_str," driver restart")
-						time.sleep(0.05)
+				req = threading.Thread(target=ppro_request, args=(request_str,sucess_str,failure_str,symbol,pipe_status,is_order),daemon=True)
+				req.start()	
+
+				### START A THREAD. 
+
+				# while not sucessful:
+				# 	try:
+
+				# 		req = str(request_str)
+				# 		r = requests.post(req)
+				# 		sucessful = True
+				# 		#log_print("POSTING:",request_str)
+				# 	except Exception as e:
+				# 		log_print(e,failure_str," driver restart")
+				# 		time.sleep(0.05)
 
 		except Exception as e:
 			PrintException("PPro out:",e)
@@ -475,30 +487,70 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 	log_print("ppro out terminated")
 
 
-def ppro_request(request,success=None,failure=None,wait=0,traceid=False,symbol=None,side=None,pipe=None):
-	failure = 0
+#### ORDER TRACING PROGAM ###
 
-	if wait!=0:
-		time.sleep(wait)
 
-	while True:
-		r = requests.post(request)
-		#print(r.text)
+
+def ppro_request(request_str,sucess_str,failure_str,symbol,pipe,is_order):
+
+
+	try:
+		r = requests.post(request_str)
+
 		if r.status_code ==200:
-			# if success!=None:
-			# 	log_print(success)
-			if traceid==True:
-				get_order_id(find_between(r.text,"<Content>","</Content>"),symbol,side,pipe)  #need to grab the request id. obtain the order id. assign it to the symbol.the 
-			return True
+			if is_order==True:
+				time.sleep(0.2)
+
+				order_number=""
+				order_id = find_between(r.text,"<Content>","</Content>")
+
+				if len(order_id)>0:
+					order_id = int(order_id)
+					req = "http://127.0.0.1:8080/GetOrderNumber?requestid="+str(order_id)
+					r = requests.get(req)
+					order_number = find_between(r.text,"<Content>","</Content>")
+
+				if len(order_number)>0:
+					req = "http://127.0.0.1:8080/GetOrderState?ordernumber="+order_number
+					r = requests.post(req)
+
+					if "Rejected" in r.text:
+
+						data = {}
+						data["symbol"]= symbol
+						data["side"]= ""
+						data["info"]=r.text
+
+						log_print("Rejected:",symbol)
+
+						pipe.send(["order rejected",data])
+
+
+					# elif "Pending" in r.text or "Filled" in r.text or "Accepted" in r.text:
+					# 	log_print(sucess_str)
+
+					# else:
+					# 	log_print("PPRO OUT: WERID MESSAGE:",r.text)
+
 		else:
-			log_print(failure)
-			#return False
-			failure +=1
+			log_print(failure_str," ",r.text)
+			if is_order==True and symbol!="" and  "Invalid" in r.text:
 
-		if failure>4:
-			break
+				data = {}
+				data["symbol"]= symbol
+				data["side"]= ""
+				data["info"]=r.text
 
-	return False
+				log_print("Rejected:",symbol)
+
+				pipe.send(["order rejected",data])
+
+
+	except Exception as e:
+
+		log_print("PPRO OUT ERROR:",e)
+
+
 
 def get_order_id(request_number,symbol,side,pipe):
 	count=0
@@ -513,7 +565,6 @@ def get_order_id(request_number,symbol,side,pipe):
 		else:
 			count = count+1
 			log_print(symbol,side,"get id failed:",count)
-
 
 
 def get_stoporder_status(id_):
@@ -533,6 +584,37 @@ def cancel_stoporder(id_):
 	req.start()	
 
 
+
+
+# request_number = 32718
+# req = "http://127.0.0.1:8080/GetOrderNumber?requestid="+str(request_number)
+# r = requests.post(req)
+
+# print(r.text)
+
+
 # print("start")
-# req = "http://127.0.0.1:8080/ExecuteOrder?symbol=SPY.AM&ordername=ARCA%20Buy%20ARCX%20Market%20DAY&shares=5"
-# r = requests.get(req)
+# req = "http://127.0.0.1:8080/ExecuteOrder?symbol=USO.AM&ordername=ARCA%20Buy%20ARCX%20Market%20DAY&shares=1"
+# r = requests.post(req)
+
+# order_id = find_between(r.text,"<Content>","</Content>")
+
+# state = ""
+
+# time.sleep(0.2)
+# order_number=""
+# if len(order_id)>0:
+# 	order_id = int(order_id)
+# 	req = str("http://127.0.0.1:8080/GetOrderNumber?requestid="+str(order_id))
+# 	req = "http://127.0.0.1:8080/GetOrderNumber?requestid="+str(order_id)
+# 	r = requests.get(req)
+# 	print(req,r.text)
+# 	order_number = find_between(r.text,"<Content>","</Content>")
+# print(order_number)
+
+# if len(order_number)>0:
+# 	req = "http://127.0.0.1:8080/GetOrderState?ordernumber="+order_number
+# 	r = requests.post(req)
+
+
+# print(r.text)

@@ -69,6 +69,29 @@ def request(post):
 		print(symbol, "failed")
 
 
+try:
+	import smtplib
+except ImportError:
+	import pip
+	pip.main(['install', 'smtplib'])
+	import smtplib
+
+try:
+	from email.mime.text import MIMEText
+	from email.mime.multipart import MIMEMultipart
+	from email.mime.application import MIMEApplication
+except ImportError:
+	import pip
+	pip.main(['install', 'email'])
+	
+	from email.mime.text import MIMEText
+	from email.mime.multipart import MIMEMultipart
+	from email.mime.application import MIMEApplication
+
+
+
+# Email configuration
+
 
 
 
@@ -82,10 +105,21 @@ class Manager:
 
 		self.termination = False
 
+
+		self.system_enable = False 
+
+
 		self.pipe_ppro_in = ppro_in
 		self.pipe_ppro_out = ppro_out
 		self.pipe_goodtrade = goodtrade_pipe
 
+
+		self.ppro_in_inspection = False
+		self.ppro_out_inspection = False 
+		self.ppro_realtime_inspection = False 
+		self.account_inspection = False 
+
+		self.rejection_count = 0
 		self.test_mode = TEST_MODE
 
 		self.symbols = []
@@ -208,13 +242,16 @@ class Manager:
 		self.get_price_lock = threading.Lock()
 		######
 		self.moo_orders = {}
+
 		self.moo_algos = {}
 		self.moo_lock = threading.Lock()
 
 		#print(self.total_record)
 		self.shutdown=False
+
 		self.symbol_inspection_lock = threading.Lock()
-		self.symbol_inspection_start = False
+		self.symbol_inspection_start = True
+
 		# handl = threading.Thread(target=self.symbols_inspection,daemon=True)
 		# handl.start()
 
@@ -321,50 +358,44 @@ class Manager:
 			log_print("Manager: previous symbols inspection not finished. skip.")
 
 
+	# def moo_apply_basket_cmd(self,basket_name,orders,risk,aggresive,info):
 
+	# 	if basket_name not in self.baskets:
 
-	def moo_apply_basket_cmd(self,basket_name,orders,risk,aggresive,info):
+	# 		if self.ui.basket_label_count<self.algo_limit:
+	# 			self.baskets[basket_name] = TradingPlan_Basket(basket_name,risk,self,info)
+	# 			self.ui.create_new_single_entry(self.baskets[basket_name],"Basket",None)
 
-		if basket_name not in self.baskets:
-
-			if self.ui.basket_label_count<self.algo_limit:
-				self.baskets[basket_name] = TradingPlan_Basket(basket_name,risk,self,info)
-				self.ui.create_new_single_entry(self.baskets[basket_name],"Basket",None)
-
-				self.baskets[basket_name].deploy()
+	# 			self.baskets[basket_name].deploy()
 		
-				c = 0 
+	# 			c = 0 
 
-				total_orders = {}
+	# 			total_orders = {}
 
-				with self.moo_lock:
-					for symbol,share in orders.items():
+	# 			with self.moo_lock:
+	# 				for symbol,share in orders.items():
 						
-						if symbol not in self.moo_orders:
-							self.moo_orders[symbol] = share 
-						else:
-							self.moo_orders[symbol] += share 
+	# 					if symbol not in self.moo_orders:
+	# 						self.moo_orders[symbol] = share 
+	# 					else:
+	# 						self.moo_orders[symbol] += share 
 
-					self.moo_algos[basket_name] = [basket_name,orders,risk,aggresive,info]
-					#self.moo_algos.append([basket_name,orders,risk,aggresive,info])
+	# 				self.moo_algos[basket_name] = [basket_name,orders,risk,aggresive,info]
+	# 				#self.moo_algos.append([basket_name,orders,risk,aggresive,info])
 
-				for symbol,value in orders.items():
-					if symbol not in self.symbol_data:
-						self.symbol_data[symbol] = Symbol(self,symbol,self.pipe_ppro_out)  #register in Symbol.
-						self.symbols.append(symbol)
-						self.symbols_short[symbol[:-3]] = symbol
+	# 			for symbol,value in orders.items():
+	# 				if symbol not in self.symbol_data:
+	# 					self.symbol_data[symbol] = Symbol(self,symbol,self.pipe_ppro_out)  #register in Symbol.
+	# 					self.symbols.append(symbol)
+	# 					self.symbols_short[symbol[:-3]] = symbol
 
-					self.baskets[basket_name].register_symbol(symbol,self.symbol_data[symbol])
+	# 				self.baskets[basket_name].register_symbol(symbol,self.symbol_data[symbol])
 
 
 	def apply_pair_cmd(self,d):
 
 		pair = d['pair'] 
-		# d['symbol1'] 
-		# d['symbol2']
-		# d['amount'] 
-		# d['ratio'] 
-		# d['passive'] 
+
 		log_print("Pair applying:",d)
 		risk=10
 	
@@ -426,8 +457,6 @@ class Manager:
 			for symbol,value in orders.items():
 
 				if "." in symbol and symbol not in self.bad_symbols:
-
-				
 					log_print("Manager: Applying basket command",symbol,value)
 					if symbol not in self.symbol_data:
 						self.symbol_data[symbol] = Symbol(self,symbol,self.pipe_ppro_out)  #register in Symbol.
@@ -451,6 +480,49 @@ class Manager:
 			log_print(basket_name,"already shutdown")
 
 
+	def send_moo(self,dic):
+		now = datetime.now()
+		ts = now.hour*60 + now.minute*60
+
+		with self.moo_lock:
+			for symbol,share in dic.items():
+				
+				share = int(share)
+				print("sending",symbol,share)
+
+				if ts<570:
+					if share<0:
+						if c%2==0:
+							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Sell->Short%20ARCX%20MOO%20OnOpen&shares="+str(abs(share))
+						else:
+							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Sell->Short NSDQ MOO Regular OnOpen&shares="+str(abs(share))
+					else:
+						if c%2==0:
+							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Buy%20ARCX%20MOO%20OnOpen&shares="+str(share)
+						else:
+							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Buy NSDQ MOO Regular OnOpen&shares="+str(share)
+					c+=1 
+
+					### TEST BLOCK. MARKET IN AND OUT.
+				else:
+					if share<0:
+						reque = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(abs(share))
+					else:
+						reque = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Buy ARCX Market DAY&shares='+str(share)
+
+				# with self.symbol_inspection_lock:
+				# 	for i in self.moo_algos.values():
+
+				# 		log_print("APPLYING MOO ALOGS:",i)
+				# 		basket_name,orders,risk,aggresive,info = i[0],i[1],i[2],i[3],i[4]
+						#self.apply_basket_cmd(basket_name,orders,risk,aggresive,info)
+
+				
+				req = threading.Thread(target=request, args=(reque,),daemon=True)
+				req.start() 
+
+	def send_moc(self,dic):
+		pass 
 
 	def timer(self):
 
@@ -459,12 +531,24 @@ class Manager:
 		moc_release = False 
 		moc_pair_release = False
 
+		now = datetime.now()
+		ts = now.hour*3600 + now.minute*60 + now.second
 
 		premarket_timer_start = 350*60
 		premarket_timer_stop = 550 *60
 
-		MOO_send_out_timer = 565*60
-		MOO_pairing_timer = 571*60
+		
+		MOO_exit_timer = 567*60 #ts+19 #
+		MOO_exit = False 
+
+
+		Moo_enter_timer =566*60  #ts+20
+		Moo_enter = False 
+
+
+		MOO_pair_timer = 570*60+20 #ts+25 #
+		MOO_pair = False 
+
 
 		MOC_send_out_timer = 958*60+30 #958*60+50
 
@@ -476,74 +560,46 @@ class Manager:
 			now = datetime.now()
 			ts = now.hour*3600 + now.minute*60 + now.second
 
-			if ts>premarket_timer_start and ts<premarket_timer_stop:
-				self.symbol_inspection_start = True 
+			if ts>=MOO_exit_timer and MOO_exit==False :
 
-			if ts>=MOO_send_out_timer and moo_release==False :
-				### TRIGGER. Realese the moo orders. 
-				#self.symbol_inspection_start = False 
-				log_print("Timer: timer triggered for MOO",self.moo_orders)
-				# with self.symbol_inspection_lock  THIS IS NOT A PERMENANT SOLUTION> 
-				with self.moo_lock:
-					for symbol,share in self.moo_orders.items():
-						
-						share = int(share)
-						print("sending",symbol,share)
-						if share<0:
-							if c%2==0:
-								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Sell->Short%20ARCX%20MOO%20OnOpen&shares="+str(abs(share))
-							else:
-								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Sell->Short NSDQ MOO Regular OnOpen&shares="+str(abs(share))
-						else:
-							if c%2==0:
-								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Buy%20ARCX%20MOO%20OnOpen&shares="+str(share)
-							else:
-								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Buy NSDQ MOO Regular OnOpen&shares="+str(share)
-						c+=1 
+				total_moo_exit = {}
+
+				for symbol,data in self.symbol_data.items():
+					share = data.get_all_moo_exit()*-1
+
+					if share!=0:
+						total_moo_exit[symbol] = share
+
+				log_print("Timer: timer triggered for MOO Exit:",total_moo_exit)
+
+				self.send_moo(total_moo_exit)
+
+				MOO_exit = True 
+
+			if ts>=Moo_enter_timer and Moo_enter==False :
 
 
-						with self.symbol_inspection_lock:
-							for i in self.moo_algos.values():
 
-								log_print("APPLYING MOO ALOGS:",i)
-								basket_name,orders,risk,aggresive,info = i[0],i[1],i[2],i[3],i[4]
-								#self.apply_basket_cmd(basket_name,orders,risk,aggresive,info)
+				total_moo_enter = {}
 
-						
-						req = threading.Thread(target=request, args=(reque,),daemon=True)
-						req.start()
+				for symbol,data in self.symbol_data.items():
+					share = data.get_all_moo_enter()
 
-				moo_release = True
+					if share!=0:
+						total_moo_enter[symbol] = share
 
+				log_print("Timer: timer triggered for MOO Enter",total_moo_enter)
+				self.send_moo(total_moo_enter)
+				Moo_enter = True 
 
-				### PRE RELEASE. 
+			if ts>=MOO_pair_timer and MOO_pair == False:
 
-				for basket,item in self.baskets.items():
-					if basket[:3]=="PRE":
-						for symbol,share in item.current_shares.items():	
-							if share<0:
-								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Buy%20ARCX%20MOO%20OnOpen&shares="+str(share)
-							else:
-								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Sell->Short%20ARCX%20MOO%20OnOpen&shares="+str(abs(share))
-								
-							req = threading.Thread(target=request, args=(reque,),daemon=True)
-							req.start()
+				### ALL INSPECTION NOW TURN ON.
+				log_print("Timer: pair timer initiated")
+				for trade in list(self.baskets.values()):
+					trade.turn_on_inspection()
 
-						#flat and then shut down. 
-						item.flatten_cmd()
-						item.shutdown()
-
-			if ts>=MOO_pairing_timer and pair_release==False :
-
-				log_print("Timer: pair realease complelte")
-
-				pair_release=True 
- 
-
-				self.symbol_inspection_start = True
-				time.sleep(5)
-				### TRIGGER. PAIR UP the algos.
-
+				MOO_pair = True 
 			if ts>=MOC_send_out_timer and moc_release==False:
 
 				########################################################################################################################
@@ -556,7 +612,6 @@ class Manager:
 
 				with self.symbol_inspection_lock: 
 					
-
 					#reduce_everything_by_half_ta
 
 					if self.ta_moc.get()==False:
@@ -608,6 +663,7 @@ class Manager:
 					basket.flatten_cmd()
 
 				moc_pair_release=True
+
 			#print('current:',ts)
 			time.sleep(3)
 
@@ -763,10 +819,9 @@ class Manager:
 
 					confirmation,orders,risk,aggresive,multiplier = self.ui.order_confirmation(d[1],d[2])
 
-
 						# stop,
 
-					if self.net > self.set_risk*-1:
+					if self.net > self.set_risk*-1 and self.system_enable:
 						if confirmation:
 							#log_print("basket update:",d)
 							#log_print(d[1],confirmation,orders,risk,aggresive)
@@ -777,17 +832,8 @@ class Manager:
 								if type(info[key])==int  or type(info[key])==float:
 									info[key] =info[key]*multiplier
 
-
-							if "OB" in d[1] and cur_ts<570:
-								handl = threading.Thread(target=self.moo_apply_basket_cmd,args=(d[1],orders,risk,aggresive,info,),daemon=True)
-								handl.start()
-								#self.moo_apply_basket_cmd(d[1],orders,risk,aggresive)
-
-							elif "COP" in d[1] and cur_ts<570:
-								handl = threading.Thread(target=self.moo_apply_basket_cmd,args=(d[1],orders,risk,aggresive,info,),daemon=True)
-								handl.start()
 								
-							elif cur_ts<=958:
+							if cur_ts<=958:
 								log_print("basket update:",d,info)
 								self.apply_basket_cmd(d[1],orders,risk,aggresive,info)
 					else:
@@ -803,7 +849,7 @@ class Manager:
 					cur_ts = now.hour*60+now.minute
 
 					log_print("Deploying:",d)
-					if self.net > self.set_risk*-1 and cur_ts<=957:
+					if self.net > self.set_risk*-1 and cur_ts<=957 and self.system_enable:
 
 						self.apply_pair_cmd(d[1])
 
@@ -884,6 +930,8 @@ class Manager:
 					user = d[2]
 
 					# self.user.set("User:"+user)
+					self.system_enable = True 
+
 					self.current_positions = positions
 
 					self.ui.user.set(user)
@@ -950,9 +998,11 @@ class Manager:
 						self.symbol_data[symbol].rejection_message(side)
 				except Exception as e:
 					PrintException(e,"Order rejection error")
-				# if symbol in self.tradingplan:
-				# 	self.tradingplan[symbol].ppro_order_rejection()
 
+				self.rejection_count+=1
+				log_print("Rejection count:",self.rejection_count)
+				if self.rejection_count%5==0:
+					self.rejection_alert(self.ui.user.get(),self.rejection_count)
 
 			elif d[0] =="shutdown":
 				break
@@ -1086,6 +1136,27 @@ class Manager:
 				d.data[RELOAD_TIMES] = reloa
 			d.adjusting_risk()
 			d.update_displays()
+
+
+	def rejection_alert(self,user,rejection_count):
+
+		sender = 'algomanagertnv@gmail.com'
+		password = 'myvjbplswvsvktau'
+		recipients = ['chiao@selectvantage.com','zenvoidsun@gmail.com']
+
+
+		subject = "Rejection Alert:"+user +" : "+str(rejection_count)
+		body = "Rejection: " +str(rejection_count)
+
+		msg = MIMEText(body)
+		msg['Subject'] = subject
+		msg['From'] = sender
+		msg['To'] = ', '.join(recipients)
+		with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
+		   smtp_server.login(sender, password)
+		   smtp_server.sendmail(sender, recipients, msg.as_string())
+
+
 
 	def deselect_all(self):
 		for d in self.tradingplan.values():
@@ -1351,3 +1422,21 @@ if __name__ == '__main__':
 	os._exit(1)
 
 	print("exit")
+
+
+
+
+# for basket,item in self.baskets.items():
+# 	if basket[:3]=="PRE":
+# 		for symbol,share in item.current_shares.items():	
+# 			if share<0:
+# 				reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Buy%20ARCX%20MOO%20OnOpen&shares="+str(share)
+# 			else:
+# 				reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Sell->Short%20ARCX%20MOO%20OnOpen&shares="+str(abs(share))
+				
+# 			req = threading.Thread(target=request, args=(reque,),daemon=True)
+# 			req.start()
+
+# 		#flat and then shut down. 
+# 		item.flatten_cmd()
+# 		item.shutdown()

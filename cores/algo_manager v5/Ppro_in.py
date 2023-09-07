@@ -174,6 +174,8 @@ def Ppro_in_old(port,pipe):
 
 			if rec:
 				stream_data = str(data)
+
+				#log_print(stream_data)
 				if work==False:
 					pipe.send(["ppro_in","Connected"])
 				work=True

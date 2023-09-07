@@ -45,11 +45,20 @@ class TradingPlan_Basket:
 
 		self.manual_addable = False 
 		self.manual_flattable = False 
+
+		self.one_shot_algo = False
+
+		self.inspectable = True 
+
+		self.terminated = False 
+
+		self.manually_added = False 
+
 		if "Profit" in info:
 			self.profit = int(info["Profit"])
 
-		if "Risk" in info:
-			self.stop = int(info["Risk"])
+		if "Stop" in info:
+			self.stop = int(info["Stop"])
 
 		if "Addable" in info:
 			self.manual_addable = True 
@@ -57,6 +66,8 @@ class TradingPlan_Basket:
 		if "Flattable" in info:
 			self.manual_flattable = True 
 
+		if "Mooin" in info:
+			self.inspectable = False 
 
 		log_print(algo_name,"  profit & risk : ",self.profit,self.stop)
 		#### BANED SYMBOL
@@ -70,7 +81,7 @@ class TradingPlan_Basket:
 		self.expected_shares = {}
 		self.current_shares = {}
 		self.current_request = {}
-
+		self.maximum_manual = {}
 		####################################################################################
 
 		self.incremental_state = {}
@@ -81,7 +92,6 @@ class TradingPlan_Basket:
 		self.incremental_expected_shares_deadline = {}
 
 		####################################################################################
-
 
 		self.current_exposure = {}
 
@@ -116,6 +126,19 @@ class TradingPlan_Basket:
 
 		self.init_data(risk)
 
+
+		self.specific_initiation()
+
+	def specific_initiation(self):
+
+
+		if "OB" == self.algo_name[:2]:
+			self.inspectable = False
+			self.one_shot_algo = True 
+		if "IMB_MOO" in self.algo_name:
+			self.manual_flattable = True 
+			self.one_shot_algo = True
+		log_print(self.source," Initializing:, Manual flattable:",self.manual_flattable," Inspectable:",self.inspectable)
 	def init_data(self,risk):
 
 		for i in self.numeric_labels:
@@ -140,6 +163,40 @@ class TradingPlan_Basket:
 		# for i in self.symbol.numeric_labels:
 		# 	self.tkvars[i] = tk.DoubleVar(value=self.symbol.data[i])
 
+	def get_inspectable(self):
+
+		return self.inspectable
+
+	def get_manual_addable(self):
+
+		return self.manual_addable
+
+	def get_manual_flatable(self):
+
+		return self.manual_flattable
+
+
+	def get_algoname(self):
+
+		return self.algo_name #get_inspectable
+
+	def manual_flattable(self,val):
+		if val:
+			self.manual_flattable = True 
+		else:
+			self.manual_flattable = False 
+
+	def manual_addable(self,val):
+		if val:
+			self.manual_addable = True 
+		else:
+			self.manual_addable = False 
+
+	def turn_on_inspection(self):
+		self.inspectable = True 
+
+	def turn_off_inspection(self):
+		self.inspectable = False 
 
 	def internal(self):
 		log_print(self.source,self.name,"holding:",self.current_shares ,"expected:",self.expected_shares,"requested:",self.current_request)
@@ -153,6 +210,8 @@ class TradingPlan_Basket:
 	def if_activated(self):
 		return self.in_use	
 
+	def modify_maximum_manual(self,symbol,share):
+		self.maximum_manual[symbol] = share
 
 	def register_symbol(self,symbol_name,symbol):
 
@@ -167,6 +226,8 @@ class TradingPlan_Basket:
 			self.current_shares[symbol_name] = 0
 			self.current_request[symbol_name] = 0
 			self.current_exposure[symbol_name] = []
+
+			self.maximum_manual[symbol_name] = 300
 
 			################################################################
 			self.incremental_state[symbol_name] = False
@@ -191,7 +252,6 @@ class TradingPlan_Basket:
 	def update_stockprices(self,symbol,price):
 
 		self.stock_price[symbol] = price
-
 
 	def check_incremental(self,symbol,ts):
 
@@ -232,8 +292,6 @@ class TradingPlan_Basket:
 				self.tkvars[MIND].set(str(self.expected_shares[symbol])+"/"+str(self.incremental_expected_shares[symbol]))
 			else:
 				log_print(self.source,self.algo_name,symbol," increment done.")
-
-
 
 	def reduce_everything_by_half_ta(self,timetakes,percentage):
 
@@ -451,21 +509,37 @@ class TradingPlan_Basket:
 		else:
 
 			### MANUAL CONTROL SIDE ###
+			# change = False 
+			# if self.manual_addable and self.flatten_order!=True and abs(self.self.current_shares[symbol])<50: ### NEED ON SAME SIDE. AND LESS THAN THE LIMIT. 
+			# 	if self.expected_shares[symbol]*share>=0:
+
+			# 		### WHATS THE MAXIUM TO ADD??? Infinity.
+
+			# 		remaining_room = abs(self.maximum_manual[symbol]) - abs(self.current_shares[symbol])
+
+
+			# 		if abs(remaining_room)>=abs(share): # EATS EVERYTHING 
+			# 			self.expected_shares[symbol] += share 
+			# 			self.current_shares[symbol] += share 
+
+			# 			share_added = share
+			# 			ret = 0 
+
+			# 		else:
+			# 			sign = np.sign(share)
+			# 			self.expected_shares[symbol] += remaining_room*sign 
+			# 			self.current_shares[symbol] += remaining_room*sign 
+
+			# 			share_added = share
+			# 			ret = 0 
+
+			# 		change = True 
+
+			# 		self.manually_added = True
+
+			# 		log_print(self.source,self.algo_name,symbol,"Manual Loading UP :incmonig,",share," now have",self.current_shares[symbol],"return",ret)
+
 			change = False 
-			if self.manual_addable and self.flatten_order!=True: ### NEED ON SAME SIDE. AND LESS THAN THE LIMIT. 
-				if self.expected_shares[symbol]*share>=0:
-
-					### WHATS THE MAXIUM TO ADD??? Infinity.
-					self.expected_shares[symbol] += share 
-					self.current_shares[symbol] += share 
-
-					share_added = share
-					ret = 0 
-
-					change = True 
-
-					log_print(self.source,self.algo_name,symbol,"Manual Loading UP :incmonig,",share," now have",self.current_shares[symbol],"return",ret)
-
 			if self.manual_flattable: ### NEED ON DIFF SIDE
 				if self.expected_shares[symbol]*share<=0:
 
@@ -505,9 +579,12 @@ class TradingPlan_Basket:
 					PrintException(e,"Basket Holding Update Error:"+self.source+symbol)
 				self.calculate_avg_price(symbol)
 
-				if sum(self.current_shares.values())==0:
+				if sum(self.current_shares.values())==0 : #and self.one_shot_algo
 					### COMPLETELY FLAT. ###
 					self.flatten_order = True 
+					self.terminated = True 
+
+					log_print(self.source,self.algo_name,"NOW MANUUAL FLAT.")
 
 				return ret 
 
@@ -657,8 +734,8 @@ class TradingPlan_Basket:
 		# if self.display_count %3==0:
 		# 	log_print(self.source,"PNL checking",self.algo_name,check,total_unreal,self.current_shares, self.average_price)
 		
-		if self.profit!=0:
-			if total_unreal>self.profit:
+		if self.profit!=0 and self.manually_added==False:
+			if total_unreal>self.profit :
 				log_print(self.source, self.algo_name, " MEET PROFIT TARGET",self.profit)
 				self.flatten_cmd()
 		if self.stop!=0:
@@ -754,4 +831,3 @@ class TradingPlan_Basket:
 
 		self.data[STATUS] = DEPLOYED
 		self.tkvars[STATUS].set(DEPLOYED)
-

@@ -106,7 +106,6 @@ class UI(pannel):
 		self.risk_timer = tk.DoubleVar(value=300)
 
 
-
 		self.custom_algo = None 
 
 		self.init_pannel()
@@ -1295,7 +1294,7 @@ class UI(pannel):
 						self.algos[strategy][i].append(tk.IntVar(value=1))
 						self.algos[strategy][i].append(tk.IntVar(value=1))
 						self.algos[strategy][i].append(tk.BooleanVar(value=0))
-						self.algos[strategy][i].append("")
+						self.algos[strategy][i].append(tk.StringVar(value=""))
 					else:
 						split = i.split(':')
 						i = split[0]
@@ -1305,7 +1304,7 @@ class UI(pannel):
 						self.algos[strategy][i].append(tk.IntVar(value=1))
 						self.algos[strategy][i].append(tk.IntVar(value=1))
 						self.algos[strategy][i].append(tk.BooleanVar(value=0))
-						self.algos[strategy][i].append(description)
+						self.algos[strategy][i].append(tk.StringVar(value=description))
 	def create_algo_tabs(self):
 
 		for i in self.algo_groups:
@@ -1314,13 +1313,7 @@ class UI(pannel):
 
 	def create_each_algos(self):
 
-
-
-
 		for i in self.algo_groups:
-
-
-
 
 			#ttk.Label(self.frames[i], text="").grid(sticky="w",column=0,row=0)
 			row = 1
@@ -1343,16 +1336,8 @@ class UI(pannel):
 				ttk.Checkbutton(self.frames[i], variable=item[PASSIVE]).grid(sticky="w",column=col+3,row=row)
 
 
-
 				if item[DESCRIPTION]!="":
-					print("BIND ",item[DESCRIPTION])
 					tip= Tooltip(label,"Algo info",item[DESCRIPTION])
-					# tooltip_label = tk.Label(self.frames[i], text="", background="yellow", relief="solid", borderwidth=1)
-					# # tooltip_label.pack()
-					# label.bind("<Enter>", lambda event, widget=label,root=self.frames[i],label=tooltip_label: show_tooltip(event, widget,root,label,item[DESCRIPTION]))
-					# label.bind("<Leave>",  lambda event,root=self.frames[i]: hide_tooltip(event,root))
-					#label.bind("<Enter>", lambda event, widget=label: show_tooltip(event, widget,item[DESCRIPTION]))
-					#label.bind("<Leave>", hide_tooltip)
 
 				row+=1
 
@@ -1400,15 +1385,17 @@ class UI(pannel):
 			try:
 				d = {}
 
+
 				for algo,item in self.algos[tab].items():
 					d[algo]=[]
+
 					for i in item:
 						d[algo].append(i.get())
 				#print("saving",tab)
 				with open('../../custom_algos_config/'+tab+'_setting.json', 'w') as fp:
 					json.dump(d, fp)
 			except Exception as e:
-				print("saving error",e,tab)
+				PrintException("saving error"+tab+item,e)
 
 	def load_all(self):
 
@@ -1478,7 +1465,7 @@ class UI(pannel):
 
 	def order_confirmation(self,basket_name,orders):
 
-		print("RECEVING:",basket_name,orders)
+		#print("RECEVING:",basket_name,orders)
 
 
 			## PARSE IT AND RE PARSE IT. ? ADD RISK TO IT. 

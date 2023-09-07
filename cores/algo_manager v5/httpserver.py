@@ -131,7 +131,7 @@ class S(BaseHTTPRequestHandler):
 
 				elif "Basket" in stream_data:
 
-					#print("....",stream_data,"...")
+
 					basket = find_between(stream_data,"Basket=",",")
 
 					orders = find_between(stream_data,"Order=*","*")
@@ -140,7 +140,7 @@ class S(BaseHTTPRequestHandler):
 
 					# aggresive = int(find_between(stream_data,"Aggresive=",","))
 
-					#print(stream_data)
+
 					d={}
 					for i in orders.split(","):
 
@@ -184,7 +184,7 @@ class S(BaseHTTPRequestHandler):
 					ratio = find_between(stream_data,"Ratio=",",")
 					passive = find_between(stream_data,"Passive=",",")
 
-					#print(amount,ratio,passive)
+
 
 					d={}
 					d['pair'] = pair
@@ -209,7 +209,7 @@ class S(BaseHTTPRequestHandler):
 	# def send_basket(self,basket_name,orders,risk,aggresive):
 
 	# 	global pipec
-	# 	#print("sending",msg,pipec)
+
 
 	# 	print("HTTP sending:",basket_name,orders,risk,aggresive)
 
@@ -218,18 +218,11 @@ class S(BaseHTTPRequestHandler):
 	def send_cmd(self,msg):
 
 		global pipec
-		#print("sending",msg,pipec)
-
-		#print("HTTP sending:",msg)
-
 		pipec.send(["cmd",msg])
 
 	def send_pkg(self,msg):
 
 		global pipec
-		#print("sending",msg,pipec)
-
-		#print("HTTP sending:",msg)
 
 		pipec.send(["pkg",[msg]])
 		#pipe.send(msg)
@@ -276,115 +269,3 @@ def httpserver(pipex):
 	logging.info('Stopping httpd...\n')
 
 
-
-# stream_data="Basket=koko,Order=AAPL.NQ:5,AMD.NQ*"
-# basket = find_between(stream_data,"Basket=",",")
-
-# infos = find_between(stream_data,"Order=","*")
-
-# print(basket,infos)
-
-# d={}
-# for i in infos.split(","):
-# 	print(i)
-# 	a,b = i.split(":")
-# 	d[a] = int(b)
-
-# print(d)
-
-
-# stream_data = "https://tnv.ngrok.io/Basket=TEST2,Order=*SPY.AM:5,QQQ.NQ:5*,Infos=(Profit=5,Stop=5,)=Infos"
-# #print("....",stream_data,"...")
-# basket = find_between(stream_data,"Basket=",",")
-
-# orders = find_between(stream_data,"Order=*","*")
-
-# # risk = int(find_between(stream_data,"Risk=",","))
-
-# # aggresive = int(find_between(stream_data,"Aggresive=",","))
-
-# #print(stream_data)
-# d={}
-# for i in orders.split(","):
-
-# 	a,b = i.split(":")
-# 	d[a] = int(b)
-
-# info = {}
-
-# if "Infos" in stream_data:
-# 	infos = find_between(stream_data,"Infos=(",")=Infos") 
-			
-
-# 	for i in infos.split(","):
-# 		#print(i)
-# 		if "=" in i:
-# 			a,b = i.split("=")
-# 			info[a] = int(b)
-
-
-# print(basket,orders,info)
-# s=" /Trade_type=Single,Algo_id=Manual_LCID.NQ944,Algo_name=Manual%20Trade,Symbol=LCID.NQ,Entry_typeInstant%20Short,Support0,Resistance22.0,Risk=3.0,Side=Short,Deploy=T,Management=FullManual"
-
-
-# s.replace("%20"," ")
-# print(s.replace("%20"," "))
-#httpserver("GEGE")
-
-
-# TRADETYPE = "Trade_type="
-# ALGOID ="Algo_id="
-# ALGONAME ="Algo_name="
-# SYMBOL = "Symbol="
-# ENTRYPLAN = "Entry_type"
-# SUPPORT = "Support"
-# RESISTANCE = "Resistance"
-# RISK =  "Risk="
-# SIDE =  "Side="
-# DEPLOY = "Deploy="
-# MANAGEMENT = "Management="
-
-# a = [DEPLOY,TRADETYPE,ALGOID,ALGONAME,SYMBOL,ENTRYPLAN,SUPPORT,RESISTANCE,RISK,SIDE,MANAGEMENT]
-
-# b = [i for i in range(len(a))]
-# b[0] = True
-
-# print(b)
-
-# msg = ""
-# for i in range(len(a)):
-
-# 	msg+= str(a[i])+str(b[i])+","
-
-# print(msg)
-
-#s = "Algo_id=TEST1,Trade_type=Single,Algo_name=TEST,Entry_type=MarketAction,Symbol=SPY.AM,Support=413,Resistance=414,Side=Long,Risk=50.0,Deploy=T,Management=HoldXSecond"
-
-#Algo_id=TEST1,Trade_type=Single,Algo_name=TEST,Entry_type=MarketLong,Symbol=SPY.AM,Support=413,Resistance=414,Side=Long,Risk=5.0,Deploy=T,Management=HoldXSecond,
-#Algo_id=TEST1,Trade_type=Single,Algo_name=TEST,Entry_type=MarketShort,Symbol=SPY.AM,Support=413,Resistance=414,Side=Short,Risk=5.0,Deploy=T,Management=HoldXSecond,
-
-
-# stream_data="Basket=koko,Risk=10,Order={SPY.AM:0,QQQ.NQ:0}"
-
-# basket = find_between(stream_data,"Basket=",",")
-# infos = find_between(stream_data,"Order={","}")
-# risk = find_between(stream_data,"Risk=",",")
-# print(basket,infos,risk)
-
-
-
-# stream_data = "Basket=MRQQQ,Risk=200,Order=*PDD.NQ:-3,ZM.NQ:-2,JD.NQ:-4,NTES.NQ:-3,CSCO.NQ:-8,ATVI.NQ:-8,AMD.NQ:-2,NVDA.NQ:-1,OKTA.NQ:-2,AMZN.NQ:-1,MCHP.NQ:-2,ADSK.NQ:-1,GOOGL.NQ:-2,EBAY.NQ:-6,PYPL.NQ:-2,INTC.NQ:-7,CRWD.NQ:-1,GOOG.NQ:-2,WDAY.NQ:-1,BIDU.NQ:-1,SIRI.NQ:-57,META.NQ:-1,DDOG.NQ:-1,EA.NQ:-2,CTSH.NQ:-4,ADI.NQ:-1,ABNB.NQ:-1,AZN.NQ:-6,CSX.NQ:-9,AAPL.NQ:-1,KHC.NQ:13,XEL.NQ:4,PCAR.NQ:3,AEP.NQ:2,CEG.NQ:2,EXC.NQ:6,SGEN.NQ:2,VRSK.NQ:1,PEP.NQ:1,DLTR.NQ:2,FAST.NQ:3,KDP.NQ:9,MDLZ.NQ:6,FISV.NQ:2,ADP.NQ:1,DXCM.NQ:1,NXPI.NQ:1,AMGN.NQ:1,VRSN.NQ:1,GILD.NQ:5,HON.NQ:1,ROST.NQ:2,SBUX.NQ:2,SWKS.NQ:1,CMCSA.NQ:7,MNST.NQ:2,PAYX.NQ:2,MTCH.NQ:3,CPRT.NQ:2,CDNS.NQ:1*Aggresive=0,"
-# basket = find_between(stream_data,"Basket=",",")
-
-# infos = find_between(stream_data,"Order=*","*")
-
-# risk = int(find_between(stream_data,"Risk=",","))
-
-# aggresive = int(find_between(stream_data,"Aggresive=",","))
-
-# print(stream_data)
-# d={}
-# for i in infos.split(","):
-
-# 	a,b = i.split(":")
-# 	d[a] = int(b)

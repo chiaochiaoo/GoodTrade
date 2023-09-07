@@ -221,6 +221,37 @@ class Symbol:
 		log_print(self.symbol_name,"would remain:",remaining)
 
 		return remaining
+
+	def get_all_moo_exit(self):
+
+		### all tps have the name of IMB_MOO
+		remaining = 0
+
+		tps = list(self.tradingplans.keys())
+
+		for tp in tps:
+			if "IMB_MOO" in  self.tradingplans[tp].get_algoname():
+				remaining+= self.tradingplans[tp].get_current_share(self.symbol_name)
+
+		log_print(self.symbol_name,"get all moo exit :current have:",remaining)
+
+		return remaining
+
+	def get_all_moo_enter(self):
+
+		remaining = 0
+
+		tps = list(self.tradingplans.keys())
+
+		for tp in tps:
+			if "OB" ==  self.tradingplans[tp].get_algoname()[:2]:
+				remaining+= self.tradingplans[tp].get_current_expected(self.symbol_name)
+
+		log_print(self.symbol_name,"get all moo enter: expect to have:",remaining)
+
+		return remaining
+
+		
 	def as_is(self):
 
 		pass 
@@ -249,7 +280,8 @@ class Symbol:
 				log_print(self.source,self.symbol_name," inspection discrepancy: discrepancy matched. ",self.current_imbalance,current_shares-self.current_shares)
 				self.difference += self.current_imbalance * -1
 
-
+		if self.difference!=0:
+			log_print(self.source,self.symbol_name,"Current:",self.current_shares,"Expected:",self.expected,"Difference:",self.difference)
 		######################################################################################
 
 		### need at least 3 seconds delay.
@@ -322,7 +354,8 @@ class Symbol:
 		current_shares = 0
 		
 		for tp in tps:
-			current_shares +=  self.tradingplans[tp].get_current_share(self.symbol_name)
+			if self.tradingplans[tp].get_inspectable():
+				current_shares +=  self.tradingplans[tp].get_current_share(self.symbol_name)
 
 		return current_shares
 
@@ -335,7 +368,10 @@ class Symbol:
 		self.expected = 0
 		
 		for tp in tps:
-			self.expected +=  self.tradingplans[tp].get_current_expected(self.symbol_name)
+			### ONLY IF TP is inspectable. 
+
+			if self.tradingplans[tp].get_inspectable():
+				self.expected +=  self.tradingplans[tp].get_current_expected(self.symbol_name)
 
 		return self.expected
 
@@ -356,7 +392,8 @@ class Symbol:
 		want = []
 
 		for tp in tps:
-			want.append(self.tradingplans[tp].get_current_request(self.symbol_name))
+			if self.tradingplans[tp].get_inspectable():
+				want.append(self.tradingplans[tp].get_current_request(self.symbol_name))
 
 		p=0
 		n=0
@@ -377,14 +414,16 @@ class Symbol:
 			# if price is 0, use impcming
 
 			for tp in tps: 
-				long_pair_off = self.tradingplans[tp].request_fufill(self.symbol_name,long_pair_off,self.data[BID])
-				if long_pair_off<=0:
-					break
+				if self.tradingplans[tp].get_inspectable():
+					long_pair_off = self.tradingplans[tp].request_fufill(self.symbol_name,long_pair_off,self.data[BID])
+					if long_pair_off<=0:
+						break
 
 			for tp in tps: 
-				short_pair_off = self.tradingplans[tp].request_fufill(self.symbol_name,short_pair_off,self.data[BID])
-				if short_pair_off>=0:
-					break
+				if self.tradingplans[tp].get_inspectable():
+					short_pair_off = self.tradingplans[tp].request_fufill(self.symbol_name,short_pair_off,self.data[BID])
+					if short_pair_off>=0:
+						break
 
 			log_print(self.source,self.symbol_name	,"pair off,",want," amount", long_pair_off,short_pair_off)
 
@@ -418,7 +457,20 @@ class Symbol:
 					time.sleep(0.1)
 					self.order_processing_timer	-=0.1
 
-				tps = list(self.tradingplans.keys())
+				total_tp = list(self.tradingplans.keys())
+
+				tps = []
+				for tp in total_tp:
+					if self.tradingplans[tp].get_inspectable():
+						tps.append(tp)
+
+				for tp in total_tp: #EVERYTHING ELSE.
+					if tp not in tps:
+						tps.append(tp)
+
+				if len(tps)!=len(total_tp):
+					log_print(self.source,"WARNING, WARNING. TP ORDERS UNMATCH.")
+
 				with self.incoming_shares_lock:
 
 					#for each piece feed it.. to the requested.
@@ -429,12 +481,16 @@ class Symbol:
 					for price,share in self.incoming_shares.items():
 
 						share_difference = share
+
+						### HERE I SHOULD MAKE PRIORITIZATION. NON_MANUAL, NON INSPECTABLE LAST. 
 						for tp in tps:
 							share_difference = self.tradingplans[tp].request_fufill(self.symbol_name,share_difference,price)
 
 							self.tradingplans[tp].notify_holding_change(self.symbol_name)
 							if share_difference==0:
 								break
+
+
 
 						if share_difference!=0:
 							remaining += share_difference
