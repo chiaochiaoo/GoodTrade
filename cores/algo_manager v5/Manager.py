@@ -1142,7 +1142,7 @@ class Manager:
 
 		sender = 'algomanagertnv@gmail.com'
 		password = 'myvjbplswvsvktau'
-		recipients = ['chiao@selectvantage.com','zenvoidsun@gmail.com']
+		recipients = ['chiao@selectvantage.com','zenvoidsun@gmail.com','andrew@selectvantage.com']
 
 
 		subject = "Rejection Alert:"+user +" : "+str(rejection_count)
@@ -1155,8 +1155,6 @@ class Manager:
 		with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
 		   smtp_server.login(sender, password)
 		   smtp_server.sendmail(sender, recipients, msg.as_string())
-
-
 
 	def deselect_all(self):
 		for d in self.tradingplan.values():
