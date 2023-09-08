@@ -440,9 +440,9 @@ class UI(pannel):
 		# row +=1 
 	def init_deployment_pannel(self):
 
-		self.labels = {"Strategy":15,\
-						"Status":10,\
-						"Updates":5,\
+		self.labels = {"Strategy":25,\
+						"Status":8,\
+						#"Updates":5,\
 						"MaxU":8,\
 						"MinU":8,\
 						UNREAL:8,\
