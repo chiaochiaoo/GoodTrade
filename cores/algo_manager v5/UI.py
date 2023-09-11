@@ -679,7 +679,7 @@ class UI(pannel):
 				i['TA'].grid(sticky="w",column=c,row=t)	
 
 				c+=1
-				i["set_button"] =tk.Button(tab, text="CANCEL",command=lambda s=i,side="direct": self.submit_spread(s,side),width=labels['button'])
+				i["set_button"] =tk.Button(tab, text="CANCEL",command=lambda s=i: self.as_is(s),width=labels['button'])
 				i["set_button"].grid(sticky="w",column=c,row=t)
 				
 
