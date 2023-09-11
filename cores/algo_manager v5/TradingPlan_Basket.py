@@ -411,6 +411,10 @@ class TradingPlan_Basket:
 				self.expected_shares[symbol] = self.current_shares[symbol]
 				self.current_request[symbol] = 0
 
+				## IF THERE IS REQUEST> CANCEL IT.
+
+				self.symbols[symbol].cancel_request()
+
 
 	def recalculate_current_request(self,symbol):
 		self.current_request[symbol] = self.expected_shares[symbol] - self.current_shares[symbol]

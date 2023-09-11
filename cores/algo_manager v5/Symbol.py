@@ -251,7 +251,7 @@ class Symbol:
 
 		return remaining
 
-		
+	
 	def as_is(self):
 
 		pass 
@@ -523,6 +523,11 @@ class Symbol:
 		else:
 			if self.order_processing_timer<0.2:
 				self.order_processing_timer=0.2
+			
+
+	def cancel_request(self):
+		if self.aggresive_only!=True and ts<57500:
+			self.ppro_out.send([CANCEL,self.symbol_name])	
 			
 	def deploy_orders(self,ts):
 
