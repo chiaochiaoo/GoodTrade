@@ -526,9 +526,13 @@ class Symbol:
 			
 
 	def cancel_request(self):
+
+		now = datetime.now()
+		ts = now.hour*3600 + now.minute*60 + now.second
+		
 		if self.aggresive_only!=True and ts<57500:
 			self.ppro_out.send([CANCEL,self.symbol_name])	
-			
+
 	def deploy_orders(self,ts):
 
 		# I NEED TO ADD A MECHANISM ON THIS
