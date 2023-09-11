@@ -666,7 +666,9 @@ class UI(pannel):
 
 				i['status_bar'] = tk.Label(tab, textvariable=i['status'])
 				i['status_bar'].grid(sticky="w",column=c,row=t)
-				c+=2
+				c+=1
+
+
 
 				tk.Label(tab, text="TA:").grid(sticky="w",column=c,row=t)
 				c+=1
@@ -675,6 +677,11 @@ class UI(pannel):
 				i['TA']=tk.Entry(tab,textvariable=i['timer'],width=labels['entry'])
 				#i['TA']["state"] = DISABLED
 				i['TA'].grid(sticky="w",column=c,row=t)	
+
+				c+=1
+				i["set_button"] =tk.Button(tab, text="CANCEL",command=lambda s=i,side="direct": self.submit_spread(s,side),width=labels['button'])
+				i["set_button"].grid(sticky="w",column=c,row=t)
+				
 
 
 				t+=1 
@@ -797,6 +804,11 @@ class UI(pannel):
 
 
 			x+=1
+
+	def as_is(self,dic):
+
+		self.manager.algo_as_is(dic['name'])
+
 
 	def submit_spread(self,dic,type_):
 	
