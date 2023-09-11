@@ -176,6 +176,7 @@ class TradingPlan_Basket:
 		return self.manual_flattable
 
 
+
 	def get_algoname(self):
 
 		return self.algo_name #get_inspectable
@@ -400,6 +401,16 @@ class TradingPlan_Basket:
 					else:
 						log_print(self.source,self.algo_name,symbol," AGGRESIVE TOO FREQUENT : ",ts - self.recent_action_ts[symbol])
 				# self.notify_request(symbol)
+
+	def algo_as_is(self):
+
+		log_print(self.source,self.algo_name," as is.")
+
+		for symbol in self.symbols.keys():
+			with self.read_lock[symbol]:
+				self.expected_shares[symbol] = self.current_shares[symbol]
+				self.current_request[symbol] = 0
+
 
 	def recalculate_current_request(self,symbol):
 		self.current_request[symbol] = self.expected_shares[symbol] - self.current_shares[symbol]

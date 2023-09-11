@@ -391,6 +391,10 @@ class Manager:
 
 	# 				self.baskets[basket_name].register_symbol(symbol,self.symbol_data[symbol])
 
+	def algo_as_is(self,algo_name):
+
+		if algo_name in self.baskets:
+			self.baskets[algo_name].algo_as_is()
 
 	def apply_pair_cmd(self,d):
 
