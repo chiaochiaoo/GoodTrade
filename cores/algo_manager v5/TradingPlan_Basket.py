@@ -729,7 +729,7 @@ class TradingPlan_Basket:
 		check = {}
 		for symbol,val in self.current_shares.items():
 
-			cur_stock_price = self.symbols[symbol].get_bid()
+			cur_stock_price = self.symbols[symbol].get_price()
 			self.stock_price[symbol] = cur_stock_price
 
 			if self.current_shares[symbol]!=0 and cur_stock_price!=0 and self.average_price[symbol]!=0:
@@ -739,7 +739,7 @@ class TradingPlan_Basket:
 					check[symbol] = [cur_stock_price,self.average_price[symbol],self.current_shares[symbol],((cur_stock_price - self.average_price[symbol])-0.01) * abs(self.current_shares[symbol])]
 					#log_print(self.algo_name,symbol,"avg price",self.average_price[symbol],"cur price",cur_stock_price,"share",val,"result", (cur_stock_price - self.average_price[symbol]) * abs(self.current_shares[symbol]))
 				else:
-					cur_stock_price = self.symbols[symbol].get_ask()
+					cur_stock_price = self.symbols[symbol].get_price()
 					total_unreal +=  ((self.average_price[symbol] - cur_stock_price)-0.01) * abs(self.current_shares[symbol]) #self.data[AVERAGE_PRICE]-price
 					check[symbol] = [cur_stock_price,self.average_price[symbol],self.current_shares[symbol],((self.average_price[symbol] - cur_stock_price)-0.01) * abs(self.current_shares[symbol])]
 					#log_print(self.algo_name,symbol,"avg price",self.average_price[symbol],"cur price",cur_stock_price,"share",val,"result",(self.average_price[symbol] - cur_stock_price) * abs(self.current_shares[symbol]))

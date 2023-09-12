@@ -4,7 +4,7 @@ import tkinter as tk
 from Util_functions import *
 from datetime import datetime, timedelta
 import threading
-
+import requests
 
 
 
@@ -14,6 +14,16 @@ def sign_test(a,b):
 
 
 ### I NEED TO TRACK HOW MANY SYMBOLS IT IS RUNNING SIMULTANEOUSLY. ###
+
+def find_between(data, first, last):
+	try:
+		start = data.index(first) + len(first)
+		end = data.index(last, start)
+		return data[start:end]
+	except ValueError:
+		return data
+
+PRICE = "Price"
 
 class Symbol:
 
@@ -38,7 +48,7 @@ class Symbol:
 
 		self.banned = False 
 
-		self.numeric_labels = [TRADE_TIMESTAMP,TIMESTAMP,BID,ASK,RESISTENCE,SUPPORT,OPEN,HIGH,LOW,PREMARKETLOW,STOP,EXIT,ENTRY,CUSTOM]
+		self.numeric_labels = [TRADE_TIMESTAMP,TIMESTAMP,PRICE,BID,ASK,RESISTENCE,SUPPORT,OPEN,HIGH,LOW,PREMARKETLOW,STOP,EXIT,ENTRY,CUSTOM]
 		self.tech_indicators = [EMACOUNT,EMA8H,EMA8L,EMA8C,EMA5H,EMA5L,EMA5C,EMA21H,EMA21L,EMA21C,CLOSE]
 
 		self.data = {}
@@ -56,6 +66,11 @@ class Symbol:
 
 		self.enabled_insepction = True 
 
+		self.last_l1_update = 0
+
+
+		self.bid_change = False 
+		self.ask_change = False 
 		"""
 		UPGRADED PARTS
 
@@ -121,13 +136,13 @@ class Symbol:
 
 		self.tradingplans[name] = tradingplan
 
-	def update_price(self,bid,ask,ts):
+	def update_price(self,price,ts):
 
 		#print("price",bid,ask,ts)
-		if self.data[BID]!= bid and self.data[ASK]!=ask:
+		if self.data[PRICE]!= price:
 
-			self.data[BID] = bid
-			self.data[ASK] = ask
+			self.data[PRICE] = price
+			#self.data[ASK] = ask
 			self.data[TIMESTAMP] = ts
 
 	def instant_inspection(self):
@@ -255,6 +270,50 @@ class Symbol:
 	def as_is(self):
 
 		pass 
+
+
+	def l1_update_module(self):
+
+		pass 
+
+		### tell the system if there is any bid ask changes since last time.
+
+		try:
+			postbody = "http://127.0.0.1:8080/GetLv1?symbol=" + self.symbol_name 
+
+			r= requests.get(postbody)
+
+			stream_data = r.text
+
+			bid = float(find_between(stream_data, "BidPrice=\"", "\""))
+			ask = float(find_between(stream_data, "AskPrice=\"", "\""))
+			ts = find_between(stream_data, "MarketTime=\"", "\"")
+
+
+			if self.data[BID]!=bid:
+				self.bid_change = True 
+			else:
+				self.bid_change = False 
+
+
+			if self.data[ASK]!=ask:
+				self.ask_change = True 
+			else:
+				self.ask_change = False 
+
+			self.data[ASK] = ask
+			self.data[BID] = bid
+			self.data[TIMESTAMP] = ts
+
+			log_print(self.symbol_name,self.data[BID],self.bid_change,self.data[ASK],self.ask_change)
+
+			return 
+		except Exception as e:
+
+			PrintException(self.symbol_name,e)
+
+		self.ask_change = True 
+		self.bid_change = True 
 
 
 	def calc_total_imbalances(self,tps):
@@ -490,15 +549,10 @@ class Symbol:
 							if share_difference==0:
 								break
 
-
-
 						if share_difference!=0:
 							remaining += share_difference
 
 					######################################SECONDARY REQUEST FILL #########################################################################
-
-
-
 
 
 					######################################################################################################################################
@@ -524,12 +578,11 @@ class Symbol:
 			if self.order_processing_timer<0.2:
 				self.order_processing_timer=0.2
 			
-
 	def cancel_request(self):
 
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second
-		
+
 		if self.aggresive_only!=True and ts<57500:
 			self.ppro_out.send([CANCEL,self.symbol_name])	
 
@@ -543,18 +596,32 @@ class Symbol:
 		# if there might be already an order: #
 		#if self.sent_orders==True:
 
+		if self.difference>0:
+			self.action = PASSIVEBUY
+		else:
+			self.action = PASSIVESELL
+
+		self.l1_update_module()
+
+		skip = True 
+
 		if self.aggresive_only!=True and ts<57500:
-			self.ppro_out.send([CANCEL,self.symbol_name]) 
+			if self.action==PASSIVEBUY and self.bid_change==True:
+				self.ppro_out.send([CANCEL,self.symbol_name]) 
+				skip = False 
+			elif self.action==PASSIVESELL and self.ask_change==True:
+				self.ppro_out.send([CANCEL,self.symbol_name])
+				skip = False 
+
+			# else:
+				
+			# 	skip = False 
+		# if self.aggresive_only!=True and ts<57500:
+		# 	self.ppro_out.send([CANCEL,self.symbol_name]) 
+
 
 		time.sleep(0.1)
 
-		if self.difference>0:
-			self.action = PASSIVEBUY
-			#price = self.get_bid()
-			#coefficient = -1
-
-		else:
-			self.action = PASSIVESELL
 			#price = self.get_ask()
 			#coefficient = 1
 
@@ -572,11 +639,13 @@ class Symbol:
 
 			if self.aggresive_only==True or ts>57500: ### LAST 100 seconds market only.
 				self.immediate_request(self.difference)
+				self.sent_orders = True 
 			else:
-				self.ppro_out.send([self.action,self.symbol_name,total,0,self.manager.gateway])
-
-
-			self.sent_orders = True 
+				if not skip:
+					self.ppro_out.send([self.action,self.symbol_name,total,0,self.manager.gateway])
+					self.sent_orders = True 
+				else:
+					log_print(self.source,self.symbol_name,"NO CHANGE DETECTED, skipping.")
 
 		# handl = threading.Thread(target=self.threading_order,daemon=True)
 		# handl.start()
@@ -591,6 +660,9 @@ class Symbol:
 
 		if self.difference!=0:
 			self.ppro_out.send([self.action,self.symbol_name,abs(self.difference),0])
+
+	def get_price(self):
+		return self.data[PRICE]
 
 	def get_bid(self):
 		return self.data[BID]

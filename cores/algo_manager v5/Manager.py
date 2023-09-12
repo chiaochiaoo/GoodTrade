@@ -1103,7 +1103,7 @@ class Manager:
 					for symbol,price in x.items():
 
 						if symbol in self.symbols_short:
-							self.symbol_data[self.symbols_short[symbol]].update_price(price,price,0)
+							self.symbol_data[self.symbols_short[symbol]].update_price(price,0)
 
 					#log_print("Manager: price update complete.. symbols:",len(symbols),x,symbol,self.symbols_short[symbol],self.symbol_data[self.symbols_short[symbol]].get_bid())
 		except	Exception	as e:
