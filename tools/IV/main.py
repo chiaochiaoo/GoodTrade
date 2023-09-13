@@ -126,10 +126,18 @@ class processor:
 
 			NearIndicativeClosingPx = find_between(row,"NearIndicativeClosingPx=", ",")	#NearIndicativeClosingPx
 			procced = False
+			paired = find_between(row,"PairedVolume=",",")
 
+			side = find_between(row, "Side=", ",")
+			volume =  int(find_between(row, "Volume=", ","))
 			#print(symbol,NearIndicativeClosingPx)
 			if symbol in self.etfs_names:
-				self.etfs[symbol].new_price(symbol,cur_price,auc_price,cont_price,NearIndicativeClosingPx)
+
+				#print(symbol)
+				self.etfs[symbol].new_price(symbol,cur_price,time_,auc_price,cont_price,NearIndicativeClosingPx,side,volume)
+
+
+				writer.writerow([symbol,time_,cur_price,auc_price,cont_price,NearIndicativeClosingPx,side,paired,volume])
 
 			if market =="NQ" and source =="NADQ"and ts>=50400: 
 				procced = True
@@ -148,7 +156,7 @@ class processor:
 
 				data = self.data[symbol]
 
-				writer.writerow([row])
+				
 
 				for data in data["etf"]:
 					etf = data[0]
@@ -182,9 +190,10 @@ class processor:
 		sock.bind((UDP_IP, UDP_PORT))
 
 		count = 0
-		with open("saves/"+datetime.now().strftime("%m-%d")+".csv", 'a',newline='') as csvfile2:
+		with open(datetime.now().strftime("%m-%d")+".csv", 'a',newline='') as csvfile2:
 			writer = csv.writer(csvfile2)
 
+			writer.writerow(["symbol","time_","cur_price","auc_price","cont_price","NearIndPx","side","paired","volume"])
 			while True:
 				data, addr = sock.recvfrom(1024)
 				row = str(data)
@@ -203,6 +212,7 @@ class processor:
 			line_count = 1
 			with open(datetime.now().strftime("%m-%d")+".csv", 'a',newline='') as csvfile2:
 				writer = csv.writer(csvfile2)
+				writer.writerow(["symbol","time_","cur_price","auc_price","cont_price","NearIndPx","side","paired","volume"])
 				for row in csv_reader:
 					row = row[0]
 					self.process_data(row,writer)
@@ -246,7 +256,11 @@ class ETF:
 		self.sell_1min_trailing = []
 		self.bsratio_1min_trailing = []
 
-	def new_price(self,symbol,price,auc_price,cont_price,near):
+
+		self.lst = []
+
+		#cur_price,time_,auc_price,cont_price,NearIndicativeClosingPx,side,volume
+	def new_price(self,symbol,price,time_,auc_price,cont_price,near,side,volume):
 
 		self.data["Price"] = float(price)
 		self.data["AucPrice"] = float(auc_price)
@@ -256,6 +270,10 @@ class ETF:
 		self.data["Near_price"] = round(float(near) - self.data["Price"],1)
 		#Near_price
 		self.data["Near_difference"] =  0#round(self.data["Near_price"]-self.data["Price"],2)  #float(near)#
+
+
+		# FIND THE FILE AND APPEND TO IT. 
+
 
 	def new_imbalance(self,symbol,side,quantity,weight,time_,ts,price,auc_price,cont_price,NearIndicativeClosingPx):
 
