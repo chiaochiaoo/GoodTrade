@@ -40,32 +40,43 @@ class TradingPlan_Basket:
 		self.flatten_order = False
 
 
-		self.stop = 0
-		self.profit = 0
+		
+		
 
-		self.manual_addable = False 
-		self.manual_flattable = False 
+		
+		 
 
 		self.one_shot_algo = False
 
-		self.inspectable = True 
+		
 
 		self.terminated = False 
 
 		self.manually_added = False 
 
+
+		self.break_even = False 
+		self.break_even_amount = 0
+		if "Breakeven" in info:
+			self.break_even_amount = int(abs(info["Breakeven"]))
+
+		self.profit = 0
 		if "Profit" in info:
 			self.profit = int(abs(info["Profit"]))
 
+		self.stop = 0
 		if "Stop" in info:
 			self.stop = int(abs(info["Stop"]))
 
+		self.manual_addable = False 
 		if "Addable" in info:
 			self.manual_addable = True 
 
+		self.manual_flattable = False
 		if "Flattable" in info:
 			self.manual_flattable = True 
 
+		self.inspectable = True 
 		if "Mooin" in info:
 			self.inspectable = False 
 
@@ -707,8 +718,6 @@ class TradingPlan_Basket:
 		for symbol,item in self.symbols.items():
 			self.submit_expected_shares(symbol,0)
 
-			#if emergency.
-			#item.flatten_cmd(self.algo_name)
 
 		self.flatten_order=True
 
@@ -749,14 +758,22 @@ class TradingPlan_Basket:
 		# if self.display_count %3==0:
 		# 	log_print(self.source,"PNL checking",self.algo_name,check,total_unreal,self.current_shares, self.average_price)
 		
-		if self.profit!=0 and self.manually_added==False:
+		if self.profit!=0 and self.manually_added==False and self.flatten_order!=True:
 			if total_unreal>self.profit :
 				log_print(self.source, self.algo_name, " MEET PROFIT TARGET",self.profit)
 				self.flatten_cmd()
-		if self.stop!=0:
+		if self.stop!=0 and self.flatten_order!=True:
 			if total_unreal*-1 > self.stop:
 				log_print(self.source, self.algo_name, " MEET STOP ",self.stop)
 				self.flatten_cmd()
+
+		if self.break_even==False:
+			if total_unreal>self.break_even_amount:
+				self.break_even = True 
+				self.stop = 0.1
+				log_print(self.source,self.algo_name,"BREAK EVEN")
+
+
 		self.data[UNREAL] = round(total_unreal,2)
 		self.tkvars[UNREAL].set(self.data[UNREAL])
 
