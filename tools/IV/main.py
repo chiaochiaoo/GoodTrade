@@ -32,7 +32,7 @@ except:
 	f = open("saves/"+datetime.now().strftime("%m-%d")+".csv", "w")
 f.close()
 
-TEST = False
+TEST = True
 
 def find_between(data, first, last):
 	try:
@@ -88,7 +88,6 @@ class processor:
 			self.add_new_etf(i,self.sendpipe)
 
 		good = threading.Thread(target=self.running_mode, daemon=True)
-		
 
 		test = threading.Thread(target=self.test_mode, daemon=True)
 		
@@ -106,11 +105,8 @@ class processor:
 		self.etfs[etf] = ETF(etf,send_pipe)
 		self.sendpipe.send([NEW_ETF,etf])
 
-
-
 	def process_data(self,row,writer):
 
-					
 		Symbol = find_between(row, "Symbol=", ",")
 		symbol = Symbol[:-3]					
 
@@ -125,12 +121,13 @@ class processor:
 			cur_price = find_between(row, "Price=", ",")
 			auc_price = find_between(row, "AuctionPrice=", ",")
 			cont_price = find_between(row, "ContinuousPrice=", ",")
+
+			NearIndicativeClosingPx = find_between(row,"NearIndicativeClosingPx=", ",")	#NearIndicativeClosingPx
 			procced = False
 
-
+			#print(symbol,NearIndicativeClosingPx)
 			if symbol in self.etfs_names:
-
-				self.etfs[symbol].new_price(symbol,cur_price,auc_price,cont_price)
+				self.etfs[symbol].new_price(symbol,cur_price,auc_price,cont_price,NearIndicativeClosingPx)
 
 			if market =="NQ" and source =="NADQ"and ts>=50400: 
 				procced = True
@@ -158,7 +155,7 @@ class processor:
 					#print(symbol,etf,weight)
 					try:
 						#print(symbol,cur_price,auc_price,cont_price)
-						self.etfs[etf].new_imbalance(symbol,side,volume,weight,time_,ts,cur_price,auc_price,cont_price)
+						self.etfs[etf].new_imbalance(symbol,side,volume,weight,time_,ts,cur_price,auc_price,cont_price,NearIndicativeClosingPx)
 					except Exception as e:
 						print(symbol,e)
 
@@ -199,7 +196,7 @@ class processor:
 	def test_mode(self):
 
 		#send,,, when?
-		with open('imbalance514.csv') as csv_file:
+		with open('test.csv') as csv_file:
 			csv_reader = csv.reader(csv_file, delimiter=',')
 			line_count = 1
 			with open(datetime.now().strftime("%m-%d")+".csv", 'a',newline='') as csvfile2:
@@ -207,7 +204,6 @@ class processor:
 				for row in csv_reader:
 					row = row[0]
 					self.process_data(row,writer)
-
 
 					#time.sleep(0.00001)
 
@@ -229,7 +225,9 @@ class ETF:
 		self.data["AucPrice"] = 0
 		self.data["AucDiff"] = 0
 		self.data["ContPrice"] = 0
-
+		self.data["Near_price"] = 0
+		self.data["Near_difference"] = 0
+		#self.data[]
 		self.data["pre_55_buy"]= 0
 		self.data["pre_55_sell"]= 0
 
@@ -246,14 +244,18 @@ class ETF:
 		self.sell_1min_trailing = []
 		self.bsratio_1min_trailing = []
 
-	def new_price(self,symbol,price,auc_price,cont_price):
+	def new_price(self,symbol,price,auc_price,cont_price,near):
 
 		self.data["Price"] = float(price)
 		self.data["AucPrice"] = float(auc_price)
 		self.data["ContPrice"] = float(cont_price)
 		self.data["AucDiff"] = round(self.data["AucPrice"]-self.data["Price"],2)
 
-	def new_imbalance(self,symbol,side,quantity,weight,time_,ts,price,auc_price,cont_price):
+
+		self.data["Near_price"] = float(near)
+
+
+	def new_imbalance(self,symbol,side,quantity,weight,time_,ts,price,auc_price,cont_price,NearIndicativeClosingPx):
 
 		try:
 			#print(ts)
@@ -393,8 +395,9 @@ class UI:
 						"AucPrice":11,\
 						"AucDiff":11,\
 						"ContPrice":11,\
+						"Near_price":11,\
 						}
-
+		#Near-Price
 		self.width = list(self.labels.values())
 
 		self.hq = ttk.LabelFrame(self.root,text="Main") 
@@ -413,6 +416,7 @@ class UI:
 	def save_file(self):
 
 		k = []
+
 		while True:
 
 			d = {}
@@ -459,7 +463,8 @@ class UI:
 
 		# self.data["post_55_b"]= 0
 		# self.data["post_55_s"]= 0
-		keys = ["name","total","buy","sell","Trend","pre_55_buy","pre_55_sell","post_55_buy","post_55_sell","Price","AucPrice","AucDiff","ContPrice"]
+
+		keys = ["name","total","buy","sell","Trend","pre_55_buy","pre_55_sell","post_55_buy","post_55_sell","Price","AucPrice","AucDiff","ContPrice","Near_price"]
 
 		for i in keys:
 			data[i] = tk.StringVar()
@@ -491,7 +496,6 @@ class UI:
 
 		ke = ["pre_55_sell","pre_55_buy","post_55_sell","post_55_buy"]
 
-		#print(self.etfs[etf])
 		for key,item in data.items():
 
 			if key in self.etfs[etf]:
@@ -538,8 +542,16 @@ class UI:
 					else:
 						self.etfs_labels[etf][key]["background"] = PINK
 					self.etfs[etf][key].set(item)
+
+				elif key=="Near-Price":
+					print(item)
+					if item>0:
+						self.etfs_labels[etf][key]["background"] = LIGHTGREEN
+					else:
+						self.etfs_labels[etf][key]["background"] = PINK
 				else:
 					self.etfs[etf][key].set(item)
+
 
 
 	def update(self):
