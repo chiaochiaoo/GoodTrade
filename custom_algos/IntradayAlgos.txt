@@ -6,3 +6,11 @@ NB_MidCap
 NB_SmallCap
 NB_Micro
 NB_TEST
+FTR_QQQ
+FTR_SPY
+FTR_ETF
+FTR_LargeCap
+FTR_MidCap
+FTR_SmallCap
+FTR_Micro
+FTR_TEST
