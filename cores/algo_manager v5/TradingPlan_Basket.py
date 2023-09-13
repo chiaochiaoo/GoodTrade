@@ -55,10 +55,10 @@ class TradingPlan_Basket:
 		self.manually_added = False 
 
 		if "Profit" in info:
-			self.profit = int(info["Profit"])
+			self.profit = int(abs(info["Profit"]))
 
 		if "Stop" in info:
-			self.stop = int(info["Stop"])
+			self.stop = int(abs(info["Stop"]))
 
 		if "Addable" in info:
 			self.manual_addable = True 
