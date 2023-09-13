@@ -40,20 +40,12 @@ class TradingPlan_Basket:
 		self.flatten_order = False
 
 
-		
-		
-
-		
-		 
-
 		self.one_shot_algo = False
 
 		
-
 		self.terminated = False 
 
 		self.manually_added = False 
-
 
 		self.break_even = False 
 		self.break_even_amount = 10000000
