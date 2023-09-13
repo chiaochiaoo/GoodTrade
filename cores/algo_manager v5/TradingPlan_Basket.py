@@ -56,7 +56,7 @@ class TradingPlan_Basket:
 
 
 		self.break_even = False 
-		self.break_even_amount = 0
+		self.break_even_amount = 10000000
 		if "Breakeven" in info:
 			self.break_even_amount = int(abs(info["Breakeven"]))
 
