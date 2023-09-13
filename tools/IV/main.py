@@ -32,7 +32,9 @@ except:
 	f = open("saves/"+datetime.now().strftime("%m-%d")+".csv", "w")
 f.close()
 
-TEST = True
+
+TEST = False
+
 
 def find_between(data, first, last):
 	try:
@@ -251,9 +253,9 @@ class ETF:
 		self.data["ContPrice"] = float(cont_price)
 		self.data["AucDiff"] = round(self.data["AucPrice"]-self.data["Price"],2)
 
-
-		self.data["Near_price"] = float(near)
-
+		self.data["Near_price"] = round(float(near) - self.data["Price"],1)
+		#Near_price
+		self.data["Near_difference"] =  0#round(self.data["Near_price"]-self.data["Price"],2)  #float(near)#
 
 	def new_imbalance(self,symbol,side,quantity,weight,time_,ts,price,auc_price,cont_price,NearIndicativeClosingPx):
 
@@ -304,6 +306,7 @@ class ETF:
 			time.sleep(0.1)
 
 		self.time = time_
+
 		self.ts = ts 
 
 		if self.data["buy"]>self.data["sell"]:
@@ -395,7 +398,7 @@ class UI:
 						"AucPrice":11,\
 						"AucDiff":11,\
 						"ContPrice":11,\
-						"Near_price":11,\
+						"Near_difference":11,\
 						}
 		#Near-Price
 		self.width = list(self.labels.values())
@@ -543,12 +546,12 @@ class UI:
 						self.etfs_labels[etf][key]["background"] = PINK
 					self.etfs[etf][key].set(item)
 
-				elif key=="Near-Price":
-					print(item)
+				elif key=="Near_price":
 					if item>0:
 						self.etfs_labels[etf][key]["background"] = LIGHTGREEN
 					else:
 						self.etfs_labels[etf][key]["background"] = PINK
+					self.etfs[etf][key].set(item)
 				else:
 					self.etfs[etf][key].set(item)
 
