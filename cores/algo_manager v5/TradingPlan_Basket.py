@@ -53,9 +53,17 @@ class TradingPlan_Basket:
 			self.break_even_amount = int(abs(info["Breakeven"]))
 
 		self.profit = 0
+
+
+		self.profit1=0
+		self.profit2=0
+		self.profit3=0
+		self.profit_tier = 0
 		if "Profit" in info:
 			self.profit = int(abs(info["Profit"]))
-
+			self.profit1= self.profit/2
+			self.profit2= self.profit 
+			self.profit3= self.profit *1.5
 		self.stop = 0
 		if "Stop" in info:
 			self.stop = int(abs(info["Stop"]))
@@ -411,12 +419,13 @@ class TradingPlan_Basket:
 
 		for symbol in self.symbols.keys():
 			with self.read_lock[symbol]:
-				self.expected_shares[symbol] = self.current_shares[symbol]
-				self.current_request[symbol] = 0
+				if self.expected_shares[symbol] != self.current_shares[symbol]:
+					self.expected_shares[symbol] = self.current_shares[symbol]
+					self.current_request[symbol] = 0
 
-				## IF THERE IS REQUEST> CANCEL IT.
+					## IF THERE IS REQUEST> CANCEL IT.
 
-				self.symbols[symbol].cancel_request()
+					self.symbols[symbol].cancel_request()
 
 
 	def recalculate_current_request(self,symbol):
@@ -647,6 +656,18 @@ class TradingPlan_Basket:
 		self.symbols[[symbol]].expecting_marketorder()
 		self.notify_request(symbol)
 
+
+	def reduce_one_third(self):
+
+		for symbol,item in self.symbols.items():
+			self.submit_expected_shares(symbol,self.current_shares[symbol]-self.current_shares[symbol]//3)
+
+	def reduce_one_half(self):
+		for symbol,item in self.symbols.items():
+			self.submit_expected_shares(symbol,self.current_shares[symbol]-self.current_shares[symbol]//2)
+
+
+
 	def market_in(self,shares,symbol=None):
 
 		if shares>0:
@@ -686,7 +707,7 @@ class TradingPlan_Basket:
 	# need to know which symbol got rejected. cancel the request. 
 	def rejection_handling(self,symbol):
 
-		#self.submit_expected_shares(symbol,0)
+
 
 		self.expected_shares[symbol] = 0
 		self.banned.append(symbol)
@@ -751,9 +772,29 @@ class TradingPlan_Basket:
 		# 	log_print(self.source,"PNL checking",self.algo_name,check,total_unreal,self.current_shares, self.average_price)
 		
 		if self.profit!=0 and self.manually_added==False and self.flatten_order!=True:
-			if total_unreal>self.profit :
+
+			# if total_unreal>self.profit :
+			# 	log_print(self.source, self.algo_name, " MEET PROFIT TARGET",self.profit)
+			# 	self.flatten_cmd()
+
+			if self.profit_tier==0 and  total_unreal+self.data[REALIZED] > self.profit1:
+				# take off 30% 
+				self.reduce_one_third()
+				self.profit_tier+=1
+				log_print(self.source,self.algo_name," REDUCE ONE THIRD")
+			elif self.profit_tier==1 and  total_unreal+self.data[REALIZED] > self.profit2:
+				# take off 30% 
+				self.reduce_one_half()
+				self.profit_tier+=1
+				log_print(self.source,self.algo_name," REDUCE ONE THIRD")
+			elif self.profit_tier==2 and  total_unreal+self.data[REALIZED] > self.profit3:
+				# take off 30% 
 				log_print(self.source, self.algo_name, " MEET PROFIT TARGET",self.profit)
 				self.flatten_cmd()
+				#log_print(self.source,self.algo_name," REDUCE ALL")
+
+			else:
+				pass 
 		if self.stop!=0 and self.flatten_order!=True:
 			if total_unreal*-1 > self.stop:
 				log_print(self.source, self.algo_name, " MEET STOP ",self.stop)

@@ -14,3 +14,4 @@ FTR_MidCap
 FTR_SmallCap
 FTR_Micro
 FTR_TEST
+FTR_M2
