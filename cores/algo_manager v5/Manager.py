@@ -396,6 +396,8 @@ class Manager:
 		if algo_name in self.baskets:
 			self.baskets[algo_name].algo_as_is()
 
+			log_print(algo_name," AS IS.")
+
 	def apply_pair_cmd(self,d):
 
 		pair = d['pair'] 
@@ -541,7 +543,9 @@ class Manager:
 		premarket_timer_start = 350*60
 		premarket_timer_stop = 550 *60
 
-		
+		MOO_as_is = 566*60
+		MOO_as_is_exit =False 
+
 		MOO_exit_timer = 567*60 #ts+19 #
 		MOO_exit = False 
 
@@ -564,6 +568,15 @@ class Manager:
 			now = datetime.now()
 			ts = now.hour*3600 + now.minute*60 + now.second
 
+
+			if ts>=MOO_as_is and MOO_as_is_exit==False :
+
+				for name,basket in self.baskets.items():
+					if "IMB" in name:
+						self.algo_as_is(name)
+				# for any basket has name IMB. as is. 
+				MOO_as_is_exit= True 
+				
 			if ts>=MOO_exit_timer and MOO_exit==False :
 
 				total_moo_exit = {}
@@ -581,7 +594,6 @@ class Manager:
 				MOO_exit = True 
 
 			if ts>=Moo_enter_timer and Moo_enter==False :
-
 
 
 				total_moo_enter = {}
