@@ -397,7 +397,7 @@ class TradingPlan_Basket:
 	def submit_expected_shares(self,symbol,shares,aggresive=0):
 
 		spread = round(self.manager.get_spread(symbol[:-3]),2)
-		sliperage = round(shares*spread,2)
+		sliperage = abs(round(shares*spread,2))
 
 		log_print(self.source,self.algo_name,"expect",symbol,shares," aggresive ", aggresive,"spread",spread,'slipperage',sliperage,"current have",self.current_shares[symbol])
 
@@ -416,7 +416,7 @@ class TradingPlan_Basket:
 				self.tkvars[STATUS].set("STH")
 				check = False 
 
-				
+
 		if symbol not in self.banned and self.flatten_order!=True and check:
 			with self.read_lock[symbol]:
 				now = datetime.now()

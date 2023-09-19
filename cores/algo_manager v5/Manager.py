@@ -1104,6 +1104,7 @@ class Manager:
 
 		else:
 			return 0
+
 	def get_symbol_price(self):
 
 		### GET THE NEWEST . THEN UPDATE IT ###
@@ -1112,7 +1113,7 @@ class Manager:
 		sts = now.hour*3600 + now.minute*60 + now.second 
 
 
-		if sts>self.last_price_ts+1:
+		if sts>self.last_price_ts+2:
 			try:
 				with self.get_price_lock:
 
