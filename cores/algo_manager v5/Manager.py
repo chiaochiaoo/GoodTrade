@@ -138,6 +138,9 @@ class Manager:
 
 		self.algo_limit = 100
 
+
+		self.real_time_ts = 0
+		self.last_price_ts = 0
 		""" POSITION DATA """
 
 		# no need to use lock. everytime need to read. just obtain copy. 
@@ -576,7 +579,7 @@ class Manager:
 						self.algo_as_is(name)
 				# for any basket has name IMB. as is. 
 				MOO_as_is_exit= True 
-				
+
 			if ts>=MOO_exit_timer and MOO_exit==False :
 
 				total_moo_exit = {}
@@ -957,10 +960,12 @@ class Manager:
 
 					count +=1 
 
+					req = threading.Thread(target=self.get_symbol_price, daemon=True)
+					req.start()
+
 					if count%4==0:# and count%20!=0:
 
-						req = threading.Thread(target=self.get_symbol_price, daemon=True)
-						req.start()
+
 
 						if self.symbol_inspection_start:
 							handl = threading.Thread(target=self.symbols_inspection,daemon=True)
@@ -1092,34 +1097,78 @@ class Manager:
 
 	def get_symbol_price(self):
 
-		try:
-			with self.get_price_lock:
+		### GET THE NEWEST . THEN UPDATE IT ###
 
-				symbols = list(self.symbols_short.keys())
+		now = datetime.now()
+		sts = now.hour*3600 + now.minute*60 + now.second 
 
-				if len(symbols)>0:
-					s = ''
-					for i in symbols:
-						s+=i+','
-					s=s[:-1]
 
-					b = "https://financialmodelingprep.com/api/v3/quote-short/"+s+"?apikey=a901e6d3dd9c97c657d40a2701374d2a"
+		if sts>self.last_price_ts+1:
+			try:
+				with self.get_price_lock:
 
-					res=requests.get(b)
-					d= json.loads(res.text)
+					r = "https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?include_otc=false&apiKey=ezY3uX1jsxve3yZIbw2IjbNi5X7uhp1H"
 
-					x = {}
-					for i in d:
-						x[i['symbol']] = i['price']
+					r = requests.get(r)
+					# print(r.text)
 
-					for symbol,price in x.items():
+					d = json.loads(r.text)
 
-						if symbol in self.symbols_short:
-							self.symbol_data[self.symbols_short[symbol]].update_price(price,0)
+					symbols = list(self.symbols_short.keys())
+					cur_ts = 0 
+					for i in d['tickers']:
+						if i['ticker'] in symbols:
+					
+							last_price = i['lastTrade']['p']
+							bid = i['lastQuote']['p']
+							ask = i['lastQuote']['P']
+							ts = int(str(i['updated'])[:10])
 
-					#log_print("Manager: price update complete.. symbols:",len(symbols),x,symbol,self.symbols_short[symbol],self.symbol_data[self.symbols_short[symbol]].get_bid())
-		except	Exception	as e:
-			PrintException("Updating prices error",e)
+							if ts>cur_ts:
+								cur_ts = ts
+							self.symbol_data[self.symbols_short[i['ticker']]].update_price(last_price,bid,ask,ts)
+
+
+					self.real_time_ts = cur_ts
+					self.last_price_ts = sts 
+					log_print("Price update complete.")				
+						#log_print("Manager: price update complete.. symbols:",len(symbols),x,symbol,self.symbols_short[symbol],self.symbol_data[self.symbols_short[symbol]].get_bid())
+			except	Exception	as e:
+				PrintException("Updating prices error",e)
+
+	# def get_symbol_price(self):
+
+
+	# 	### GET THE NEWEST . THEN UPDATE IT ###
+
+	# 	try:
+	# 		with self.get_price_lock:
+
+	# 			symbols = list(self.symbols_short.keys())
+
+	# 			if len(symbols)>0:
+	# 				s = ''
+	# 				for i in symbols:
+	# 					s+=i+','
+	# 				s=s[:-1]
+
+	# 				b = "https://financialmodelingprep.com/api/v3/quote-short/"+s+"?apikey=a901e6d3dd9c97c657d40a2701374d2a"
+
+	# 				res=requests.get(b)
+	# 				d= json.loads(res.text)
+
+	# 				x = {}
+	# 				for i in d:
+	# 					x[i['symbol']] = i['price']
+
+	# 				for symbol,price in x.items():
+
+	# 					if symbol in self.symbols_short:
+	# 						self.symbol_data[self.symbols_short[symbol]].update_price(price,0)
+
+	# 				#log_print("Manager: price update complete.. symbols:",len(symbols),x,symbol,self.symbols_short[symbol],self.symbol_data[self.symbols_short[symbol]].get_bid())
+	# 	except	Exception	as e:
+	# 		PrintException("Updating prices error",e)
 
 	def get_position(self,ticker):
 

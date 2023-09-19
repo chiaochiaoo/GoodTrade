@@ -136,14 +136,23 @@ class Symbol:
 
 		self.tradingplans[name] = tradingplan
 
-	def update_price(self,price,ts):
+	def update_price(self,price,bid,ask,ts):
 
-		#print("price",bid,ask,ts)
-		if self.data[PRICE]!= price:
+		self.data[PRICE] = price
 
-			self.data[PRICE] = price
-			#self.data[ASK] = ask
-			self.data[TIMESTAMP] = ts
+		self.data[TIMESTAMP] = ts
+		if self.data[BID]!=bid:
+			self.bid_change = True 
+		else:
+			self.bid_change = False 
+
+		if self.data[ASK]!=ask:
+			self.ask_change = True 
+		else:
+			self.ask_change = False 
+
+		self.data[ASK] = ask
+		self.data[BID] = bid
 
 	def instant_inspection(self):
 
@@ -584,6 +593,8 @@ class Symbol:
 		ts = now.hour*3600 + now.minute*60 + now.second
 
 		if self.aggresive_only!=True and ts<57500:
+
+			### NEED TO KNOW IF. HMM .
 			self.ppro_out.send([CANCEL,self.symbol_name])	
 
 	def deploy_orders(self,ts):
@@ -601,7 +612,7 @@ class Symbol:
 		else:
 			self.action = PASSIVESELL
 
-		self.l1_update_module()
+		#self.l1_update_module()
 
 		skip = True 
 
