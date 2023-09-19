@@ -59,6 +59,7 @@ class TradingPlan_Basket:
 		self.profit2=0
 		self.profit3=0
 		self.profit_tier = 0
+
 		if "Profit" in info:
 			self.profit = int(abs(info["Profit"]))
 			self.profit1= self.profit/2
@@ -79,6 +80,13 @@ class TradingPlan_Basket:
 		self.inspectable = True 
 		if "Mooin" in info:
 			self.inspectable = False 
+
+		self.sliperage_control = False 
+		self.spread_limit = 0
+
+		if "Spreadlimit" in info:
+			self.sliperage_control = True 
+			self.spread_limit = int(abs(info["Spreadlimit"]))
 
 		log_print(algo_name,"  profit & risk : ",self.profit,self.stop)
 		#### BANED SYMBOL
@@ -388,13 +396,28 @@ class TradingPlan_Basket:
 
 	def submit_expected_shares(self,symbol,shares,aggresive=0):
 
-		log_print(self.source,self.algo_name,"expect",symbol,shares," aggresive ", aggresive,"current have",self.current_shares[symbol])
+		spread = round(self.manager.get_spread(symbol[:-3]),2)
+		sliperage = round(shares*spread,2)
+
+		log_print(self.source,self.algo_name,"expect",symbol,shares," aggresive ", aggresive,"spread",spread,'slipperage',sliperage,"current have",self.current_shares[symbol])
 
 		##################################################################################################
 		##############     I THINK THIS IS WHY. ORDER STILL PROCESS UNTIL 1600   #########################
 		##################################################################################################
 
-		if symbol not in self.banned and self.flatten_order!=True:
+		## check slipperage . self.sliperage_control
+
+		#if self.tkvars[STATUS]
+
+		check = True 
+		if self.sliperage_control:
+
+			if sliperage>self.spread_limit:
+				self.tkvars[STATUS].set("STH")
+				check = False 
+
+				
+		if symbol not in self.banned and self.flatten_order!=True and check:
 			with self.read_lock[symbol]:
 				now = datetime.now()
 				ts = now.hour*3600 + now.minute*60 + now.second
@@ -665,7 +688,6 @@ class TradingPlan_Basket:
 	def reduce_one_half(self):
 		for symbol,item in self.symbols.items():
 			self.submit_expected_shares(symbol,self.current_shares[symbol]-self.current_shares[symbol]//2)
-
 
 
 	def market_in(self,shares,symbol=None):

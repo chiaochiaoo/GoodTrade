@@ -138,7 +138,7 @@ class Manager:
 
 		self.algo_limit = 100
 
-
+		self.spread_check = {}
 		self.real_time_ts = 0
 		self.last_price_ts = 0
 		""" POSITION DATA """
@@ -1095,6 +1095,15 @@ class Manager:
 
 			# 	self.ppro_append_new_stoporder(d[1])
 
+
+	def get_spread(self,symbol):
+
+		if symbol in self.spread_check:
+
+			return self.spread_check[symbol]
+
+		else:
+			return 0
 	def get_symbol_price(self):
 
 		### GET THE NEWEST . THEN UPDATE IT ###
@@ -1128,6 +1137,9 @@ class Manager:
 								cur_ts = ts
 							self.symbol_data[self.symbols_short[i['ticker']]].update_price(last_price,bid,ask,ts)
 
+						spread = i['lastQuote']['P']-i['lastQuote']['p']
+						self.spread_check[i['ticker']] = spread
+					self.real_time_ts
 
 					self.real_time_ts = cur_ts
 					self.last_price_ts = sts 
