@@ -48,7 +48,7 @@ class Symbol:
 
 		self.banned = False 
 
-		self.numeric_labels = [TRADE_TIMESTAMP,TIMESTAMP,PRICE,BID,ASK,RESISTENCE,SUPPORT,OPEN,HIGH,LOW,PREMARKETLOW,STOP,EXIT,ENTRY,CUSTOM]
+		self.numeric_labels = [TRADE_TIMESTAMP,TIMESTAMP,PRICE,BID,ASK,'SPREAD',RESISTENCE,SUPPORT,OPEN,HIGH,LOW,PREMARKETLOW,STOP,EXIT,ENTRY,CUSTOM]
 		self.tech_indicators = [EMACOUNT,EMA8H,EMA8L,EMA8C,EMA5H,EMA5L,EMA5C,EMA21H,EMA21L,EMA21C,CLOSE]
 
 		self.data = {}
@@ -142,18 +142,21 @@ class Symbol:
 		self.data[PRICE] = price
 
 		self.data[TIMESTAMP] = ts
-		if self.data[BID]!=bid:
-			self.bid_change = True 
-		else:
-			self.bid_change = False 
 
-		if self.data[ASK]!=ask:
-			self.ask_change = True 
-		else:
-			self.ask_change = False 
+		self.data['SPREAD'] = ask-bid 
+		
+		# if self.data[BID]!=bid:
+		# 	self.bid_change = True 
+		# else:
+		# 	self.bid_change = False 
 
-		self.data[ASK] = ask
-		self.data[BID] = bid
+		# if self.data[ASK]!=ask:
+		# 	self.ask_change = True 
+		# else:
+		# 	self.ask_change = False 
+
+		# self.data[ASK] = ask
+		# self.data[BID] = bid
 
 	def instant_inspection(self):
 
@@ -615,7 +618,7 @@ class Symbol:
 		else:
 			self.action = PASSIVESELL
 
-		#self.l1_update_module()
+		self.l1_update_module()
 
 		skip = True 
 
