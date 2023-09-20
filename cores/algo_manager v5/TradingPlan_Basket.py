@@ -413,7 +413,7 @@ class TradingPlan_Basket:
 		if self.sliperage_control:
 
 			if sliperage>self.spread_limit:
-				self.tkvars[STATUS].set("STH")
+				self.tkvars[STATUS].set("STH:"+str(sliperage))
 				check = False 
 
 
