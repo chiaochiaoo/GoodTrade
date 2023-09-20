@@ -1144,7 +1144,7 @@ class Manager:
 
 					self.real_time_ts = cur_ts
 					self.last_price_ts = sts 
-					log_print("Price update complete.")				
+					#log_print("Price update complete.")				
 						#log_print("Manager: price update complete.. symbols:",len(symbols),x,symbol,self.symbols_short[symbol],self.symbol_data[self.symbols_short[symbol]].get_bid())
 			except	Exception	as e:
 				PrintException("Updating prices error",e)

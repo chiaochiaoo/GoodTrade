@@ -68,6 +68,7 @@ class Symbol:
 
 		self.last_l1_update = 0
 
+		self.have_pending_orders = False 
 
 		self.bid_change = False 
 		self.ask_change = False 
@@ -208,6 +209,8 @@ class Symbol:
 
 				# Check again if there is any update. if there is, call it off. 
 
+				if self.difference==0:
+					self.sent_orders= False 
 
 				if self.holding_update==False:
 					if self.difference!=0 and ts<=57590:
@@ -605,7 +608,7 @@ class Symbol:
 
 		# ALL ORDERS AT ONCE. # First clear previous order. 
 		# if there might be already an order: #
-		#if self.sent_orders==True:
+
 
 		if self.difference>0:
 			self.action = PASSIVEBUY
@@ -623,6 +626,9 @@ class Symbol:
 			elif self.action==PASSIVESELL and self.ask_change==True:
 				self.ppro_out.send([CANCEL,self.symbol_name])
 				skip = False 
+
+		if self.sent_orders==False:
+			skip = False 
 
 			# else:
 				
