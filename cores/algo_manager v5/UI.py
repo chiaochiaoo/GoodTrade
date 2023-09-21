@@ -581,7 +581,9 @@ class UI(pannel):
 	
 		gdxgdxj = {"name":"GDXGDXJ","symbol":["GDX.AM","GDXJ.AM"],"ratio":[10,-7],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		gdxgld = {"name":"GDXGLD","symbol":["GDX.AM","GLD.AM"],"ratio":[2,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-			
+		
+		silslv = {"name":"SLVSLI","symbol":["SLV.AM","SIL.AM"],"ratio":[8,-5],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+				
 
 		xleqqq = {"name":"XLEQQQ","symbol":["XLE.AM","QQQ.NQ"],"ratio":[4,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		
@@ -596,7 +598,7 @@ class UI(pannel):
 
 		spy = [spyqqq,spytlt,spyuso]
 		qqq = [tlsaqqq,smhqqq,xleqqq,arkkqqq,drivqqq]
-		gld = [gldslv,gdxgdxj,gdxgld]
+		gld = [gldslv,gdxgdxj,gdxgld,silslv]
 		misc =[fxixpev]
 
 		total = [spy,qqq,gld,misc]
