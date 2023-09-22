@@ -15,3 +15,4 @@ FTR_SmallCap
 FTR_Micro
 FTR_TEST
 FTR_M2
+FTR_M3
