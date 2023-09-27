@@ -418,8 +418,9 @@ class TradingPlan_Basket:
 				#check = False 
 				shares = int(shares) // (sliperage/self.spread_limit)
 
-		if spread >0.5:
+		if spread >0.5 and aggresive:
 			aggresive = 0 
+			log_print(self.source,self.algo_name,symbol," spread too high. aggresive off")
 
 
 		if symbol not in self.banned and self.flatten_order!=True and check:
