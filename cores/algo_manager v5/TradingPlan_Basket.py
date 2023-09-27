@@ -405,7 +405,7 @@ class TradingPlan_Basket:
 		##############     I THINK THIS IS WHY. ORDER STILL PROCESS UNTIL 1600   #########################
 		##################################################################################################
 
-		## check slipperage . self.sliperage_control
+		## check slipperage . self.sliperage_controlsp
 
 		#if self.tkvars[STATUS]
 
@@ -413,8 +413,13 @@ class TradingPlan_Basket:
 		if self.sliperage_control:
 
 			if sliperage>self.spread_limit:
-				self.tkvars[STATUS].set("STH:"+str(sliperage))
-				check = False 
+				self.tkvars[STATUS].set("STH:"+str(round((sliperage/self.spread_limit),1)))
+
+				#check = False 
+				shares = int(shares) // (sliperage/self.spread_limit)
+
+		if spread >0.5:
+			aggresive = 0 
 
 
 		if symbol not in self.banned and self.flatten_order!=True and check:
