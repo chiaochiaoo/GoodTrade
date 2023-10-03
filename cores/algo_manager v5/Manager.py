@@ -456,11 +456,15 @@ class Manager:
 		if basket_name not in self.baskets:
 
 			if self.ui.basket_label_count<self.algo_limit:
-				self.baskets[basket_name] = TradingPlan_Basket(basket_name,risk,self,info)
-				self.ui.create_new_single_entry(self.baskets[basket_name],"Basket",None)
 
-				self.baskets[basket_name].deploy()
-		
+
+				if sum(orders.values())!=0:
+					self.baskets[basket_name] = TradingPlan_Basket(basket_name,risk,self,info)
+					self.ui.create_new_single_entry(self.baskets[basket_name],"Basket",None)
+
+					self.baskets[basket_name].deploy()
+				else:
+					return 
 
 		if self.baskets[basket_name].shut_down==False:
 			for symbol,value in orders.items():
@@ -1094,7 +1098,6 @@ class Manager:
 			# if d[0] =="new stoporder":
 
 			# 	self.ppro_append_new_stoporder(d[1])
-
 
 	def get_spread(self,symbol):
 
