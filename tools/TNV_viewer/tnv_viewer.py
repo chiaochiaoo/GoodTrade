@@ -11,8 +11,8 @@ def create_tab(tab_name):
     # Sample Matplotlib chart
     fig = Figure(figsize=(5, 4), dpi=100)
     plot = fig.add_subplot(1, 1, 1)
-    plot.plot([1, 2, 3, 4], [10, 30, 20, 40])
-    plot.set_title(f"Chart in {tab_name}")
+    plot.plot([i for i in range(570,960)],[i for i in range(570,960)])
+    plot.set_title(f"{tab_name}")
 
     canvas = FigureCanvasTkAgg(fig, master=tab)  # A tk.DrawingArea.
     canvas.draw()
@@ -47,5 +47,5 @@ for tab_name in tabs:
 
 notebook.pack(expand=True, fill="both")
 
-root.geometry("600x400")
+root.geometry("1280x720")
 root.mainloop()
