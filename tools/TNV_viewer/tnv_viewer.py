@@ -11,7 +11,7 @@ import numpy as np
 import pytz
 from datetime import datetime
 from datetime import date
-
+import pandas as pd 
 
 global data 
 data = {}
@@ -87,7 +87,7 @@ class model:
 
         d = threading.Thread(target=self.model_load_early_chart,daemon=True)
         d.start() 
-        
+
     def model_load_early_chart(self):
         print("loading start")
         dic = {}
@@ -113,8 +113,8 @@ class model:
           df = df.loc[df['date']>pd.Timestamp(date.today())]
           df['ts'] = df['date'].dt.hour*60 + df['date'].dt.minute-570
 
-          idx = df['ts'].tolist()
-          p = df['open'].to_numpy()
+          idx = df['ts'].tolist()[:ts-570]
+          p = df['open'].to_numpy()[:ts-570]
 
           diff = (p-p[0])*share
           earlier_pnl[c][idx] = diff
@@ -122,6 +122,7 @@ class model:
           earlier_pnl[c][mask]= np.interp(np.flatnonzero(mask), np.flatnonzero(~mask),  earlier_pnl[c][~mask])
 
           c+=1
+
 
         self.e_pnl = np.sum(earlier_pnl,axis=0)
         self.e_ts  = [570+i for i in range(len(self.e_pnl))]
