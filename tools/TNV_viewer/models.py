@@ -154,7 +154,9 @@ class obq_model(model):
 
 		if self.model_initialized:
 			spread = 0
-			spreads = []
+			spreads = {}
+
+
 			for key,share in self.model.items():
 
 				if key in data:
@@ -162,12 +164,13 @@ class obq_model(model):
 
 					spread+= (data[key]['ask'] - data[key]['bid'])*abs(share)
 
-					spreads.append((data[key]['ask'] - data[key]['bid'])*abs(share))
+					spreads[key]=((data[key]['ask'] - data[key]['bid'])*abs(share))
 					#print(key,round( (data[key]['ask'] - data[key]['bid'])*abs(share),1))
 				else:
 					print("no",key)
 
-
+			print({k: v for k, v in sorted(spreads.items(), key=lambda item: item[1])})
+			
 			#print(np.mean(spreads))
 			now = datetime.now(tz=pytz.timezone('US/Eastern'))
 			ts = now.hour*60 + now.minute
