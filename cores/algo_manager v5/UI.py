@@ -771,7 +771,7 @@ class UI(pannel):
 				c = 1
 
 				# LONG:
-				tk.Label(tab, text="LONG:",bg="lightgreen").grid(sticky="w",column=c,row=t)
+				tk.Label(tab, text="LONG:").grid(sticky="w",column=c,row=t)
 				c+=1
 
 				tk.Button(tab, text="+",command=lambda s=i,side="long": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
@@ -784,7 +784,7 @@ class UI(pannel):
 				#c = 1
 
 				# LONG:
-				tk.Label(tab, text="SHORT:",bg="pink").grid(sticky="w",column=c,row=t)
+				tk.Label(tab, text="SHORT:").grid(sticky="w",column=c,row=t)
 				c+=1
 
 				tk.Button(tab, text="+",command=lambda s=i,side="short": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
