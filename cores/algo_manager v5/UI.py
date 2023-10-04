@@ -143,6 +143,8 @@ class UI(pannel):
 		self.user_phone = tk.StringVar()
 		self.user_phone.set("")
 
+		self.system_status_text = tk.StringVar()
+		self.system_status_text.set("")
 
 		self.ppro_last_update = tk.StringVar()
 
@@ -160,6 +162,13 @@ class UI(pannel):
 		# self.main_status.grid(sticky="w",column=2,row=row)
 
 		row = 1
+		self.main = ttk.Label(self.system_pannel, text="SYSTEM:")
+		self.main.grid(sticky="w",column=1,row=row,padx=10)
+
+		self.system_status = ttk.Label(self.system_pannel, textvariable=self.system_status_text)
+		self.system_status.grid(sticky="w",column=1,row=row)
+
+		row +=1
 		self.main = ttk.Label(self.system_pannel, text="Account ID:")
 		self.main.grid(sticky="w",column=1,row=row,padx=10)
 		
@@ -179,11 +188,11 @@ class UI(pannel):
 		self.ppro_status_out = ttk.Label(self.system_pannel, textvariable=self.ppro_out_status)
 		self.ppro_status_out.grid(sticky="w",column=2,row=row)
 
-		row +=1
-		self.timerc = ttk.Label(self.system_pannel, text="Ppro Update:")
-		self.timerc.grid(sticky="w",column=1,row=row,padx=10)
-		self.timersx = ttk.Label(self.system_pannel,  textvariable=self.ppro_last_update)
-		self.timersx.grid(sticky="w",column=2,row=row,padx=10)
+		# row +=1
+		# self.timerc = ttk.Label(self.system_pannel, text="Ppro Update:")
+		# self.timerc.grid(sticky="w",column=1,row=row,padx=10)
+		# self.timersx = ttk.Label(self.system_pannel,  textvariable=self.ppro_last_update)
+		# self.timersx.grid(sticky="w",column=2,row=row,padx=10)
 
 		row +=1
 		self.al = ttk.Label(self.system_pannel, text="Algo Count::")
