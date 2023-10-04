@@ -66,7 +66,7 @@ class obq_model(model):
 		self.name = "TEST_OBQ"
 
 	def model_init(self):
-		self.model =    {'COST': 2, 'GOOGL': 6, 'ADSK': 4, 'WBA': 21, 'CSCO': 29, 'AMZN': 5, 'CRWD': 6, 'NVDA': 2, 'MSFT': 3, 'AAPL': 5, 'PDD': 7, 'ATVI': 61, 'ZS': 6, 'TSLA': 2, 'ROST': 10, 'ADBE': 2, 'FANG': -5, 'REGN': -2, 'BKR': -21, 'HON': -9, 'ORLY': -1, 'GILD': -25, 'ENPH': -8, 'KHC': -41, 'EXC': -33, 'XEL': -16, 'IDXX': -3, 'MAR': -4, 'BIIB': -5, 'AEP': -11, 'PAYX': -6, 'AZN': -22}
+		self.model =  {'JD': 53, 'ADP': 4, 'CSCO': 32, 'SGEN': 9, 'VRTX': 5, 'CTAS': 3, 'MU': 12, 'TSLA': 2, 'NFLX': 3, 'INTC': 23, 'WBA': 21, 'MRNA': 7, 'CSX': 39, 'AAPL': 6, 'PDD': 11, 'ATVI': 62, 'LULU': -3, 'TMUS': -11, 'MNST': -19, 'MDLZ': -31, 'DDOG': -6, 'CSGP': -18, 'RIVN': -15, 'ABNB': -5, 'ANSS': -3, 'EBAY': -20, 'AMGN': -5, 'SBUX': -17, 'ZS': -3, 'GFS': -12, 'ALGN': -2, 'CDNS': -4}
 		self.model_initialized = True 
 		self.model_early_chart = False 
 
