@@ -49,11 +49,11 @@ except ImportError:
 
 #May this class bless by the Deus Mechanicus.
 
-try:
-	f = open("../../algo_logs/"+datetime.now().strftime("%m-%d")+".txt", "x")
-except:
-	f = open("../../algo_logs/"+datetime.now().strftime("%m-%d")+".txt", "w")
-f.close()
+# try:
+# 	f = open("../../algo_logs/"+datetime.now().strftime("%m-%d")+".txt", "x")
+# except:
+# 	f = open("../../algo_logs/"+datetime.now().strftime("%m-%d")+".txt", "w")
+# f.close()
 
 
 
@@ -93,7 +93,8 @@ except ImportError:
 # Email configuration
 
 
-
+CONNECTED  ="Connected"
+# DISCONNECTED = "Disconnec"
 
 class Manager:
 
@@ -130,6 +131,7 @@ class Manager:
 
 		self.bad_symbols = []
 
+		self.rejected_symbols = []
 		self.processes = processes
 	
 		self.algo_ids = []
@@ -818,7 +820,7 @@ class Manager:
 			if d[0] =="msg":
 				try:
 					self.ui.main_app_status.set(str(d[1]))
-					if str(d[1])=="Connected":
+					if str(d[1])==CONNECTED:
 						self.termination = True
 						self.ui.main_status["background"] = "#97FEA8"
 					else:
@@ -902,6 +904,39 @@ class Manager:
 			elif d[0] =="shutdown":
 				break
 
+	def system_check(self):
+
+
+		#### if all green. then good to go ###
+
+		if self.ui.user.get()!="DISCONNECTED" and self.ui.ppro_api_status.get()==CONNECTED and self.ui.file_last_update.get()==CONNECTED:
+
+			# GOOD TO GO.
+			self.ui.system_status_text.set("READY")
+			self.ui.system_status['bg'] = 'lightgreen'
+			#log_print("System all green")
+
+			if self.system_enable==False:
+
+				self.online_alert()
+			self.system_enable = True 
+			
+		else:
+
+			self.ui.system_status_text.set("ERROR")
+			self.ui.system_status['bg'] = 'red'
+			self.ui.system_status.flash()
+
+			if self.system_enable:
+				self.disconnection_alert()
+			## if . send me an email.
+			self.system_enable = False 
+
+
+
+		### if not flash ### 
+
+
 	def ppro_in(self):
 
 		count = 0
@@ -910,35 +945,37 @@ class Manager:
 
 			#FIRST TWO CONNECTION CHECK
 
-			if d[0] =="ppro_in":
+			if d[0] =="ppro_in": ### DEPRECATED
 				try:
-					self.ui.ppro_status.set(str(d[1]))
+					self.ui.ppro_api_status.set(str(d[1]))
 
-					if str(d[1])=="Connected":
-						self.ui.ppro_status_["background"] = "#97FEA8"
+					if str(d[1])!=CONNECTED:
+						self.ui.ppro_api_status_label["background"] = "red"
+
 					else:
-						self.ui.ppro_status_["background"] = "red"
+						self.ui.ppro_api_status_label["background"] = self.ui.deployment_frame.cget("background") #"#d9d9d9" 
 
 						for symbol in self.symbols:
 							self.pipe_ppro_out.send(["Register",symbol])
 
-						self.pipe_ppro_out.send(["Register","QQQ.NQ"])
-
+						#self.pipe_ppro_out.send(["Register","QQQ.NQ"])
 
 					log_print("PPRO In status update:",d[1])
 
 				except Exception as e:
 					PrintException(e,"PPRO IN ERROR")
 
-			elif d[0] =="ppro_out":
+			elif d[0] =="ppro_api":
 
 				try:
-					self.ui.ppro_out_status.set(str(d[1]))
+					self.ui.ppro_api_status.set(str(d[1]))
 
-					if str(d[1])=="Connected":
-						self.ui.ppro_status_out["background"] = "#97FEA8"
+					if str(d[1])!=CONNECTED:
+						self.ui.ppro_api_status_label["background"] =  "red"
 					else:
-						self.ui.ppro_status_out["background"] = "red"
+						self.ui.ppro_api_status_label["background"] = self.ui.deployment_frame.cget("background") #"#d9d9d9" 
+
+					self.system_check()
 				except Exception as e:
 					PrintException(e,"PPRO OUT ERROR")
 
@@ -952,14 +989,12 @@ class Manager:
 					positions = d[1]
 					user = d[2]
 
-					# self.user.set("User:"+user)
-					self.system_enable = True 
-
+					
 					self.current_positions = positions
 
 					self.ui.user.set(user)
 					self.ui.position_count.set(len(self.current_positions))
-					self.ui.account_status["background"] = "#97FEA8"
+					self.ui.account_status["background"] =self.ui.deployment_frame.cget("background")
 					#log_print("Position updates:",len(positions),positions)
 
 					count +=1 
@@ -969,8 +1004,6 @@ class Manager:
 
 					if count%4==0:# and count%20!=0:
 
-
-
 						if self.symbol_inspection_start:
 							handl = threading.Thread(target=self.symbols_inspection,daemon=True)
 							handl.start()
@@ -979,6 +1012,10 @@ class Manager:
 
 						rec = threading.Thread(target=self.record_update,daemon=True)
 						rec.start()
+
+					if count%200==0:
+
+						self.periodical_status()
 
 				except Exception as e:
 					PrintException(e, " POSITION UPDATE ERROR")
@@ -991,22 +1028,28 @@ class Manager:
 				data = d[1]
 
 				try:
-					for key,val in data.items():
-						self.current_summary[key].set(val)
+					if len(data)==0:
 
-					if abs(cur_ts-data['timestamp'])>5:
-
-						self.ui.ppro_last_update.set(str(abs(cur_ts-data['timestamp']))+" delay")
-
-						self.ui.timersx["background"] = "red"
+						self.ui.file_last_update.set("DISCONNECTED")
+						self.ui.file_link_status["background"] = "red"
 					else:
-						self.ui.ppro_last_update.set('REALTIME')
+						for key,val in data.items():
+							self.current_summary[key].set(val)
 
-						self.ui.timersx["background"] = "#97FEA8"
+						if abs(cur_ts-data['timestamp'])>5:
 
-					self.ui.update_performance(data)
+							self.ui.file_last_update.set(str(abs(cur_ts-data['timestamp']))+" delay")
 
-					self.check_all_pnl()
+							self.ui.file_link_status["background"] = "red"
+						else:
+							self.ui.file_last_update.set(CONNECTED)
+
+							self.ui.file_link_status["background"] = self.ui.deployment_frame.cget("background") #"#d9d9d9" 
+
+						self.ui.update_performance(data)
+
+						self.check_all_pnl()
+					self.system_check()
 				except Exception as e :
 					PrintException(e, " Updating Summary Problem")
 
@@ -1024,10 +1067,12 @@ class Manager:
 				except Exception as e:
 					PrintException(e,"Order rejection error")
 
+				self.rejected_symbols.append(symbol+":"+side)
+
 				self.rejection_count+=1
 				log_print("Rejection count:",self.rejection_count)
 				if self.rejection_count%5==0:
-					self.rejection_alert(self.ui.user.get(),self.rejection_count)
+					self.rejection_alert(self.ui.user.get())
 
 			elif d[0] =="shutdown":
 				break
@@ -1219,15 +1264,72 @@ class Manager:
 			d.update_displays()
 
 
-	def rejection_alert(self,user,rejection_count):
+	def send_email(self,subject,body):
+
+		sender = 'algomanagertnv@gmail.com'
+		password = 'myvjbplswvsvktau'
+		recipients = ['chiao@selectvantage.com']
+
+		msg = MIMEText(body)
+		msg['Subject'] = subject
+		msg['From'] = sender
+		msg['To'] = ', '.join(recipients)
+		with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
+		   smtp_server.login(sender, password)
+		   smtp_server.sendmail(sender, recipients, msg.as_string())
+
+	def stringfy(self,dic):
+
+		msg = "\n"
+
+		for key,item in dic.items():
+
+			msg +=str(key)+":"
+			try:
+
+				msg+=str(item.get()) +" "
+
+			except:
+
+				msg+=str(item)
+
+		msg+="\n"
+
+		return msg
+	def periodical_status(self):
+
+		user = self.ui.user.get()
+		subject = "User Status:"+user
+		body = "User Status."+self.stringfy(self.current_positions)  + self.stringfy(self.current_summary)
+
+		self.send_email(subject,body)	
+
+	def disconnection_alert(self):
+
+		user = self.ui.user.get()
+		subject = "Disconnection Alert:"+user
+		body = "Disconnection."+self.stringfy(self.current_positions)  + self.stringfy(self.current_summary)
+
+		self.send_email(subject,body)
+
+	def online_alert(self):
+
+		user = self.ui.user.get()
+		subject = "Connection:"+user
+		body = "Connection.\n" +self.stringfy(self.current_positions)  + self.stringfy(self.current_summary)
+
+		self.send_email(subject,body)
+
+
+	def rejection_alert(self,user):
 
 		sender = 'algomanagertnv@gmail.com'
 		password = 'myvjbplswvsvktau'
 		recipients = ['chiao@selectvantage.com','zenvoidsun@gmail.com','andrew@selectvantage.com']
 
 
-		subject = "Rejection Alert:"+user +" : "+str(rejection_count)
-		body = "Rejection: " +str(rejection_count)
+		subject = "Rejection Alert:"+user +" : "+str(self.rejection_count)
+		body = "Rejection: " +str(self.rejected_symbols)
 
 		msg = MIMEText(body)
 		msg['Subject'] = subject

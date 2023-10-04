@@ -297,22 +297,40 @@ def cancel_all_oders(symbol):
 
 	return r,sucess,failure
 
-def init_driver(pipe_status):
+# def init_driver(pipe_status):
 
-	while True:
-		try:
-			PATH = "../sys/chromedriver.exe"
+# 	while True:
+# 		try:
+# 			PATH = "../sys/chromedriver.exe"
 
-			#driver = webdriver.Chrome(ChromeDriverManager().install())
-			driver = webdriver.Chrome(PATH)
-			driver.minimize_window()
-			pipe_status.send(["ppro_out","Connected"])
-			return driver
-		except Exception as e:
-			log_print("Driver init failed. restarting.",e)
-			pipe_status.send(["ppro_out","Disconnected"])
-			time.sleep(1)
-			pass
+# 			#driver = webdriver.Chrome(ChromeDriverManager().install())
+# 			driver = webdriver.Chrome(PATH)
+# 			driver.minimize_window()
+# 			pipe_status.send(["ppro_out","Connected"])
+# 			return driver
+# 		except Exception as e:
+# 			log_print("Driver init failed. restarting.",e)
+# 			pipe_status.send(["ppro_out","Disconnected"])
+# 			time.sleep(1)
+# 			pass
+
+
+# def ppro_api_check(pipe):
+
+# 	while True:
+# 		req = "http://127.0.0.1:8080/Register?symbol=QQQ.NQ&feedtype=L1"
+
+# 		try:
+# 			r = requests.post(req)
+
+# 			if r.status_code ==200:
+# 				pipe.send(["ppro_out","Connected"])
+# 			else:
+# 				pipe.send(["ppro_out","Disconnected"])
+# 		except:
+# 			pipe.send(["ppro_out","Disconnected"])
+# 		time.sleep(15)
+
 
 def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY. 
 
@@ -324,7 +342,10 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 	sucess_str= ""
 	failure_str = ""
 	termination = False
-	pipe_status.send(["ppro_out","Connected"])
+
+	# req = threading.Thread(target=ppro_api_check, args=(pipe_status,),daemon=True)
+	# req.start()	
+	
 	while True and not termination:
 		try:
 			request_str = ""
@@ -446,7 +467,6 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 
 				request_str,sucess_str,failure_str=cancel_all_oders(symbol)
 
-
 			elif type_ == CANCELALL:
 
 				request_str = "http://127.0.0.1:8080/CancelOrder?type=all&symbol=*.*&side=order"
@@ -467,19 +487,6 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 
 				req = threading.Thread(target=ppro_request, args=(request_str,sucess_str,failure_str,symbol,pipe_status,is_order),daemon=True)
 				req.start()	
-
-				### START A THREAD. 
-
-				# while not sucessful:
-				# 	try:
-
-				# 		req = str(request_str)
-				# 		r = requests.post(req)
-				# 		sucessful = True
-				# 		#log_print("POSTING:",request_str)
-				# 	except Exception as e:
-				# 		log_print(e,failure_str," driver restart")
-				# 		time.sleep(0.05)
 
 		except Exception as e:
 			PrintException("PPro out:",e)

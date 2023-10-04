@@ -122,14 +122,11 @@ class UI(pannel):
 
 	
 		self.user = tk.StringVar()
-		self.user.set("")
+		self.user.set("DISCONNECTED")
 
 
-		self.ppro_status = tk.StringVar()
-		self.ppro_status.set("")
-
-		self.ppro_out_status = tk.StringVar()
-		self.ppro_out_status.set("")
+		self.ppro_api_status = tk.StringVar()
+		self.ppro_api_status.set("Disconnected")
 
 		self.algo_count_number = tk.IntVar(value=0)
 		self.algo_number = 0
@@ -144,9 +141,9 @@ class UI(pannel):
 		self.user_phone.set("")
 
 		self.system_status_text = tk.StringVar()
-		self.system_status_text.set("")
+		self.system_status_text.set("ERROR")
 
-		self.ppro_last_update = tk.StringVar()
+		self.file_last_update = tk.StringVar(value="Disconnected")
 
 		self.algo_count_string = tk.StringVar(value="0")
 		self.algo_timer_string = tk.StringVar(value="0")
@@ -162,37 +159,34 @@ class UI(pannel):
 		# self.main_status.grid(sticky="w",column=2,row=row)
 
 		row = 1
-		self.main = ttk.Label(self.system_pannel, text="SYSTEM:")
-		self.main.grid(sticky="w",column=1,row=row,padx=10)
+		self.system = ttk.Label(self.system_pannel, text="SYSTEM:")
+		self.system.grid(sticky="w",column=1,row=row,padx=10)
 
-		self.system_status = ttk.Label(self.system_pannel, textvariable=self.system_status_text)
-		self.system_status.grid(sticky="w",column=1,row=row)
-
+		self.system_status = tk.Button(self.system_pannel, textvariable=self.system_status_text,activebackground='red',activeforeground='yellow')
+		self.system_status.grid(sticky="w",column=2,row=row)
+		self.system_status["background"] = "red"
 		row +=1
-		self.main = ttk.Label(self.system_pannel, text="Account ID:")
-		self.main.grid(sticky="w",column=1,row=row,padx=10)
+		self.account = ttk.Label(self.system_pannel, text="Account ID:")
+		self.account.grid(sticky="w",column=1,row=row,padx=10)
 		
 		self.account_status = ttk.Label(self.system_pannel, textvariable=self.user)
 		self.account_status.grid(sticky="w",column=2,row=row)
-
-
-		row +=1
-		self.ppro = ttk.Label(self.system_pannel, text="Ppro In:")
-		self.ppro.grid(sticky="w",column=1,row=row,padx=10)
-		self.ppro_status_ = ttk.Label(self.system_pannel, textvariable=self.ppro_status)
-		self.ppro_status_.grid(sticky="w",column=2,row=row)
+		self.account_status["background"] = "red"
 
 		row +=1
-		self.ppro = ttk.Label(self.system_pannel, text="Ppro Out:")
-		self.ppro.grid(sticky="w",column=1,row=row,padx=10)
-		self.ppro_status_out = ttk.Label(self.system_pannel, textvariable=self.ppro_out_status)
-		self.ppro_status_out.grid(sticky="w",column=2,row=row)
+		self.file_link_label = ttk.Label(self.system_pannel, text="File Linked:")
+		self.file_link_label.grid(sticky="w",column=1,row=row,padx=10)
+		self.file_link_status = ttk.Label(self.system_pannel,  textvariable=self.file_last_update)
+		self.file_link_status["background"] = "red"
+		self.file_link_status.grid(sticky="w",column=2,row=row,padx=10)
 
-		# row +=1
-		# self.timerc = ttk.Label(self.system_pannel, text="Ppro Update:")
-		# self.timerc.grid(sticky="w",column=1,row=row,padx=10)
-		# self.timersx = ttk.Label(self.system_pannel,  textvariable=self.ppro_last_update)
-		# self.timersx.grid(sticky="w",column=2,row=row,padx=10)
+		row +=1
+		self.ppro = ttk.Label(self.system_pannel, text="Ppro API:")
+		self.ppro.grid(sticky="w",column=1,row=row,padx=10)
+		self.ppro_api_status_label = ttk.Label(self.system_pannel, textvariable=self.ppro_api_status)
+		self.ppro_api_status_label.grid(sticky="w",column=2,row=row)
+		self.ppro_api_status_label["background"] = "red"
+
 
 		row +=1
 		self.al = ttk.Label(self.system_pannel, text="Algo Count::")
@@ -447,6 +441,7 @@ class UI(pannel):
 		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=4)
 
 		# row +=1 
+
 	def init_deployment_pannel(self):
 
 		self.labels = {"Strategy":25,\
@@ -483,17 +478,13 @@ class UI(pannel):
 
 	def init_pannel(self):
 
-
 		self.sub_pannel = ttk.LabelFrame(self.root,text="") 
 		self.sub_pannel.place(x=0,y=220,height=950,width=350)
 
 		self.SUB_TAB = ttk.Notebook(self.sub_pannel)
 		self.SUB_TAB.place(x=0,rely=0.01,relheight=1,width=640)
 
-
-
 		self.quick_spread_pannel = ttk.LabelFrame(self.SUB_TAB,text="") 
-
 
 		self.custom_algo_pannel = ttk.LabelFrame(self.SUB_TAB,text="") 
 		#self.custom_algo_pannel.place(x=0,y=0,height=950,width=350)
@@ -525,8 +516,6 @@ class UI(pannel):
 		self.init_system_pannel()
 		self.init_performance_pannel()
 		self.init_deployment_pannel()
-		self.init_control_pannel()
-
 		self.init_control_pannel()
 
 		self.init_gateway()

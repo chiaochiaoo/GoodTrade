@@ -126,10 +126,10 @@ def log_print(*args):
 		listToStr = ' '.join([str(elem) for elem in args])
 
 		if len(listToStr)>5:
-			f = open("../../algo_logs/"+datetime.now().strftime("%m-%d")+".txt", "a")
 			time_ = datetime.now().strftime("%H:%M:%S : ")
-			f.write("\n"+time_+listToStr)
-			f.close()
+			with open("../../algo_logs/"+datetime.now().strftime("%m-%d")+".txt", "a+") as file:
+				
+				file.write("\n"+time_+listToStr)
 			print(time_,*args)
 	except Exception as e:
 		print(*args,e,"failed to write")

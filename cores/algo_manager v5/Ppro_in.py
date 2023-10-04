@@ -42,7 +42,6 @@ def open_file():
 	return f,writer 
 
 def save_file(f):
-
 	f.close()
 
 def threading_request(request_str):
@@ -51,7 +50,6 @@ def threading_request(request_str):
 
 def request(request_str):
 	requests.get(request_str)
-
 
 def Ppro_in(port,pipe):
 
@@ -63,10 +61,8 @@ def Ppro_in(port,pipe):
 
 	last_ts = 0
 
-
 	UDP_IP = "localhost"
 	UDP_PORT = port
-
 
 	force_close_port(port)
 
@@ -88,12 +84,12 @@ def Ppro_in(port,pipe):
 				log_print(e)
 				# IF I don't hear things for 5 seconds. it would result in a timed out. ok. good.
 				work = False
-				pipe.send(["ppro_in","Disconnected"])
+				#pipe.send(["ppro_in","DISCONNECTED"])
 
 			if rec:
 				stream_data = str(data)
-				if work==False:
-					pipe.send(["ppro_in","Connected"])
+				# if work==False:
+				# 	pipe.send(["ppro_in","Connected"])
 
 				work=True
 				type_ = find_between(stream_data, "Message=", ",")
@@ -102,9 +98,6 @@ def Ppro_in(port,pipe):
 					decode_order(stream_data,pipe)
 
 				#### CAN USE THIS TO TAKE CURRENT SYMBOLS ####
-
-
-
 
 				#now = datetime.now()
 
@@ -123,84 +116,12 @@ def Ppro_in(port,pipe):
 				# 	if count %1000 ==0:
 				# 		save_file(f)
 				# 		f,writer = open_file()
+
 		except Exception as e:
 			PrintException(e,"PPRO IN error")
 	f.close()
 
-def Ppro_in_old(port,pipe):
 
-	now = datetime.now()
-	ts = now.hour*60+now.minute 
-	last_ts = 0
-	l1data = {}
-
-	UDP_IP = "localhost"
-	UDP_PORT = port
-
-	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	sock.bind((UDP_IP, UDP_PORT))
-
-	ppro_conn = threading.Thread(target=ppro_connection_service,args=(pipe,port), daemon=True)
-	ppro_conn.start()
-
-	log_print("Socket Created:",sock)
-	
-	work=False
-
-	count = 0
-
-	f,writer = open_file()
-
-	pipe.send(["msg","algo_ppro working"])
-	write_count = 0
-	#sock.settimeout(5)
-
-	while True:
-
-		try:
-			rec= False
-			#print("restart")
-
-			log_print("waiting for input")
-			try:
-				data, addr = sock.recvfrom(1024)
-				#print(data)
-				rec = True
-			except Exception as e:
-				log_print(e)
-				# IF I don't hear things for 5 seconds. it would result in a timed out. ok. good.
-				work = False
-				pipe.send(["ppro_in","Disconnected"])
-
-			if rec:
-				stream_data = str(data)
-
-				#log_print(stream_data)
-				if work==False:
-					pipe.send(["ppro_in","Connected"])
-				work=True
-				type_ = find_between(stream_data, "Message=", ",")
-
-				now = datetime.now()
-				cur_ts = now.hour*60+now.minute 
-				if cur_ts - ts >= 30:
-					ts = cur_ts 
-					ppro_conn = threading.Thread(target=ppro_connection_service,args=(pipe,port), daemon=True)
-					ppro_conn.start()
-				if cur_ts !=last_ts:
-					log_print("PPRO message updating normal,",cur_ts)
-					last_ts = cur_ts
-				if type_ == "OrderStatus":
-					decode_order(stream_data,pipe)
-				elif type_ =="L1":
-					decode_l1(stream_data,pipe,writer,l1data)
-					count+=1
-					if count %1000 ==0:
-						save_file(f)
-						f,writer = open_file()
-		except Exception as e:
-			PrintException(e,"PPRO IN error")
-	f.close()
 	
 def get_symbol_price(symbols,pipe,lock):
 
@@ -245,60 +166,78 @@ def periodical_check(pipe,port):
 
 	c = 0
 
+	status = False 
 	while True:
 		
 		try:
 
+			#### API CHECK BEFORE ALL ELSE. ####
+
+			if c%10==0 or status==False:
+
+				req = "http://127.0.0.1:8080/Register?symbol=QQQ.NQ&feedtype=L1"
+
+				try:
+					r = requests.post(req)
+
+					if r.status_code ==200:
+						pipe.send(["ppro_api","Connected"])
+						status= True 
+					else:
+						pipe.send(["ppro_api","DISCONNECTED"])
+						status = False 
+				except:
+					pipe.send(["ppro_api","DISCONNECTED"])
+					status = False 
+
 			### first step, get user and file location
-			if summary_being_read==False:
-				threading_request("http://127.0.0.1:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity")
-				user,file_location = get_env()
-			else:
-				if c%50==0:
+			if status:
+				if summary_being_read==False:
+					threading_request("http://127.0.0.1:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity")
+					user,file_location = get_env()
+				else:
+					if c%50==0:
+						#log_print("PPro in : periodcal new loop",cur_ts)
+						threading_request("http://127.0.0.1:8080/SetOutput?region=1&feedtype=OSTAT&output="+ str(port)+"&status=on") ## ORDER STATS.
 
-					now = datetime.now()
+					# ### 1. register OSTAT  
+					# if c%5==0:
+					# 	register_order_listener(port)
 
-					cur_ts = now.hour*60+now.minute 
-					#log_print("PPro in : periodcal new loop",cur_ts)
-					threading_request("http://127.0.0.1:8080/SetOutput?region=1&feedtype=OSTAT&output="+ str(port)+"&status=on") ## ORDER STATS.
+					### 2. Get open position 
+					positions = get_current_positions()
 
-				# ### 1. register OSTAT  
-				# if c%5==0:
-				# 	register_order_listener(port)
-
-				### 2. Get open position 
-				positions = get_current_positions()
-
-				### 3. send request for summary PNL
-				threading_request("http://127.0.0.1:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity")
+					### 3. send request for summary PNL
+					threading_request("http://127.0.0.1:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity")
 
 
-				#############################THIS PART IS MOVED TO MANAGER #############################################################
 
-				# symbols = list(positions.keys())
-				# symbols = [i[:-3] for i in symbols]
+					#############################THIS PART IS MOVED TO MANAGER #############################################################
 
-				# if c%2==0:
-				# 	req = threading.Thread(target=get_symbol_price,args=(symbols,pipe,lock,), daemon=True)
-				# 	req.start()
+					# symbols = list(positions.keys())
+					# symbols = [i[:-3] for i in symbols]
 
-
-				#####################################################################################################################
-
-				### 4. send request for each individual symbol PNL
-
-				# if c%7==0:
-				# 	for symbol in positions.keys():
-				# 		threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity"+"^"+user+"^"+symbol)
-
-				# if c%8==0:
-				# 	for symbol in positions.keys():
-				# 		threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity"+"^"+symbol)
+					# if c%2==0:
+					# 	req = threading.Thread(target=get_symbol_price,args=(symbols,pipe,lock,), daemon=True)
+					# 	req.start()
 
 
-				### RETURN BUS. 
-				c+=1
-				pipe.send([POSITION_UPDATE,positions,user])
+					#####################################################################################################################
+
+					### 4. send request for each individual symbol PNL
+
+					# if c%7==0:
+					# 	for symbol in positions.keys():
+					# 		threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity"+"^"+user+"^"+symbol)
+
+					# if c%8==0:
+					# 	for symbol in positions.keys():
+					# 		threading_request("http://localhost:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity"+"^"+symbol)
+
+
+					### RETURN BUS. 
+					c+=1
+					pipe.send([POSITION_UPDATE,positions,user])
 
 		except Exception as e:
 			PrintException(e,"periodical_check error ")
@@ -340,7 +279,9 @@ def read_summary(pipe):
 			log_print("summary file located.")
 			if file_found==False:
 				try:
-					os.remove(file_location)
+					#os.remove(file_location)
+					with open(file_location, 'w') as creating_new_csv_file: 
+  						pass 
 				except:
 					pass
 				file_found = True 
@@ -431,31 +372,10 @@ def read_summary(pipe):
 		else:
 			log_print("Ppro_in:, file_location_not detected:",file_location)
 			summary_being_read = False
+
+			pipe.send([SUMMARY_UPDATE,{}])
+			#### ALERT. ? #### 
 			time.sleep(2)
-
-
-
-def ppro_connection_service(pipe,port):
-
-	#keep running and don't stop
-	state = False
-
-	if test_register():
-		pipe.send(["ppro_in","Connected"])
-		if state == False:
-			log_print("Ppro connected. Registering OSTAT")
-			i = 3
-			while i >0:
-				if register_order_listener(port):
-					log_print("OSTAT registered")
-					state = True
-					break
-				else:
-					log_print("OSTAT registeration failed")
-				i-=1 
-	else:
-		pipe.send(["ppro_in","Disconnected"])
-		state = False
 
 
 
@@ -872,3 +792,103 @@ def force_close_port(port, process_name=None):
 
 
 
+# def ppro_connection_service(pipe,port):
+
+# 	#keep running and don't stop
+# 	state = False
+
+# 	if test_register():
+# 		pipe.send(["ppro_in","Connected"])
+# 		if state == False:
+# 			log_print("Ppro connected. Registering OSTAT")
+# 			i = 3
+# 			while i >0:
+# 				if register_order_listener(port):
+# 					log_print("OSTAT registered")
+# 					state = True
+# 					break
+# 				else:
+# 					log_print("OSTAT registeration failed")
+# 				i-=1 
+# 	else:
+# 		pipe.send(["ppro_in","DISCONNECTED"])
+# 		state = False
+
+
+
+
+
+# def Ppro_in_old(port,pipe):
+
+# 	now = datetime.now()
+# 	ts = now.hour*60+now.minute 
+# 	last_ts = 0
+# 	l1data = {}
+
+# 	UDP_IP = "localhost"
+# 	UDP_PORT = port
+
+# 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+# 	sock.bind((UDP_IP, UDP_PORT))
+
+# 	ppro_conn = threading.Thread(target=ppro_connection_service,args=(pipe,port), daemon=True)
+# 	ppro_conn.start()
+
+# 	log_print("Socket Created:",sock)
+	
+# 	work=False
+
+# 	count = 0
+
+# 	f,writer = open_file()
+
+# 	pipe.send(["msg","algo_ppro working"])
+# 	write_count = 0
+# 	#sock.settimeout(5)
+
+# 	while True:
+
+# 		try:
+# 			rec= False
+# 			#print("restart")
+
+# 			log_print("waiting for input")
+# 			try:
+# 				data, addr = sock.recvfrom(1024)
+# 				#print(data)
+# 				rec = True
+# 			except Exception as e:
+# 				log_print(e)
+# 				# IF I don't hear things for 5 seconds. it would result in a timed out. ok. good.
+# 				work = False
+# 				pipe.send(["ppro_in","DISCONNECTED"])
+
+# 			if rec:
+# 				stream_data = str(data)
+
+# 				#log_print(stream_data)
+# 				if work==False:
+# 					pipe.send(["ppro_in","Connected"])
+# 				work=True
+# 				type_ = find_between(stream_data, "Message=", ",")
+
+# 				now = datetime.now()
+# 				cur_ts = now.hour*60+now.minute 
+# 				if cur_ts - ts >= 30:
+# 					ts = cur_ts 
+# 					ppro_conn = threading.Thread(target=ppro_connection_service,args=(pipe,port), daemon=True)
+# 					ppro_conn.start()
+# 				if cur_ts !=last_ts:
+# 					log_print("PPRO message updating normal,",cur_ts)
+# 					last_ts = cur_ts
+# 				if type_ == "OrderStatus":
+# 					decode_order(stream_data,pipe)
+# 				elif type_ =="L1":
+# 					decode_l1(stream_data,pipe,writer,l1data)
+# 					count+=1
+# 					if count %1000 ==0:
+# 						save_file(f)
+# 						f,writer = open_file()
+# 		except Exception as e:
+# 			PrintException(e,"PPRO IN error")
+# 	f.close()
