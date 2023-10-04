@@ -1264,19 +1264,6 @@ class Manager:
 			d.update_displays()
 
 
-	def send_email(self,subject,body):
-
-		sender = 'algomanagertnv@gmail.com'
-		password = 'myvjbplswvsvktau'
-		recipients = ['chiao@selectvantage.com']
-
-		msg = MIMEText(body)
-		msg['Subject'] = subject
-		msg['From'] = sender
-		msg['To'] = ', '.join(recipients)
-		with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
-		   smtp_server.login(sender, password)
-		   smtp_server.sendmail(sender, recipients, msg.as_string())
 
 	def stringfy(self,dic):
 
@@ -1296,13 +1283,14 @@ class Manager:
 		msg+="\n"
 
 		return msg
+
 	def periodical_status(self):
 
 		user = self.ui.user.get()
 		subject = "User Status:"+user
 		body = "User Status."+self.stringfy(self.current_positions)  + self.stringfy(self.current_summary)
 
-		self.send_email(subject,body)	
+		self.send_email_admin(subject,body)	
 
 	def disconnection_alert(self):
 
@@ -1310,7 +1298,7 @@ class Manager:
 		subject = "Disconnection Alert:"+user
 		body = "Disconnection."+self.stringfy(self.current_positions)  + self.stringfy(self.current_summary)
 
-		self.send_email(subject,body)
+		self.send_email_admin(subject,body)
 
 	def online_alert(self):
 
@@ -1318,8 +1306,21 @@ class Manager:
 		subject = "Connection:"+user
 		body = "Connection.\n" +self.stringfy(self.current_positions)  + self.stringfy(self.current_summary)
 
-		self.send_email(subject,body)
+		self.send_email_admin(subject,body)
 
+	def send_email_admin(self,subject,body):
+
+		sender = 'algomanagertnv@gmail.com'
+		password = 'myvjbplswvsvktau'
+		recipients = ['chiao@selectvantage.com']
+
+		msg = MIMEText(body)
+		msg['Subject'] = subject
+		msg['From'] = sender
+		msg['To'] = ', '.join(recipients)
+		with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
+		   smtp_server.login(sender, password)
+		   smtp_server.sendmail(sender, recipients, msg.as_string())
 
 	def rejection_alert(self,user):
 
@@ -1330,6 +1331,20 @@ class Manager:
 
 		subject = "Rejection Alert:"+user +" : "+str(self.rejection_count)
 		body = "Rejection: " +str(self.rejected_symbols)
+
+		self.send_email_all(subject,body)
+		
+	def send_email_all(self,subject,body):
+
+		sender = 'algomanagertnv@gmail.com'
+		password = 'myvjbplswvsvktau'
+		recipients = ['chiao@selectvantage.com','andrew@selectvantage.com','zenvoidsun@gmail.com']
+
+
+		user = self.ui.user.get()
+
+		if "COREYKIN" in suer:
+			recipients.append("corey@selectvantage.com")
 
 		msg = MIMEText(body)
 		msg['Subject'] = subject
