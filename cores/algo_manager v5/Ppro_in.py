@@ -317,13 +317,17 @@ def read_summary(pipe):
 										#print(time_,net,fees,trades,sizeTraded,unrealizedPlusNet)
 										# SymbolLayerDisplayData: 
 										d= {}
+
+										d['unrealizedPlusNet'] = unrealizedPlusNet
+										d['timestamp'] = ts
+										d['unrealized'] = round(unrealized,2)
 										d['net'] = round(net,2)
 										d['fees'] = round(fees,2)
 										d['trades'] = int(trades)
 										d['sizeTraded'] = int(sizeTraded)
-										d['unrealizedPlusNet'] = unrealizedPlusNet
-										d['timestamp'] = ts
-										d['unrealized'] = round(unrealized,2)	
+										
+										
+											
 
 										if cur_exp<1000000:
 											d["cur_exp"] = str(cur_exp//1000)+"k"
