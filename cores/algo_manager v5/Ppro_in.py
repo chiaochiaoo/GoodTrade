@@ -402,7 +402,7 @@ def get_current_positions():
 				share = int(find_between(i, "Volume=", " ")[1:-1])
 
 				
-				d[symbol] = (0,share) 
+				d[symbol] = (price,share) 
 		#log_print("Ppro_in:, get positions:",d)
 		return d
 	except Exception as e:

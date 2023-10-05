@@ -495,7 +495,6 @@ class Manager:
 		else:
 			log_print(basket_name,"already shutdown")
 
-
 	def send_moo(self,dic):
 		now = datetime.now()
 		ts = now.hour*60 + now.minute*60
@@ -937,7 +936,6 @@ class Manager:
 
 		### if not flash ### 
 
-
 	def ppro_in(self):
 
 		count = 0
@@ -1293,7 +1291,7 @@ class Manager:
 		if ts>=500 and ts<=980:
 			user = self.ui.user.get()
 			subject = "User Status:"+user
-			body = "User Status."+self.stringfy(self.current_positions)  + self.stringfy(self.current_summary)
+			body = "User Status."  + self.stringfy(self.current_summary) +self.stringfy(self.current_positions)
 
 			self.send_email_admin(subject,body)	
 
