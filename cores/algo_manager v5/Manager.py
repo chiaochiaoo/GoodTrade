@@ -1286,11 +1286,15 @@ class Manager:
 
 	def periodical_status(self):
 
-		user = self.ui.user.get()
-		subject = "User Status:"+user
-		body = "User Status."+self.stringfy(self.current_positions)  + self.stringfy(self.current_summary)
+		now = datetime.now()
+		ts = now.hour*60 + now.minute
 
-		self.send_email_admin(subject,body)	
+		if ts>=600 and ts<=980:
+			user = self.ui.user.get()
+			subject = "User Status:"+user
+			body = "User Status."+self.stringfy(self.current_positions)  + self.stringfy(self.current_summary)
+
+			self.send_email_admin(subject,body)	
 
 	def disconnection_alert(self):
 
@@ -1333,7 +1337,7 @@ class Manager:
 		body = "Rejection: " +str(self.rejected_symbols)
 
 		self.send_email_all(subject,body)
-		
+
 	def send_email_all(self,subject,body):
 
 		sender = 'algomanagertnv@gmail.com'
