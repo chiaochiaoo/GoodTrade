@@ -892,7 +892,7 @@ class Manager:
 						for basket in list(self.baskets.keys()):
 							
 							l = len(d[1])
-							log_print("flattening checking",d[1],basket[:l])
+							#log_print("flattening checking",d[1],basket[:l])
 							if d[1]==basket[:l]:
 								self.baskets[basket].flatten_cmd()
 							#self.baskets[d[1]].flatten_cmd()
@@ -902,7 +902,7 @@ class Manager:
 						# 	if d[1]==d[:l]:
 						# 		self.baskets[d].flatten_cmd()
 				except Exception as e:
-					PrintException(e,"Flatten")
+					PrintException(e,"Flatten error")
 			elif d[0] =="shutdown":
 				break
 
