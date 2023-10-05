@@ -279,9 +279,10 @@ def read_summary(pipe):
 			log_print("summary file located.")
 			if file_found==False:
 				try:
+					pass
 					#os.remove(file_location)
-					with open(file_location, 'w') as creating_new_csv_file: 
-  						pass 
+					# with open(file_location, 'w') as creating_new_csv_file: 
+  					# 	pass 
 				except:
 					pass
 				file_found = True 
