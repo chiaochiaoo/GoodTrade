@@ -1289,7 +1289,7 @@ class Manager:
 		now = datetime.now()
 		ts = now.hour*60 + now.minute
 
-		if ts>=600 and ts<=980:
+		if ts>=500 and ts<=980:
 			user = self.ui.user.get()
 			subject = "User Status:"+user
 			body = "User Status."+self.stringfy(self.current_positions)  + self.stringfy(self.current_summary)
