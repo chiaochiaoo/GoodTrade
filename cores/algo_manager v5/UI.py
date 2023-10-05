@@ -471,7 +471,6 @@ class UI(pannel):
 		self.deployment_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
 		self.dev_canvas.create_window(0, 0, window=self.deployment_frame, anchor=tk.NW)
 
-
 		self.rebind(self.dev_canvas,self.deployment_frame)
 
 		self.recreate_labels()

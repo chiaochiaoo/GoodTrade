@@ -1283,6 +1283,16 @@ class Manager:
 
 		return msg
 
+
+	def output_active_tps(self):
+
+		msg = ""
+		for basket,val in self.baskets.items():
+			if val.get_flatten_order()!=True:
+				msg+=basket+" : " + str(val.data[UNREAL]) + " | " + str(val.data[REALIZED]) + str(val.current_shares)+ "\n"
+
+		return msg 
+
 	def periodical_status(self):
 
 		now = datetime.now()
@@ -1291,7 +1301,7 @@ class Manager:
 		if ts>=500 and ts<=980:
 			user = self.ui.user.get()
 			subject = "User Status:"+user
-			body = "User Status."  + self.stringfy(self.current_summary) +self.stringfy(self.current_positions)
+			body = "User Status."  + self.stringfy(self.current_summary) + self.output_active_tps() +self.stringfy(self.current_positions)
 
 			self.send_email_admin(subject,body)	
 
