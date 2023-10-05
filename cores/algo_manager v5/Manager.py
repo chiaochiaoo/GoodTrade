@@ -149,13 +149,14 @@ class Manager:
 		self.current_positions = {} #for 
 
 		self.current_summary = {}
+
+		self.current_summary['unrealizedPlusNet'] = tk.DoubleVar()
+		self.current_summary['unrealized'] = tk.DoubleVar()
 		self.current_summary['net'] = tk.DoubleVar()
+		self.current_summary['timestamp'] = tk.StringVar()
 		self.current_summary['fees'] = tk.DoubleVar()
 		self.current_summary['trades'] = tk.DoubleVar()
 		self.current_summary['sizeTraded'] = tk.DoubleVar()
-		self.current_summary['unrealizedPlusNet'] = tk.DoubleVar()
-		self.current_summary['timestamp'] = tk.StringVar()
-		self.current_summary['unrealized'] = tk.DoubleVar()	
 		self.current_summary['cur_exp'] = tk.StringVar()
 		self.current_summary['max_exp'] = tk.StringVar()
 
