@@ -91,7 +91,7 @@ def create_tab(tab_name):
     button_frame = ttk.LabelFrame(tab, text="Buttons")
     button_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=10, pady=10)
 
-    button1 = ttk.Button(button_frame, text="Load model")
+    button1 = ttk.Button(button_frame, text="Load model",command=obq.model_init)
     button1.pack(side=tk.TOP, pady=5)
 
     button1 = ttk.Button(button_frame, text="Load model early data",command=obq.model_early_load)
