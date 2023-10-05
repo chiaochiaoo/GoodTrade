@@ -886,7 +886,7 @@ class Manager:
 					if d[1] == "ALL":
 						self.flatten_all()
 					else:
-						log_print("flattening ",d[1],list(self.baskets.keys()))
+						log_print("flattening ",d[1])
 						#if d[1] in list(self.baskets.keys()):
 
 						for basket in list(self.baskets.keys()):
@@ -1264,8 +1264,6 @@ class Manager:
 			d.adjusting_risk()
 			d.update_displays()
 
-
-
 	def stringfy(self,dic):
 
 		msg = "\n"
@@ -1358,7 +1356,7 @@ class Manager:
 
 		user = self.ui.user.get()
 
-		if "COREYKIN" in suer:
+		if "COREYKIN" in user:
 			recipients.append("corey@selectvantage.com")
 
 		msg = MIMEText(body)
