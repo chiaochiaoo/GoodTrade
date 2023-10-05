@@ -143,9 +143,11 @@ class Manager:
 		self.spread_check = {}
 		self.real_time_ts = 0
 		self.last_price_ts = 0
+
 		""" POSITION DATA """
 
 		# no need to use lock. everytime need to read. just obtain copy. 
+
 		self.current_positions = {} #for 
 
 		self.current_summary = {}
@@ -1289,7 +1291,7 @@ class Manager:
 		msg = ""
 		for basket,val in self.baskets.items():
 			if val.get_flatten_order()!=True:
-				msg+=basket+" : " + str(val.data[UNREAL]) + " | " + str(val.data[REALIZED]) + str(val.current_shares)+ "\n"
+				msg+=basket+" : " + str(val.data[UNREAL]) + " | " + str(val.data[REALIZED]) +"   "+ str(val.current_shares)+ "\n"
 
 		return msg 
 
@@ -1557,9 +1559,6 @@ if __name__ == '__main__':
 
 	# algo_voxcom = multiprocessing.Process(name="algo vox1",target=algo_manager_voxcom3, args=(receive_pipe,),daemon=True)
 	# algo_voxcom.daemon=True
-
-
-
 
 	algo_voxcom = multiprocessing.Process(name="http server",target=httpserver, args=(receive_pipe,),daemon=True)
 	algo_voxcom.daemon=True
