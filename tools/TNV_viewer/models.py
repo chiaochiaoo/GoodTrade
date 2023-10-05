@@ -8,6 +8,14 @@ import pytz
 from datetime import datetime
 from datetime import date
 import pandas as pd 
+from functools import reduce
+import sys
+if sys.version_info[0] < 3:
+    from StringIO import StringIO
+else:
+    from io import StringIO
+
+
 class model:
 
 	def __init__(self):
@@ -65,8 +73,128 @@ class obq_model(model):
 
 		self.name = "TEST_OBQ"
 
+		self.symbols =['MSFT','AAPL','AMZN','NVDA','GOOGL','META','TSLA','AVGO','PEP','COST','CSCO','TMUS','ADBE','TXN','CMCSA','NFLX','AMD','QCOM','AMGN','INTC','HON','INTU','SBUX','GILD','AMAT','ADI','MDLZ','ISRG',
+'ADP','REGN','PYPL','VRTX','MU','LRCX','ATVI','MELI','CSX','MRNA','PANW','CDNS','ASML','SNPS','ORLY','MNST','FTNT','CHTR','KLAC','MAR','KDP','KHC','AEP','ABNB','CTAS','LULU','DXCM','NXPI',
+'AZN','MCHP','ADSK','EXC','BIIB','PDD','IDXX','WDAY','PAYX','XEL','SGEN','PCAR','ODFL','CPRT','ILMN','ROST','GFS','EA','MRVL','WBD','DLTR','CTSH','WBA','FAST','VRSK','CRWD','BKR','ENPH','CSGP','ANSS',
+'FANG','ALGN','TEAM','EBAY','DDOG','ZM','JD','ZS','LCID','RIVN']
+	def create_standard_obq_df(self):
+
+		k = []
+		c=0
+		for symbol in self.symbols:
+
+			try:
+				postbody = "http://api.kibot.com/?action=history&symbol="+symbol+"&interval=day&period=250&user=sajali26@hotmail.com&password=guupu4upu"
+				r= requests.post(postbody)
+
+				t_df = pd.read_csv(StringIO(r.text),names=["day","open","high","low","close","volume"])
+				t_df['day'] = pd.to_datetime(t_df['day'])
+				t_df[symbol+"_gain"] =  np.log(t_df["close"]) - np.log(t_df["open"])
+				t_df[symbol+"_gap"] =  np.log(t_df["open"]) - np.log(t_df.close.shift(1))
+				t_df[symbol+"_volume"] = t_df["volume"]
+
+				t_df.rename({'open': symbol+'_open', }, axis=1, inplace=True)
+				t_df.rename({'close': symbol+'_close', }, axis=1, inplace=True)
+
+				t_df = t_df.drop(["high","low","volume"],axis=1)
+				k.append(t_df)
+				c+=1
+			except Exception as e:
+				print(symbol,e)
+
+		df = reduce(lambda  left,right: pd.merge(left,right,on=['day'],
+																								how='outer'), k).fillna(0)
+
+		return df
+
+	def obq_original(self,df):
+
+		std_window1 = 50
+		std_window2 = 25
+		std_window3 = 5
+
+		std1_weight= 0.2
+		std2_weight= 0.2
+		std3_weight= 0.6
+
+		for symbol in self.symbols:
+			std1 = df[symbol+"_gain"].rolling(window=std_window1).std()
+			std2 = df[symbol+"_gain"].rolling(window=std_window2).std()
+			std3 = df[symbol+"_gain"].rolling(window=std_window3).std()
+
+			df[symbol+"_std"] = std1*std1_weight+ std2*std2_weight + std3*std3_weight
+
+			df[symbol+"_current"] = df[symbol+"_close"].shift(1)
+			df[symbol+"_ystd"] = df[symbol+"_std"].shift(1)
+
+			df[symbol+"_ystd"].replace(0, np.nan, inplace=True)
+
+			df[symbol+"_ranking_norm"] = df[symbol+"_gain"]/df[symbol+"_std"]
+			df[symbol+"_executing_norm"] = df[symbol+"_gain"]/df[symbol+"_ystd"]
+
+			df[symbol+"_norm"] = df[symbol+"_executing_norm"]
+
+		return df
+
+
+	def output_to_tnv(self,df):
+
+		risk = 12
+		columns = [symbol+'_ranking_norm' for symbol in self.symbols]
+
+		rename ={}
+		for i in columns:
+			rename[i] = i[:-13]
+
+		norm_df = df[columns].copy()
+		rank_df =  df[columns].copy().rank(axis=1,method='min')
+		rank_df.rename(rename, axis=1, inplace=True)
+		predicted_rank = rank_df.shift(1)*0.7 + rank_df.shift(2)*0.3
+
+		predicted_rank=predicted_rank.copy().rank(axis=1,method='min')
+		top_x = 16
+
+
+		selected={}
+		val = (rank_df.iloc[-1]*0.7 + rank_df.iloc[-2]*0.3).rank(method='min')
+		shorts = val.sort_values().iloc[:top_x].index
+		longs =  val.sort_values().iloc[-top_x:].index
+		selected['long_std'] = longs
+		selected['long_open'] = longs +"_open"
+		selected['short'] = shorts +"_std"
+
+		#cmdstr1 =  "https://tnv.ngrok.io/Basket="+name+",Order=*"
+
+		l = {}
+		s = {}
+		t = {}
+		for symbol in longs:
+			std = df.iloc[-1][symbol+"_std"]
+			share = int(int(round(risk/(std*df.iloc[-1][symbol+"_close"]),0)))
+			t[symbol] = share
+			symbol +=".NQ"
+			#cmdstr1 += symbol+":"+str(share)+","
+			l[symbol] = share
+
+		for symbol in shorts:
+			std = df.iloc[-1][symbol+"_std"]
+			share = -int(int(round(risk/(std*df.iloc[-1][symbol+"_close"]),0)))
+			t[symbol] = share
+			symbol +=".NQ"
+			#cmdstr1 += symbol+":"+str(share)+","
+
+			s[symbol] = share
+
+		return t
+
 	def model_init(self):
-		self.model =  {'JD': 53, 'ADP': 4, 'CSCO': 32, 'SGEN': 9, 'VRTX': 5, 'CTAS': 3, 'MU': 12, 'TSLA': 2, 'NFLX': 3, 'INTC': 23, 'WBA': 21, 'MRNA': 7, 'CSX': 39, 'AAPL': 6, 'PDD': 11, 'ATVI': 62, 'LULU': -3, 'TMUS': -11, 'MNST': -19, 'MDLZ': -31, 'DDOG': -6, 'CSGP': -18, 'RIVN': -15, 'ABNB': -5, 'ANSS': -3, 'EBAY': -20, 'AMGN': -5, 'SBUX': -17, 'ZS': -3, 'GFS': -12, 'ALGN': -2, 'CDNS': -4}
+		#self.model =  {'JD': 53, 'ADP': 4, 'CSCO': 32, 'SGEN': 9, 'VRTX': 5, 'CTAS': 3, 'MU': 12, 'TSLA': 2, 'NFLX': 3, 'INTC': 23, 'WBA': 21, 'MRNA': 7, 'CSX': 39, 'AAPL': 6, 'PDD': 11, 'ATVI': 62, 'LULU': -3, 'TMUS': -11, 'MNST': -19, 'MDLZ': -31, 'DDOG': -6, 'CSGP': -18, 'RIVN': -15, 'ABNB': -5, 'ANSS': -3, 'EBAY': -20, 'AMGN': -5, 'SBUX': -17, 'ZS': -3, 'GFS': -12, 'ALGN': -2, 'CDNS': -4}
+		
+		test = self.create_standard_obq_df()
+
+		self.model = self.output_to_tnv(self.obq_original(test))
+
+		print(self.model)
 		self.model_initialized = True 
 		self.model_early_chart = False 
 
@@ -183,4 +311,6 @@ class obq_model(model):
 				self.pnl[idx] = c
 				self.spread = spread
 		else:
-			self.model_init()
+			print("require init model.")
+			pass
+			pass#self.model_init()
