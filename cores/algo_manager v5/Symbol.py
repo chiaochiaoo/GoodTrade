@@ -664,8 +664,8 @@ class Symbol:
 				if not skip:
 					self.ppro_out.send([self.action,self.symbol_name,total,0,self.manager.gateway])
 					self.sent_orders = True 
-				else:
-					log_print(self.source,self.symbol_name,"NO CHANGE DETECTED, skipping.")
+				# else:
+				# 	log_print(self.source,self.symbol_name,"NO CHANGE DETECTED, skipping.")
 
 		# handl = threading.Thread(target=self.threading_order,daemon=True)
 		# handl.start()

@@ -872,6 +872,7 @@ class Manager:
 
 			elif d[0] =="pair":
 
+				try:
 					now = datetime.now()
 					cur_ts = now.hour*60+now.minute
 
@@ -880,6 +881,9 @@ class Manager:
 
 						self.apply_pair_cmd(d[1])
 
+				except Exception as e:
+
+					PrintException(e,"pair error")
 			elif d[0] =="flatten":
 
 				try:
@@ -887,20 +891,12 @@ class Manager:
 						self.flatten_all()
 					else:
 						log_print("flattening ",d[1])
-						#if d[1] in list(self.baskets.keys()):
-
 						for basket in list(self.baskets.keys()):
-							
 							l = len(d[1])
-							#log_print("flattening checking",d[1],basket[:l])
+
 							if d[1]==basket[:l]:
 								self.baskets[basket].flatten_cmd()
-							#self.baskets[d[1]].flatten_cmd()
-						# l = len(d[1])
-						# for d in list(self.baskets.keys()):
-						# 	print("trying to flat",d[1],"checking:",d[:l])
-						# 	if d[1]==d[:l]:
-						# 		self.baskets[d].flatten_cmd()
+
 				except Exception as e:
 					PrintException(e,"Flatten error")
 			elif d[0] =="shutdown":
@@ -911,29 +907,31 @@ class Manager:
 
 		#### if all green. then good to go ###
 
-		if self.ui.user.get()!="DISCONNECTED" and self.ui.ppro_api_status.get()==CONNECTED and self.ui.file_last_update.get()==CONNECTED:
+		try:
+			if self.ui.user.get()!="DISCONNECTED" and self.ui.ppro_api_status.get()==CONNECTED and self.ui.file_last_update.get()==CONNECTED:
 
-			# GOOD TO GO.
-			self.ui.system_status_text.set("READY")
-			self.ui.system_status['bg'] = 'lightgreen'
-			#log_print("System all green")
+				# GOOD TO GO.
+				self.ui.system_status_text.set("READY")
+				self.ui.system_status['bg'] = 'lightgreen'
+				#log_print("System all green")
 
-			if self.system_enable==False:
+				if self.system_enable==False:
 
-				self.online_alert()
-			self.system_enable = True 
-			
-		else:
+					self.online_alert()
+				self.system_enable = True 
+				
+			else:
 
-			self.ui.system_status_text.set("ERROR")
-			self.ui.system_status['bg'] = 'red'
-			self.ui.system_status.flash()
+				self.ui.system_status_text.set("ERROR")
+				self.ui.system_status['bg'] = 'red'
+				self.ui.system_status.flash()
 
-			if self.system_enable:
-				self.disconnection_alert()
-			## if . send me an email.
-			self.system_enable = False 
-
+				if self.system_enable:
+					self.disconnection_alert()
+				## if . send me an email.
+				self.system_enable = False 
+		except Exception as e:
+			PrintException(e,"System_check error:")
 
 
 		### if not flash ### 
@@ -1014,7 +1012,7 @@ class Manager:
 						rec = threading.Thread(target=self.record_update,daemon=True)
 						rec.start()
 
-					if count%200==0:
+					if count%180==0:
 
 						self.periodical_status()
 
