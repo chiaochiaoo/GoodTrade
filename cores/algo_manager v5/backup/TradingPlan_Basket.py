@@ -60,12 +60,12 @@ class TradingPlan_Basket:
 		self.profit3=0
 		self.profit_tier = 0
 
-		self.info = info
 		if "Profit" in info:
 			self.profit = int(abs(info["Profit"]))
 			self.profit1= self.profit/2
 			self.profit2= self.profit 
 			self.profit3= self.profit *1.5
+			self.max_profit = self.profit3
 		self.stop = 0
 		if "Stop" in info:
 			self.stop = int(abs(info["Stop"]))
@@ -151,7 +151,6 @@ class TradingPlan_Basket:
 
 	def specific_initiation(self):
 
-
 		if "OB" == self.algo_name[:2]:
 			self.inspectable = False
 			self.one_shot_algo = True 
@@ -159,6 +158,7 @@ class TradingPlan_Basket:
 			self.manual_flattable = True 
 			self.one_shot_algo = True
 		log_print(self.source," Initializing:, Manual flattable:",self.manual_flattable," Inspectable:",self.inspectable)
+
 	def init_data(self,risk):
 
 		for i in self.numeric_labels:
@@ -194,8 +194,6 @@ class TradingPlan_Basket:
 	def get_manual_flatable(self):
 
 		return self.manual_flattable
-
-
 
 	def get_algoname(self):
 
@@ -763,6 +761,11 @@ class TradingPlan_Basket:
 
 		self.flatten_order=True
 
+	def clone_cmd(self):
+
+
+		pass 
+		
 	""" Deployment initialization """
 
 	def check_pnl(self):
@@ -808,22 +811,32 @@ class TradingPlan_Basket:
 
 			if self.profit_tier==0 and  total_unreal+self.data[REALIZED] > self.profit1:
 				# take off 30% 
-				self.reduce_one_third()
+				#self.reduce_one_third()
+				# break even
+				self.stop = 0.1
 				self.profit_tier+=1
 				log_print(self.source,self.algo_name," REDUCE ONE THIRD")
+				self.tkvars[STATUS].set("Tier 1")
 			elif self.profit_tier==1 and  total_unreal+self.data[REALIZED] > self.profit2:
 				# take off 30% 
-				self.reduce_one_half()
+				#self.reduce_one_half()
 				self.profit_tier+=1
+				self.stop = self.profit1
 				log_print(self.source,self.algo_name," REDUCE ONE THIRD")
+				self.tkvars[STATUS].set("Tier 2")
 			elif self.profit_tier==2 and  total_unreal+self.data[REALIZED] > self.profit3:
 				# take off 30% 
 				log_print(self.source, self.algo_name, " MEET PROFIT TARGET",self.profit)
-				self.flatten_cmd()
+				self.stop = self.profit2
+				self.profit_tier+=1
+				self.tkvars[STATUS].set("Tier 3")
+				#self.flatten_cmd()
 				#log_print(self.source,self.algo_name," REDUCE ALL")
 
+			elif self.profit_tier==3 and total_unreal+self.data[REALIZED] >self.max_profit:
+				self.stop = self.max_profit*0.6
 			else:
-				pass 
+				pass
 		if self.stop!=0 and self.flatten_order!=True:
 			if total_unreal*-1 > self.stop:
 				log_print(self.source, self.algo_name, " MEET STOP ",self.stop)
@@ -861,13 +874,6 @@ class TradingPlan_Basket:
 
 	def shutdown(self):
 		self.shutdown = True 
-
-	def clone_cmd(self):
-
-		#### submit a clone to manager. ### 
-
-		#basket_name,orders,risk,aggresive,info
-		self.manager.apply_basket_cmd(self.algo_name+"_c",self.current_shares,5,False,self.info)
 
 	def update_displays(self):
 
