@@ -857,7 +857,8 @@ class Manager:
 
 							for key in info.keys():
 								if type(info[key])==int  or type(info[key])==float:
-									info[key] =info[key]*multiplier
+									if key!="TA":
+										info[key] =info[key]*multiplier
 
 								
 							if cur_ts<=958:
