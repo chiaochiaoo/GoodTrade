@@ -13,3 +13,5 @@ NQCLOSE1
 NQCLOSE2
 GapRunL
 GapRunS
+OpenDump
+OpenReversal
