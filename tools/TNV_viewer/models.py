@@ -71,7 +71,7 @@ class obq_model(model):
 		self.model_initialized = False 
 		self.model_early_chart = False 
 
-		self.name = "TEST_OBQ"
+		self.name = "OBQ_Manual"
 
 		self.symbols =['MSFT','AAPL','AMZN','NVDA','GOOGL','META','TSLA','AVGO','PEP','COST','CSCO','TMUS','ADBE','TXN','CMCSA','NFLX','AMD','QCOM','AMGN','INTC','HON','INTU','SBUX','GILD','AMAT','ADI','MDLZ','ISRG',
 'ADP','REGN','PYPL','VRTX','MU','LRCX','ATVI','MELI','CSX','MRNA','PANW','CDNS','ASML','SNPS','ORLY','MNST','FTNT','CHTR','KLAC','MAR','KDP','KHC','AEP','ABNB','CTAS','LULU','DXCM','NXPI',
@@ -204,7 +204,7 @@ class obq_model(model):
 		d.start() 
 
 	def model_buy(self):
-		now = datetime.now(tz=pytz.timezone('US/Eastern'))
+		now = datetime.now()
 		ts = now.strftime("_%H:%M")
 		cmdstr =  "https://tnv.ngrok.io/Basket="+self.name+"_L"+ts+",Order=*"
 		for symbol,share in self.model.items():
@@ -216,7 +216,7 @@ class obq_model(model):
 		print(cmdstr)
 		requests.get(cmdstr)
 	def model_sell(self):
-		now = datetime.now(tz=pytz.timezone('US/Eastern'))
+		now = datetime.now()
 
 		ts = now.strftime("_%H:%M")
 		cmdstr =  "https://tnv.ngrok.io/Basket="+self.name+"_S"+ts+",Order=*"
