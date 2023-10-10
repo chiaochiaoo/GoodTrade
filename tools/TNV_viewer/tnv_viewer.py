@@ -115,7 +115,7 @@ def update_chart(model,plot,canvas):
     global data 
     # Generate new data for the chart
 
-    model.model_init()
+    #model.model_init()
 
     while True:
         #//
@@ -130,7 +130,7 @@ def update_chart(model,plot,canvas):
             if model.model_early_chart:
                 plot.plot(model.get_early_ts(),model.get_early_pnl(), label='Line 2')
 
-            now = datetime.now(tz=pytz.timezone('US/Eastern'))
+            now = datetime.now()#tz=pytz.timezone('US/Eastern')
             ts = now.hour*60 + now.minute
 
             plot.set_title("Updated Chart:"+now.strftime("%H:%M:%S")+"     SPREAD:" + model.get_spread())
