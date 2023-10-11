@@ -92,7 +92,7 @@ class qfaang_model(model):
 		ts = now.strftime("_%H:%M")
 		cmdstr =  "http://127.0.0.1:4440/Basket="+self.name+"_L"+ts+",Order=*"
 		for symbol,share in self.model.items():
-			cmdstr += symbol+":"+str(share)+","
+			cmdstr += symbol+".NQ:"+str(share)+","
 
 		cmdstr= cmdstr[:-1]
 		cmdstr+="*"
@@ -106,7 +106,7 @@ class qfaang_model(model):
 		ts = now.strftime("_%H:%M")
 		cmdstr =  "http://127.0.0.1:4440/Basket="+self.name+"_S"+ts+",Order=*"
 		for symbol,share in self.model.items():
-			cmdstr += symbol+":"+str(share*-1)+","
+			cmdstr += symbol+".NQ:"+str(share*-1)+","
 
 		cmdstr= cmdstr[:-1]
 		cmdstr+="*"
@@ -352,7 +352,7 @@ class obq_model(model):
 		ts = now.strftime("_%H:%M")
 		cmdstr =  "http://127.0.0.1:4440/Basket="+self.name+"_L"+ts+",Order=*"
 		for symbol,share in self.model.items():
-			cmdstr += symbol+":"+str(share)+","
+			cmdstr += symbol+".NQ:"+str(share)+","
 
 		cmdstr= cmdstr[:-1]
 		cmdstr+="*"
@@ -365,7 +365,7 @@ class obq_model(model):
 		ts = now.strftime("_%H:%M")
 		cmdstr =  "http://127.0.0.1:4440/Basket="+self.name+"_S"+ts+",Order=*"
 		for symbol,share in self.model.items():
-			cmdstr += symbol+":"+str(share*-1)+","
+			cmdstr += symbol+".NQ:"+str(share*-1)+","
 
 		cmdstr= cmdstr[:-1]
 		cmdstr+="*"
