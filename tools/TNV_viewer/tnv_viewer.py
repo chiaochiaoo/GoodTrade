@@ -80,8 +80,11 @@ def create_tab(tab_name):
     canvas.draw()
     canvas.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
 
-    obq = obq_model()
 
+    if tab_name == "OBQ":
+        obq = obq_model()
+    elif tab_name =="QFAANG":
+        obq = qfaang_model()
     # LabelFrame for vertical buttons
 
     info_frame = ttk.LabelFrame(tab, text="Infos")
@@ -154,7 +157,7 @@ d.start()
 notebook = ttk.Notebook(root)
 
 # Create 5 tabs
-tabs = ["OBQ", ]# "Last Minute", "Tab 5"#"MRQ1", "MRQ2",
+tabs = ["OBQ", "QFAANG"]# "Last Minute", "Tab 5"#"MRQ1", "MRQ2",
 
 for tab_name in tabs:
     create_tab(tab_name)
