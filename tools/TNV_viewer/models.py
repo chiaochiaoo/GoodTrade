@@ -90,7 +90,7 @@ class qfaang_model(model):
 	def model_buy(self):
 		now = datetime.now()
 		ts = now.strftime("_%H:%M")
-		cmdstr =  "https://tnv.ngrok.io/Basket="+self.name+"_L"+ts+",Order=*"
+		cmdstr =  "http://127.0.0.1:4440/Basket="+self.name+"_L"+ts+",Order=*"
 		for symbol,share in self.model.items():
 			cmdstr += symbol+":"+str(share)+","
 
@@ -104,7 +104,7 @@ class qfaang_model(model):
 		now = datetime.now()
 
 		ts = now.strftime("_%H:%M")
-		cmdstr =  "https://tnv.ngrok.io/Basket="+self.name+"_S"+ts+",Order=*"
+		cmdstr =  "http://127.0.0.1:4440/Basket="+self.name+"_S"+ts+",Order=*"
 		for symbol,share in self.model.items():
 			cmdstr += symbol+":"+str(share*-1)+","
 
@@ -350,7 +350,7 @@ class obq_model(model):
 	def model_buy(self):
 		now = datetime.now()
 		ts = now.strftime("_%H:%M")
-		cmdstr =  "https://tnv.ngrok.io/Basket="+self.name+"_L"+ts+",Order=*"
+		cmdstr =  "http://127.0.0.1:4440/Basket="+self.name+"_L"+ts+",Order=*"
 		for symbol,share in self.model.items():
 			cmdstr += symbol+":"+str(share)+","
 
@@ -363,7 +363,7 @@ class obq_model(model):
 		now = datetime.now()
 
 		ts = now.strftime("_%H:%M")
-		cmdstr =  "https://tnv.ngrok.io/Basket="+self.name+"_S"+ts+",Order=*"
+		cmdstr =  "http://127.0.0.1:4440/Basket="+self.name+"_S"+ts+",Order=*"
 		for symbol,share in self.model.items():
 			cmdstr += symbol+":"+str(share*-1)+","
 
