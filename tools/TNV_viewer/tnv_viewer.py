@@ -1,5 +1,11 @@
 import tkinter as tk
 from tkinter import ttk
+try:
+    pip.main(['install', 'matplotlib'])
+    pip.main(['install', 'requests'])
+except:
+  pass
+
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
