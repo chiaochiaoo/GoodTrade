@@ -165,18 +165,22 @@ d = threading.Thread(target=data_update, args=(),daemon=True)
 d.start()
 
 
-notebook = ttk.Notebook(root)
 
-# Create 5 tabs
-tabs = ["OBQ", "QFAANG"]# "Last Minute", "Tab 5"#"MRQ1", "MRQ2",
+try:
+    notebook = ttk.Notebook(root)
 
-for tab_name in tabs:
-    create_tab(tab_name)
+    # Create 5 tabs
+    tabs = ["OBQ", "QFAANG"]# "Last Minute", "Tab 5"#"MRQ1", "MRQ2",
 
-notebook.pack(expand=True, fill="both")
+    for tab_name in tabs:
+        create_tab(tab_name)
+
+    notebook.pack(expand=True, fill="both")
 
 
-#data_update
+    #data_update
 
-root.geometry("1280x720")
-root.mainloop()
+    root.geometry("1280x720")
+    root.mainloop()
+except Exception as e:
+    print(e)
