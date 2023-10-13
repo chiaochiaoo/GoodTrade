@@ -662,6 +662,9 @@ class Manager:
 
 						#reduce_everything_by_half_ta(self,timetakes,percentage)
 
+					for name,basket in self.baskets.items():
+						self.algo_as_is(name)
+						
 					for ticker in total_moc.keys():
 						share = total_moc[ticker][1]
 
