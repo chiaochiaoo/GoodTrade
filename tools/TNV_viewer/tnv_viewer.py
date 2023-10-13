@@ -1,8 +1,13 @@
 import tkinter as tk
 from tkinter import ttk
+import pip
 try:
     pip.main(['install', 'matplotlib'])
     pip.main(['install', 'requests'])
+    pip.main(['install', 'python-matplotlib'])
+    pip.main(['install', 'pytz'])
+    pip.main(['install', 'pandas'])
+    pip.main(['install', 'numpy'])
 except:
   pass
 
