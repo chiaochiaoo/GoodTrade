@@ -18,5 +18,6 @@ OpenDump
 OpenReversal
 TNV_Model
 PM_Mover
-NPMB
-NOR
+TS_PMB
+TS_OR
+TS_GAINER
