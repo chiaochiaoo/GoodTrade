@@ -99,8 +99,6 @@ def create_tab(tab_name):
     canvas.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
 
 
-
-
     if tab_name == "OBQ":
         obq = obq_model()
     elif tab_name =="QFAANG":
@@ -130,10 +128,10 @@ def create_tab(tab_name):
     button2 = ttk.Button(button_frame, text="Short 1",command=obq.model_sell)
     button2.pack(side=tk.TOP, pady=5)
     
-    d = threading.Thread(target=update_chart, args=(obq,plot,canvas),daemon=True)
+    d = threading.Thread(target=update_chart, args=(obq,plot,eval_plot,canvas),daemon=True)
     d.start()
 
-def update_chart(model,plot,canvas):
+def update_chart(model,plot,eval_plot,canvas):
 
     global data 
     # Generate new data for the chart
@@ -153,6 +151,45 @@ def update_chart(model,plot,canvas):
             if model.model_early_chart:
                 plot.plot(model.get_early_ts(),model.get_early_pnl(), label='Line 2')
 
+            if model.historical_computed:
+
+                # if up, if down.
+
+                str_ = ""
+
+                levels = ["90%: ","95%: ","99%: "]
+
+                for i in range(len(model.historical_plus)):
+                    str_+=levels[i]+str(int(model.historical_plus[i]*model.historical_fixpoint))+"\n"
+                str_ = str_[:-1]
+                legend = plot.legend(loc='upper right')
+                legend.get_texts()[0].set_text(str_)
+                #plot.legend(handles=[], labels=['1','90%:','2'])
+
+                # comment_text = "Top Right Comment"
+                # plot.annotate(comment_text, xy=(1, 1), xytext=(-5, -5), ha='right', va='top', textcoords='axes fraction', fontsize=10)
+
+                # for i in model.historical_plus:
+                #     print(i*model.historical_fixpoint)
+                    #plot.axhline(i*model.historical_fixpoint,linestyle="--")
+                # if model.cur>0:
+                #     #print("HHIIIIII U")
+                #     for i in model.historical_plus:
+                #         #print(i*model.historical_fixpoint)
+                #         plot.axhline(i*model.historical_fixpoint,linestyle="--")
+                #     plot.set_ylim([0,-10])
+                #     #plot.set_ylim([min(model.pnl), max(model.pnl)*2])
+                # else:
+                #     #print("HHIIIIII D")
+                #     for i in model.historical_minus:
+                #         print(i*model.historical_fixpoint)
+                #         plot.axhline(i*model.historical_fixpoint,linestyle="--")
+
+
+                #    # plot.set_ylim([-10,])
+                #     print(min(model.pnl)*2, max(model.pnl))
+                    #plot.set_ylim([min(model.pnl)*2, max(model.pnl)])
+                    #plt.xlim([max(model.pnl), model.historical_plus[-1]*model.historical_fixpoint])
             now = datetime.now()#tz=pytz.timezone('US/Eastern')
             ts = now.hour*60 + now.minute
 

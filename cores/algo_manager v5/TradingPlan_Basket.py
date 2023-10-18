@@ -160,6 +160,7 @@ class TradingPlan_Basket:
 			self.manual_flattable = True 
 			self.one_shot_algo = True
 		log_print(self.source," Initializing:, Manual flattable:",self.manual_flattable," Inspectable:",self.inspectable)
+		
 	def init_data(self,risk):
 
 		for i in self.numeric_labels:

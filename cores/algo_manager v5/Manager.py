@@ -1618,6 +1618,7 @@ if __name__ == '__main__':
 	algo_voxcom.join()
 	ppro_in_manager.join()
 	ppro_out_manager.join()
+	
 	print("All subprocesses terminated")
 
 	print("checking remaining processes:",multiprocessing.active_children(),threading.active_count())

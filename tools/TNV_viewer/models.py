@@ -34,6 +34,11 @@ class model:
 		self.model_early_chart = False 
 		self.historical_computed = False 
 
+		self.historical_computed = False
+		self.historical_plus = []
+		self.historical_minus = []
+		self.historical_fixpoint = 0
+
 	def model_init(self):
 		pass
 	def model_early_load(self):
@@ -84,8 +89,9 @@ class qfaang_model(model):
 		self.model_early_chart = False 
 
 		self.historical_computed = True 
-		self.historical_plus = []
-		self.historical_minus = []
+		self.historical_plus = [0.01,0.02,0.04]
+		self.historical_minus = [-0.01,-0.02,-0.04]
+		self.historical_fixpoint = 1200
 
 		self.name = "TNV_Model_QFAANG"
 
@@ -230,6 +236,11 @@ class obq_model(model):
 		self.e_ts  = []
 		self.model_initialized = False 
 		self.model_early_chart = False 
+
+		self.historical_computed = True 
+		self.historical_plus = []
+		self.historical_minus = []
+
 
 		self.name = "TNV_Model_OBQ"
 
