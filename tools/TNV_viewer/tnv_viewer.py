@@ -149,7 +149,7 @@ def update_chart(model,plot,canvas):
             now = datetime.now()#tz=pytz.timezone('US/Eastern')
             ts = now.hour*60 + now.minute
 
-            plot.set_title("Updated Chart:"+now.strftime("%H:%M:%S")+"     SPREAD:" + model.get_spread())
+            plot.set_title("Updated Chart:"+now.strftime("%H:%M:%S")+"     SPREAD:" + model.get_spread()+"  CUR:"+model.get_price())
 
             # Redraw the canvas
             canvas.draw()
@@ -172,7 +172,7 @@ try:
     notebook = ttk.Notebook(root)
 
     # Create 5 tabs
-    tabs = [ "QFAANG"]# "Last Minute", "Tab 5"#"MRQ1", "MRQ2", #"OBQ",
+    tabs = [ "QFAANG","OBQ"]# "Last Minute", "Tab 5"#"MRQ1", "MRQ2", #"OBQ",
 
     for tab_name in tabs:
         create_tab(tab_name)

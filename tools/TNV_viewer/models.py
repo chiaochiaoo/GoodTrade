@@ -25,6 +25,7 @@ class model:
 		self.pnl = np.array([None for i in range(570,960)])
 		self.ts  = np.array([i for i in range(570,960)])
 		self.spread = 0
+		self.cur = 0
 		self.e_pnl = []
 		self.e_ts  = []
 
@@ -42,6 +43,7 @@ class model:
 		pass
 	def model_update(self):
 		pass
+
 
 	def get_ts(self):
 		return self.ts 
@@ -62,6 +64,9 @@ class model:
 
 		return str(round(self.spread,2))
 
+	def get_price(self):
+
+		return  str(round(self.cur,2))
 
 class qfaang_model(model):
 
@@ -80,8 +85,8 @@ class qfaang_model(model):
 		self.historical_computed = True 
 		self.historical_plus = []
 		self.historical_minus = []
-		
-		self.name = "TNV_Model_QFANG"
+
+		self.name = "TNV_Model_QFAANG"
 
 		self.symbols =['MSFT','AAPL','AMZN','NFLX','GOOGL','META','QQQ']
 
@@ -204,6 +209,7 @@ class qfaang_model(model):
 			if c!=0:
 				self.pnl[idx] = c
 				self.spread = spread
+				self.cur = c
 		else:
 			print("require init model.")
 			pass
@@ -461,6 +467,7 @@ class obq_model(model):
 			# self.pnl[before[before<idx]]=0
 
 			if c!=0:
+				self.cur = c
 				self.pnl[idx] = c
 				self.spread = spread
 		else:
