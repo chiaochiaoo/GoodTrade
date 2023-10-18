@@ -81,17 +81,24 @@ def create_tab(tab_name):
 
     # Sample Matplotlib chart
     fig = Figure(figsize=(5, 4), dpi=100)
-    plot = fig.add_subplot(1, 1, 1)
 
-   
+    fig, axs = plt.subplots(2, 1, figsize=(10, 4), gridspec_kw={'height_ratios': [2, 1,]}) #'width_ratios': [2, 1,]
+
+    #plot = fig.add_subplot(1, 1, 1)
+
+    plot = axs[0]
     #plot.plot([i for i in range(570,960)],pnl)
 
 
     plot.set_title(f"{tab_name}")
 
+    eval_plot = axs[1]
+    eval_plot.set_title("Eval")
     canvas = FigureCanvasTkAgg(fig, master=tab)  # A tk.DrawingArea.
     canvas.draw()
     canvas.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
+
+
 
 
     if tab_name == "OBQ":
