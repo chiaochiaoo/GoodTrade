@@ -188,7 +188,7 @@ try:
 
 
     #data_update
-
+    root.title("SelectTrade Model Viewer")
     root.geometry("1280x720")
     root.mainloop()
 except Exception as e:
