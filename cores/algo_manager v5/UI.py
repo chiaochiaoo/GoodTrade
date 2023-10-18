@@ -1344,8 +1344,8 @@ class UI(pannel):
 				label.grid(sticky="w",column=col,row=row)
 				ttk.Checkbutton(self.frames[i], variable=item[ACTIVE]).grid(sticky="w",column=col+1,row=row)
 
-				ttk.Label(self.frames[i], text="Risk:").grid(sticky="w",column=col+4,row=row)
-				ttk.Entry(self.frames[i], textvariable=item[RISK],width=4).grid(sticky="w",column=col+5,row=row)
+				# ttk.Label(self.frames[i], text="Risk:").grid(sticky="w",column=col+4,row=row)
+				# ttk.Entry(self.frames[i], textvariable=item[RISK],width=4).grid(sticky="w",column=col+5,row=row)
 
 				ttk.Label(self.frames[i], text="Multiplier:").grid(sticky="w",column=col+6,row=row)
 				ttk.Entry(self.frames[i], textvariable=item[MULTIPLIER],width=3).grid(sticky="w",column=col+7,row=row)
