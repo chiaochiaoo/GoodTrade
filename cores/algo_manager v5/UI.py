@@ -1147,7 +1147,10 @@ class UI(pannel):
 			#print(self.tk_labels_single[symbol])
 			if label_name == "Strategy":
 				self.tk_labels_basket[symbol][label_name]["text"] = info[j] 
-				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.clone_cmd
+				#self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.clone_cmd
+
+				self.tk_labels_basket[symbol][label_name].bind("<Double-1>", lambda event:  tradingplan.clone_cmd())
+
 			elif label_name == STATUS:
 				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j] 
 				#self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.cancle_deployment
