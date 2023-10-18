@@ -28,7 +28,7 @@ class TradingPlan_Pair(TradingPlan_Basket):
 
 		self.ratio = infos['ratio']
 
-
+		self.clone_able = False
 
 		# self.algo_name = algo_name
 

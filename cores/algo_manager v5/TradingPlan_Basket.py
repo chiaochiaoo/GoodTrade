@@ -39,6 +39,7 @@ class TradingPlan_Basket:
 		self.expect_orders = ""
 		self.flatten_order = False
 
+		self.clone_able =True 
 
 		self.one_shot_algo = False
 
@@ -867,7 +868,9 @@ class TradingPlan_Basket:
 		#### submit a clone to manager. ### 
 
 		#basket_name,orders,risk,aggresive,info
-		self.manager.apply_basket_cmd(self.algo_name+"_c",self.current_shares,5,False,self.info)
+
+		if self.clone_able:
+			self.manager.apply_basket_cmd(self.algo_name+"_c",self.current_shares,5,False,self.info)
 
 	def update_displays(self):
 
