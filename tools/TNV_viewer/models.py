@@ -79,6 +79,7 @@ class qfaang_model(model):
 		self.spread = 0
 		self.e_pnl = []
 		self.e_ts  = []
+		self.cur = 0
 		self.model_initialized = True 
 		self.model_early_chart = False 
 
@@ -221,7 +222,7 @@ class obq_model(model):
 	def __init__(self):
 		self.model_initialized = False 
 		self.model = {}
-
+		self.cur = 0
 		self.pnl = np.array([None for i in range(570,960)])
 		self.ts  = np.array([i for i in range(570,960)])
 		self.spread = 0
