@@ -28,6 +28,11 @@ class model:
 		self.e_pnl = []
 		self.e_ts  = []
 
+
+		self.model_initialized = True 
+		self.model_early_chart = False 
+		self.historical_computed = False 
+
 	def model_init(self):
 		pass
 	def model_early_load(self):
@@ -72,6 +77,10 @@ class qfaang_model(model):
 		self.model_initialized = True 
 		self.model_early_chart = False 
 
+		self.historical_computed = True 
+		self.historical_plus = []
+		self.historical_minus = []
+		
 		self.name = "TNV_Model_QFANG"
 
 		self.symbols =['MSFT','AAPL','AMZN','NFLX','GOOGL','META','QQQ']
