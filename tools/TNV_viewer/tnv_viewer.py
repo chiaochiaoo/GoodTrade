@@ -38,41 +38,44 @@ def data_update():
 
     while True:
 
-        r = "https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?include_otc=false&apiKey=ezY3uX1jsxve3yZIbw2IjbNi5X7uhp1H"
 
-        r = requests.get(r)
-        # print(r.text)
+        try:
+            r = "https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?include_otc=false&apiKey=ezY3uX1jsxve3yZIbw2IjbNi5X7uhp1H"
 
-        d = json.loads(r.text)
+            r = requests.get(r)
+            # print(r.text)
 
-        last_min_stamp = []
+            d = json.loads(r.text)
 
-        for i in d['tickers']:
-            last_min_stamp.append(i['lastTrade']['t']//1000000000)
+            last_min_stamp = []
 
-        cur_ts = max(last_min_stamp)
+            for i in d['tickers']:
+                last_min_stamp.append(i['lastTrade']['t']//1000000000)
 
-        data['timestamp'] = cur_ts
+            cur_ts = max(last_min_stamp)
 
-        for i in d['tickers']:
-            data[i['ticker']] = {}
-            data[i['ticker']]['day_open'] = i['day']['o'] 
-            data[i['ticker']]['day_current'] = i['day']['c'] 
-            data[i['ticker']]['day_high'] = i['day']['h'] 
-            data[i['ticker']]['day_low'] = i['day']['l'] 
-            data[i['ticker']]['day_volume'] = i['day']['v'] 
+            data['timestamp'] = cur_ts
 
-            data[i['ticker']]['bid'] = i['lastQuote']['p']
-            data[i['ticker']]['ask'] = i['lastQuote']['P']
+            for i in d['tickers']:
+                data[i['ticker']] = {}
+                data[i['ticker']]['day_open'] = i['day']['o'] 
+                data[i['ticker']]['day_current'] = i['day']['c'] 
+                data[i['ticker']]['day_high'] = i['day']['h'] 
+                data[i['ticker']]['day_low'] = i['day']['l'] 
+                data[i['ticker']]['day_volume'] = i['day']['v'] 
 
-            # data[i['ticker']]['minute_open'] = i['min']['o'] 
-            # data[i['ticker']]['minute_close'] = i['min']['c'] 
-            # data[i['ticker']]['minute_high'] = i['min']['h'] 
-            # data[i['ticker']]['minute_low'] = i['min']['l']
-            # data[i['ticker']]['minute_volume'] = i['min']['v']
+                data[i['ticker']]['bid'] = i['lastQuote']['p']
+                data[i['ticker']]['ask'] = i['lastQuote']['P']
 
-        time.sleep(5)
+                # data[i['ticker']]['minute_open'] = i['min']['o'] 
+                # data[i['ticker']]['minute_close'] = i['min']['c'] 
+                # data[i['ticker']]['minute_high'] = i['min']['h'] 
+                # data[i['ticker']]['minute_low'] = i['min']['l']
+                # data[i['ticker']]['minute_volume'] = i['min']['v']
 
+            time.sleep(5)
+        except Exception as e:
+            print(e)
 
 
 def create_tab(tab_name):
