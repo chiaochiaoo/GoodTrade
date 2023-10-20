@@ -100,7 +100,7 @@ class qfaang_model(model):
 
 	def model_init(self):
 
-		self.model =  {'QQQ': 9, 'AAPL': -1, 'AMZN': -1, 'NFLX': -3, 'META': -3, 'GOOG': -1, }
+		self.model =  {'QQQ': 10, 'AAPL': -4, 'AMZN': -4, 'NFLX': -1, 'META': -1, 'GOOG': -4, }
 		self.model_initialized = True 
 
 	def model_early_load(self):
