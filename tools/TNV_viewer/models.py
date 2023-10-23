@@ -79,152 +79,152 @@ class model:
 
 		return  str(round(self.cur,2))
 
-class qfaang_model(model):
+# class qfaang_model(model):
 
-	def __init__(self):
-		self.model_initialized = False 
-		self.model = {}
+# 	def __init__(self):
+# 		self.model_initialized = False 
+# 		self.model = {}
 
-		self.pnl = np.array([None for i in range(570,960)])
-		self.ts  = np.array([i for i in range(570,960)])
-		self.spread = 0
-		self.e_pnl = []
-		self.e_ts  = []
-		self.cur = 0
-		self.model_initialized = True 
-		self.model_early_chart = False 
+# 		self.pnl = np.array([None for i in range(570,960)])
+# 		self.ts  = np.array([i for i in range(570,960)])
+# 		self.spread = 0
+# 		self.e_pnl = []
+# 		self.e_ts  = []
+# 		self.cur = 0
+# 		self.model_initialized = True 
+# 		self.model_early_chart = False 
 
-		self.historical_computed = True 
-		self.historical_plus = [0.01,0.02,0.04]
-		self.historical_minus = [-0.01,-0.02,-0.04]
-		self.historical_fixpoint = 1200
+# 		self.historical_computed = True 
+# 		self.historical_plus = [0.01,0.02,0.04]
+# 		self.historical_minus = [-0.01,-0.02,-0.04]
+# 		self.historical_fixpoint = 1200
 
-		self.name = "TNV_Model_QFAANG"
+# 		self.name = "TNV_Model_QFAANG"
 
-		self.symbols =['MSFT','AAPL','AMZN','NFLX','GOOGL','META','QQQ']
-
-
-	def model_init(self):
-
-		self.model =  {'QQQ': 10, 'AAPL': -4, 'AMZN': -4, 'NFLX': -1, 'META': -1, 'GOOG': -4, }
-		self.model_initialized = True 
-
-	def model_early_load(self):
-
-		d = threading.Thread(target=self.model_load_early_chart,daemon=True)
-		d.start() 
-
-	def model_buy(self):
-		now = datetime.now()
-		ts = now.strftime("_%H:%M")
-		cmdstr =  "http://127.0.0.1:4440/Basket="+self.name+"_L"+ts+",Order=*"
-		for symbol,share in self.model.items():
-			cmdstr += symbol+".NQ:"+str(share)+","
-
-		cmdstr= cmdstr[:-1]
-		cmdstr+="*"
-
-		print(cmdstr)
-		requests.get(cmdstr)
-
-	def model_sell(self):
-		now = datetime.now()
-
-		ts = now.strftime("_%H:%M")
-		cmdstr =  "http://127.0.0.1:4440/Basket="+self.name+"_S"+ts+",Order=*"
-		for symbol,share in self.model.items():
-			cmdstr += symbol+".NQ:"+str(share*-1)+","
-
-		cmdstr= cmdstr[:-1]
-		cmdstr+="*"
-
-		print(cmdstr)
-		requests.get(cmdstr)
-
-	def model_load_early_chart(self):
-		print("loading start")
-		dic = {}
-
-		now = datetime.now(tz=pytz.timezone('US/Eastern'))
-		ts = now.hour*60 + now.minute
-
-		for key in self.model.keys():
-		  postbody = "https://financialmodelingprep.com/api/v3/historical-chart/1min/"+key+"?apikey=a901e6d3dd9c97c657d40a2701374d2a"
-		  r= requests.get(postbody)
-		  # print(r.text)
-
-		  d = json.loads(r.text)
-		  dic[key] = d 
-
-		earlier_pnl = np.zeros((len(dic),ts-570+1))
-		c = 0
-
-		for symbol,share in self.model.items():
-
-		  df = pd.DataFrame.from_dict(dic[symbol])
-
-		  df['date']= pd.to_datetime(df['date']) 
-		  df = df.loc[df['date']>pd.Timestamp(date.today())]
-		  df['ts'] = df['date'].dt.hour*60 + df['date'].dt.minute-570
-
-		  idx = df['ts'].tolist()[:ts-570]
-		  p = df['open'].to_numpy()[:ts-570]
-
-		  diff = p*share
-		  earlier_pnl[c][idx] = diff
-		  mask = earlier_pnl[c]==0
-
-		  earlier_pnl[c][mask]= np.interp(np.flatnonzero(mask), np.flatnonzero(~mask),  earlier_pnl[c][~mask])
-
-		  c+=1
-
-		s = np.sum(earlier_pnl,axis=0)
-		s = s - s[0]
-
-		self.e_pnl = s
-		self.e_ts  = [570+i for i in range(len(self.e_pnl))]
-
-		self.model_early_chart = True 
-		print("loading complete ")
-
-	def model_update(self,data):
-		c= 0
-
-		if self.model_initialized:
-			spread = 0
-			spreads = {}
+# 		self.symbols =['MSFT','AAPL','AMZN','NFLX','GOOGL','META','QQQ']
 
 
-			for key,share in self.model.items():
+# 	def model_init(self):
 
-				if key in data:
-					c+=(data[key]['day_current'] - data[key]['day_open'])*share
+# 		self.model =  {'QQQ': 10, 'AAPL': -4, 'AMZN': -4, 'NFLX': -1, 'META': -1, 'GOOG': -4, }
+# 		self.model_initialized = True 
 
-					spread+= (data[key]['ask'] - data[key]['bid'])*abs(share)
+# 	def model_early_load(self):
 
-					spreads[key]=((data[key]['ask'] - data[key]['bid'])*abs(share))
-					#print(key,round( (data[key]['ask'] - data[key]['bid'])*abs(share),1))
-				else:
-					print("no",key)
+# 		d = threading.Thread(target=self.model_load_early_chart,daemon=True)
+# 		d.start() 
 
-			print({k: v for k, v in sorted(spreads.items(), key=lambda item: item[1])})
+# 	def model_buy(self):
+# 		now = datetime.now()
+# 		ts = now.strftime("_%H:%M")
+# 		cmdstr =  "http://127.0.0.1:4440/Basket="+self.name+"_L"+ts+",Order=*"
+# 		for symbol,share in self.model.items():
+# 			cmdstr += symbol+".NQ:"+str(share)+","
+
+# 		cmdstr= cmdstr[:-1]
+# 		cmdstr+="*"
+
+# 		print(cmdstr)
+# 		requests.get(cmdstr)
+
+# 	def model_sell(self):
+# 		now = datetime.now()
+
+# 		ts = now.strftime("_%H:%M")
+# 		cmdstr =  "http://127.0.0.1:4440/Basket="+self.name+"_S"+ts+",Order=*"
+# 		for symbol,share in self.model.items():
+# 			cmdstr += symbol+".NQ:"+str(share*-1)+","
+
+# 		cmdstr= cmdstr[:-1]
+# 		cmdstr+="*"
+
+# 		print(cmdstr)
+# 		requests.get(cmdstr)
+
+# 	def model_load_early_chart(self):
+# 		print("loading start")
+# 		dic = {}
+
+# 		now = datetime.now(tz=pytz.timezone('US/Eastern'))
+# 		ts = now.hour*60 + now.minute
+
+# 		for key in self.model.keys():
+# 		  postbody = "https://financialmodelingprep.com/api/v3/historical-chart/1min/"+key+"?apikey=a901e6d3dd9c97c657d40a2701374d2a"
+# 		  r= requests.get(postbody)
+# 		  # print(r.text)
+
+# 		  d = json.loads(r.text)
+# 		  dic[key] = d 
+
+# 		earlier_pnl = np.zeros((len(dic),ts-570+1))
+# 		c = 0
+
+# 		for symbol,share in self.model.items():
+
+# 		  df = pd.DataFrame.from_dict(dic[symbol])
+
+# 		  df['date']= pd.to_datetime(df['date']) 
+# 		  df = df.loc[df['date']>pd.Timestamp(date.today())]
+# 		  df['ts'] = df['date'].dt.hour*60 + df['date'].dt.minute-570
+
+# 		  idx = df['ts'].tolist()[:ts-570]
+# 		  p = df['open'].to_numpy()[:ts-570]
+
+# 		  diff = p*share
+# 		  earlier_pnl[c][idx] = diff
+# 		  mask = earlier_pnl[c]==0
+
+# 		  earlier_pnl[c][mask]= np.interp(np.flatnonzero(mask), np.flatnonzero(~mask),  earlier_pnl[c][~mask])
+
+# 		  c+=1
+
+# 		s = np.sum(earlier_pnl,axis=0)
+# 		s = s - s[0]
+
+# 		self.e_pnl = s
+# 		self.e_ts  = [570+i for i in range(len(self.e_pnl))]
+
+# 		self.model_early_chart = True 
+# 		print("loading complete ")
+
+# 	def model_update(self,data):
+# 		c= 0
+
+# 		if self.model_initialized:
+# 			spread = 0
+# 			spreads = {}
+
+
+# 			for key,share in self.model.items():
+
+# 				if key in data:
+# 					c+=(data[key]['day_current'] - data[key]['day_open'])*share
+
+# 					spread+= (data[key]['ask'] - data[key]['bid'])*abs(share)
+
+# 					spreads[key]=((data[key]['ask'] - data[key]['bid'])*abs(share))
+# 					#print(key,round( (data[key]['ask'] - data[key]['bid'])*abs(share),1))
+# 				else:
+# 					print("no",key)
+
+# 			print({k: v for k, v in sorted(spreads.items(), key=lambda item: item[1])})
 			
-			#print(np.mean(spreads))
-			now = datetime.now(tz=pytz.timezone('US/Eastern'))
-			ts = now.hour*60 + now.minute
-			idx = ts-570
+# 			#print(np.mean(spreads))
+# 			now = datetime.now(tz=pytz.timezone('US/Eastern'))
+# 			ts = now.hour*60 + now.minute
+# 			idx = ts-570
 
-			# before = np.where(self.pnl==None)[0]
-			# self.pnl[before[before<idx]]=0
+# 			# before = np.where(self.pnl==None)[0]
+# 			# self.pnl[before[before<idx]]=0
 
-			if c!=0:
-				self.pnl[idx] = c
-				self.spread = spread
-				self.cur = c
-		else:
-			print("require init model.")
-			pass
-			pass#self.model_init()
+# 			if c!=0:
+# 				self.pnl[idx] = c
+# 				self.spread = spread
+# 				self.cur = c
+# 		else:
+# 			print("require init model.")
+# 			pass
+# 			pass#self.model_init()
 
 
 class obq_model(model):
