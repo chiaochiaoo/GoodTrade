@@ -103,35 +103,60 @@ def create_tab(tab_name):
 
 
     if tab_name == "OBQ":
-        obq = obq_model()
+        model = obq_model()
+
     elif tab_name =="QFAANG":
-        obq = qfaang_model()
+        name = "QFAANG"
+        model =  {'QQQ.NQ': 10, 'AAPL.NQ': -4, 'AMZN.NQ': -4, 'NFLX.NQ': -1, 'META.NQ': -1, 'GOOG.NQ': -4, }
+        historical_plus = [0.01,0.02,0.04]
+        historical_minus = [-0.01,-0.02,-0.04]
+        historical_fixpoint =1200
+
+        model =  quick_model(name,model,historical_plus,historical_minus,historical_fixpoint)
+
+    elif tab_name =="QEV":
+        name = "QEV"
+        model =  {'QQQ.NQ': 4, 'TSLA.NQ': -1, 'NIO.NY': -29, 'LCID.NQ': -33, 'FSR.NY': -22}
+        historical_plus = [0]
+        historical_minus = [0]
+        historical_fixpoint =1200
+
+        model =  quick_model(name,model,historical_plus,historical_minus,historical_fixpoint)
+
     # LabelFrame for vertical buttons
 
-    info_frame = ttk.LabelFrame(tab, text="Infos")
-    info_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=10, pady=10)
-
+    # info_frame = ttk.LabelFrame(tab, text="Infos")
+    # info_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=10, pady=10)
 
     button_frame = ttk.LabelFrame(tab, text="Buttons")
     button_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=10, pady=10)
 
-    button1 = ttk.Button(button_frame, text="Load model",command=obq.model_init)
-    button1.pack(side=tk.TOP, pady=5)
+    row =1
+    button1 = ttk.Button(button_frame, text="Load model",command=model.model_init)
+    button1.grid(sticky="w",column=1,row=row) 
 
-    button1 = ttk.Button(button_frame, text="Load model early data",command=obq.model_early_load)
-    button1.pack(side=tk.TOP, pady=5)
+    row +=1
+    button1 = ttk.Button(button_frame, text="Load Earlier",command=model.model_early_load)
+    button1.grid(sticky="w",column=1,row=row) 
 
-    # update_button = ttk.Button(button_frame, text="Plot Earlier", command=lambda: earlier_plot(obq,plot,canvas))
-    # update_button.pack(side=tk.TOP, pady=10)
+    row +=1
+    tk.Label(button_frame,text="Profit:").grid(sticky="w",column=1,row=row) 
+    tk.Entry(button_frame,textvariable=model.profit,width=8).grid(sticky="w",column=2,row=row) 
 
-    # Buttons on the right side (vertical)
-    button1 = ttk.Button(button_frame, text="Buy 1",command=obq.model_buy)
-    button1.pack(side=tk.TOP, pady=5)
+    row +=1
+    tk.Label(button_frame,text="Stop:").grid(sticky="w",column=1,row=row) 
+    tk.Entry(button_frame,textvariable=model.stop,width=8).grid(sticky="w",column=2,row=row) 
 
-    button2 = ttk.Button(button_frame, text="Short 1",command=obq.model_sell)
-    button2.pack(side=tk.TOP, pady=5)
-    
-    d = threading.Thread(target=update_chart, args=(obq,plot,eval_plot,canvas),daemon=True)
+
+    row +=1
+    button1 = ttk.Button(button_frame, text="Buy 1",command=model.model_buy)
+    button1.grid(sticky="w",column=1,row=row) 
+
+    row +=1
+    button2 = ttk.Button(button_frame, text="Short 1",command=model.model_sell)
+    button2.grid(sticky="w",column=1,row=row) 
+
+    d = threading.Thread(target=update_chart, args=(model,plot,eval_plot,canvas),daemon=True)
     d.start()
 
 def update_chart(model,plot,eval_plot,canvas):
@@ -219,7 +244,7 @@ try:
     notebook = ttk.Notebook(root)
 
     # Create 5 tabs
-    tabs = [ "QFAANG","OBQ"]# "Last Minute", "Tab 5"#"MRQ1", "MRQ2", #"OBQ",
+    tabs = [ "QFAANG","QEV"]# "Last Minute", "Tab 5"#"MRQ1", "MRQ2", #"OBQ", #"OBQ"
 
     for tab_name in tabs:
         create_tab(tab_name)

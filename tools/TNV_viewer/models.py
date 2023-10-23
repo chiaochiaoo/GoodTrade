@@ -15,10 +15,13 @@ if sys.version_info[0] < 3:
 else:
     from io import StringIO
 
+import tkinter as tk
+from tkinter import ttk
 
 class model:
 
 	def __init__(self):
+
 		self.model_initialized = False 
 		self.model = {}
 
@@ -29,7 +32,6 @@ class model:
 		self.e_pnl = []
 		self.e_ts  = []
 
-
 		self.model_initialized = True 
 		self.model_early_chart = False 
 		self.historical_computed = False 
@@ -39,17 +41,21 @@ class model:
 		self.historical_minus = []
 		self.historical_fixpoint = 0
 
+		self.name = []
+		self.symbols =[]
+
+
+		self.profit = tk.DoubleVar(value=0)
+		self.stop = tk.DoubleVar(value=0)
+
 	def model_init(self):
 		pass
 	def model_early_load(self):
 		pass
-
 	def model_load_early_chart(self):
 		pass
 	def model_update(self):
 		pass
-
-
 	def get_ts(self):
 		return self.ts 
 
@@ -181,8 +187,6 @@ class qfaang_model(model):
 		self.model_early_chart = True 
 		print("loading complete ")
 
-
-
 	def model_update(self,data):
 		c= 0
 
@@ -244,10 +248,8 @@ class obq_model(model):
 
 		self.name = "TNV_Model_OBQ"
 
-		self.symbols =['MSFT','AAPL','AMZN','NVDA','GOOGL','META','TSLA','AVGO','PEP','COST','CSCO','TMUS','ADBE','TXN','CMCSA','NFLX','AMD','QCOM','AMGN','INTC','HON','INTU','SBUX','GILD','AMAT','ADI','MDLZ','ISRG',
-'ADP','REGN','PYPL','VRTX','MU','LRCX','ATVI','MELI','CSX','MRNA','PANW','CDNS','ASML','SNPS','ORLY','MNST','FTNT','CHTR','KLAC','MAR','KDP','KHC','AEP','ABNB','CTAS','LULU','DXCM','NXPI',
-'AZN','MCHP','ADSK','EXC','BIIB','PDD','IDXX','WDAY','PAYX','XEL','SGEN','PCAR','ODFL','CPRT','ILMN','ROST','GFS','EA','MRVL','WBD','DLTR','CTSH','WBA','FAST','VRSK','CRWD','BKR','ENPH','CSGP','ANSS',
-'FANG','ALGN','TEAM','EBAY','DDOG','ZM','JD','ZS','LCID','RIVN']
+		self.symbols =['MSFT','AAPL','AMZN','NVDA','GOOGL','META','TSLA','AVGO','PEP','COST','CSCO','TMUS','ADBE','TXN','CMCSA','NFLX','AMD','QCOM','AMGN','INTC','HON','INTU','SBUX','GILD','AMAT','ADI','MDLZ','ISRG','ADP','REGN','PYPL','VRTX','MU','LRCX','ATVI','MELI','CSX','MRNA','PANW','CDNS','ASML','SNPS','ORLY','MNST','FTNT','CHTR','KLAC','MAR','KDP','KHC','AEP','ABNB','CTAS','LULU','DXCM','NXPI','AZN','MCHP','ADSK','EXC','BIIB','PDD','IDXX','WDAY','PAYX','XEL','SGEN','PCAR','ODFL','CPRT','ILMN','ROST','GFS','EA','MRVL','WBD','DLTR','CTSH','WBA','FAST','VRSK','CRWD','BKR','ENPH','CSGP','ANSS','FANG','ALGN','TEAM','EBAY','DDOG','ZM','JD','ZS','LCID','RIVN']
+
 	def create_standard_obq_df(self):
 
 		k = []
@@ -486,3 +488,181 @@ class obq_model(model):
 			print("require init model.")
 			pass
 			pass#self.model_init()
+
+
+
+class quick_model(model):
+
+	def __init__(self,name,model,historical_plus,historical_minus,historical_fixpoint):
+
+		super().__init__()
+
+		self.model_initialized = True 
+		self.model = {}
+
+		self.pnl = np.array([None for i in range(570,960)])
+		self.ts  = np.array([i for i in range(570,960)])
+		self.spread = 0
+		self.e_pnl = []
+		self.e_ts  = []
+		self.cur = 0
+		self.model_initialized = True 
+		self.model_early_chart = False 
+
+		self.name = "TNV_Model_" + name #"QFAANG"
+
+		self.model =  model 
+		self.model_initialized = True 
+
+		self.historical_computed = True 
+		self.historical_plus = historical_plus
+		self.historical_minus = historical_minus
+		self.historical_fixpoint = historical_fixpoint
+
+	def model_early_load(self):
+
+		d = threading.Thread(target=self.model_load_early_chart,daemon=True)
+		d.start() 
+
+	def model_buy(self):
+
+		try:
+			now = datetime.now()
+			ts = now.strftime("_%H:%M")
+			cmdstr =  "http://127.0.0.1:4440/Basket="+self.name+"_L"+ts+",Order=*"
+			for symbol,share in self.model.items():
+				cmdstr += symbol+":"+str(share)+","
+
+			cmdstr= cmdstr[:-1]
+			cmdstr+="*"
+
+
+			cmdstr+="Infos=("
+			if self.profit.get()>0:
+				cmdstr+="Profit="+str(int(self.profit.get()))+","
+			if self.stop.get()>0:	
+				cmdstr+="Stop="+str(int(self.profit.get()))+","
+			cmdstr+=")"
+			print(cmdstr)
+			requests.get(cmdstr)
+		except Exception as e:
+			print(e)
+
+	def model_sell(self):
+
+		try:
+			now = datetime.now()
+
+			ts = now.strftime("_%H:%M")
+			cmdstr =  "http://127.0.0.1:4440/Basket="+self.name+"_S"+ts+",Order=*"
+			for symbol,share in self.model.items():
+				cmdstr += symbol+":"+str(share*-1)+","
+
+			cmdstr= cmdstr[:-1]
+			cmdstr+="*"
+
+			cmdstr+="Infos=("
+			if self.profit.get()>0:
+				cmdstr+="Profit="+str(int(self.profit.get()))+","
+			if self.stop.get()>0:	
+				cmdstr+="Stop="+str(int(self.stop.get()))+","
+			cmdstr+=")"
+			print(cmdstr)
+			requests.get(cmdstr)
+
+		except Exception as e:
+			print(e)
+	def model_load_early_chart(self):
+
+		try:
+			print("loading start")
+			dic = {}
+
+			now = datetime.now(tz=pytz.timezone('US/Eastern'))
+			ts = now.hour*60 + now.minute
+
+			for key in self.model.keys():
+			  postbody = "https://financialmodelingprep.com/api/v3/historical-chart/1min/"+key[:-3]+"?apikey=a901e6d3dd9c97c657d40a2701374d2a"
+			  r= requests.get(postbody)
+			  # print(r.text)
+
+			  d = json.loads(r.text)
+			  dic[key] = d 
+
+			earlier_pnl = np.zeros((len(dic),ts-570+1))
+			c = 0
+
+			for symbol,share in self.model.items():
+
+			  df = pd.DataFrame.from_dict(dic[symbol])
+
+			  df['date']= pd.to_datetime(df['date']) 
+			  df = df.loc[df['date']>pd.Timestamp(date.today())]
+			  df['ts'] = df['date'].dt.hour*60 + df['date'].dt.minute-570
+
+			  idx = df['ts'].tolist()[:ts-570]
+			  p = df['open'].to_numpy()[:ts-570]
+
+			  diff = p*share
+			  earlier_pnl[c][idx] = diff
+			  mask = earlier_pnl[c]==0
+
+			  earlier_pnl[c][mask]= np.interp(np.flatnonzero(mask), np.flatnonzero(~mask),  earlier_pnl[c][~mask])
+
+			  c+=1
+
+			s = np.sum(earlier_pnl,axis=0)
+			s = s - s[0]
+
+			self.e_pnl = s
+			self.e_ts  = [570+i for i in range(len(self.e_pnl))]
+
+			self.model_early_chart = True 
+			print("loading complete ")
+
+		except Exception as e:
+			print(e)
+	def model_update(self,data):
+
+		try:
+			c= 0
+
+			if self.model_initialized:
+				spread = 0
+				spreads = {}
+
+
+				for key,share in self.model.items():
+
+					key = key[:-3]
+					
+					if key in data:
+						c+=(data[key]['day_current'] - data[key]['day_open'])*share
+
+						spread+= (data[key]['ask'] - data[key]['bid'])*abs(share)
+
+						spreads[key]=((data[key]['ask'] - data[key]['bid'])*abs(share))
+						#print(key,round( (data[key]['ask'] - data[key]['bid'])*abs(share),1))
+					else:
+						print("no",key)
+
+				print({k: v for k, v in sorted(spreads.items(), key=lambda item: item[1])})
+				
+				#print(np.mean(spreads))
+				now = datetime.now(tz=pytz.timezone('US/Eastern'))
+				ts = now.hour*60 + now.minute
+				idx = ts-570
+
+				# before = np.where(self.pnl==None)[0]
+				# self.pnl[before[before<idx]]=0
+
+				if c!=0:
+					self.pnl[idx] = c
+					self.spread = spread
+					self.cur = c
+			else:
+				print("require init model.")
+				pass
+				pass#self.model_init()
+		except Exception as e:
+			print(e)
