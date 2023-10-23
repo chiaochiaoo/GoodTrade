@@ -493,7 +493,7 @@ class obq_model(model):
 
 class quick_model(model):
 
-	def __init__(self,name,model,historical_plus,historical_minus,historical_fixpoint):
+	def __init__(self,name,model,historical_plus,historical_minus):
 
 		super().__init__()
 
@@ -517,7 +517,7 @@ class quick_model(model):
 		self.historical_computed = True 
 		self.historical_plus = historical_plus
 		self.historical_minus = historical_minus
-		self.historical_fixpoint = historical_fixpoint
+		self.historical_fixpoint = 0
 
 	def model_early_load(self):
 
@@ -572,6 +572,7 @@ class quick_model(model):
 
 		except Exception as e:
 			print(e)
+
 	def model_load_early_chart(self):
 
 		try:
@@ -622,6 +623,7 @@ class quick_model(model):
 
 		except Exception as e:
 			print(e)
+
 	def model_update(self,data):
 
 		try:
@@ -630,6 +632,12 @@ class quick_model(model):
 			if self.model_initialized:
 				spread = 0
 				spreads = {}
+
+
+				if self.historical_fixpoint==0:
+					for key,share in self.model.items():
+						key = key[:-3]
+						self.historical_fixpoint +=  data[key]['day_open']*share
 
 
 				for key,share in self.model.items():
@@ -645,6 +653,12 @@ class quick_model(model):
 						#print(key,round( (data[key]['ask'] - data[key]['bid'])*abs(share),1))
 					else:
 						print("no",key)
+
+
+					
+
+
+
 
 				print({k: v for k, v in sorted(spreads.items(), key=lambda item: item[1])})
 				

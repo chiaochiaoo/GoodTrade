@@ -108,20 +108,19 @@ def create_tab(tab_name):
     elif tab_name =="QFAANG":
         name = "QFAANG"
         model =  {'QQQ.NQ': 9, 'AAPL.NQ': -1, 'AMZN.NQ': -1, 'NFLX.NQ': -3, 'META.NQ': -3, 'GOOG.NQ': -1, }
-        historical_plus = [0.01,0.02,0.04]
-        historical_minus = [-0.01,-0.02,-0.04]
-        historical_fixpoint =1200
+        historical_plus = [0.031356,0.03812058,0.05]
+        historical_minus =[-0.03046357,-0.03919835,-0.07]
 
-        model =  quick_model(name,model,historical_plus,historical_minus,historical_fixpoint)
+
+        model =  quick_model(name,model,historical_plus,historical_minus)
 
     elif tab_name =="QEV":
         name = "QEV"
         model =  {'QQQ.NQ': 4, 'TSLA.NQ': -1, 'NIO.NY': -29, 'LCID.NQ': -33, 'FSR.NY': -22}
-        historical_plus = [0]
-        historical_minus = [0]
-        historical_fixpoint =1200
+        historical_plus =[0.05935571,0.07515851,0.29395085]
+        historical_minus =[-0.06155882,-0.08956221,-0.19296097]
 
-        model =  quick_model(name,model,historical_plus,historical_minus,historical_fixpoint)
+        model =  quick_model(name,model,historical_plus,historical_minus)
 
     # LabelFrame for vertical buttons
 
