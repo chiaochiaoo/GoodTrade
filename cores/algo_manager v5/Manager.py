@@ -460,6 +460,7 @@ class Manager:
 
 		if basket_name not in self.baskets:
 
+			print("REGISTERING")
 			if self.ui.basket_label_count<self.algo_limit:
 
 
@@ -865,7 +866,7 @@ class Manager:
 
 								
 							if cur_ts<=958:
-								log_print("basket update:",d,info)
+								log_print("Manager:","basket update:",d,info)
 								self.apply_basket_cmd(d[1],orders,risk,aggresive,info)
 					else:
 						log_print("Manager:","Risk exceeded, skip. ",self.net,self.set_risk*-1)
