@@ -460,10 +460,10 @@ class Manager:
 
 		if basket_name not in self.baskets:
 
-			print("REGISTERING")
+			# print("REGISTERING")
 			if self.ui.basket_label_count<self.algo_limit:
 
-				print("REGISTERING good")
+				# print("REGISTERING good")
 
 				check = False 
 
