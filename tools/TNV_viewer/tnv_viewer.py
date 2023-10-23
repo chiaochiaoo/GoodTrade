@@ -117,8 +117,8 @@ def create_tab(tab_name):
     elif tab_name =="QEV":
         name = "QEV"
         model =  {'QQQ.NQ': 4, 'TSLA.NQ': -1, 'NIO.NY': -29, 'LCID.NQ': -33, 'FSR.NY': -22}
-        historical_plus =[0.05935571,0.07515851,0.29395085]
-        historical_minus =[-0.06155882,-0.08956221,-0.19296097]
+        historical_plus =[0.05935571,0.07515851,0.2]
+        historical_minus =[-0.06155882,-0.08956221,-0.2]
 
         model =  quick_model(name,model,historical_plus,historical_minus)
 
