@@ -463,8 +463,17 @@ class Manager:
 			print("REGISTERING")
 			if self.ui.basket_label_count<self.algo_limit:
 
+				print("REGISTERING good")
 
-				if sum(orders.values())!=0:
+				check = False 
+
+				for j,i in orders.items():
+
+					if i!=0:
+						check = True 
+						break
+
+				if check:
 					self.baskets[basket_name] = TradingPlan_Basket(basket_name,risk,self,info)
 					self.ui.create_new_single_entry(self.baskets[basket_name],"Basket",None)
 
