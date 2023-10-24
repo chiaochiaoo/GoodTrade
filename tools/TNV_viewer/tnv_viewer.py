@@ -1,5 +1,18 @@
 import tkinter as tk
 from tkinter import ttk
+# import pip
+
+
+# try:
+#     pip.main(['install', 'matplotlib'])
+#     pip.main(['install', 'requests'])
+#     pip.main(['install', 'python-matplotlib'])
+#     pip.main(['install', 'pytz'])
+#     pip.main(['install', 'pandas'])
+#     pip.main(['install', 'numpy'])
+# except:
+#   pass
+
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
@@ -25,41 +38,44 @@ def data_update():
 
     while True:
 
-        r = "https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?include_otc=false&apiKey=ezY3uX1jsxve3yZIbw2IjbNi5X7uhp1H"
 
-        r = requests.get(r)
-        # print(r.text)
+        try:
+            r = "https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?include_otc=false&apiKey=ezY3uX1jsxve3yZIbw2IjbNi5X7uhp1H"
 
-        d = json.loads(r.text)
+            r = requests.get(r)
+            # print(r.text)
 
-        last_min_stamp = []
+            d = json.loads(r.text)
 
-        for i in d['tickers']:
-            last_min_stamp.append(i['lastTrade']['t']//1000000000)
+            last_min_stamp = []
 
-        cur_ts = max(last_min_stamp)
+            for i in d['tickers']:
+                last_min_stamp.append(i['lastTrade']['t']//1000000000)
 
-        data['timestamp'] = cur_ts
+            cur_ts = max(last_min_stamp)
 
-        for i in d['tickers']:
-            data[i['ticker']] = {}
-            data[i['ticker']]['day_open'] = i['day']['o'] 
-            data[i['ticker']]['day_current'] = i['day']['c'] 
-            data[i['ticker']]['day_high'] = i['day']['h'] 
-            data[i['ticker']]['day_low'] = i['day']['l'] 
-            data[i['ticker']]['day_volume'] = i['day']['v'] 
+            data['timestamp'] = cur_ts
 
-            data[i['ticker']]['bid'] = i['lastQuote']['p']
-            data[i['ticker']]['ask'] = i['lastQuote']['P']
+            for i in d['tickers']:
+                data[i['ticker']] = {}
+                data[i['ticker']]['day_open'] = i['day']['o'] 
+                data[i['ticker']]['day_current'] = i['day']['c'] 
+                data[i['ticker']]['day_high'] = i['day']['h'] 
+                data[i['ticker']]['day_low'] = i['day']['l'] 
+                data[i['ticker']]['day_volume'] = i['day']['v'] 
 
-            # data[i['ticker']]['minute_open'] = i['min']['o'] 
-            # data[i['ticker']]['minute_close'] = i['min']['c'] 
-            # data[i['ticker']]['minute_high'] = i['min']['h'] 
-            # data[i['ticker']]['minute_low'] = i['min']['l']
-            # data[i['ticker']]['minute_volume'] = i['min']['v']
+                data[i['ticker']]['bid'] = i['lastQuote']['p']
+                data[i['ticker']]['ask'] = i['lastQuote']['P']
 
-        time.sleep(5)
+                # data[i['ticker']]['minute_open'] = i['min']['o'] 
+                # data[i['ticker']]['minute_close'] = i['min']['c'] 
+                # data[i['ticker']]['minute_high'] = i['min']['h'] 
+                # data[i['ticker']]['minute_low'] = i['min']['l']
+                # data[i['ticker']]['minute_volume'] = i['min']['v']
 
+            time.sleep(5)
+        except Exception as e:
+            print(e)
 
 
 def create_tab(tab_name):
@@ -68,52 +84,81 @@ def create_tab(tab_name):
 
     # Sample Matplotlib chart
     fig = Figure(figsize=(5, 4), dpi=100)
-    plot = fig.add_subplot(1, 1, 1)
 
-   
+    fig, axs = plt.subplots(2, 1, figsize=(10, 4), gridspec_kw={'height_ratios': [2, 1,]}) #'width_ratios': [2, 1,]
+
+    #plot = fig.add_subplot(1, 1, 1)
+
+    plot = axs[0]
     #plot.plot([i for i in range(570,960)],pnl)
 
 
     plot.set_title(f"{tab_name}")
 
+    eval_plot = axs[1]
+    eval_plot.set_title("Eval")
     canvas = FigureCanvasTkAgg(fig, master=tab)  # A tk.DrawingArea.
     canvas.draw()
     canvas.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
 
 
     if tab_name == "OBQ":
-        obq = obq_model()
+        model = obq_model()
+
     elif tab_name =="QFAANG":
-        obq = qfaang_model()
+        name = "QFAANG"
+        model =  {'QQQ.NQ': 9, 'AAPL.NQ': -1, 'AMZN.NQ': -1, 'NFLX.NQ': -3, 'META.NQ': -3, 'GOOG.NQ': -1, }
+        historical_plus = [0.031356,0.03812058,0.05]
+        historical_minus =[-0.03046357,-0.03919835,-0.07]
+
+
+        model =  quick_model(name,model,historical_plus,historical_minus)
+
+    elif tab_name =="QEV":
+        name = "QEV"
+        model =  {'QQQ.NQ': 4, 'TSLA.NQ': -1, 'NIO.NY': -29, 'LCID.NQ': -33, 'RIVN.NQ': -5}
+        historical_plus =[0.05935571,0.07515851,0.2]
+        historical_minus =[-0.06155882,-0.08956221,-0.2]
+
+        model =  quick_model(name,model,historical_plus,historical_minus)
+
     # LabelFrame for vertical buttons
 
-    info_frame = ttk.LabelFrame(tab, text="Infos")
-    info_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=10, pady=10)
-
+    # info_frame = ttk.LabelFrame(tab, text="Infos")
+    # info_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=10, pady=10)
 
     button_frame = ttk.LabelFrame(tab, text="Buttons")
     button_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=10, pady=10)
 
-    button1 = ttk.Button(button_frame, text="Load model",command=obq.model_init)
-    button1.pack(side=tk.TOP, pady=5)
+    row =1
+    button1 = ttk.Button(button_frame, text="Load model",command=model.model_init)
+    button1.grid(sticky="w",column=1,row=row) 
 
-    button1 = ttk.Button(button_frame, text="Load model early data",command=obq.model_early_load)
-    button1.pack(side=tk.TOP, pady=5)
+    row +=1
+    button1 = ttk.Button(button_frame, text="Load Earlier",command=model.model_early_load)
+    button1.grid(sticky="w",column=1,row=row) 
 
-    # update_button = ttk.Button(button_frame, text="Plot Earlier", command=lambda: earlier_plot(obq,plot,canvas))
-    # update_button.pack(side=tk.TOP, pady=10)
+    row +=1
+    tk.Label(button_frame,text="Profit:").grid(sticky="w",column=1,row=row) 
+    tk.Entry(button_frame,textvariable=model.profit,width=8).grid(sticky="w",column=2,row=row) 
 
-    # Buttons on the right side (vertical)
-    button1 = ttk.Button(button_frame, text="Buy 1",command=obq.model_buy)
-    button1.pack(side=tk.TOP, pady=5)
+    row +=1
+    tk.Label(button_frame,text="Stop:").grid(sticky="w",column=1,row=row) 
+    tk.Entry(button_frame,textvariable=model.stop,width=8).grid(sticky="w",column=2,row=row) 
 
-    button2 = ttk.Button(button_frame, text="Short 1",command=obq.model_sell)
-    button2.pack(side=tk.TOP, pady=5)
-    
-    d = threading.Thread(target=update_chart, args=(obq,plot,canvas),daemon=True)
+
+    row +=1
+    button1 = ttk.Button(button_frame, text="Buy 1",command=model.model_buy)
+    button1.grid(sticky="w",column=1,row=row) 
+
+    row +=1
+    button2 = ttk.Button(button_frame, text="Short 1",command=model.model_sell)
+    button2.grid(sticky="w",column=1,row=row) 
+
+    d = threading.Thread(target=update_chart, args=(model,plot,eval_plot,canvas),daemon=True)
     d.start()
 
-def update_chart(model,plot,canvas):
+def update_chart(model,plot,eval_plot,canvas):
 
     global data 
     # Generate new data for the chart
@@ -133,10 +178,49 @@ def update_chart(model,plot,canvas):
             if model.model_early_chart:
                 plot.plot(model.get_early_ts(),model.get_early_pnl(), label='Line 2')
 
+            if model.historical_computed:
+
+                # if up, if down.
+
+                str_ = ""
+
+                levels = ["90%: ","95%: ","99%: "]
+
+                for i in range(len(model.historical_plus)):
+                    str_+=levels[i]+str(int(model.historical_plus[i]*model.historical_fixpoint))+"\n"
+                str_ = str_[:-1]
+                legend = plot.legend(loc='upper right')
+                legend.get_texts()[0].set_text(str_)
+                #plot.legend(handles=[], labels=['1','90%:','2'])
+
+                # comment_text = "Top Right Comment"
+                # plot.annotate(comment_text, xy=(1, 1), xytext=(-5, -5), ha='right', va='top', textcoords='axes fraction', fontsize=10)
+
+                # for i in model.historical_plus:
+                #     print(i*model.historical_fixpoint)
+                    #plot.axhline(i*model.historical_fixpoint,linestyle="--")
+                # if model.cur>0:
+                #     #print("HHIIIIII U")
+                #     for i in model.historical_plus:
+                #         #print(i*model.historical_fixpoint)
+                #         plot.axhline(i*model.historical_fixpoint,linestyle="--")
+                #     plot.set_ylim([0,-10])
+                #     #plot.set_ylim([min(model.pnl), max(model.pnl)*2])
+                # else:
+                #     #print("HHIIIIII D")
+                #     for i in model.historical_minus:
+                #         print(i*model.historical_fixpoint)
+                #         plot.axhline(i*model.historical_fixpoint,linestyle="--")
+
+
+                #    # plot.set_ylim([-10,])
+                #     print(min(model.pnl)*2, max(model.pnl))
+                    #plot.set_ylim([min(model.pnl)*2, max(model.pnl)])
+                    #plt.xlim([max(model.pnl), model.historical_plus[-1]*model.historical_fixpoint])
             now = datetime.now()#tz=pytz.timezone('US/Eastern')
             ts = now.hour*60 + now.minute
 
-            plot.set_title("Updated Chart:"+now.strftime("%H:%M:%S")+"     SPREAD:" + model.get_spread())
+            plot.set_title("Updated Chart:"+now.strftime("%H:%M:%S")+"     SPREAD:" + model.get_spread()+"  CUR:"+model.get_price())
 
             # Redraw the canvas
             canvas.draw()
@@ -154,18 +238,22 @@ d = threading.Thread(target=data_update, args=(),daemon=True)
 d.start()
 
 
-notebook = ttk.Notebook(root)
 
-# Create 5 tabs
-tabs = ["OBQ", "QFAANG"]# "Last Minute", "Tab 5"#"MRQ1", "MRQ2",
+try:
+    notebook = ttk.Notebook(root)
 
-for tab_name in tabs:
-    create_tab(tab_name)
+    # Create 5 tabs
+    tabs = [ "QFAANG","QEV"]# "Last Minute", "Tab 5"#"MRQ1", "MRQ2", #"OBQ", #"OBQ"
 
-notebook.pack(expand=True, fill="both")
+    for tab_name in tabs:
+        create_tab(tab_name)
+
+    notebook.pack(expand=True, fill="both")
 
 
-#data_update
-
-root.geometry("1280x720")
-root.mainloop()
+    #data_update
+    root.title("SelectTrade Model Viewer")
+    root.geometry("1280x720")
+    root.mainloop()
+except Exception as e:
+    print(e)

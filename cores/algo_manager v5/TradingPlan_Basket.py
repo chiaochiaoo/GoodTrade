@@ -39,6 +39,7 @@ class TradingPlan_Basket:
 		self.expect_orders = ""
 		self.flatten_order = False
 
+		self.clone_able =True 
 
 		self.one_shot_algo = False
 
@@ -159,6 +160,7 @@ class TradingPlan_Basket:
 			self.manual_flattable = True 
 			self.one_shot_algo = True
 		log_print(self.source," Initializing:, Manual flattable:",self.manual_flattable," Inspectable:",self.inspectable)
+
 	def init_data(self,risk):
 
 		for i in self.numeric_labels:
@@ -280,8 +282,10 @@ class TradingPlan_Basket:
 
 		#### STEP 1 : check if it already matches ###
 
+
 		if self.incremental_state[symbol] ==True:
 
+			release = True 
 			if self.incremental_expected_shares[symbol] == self.expected_shares[symbol]:
 
 				### TURN OFF. 
@@ -299,13 +303,17 @@ class TradingPlan_Basket:
 
 				self.incremental_expected_shares_last_register[symbol] = ts
 
+				### FINALLY... VERY VERY CLOSE. 
 				if abs(self.incremental_expected_shares[symbol]-self.expected_shares[symbol]) < self.incremental_expected_shares_increments[symbol]:
 					self.expected_shares[symbol] = self.incremental_expected_shares[symbol]
-
 
 				else:
 					self.expected_shares[symbol] += self.incremental_expected_shares_increments[symbol]
 
+					if abs(self.expected_shares[symbol]-self.current_shares[symbol])<10:
+						release = False
+
+			
 			self.recalculate_current_request(symbol)
 
 			if self.incremental_state[symbol]:
@@ -365,13 +373,19 @@ class TradingPlan_Basket:
 
 					if difference>0:
 						increments = abs(increments)
+
+						if increments<10:
+							increments = 10 
 					else:
 						increments = increments*-1
 
-					if increments>0 and increments<1:
-						increments = 1 
-					if increments<0 and increments>-1:
-						increments = -1
+						if increments>-10:
+							increments = -10 
+
+					# if increments>0 and increments<1:
+					# 	increments = 1 
+					# if increments<0 and increments>-1:
+					# 	increments = -1
 
 					self.incremental_state[symbol] = True 
 					self.incremental_expected_shares[symbol] = shares 
@@ -380,10 +394,11 @@ class TradingPlan_Basket:
 					self.incremental_expected_shares_last_register[symbol] = ts
 					self.expected_shares[symbol] = self.current_shares[symbol]
 
-					if increments ==1 or increments==-1:
-						self.incremental_expected_shares_intervals[symbol] = 4 * abs(period_number//difference)
-					else:
-						self.incremental_expected_shares_intervals[symbol] = 4
+					self.incremental_expected_shares_intervals[symbol] = abs(time_takes//increments)
+					# if increments ==1 or increments==-1:
+					# 	self.incremental_expected_shares_intervals[symbol] = 4 * abs(period_number//difference)
+					# else:
+					# 	self.incremental_expected_shares_intervals[symbol] = 4
 
 					if aggresive:
 						self.symbols[symbol].turn_on_aggresive_only()
@@ -867,7 +882,9 @@ class TradingPlan_Basket:
 		#### submit a clone to manager. ### 
 
 		#basket_name,orders,risk,aggresive,info
-		self.manager.apply_basket_cmd(self.algo_name+"_c",self.current_shares,5,False,self.info)
+
+		if self.clone_able:
+			self.manager.apply_basket_cmd(self.algo_name+"_c",self.current_shares,5,False,self.info)
 
 	def update_displays(self):
 

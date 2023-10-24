@@ -16,5 +16,11 @@ GapRunL
 GapRunS
 OpenDump
 OpenReversal
-TNV_Model
+TNV_Model_QFAANG
+TNV_Model_OBQ
+TNV_Model_QEV
 PM_Mover
+TS_PMB
+TS_OR
+TS_GAINER
+TS_LOSER

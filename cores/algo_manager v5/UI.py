@@ -589,6 +589,10 @@ class UI(pannel):
 		gldslv = {"name":"GLDSLV","symbol":["GLD.AM","SLV.AM"],"ratio":[1,-4],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		spytlt = {"name":"TLTSPY","symbol":["TLT.NQ","SPY.AM"],"ratio":[4,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		spyuso = {"name":"SPYUSO","symbol":["SPY.AM","USO.AM"],"ratio":[1,-3],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		
+		spygdx = {"name":"GDXSPY","symbol":["GDX.AM","SPY.AM"],"ratio":[10,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+			
+
 		tlsaqqq = {"name":"TSLAQQQ","symbol":["TSLA.NQ","QQQ.NQ"],"ratio":[1,-2],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		smhqqq = {"name":"SMHQQQ","symbol":["SMH.NQ","QQQ.NQ"],"ratio":[17,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 	
@@ -609,7 +613,7 @@ class UI(pannel):
 
 		total = [spyqqq,gldslv,tlsaqqq,smhqqq,gdxgdxj]
 
-		spy = [spyqqq,spytlt,spyuso]
+		spy = [spyqqq,spytlt,spyuso,spygdx]
 		qqq = [tlsaqqq,smhqqq,xleqqq,arkkqqq,drivqqq]
 		gld = [gldslv,gdxgdxj,gdxgld,silslv]
 		misc =[fxixpev]
@@ -1159,7 +1163,10 @@ class UI(pannel):
 			#print(self.tk_labels_single[symbol])
 			if label_name == "Strategy":
 				self.tk_labels_basket[symbol][label_name]["text"] = info[j] 
-				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.clone_cmd
+				#self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.clone_cmd
+
+				self.tk_labels_basket[symbol][label_name].bind("<Double-1>", lambda event:  tradingplan.clone_cmd())
+
 			elif label_name == STATUS:
 				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j] 
 				#self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.cancle_deployment
@@ -1353,8 +1360,8 @@ class UI(pannel):
 				label.grid(sticky="w",column=col,row=row)
 				ttk.Checkbutton(self.frames[i], variable=item[ACTIVE]).grid(sticky="w",column=col+1,row=row)
 
-				ttk.Label(self.frames[i], text="Risk:").grid(sticky="w",column=col+4,row=row)
-				ttk.Entry(self.frames[i], textvariable=item[RISK],width=4).grid(sticky="w",column=col+5,row=row)
+				# ttk.Label(self.frames[i], text="Risk:").grid(sticky="w",column=col+4,row=row)
+				# ttk.Entry(self.frames[i], textvariable=item[RISK],width=4).grid(sticky="w",column=col+5,row=row)
 
 				ttk.Label(self.frames[i], text="Multiplier:").grid(sticky="w",column=col+6,row=row)
 				ttk.Entry(self.frames[i], textvariable=item[MULTIPLIER],width=3).grid(sticky="w",column=col+7,row=row)

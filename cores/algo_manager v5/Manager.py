@@ -460,10 +460,20 @@ class Manager:
 
 		if basket_name not in self.baskets:
 
+			# print("REGISTERING")
 			if self.ui.basket_label_count<self.algo_limit:
 
+				# print("REGISTERING good")
 
-				if sum(orders.values())!=0:
+				check = False 
+
+				for j,i in orders.items():
+
+					if i!=0:
+						check = True 
+						break
+
+				if check:
 					self.baskets[basket_name] = TradingPlan_Basket(basket_name,risk,self,info)
 					self.ui.create_new_single_entry(self.baskets[basket_name],"Basket",None)
 
@@ -662,6 +672,9 @@ class Manager:
 
 						#reduce_everything_by_half_ta(self,timetakes,percentage)
 
+					for name,basket in self.baskets.items():
+						self.algo_as_is(name)
+						
 					for ticker in total_moc.keys():
 						share = total_moc[ticker][1]
 
@@ -862,7 +875,7 @@ class Manager:
 
 								
 							if cur_ts<=958:
-								log_print("basket update:",d,info)
+								log_print("Manager:","basket update:",d,info)
 								self.apply_basket_cmd(d[1],orders,risk,aggresive,info)
 					else:
 						log_print("Manager:","Risk exceeded, skip. ",self.net,self.set_risk*-1)
@@ -1615,6 +1628,7 @@ if __name__ == '__main__':
 	algo_voxcom.join()
 	ppro_in_manager.join()
 	ppro_out_manager.join()
+	
 	print("All subprocesses terminated")
 
 	print("checking remaining processes:",multiprocessing.active_children(),threading.active_count())
