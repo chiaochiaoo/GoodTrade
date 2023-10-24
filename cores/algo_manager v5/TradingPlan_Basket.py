@@ -59,14 +59,16 @@ class TradingPlan_Basket:
 		self.profit1=0
 		self.profit2=0
 		self.profit3=0
+
+		self.trail_stop=0
 		self.profit_tier = 0
 
 		self.info = info
 		if "Profit" in info:
 			self.profit = int(abs(info["Profit"]))
-			self.profit1= self.profit/2
+			self.profit1= self.profit
 			self.profit2= self.profit 
-			self.profit3= self.profit *1.5
+
 		self.stop = 0
 		if "Stop" in info:
 			self.stop = int(abs(info["Stop"]))
@@ -391,7 +393,7 @@ class TradingPlan_Basket:
 					self.incremental_expected_shares[symbol] = shares 
 					self.incremental_expected_shares_increments[symbol] = increments
 					self.incremental_expected_shares_deadline[symbol] = ts+time_takes
-					self.incremental_expected_shares_last_register[symbol] = ts
+					self.incremental_expected_shares_last_register[symbol] = ts -  abs(time_takes//increments) -3
 					self.expected_shares[symbol] = self.current_shares[symbol]
 
 					self.incremental_expected_shares_intervals[symbol] = abs(time_takes//increments)
@@ -823,19 +825,34 @@ class TradingPlan_Basket:
 
 			if self.profit_tier==0 and  total_unreal+self.data[REALIZED] > self.profit1:
 				# take off 30% 
-				self.reduce_one_third()
-				self.profit_tier+=1
-				log_print(self.source,self.algo_name," REDUCE ONE THIRD")
-			elif self.profit_tier==1 and  total_unreal+self.data[REALIZED] > self.profit2:
-				# take off 30% 
+				#self.reduce_one_third()
+
 				self.reduce_one_half()
 				self.profit_tier+=1
 				log_print(self.source,self.algo_name," REDUCE ONE THIRD")
-			elif self.profit_tier==2 and  total_unreal+self.data[REALIZED] > self.profit3:
+				# now break even. 
+			elif self.profit_tier==1 and  total_unreal+self.data[REALIZED] >  self.profit2:
 				# take off 30% 
-				log_print(self.source, self.algo_name, " MEET PROFIT TARGET",self.profit)
-				self.flatten_cmd()
-				#log_print(self.source,self.algo_name," REDUCE ALL")
+				#self.reduce_one_half()
+				#self.profit_tier+=1
+				# log_print(self.source,self.algo_name," REDUCE ONE THIRD")
+
+				# TRAIL IT WITH 1 RISK. 
+				# self.stop = self.profit2 - self.profit
+
+				self.break_even = True 
+				self.profit2 =  total_unreal+self.data[REALIZED]
+
+				self.trail_stop = self.profit2 - self.profit1*0.5 
+
+				log_print(self.source, self.algo_name, 'update TRAIL STOP',self.trail_stop)
+
+				#self.trail_stop
+			# elif self.profit_tier==2 and  total_unreal+self.data[REALIZED] > self.profit3:
+			# 	# take off 30% 
+			# 	log_print(self.source, self.algo_name, " MEET PROFIT TARGET",self.profit)
+			# 	self.flatten_cmd()
+			# 	#log_print(self.source,self.algo_name," REDUCE ALL")
 
 			else:
 				pass 
@@ -843,7 +860,11 @@ class TradingPlan_Basket:
 			if total_unreal*-1 > self.stop:
 				log_print(self.source, self.algo_name, " MEET STOP ",self.stop)
 				self.flatten_cmd()
-
+				
+		if self.trail_stop!=0 and self.flatten_order!=True:
+			if total_unreal+self.data[REALIZED] < self.trail_stop:
+				log_print(self.source, self.algo_name, " MEET TRAIL STOP ",self.trail_stop)
+				self.flatten_cmd()
 		if self.break_even==False:
 			if total_unreal>self.break_even_amount:
 				self.break_even = True 
