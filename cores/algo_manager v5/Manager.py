@@ -170,8 +170,6 @@ class Manager:
 
 
 		self.ta_moc = tk.BooleanVar(value=0)
-		self.moc_1559 = tk.BooleanVar(value=0)
-		self.moc_1601 = tk.BooleanVar(value=0)
 
 		self.ui = UI(root,self,self.receiving_signals,self.cmd_text)
 
@@ -583,13 +581,7 @@ class Manager:
 
 		MOC_send_out_timer = 958*60+30 #958*60+50
 
-		MOC_1559_timer = 959*60
-		MOC_1559 = False 
-
 		MOC_pairing_timer = 959*60+50
-
-		MOC_flat_timer = 961*60
-		MOC_flat = False 
 
 		c = 0 
 		log_print("Timer: functional and counting")
@@ -657,25 +649,32 @@ class Manager:
 
 				with self.symbol_inspection_lock: 
 					
+					#reduce_everything_by_half_ta
+
+					if self.ta_moc.get()==False:
+						total_moc = self.current_positions
+
+					else:
+
+						total_moc = {}
+
+						for trade in list(self.baskets.values()):
+							trade.reduce_everything_by_half_ta(60,0.5)
+
+
+						for symbol,data in self.symbol_data.items():
+							total_moc[symbol] = [symbol,data.get_all_future_remaining()]
+
+						log_print(total_moc)
+
+						## all symbols call get_all_future_remaining
+						## all tps call half
+
+						#reduce_everything_by_half_ta(self,timetakes,percentage)
 
 					for name,basket in self.baskets.items():
 						self.algo_as_is(name)
-
-					mul = 1 
-
-					if self.MOC_1559.get():
-						mul+=1
-
-					if self.MOC_flat.get():
-						mul+=1 
-
-					### if 59 on, half, if 01 on half. ###
-					for symbol,data in self.symbol_data.items():
-						total_moc[symbol] = [symbol,data.get_all_future_remaining()//mul]
-
-					log_print(mul,total_moc)
-
-
+						
 					for ticker in total_moc.keys():
 						share = total_moc[ticker][1]
 
@@ -696,66 +695,6 @@ class Manager:
 
 				moc_release=True
 
-				# 	#reduce_everything_by_half_ta
-
-				# 	if self.ta_moc.get()==False:
-				# 		total_moc = self.current_positions
-
-				# 	else:
-
-				# 		total_moc = {}
-
-				# 		for trade in list(self.baskets.values()):
-				# 			trade.reduce_everything_by_half_ta(60,0.5)
-
-
-				# 		for symbol,data in self.symbol_data.items():
-				# 			total_moc[symbol] = [symbol,data.get_all_future_remaining()]
-
-				# 		log_print(total_moc)
-
-				# 		## all symbols call get_all_future_remaining
-				# 		## all tps call half
-
-				# 		#reduce_everything_by_half_ta(self,timetakes,percentage)
-
-				# 	for name,basket in self.baskets.items():
-				# 		self.algo_as_is(name)
-						
-				# 	for ticker in total_moc.keys():
-				# 		share = total_moc[ticker][1]
-
-				# 		if ticker[-2:]=="NY":
-				# 			if share<0:
-				# 				reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ROSN Buy RosenblattDQuoteClose MOC DAY&shares="+str(abs(share))
-				# 			elif share>0:
-				# 				reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ROSN Sell->Short RosenblattDQuoteClose MOC DAY&shares="+str(share)
-				# 		else:
-				# 			if share<0:
-				# 				reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Buy ARCX MOC DAY&shares="+str(abs(share))
-				# 			elif share>0:
-				# 				reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Sell->Short ARCX MOC DAY&shares="+str(share)
-
-				# 		log_print("Sending" ,reque)
-				# 		req = threading.Thread(target=request, args=(reque,),daemon=True)
-				# 		req.start()
-
-				# moc_release=True
-
-			if ts>=MOC_1559_timer and MOC_1559 == False :
-
-				## reduce by 1/3 
-
-				for trade in list(self.baskets.values()):
-					trade.reduce_one_third()
-
-
-				MOC_1559 = True 
-
-			if ts>=MOC_flat_timer and MOC_flat ==False:
-
-				## flat
-				MOC_flat= True 
 			if ts>MOC_pairing_timer and moc_pair_release==False:
 
 				#every tp's symbol no clear.
