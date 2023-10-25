@@ -107,7 +107,7 @@ def create_tab(tab_name):
 
     elif tab_name =="QFAANG":
         name = "QFAANG"
-        model =  {'QQQ.NQ': 9, 'AAPL.NQ': -1, 'AMZN.NQ': -1, 'NFLX.NQ': -3, 'META.NQ': -3, 'GOOG.NQ': -1, }
+        model =  {'QQQ.NQ': 9, 'AAPL.NQ': -1, 'AMZN.NQ': -1, 'MSFT.NQ': -1, 'META.NQ': -3, 'GOOG.NQ': -1, }
         historical_plus = [0.031356,0.03812058,0.05]
         historical_minus =[-0.03046357,-0.03919835,-0.07]
 
