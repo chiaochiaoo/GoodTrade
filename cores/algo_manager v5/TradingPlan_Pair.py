@@ -95,7 +95,7 @@ class TradingPlan_Pair(TradingPlan_Basket):
 
 		self.symbols[self.symbol2].turn_on_aggresive_only()
 
-		if ta==0:
+		if ta<=30:
 			if passive:
 				self.submit_expected_shares(self.symbol1,amount*self.ratio[0],False)
 			else:
