@@ -106,7 +106,7 @@ class TradingPlan_Pair(TradingPlan_Basket):
 
 	def notify_holding_change(self,symbol):
 
-		if symbol == self.symbol1:
+		if symbol == self.symbol1 and self.flatten_order!=True:
 			# get expected on the other side .
 			self.expected_shares[self.symbol2] = ((self.current_shares[self.symbol1])//self.ratio[0])*self.ratio[1]
 
@@ -119,3 +119,17 @@ class TradingPlan_Pair(TradingPlan_Basket):
 			# 	self.submit_expected_shares(self.symbol2,self.expected_shares[self.symbol2],1) 
 
 
+
+	# def flatten_cmd(self):
+		
+	# 	# if self.tkvars[STATUS].get()==PENDING:
+	# 	# 	self.cancel_algo()
+	# 	# else:
+
+	# 	#self.deactive()
+	# 	log_print(self.source,self.algo_name," flattening")
+		
+	# 	self.submit_expected_pair(0,1,0)
+
+
+	# 	self.flatten_order=True
