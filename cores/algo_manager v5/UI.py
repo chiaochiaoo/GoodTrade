@@ -227,11 +227,27 @@ class UI(pannel):
 
 
 		row +=1
-		# self.tamoc = ttk.Label(self.system_pannel, text="TA-MOC:")
-		# self.tamoc.grid(sticky="w",column=1,row=row,padx=10)
 
 		ttk.Label(self.system_pannel, text="TA-MOC:").grid(sticky="w",column=1,row=row,padx=10)
-		#tk.Entry(self.system_pannel,textvariable=self.user_phone,width=7).grid(sticky="w",column=2,row=row,padx=10)
+
+		try:
+			ttk.Checkbutton(self.system_pannel, variable=self.manager.ta_moc).grid(sticky="w",column=2,row=row)
+		except:
+			pass 
+
+
+		row +=1
+
+		ttk.Label(self.system_pannel, text="1559-MOC:").grid(sticky="w",column=1,row=row,padx=10)
+
+		try:
+			ttk.Checkbutton(self.system_pannel, variable=self.manager.ta_moc).grid(sticky="w",column=2,row=row)
+		except:
+			pass 
+
+		row +=1
+
+		ttk.Label(self.system_pannel, text="1601-MOC:").grid(sticky="w",column=1,row=row,padx=10)
 
 		try:
 			ttk.Checkbutton(self.system_pannel, variable=self.manager.ta_moc).grid(sticky="w",column=2,row=row)
@@ -495,7 +511,7 @@ class UI(pannel):
 		# self.TNV_TAB.place(x=0,rely=0.01,relheight=1,width=640)
 
 		self.system_pannel = ttk.LabelFrame(self.root,text="System")
-		self.system_pannel.place(x=10,y=10,height=210,width=350)
+		self.system_pannel.place(x=10,y=10,height=230,width=350)
 
 		self.control_pannel = ttk.LabelFrame(self.root,text="Control") 
 		self.control_pannel.place(x=360,y=10,height=50,width=300)
