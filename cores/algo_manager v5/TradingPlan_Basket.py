@@ -829,7 +829,7 @@ class TradingPlan_Basket:
 
 				self.reduce_one_half()
 				self.profit_tier+=1
-				log_print(self.source,self.algo_name," REDUCE ONE THIRD")
+				log_print(self.source,self.algo_name," REDUCE ONE HALF")
 				# now break even. 
 			elif self.profit_tier==1 and  total_unreal+self.data[REALIZED] >  self.profit2:
 				# take off 30% 
@@ -860,7 +860,7 @@ class TradingPlan_Basket:
 			if total_unreal*-1 > self.stop:
 				log_print(self.source, self.algo_name, " MEET STOP ",self.stop)
 				self.flatten_cmd()
-				
+
 		if self.trail_stop!=0 and self.flatten_order!=True:
 			if total_unreal+self.data[REALIZED] < self.trail_stop:
 				log_print(self.source, self.algo_name, " MEET TRAIL STOP ",self.trail_stop)
