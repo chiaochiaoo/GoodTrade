@@ -250,7 +250,7 @@ try:
     notebook = ttk.Notebook(root)
 
     # Create 5 tabs
-    tabs = [ "QFAANG","QEV","QBT"]# "Last Minute", "Tab 5"#"MRQ1", "MRQ2", #"OBQ", #"OBQ"
+    tabs = [ "QFAANG","QEV","QBT","OBQ"]# "Last Minute", "Tab 5"#"MRQ1", "MRQ2", #"OBQ", #"OBQ"
 
     for tab_name in tabs:
         create_tab(tab_name)
