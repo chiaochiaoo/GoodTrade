@@ -109,7 +109,7 @@ def create_tab(tab_name):
         name = "QFAANG"
         model =  {'QQQ.NQ': 8, 'AAPL.NQ': -1, 'AMZN.NQ': -1, 'MSFT.NQ': -2, 'META.NQ': -3, 'GOOG.NQ': -1, }
         historical_plus = [0.031356,0.03812058,0.05]
-        historical_minus =[-0.03046357,-0.03919835,-0.07]
+        historical_minus =[-0.03046357,-0.03919835,-0.05]
 
 
         model =  quick_model(name,model,historical_plus,historical_minus)
@@ -117,11 +117,18 @@ def create_tab(tab_name):
     elif tab_name =="QEV":
         name = "QEV"
         model =  {'QQQ.NQ': 4, 'TSLA.NQ': -1, 'NIO.NY': -29, 'LCID.NQ': -33, 'RIVN.NQ': -5}
-        historical_plus =[0.05935571,0.07515851,0.2]
-        historical_minus =[-0.06155882,-0.08956221,-0.2]
+        historical_plus =[0.02769937,0.03559813,0.04095039]
+        historical_minus =[-0.02457263,-0.0369145,-0.03967848]
 
         model =  quick_model(name,model,historical_plus,historical_minus)
 
+    elif tab_name =="QBT":
+        name = "QBT"
+        model =  {'QQQ.NQ': 11, 'MARA.NQ': -20, 'RIOT.NQ': -22, 'COIN.NQ': -4, }
+        historical_plus =[0.01054703,0.01527036,0.02186224]
+        historical_minus =[-0.01193436,-0.01220059,-0.01666259]
+
+        model =  quick_model(name,model,historical_plus,historical_minus)
     # LabelFrame for vertical buttons
 
     # info_frame = ttk.LabelFrame(tab, text="Infos")
@@ -243,7 +250,7 @@ try:
     notebook = ttk.Notebook(root)
 
     # Create 5 tabs
-    tabs = [ "QFAANG","QEV"]# "Last Minute", "Tab 5"#"MRQ1", "MRQ2", #"OBQ", #"OBQ"
+    tabs = [ "QFAANG","QEV","QBT"]# "Last Minute", "Tab 5"#"MRQ1", "MRQ2", #"OBQ", #"OBQ"
 
     for tab_name in tabs:
         create_tab(tab_name)
