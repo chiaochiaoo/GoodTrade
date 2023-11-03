@@ -125,9 +125,11 @@ class quick_model(model):
 
 	def model_early_load(self):
 
-		d = threading.Thread(target=self.model_load_early_chart,daemon=True)
-		d.start() 
-
+		if self.model_initialized :
+			d = threading.Thread(target=self.model_load_early_chart,daemon=True)
+			d.start() 
+		else:
+			print(" Model not Init.")
 	def model_buy(self):
 
 		try:
