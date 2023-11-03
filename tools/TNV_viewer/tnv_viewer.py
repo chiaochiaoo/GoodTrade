@@ -26,10 +26,23 @@ from datetime import datetime
 from datetime import date
 import pandas as pd 
 from models import *
-
+import os
+import traceback
 global data 
 data = {}
 
+
+def PrintException(info,additional="ERROR"):
+    # exc_type, exc_obj, tb = sys.exc_info()
+    # f = tb.tb_frame
+    # lineno = tb.tb_lineno
+    # filename = f.f_code.co_filename
+    # linecache.checkcache(filename)
+    # line = linecache.getline(filename, lineno, f.f_globals)
+    # log_print (info+'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj))
+    exc_type, exc_obj, exc_tb = sys.exc_info()
+    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    print(additional,info,exc_type, fname, exc_tb.tb_lineno,traceback.format_exc())
 
 
 def data_update():
@@ -75,7 +88,7 @@ def data_update():
 
             time.sleep(5)
         except Exception as e:
-            print(e)
+            PrintException(e)
 
 
 def create_tab(tab_name):
@@ -235,7 +248,7 @@ def update_chart(model,plot,eval_plot,canvas):
             time.sleep(5)
             print("chart updated:",ts)
         except Exception as e:
-            print(e)
+            PrintException(e)
 
 root = tk.Tk()
 root.title("Tabbed Application")
@@ -263,4 +276,4 @@ try:
     root.geometry("1280x720")
     root.mainloop()
 except Exception as e:
-    print(e)
+    PrintException(e)
