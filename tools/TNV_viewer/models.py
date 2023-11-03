@@ -145,23 +145,25 @@ class quick_model(model):
 
 	def model_init(self):
 
-		self.long_symbols = ""
+		if self.model_initialized and len(self.model)<10:
 
-		for symbol,share in self.model.items():
+			self.long_symbols = ""
+			c  =0
+			for symbol,share in self.model.items():
 
-			if share>0:
-				self.long_symbols += (str(symbol)+":"+str(share)+",")
+				if share>0:
+					self.long_symbols += (str(symbol)+":"+str(share)+",")
+					c+=1
+			self.long_symbols  = self.long_symbols[:-1]
 
-		self.long_symbols  = self.long_symbols[:-1]
+			self.short_symbols = ""
+			c  =0
+			for symbol,share in self.model.items():
 
-		self.short_symbols = ""
-
-		for symbol,share in self.model.items():
-
-			if share<0:
-				self.short_symbols   += (str(symbol)+":"+str(share)+",")
-
-		self.short_symbols  = self.short_symbols[:-1]
+				if share<0:
+					self.short_symbols   += (str(symbol)+":"+str(share)+",")
+					c+=1
+			self.short_symbols  = self.short_symbols[:-1]
 
 	def model_early_load(self):
 
