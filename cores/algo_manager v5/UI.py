@@ -1192,15 +1192,15 @@ class UI(pannel):
 
 			elif label_name =="flatten":
 
-				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.reduce_one_third
+				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.flatten_cmd
 
 			elif label_name =="-30%":
 
-				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.reduce_one_half
+				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.reduce_one_third
 
 			elif label_name =="-50%":
 
-				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.flatten_cmd
+				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.reduce_one_half
 
 				#self.tk_labels_single[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command=tradingplan.flatten_cmd)
 			else:
