@@ -297,37 +297,64 @@ class obq_model(quick_model):
 	def create_standard_obq_df(self):
 
 
+			# STEP 1 , obtain symbols.
 		try:
+			print("loading OBQ")
 			postbody = "https://financialmodelingprep.com/api/v3/nasdaq_constituent?apikey=a901e6d3dd9c97c657d40a2701374d2a"
 			r= requests.get(postbody)
 			d = json.loads(r.text)
 			symbols = [i['symbol'] for i in d]
 
+			print("symbol count:",symbols.__len__())
+
+			# step 2, get the df. 
+
 			k = []
 			c=0
+			skips = []
 			for symbol in symbols:
 
-				try:
-					postbody = "http://api.kibot.com/?action=history&symbol="+symbol+"&interval=day&period=250&user=sajali26@hotmail.com&password=guupu4upu"
-					r= requests.post(postbody)
+			  try:
+			    postbody = "http://api.kibot.com/?action=history&symbol="+symbol+"&interval=day&period=100&user=sajali26@hotmail.com&password=guupu4upu"
+			    r= requests.post(postbody)
 
-					t_df = pd.read_csv(StringIO(r.text),names=["day","open","high","low","close","volume"])
-					t_df['day'] = pd.to_datetime(t_df['day'])
-					t_df[symbol+"_gain"] =  np.log(t_df["close"]) - np.log(t_df["open"])
-					t_df[symbol+"_gap"] =  np.log(t_df["open"]) - np.log(t_df.close.shift(1))
-					t_df[symbol+"_volume"] = t_df["volume"]
+			    t_df = pd.read_csv(StringIO(r.text),names=["day","open","high","low","close","volume"])
+			    t_df['day'] = pd.to_datetime(t_df['day'])
+			    t_df[symbol+"_gain"] =  np.log(t_df["close"]) - np.log(t_df["open"])
+			    t_df[symbol+"_gap"] =  np.log(t_df["open"]) - np.log(t_df.close.shift(1))
+			    t_df[symbol+"_volume"] = t_df["volume"]
+			 
+			    t_df[symbol+"_std"] =0
+			    t_df[symbol+"_current"] =0
+			    t_df[symbol+"_ystd"] =0
+			    t_df[symbol+"_ranking_norm"] =0
+			    t_df[symbol+"_executing_norm"] =0
+			    t_df[symbol+"_norm"] =0
+			    
+			    t_df.rename({'open': symbol+'_open', }, axis=1, inplace=True)
+			    t_df.rename({'close': symbol+'_close', }, axis=1, inplace=True)
 
-					t_df.rename({'open': symbol+'_open', }, axis=1, inplace=True)
-					t_df.rename({'close': symbol+'_close', }, axis=1, inplace=True)
+			    t_df = t_df.drop(["high","low","volume"],axis=1)
 
-					t_df = t_df.drop(["high","low","volume"],axis=1)
-					k.append(t_df)
-					c+=1
-				except Exception as e:
-					PrintException(symbol,e)
+			    ####### EXCLUDE SYMBOL $500 and above ####
+
+			    if t_df[symbol+"_open"].iloc[-1]>600:
+			      skips.append(symbol)
+			    else:
+			      k.append(t_df)
+			    c+=1
+			  except Exception as e:
+			    PrintException(symbol,e)
 
 			df = reduce(lambda  left,right: pd.merge(left,right,on=['day'],how='outer'), k).fillna(0)
-			####### MODEL ####
+			print("actual:",k.__len__()," skipping:",skips)
+
+
+			symbols = [x for x in symbols if x not in skips]
+
+
+
+			### STEP 3 MODEL ####
 
 			std_window1 = 50
 			std_window2 = 25
@@ -338,31 +365,34 @@ class obq_model(quick_model):
 			std3_weight= 0.6
 
 			for symbol in symbols:
-				std1 = df[symbol+"_gain"].rolling(window=std_window1).std()
-				std2 = df[symbol+"_gain"].rolling(window=std_window2).std()
-				std3 = df[symbol+"_gain"].rolling(window=std_window3).std()
+			  std1 = df[symbol+"_gain"].rolling(window=std_window1).std()
+			  std2 = df[symbol+"_gain"].rolling(window=std_window2).std()
+			  std3 = df[symbol+"_gain"].rolling(window=std_window3).std()
 
-				df[symbol+"_std"] = std1*std1_weight+ std2*std2_weight + std3*std3_weight
+			  df[symbol+"_std"] = std1*std1_weight+ std2*std2_weight + std3*std3_weight
 
-				df[symbol+"_current"] = df[symbol+"_close"].shift(1)
-				df[symbol+"_ystd"] = df[symbol+"_std"].shift(1)
+			  df[symbol+"_current"] = df[symbol+"_close"].shift(1)
+			  df[symbol+"_ystd"] = df[symbol+"_std"].shift(1)
 
-				df[symbol+"_ystd"].replace(0, np.nan, inplace=True)
+			  df[symbol+"_ystd"].replace(0, np.nan, inplace=True)
 
-				df[symbol+"_ranking_norm"] = df[symbol+"_gain"]/df[symbol+"_std"]
-				df[symbol+"_executing_norm"] = df[symbol+"_gain"]/df[symbol+"_ystd"]
+			  df[symbol+"_ranking_norm"] = df[symbol+"_gain"]/df[symbol+"_std"]
+			  df[symbol+"_executing_norm"] = df[symbol+"_gain"]/df[symbol+"_ystd"]
 
-				df[symbol+"_norm"] = df[symbol+"_executing_norm"]
+			  df[symbol+"_norm"] = df[symbol+"_executing_norm"]
+
+			# for symbol in symbols:
+			#   print(symbol,df[symbol+"_std"].iloc[-1])
 
 
-			###### OUTPUT ########
+			### STEP 4 OUTPUT ###
 
-			risk = 15 
+			risk = 12 
 			columns = [symbol+'_ranking_norm' for symbol in symbols]
 
 			rename ={}
 			for i in columns:
-				rename[i] = i[:-13]
+			  rename[i] = i[:-13]
 
 			norm_df = df[columns].copy()
 			rank_df =  df[columns].copy().rank(axis=1,method='min')
@@ -376,33 +406,32 @@ class obq_model(quick_model):
 			val = (rank_df.iloc[-1]*0.7 + rank_df.iloc[-2]*0.3).rank(method='min')
 			shorts = val.sort_values().iloc[:top_x].index
 			longs =  val.sort_values().iloc[-top_x:].index
+
+
 			selected['long_std'] = longs
 			selected['long_open'] = longs +"_open"
 			selected['short'] = shorts +"_std"
-
-
 
 			l = {}
 			s = {}
 			t = {}
 			for symbol in longs:
-				std = df.iloc[-1][symbol+"_std"]
-				share = int(int(round(risk/(std*df.iloc[-1][symbol+"_close"]),0)))
-				t[symbol+".NQ"] = share
-				symbol +=".NQ"
+			  std = df.iloc[-1][symbol+"_std"]
+			  share = int(int(round(risk/(std*df.iloc[-1][symbol+"_close"]),0)))
+			  t[symbol+".NQ"] = share
+			  symbol +=".NQ"
 
-				l[symbol] = share
+			  l[symbol] = share
 
 			for symbol in shorts:
-				std = df.iloc[-1][symbol+"_std"]
-				share = -int(int(round(risk/(std*df.iloc[-1][symbol+"_close"]),0)))
-				t[symbol+".NQ"] = share
-				symbol +=".NQ"
+			  std = df.iloc[-1][symbol+"_std"]
+			  share = -int(int(round(risk/(std*df.iloc[-1][symbol+"_close"]),0)))
+			  t[symbol+".NQ"] = share
+			  symbol +=".NQ"
+			  s[symbol] = share
 
-
-				s[symbol] = share
-
-			self.model = self.create_standard_obq_df()
+			self.model = t
 			self.model_initialized = True 
+			print("OBQ loading complete")
 		except Exception as e:
 			PrintException(e)

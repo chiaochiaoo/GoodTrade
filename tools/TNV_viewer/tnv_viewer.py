@@ -168,12 +168,33 @@ def create_tab(tab_name):
 
 
     row +=1
-    button1 = ttk.Button(button_frame, text="Buy 1",command=model.model_buy)
+    button1 = ttk.Button(button_frame, text="Buy 1 Total",command=model.model_buy)
     button1.grid(sticky="w",column=1,row=row) 
 
     row +=1
-    button2 = ttk.Button(button_frame, text="Short 1",command=model.model_sell)
+    button2 = ttk.Button(button_frame, text="Short 1 Total",command=model.model_sell)
     button2.grid(sticky="w",column=1,row=row) 
+
+    # row +=1
+    # button1 = ttk.Button(button_frame, text="Buy 1 Long Only")
+    # button1.grid(sticky="w",column=1,row=row) 
+
+
+    # row +=1
+    # button1 = ttk.Button(button_frame, text="Short 1 Long Only")
+    # button1.grid(sticky="w",column=1,row=row) 
+
+
+    # row +=1
+    # button1 = ttk.Button(button_frame, text="Buy 1 Short Only")
+    # button1.grid(sticky="w",column=1,row=row) 
+
+
+    # row +=1
+    # button1 = ttk.Button(button_frame, text="Sell 1 Short Only")
+    # button1.grid(sticky="w",column=1,row=row) 
+
+
 
     d = threading.Thread(target=update_chart, args=(model,plot,eval_plot,canvas),daemon=True)
     d.start()
