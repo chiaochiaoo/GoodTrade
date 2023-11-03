@@ -708,6 +708,10 @@ class TradingPlan_Basket:
 
 		for symbol,item in self.symbols.items():
 			self.submit_expected_shares(symbol,self.current_shares[symbol]-self.current_shares[symbol]//3)
+	def reduce_one_third_aggresive(self):
+
+		for symbol,item in self.symbols.items():
+			self.submit_expected_shares(symbol,self.current_shares[symbol]-self.current_shares[symbol]//3,1)
 
 	def reduce_one_half(self):
 		for symbol,item in self.symbols.items():
