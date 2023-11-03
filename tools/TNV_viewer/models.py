@@ -85,6 +85,27 @@ class model:
 	def get_short(self):
 		return self.short
 
+	def get_long_symbols(self):
+		r= ""
+
+		for symbol,share in self.model.items():
+
+			if share>0:
+				r += (str(symbol)+":"+str(share)+",")
+
+		r = r[:-1]
+
+		return r 
+	def get_short_symbols(self):
+
+		r= ""
+
+		for symbol,share in self.model.items():
+
+			if share<0:
+				r  += (str(symbol)+":"+str(share)+",")
+
+		return r 
 	def get_early_ts(self):
 		return self.e_ts 
 

@@ -217,7 +217,7 @@ def update_chart(model,plot,eval_plot,canvas):
             plot.plot(model.get_ts(),model.get_pnl(), label='Line 1')
 
 
-            categories = ['long', 'short']
+            categories = ['long:\n'+model.get_long_symbols(), 'short:\n'+model.get_short_symbols()]
             values = [model.get_long(), model.get_short()]
 
             # Create a bar plot
