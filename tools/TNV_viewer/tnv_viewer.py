@@ -216,6 +216,13 @@ def update_chart(model,plot,eval_plot,canvas):
             model.model_update(data)
             plot.plot(model.get_ts(),model.get_pnl(), label='Line 1')
 
+
+            categories = ['long', 'short']
+            values = [model.get_long(), model.get_short()]
+
+            # Create a bar plot
+            eval_plot.bar(categories, values,color=["green","red"])
+
             if model.model_early_chart:
                 plot.plot(model.get_early_ts(),model.get_early_pnl(), label='Line 2')
 

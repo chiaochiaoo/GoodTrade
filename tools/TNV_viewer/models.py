@@ -44,6 +44,8 @@ class model:
 		self.ts  = np.array([i for i in range(570,960)])
 		self.spread = 0
 		self.cur = 0
+		self.long = 0
+		self.short =0
 		self.e_pnl = []
 		self.e_ts  = []
 
@@ -76,6 +78,12 @@ class model:
 
 	def get_pnl(self):
 		return self.pnl 
+
+	def get_long(self):
+		return self.long 
+
+	def get_short(self):
+		return self.short
 
 	def get_early_ts(self):
 		return self.e_ts 
@@ -234,7 +242,8 @@ class quick_model(model):
 
 		try:
 			c= 0
-
+			self.long =0
+			self.short = 0
 			if self.model_initialized:
 				spread = 0
 				spreads = {}
@@ -251,7 +260,13 @@ class quick_model(model):
 					key = key[:-3]
 					
 					if key in data:
-						c+=(data[key]['day_current'] - data[key]['day_open'])*share
+						result = (data[key]['day_current'] - data[key]['day_open'])*share
+						c+=result
+
+						if share>0:
+							self.long += result 
+						else:
+							self.short += result
 
 						spread+= (data[key]['ask'] - data[key]['bid'])*abs(share)
 
