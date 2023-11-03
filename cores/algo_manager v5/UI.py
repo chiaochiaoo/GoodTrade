@@ -467,11 +467,13 @@ class UI(pannel):
 						"MinU":8,\
 						UNREAL:8,\
 						REALIZED:8,\
-						"WR":8,\
-						"MR":8,\
-						"TR":8,\
+						"WR":7,\
+						"MR":7,\
+						"TR":7,\
+						"-30%":7,\
+						"-50%":7,\
 						"flatten":8,\
-						"log":8}
+						}
 		self.width = list(self.labels.values())
 
 
@@ -1145,8 +1147,10 @@ class UI(pannel):
 		"WR":tradingplan.tkvars[WR], \
 		"MR":tradingplan.tkvars[MR], \
 		"TR":tradingplan.tkvars[TR], \
+		"-30%":"",\
+		"-50%":"",\
 		'flatten':"",\
-		'log':""}
+		}
 
 		#link the global variable 
 		tradingplan.tkvars[RISKTIMER] = self.risk_timer 
@@ -1187,6 +1191,14 @@ class UI(pannel):
 
 
 			elif label_name =="flatten":
+
+				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.reduce_one_third
+
+			elif label_name =="-30%":
+
+				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.reduce_one_half
+
+			elif label_name =="-50%":
 
 				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.flatten_cmd
 
