@@ -40,6 +40,8 @@ class model:
 		self.model_initialized = False 
 		self.model = {}
 
+		self.long_symbols =""
+		self.short_symbols =""
 		self.pnl = np.array([None for i in range(570,960)])
 		self.ts  = np.array([i for i in range(570,960)])
 		self.spread = 0
@@ -83,29 +85,15 @@ class model:
 		return self.long 
 
 	def get_short(self):
-		return self.short
+		return self.short*-1
 
 	def get_long_symbols(self):
-		r= ""
 
-		for symbol,share in self.model.items():
-
-			if share>0:
-				r += (str(symbol)+":"+str(share)+",")
-
-		r = r[:-1]
-
-		return r 
+		return self.long_symbols 
 	def get_short_symbols(self):
 
-		r= ""
 
-		for symbol,share in self.model.items():
-
-			if share<0:
-				r  += (str(symbol)+":"+str(share)+",")
-
-		return r 
+		return self.short_symbols 
 	def get_early_ts(self):
 		return self.e_ts 
 
@@ -151,6 +139,29 @@ class quick_model(model):
 		self.historical_plus = historical_plus
 		self.historical_minus = historical_minus
 		self.historical_fixpoint = 0
+
+
+		self.model_init()
+
+	def model_init(self):
+
+		self.long_symbols = ""
+
+		for symbol,share in self.model.items():
+
+			if share>0:
+				self.long_symbols += (str(symbol)+":"+str(share)+",")
+
+		self.long_symbols  = self.long_symbols[:-1]
+
+		self.short_symbols = ""
+
+		for symbol,share in self.model.items():
+
+			if share<0:
+				self.short_symbols   += (str(symbol)+":"+str(share)+",")
+
+		self.short_symbols  = self.short_symbols[:-1]
 
 	def model_early_load(self):
 
@@ -471,5 +482,7 @@ class obq_model(quick_model):
 			self.model = t
 			self.model_initialized = True 
 			print("OBQ loading complete")
+
+			super().model_init()
 		except Exception as e:
 			PrintException(e)
