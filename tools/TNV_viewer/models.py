@@ -31,8 +31,114 @@ def PrintException(info,additional="ERROR"):
     exc_type, exc_obj, exc_tb = sys.exc_info()
     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
     print(additional,info,exc_type, fname, exc_tb.tb_lineno,traceback.format_exc())
+def extract_ts(s):
+    return s[-5:]
+def extract_day(s):
+    return s[:10]
 
 
+def drop_columns(df,drops):
+
+  drop = []
+  for i in df.columns:
+    for x in drops:
+      if x in i:
+        drop.append(i)
+
+  return df.drop(drop, axis=1)
+
+def absolute_mean(sl,window):
+
+  if len(sl)==window:
+    return np.mean(np.abs(sl))
+  else:
+    return np.nan
+
+def tailless_mean(sl,window=0):
+  if window==0 or len(sl)==window:
+    return np.mean(sl[sl<np.percentile(sl,97)])
+  else:
+    return np.nan
+
+def log_and_subtract(row):
+    log_values = np.log(row)
+    return log_values - log_values[0]
+
+# Apply the function to each row using np.apply_along_axis
+def slicer_vectorized(a,start,end):
+    b = a.view((str,1)).reshape(len(a),-1)[:,start:end]
+    return np.fromstring(b.tostring(),dtype=(str,end-start))
+
+def get_symbol_basket(symbol,timeframe,days):
+
+  postbody = "http://api.kibot.com/?action=history&symbol="+symbol+"&interval="+str(timeframe)+"&period="+str(days)+"&regular=0&user=sajali26@hotmail.com&password=guupu4upu"
+
+  r= requests.post(postbody)
+
+  if timeframe=="Day":
+    df  = pd.read_csv(StringIO(r.text),names=["day","open","high","low","close","volume"])
+    return df
+  else:
+    df  = pd.read_csv(StringIO(r.text),names=["day","time","open","high","low","close","volume"])
+
+  ts_5 = ['09:30', '09:35', '09:40', '09:45', '09:50', '09:55', '10:00', '10:05', '10:10', '10:15', '10:20', '10:25', '10:30', '10:35', '10:40', '10:45', '10:50', '10:55', '11:00', '11:05', '11:10', '11:15', '11:20', '11:25', '11:30', '11:35', '11:40', '11:45', '11:50', '11:55', '12:00', '12:05', '12:10', '12:15', '12:20', '12:25', '12:30', '12:35', '12:40', '12:45', '12:50', '12:55', '13:00', '13:05', '13:10', '13:15', '13:20', '13:25', '13:30', '13:35', '13:40', '13:45', '13:50', '13:55', '14:00', '14:05', '14:10', '14:15', '14:20', '14:25', '14:30', '14:35', '14:40', '14:45', '14:50', '14:55', '15:00', '15:05', '15:10', '15:15', '15:20', '15:25', '15:30', '15:35', '15:40', '15:45', '15:50', '15:55']
+  ts_1 = ["09:30","09:31","09:32","09:33","09:34","09:35","09:36","09:37","09:38","09:39","09:40","09:41","09:42","09:43","09:44","09:45","09:46","09:47","09:48","09:49","09:50","09:51","09:52","09:53","09:54","09:55","09:56","09:57","09:58","09:59","10:00","10:01","10:02","10:03","10:04","10:05","10:06","10:07","10:08","10:09","10:10","10:11","10:12","10:13","10:14","10:15","10:16","10:17","10:18","10:19","10:20","10:21","10:22","10:23","10:24","10:25","10:26","10:27","10:28","10:29","10:30","10:31","10:32","10:33","10:34","10:35","10:36","10:37","10:38","10:39","10:40","10:41","10:42","10:43","10:44","10:45","10:46","10:47","10:48","10:49","10:50","10:51","10:52","10:53","10:54","10:55","10:56","10:57","10:58","10:59","11:00","11:01","11:02","11:03","11:04","11:05","11:06","11:07","11:08","11:09","11:10","11:11","11:12","11:13","11:14","11:15","11:16","11:17","11:18","11:19","11:20","11:21","11:22","11:23","11:24","11:25","11:26","11:27","11:28","11:29","11:30","11:31","11:32","11:33","11:34","11:35","11:36","11:37","11:38","11:39","11:40","11:41","11:42","11:43","11:44","11:45","11:46","11:47","11:48","11:49","11:50","11:51","11:52","11:53","11:54","11:55","11:56","11:57","11:58","11:59","12:00","12:01","12:02","12:03","12:04","12:05","12:06","12:07","12:08","12:09","12:10","12:11","12:12","12:13","12:14","12:15","12:16","12:17","12:18","12:19","12:20","12:21","12:22","12:23","12:24","12:25","12:26","12:27","12:28","12:29","12:30","12:31","12:32","12:33","12:34","12:35","12:36","12:37","12:38","12:39","12:40","12:41","12:42","12:43","12:44","12:45","12:46","12:47","12:48","12:49","12:50","12:51","12:52","12:53","12:54","12:55","12:56","12:57","12:58","12:59","13:00","13:01","13:02","13:03","13:04","13:05","13:06","13:07","13:08","13:09","13:10","13:11","13:12","13:13","13:14","13:15","13:16","13:17","13:18","13:19","13:20","13:21","13:22","13:23","13:24","13:25","13:26","13:27","13:28","13:29","13:30","13:31","13:32","13:33","13:34","13:35","13:36","13:37","13:38","13:39","13:40","13:41","13:42","13:43","13:44","13:45","13:46","13:47","13:48","13:49","13:50","13:51","13:52","13:53","13:54","13:55","13:56","13:57","13:58","13:59","14:00","14:01","14:02","14:03","14:04","14:05","14:06","14:07","14:08","14:09","14:10","14:11","14:12","14:13","14:14","14:15","14:16","14:17","14:18","14:19","14:20","14:21","14:22","14:23","14:24","14:25","14:26","14:27","14:28","14:29","14:30","14:31","14:32","14:33","14:34","14:35","14:36","14:37","14:38","14:39","14:40","14:41","14:42","14:43","14:44","14:45","14:46","14:47","14:48","14:49","14:50","14:51","14:52","14:53","14:54","14:55","14:56","14:57","14:58","14:59","15:00","15:01","15:02","15:03","15:04","15:05","15:06","15:07","15:08","15:09","15:10","15:11","15:12","15:13","15:14","15:15","15:16","15:17","15:18","15:19","15:20","15:21","15:22","15:23","15:24","15:25","15:26","15:27","15:28","15:29","15:30","15:31","15:32","15:33","15:34","15:35","15:36","15:37","15:38","15:39","15:40","15:41","15:42","15:43","15:44","15:45","15:46","15:47","15:48","15:49","15:50","15:51","15:52","15:53","15:54","15:55","15:56","15:57","15:58","15:59",\
+          "16:00"]
+  ts_15 = [i for i in ts_5[::3]]
+  ts_30 = [i for i in ts_5[::6]]
+
+  all_ts = [i for i in ts_1[::timeframe]]
+
+  ### ACC ?#
+  print("downloaded. processing...")
+  all_index = [r[0] +" " + r[1] for r in itertools.product(df['day'].unique().tolist(),all_ts)]
+
+  df['ts'] = df['day'] + " " + df['time']
+  df = df.set_index('ts')
+
+  days = df['day'].unique().tolist()
+
+
+  unique_days = df['day'].unique()
+
+  all = []
+  for day in unique_days:
+
+    k = df.loc[df['day']==day].index
+
+    all.extend(df.loc[k]['volume'].cumsum())
+
+  df['acc_vol'] = all
+  ndf = pd.DataFrame()
+
+  ndf['ts'] = all_index
+
+
+  ndf2  = ndf.merge(df, left_on='ts', right_on='ts',how='left')
+
+
+  ndf2['volume'] = ndf2['volume'].fillna(0)
+  #print(ndf2['ts'])
+  ndf2['time'] = ndf2['ts'].apply(extract_ts)
+  ndf2['day'] = ndf2['ts'].apply(extract_day)
+
+
+  ndf2['ts'] = pd.to_datetime(ndf2['ts'])
+  ndf2['ts'] = ndf2['ts'].dt.hour*60+ndf2['ts'].dt.minute
+
+  len_unique = len(df['day'].unique())
+  number_of_minutes = len(all_ts)
+  cumsum_array = np.cumsum(ndf2['volume'].to_numpy().reshape(len_unique,number_of_minutes), axis=1)
+  ndf2['acc_vol'] = cumsum_array.flatten()
+  # ndf2.loc[(ndf2['time']=="16:15")] = ndf2.loc[(ndf2['time']=="16:15")].interpolate(method="ffill")
+  # ndf2.loc[(ndf2['time']=="09:00")] = ndf2.loc[(ndf2['time']=="09:00")].interpolate(method="bfill")
+
+  ndf2 =ndf2.interpolate(method="pad")
+  #ndf2 = ndf2.drop(['low','high'],axis=1)
+  print("finished. ...")
+  ndf2.to_csv("/content/drive/MyDrive/Colab Notebooks/Da_Million_Dollar_Dataset/Raw_Data"+str(timeframe)+"/"+symbol+".csv")
+
+  return ndf2
 class model:
 
 	def __init__(self):
@@ -283,12 +389,14 @@ class quick_model(model):
 				spreads = {}
 
 
-				if self.historical_fixpoint==0:
-					for key,share in self.model.items():
-						key = key[:-3]
-						self.historical_fixpoint +=  data[key]['day_open']*share
+				try:
+					if self.historical_fixpoint==0:
+						for key,share in self.model.items():
+							key = key[:-3]
+							self.historical_fixpoint +=  data[key]['day_open']*share
 
-
+				except:
+					pass 
 				for key,share in self.model.items():
 
 					key = key[:-3]
@@ -484,6 +592,192 @@ class obq_model(quick_model):
 			self.model = t
 			self.model_initialized = True 
 			print("OBQ loading complete")
+
+			super().model_init()
+		except Exception as e:
+			PrintException(e)
+
+
+
+class nqg_model(quick_model):
+	def __init__(self):
+
+		super().__init__("OQG",{},[],[])
+
+		self.model_initialized = False 
+
+	def model_init(self):
+
+		print("NQG LOADING START")
+		d = threading.Thread(target=self.create_standard_obq_df,daemon=True)
+		d.start() 
+
+
+	def create_standard_obq_df(self):
+
+
+			# STEP 1 , obtain symbols.
+		try:
+			postbody = "https://financialmodelingprep.com/api/v3/nasdaq_constituent?apikey=a901e6d3dd9c97c657d40a2701374d2a"
+			r= requests.get(postbody)
+			d = json.loads(r.text)
+			symbols = [i['symbol'] for i in d]
+
+			symbols.append("QQQ")
+
+			anchord_symbol = 'QQQ'
+			name = 'QQQ'
+			
+
+			### POLYGON PART ###
+			r = "https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?include_otc=false&apiKey=ezY3uX1jsxve3yZIbw2IjbNi5X7uhp1H"
+
+			r = requests.get(r)
+			# print(r.text)
+
+			d = json.loads(r.text)
+
+			symbol_open = {}
+			t={}
+			for i in d['tickers']:
+			  t[i['ticker']] = i
+			  #symbol_open[i['ticker']] = [i['lastQuote']['P'],i['lastQuote']['P']]
+			  symbol_open[i['ticker']] = [i['day']['o'],i['day']['c']]
+
+			  #premarket
+			  #t[i['ticker']] = i['lastTrade']['p']
+
+
+			# DATA AND ALL #
+			total = {}
+
+			eval = ['/'+i for i in symbols]
+			std =  ['s/'+i for i in symbols]
+			norm =  ['n/'+i for i in symbols]
+
+			t = []
+			t.extend(eval)
+			t.extend(std)
+			t.extend(norm)
+			skips = []
+			black_list = ['GOOGL']
+
+			print(len(symbols),symbols)
+			for symbol in symbols[:]:
+
+			  df = get_symbol_basket(symbol,'Day',50)
+			  df.loc[len(df)] = ['Cur',symbol_open[symbol][0],symbol_open[symbol][0],symbol_open[symbol][0],symbol_open[symbol][1],0]
+			  df = drop_columns(df,['Unnamed'])
+
+			  df['symbol'] = symbol
+			  df['anchord_ret'] =0
+			  df['std_ret'] =0
+			  df['result'] =0
+			  df= pd.concat([df,pd.DataFrame(columns=t)])
+
+			  # df=pd.concat([df,pd.DataFrame(columns=std)])
+			  # df=pd.concat([df,pd.DataFrame(columns=norm)])
+
+			  if df['open'].iloc[-1]>600 or symbol in black_list:
+			    skips.append(symbol)
+			  else:
+			    total[symbol]=df
+
+			symbols = [x for x in symbols if x not in skips]
+			print("Total:",len(total),len(symbols),"skipping:",skips)
+
+			#### AMEND THE DATA. if not presented.
+
+			df = []
+
+			for i in total.values():
+			  if len(i)>len(df):
+			    df = i
+
+			days = df['day'].unique()
+
+			for i in total.keys():
+			  if len(total[i])!=len(days):
+			    ndf = pd.DataFrame()
+			    ndf['day'] = days
+			    #ndf['symbol'] =  total[i]['symbol'].unique()[0]
+
+			    total[i]  = ndf.merge(total[i], left_on='day', right_on='day',how='left')
+			    total[i].loc[:,'symbol'] = i
+
+			for i in total.values():
+
+			  i['po'] = i['open'].shift(1)
+			  i['pc'] = i['close'].shift(1)
+
+			  i['log'] = np.log(i['open']) - np.log(i['pc'])
+			  i['ret'] = np.log(i['close']) - np.log(i['open'])
+
+			  # for j in symbols:
+			  #   i['s/'+j] = 0
+			  #   i['n/'+j] = 0
+
+			all_logs = []
+
+			for i in total.values():
+			  l = i['log'].to_list()
+
+			  all_logs.append(l)
+
+			all_logs = np.array(all_logs)
+
+			anchord_ret = total[anchord_symbol]['ret'].tolist()
+
+			c=1
+			for i in total.values():
+
+			  r = i['log'].to_numpy() - all_logs
+
+			  i['anchord_ret'] = i['ret'] - anchord_ret
+
+			  for j in range(len(symbols)):
+			    i[eval[j]] = r[j]
+
+			  i['std_ret'] = i['ret'].rolling(30).std()
+			  i['std_ret'] = i['std_ret'].shift(1)
+
+			  i['result'] = i['ret']/i['std_ret']
+			  for j in symbols:
+			    i['s/'+j] = i['/'+j].rolling(30).std() #
+
+			    i['n/'+j] = i['/'+j]/i['s/'+j] #
+
+			  #print(i.shape,c)
+			  c+=1
+			  i.fillna(0)
+			  i['strength'] = i[norm].sum(axis=1)/len(symbols)
+
+			df = pd.concat(total.values())
+
+			t = df.loc[df['day']=="Cur"].sort_values('strength',ascending=False)
+
+			t['share'] = (20/(t['open']*t['std_ret'])).astype(int)
+
+			print(t)
+			output ={}
+			for i,r in t.iloc[:10].iterrows():
+			  symbol = r['symbol']+".NQ"
+			  share = r['share']*-1
+			  print(r['symbol'],r['share'],r['strength'])
+			  #cmdstr1 += symbol+".NQ"+":"+str(share)+","
+
+			  output[symbol]=share
+
+			for i,r in t.iloc[-10:].iterrows():
+			  symbol = r['symbol']+".NQ"
+			  share = r['share']
+			  print(r['symbol'],r['share'],r['strength'])
+			  output[symbol]=share
+
+
+			self.model = output
+			self.model_initialized = True 
+			print(self.name,":",self.model)
 
 			super().model_init()
 		except Exception as e:

@@ -32,6 +32,7 @@ global data
 data = {}
 
 
+
 def PrintException(info,additional="ERROR"):
     # exc_type, exc_obj, tb = sys.exc_info()
     # f = tb.tb_frame
@@ -142,11 +143,17 @@ def create_tab(tab_name):
         historical_minus =[-0.01193436,-0.01220059,-0.01666259]
 
         model =  quick_model(name,model,historical_plus,historical_minus)
+    elif tab_name=="NQG":
+
+        model = nqg_model()
+
+        
     # LabelFrame for vertical buttons
 
     # info_frame = ttk.LabelFrame(tab, text="Infos")
     # info_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=10, pady=10)
 
+    print(tab_name)
     button_frame = ttk.LabelFrame(tab, text="Buttons")
     button_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=10, pady=10)
 
@@ -291,7 +298,7 @@ try:
     notebook = ttk.Notebook(root)
 
     # Create 5 tabs
-    tabs = [ "QFAANG","QEV","QBT","OBQ"]# "Last Minute", "Tab 5"#"MRQ1", "MRQ2", #"OBQ", #"OBQ"
+    tabs = [ "QFAANG","QEV","QBT","OBQ","NQG"]# "Last Minute", "Tab 5"#"MRQ1", "MRQ2", #"OBQ", #"OBQ" #
 
     for tab_name in tabs:
         create_tab(tab_name)
