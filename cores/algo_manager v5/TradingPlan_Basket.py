@@ -105,6 +105,7 @@ class TradingPlan_Basket:
 		self.current_shares = {}
 		self.current_request = {}
 		self.maximum_manual = {}
+		self.current_request_timer ={}
 		####################################################################################
 
 		self.incremental_state = {}
@@ -251,7 +252,7 @@ class TradingPlan_Basket:
 			self.current_shares[symbol_name] = 0
 			self.current_request[symbol_name] = 0
 			self.current_exposure[symbol_name] = []
-
+			self.current_request_timer[symbol_name] = 0
 			self.maximum_manual[symbol_name] = 300
 
 			################################################################
@@ -476,8 +477,17 @@ class TradingPlan_Basket:
 
 
 	def recalculate_current_request(self,symbol):
-		self.current_request[symbol] = self.expected_shares[symbol] - self.current_shares[symbol]
+		diff = self.expected_shares[symbol] - self.current_shares[symbol]
 
+		if self.current_request[symbol]!=diff:
+			now = datetime.now()
+			ts = now.hour*3600 + now.minute*60+ now.second
+			self.current_request[symbol] = diff
+			self.current_request_timer[symbol] = ts
+
+	def get_request_time(self,symbol):
+
+		return self.current_request_timer[symbol] 
 	def get_current_expected(self,symbol):
 
 		with self.read_lock[symbol]:

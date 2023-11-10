@@ -82,6 +82,7 @@ class Symbol:
 
 		self.active_tps = 0
 		self.current_shares = 0
+		self.current_expired =0
 		self.theoritical_shares = 0
 
 		self.current_avgprice = 0
@@ -335,9 +336,9 @@ class Symbol:
 
 		### STAGE 1. JUST UPDATE THE TPs. 
 		self.current_avgprice,current_shares = self.manager.get_position(self.symbol_name)
-		self.current_shares = self.get_all_current(tps)
+		self.current_shares,self.expired = self.get_all_current(tps)
 		self.expected = self.get_all_expected(tps)
-		self.difference = self.expected - self.current_shares
+		self.difference = self.expected - self.current_shares 
 
 
 		### ISSUE: lagging imblance issue later occur. i need to reset it when it's GOOD. ###
@@ -355,7 +356,7 @@ class Symbol:
 				self.difference += self.current_imbalance * -1
 
 		if self.difference!=0:
-			log_print(self.source,self.symbol_name,"Current:",self.current_shares,"Expected:",self.expected,"Difference:",self.difference)
+			log_print(self.source,self.symbol_name,"Current:",self.current_shares,"Expected:",self.expected,"Difference:",self.difference,"Expired:",self.expired)
 		######################################################################################
 
 		### need at least 3 seconds delay.
@@ -426,12 +427,19 @@ class Symbol:
 	def get_all_current(self,tps):
 
 		current_shares = 0
-		
+		expired =0
+		now = datetime.now()
+		ts = now.hour*3600 + now.minute*60 + now.second
+
 		for tp in tps:
 			if self.tradingplans[tp].get_inspectable():
 				current_shares +=  self.tradingplans[tp].get_current_share(self.symbol_name)
 
-		return current_shares
+
+				if ts-self.tradingplans[tp].get_request_time(self.symbol_name)>20:
+					expired+=self.tradingplans[tp].get_current_request(self.symbol_name)
+
+		return current_shares,expired
 
 	def get_all_expected(self,tps):
 
@@ -533,17 +541,31 @@ class Symbol:
 
 				total_tp = list(self.tradingplans.keys())
 
+
+				now = datetime.now()
+				ts = now.hour*3600 + now.minute*60+ now.second
+
 				tps = []
+
+				tps = {}
+
 				for tp in total_tp:
 					if self.tradingplans[tp].get_inspectable():
-						tps.append(tp)
+						request_time = ts-self.tradingplans[tp].get_request_time(self.symbol_name)
+						tps[request_time] =tp
 
 				for tp in total_tp: #EVERYTHING ELSE.
 					if tp not in tps:
-						tps.append(tp)
+						request_time = ts-self.tradingplans[tp].get_request_time(self.symbol_name)
+						tps[request_time] =tp
+
+				sorted_dict = dict(sorted(tps.items(), reverse=True))
+				tps = list(sorted_dict.values())
 
 				if len(tps)!=len(total_tp):
 					log_print(self.source,"WARNING, WARNING. TP ORDERS UNMATCH.")
+
+				
 
 				with self.incoming_shares_lock:
 
@@ -652,16 +674,20 @@ class Symbol:
 
 		if self.difference!=0 and self.holding_update==False :
 
-			total = abs(self.difference)
+			total = abs(self.difference-self.expired)
 			if total>=500:
 				total = 500
 				log_print(self.source,self.symbol_name,self.action," adjusted to 200 instead of",self.difference)
 
+			if self.expired!=0:
+				self.ppro_out.send([CANCEL,self.symbol_name]) 
+				time.sleep(0.1)
+				self.immediate_request(self.expired)
 			if self.aggresive_only==True or ts>57500: ### LAST 100 seconds market only.
 				self.immediate_request(self.difference)
 				self.sent_orders = True 
 			else:
-				if not skip:
+				if not skip and total!=0:
 					self.ppro_out.send([self.action,self.symbol_name,total,0,self.manager.gateway])
 					self.sent_orders = True 
 				# else:
@@ -794,6 +820,8 @@ class Symbol:
 		self.previous_shares,self.previous_avgprice = self.current_shares, self.current_avgprice
 
 
+	def ppro_flatten(self):
+		self.ppro_out.send([FLATTEN,self.symbol_name])
 # def holdings_update(self,price,share):
 
 # 	with self.incoming_shares_lock:
