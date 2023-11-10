@@ -623,67 +623,57 @@ class nqg_model(quick_model):
 			d = json.loads(r.text)
 			symbols = [i['symbol'] for i in d]
 
-			symbols.append("QQQ")
-
-			anchord_symbol = 'QQQ'
 			name = 'QQQ'
-			
-
-			### POLYGON PART ###
-			r = "https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?include_otc=false&apiKey=ezY3uX1jsxve3yZIbw2IjbNi5X7uhp1H"
-
-			r = requests.get(r)
-			# print(r.text)
-
-			d = json.loads(r.text)
-
-			symbol_open = {}
-			t={}
-			for i in d['tickers']:
-			  t[i['ticker']] = i
-			  #symbol_open[i['ticker']] = [i['lastQuote']['P'],i['lastQuote']['P']]
-			  symbol_open[i['ticker']] = [i['day']['o'],i['day']['c']]
-
-			  #premarket
-			  #t[i['ticker']] = i['lastTrade']['p']
-
+			len(symbols)
 
 			# DATA AND ALL #
 			total = {}
 
-			eval = ['/'+i for i in symbols]
-			std =  ['s/'+i for i in symbols]
-			norm =  ['n/'+i for i in symbols]
 
-			t = []
-			t.extend(eval)
-			t.extend(std)
-			t.extend(norm)
 			skips = []
 			black_list = ['GOOGL']
 
-			print(len(symbols),symbols)
 			for symbol in symbols[:]:
 
 			  df = get_symbol_basket(symbol,'Day',50)
-			  df.loc[len(df)] = ['Cur',symbol_open[symbol][0],symbol_open[symbol][0],symbol_open[symbol][0],symbol_open[symbol][1],0]
+
 			  df = drop_columns(df,['Unnamed'])
 
-			  df['symbol'] = symbol
-			  df['anchord_ret'] =0
-			  df['std_ret'] =0
-			  df['result'] =0
-			  df= pd.concat([df,pd.DataFrame(columns=t)])
-
-			  # df=pd.concat([df,pd.DataFrame(columns=std)])
-			  # df=pd.concat([df,pd.DataFrame(columns=norm)])
-
-			  if df['open'].iloc[-1]>600 or symbol in black_list:
+			  if symbol in black_list: #df['open'].iloc[-1]>600 or
 			    skips.append(symbol)
 			  else:
 			    total[symbol]=df
 
 			symbols = [x for x in symbols if x not in skips]
+
+			top_x = 18
+
+			r = "https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?include_otc=false&apiKey=ezY3uX1jsxve3yZIbw2IjbNi5X7uhp1H"
+			r = requests.get(r)
+			d = json.loads(r.text)
+
+			symbol_open = {}
+
+			for i in d['tickers']:
+			  #t[i['ticker']] = i
+			  #symbol_open[i['ticker']] = [i['lastQuote']['P'],i['lastQuote']['P']]
+			  symbol_open[i['ticker']] = [i['day']['o'],i['day']['c']]
+			  #premarket t[i['ticker']] = i['lastTrade']['p']
+
+			### WITH THE UPDATED INFOS ###
+
+			for symbol in symbols[:]:
+
+			  df = total[symbol]
+			  df.loc[len(df)] = ['Cur',symbol_open[symbol][0],symbol_open[symbol][0],symbol_open[symbol][0],symbol_open[symbol][1],0]
+			  df['symbol'] = symbol
+			  df['std_ret'] =0
+			  df['result'] =0
+			  df['strength'] =0
+			  #df= pd.concat([df,pd.DataFrame(columns=t)]).fillna(0)
+
+			  total[symbol] = df
+
 			print("Total:",len(total),len(symbols),"skipping:",skips)
 
 			#### AMEND THE DATA. if not presented.
@@ -713,10 +703,6 @@ class nqg_model(quick_model):
 			  i['log'] = np.log(i['open']) - np.log(i['pc'])
 			  i['ret'] = np.log(i['close']) - np.log(i['open'])
 
-			  # for j in symbols:
-			  #   i['s/'+j] = 0
-			  #   i['n/'+j] = 0
-
 			all_logs = []
 
 			for i in total.values():
@@ -726,54 +712,43 @@ class nqg_model(quick_model):
 
 			all_logs = np.array(all_logs)
 
-			anchord_ret = total[anchord_symbol]['ret'].tolist()
-
 			c=1
 			for i in total.values():
 
 			  r = i['log'].to_numpy() - all_logs
 
-			  i['anchord_ret'] = i['ret'] - anchord_ret
-
-			  for j in range(len(symbols)):
-			    i[eval[j]] = r[j]
-
 			  i['std_ret'] = i['ret'].rolling(30).std()
 			  i['std_ret'] = i['std_ret'].shift(1)
 
-			  i['result'] = i['ret']/i['std_ret']
-			  for j in symbols:
-			    i['s/'+j] = i['/'+j].rolling(30).std() #
+			  i['strength'] = np.nansum(r[:,-1]/np.std(r[:,-30:],axis=1))
 
-			    i['n/'+j] = i['/'+j]/i['s/'+j] #
-
-			  #print(i.shape,c)
-			  c+=1
-			  i.fillna(0)
-			  i['strength'] = i[norm].sum(axis=1)/len(symbols)
 
 			df = pd.concat(total.values())
 
 			t = df.loc[df['day']=="Cur"].sort_values('strength',ascending=False)
 
-			t['share'] = (20/(t['open']*t['std_ret'])).astype(int)
+			t['share'] = (15/(t['open']*t['std_ret'])).astype(int)
 
-			print(t)
 			output ={}
-			for i,r in t.iloc[:10].iterrows():
-			  symbol = r['symbol']+".NQ"
-			  share = r['share']*-1
-			  print(r['symbol'],r['share'],r['strength'])
-			  #cmdstr1 += symbol+".NQ"+":"+str(share)+","
-
+			c = 0
+			for i,row in t.iterrows():
+			  symbol = row['symbol']
+			  share = row['share']*-1
 			  output[symbol]=share
+			  c+=1
+			  if c>=top_x:
+			    break
 
-			for i,r in t.iloc[-10:].iterrows():
-			  symbol = r['symbol']+".NQ"
-			  share = r['share']
-			  print(r['symbol'],r['share'],r['strength'])
+			c = 0
+			for i,row in t.iloc[::-1].iterrows():
+			  symbol = row['symbol']
+			  share = row['share']
+			  #print(r['symbol'],r['share'],r['strength'])
 			  output[symbol]=share
+			  c+=1
 
+			  if c>=top_x:
+			    break
 
 			self.model = output
 			self.model_initialized = True 
