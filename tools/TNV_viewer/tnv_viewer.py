@@ -244,7 +244,7 @@ def update_chart(model,plot,eval_plot,canvas):
                 for i in range(len(model.historical_plus)):
                     str_+=levels[i]+str(int(model.historical_plus[i]*model.historical_fixpoint))+"\n"
                 str_ = str_[:-1]
-                legend = plot.legend(loc='upper right')
+                legend = plot.legend(loc='upper left')
                 legend.get_texts()[0].set_text(str_)
                 #plot.legend(handles=[], labels=['1','90%:','2'])
 
