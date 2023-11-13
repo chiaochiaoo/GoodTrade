@@ -612,12 +612,11 @@ class UI(pannel):
 
 		fxixpev = {"name":"FXIXPEV","symbol":["FXI.AM","XPEV.NQ"],"ratio":[2,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		
-
-		spyxlk {"name":"SPYXLK","symbol":["SPY.AM","XLK.AM"],"ratio":[10,-18],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		spyxlc {"name":"SPYXLC","symbol":["SPY.AM","XLC.AM"],"ratio":[10,-49],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		spyxli {"name":"SPYXLI","symbol":["SPY.AM","XLI.AM"],"ratio":[10,-36],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		spyxlu {"name":"SPYXLU","symbol":["SPY.AM","XLU.AM"],"ratio":[10,-46],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		spyxly {"name":"SPYXLY","symbol":["SPY.AM","XLY.AM"],"ratio":[10,-24],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyxlk = {"name":"SPYXLK","symbol":["SPY.AM","XLK.AM"],"ratio":[10,-18],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyxlc = {"name":"SPYXLC","symbol":["SPY.AM","XLC.AM"],"ratio":[10,-49],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyxli = {"name":"SPYXLI","symbol":["SPY.AM","XLI.AM"],"ratio":[10,-36],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyxlu = {"name":"SPYXLU","symbol":["SPY.AM","XLU.AM"],"ratio":[10,-46],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyxly = {"name":"SPYXLY","symbol":["SPY.AM","XLY.AM"],"ratio":[10,-24],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 	
 		total = [spyqqq,gldslv,tlsaqqq,smhqqq,gdxgdxj]
 
@@ -627,7 +626,7 @@ class UI(pannel):
 		gld = [gldslv,gdxgdxj,gdxgld,silslv]
 		misc =[fxixpev]
 
-		total = [spy,etf,qqq,gld,misc]
+		total = [spy,qqq,gld,misc,etf]
 		
 		self.qs = {}
 		for j in total:
@@ -662,14 +661,16 @@ class UI(pannel):
 		self.qs_subp2 = ttk.LabelFrame(self.qs_subtab,text="")
 		self.qs_subp3 = ttk.LabelFrame(self.qs_subtab,text="")
 		self.qs_subp4 = ttk.LabelFrame(self.qs_subtab,text="")
+		self.qs_subp5 = ttk.LabelFrame(self.qs_subtab,text="")
 		#self.custom_algo_pannel.place(x=0,y=0,height=950,width=350)
 
 		#self.quick_spread_pannel.place(x=0,y=0,height=950,width=350)
 		self.qs_subtab.add(self.qs_subp1,text="SPY")
+
 		self.qs_subtab.add(self.qs_subp2,text="QQQ")
 		self.qs_subtab.add(self.qs_subp3,text="GLD")
 		self.qs_subtab.add(self.qs_subp4,text="MISC")
-
+		self.qs_subtab.add(self.qs_subp5,text="AM")
 		x = 0 
 
 		for j in total:
@@ -682,6 +683,9 @@ class UI(pannel):
 				tab = self.qs_subp3
 			elif x==3:
 				tab = self.qs_subp4	
+
+			elif x==4:
+				tab = self.qs_subp5
 
 			for i in j:
 
