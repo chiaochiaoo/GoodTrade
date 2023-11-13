@@ -613,14 +613,21 @@ class UI(pannel):
 		fxixpev = {"name":"FXIXPEV","symbol":["FXI.AM","XPEV.NQ"],"ratio":[2,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		
 
+		spyxlk {"name":"SPYXLK","symbol":["SPY.AM","XLK.AM"],"ratio":[10,-18],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyxlc {"name":"SPYXLC","symbol":["SPY.AM","XLC.AM"],"ratio":[10,-49],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyxli {"name":"SPYXLI","symbol":["SPY.AM","XLI.AM"],"ratio":[10,-36],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyxlu {"name":"SPYXLU","symbol":["SPY.AM","XLU.AM"],"ratio":[10,-46],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyxly {"name":"SPYXLY","symbol":["SPY.AM","XLY.AM"],"ratio":[10,-24],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+	
 		total = [spyqqq,gldslv,tlsaqqq,smhqqq,gdxgdxj]
 
 		spy = [spyqqq,spytlt,spyuso,spygdx]
+		etf = [spyxlk,spyxlc,spyxli,spyxlu,spyxly]
 		qqq = [tlsaqqq,smhqqq,xleqqq,arkkqqq,drivqqq]
 		gld = [gldslv,gdxgdxj,gdxgld,silslv]
 		misc =[fxixpev]
 
-		total = [spy,qqq,gld,misc]
+		total = [spy,etf,qqq,gld,misc]
 		
 		self.qs = {}
 		for j in total:
