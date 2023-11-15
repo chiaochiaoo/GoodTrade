@@ -647,7 +647,7 @@ total['server_name'] = "Server"
 total['symbols']  = []
 total['symbols'].extend(qqq['symbols'])
 total['symbols'].extend(spy['symbols'])
-total['symbols'].extend(large['symbols'])
+# total['symbols'].extend(large['symbols'])
 
 total['symbols'] = list(set(total['symbols']))
 total['algos'] = []
