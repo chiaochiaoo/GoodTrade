@@ -26,3 +26,4 @@ algo_records/
 *.bkp
 *.json
 tnv_viewer/test.py
+tools/Realtime_Stocks_Eval/logs_server/
