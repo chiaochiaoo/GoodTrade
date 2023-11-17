@@ -25,6 +25,9 @@ def find_between(data, first, last):
 
 PRICE = "Price"
 
+fill_timer = 120
+
+
 class Symbol:
 
 	#Symbol class tracks every data related to the symbol. Output it in a dictionary form.
@@ -436,7 +439,7 @@ class Symbol:
 				current_shares +=  self.tradingplans[tp].get_current_share(self.symbol_name)
 
 
-				if ts-self.tradingplans[tp].get_request_time(self.symbol_name)>20:
+				if ts-self.tradingplans[tp].get_request_time(self.symbol_name)>fill_timer:
 					expired+=self.tradingplans[tp].get_current_request(self.symbol_name)
 
 		return current_shares,expired
@@ -552,20 +555,19 @@ class Symbol:
 				for tp in total_tp:
 					if self.tradingplans[tp].get_inspectable():
 						request_time = ts-self.tradingplans[tp].get_request_time(self.symbol_name)
-						tps[request_time] =tp
+						tps[tp] =request_time
 
 				for tp in total_tp: #EVERYTHING ELSE.
 					if tp not in tps:
 						request_time = ts-self.tradingplans[tp].get_request_time(self.symbol_name)
-						tps[request_time] =tp
+						tps[tp] =request_time
 
 				sorted_dict = dict(sorted(tps.items(), reverse=True))
-				tps = list(sorted_dict.values())
+				tps = list(sorted_dict.keys())
 
 				if len(tps)!=len(total_tp):
-					log_print(self.source,"WARNING, WARNING. TP ORDERS UNMATCH.")
+					log_print(self.source,self.symbol_name,"WARNING, WARNING. TP ORDERS UNMATCH.",total_tp,sorted_dict,)
 
-				
 
 				with self.incoming_shares_lock:
 
@@ -593,7 +595,6 @@ class Symbol:
 
 
 					######################################################################################################################################
-
 
 					self.incoming_shares = {}
 
