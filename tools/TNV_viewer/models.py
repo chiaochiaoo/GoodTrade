@@ -40,7 +40,7 @@ def extract_day(s):
 
 def get_symbol(symbol,days):
 
-	timeframe=30
+	timeframe=15
 
 	postbody = "http://api.kibot.com/?action=history&symbol="+symbol+"&interval="+str(timeframe)+"&period="+str(days)+"&regular=0&user=sajali26@hotmail.com&password=guupu4upu"
 
