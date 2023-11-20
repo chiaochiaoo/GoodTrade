@@ -122,8 +122,8 @@ def create_tab(tab_name):
     elif tab_name =="QFAANG":
         name = "QFAANG"
         model =  {'QQQ.NQ': 25, 'AAPL.NQ': -10, 'AMZN.NQ': -10, 'MSFT.NQ': -4, 'META.NQ': -3, 'GOOG.NQ': -9, }
-        historical_plus = [0.031356,0.03812058,0.05]
-        historical_minus =[-0.03046357,-0.03919835,-0.05]
+        historical_plus = [0.0,0.0,0.0]
+        historical_minus =[-0.0,-0.0,-0.0]
 
 
         model =  quick_model(name,model,historical_plus,historical_minus)
@@ -131,16 +131,16 @@ def create_tab(tab_name):
     elif tab_name =="QEV":
         name = "QEV"
         model =  {'QQQ.NQ': 4, 'TSLA.NQ': -1, 'NIO.NY': -29, 'LCID.NQ': -33, 'RIVN.NQ': -5}
-        historical_plus =[0.02769937,0.03559813,0.04095039]
-        historical_minus =[-0.02457263,-0.0369145,-0.03967848]
+        historical_plus =[0.0,0.0,0.0]
+        historical_minus =[-0.0,-0.0,-0.0]
 
         model =  quick_model(name,model,historical_plus,historical_minus)
 
     elif tab_name =="QBT":
         name = "QBT"
         model =  {'QQQ.NQ': 11, 'MARA.NQ': -20, 'RIOT.NQ': -22, 'COIN.NQ': -4, }
-        historical_plus =[0.01054703,0.01527036,0.02186224]
-        historical_minus =[-0.01193436,-0.01220059,-0.01666259]
+        historical_plus =[0.0,0.0,0.0]
+        historical_minus =[-0.0,-0.0,-0.0]
 
         model =  quick_model(name,model,historical_plus,historical_minus)
     elif tab_name=="NQG":
@@ -159,6 +159,10 @@ def create_tab(tab_name):
 
     row =1
     button1 = ttk.Button(button_frame, text="Load model",command=model.model_init)
+    button1.grid(sticky="w",column=1,row=row) 
+
+    row +=1
+    button1 = ttk.Button(button_frame, text="Load Levels",command=model.model_load_levels)
     button1.grid(sticky="w",column=1,row=row) 
 
     row +=1
@@ -242,7 +246,7 @@ def update_chart(model,plot,eval_plot,canvas):
                 levels = ["90%: ","95%: ","99%: "]
 
                 for i in range(len(model.historical_plus)):
-                    str_+=levels[i]+str(int(model.historical_plus[i]*model.historical_fixpoint))+"\n"
+                    str_+=levels[i]+str(int(model.historical_plus[i]))+"\n"
                 str_ = str_[:-1]
                 legend = plot.legend(loc='upper left')
                 legend.get_texts()[0].set_text(str_)
