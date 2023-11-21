@@ -1387,7 +1387,7 @@ class Manager:
 		if "COREYKIN" in user:
 			recipients.append("corey@selectvantage.com")
 
-		pass
+		return 
 
 		msg = MIMEText(body)
 		msg['Subject'] = subject
