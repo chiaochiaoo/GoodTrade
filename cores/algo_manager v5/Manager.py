@@ -925,8 +925,9 @@ class Manager:
 		#### if all green. then good to go ###
 
 		try:
-			if self.ui.user.get()!="DISCONNECTED" and self.ui.ppro_api_status.get()==CONNECTED and self.ui.file_last_update.get()==CONNECTED:
+			if self.ui.user.get()!="DISCONNECTED" and self.ui.ppro_api_status.get()==CONNECTED :
 
+				# and self.ui.file_last_update.get()==CONNECTED
 				# GOOD TO GO.
 				self.ui.system_status_text.set("READY")
 				self.ui.system_status['bg'] = 'lightgreen'
