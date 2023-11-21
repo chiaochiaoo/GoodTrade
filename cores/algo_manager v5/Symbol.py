@@ -754,7 +754,7 @@ class Symbol:
 
 			#### FOR THE TP TRYING TO START THE POSITION. IGNORE. 
 			for tp in tps:
-				if self.tradingplans[tp].having_request(self.symbol_name) and self.tradingplans[tp].get_holdings(self.symbol_name)!=0::
+				if self.tradingplans[tp].having_request(self.symbol_name) and self.tradingplans[tp].get_holdings(self.symbol_name)!=0:
 					self.tradingplans[tp].algo_as_is()
 
 			### discrepancy added. 
