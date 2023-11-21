@@ -1343,7 +1343,6 @@ class Manager:
 	def send_email_admin(self,subject,body):
 
 
-
 		sender = 'algomanagertnv@gmail.com'
 		password = 'myvjbplswvsvktau'
 		recipients = ['chiao@selectvantage.com']

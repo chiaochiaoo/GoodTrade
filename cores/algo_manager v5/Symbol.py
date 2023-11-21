@@ -742,7 +742,7 @@ class Symbol:
 		####### BUT IF IT IS DISCREPANCY? ##### ADD IT TO THE TP.  OR IGNORE? ####
 
 
-		if timestamp not sin self.rejections:
+		if timestamp not in self.rejections:
 			self.rejections[timestamp] = 1 
 		else:
 			self.rejections[timestamp] +=1
@@ -756,7 +756,7 @@ class Symbol:
 			for tp in tps:
 				if self.tradingplans[tp].having_request(self.symbol_name) and self.tradingplans[tp].get_holdings(self.symbol_name)!=0::
 					self.tradingplans[tp].algo_as_is()
-					
+
 			### discrepancy added. 
 
 
