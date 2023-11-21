@@ -933,10 +933,11 @@ class Manager:
 				self.ui.system_status['bg'] = 'lightgreen'
 				#log_print("System all green")
 
-				if self.system_enable==False:
-
-					self.online_alert()
 				self.system_enable = True 
+				
+				if self.system_enable==False:
+					self.online_alert()
+				
 				
 			else:
 
@@ -944,10 +945,12 @@ class Manager:
 				self.ui.system_status['bg'] = 'red'
 				self.ui.system_status.flash()
 
+				self.system_enable = False 
+
 				if self.system_enable:
 					self.disconnection_alert()
 				## if . send me an email.
-				self.system_enable = False 
+				
 		except Exception as e:
 			PrintException(e,"System_check error:")
 
