@@ -1342,6 +1342,8 @@ class Manager:
 
 	def send_email_admin(self,subject,body):
 
+
+
 		sender = 'algomanagertnv@gmail.com'
 		password = 'myvjbplswvsvktau'
 		recipients = ['chiao@selectvantage.com']
@@ -1351,6 +1353,9 @@ class Manager:
 		msg['From'] = sender
 		msg['To'] = ', '.join(recipients)
 
+
+		return 
+
 		try:
 			with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
 			   smtp_server.login(sender, password)
@@ -1359,7 +1364,7 @@ class Manager:
 			with smtplib.SMTP('smtp.gmail.com', 587) as smtp_server:
 			   smtp_server.login(sender, password)
 			   smtp_server.sendmail(sender, recipients, msg.as_string())
-			
+
 
 	def rejection_alert(self,user):
 
