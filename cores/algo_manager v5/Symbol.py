@@ -678,7 +678,7 @@ class Symbol:
 			total = abs(self.difference-self.expired)
 			if total>=500:
 				total = 500
-				log_print(self.source,self.symbol_name,self.action," adjusted to 200 instead of",self.difference)
+				log_print(self.source,self.symbol_name,self.action," adjusted to 500 instead of",self.difference)
 
 			if self.expired!=0:
 				self.ppro_out.send([CANCEL,self.symbol_name]) 
