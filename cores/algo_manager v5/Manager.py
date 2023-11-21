@@ -934,7 +934,7 @@ class Manager:
 				#log_print("System all green")
 
 				self.system_enable = True 
-				
+
 				if self.system_enable==False:
 					self.online_alert()
 				
@@ -1350,9 +1350,16 @@ class Manager:
 		msg['Subject'] = subject
 		msg['From'] = sender
 		msg['To'] = ', '.join(recipients)
-		with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
-		   smtp_server.login(sender, password)
-		   smtp_server.sendmail(sender, recipients, msg.as_string())
+
+		try:
+			with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
+			   smtp_server.login(sender, password)
+			   smtp_server.sendmail(sender, recipients, msg.as_string())
+		except:
+			with smtplib.SMTP('smtp.gmail.com', 587) as smtp_server:
+			   smtp_server.login(sender, password)
+			   smtp_server.sendmail(sender, recipients, msg.as_string())
+			
 
 	def rejection_alert(self,user):
 
