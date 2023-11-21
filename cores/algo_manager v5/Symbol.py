@@ -92,7 +92,10 @@ class Symbol:
 		self.total_expected = 0
 
 
+		self.rejections = {}
+
 		"""
+
 
 		"""
 		self.expected = 0
@@ -719,6 +722,9 @@ class Symbol:
 
 	def rejection_message(self,side):
 
+		now = datetime.now()
+		timestamp = now.hour*60 + now.minute 
+
 		## iterate through all the TPs request. check who is requesting. if it is not running withdraw and cancel it. 
 		
 		if side == "Long":
@@ -728,9 +734,33 @@ class Symbol:
 
 		tps = list(self.tradingplans.keys())
 
+		#### FOR THE TP TRYING TO START THE POSITION. IGNORE. 
 		for tp in tps:
 			if self.tradingplans[tp].having_request(self.symbol_name) and self.tradingplans[tp].get_holdings(self.symbol_name)==0:
 		 		self.tradingplans[tp].rejection_handling(self.symbol_name)
+
+		####### BUT IF IT IS DISCREPANCY? ##### ADD IT TO THE TP.  OR IGNORE? ####
+
+
+		if timestamp not sin self.rejections:
+			self.rejections[timestamp] = 1 
+		else:
+			self.rejections[timestamp] +=1
+
+		if self.rejections[timestamp] >=3:
+
+			### all tp as is.
+			tps = list(self.tradingplans.keys())
+
+			#### FOR THE TP TRYING TO START THE POSITION. IGNORE. 
+			for tp in tps:
+				if self.tradingplans[tp].having_request(self.symbol_name) and self.tradingplans[tp].get_holdings(self.symbol_name)!=0::
+					self.tradingplans[tp].algo_as_is()
+					
+			### discrepancy added. 
+
+
+
 
 	def cancel_all(self):
 
@@ -788,7 +818,6 @@ class Symbol:
 
 			### Construct a share_difference with avg price. 
 
-
 			# LOADING MORE
 			if abs(self.current_shares) > abs(self.previous_shares):
 
@@ -823,62 +852,3 @@ class Symbol:
 
 	def ppro_flatten(self):
 		self.ppro_out.send([FLATTEN,self.symbol_name])
-# def holdings_update(self,price,share):
-
-# 	with self.incoming_shares_lock:
-
-# 		if price not in self.incoming_shares:
-
-# 			self.incoming_shares[price] = share
-# 		else:
-# 			self.incoming_shares[price] += share
-
-		
-# 	#log_print("holding update - releasing lock")
-# 	log_print("Symbol",self.symbol_name," holding update:",price,share)
-# 	self.holding_update = True 
-
-# 	hold_fill = threading.Thread(target=self.holdings_fill,daemon=True)
-# 	hold_fill.start()
-
-# def holdings_fill(self):
-
-# 	if not self.fill_lock.locked():
-# 		with self.fill_lock:
-# global wait_timer
-# global d 
-# wait_timer = 0
-# incoming_shares_lock = threading.Lock()
-# d = []
-
-# def incoming(x):
-
-# 	d.append(x)
-# 	hold_fill = threading.Thread(target=holdings_fill,daemon=True)
-# 	hold_fill.start()
-
-# def holdings_fill():
-
-# 	global wait_timer	
-# 	global d
-# 	if not incoming_shares_lock.locked():
-# 		with incoming_shares_lock:
-
-# 			time.sleep(0.1)# wait default time.
-
-# 			while wait_timer>0:
-# 				time.sleep(0.1)
-# 				wait_timer-=0.1
-# 			#goal: end needs to be printed.
-
-# 			print(d)
-# 			d=[]
-# 	else:
-# 		wait_timer+=0.1
-
-# for i in range(5):
-
-# 	incoming(i)
-# 	time.sleep(0.08)
-
-# time.sleep(5)
