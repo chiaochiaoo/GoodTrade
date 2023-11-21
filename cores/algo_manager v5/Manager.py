@@ -540,7 +540,7 @@ class Manager:
 
 		MOO_exit_timer = 567*60 #ts+19 #
 		MOO_exit = False 
-
+ 
 
 		Moo_enter_timer =567*60+20  #ts+20
 		Moo_enter = False 
