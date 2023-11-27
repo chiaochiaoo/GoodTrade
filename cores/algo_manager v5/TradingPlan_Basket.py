@@ -85,6 +85,7 @@ class TradingPlan_Basket:
 		if "Mooin" in info:
 			self.inspectable = False 
 
+		self.timer = 999
 		if "Timer" in info:
 			self.timer = int(info["Timer"])
 
@@ -835,8 +836,8 @@ class TradingPlan_Basket:
 		# 	log_print(self.source,"PNL checking",self.algo_name,check,total_unreal,self.current_shares, self.average_price)
 		
 
-		if ts>=self.timer:
-			log_print(self.source,self.algo_name,"TIME IS UP")
+		if ts>=self.timer and self.flatten_order!=True:
+			log_print(self.source,self.algo_name,"TIME IS UP",ts,self.timer)
 			self.flatten_cmd()
 
 		if self.profit!=0 and self.manually_added==False and self.flatten_order!=True:
