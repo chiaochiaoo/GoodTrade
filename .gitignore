@@ -26,3 +26,5 @@ algo_records/
 *.bkp
 *.json
 tnv_viewer/test.py
+tools/Realtime_Stocks_Eval/logs_server/
+custom_algos_config/CoreyAlgos_setting.json

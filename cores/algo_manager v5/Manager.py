@@ -127,7 +127,9 @@ class Manager:
 		self.symbols_short = {}
 		self.symbol_data = {}
 
+
 		self.baskets = {}
+		self.baskets_lock = threading.Lock()
 
 		self.bad_symbols = []
 
@@ -368,39 +370,6 @@ class Manager:
 			log_print("Manager: previous symbols inspection not finished. skip.")
 
 
-	# def moo_apply_basket_cmd(self,basket_name,orders,risk,aggresive,info):
-
-	# 	if basket_name not in self.baskets:
-
-	# 		if self.ui.basket_label_count<self.algo_limit:
-	# 			self.baskets[basket_name] = TradingPlan_Basket(basket_name,risk,self,info)
-	# 			self.ui.create_new_single_entry(self.baskets[basket_name],"Basket",None)
-
-	# 			self.baskets[basket_name].deploy()
-		
-	# 			c = 0 
-
-	# 			total_orders = {}
-
-	# 			with self.moo_lock:
-	# 				for symbol,share in orders.items():
-						
-	# 					if symbol not in self.moo_orders:
-	# 						self.moo_orders[symbol] = share 
-	# 					else:
-	# 						self.moo_orders[symbol] += share 
-
-	# 				self.moo_algos[basket_name] = [basket_name,orders,risk,aggresive,info]
-	# 				#self.moo_algos.append([basket_name,orders,risk,aggresive,info])
-
-	# 			for symbol,value in orders.items():
-	# 				if symbol not in self.symbol_data:
-	# 					self.symbol_data[symbol] = Symbol(self,symbol,self.pipe_ppro_out)  #register in Symbol.
-	# 					self.symbols.append(symbol)
-	# 					self.symbols_short[symbol[:-3]] = symbol
-
-	# 				self.baskets[basket_name].register_symbol(symbol,self.symbol_data[symbol])
-
 	def algo_as_is(self,algo_name):
 
 		if algo_name in self.baskets:
@@ -571,9 +540,9 @@ class Manager:
 
 		MOO_exit_timer = 567*60 #ts+19 #
 		MOO_exit = False 
+ 
 
-
-		Moo_enter_timer =566*60  #ts+20
+		Moo_enter_timer =567*60+20  #ts+20
 		Moo_enter = False 
 
 
@@ -604,9 +573,10 @@ class Manager:
 
 			if ts>=MOO_as_is and MOO_as_is_exit==False :
 
-				for name,basket in self.baskets.items():
-					if "IMB" in name:
-						self.algo_as_is(name)
+				with self.baskets_lock:
+					for name,basket in self.baskets.items():
+						if "IMB" in name:
+							self.algo_as_is(name)
 				# for any basket has name IMB. as is. 
 				MOO_as_is_exit= True 
 
@@ -645,8 +615,10 @@ class Manager:
 
 				### ALL INSPECTION NOW TURN ON.
 				log_print("Timer: pair timer initiated")
-				for trade in list(self.baskets.values()):
-					trade.turn_on_inspection()
+
+				with self.baskets_lock:
+					for trade in list(self.baskets.values()):
+						trade.turn_on_inspection()
 
 				MOO_pair = True 
 			if ts>=MOC_send_out_timer and moc_release==False:
@@ -707,59 +679,14 @@ class Manager:
 
 				moc_release=True
 
-				# 	#reduce_everything_by_half_ta
-
-				# 	if self.ta_moc.get()==False:
-				# 		total_moc = self.current_positions
-
-				# 	else:
-
-				# 		total_moc = {}
-
-				# 		for trade in list(self.baskets.values()):
-				# 			trade.reduce_everything_by_half_ta(60,0.5)
-
-
-				# 		for symbol,data in self.symbol_data.items():
-				# 			total_moc[symbol] = [symbol,data.get_all_future_remaining()]
-
-				# 		log_print(total_moc)
-
-				# 		## all symbols call get_all_future_remaining
-				# 		## all tps call half
-
-				# 		#reduce_everything_by_half_ta(self,timetakes,percentage)
-
-				# 	for name,basket in self.baskets.items():
-				# 		self.algo_as_is(name)
-						
-				# 	for ticker in total_moc.keys():
-				# 		share = total_moc[ticker][1]
-
-				# 		if ticker[-2:]=="NY":
-				# 			if share<0:
-				# 				reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ROSN Buy RosenblattDQuoteClose MOC DAY&shares="+str(abs(share))
-				# 			elif share>0:
-				# 				reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ROSN Sell->Short RosenblattDQuoteClose MOC DAY&shares="+str(share)
-				# 		else:
-				# 			if share<0:
-				# 				reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Buy ARCX MOC DAY&shares="+str(abs(share))
-				# 			elif share>0:
-				# 				reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Sell->Short ARCX MOC DAY&shares="+str(share)
-
-				# 		log_print("Sending" ,reque)
-				# 		req = threading.Thread(target=request, args=(reque,),daemon=True)
-				# 		req.start()
-
-				# moc_release=True
 
 			if ts>=MOC_1559_timer and MOC_1559 == False and self.moc_1559.get():
 
 				## reduce by 1/3 
 
-				for trade in list(self.baskets.values()):
-					trade.reduce_one_third_aggresive()
-
+				with self.baskets_lock:
+					for trade in list(self.baskets.values()):
+						trade.reduce_one_third_aggresive()
 
 				MOC_1559 = True 
 
@@ -998,17 +925,19 @@ class Manager:
 		#### if all green. then good to go ###
 
 		try:
-			if self.ui.user.get()!="DISCONNECTED" and self.ui.ppro_api_status.get()==CONNECTED and self.ui.file_last_update.get()==CONNECTED:
+			if self.ui.user.get()!="DISCONNECTED" and self.ui.ppro_api_status.get()==CONNECTED :
 
+				# and self.ui.file_last_update.get()==CONNECTED
 				# GOOD TO GO.
 				self.ui.system_status_text.set("READY")
 				self.ui.system_status['bg'] = 'lightgreen'
 				#log_print("System all green")
 
-				if self.system_enable==False:
-
-					self.online_alert()
 				self.system_enable = True 
+
+				if self.system_enable==False:
+					self.online_alert()
+				
 				
 			else:
 
@@ -1016,10 +945,12 @@ class Manager:
 				self.ui.system_status['bg'] = 'red'
 				self.ui.system_status.flash()
 
+				self.system_enable = False 
+
 				if self.system_enable:
 					self.disconnection_alert()
 				## if . send me an email.
-				self.system_enable = False 
+				
 		except Exception as e:
 			PrintException(e,"System_check error:")
 
@@ -1411,6 +1342,7 @@ class Manager:
 
 	def send_email_admin(self,subject,body):
 
+
 		sender = 'algomanagertnv@gmail.com'
 		password = 'myvjbplswvsvktau'
 		recipients = ['chiao@selectvantage.com']
@@ -1419,9 +1351,16 @@ class Manager:
 		msg['Subject'] = subject
 		msg['From'] = sender
 		msg['To'] = ', '.join(recipients)
-		with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
-		   smtp_server.login(sender, password)
-		   smtp_server.sendmail(sender, recipients, msg.as_string())
+
+
+		return 
+
+		try:
+			with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
+			   smtp_server.login(sender, password)
+			   smtp_server.sendmail(sender, recipients, msg.as_string())
+		except Exception as e:
+			print(e)
 
 	def rejection_alert(self,user):
 
@@ -1446,6 +1385,8 @@ class Manager:
 
 		if "COREYKIN" in user:
 			recipients.append("corey@selectvantage.com")
+
+		return 
 
 		msg = MIMEText(body)
 		msg['Subject'] = subject
