@@ -85,6 +85,9 @@ class TradingPlan_Basket:
 		if "Mooin" in info:
 			self.inspectable = False 
 
+		if "Timer" in info:
+			self.timer = int(info["Timer"])
+
 		self.sliperage_control = False 
 		self.spread_limit = 0
 
@@ -803,8 +806,8 @@ class TradingPlan_Basket:
 		PNL, STOP TRIGGER.  ONLY CHECK EVERY 3 SECONDS 
 		"""
 
-		#now = datetime.now()
-		#ts = now.hour*3600 + now.minute*60+ now.second
+		now = datetime.now()
+		ts = now.hour*60 + now.minute
 
 		total_unreal = 0
 
@@ -831,6 +834,11 @@ class TradingPlan_Basket:
 		# if self.display_count %3==0:
 		# 	log_print(self.source,"PNL checking",self.algo_name,check,total_unreal,self.current_shares, self.average_price)
 		
+
+		if ts>=self.timer:
+			log_print(self.source,self.algo_name,"TIME IS UP")
+			self.flatten_cmd()
+
 		if self.profit!=0 and self.manually_added==False and self.flatten_order!=True:
 
 			# if total_unreal>self.profit :
@@ -884,6 +892,7 @@ class TradingPlan_Basket:
 				self.break_even = True 
 				self.stop = 0.1
 				log_print(self.source,self.algo_name,"BREAK EVEN")
+
 
 
 		self.data[UNREAL] = round(total_unreal,2)
