@@ -109,6 +109,7 @@ class Manager:
 
 		self.system_enable = False 
 
+		self.email_error = 0
 
 		self.pipe_ppro_in = ppro_in
 		self.pipe_ppro_out = ppro_out
@@ -1033,7 +1034,7 @@ class Manager:
 						rec = threading.Thread(target=self.record_update,daemon=True)
 						rec.start()
 
-					if count%180==0:
+					if count%300==0:
 
 						self.periodical_status()
 
@@ -1217,39 +1218,6 @@ class Manager:
 			except	Exception	as e:
 				PrintException("Updating prices error",e)
 
-	# def get_symbol_price(self):
-
-
-	# 	### GET THE NEWEST . THEN UPDATE IT ###
-
-	# 	try:
-	# 		with self.get_price_lock:
-
-	# 			symbols = list(self.symbols_short.keys())
-
-	# 			if len(symbols)>0:
-	# 				s = ''
-	# 				for i in symbols:
-	# 					s+=i+','
-	# 				s=s[:-1]
-
-	# 				b = "https://financialmodelingprep.com/api/v3/quote-short/"+s+"?apikey=a901e6d3dd9c97c657d40a2701374d2a"
-
-	# 				res=requests.get(b)
-	# 				d= json.loads(res.text)
-
-	# 				x = {}
-	# 				for i in d:
-	# 					x[i['symbol']] = i['price']
-
-	# 				for symbol,price in x.items():
-
-	# 					if symbol in self.symbols_short:
-	# 						self.symbol_data[self.symbols_short[symbol]].update_price(price,0)
-
-	# 				#log_print("Manager: price update complete.. symbols:",len(symbols),x,symbol,self.symbols_short[symbol],self.symbol_data[self.symbols_short[symbol]].get_bid())
-	# 	except	Exception	as e:
-	# 		PrintException("Updating prices error",e)
 
 	def get_position(self,ticker):
 
@@ -1342,6 +1310,8 @@ class Manager:
 
 	def send_email_admin(self,subject,body):
 
+		if self.email_error>5:
+			return 
 
 		sender = 'algomanagertnv@gmail.com'
 		password = 'myvjbplswvsvktau'
@@ -1353,13 +1323,13 @@ class Manager:
 		msg['To'] = ', '.join(recipients)
 
 
-		return 
-
 		try:
 			with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
 			   smtp_server.login(sender, password)
 			   smtp_server.sendmail(sender, recipients, msg.as_string())
 		except Exception as e:
+
+			self.email_error +=1
 			print(e)
 
 	def rejection_alert(self,user):
@@ -1376,6 +1346,8 @@ class Manager:
 
 	def send_email_all(self,subject,body):
 
+		if self.email_error>5:
+			return 
 		sender = 'algomanagertnv@gmail.com'
 		password = 'myvjbplswvsvktau'
 		recipients = ['chiao@selectvantage.com','andrew@selectvantage.com','zenvoidsun@gmail.com']
@@ -1386,15 +1358,21 @@ class Manager:
 		if "COREYKIN" in user:
 			recipients.append("corey@selectvantage.com")
 
-		return 
+		 
 
 		msg = MIMEText(body)
 		msg['Subject'] = subject
 		msg['From'] = sender
 		msg['To'] = ', '.join(recipients)
-		with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
-		   smtp_server.login(sender, password)
-		   smtp_server.sendmail(sender, recipients, msg.as_string())
+
+
+		try:
+			with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
+			   smtp_server.login(sender, password)
+			   smtp_server.sendmail(sender, recipients, msg.as_string())
+		except Exception as e:
+			self.email_error +=1
+			print(e)
 
 	def deselect_all(self):
 		for d in self.tradingplan.values():
