@@ -934,10 +934,12 @@ class Manager:
 				self.ui.system_status['bg'] = 'lightgreen'
 				#log_print("System all green")
 
-				self.system_enable = True 
+				
 
 				if self.system_enable==False:
 					self.online_alert()
+
+					self.system_enable = True 
 				
 				
 			else:
@@ -946,10 +948,11 @@ class Manager:
 				self.ui.system_status['bg'] = 'red'
 				self.ui.system_status.flash()
 
-				self.system_enable = False 
+				
 
 				if self.system_enable:
 					self.disconnection_alert()
+					self.system_enable = False 
 				## if . send me an email.
 				
 		except Exception as e:
@@ -1304,7 +1307,7 @@ class Manager:
 
 		user = self.ui.user.get()
 		subject = "Connection:"+user
-		body = "Connection.\n" +self.stringfy(self.current_positions)  + self.stringfy(self.current_summary)
+		body = "Connection.\n" +self.stringfy(self.current_positions)  + self.stringfy(self.current_summary) + "\n" +self.stringfy(self.monthly_record) +"\n"+self.stringfy(self.total_record)
 
 		self.send_email_admin(subject,body)
 
