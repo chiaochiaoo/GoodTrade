@@ -654,7 +654,7 @@ total['symbols'] = list(set(total['symbols']))
 total['algos'] = []
 
 
-total['symbols'] =["SPY","QQQ","AAPL"]
+#total['symbols'] =["SPY","QQQ","AAPL"]
 print(total["symbols"])
 servers= [total]
 
