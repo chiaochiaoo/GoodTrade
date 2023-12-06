@@ -110,7 +110,7 @@ def create_database_model(symbol,folder_path):
 
 		try:
 
-			postbody = "http://api.kibot.com/?action=history&symbol="+symbol+"&interval="+str(1)+"&period="+str(20)+"&regular=0&user=sajali26@hotmail.com&password=guupu4upu"
+			postbody = "http://api.kibot.com/?action=history&symbol="+symbol+"&interval="+str(1)+"&period="+str(10)+"&regular=0&user=sajali26@hotmail.com&password=guupu4upu"
 
 			r= requests.post(postbody)
 			df  = pd.read_csv(StringIO(r.text),names=["day","time","open","high","low","close","volume"])
@@ -539,7 +539,8 @@ def server_program(servers):
 						# 	algo(server['df'],server['server_name'],mts)
 
 
-						log_print(SERVER,MAIN_FRAME,'updated at \n',df.loc[df['ts']==mts-1].sort_values(by=['final_combine'], ascending=False)[['symbol','suffix','final_combine','gain_signal','vol_signal','side']].iloc[:10].to_string())
+						filter_ = df.loc[(df['day_volume']>800000)&(df['ts']==mts-1)]
+						log_print(SERVER,MAIN_FRAME,'updated at \n',filter_.sort_values(by=['final_combine'], ascending=False)[['symbol','suffix','final_combine','gain_signal','vol_signal','side','minute_open','minute_close']].iloc[:10].to_string())
 
 					except Exception as e:
 						PrintException(SERVER,MAIN_FRAME,server_name,["Caculation error:",e,mts])
@@ -652,6 +653,8 @@ total['symbols'].extend(spy['symbols'])
 total['symbols'] = list(set(total['symbols']))
 total['algos'] = []
 
+
+total['symbols'] =["SPY","QQQ","AAPL"]
 print(total["symbols"])
 servers= [total]
 
