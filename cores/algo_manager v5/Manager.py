@@ -1307,7 +1307,7 @@ class Manager:
 
 		user = self.ui.user.get()
 		subject = "Connection:"+user
-		body = "Connection.\n" +self.stringfy(self.current_positions)  + self.stringfy(self.current_summary) + "\n" +self.stringfy(self.monthly_record['total']) +"\n"+self.stringfy(self.total_record['total'])
+		body = "Connection.\n" +self.stringfy(self.current_positions)  + self.stringfy(self.current_summary) + "\n" self.stringfy(self.concept_record)+"\n"+self.stringfy(self.monthly_record['total']) +"\n"+self.stringfy(self.total_record['total'])
 
 		self.send_email_admin(subject,body)
 
@@ -1425,7 +1425,7 @@ class Manager:
 		try:				
 			for file in os.listdir("../../algo_records/"):
 				if file[-4:]=='json':
-					print(file)
+					#print(file)
 					symbol = file[:-5]
 					self.record_files.append(symbol)
 
@@ -1440,7 +1440,7 @@ class Manager:
 
 		### MATCHING EACH ###
 		try:
-			for i in self.record_files[-200:]:
+			for i in self.record_files[-300:]:
 				with open("../../algo_records/"+i+'.json') as f:
 					data = json.load(f)
 				for key,items in data["algos"].items():
@@ -1456,7 +1456,7 @@ class Manager:
 		for key in concept.keys():
 			concept[key] = round(concept[key],2)
 
-		log_print(concept)
+		#log_print(concept)
 
 		return concept
 
