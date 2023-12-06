@@ -1453,9 +1453,11 @@ class Manager:
 
 				month = i[:7]
 				if month not in monthly:
-					monthly[month] = data["total"]["unrealizedPlusNet"]
+					if "total" in data:
+							monthly[month] = data["total"]["unrealizedPlusNet"]
 				else:
-					monthly[month] += data["total"]["unrealizedPlusNet"]
+					if "total" in data:
+							monthly[month] += data["total"]["unrealizedPlusNet"]
 						
 		except	Exception	as e:
 			PrintException(e,"take_records error")   
