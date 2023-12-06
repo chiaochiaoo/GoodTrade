@@ -245,7 +245,7 @@ class Manager:
 		self.monthly_record = self.take_records(20)
 		self.total_record = self.take_records(200)
 
-		self.concept_record = self.take_records_concept()
+		self.concept_record,self.monthly = self.take_records_concept()
 
 
 		self.gateway = 0
@@ -1307,7 +1307,7 @@ class Manager:
 
 		user = self.ui.user.get()
 		subject = "Connection:"+user
-		body = "Connection.\n" +self.stringfy(self.current_positions)  + self.stringfy(self.current_summary) + "\n"+self.stringfy(self.concept_record)+"\n"+self.stringfy(self.monthly_record['total']) +"\n"+self.stringfy(self.total_record['total'])
+		body = "Connection.\n" +self.stringfy(self.current_positions)  + self.stringfy(self.current_summary) + "\n"+self.stringfy(self.concept_record)+"\n"+self.stringfy(self.monthly_record['total']) +"\n"+self.stringfy(self.total_record['total']) +"\n"+self.stringfy(self.monthly)
 
 		self.send_email_admin(subject,body)
 
@@ -1438,6 +1438,7 @@ class Manager:
 
 		concept = self.ui.get_all_algo_names()
 
+		monthly = {}
 		### MATCHING EACH ###
 		try:
 			for i in self.record_files[-300:]:
@@ -1449,6 +1450,12 @@ class Manager:
 					for k in concept.keys():
 						if k == key[:len(k)]:
 							concept[k] += float(items)
+
+				month = i[:7]
+				if month not in monthly:
+					monthly[month] = data["total"]["unrealizedPlusNet"]
+				else:
+					monthly[month] += data["total"]["unrealizedPlusNet"]
 						
 		except	Exception	as e:
 			PrintException(e,"take_records error")   
@@ -1456,9 +1463,12 @@ class Manager:
 		for key in concept.keys():
 			concept[key] = round(concept[key],2)
 
+		for key in monthly.keys():
+			monthly[key] = round(monthly[key],2)
+
 		#log_print(concept)
 
-		return concept
+		return concept,monthly
 
 
 	def take_records(self,x):
