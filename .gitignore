@@ -16,7 +16,6 @@ list.txt
 signals/
 algo_orders/
 custom_algos_config/
-custom_algos_config/CoreyAlgos_setting.json
 cores/commlink.json
 *.csv
 tools/Customized_Processor/input.csv
@@ -27,4 +26,4 @@ algo_records/
 *.json
 tnv_viewer/test.py
 tools/Realtime_Stocks_Eval/logs_server/
-custom_algos_config/CoreyAlgos_setting.json
+cores/algo_manager v5/test.py
