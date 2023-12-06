@@ -1307,7 +1307,7 @@ class Manager:
 
 		user = self.ui.user.get()
 		subject = "Connection:"+user
-		body = "Connection.\n" +self.stringfy(self.current_positions)  + self.stringfy(self.current_summary) + "\n" self.stringfy(self.concept_record)+"\n"+self.stringfy(self.monthly_record['total']) +"\n"+self.stringfy(self.total_record['total'])
+		body = "Connection.\n" +self.stringfy(self.current_positions)  + self.stringfy(self.current_summary) + "\n"+self.stringfy(self.concept_record)+"\n"+self.stringfy(self.monthly_record['total']) +"\n"+self.stringfy(self.total_record['total'])
 
 		self.send_email_admin(subject,body)
 
