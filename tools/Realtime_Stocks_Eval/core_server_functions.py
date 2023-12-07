@@ -539,7 +539,7 @@ def server_program(servers):
 						# 	algo(server['df'],server['server_name'],mts)
 
 
-						filter_ = df.loc[(df['day_volume']>800000)&(df['ts']==mts)]
+						filter_ = df.loc[(df['day_volume']>800000)&(df['ts']==mts)&(df['final_combine']>3)&(df['gain_signal']>2)]
 						log_print(SERVER,MAIN_FRAME,'updated at \n',filter_.sort_values(by=['final_combine'], ascending=False)[['symbol','suffix','final_combine','gain_signal','vol_signal','side','minute_open','minute_close']].iloc[:10].to_string())
 
 					except Exception as e:
