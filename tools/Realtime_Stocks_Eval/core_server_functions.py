@@ -599,58 +599,17 @@ def database_program(name,df,symbols):
 	#### get the df ####
 	#### create folders. ###
 
-
-
-auth ="&auth=921716af-3aa9-47d9-b77c-8acb404639b5"
-url ="https://elite.finviz.com/export.ashx?v=111&f=idx_ndx|dji&o=ticker"+auth
-
-urlData = requests.get(url).content
-df = pd.read_csv(io.StringIO(urlData.decode('utf-8')))
-
-symbols = df['Ticker'].tolist()
-qqq = {}
-qqq['server_name']  = "QQQ"
-qqq['symbols'] = symbols
-qqq['algos'] = []
-
-time.sleep(2)
-
-auth ="&auth=921716af-3aa9-47d9-b77c-8acb404639b5"
-url ="https://elite.finviz.com/export.ashx?v=111&f=idx_sp500&o=ticker"+auth
-
-urlData = requests.get(url).content
-df = pd.read_csv(io.StringIO(urlData.decode('utf-8')))
-
-
-symbols = df['Ticker'].tolist()
-spy = {}
-spy['server_name']  = "SPY"
-spy['symbols'] = symbols
-spy['algos'] = []
-
-
-time.sleep(2)
-auth ="&auth=921716af-3aa9-47d9-b77c-8acb404639b5"
-url ="https://elite.finviz.com/export.ashx?v=111&f=cap_large,ind_stocksonly&o=ticker"+auth
-
-urlData = requests.get(url).content
-df = pd.read_csv(io.StringIO(urlData.decode('utf-8')))
-
-symbols = df['Ticker'].tolist()
-large = {}
-large['server_name']  = "Large"
-large['symbols'] = symbols
-large['algos'] = []
-
+symbols = []
+postbody = "https://financialmodelingprep.com/api/v3/sp500_constituent?apikey=a901e6d3dd9c97c657d40a2701374d2a"
+r= requests.get(postbody)
+d = json.loads(r.text)
+for i in d:
+  symbols.append(i['symbol'])
 
 total = {}
 total['server_name'] = "Server"
-total['symbols']  = []
-total['symbols'].extend(qqq['symbols'])
-total['symbols'].extend(spy['symbols'])
-# total['symbols'].extend(large['symbols'])
+total['symbols']  = symbols
 
-total['symbols'] = list(set(total['symbols']))
 total['algos'] = []
 
 
