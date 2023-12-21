@@ -163,6 +163,9 @@ class TradingPlan_Basket:
 		if "OB" == self.algo_name[:2]:
 			self.inspectable = False
 			self.one_shot_algo = True 
+		if "TE" == self.algo_name[:2]:
+			self.inspectable = False
+			self.one_shot_algo = True 
 		if "IMB_MOO" in self.algo_name:
 			self.manual_flattable = True 
 			self.one_shot_algo = True
