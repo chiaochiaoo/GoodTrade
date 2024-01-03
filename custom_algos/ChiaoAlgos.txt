@@ -12,7 +12,6 @@ NQCLOSE1
 NQCLOSE2
 GapRunL
 GapRunS
-OpenDump
 OpenReversal
 TNV_Model_ANDREW
 TNV_Model_CHIAO
