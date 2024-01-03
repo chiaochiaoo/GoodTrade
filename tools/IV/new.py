@@ -95,7 +95,7 @@ class processor:
 				if k>1 and self.registered==False:
 
 					force_close_port(4135)
-					postbody = "http://localhost:8080/SetOutput?region=1&feedtype=IMBALANCE&output=4135&status=on"
+					postbody = "http://localhost:8080/SetOutput?symbol=*.NQ,*.AM,*.NY&feedtype=IMBALANCE&output=4135&status=on"
 
 					try:
 						r= requests.post(postbody)
@@ -115,7 +115,7 @@ class processor:
 					self.registered=True
 
 				if k>5 and self.registered==True and self.termination==False:
-					postbody = "http://localhost:8080/SetOutput?region=1&feedtype=IMBALANCE&output=4135&status=on"
+					postbody =  "http://localhost:8080/SetOutput?symbol=*.NQ,*.AM,*.NY&feedtype=IMBALANCE&output=4135&status=on"
 
 					try:
 						r= requests.post(postbody)
@@ -189,6 +189,12 @@ def writer(receive_pipe):
 	nyse_long = []
 	nyse_short = []
 
+	nq_long = []
+	nq_short = []
+
+	already_sent_long = []
+	already_sent_short = []
+
 	lst  = ["LocalTime=",
 	"MarketTime=",
 	"Side=",
@@ -228,6 +234,9 @@ def writer(receive_pipe):
 	coefficient = 1
 
 	prev_time = 0
+
+	moo_release = False
+
 	with open(file, 'a+',newline='') as csvfile2:
 		writer = csv.writer(csvfile2)
 		writer.writerow(header)
@@ -256,12 +265,83 @@ def writer(receive_pipe):
 			try:
 				symbol = find_between(r,"Symbol=",",")
 				pair = float(find_between(r,"PairedVolume=",","))
+
+				price =  float(find_between(r,"AuctionPrice=",","))
+
 				size = float(find_between(r,"Volume=",","))
 				time_ = timestamp_seconds(find_between(r, "MarketTime=", ","))
 				side = find_between(r,"Side=",",")
 
-				if time_>57390 and time_< 57500 and symbol[-2:]=="NY":#57390
 
+
+				if time_>=33900 and time_ <= 33930 and symbol[-2:]=="NQ":
+
+					if size >250000:
+
+						#print(symbol,pair,size,side)
+
+						if side =="B":
+							if symbol not in nq_long and price>2:
+								print(time_,symbol,side,pair,size)
+								nq_long.append(symbol)
+						elif side =="S":
+							if symbol not in nq_short and price>2:
+								nq_short.append(symbol)
+								print(time_,symbol,side,pair,size)
+
+						name = "IMB_MOO_925L"
+						cmdstr =  "https://tnv.ngrok.io/Basket="+name+",Order=*"
+						added = False
+
+						if len(nq_long)>0:
+							for symbol in nq_long:
+								if symbol not in already_sent_long:
+									share = int(2000/price)
+
+									if share>1000:
+										share = 1000
+
+									if share<10:
+										share =10
+
+									cmdstr += symbol+":"+str(share)+","
+									already_sent_long.append(symbol)
+									added = True 
+
+						if added:
+							cmdstr= cmdstr[:-1]
+							cmdstr+="*"
+							print(cmdstr)
+							requests.get(cmdstr)
+							moo_release= True 
+
+						name = "IMB_MOO_925S"
+						cmdstr =  "https://tnv.ngrok.io/Basket="+name+",Order=*"
+						added = False
+						if len(nq_short)>0:
+							for symbol in nq_short:
+								if symbol not in already_sent_short:
+
+									share = int(2000/price)
+									if share>1000:
+										share = 1000
+									if share<10:
+										share = 10 
+										
+									cmdstr += symbol+":"+str(-1*share)+","
+									already_sent_short.append(symbol)
+									added = True 
+
+						if added:
+							cmdstr= cmdstr[:-1]
+							cmdstr+="*"
+							print(cmdstr)
+							requests.get(cmdstr)
+							moo_release= True 
+
+
+				if time_>57390 and time_< 57500 and symbol[-2:]=="NY":#57390
+					moo_release = False
 					if pair>1000000 or size >800000:
 
 						print(symbol,pair,size,side)
@@ -316,7 +396,7 @@ def running_mode(send_pipe):
 	try:
 		print("running mode starts ")
 
-		postbody = "http://localhost:8080/SetOutput?region=1&feedtype=IMBALANCE&output=4135&status=on"
+		postbody =  "http://localhost:8080/SetOutput?symbol=*.NQ,*.AM,*.NY&feedtype=IMBALANCE&output=4135&status=on"
 		r= requests.post(postbody)
 
 
