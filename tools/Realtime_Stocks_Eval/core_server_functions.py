@@ -39,7 +39,7 @@ global market
 market = {}
 
 
-pmr_timer = 900
+pmr_timer = 570
 
 def drop_columns(df,drops):
 
