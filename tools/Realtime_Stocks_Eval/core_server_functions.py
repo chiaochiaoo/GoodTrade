@@ -585,14 +585,17 @@ def grab_pmb_hl(symbol):
 
   d = json.loads(r.text)
 
-  h = d['results'][-1]['h']
-  l = d['results'][-1]['l']
-  for i in d['results'][-4:]:
-    if i['h'] > h:
-      h = i['h']
-    if i['l'] < l:
-      l = i['l']
-
+  try:
+	  h = d['results'][-1]['h']
+	  l = d['results'][-1]['l']
+	  for i in d['results'][-4:]:
+	    if i['h'] > h:
+	      h = i['h']
+	    if i['l'] < l:
+	      l = i['l']
+  except:
+  	print(r.text)
+  	h,l =0,0
   return h,l
 
 def database_program(name,df,symbols):
@@ -657,6 +660,12 @@ total['server_name'] = "Server"
 total['symbols']  = symbols
 
 total['algos'] = []
+
+
+
+for s in symbols:
+
+	print(s,grab_pmb_hl(s))
 
 
 #total['symbols'] =["SPY","QQQ","AAPL"]
