@@ -169,6 +169,11 @@ class TradingPlan_Basket:
 		if "IMB_MOO" in self.algo_name:
 			self.manual_flattable = True 
 			self.one_shot_algo = True
+		if "MO_" in self.algo_name:
+			self.manual_flattable = True 
+			self.one_shot_algo = True
+
+
 		log_print(self.source," Initializing:, Manual flattable:",self.manual_flattable," Inspectable:",self.inspectable)
 
 	def init_data(self,risk):
