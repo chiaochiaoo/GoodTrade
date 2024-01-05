@@ -132,6 +132,8 @@ class Manager:
 		self.baskets = {}
 		self.baskets_lock = threading.Lock()
 
+		self.get_symbol_price_lock = threading.Lock()
+
 		self.bad_symbols = []
 
 		self.rejected_symbols = []
@@ -1181,45 +1183,46 @@ class Manager:
 
 		### GET THE NEWEST . THEN UPDATE IT ###
 
-		now = datetime.now()
-		sts = now.hour*3600 + now.minute*60 + now.second 
+		with self.get_symbol_price_lock:
+			now = datetime.now()
+			sts = now.hour*3600 + now.minute*60 + now.second 
 
 
-		if sts>self.last_price_ts+2:
-			try:
-				with self.get_price_lock:
+			if sts>self.last_price_ts+2:
+				try:
+					with self.get_price_lock:
 
-					r = "https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?include_otc=false&apiKey=ezY3uX1jsxve3yZIbw2IjbNi5X7uhp1H"
+						r = "https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?include_otc=false&apiKey=ezY3uX1jsxve3yZIbw2IjbNi5X7uhp1H"
 
-					r = requests.get(r)
-					# print(r.text)
+						r = requests.get(r)
+						# print(r.text)
 
-					d = json.loads(r.text)
+						d = json.loads(r.text)
 
-					symbols = list(self.symbols_short.keys())
-					cur_ts = 0 
-					for i in d['tickers']:
-						if i['ticker'] in symbols:
-					
-							last_price = i['lastTrade']['p']
-							bid = i['lastQuote']['p']
-							ask = i['lastQuote']['P']
-							ts = int(str(i['updated'])[:10])
+						symbols = list(self.symbols_short.keys())
+						cur_ts = 0 
+						for i in d['tickers']:
+							if i['ticker'] in symbols:
+						
+								last_price = i['lastTrade']['p']
+								bid = i['lastQuote']['p']
+								ask = i['lastQuote']['P']
+								ts = int(str(i['updated'])[:10])
 
-							if ts>cur_ts:
-								cur_ts = ts
-							self.symbol_data[self.symbols_short[i['ticker']]].update_price(last_price,bid,ask,ts)
+								if ts>cur_ts:
+									cur_ts = ts
+								self.symbol_data[self.symbols_short[i['ticker']]].update_price(last_price,bid,ask,ts)
 
-						spread = i['lastQuote']['P']-i['lastQuote']['p']
-						self.spread_check[i['ticker']] = spread
-					self.real_time_ts
+							spread = i['lastQuote']['P']-i['lastQuote']['p']
+							self.spread_check[i['ticker']] = spread
+						self.real_time_ts
 
-					self.real_time_ts = cur_ts
-					self.last_price_ts = sts 
-					#log_print("Price update complete.")				
-						#log_print("Manager: price update complete.. symbols:",len(symbols),x,symbol,self.symbols_short[symbol],self.symbol_data[self.symbols_short[symbol]].get_bid())
-			except	Exception	as e:
-				PrintException("Updating prices error",e)
+						self.real_time_ts = cur_ts
+						self.last_price_ts = sts 
+						#log_print("Price update complete.")				
+							#log_print("Manager: price update complete.. symbols:",len(symbols),x,symbol,self.symbols_short[symbol],self.symbol_data[self.symbols_short[symbol]].get_bid())
+				except	Exception	as e:
+					PrintException("Updating prices error",e)
 
 
 	def get_position(self,ticker):
