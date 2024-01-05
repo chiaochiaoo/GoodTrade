@@ -39,6 +39,8 @@ global market
 market = {}
 
 
+pmr_timer = 900
+
 def drop_columns(df,drops):
 
 	drop = []
@@ -152,6 +154,14 @@ def create_database_model(symbol,folder_path):
 			d['atr'] = atr 
 			d['db_processed'] = 1
 
+
+			h,l = grab_pmb_hl(symbol)
+
+			d['pm_high'] = h
+			d['pm_low'] = l
+
+
+			print(symbol,d)
 			with open(folder_path+'/'+symbol+'.json', 'w') as file:
 				json.dump(d, file)
 
@@ -209,7 +219,7 @@ def init_asset_server(name,symbols):
 
 	today = date.today()
 
-	keys = ['symbol','ts','day_open','day_current','day_high','day_low','day_volume']
+	keys = ['symbol','ts','day_open','day_current','day_high','day_low','day_volume','pm_high','pm_low','pm_range']
 
 	keys.extend(['log_gain','vol_gain','minute_open','minute_close','minute_high','minute_low','minute_volume','minute_update'])
 	keys.extend(['db_processed','relv','average_gain_1m','average_volume_1m','atr'])
@@ -488,6 +498,12 @@ def server_program(servers):
 						df.loc[index,'minute_low'] = minute_low
 						df.loc[index,'minute_volume'] = minute_volume
 
+						if mts<pmr_timer:
+
+							# df.loc[index,'pm_high'] = day_high 
+							# df.loc[index,'pm_low'] = day_low
+							df.loc[index,'pm_range'] = (df.loc[index,'minute_close']-df.loc[index,'pm_low'])/(df.loc[index,'pm_high'] -df.loc[index,'pm_low'])
+
 						try:
 							# VOL GAIN
 							all_last_minute = df.loc[(df['ts']==mts-1)&(df['day_volume']!=0)].index
@@ -542,6 +558,12 @@ def server_program(servers):
 						filter_ = df.loc[(df['day_volume']>800000)&(df['ts']==mts)&(df['final_combine']>3)&(df['gain_signal']>1)]
 						log_print(SERVER,MAIN_FRAME,'updated at \n',filter_.sort_values(by=['final_combine'], ascending=False)[['symbol','suffix','final_combine','gain_signal','vol_signal','side','minute_open','minute_close']].iloc[:10].to_string())
 
+						cur_ = df.loc[df['ts']==mts]
+						if mts<pmr_timer:
+
+							log_print(SERVER,MAIN_FRAME,df.loc[index].to_string())
+							log_print(SERVER,MAIN_FRAME,"PMB top range:",cur_.sort_values(by=['final_combine'], ascending=False)[['symbol','suffix','pm_range','pm_high','pm_low','minute_open','minute_close']].iloc[:10].to_string())
+							log_print(SERVER,MAIN_FRAME,"PMB bot range:",cur_.sort_values(by=['final_combine'], ascending=True)[['symbol','suffix','pm_range','pm_high','pm_low','minute_open','minute_close']].iloc[:10].to_string())
 					except Exception as e:
 						PrintException(SERVER,MAIN_FRAME,server_name,["Caculation error:",e,mts])
 
@@ -552,6 +574,26 @@ def server_program(servers):
 		else:
 			time.sleep(1)
 
+def grab_pmb_hl(symbol):
+  today = date.today()
+  # print("Today's date:", today)
+
+  r = "https://api.polygon.io/v2/aggs/ticker/"+symbol+"/range/1/hour/"+str(today)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2000&apiKey=ezY3uX1jsxve3yZIbw2IjbNi5X7uhp1H"
+
+  r = requests.get(r)
+  # print(r.text)
+
+  d = json.loads(r.text)
+
+  h = d['results'][-1]['h']
+  l = d['results'][-1]['l']
+  for i in d['results'][-4:]:
+    if i['h'] > h:
+      h = i['h']
+    if i['l'] < l:
+      l = i['l']
+
+  return h,l
 
 def database_program(name,df,symbols):
 
@@ -581,6 +623,8 @@ def database_program(name,df,symbols):
 				log_print(SERVER,name,"Database:",symbol,c,"/",len(symbols))
 				d = create_database_model(symbol,folder_path)
 
+
+				print("!!!!!!!!!!!!!!!!!!!!",d)
 				for key,val in d.items():
 					df.loc[df['symbol']==d['symbol'],key] = val
 
@@ -600,11 +644,13 @@ def database_program(name,df,symbols):
 	#### create folders. ###
 
 symbols = []
-postbody = "https://financialmodelingprep.com/api/v3/sp500_constituent?apikey=a901e6d3dd9c97c657d40a2701374d2a"
-r= requests.get(postbody)
-d = json.loads(r.text)
-for i in d:
-  symbols.append(i['symbol'])
+
+symbols = ["AAPL"]
+# postbody = "https://financialmodelingprep.com/api/v3/sp500_constituent?apikey=a901e6d3dd9c97c657d40a2701374d2a"
+# r= requests.get(postbody)
+# d = json.loads(r.text)
+# for i in d:
+#   symbols.append(i['symbol'])
 
 total = {}
 total['server_name'] = "Server"
