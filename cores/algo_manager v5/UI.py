@@ -593,7 +593,7 @@ class UI(pannel):
 		spyuso = {"name":"SPYUSO","symbol":["SPY.AM","USO.AM"],"ratio":[1,-3],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		
 		spygdx = {"name":"GDXSPY","symbol":["GDX.AM","SPY.AM"],"ratio":[10,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		spyiwm = {"name":"GDXSPY","symbol":["SPY.AM","IWM.AM"],"ratio":[10,-12],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyiwm = {"name":"SPYIWM","symbol":["SPY.AM","IWM.AM"],"ratio":[10,-12],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 			
 		tlsaqqq = {"name":"TSLAQQQ","symbol":["TSLA.NQ","QQQ.NQ"],"ratio":[1,-2],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		smhqqq = {"name":"SMHQQQ","symbol":["SMH.NQ","QQQ.NQ"],"ratio":[17,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
