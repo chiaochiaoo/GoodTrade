@@ -226,33 +226,33 @@ class UI(pannel):
 		# tk.Entry(self.system_pannel,textvariable=self.user_phone,width=7).grid(sticky="w",column=2,row=row,padx=10)
 
 
-		row +=1
+		# row +=1
 
-		ttk.Label(self.system_pannel, text="TA-MOC:").grid(sticky="w",column=1,row=row,padx=10)
+		# ttk.Label(self.system_pannel, text="TA-MOC:").grid(sticky="w",column=1,row=row,padx=10)
 
-		try:
-			ttk.Checkbutton(self.system_pannel, variable=self.manager.ta_moc).grid(sticky="w",column=2,row=row)
-		except:
-			pass 
+		# try:
+		# 	ttk.Checkbutton(self.system_pannel, variable=self.manager.ta_moc).grid(sticky="w",column=2,row=row)
+		# except:
+		# 	pass 
 
 
-		row +=1
+		# row +=1
 
-		ttk.Label(self.system_pannel, text="1559-MOC:").grid(sticky="w",column=1,row=row,padx=10)
+		# ttk.Label(self.system_pannel, text="1559-MOC:").grid(sticky="w",column=1,row=row,padx=10)
 
-		try:
-			ttk.Checkbutton(self.system_pannel, variable=self.manager.ta_moc).grid(sticky="w",column=2,row=row)
-		except:
-			pass 
+		# try:
+		# 	ttk.Checkbutton(self.system_pannel, variable=self.manager.ta_moc).grid(sticky="w",column=2,row=row)
+		# except:
+		# 	pass 
 
-		row +=1
+		# row +=1
 
-		ttk.Label(self.system_pannel, text="1601-MOC:").grid(sticky="w",column=1,row=row,padx=10)
+		# ttk.Label(self.system_pannel, text="1601-MOC:").grid(sticky="w",column=1,row=row,padx=10)
 
-		try:
-			ttk.Checkbutton(self.system_pannel, variable=self.manager.ta_moc).grid(sticky="w",column=2,row=row)
-		except:
-			pass 
+		# try:
+		# 	ttk.Checkbutton(self.system_pannel, variable=self.manager.ta_moc).grid(sticky="w",column=2,row=row)
+		# except:
+		# 	pass 
 		# self.deconstruct = ttk.Button(self.system_pannel, text="Terminate GT",command=self.manager.terminateGT)#,command=self.deploy_all_stoporders)
 		# self.deconstruct.grid(sticky="w",column=1,row=5)
 
@@ -496,10 +496,10 @@ class UI(pannel):
 	def init_pannel(self):
 
 		self.sub_pannel = ttk.LabelFrame(self.root,text="") 
-		self.sub_pannel.place(x=0,y=220,height=950,width=350)
+		self.sub_pannel.place(x=0,y=180,height=950,width=350)
 
 		self.SUB_TAB = ttk.Notebook(self.sub_pannel)
-		self.SUB_TAB.place(x=0,rely=0.01,relheight=1,width=640)
+		self.SUB_TAB.place(x=0,rely=0.00,relheight=1,width=640)
 
 		self.quick_spread_pannel = ttk.LabelFrame(self.SUB_TAB,text="") 
 
@@ -513,7 +513,7 @@ class UI(pannel):
 		# self.TNV_TAB.place(x=0,rely=0.01,relheight=1,width=640)
 
 		self.system_pannel = ttk.LabelFrame(self.root,text="System")
-		self.system_pannel.place(x=10,y=10,height=230,width=350)
+		self.system_pannel.place(x=10,y=10,height=160,width=350)
 
 		self.control_pannel = ttk.LabelFrame(self.root,text="Control") 
 		self.control_pannel.place(x=360,y=10,height=50,width=300)
@@ -595,7 +595,7 @@ class UI(pannel):
 		spygdx = {"name":"GDXSPY","symbol":["GDX.AM","SPY.AM"],"ratio":[6,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		spyiwm = {"name":"SPYIWM","symbol":["SPY.AM","IWM.AM"],"ratio":[10,-12],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 			
-		tlsaqqq = {"name":"TSLAQQQ","symbol":["TSLA.NQ","QQQ.NQ"],"ratio":[1,-2],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		#tlsaqqq = {"name":"TSLAQQQ","symbol":["TSLA.NQ","QQQ.NQ"],"ratio":[1,-2],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		smhqqq = {"name":"SMHQQQ","symbol":["SMH.NQ","QQQ.NQ"],"ratio":[17,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 	
 		gdxgdxj = {"name":"GDXGDXJ","symbol":["GDX.AM","GDXJ.AM"],"ratio":[10,-7],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
@@ -608,7 +608,7 @@ class UI(pannel):
 		
 		arkkqqq = {"name":"ARKKQQQ","symbol":["ARKK.AM","QQQ.NQ"],"ratio":[4,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		
-		drivqqq = {"name":"DRIVQQQ","symbol":["DRIV.NQ","QQQ.NQ"],"ratio":[12,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		#drivqqq = {"name":"DRIVQQQ","symbol":["DRIV.NQ","QQQ.NQ"],"ratio":[12,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 
 		fxixpev = {"name":"FXIXPEV","symbol":["FXI.AM","XPEV.NQ"],"ratio":[2,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		
@@ -618,11 +618,11 @@ class UI(pannel):
 		spyxlu = {"name":"SPYXLU","symbol":["SPY.AM","XLU.AM"],"ratio":[10,-46],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		spyxly = {"name":"SPYXLY","symbol":["SPY.AM","XLY.AM"],"ratio":[10,-24],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 	
-		total = [spyqqq,gldslv,tlsaqqq,smhqqq,gdxgdxj]
+		#total = [spyqqq,gldslv,tlsaqqq,smhqqq,gdxgdxj]
 
 		spy = [spyqqq,spytlt,spyuso,spygdx,spyiwm]
 		etf = [spyxlk,spyxlc,spyxli,spyxlu,spyxly]
-		qqq = [tlsaqqq,smhqqq,xleqqq,arkkqqq,drivqqq]
+		qqq = [smhqqq,xleqqq,] #arkkqqq
 		gld = [gldslv,gdxgdxj,gdxgld,silslv]
 		misc =[fxixpev]
 
@@ -1373,7 +1373,6 @@ class UI(pannel):
 
 		for i in self.algo_groups:
 
-			#ttk.Label(self.frames[i], text="").grid(sticky="w",column=0,row=0)
 			row = 1
 			col = 0
 			for algo,item in self.algos[i].items():
@@ -1553,4 +1552,4 @@ if __name__ == '__main__':
 	UI(root)
 	# root.minsize(1600, 1000)
 	# root.maxsize(1800, 1200)
-	root.mainloop()
+	root.mainloop() 
