@@ -159,7 +159,9 @@ class TradingPlan_Basket:
 
 	def specific_initiation(self):
 
-
+		if "D2D" == self.algo_name[:3]:
+			self.inspectable = False
+			self.one_shot_algo = True 
 		if "OB" == self.algo_name[:2]:
 			self.inspectable = False
 			self.one_shot_algo = True 
