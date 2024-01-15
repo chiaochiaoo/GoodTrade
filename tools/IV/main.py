@@ -173,7 +173,7 @@ class processor:
 
 	def running_mode(self):
 
-		postbody = "http://localhost:8080/SetOutput?region=1&feedtype=IMBALANCE&output=4135&status=on"
+		postbody = "http://localhost:8080/SetOutput?symbol=*.NQ,*.AM,*.NY&feedtype=IMBALANCE&output=4135&status=on"
 		r= requests.post(postbody)
 
 		while r.status_code !=200:
