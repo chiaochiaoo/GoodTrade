@@ -1,7 +1,0 @@
-NB_QQQ
-NB_SPY
-NB_ETF
-NB_LargeCap
-NB_TEST
-FOM
-ODR
