@@ -1,4 +1,0 @@
-TICKHOLD
-TickClose
-TCV2
-QuickSpread
