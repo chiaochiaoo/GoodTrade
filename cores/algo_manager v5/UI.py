@@ -619,8 +619,8 @@ class UI(pannel):
 		spyxly = {"name":"SPYXLY","symbol":["SPY.AM","XLY.AM"],"ratio":[10,-24],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 	
 		#total = [spyqqq,gldslv,tlsaqqq,smhqqq,gdxgdxj]
-		AMDNVDA = {"name":"AMDNVDA","symbol":["AMD.NQ","NVDA.NQ"],"ratio":[3,-9],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		DISNFLX = {"name":"DISNFLX","symbol":["DIS.NY","NFLX.NQ"],"ratio":[5,-29],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		AMDNVDA = {"name":"AMDNVDA","symbol":["AMD.NQ","NVDA.NQ"],"ratio":[9,-3],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		DISNFLX = {"name":"DISNFLX","symbol":["DIS.NY","NFLX.NQ"],"ratio":[29,-5],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 	
 
 		spy = [spyqqq,spytlt,spyuso,spygdx,spyiwm]
