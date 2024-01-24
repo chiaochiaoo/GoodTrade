@@ -483,25 +483,39 @@ class Manager:
 
 	def send_moo(self,dic):
 		now = datetime.now()
-		ts = now.hour*60 + now.minute*60
+		ts = now.hour*60 + now.minute
 
 		with self.moo_lock:
 			for symbol,share in dic.items():
 				
 				share = int(share)
 				print("sending",symbol,share)
-
-				if ts<570:
+				c =0
+				if ts<571:
+					offset = 0.5 
 					if share<0:
-						if c%2==0:
-							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Sell->Short%20ARCX%20MOO%20OnOpen&shares="+str(abs(share))
+
+						if symbol[-2:]=="NQ":
+							reque =  "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+'&priceadjust='+str(offset)+'&ordername=NSDQ Sell->Short NSDQ LOO Far Regular OnOpen&shares='+str(abs(share))
 						else:
-							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Sell->Short NSDQ MOO Regular OnOpen&shares="+str(abs(share))
+							reque =  "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+'&priceadjust='+str(offset)+'&ordername=ARCA%20Sell->Short%20ARCX%20LOO%20Far%20OnOpen&shares='+str(abs(share))
+
 					else:
-						if c%2==0:
-							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Buy%20ARCX%20MOO%20OnOpen&shares="+str(share)
+
+						if symbol[-2:]=="NQ":
+							reque =  "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+'&priceadjust='+str(offset)+'&ordername=NSDQ Buy NSDQ LOO Far Regular OnOpen&shares='+str(abs(share))
 						else:
-							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Buy NSDQ MOO Regular OnOpen&shares="+str(share)
+							reque =  "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+'&priceadjust='+str(offset)+'&ordername=ARCA%20Buy%20ARCX%20LOO%20Far%20OnOpen&shares='+str(abs(share))
+										
+					# 	if c%2==0:
+					# 		#reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Sell->Short%20ARCX%20MOO%20OnOpen&shares="+str(abs(share))
+					# 	else:
+					# 		reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Sell->Short NSDQ MOO Regular OnOpen&shares="+str(abs(share))
+					# else:
+					# 	if c%2==0:
+					# 		reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Buy%20ARCX%20MOO%20OnOpen&shares="+str(share)
+					# 	else:
+					# 		reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Buy NSDQ MOO Regular OnOpen&shares="+str(share)
 					c+=1 
 
 					### TEST BLOCK. MARKET IN AND OUT.
@@ -511,14 +525,8 @@ class Manager:
 					else:
 						reque = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Buy ARCX Market DAY&shares='+str(share)
 
-				# with self.symbol_inspection_lock:
-				# 	for i in self.moo_algos.values():
 
-				# 		log_print("APPLYING MOO ALOGS:",i)
-				# 		basket_name,orders,risk,aggresive,info = i[0],i[1],i[2],i[3],i[4]
-						#self.apply_basket_cmd(basket_name,orders,risk,aggresive,info)
-
-				
+				print(symbol[-2:],reque)
 				req = threading.Thread(target=request, args=(reque,),daemon=True)
 				req.start() 
 
@@ -545,7 +553,7 @@ class Manager:
 		MOO_exit = False 
  
 
-		Moo_enter_timer =567*60+20  #ts+20
+		Moo_enter_timer =569*60+10  #ts+20
 		Moo_enter = False 
 
 
