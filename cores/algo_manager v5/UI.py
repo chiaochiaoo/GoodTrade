@@ -621,13 +621,14 @@ class UI(pannel):
 		#total = [spyqqq,gldslv,tlsaqqq,smhqqq,gdxgdxj]
 		AMDNVDA = {"name":"NVDAAMD","symbol":["NVDA.NQ","AMD.NQ"],"ratio":[3,-9],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		DISNFLX = {"name":"DISNFLX","symbol":["DIS.NY","NFLX.NQ"],"ratio":[29,-5],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		
+		JETSXLE = {"name":"JETSXLE","symbol":["JETS.AM","XLE.AM"],"ratio":[41,-12],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 	
-
 		spy = [spyqqq,spytlt,spyuso,spygdx,spyiwm]
 		etf = [spyxlk,spyxlc,spyxli,spyxlu,spyxly]
 		qqq = [smhqqq,xleqqq,] #arkkqqq
 		gld = [gldslv,gdxgdxj,gdxgld,silslv]
-		misc =[fxixpev,AMDNVDA,DISNFLX]
+		misc =[fxixpev,AMDNVDA,DISNFLX,JETSXLE]
 
 		total = [spy,qqq,gld,misc,etf]
 		
