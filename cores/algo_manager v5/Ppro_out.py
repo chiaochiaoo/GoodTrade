@@ -625,3 +625,14 @@ def cancel_stoporder(id_):
 
 
 # print(r.text)
+
+# symbol = "QQQ.NQ"
+# share = 1
+# offset = 0.5 
+# if share<0:
+# 	reque =  "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+'&priceadjust='+str(offset)+'&ordername=ARCA%20Sell->Short%20ARCX%20LOO%20Far%20OnOpen&shares='+str(abs(share))
+
+# else:
+# 	reque =  "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+'&priceadjust='+str(offset)+'&ordername=ARCA%20Buy%20ARCX%20LOO%20Far%20OnOpen&shares='+str(abs(share))
+# r = requests.post(reque)
+# print(r.text)

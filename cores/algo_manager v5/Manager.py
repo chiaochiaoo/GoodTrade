@@ -485,37 +485,38 @@ class Manager:
 		now = datetime.now()
 		ts = now.hour*60 + now.minute
 
+		c =0
+
 		with self.moo_lock:
 			for symbol,share in dic.items():
 				
 				share = int(share)
 				print("sending",symbol,share)
-				c =0
+
 				if ts<571:
 					offset = 0.5 
 					if share<0:
 
-						if symbol[-2:]=="NQ":
-							reque =  "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+'&priceadjust='+str(offset)+'&ordername=NSDQ Sell->Short NSDQ LOO Far Regular OnOpen&shares='+str(abs(share))
-						else:
-							reque =  "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+'&priceadjust='+str(offset)+'&ordername=ARCA%20Sell->Short%20ARCX%20LOO%20Far%20OnOpen&shares='+str(abs(share))
-
-					else:
-
-						if symbol[-2:]=="NQ":
-							reque =  "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+'&priceadjust='+str(offset)+'&ordername=NSDQ Buy NSDQ LOO Far Regular OnOpen&shares='+str(abs(share))
-						else:
-							reque =  "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+'&priceadjust='+str(offset)+'&ordername=ARCA%20Buy%20ARCX%20LOO%20Far%20OnOpen&shares='+str(abs(share))
-										
-					# 	if c%2==0:
-					# 		#reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Sell->Short%20ARCX%20MOO%20OnOpen&shares="+str(abs(share))
+					# 	if symbol[-2:]=="NQ":
+					# 		reque =  "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+'&priceadjust='+str(offset)+'&ordername=NSDQ Sell->Short NSDQ LOO Far Regular OnOpen&shares='+str(abs(share))
 					# 	else:
-					# 		reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Sell->Short NSDQ MOO Regular OnOpen&shares="+str(abs(share))
+					# 		reque =  "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+'&priceadjust='+str(offset)+'&ordername=ARCA%20Sell->Short%20ARCX%20LOO%20Far%20OnOpen&shares='+str(abs(share))
 					# else:
-					# 	if c%2==0:
-					# 		reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Buy%20ARCX%20MOO%20OnOpen&shares="+str(share)
+
+					# 	if symbol[-2:]=="NQ":
+					# 		reque =  "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+'&priceadjust='+str(offset)+'&ordername=NSDQ Buy NSDQ LOO Far Regular OnOpen&shares='+str(abs(share))
 					# 	else:
-					# 		reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Buy NSDQ MOO Regular OnOpen&shares="+str(share)
+					# 		reque =  "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+'&priceadjust='+str(offset)+'&ordername=ARCA%20Buy%20ARCX%20LOO%20Far%20OnOpen&shares='+str(abs(share))
+										
+						if c%2==0:
+							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Sell->Short%20ARCX%20MOO%20OnOpen&shares="+str(abs(share))
+						else:
+							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Sell->Short NSDQ MOO Regular OnOpen&shares="+str(abs(share))
+					else:
+						if c%2==0:
+							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Buy%20ARCX%20MOO%20OnOpen&shares="+str(share)
+						else:
+							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Buy NSDQ MOO Regular OnOpen&shares="+str(share)
 					c+=1 
 
 					### TEST BLOCK. MARKET IN AND OUT.
@@ -553,7 +554,7 @@ class Manager:
 		MOO_exit = False 
  
 
-		Moo_enter_timer =569*60+10  #ts+20
+		Moo_enter_timer = 566*60+50 #569*60+10  #ts+20
 		Moo_enter = False 
 
 

@@ -159,24 +159,28 @@ class TradingPlan_Basket:
 
 	def specific_initiation(self):
 
-		if "D2D" == self.algo_name[:3]:
-			self.inspectable = False
-			self.one_shot_algo = True 
-		if "OB" == self.algo_name[:2]:
-			self.inspectable = False
-			self.one_shot_algo = True 
-		if "TE" == self.algo_name[:2]:
-			self.inspectable = False
-			self.one_shot_algo = True 
-		if "IMB_MOO" in self.algo_name:
-			self.manual_flattable = True 
-			self.one_shot_algo = True
-		if "MO_" in self.algo_name:
-			self.manual_flattable = True 
-			self.one_shot_algo = True
+		now = datetime.now()
+		ts = now.hour*60 + now.minute
+
+		if ts<570:
+			if "D2D" == self.algo_name[:3]:
+				self.inspectable = False
+				self.one_shot_algo = True 
+			if "OB" == self.algo_name[:2]:
+				self.inspectable = False
+				self.one_shot_algo = True 
+			if "TE" == self.algo_name[:2]:
+				self.inspectable = False
+				self.one_shot_algo = True 
+			if "IMB_MOO" in self.algo_name:
+				self.manual_flattable = True 
+				self.one_shot_algo = True
+			if "MO_" in self.algo_name:
+				self.manual_flattable = True 
+				self.one_shot_algo = True
 
 
-		log_print(self.source," Initializing:, Manual flattable:",self.manual_flattable," Inspectable:",self.inspectable)
+			log_print(self.source," Initializing:, Manual flattable:",self.manual_flattable," Inspectable:",self.inspectable)
 
 	def init_data(self,risk):
 
