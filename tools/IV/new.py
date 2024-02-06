@@ -43,6 +43,13 @@ def timestamp(s):
 		print("Timestamp conversion error:",e)
 		return 0
 
+##############################
+### START A SIMPLE VERSION ###
+##############################
+
+
+earning_list = []
+
 class processor:
 
 	def __init__(self):
@@ -93,6 +100,8 @@ class processor:
 					k +=1 
 
 				if k>1 and self.registered==False:
+
+					earning_list = earning_tracking()
 
 					force_close_port(4135)
 					postbody = "http://localhost:8080/SetOutput?symbol=*.NQ,*.AM,*.NY&feedtype=IMBALANCE&output=4135&status=on"
@@ -195,6 +204,10 @@ def writer(receive_pipe):
 	already_sent_long = []
 	already_sent_short = []
 
+
+	earning_long = []
+	earning_short = []
+
 	lst  = ["LocalTime=",
 	"MarketTime=",
 	"Side=",
@@ -226,6 +239,8 @@ def writer(receive_pipe):
 		file = "saves/N_"+datetime.now().strftime("%m-%d")+".csv"
 
 	print("Writer functional",file)
+
+	print("earning list:",earning_list)
 
 	### if morning 
 
@@ -273,19 +288,25 @@ def writer(receive_pipe):
 				side = find_between(r,"Side=",",")
 
 
-
+				# 09:25
 				if time_>=33900 and time_ <= 33930 and symbol[-2:]=="NQ":
 
-					if size >250000:
+						# print(time_,symbol,side,pair,size)
+						# if side =="B":
+						# 	earning_long.append(symbol)
+						# else:
+						# 	earning_short.append(symbol)
+
+					if symbol[:-3] in earning_list: #if size >250000:
 
 						#print(symbol,pair,size,side)
 
 						if side =="B":
-							if symbol not in nq_long and price>2:
+							if symbol not in nq_long and price>1:
 								print(time_,symbol,side,pair,size)
 								nq_long.append(symbol)
 						elif side =="S":
-							if symbol not in nq_short and price>2:
+							if symbol not in nq_short and price>1:
 								nq_short.append(symbol)
 								print(time_,symbol,side,pair,size)
 
@@ -293,10 +314,12 @@ def writer(receive_pipe):
 						cmdstr =  "https://tnv.ngrok.io/Basket="+name+",Order=*"
 						added = False
 
+
+						money = 1000
 						if len(nq_long)>0:
 							for symbol in nq_long:
 								if symbol not in already_sent_long:
-									share = int(2000/price)
+									share = int(money/price)
 
 									if share>1000:
 										share = 1000
@@ -322,7 +345,7 @@ def writer(receive_pipe):
 							for symbol in nq_short:
 								if symbol not in already_sent_short:
 
-									share = int(2000/price)
+									share = int(money/price)
 									if share>1000:
 										share = 1000
 									if share<10:
@@ -430,8 +453,70 @@ def running_mode(send_pipe):
 
 	except Exception as e:
 		print(e)
+
+
+# from datetime import datetime
+import datetime
+import requests 
+from datetime import date, timedelta,datetime
+
+import json 
+
+def get_open_price(symbols):
+  nyc_datetime = datetime.now()
+  ts =  nyc_datetime.hour*60+nyc_datetime.minute
+
+  r = "https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?include_otc=false&apiKey=ezY3uX1jsxve3yZIbw2IjbNi5X7uhp1H"
+  r = requests.get(r)
+  d = json.loads(r.text)
+
+  gap = {}
+
+  ### NEED TO MAKE SURE THESE VAL ARE NON 0 .
+  for i in d['tickers']:
+    if i['ticker'] in symbols:
+      gap[i['ticker']] = i['todaysChangePerc']
+
+  return gap
+
+def earning_tracking():
+  asset = "QQQ"
+  day = 1
+  postbody ="https://financialmodelingprep.com/api/v3/earning_calendar?from="+(date.today()-timedelta(days = day)).strftime("%Y-%m-%d")+ "&to="+ date.today().strftime("%Y-%m-%d")+"&apikey=a901e6d3dd9c97c657d40a2701374d2a"
+  r= requests.get(postbody)
+  earning = json.loads(r.text)
+
+  etf = []
+  postbody = "https://financialmodelingprep.com/api/v3/etf-holder/"+asset+"?apikey=a901e6d3dd9c97c657d40a2701374d2a"
+
+  r= requests.get(postbody)
+  d = json.loads(r.text)
+
+  for i in d:
+    etf.append(i['asset'])
+
+  tracking = []
+  for i in earning:
+    if i['symbol'] in etf:
+      tracking.append(i['symbol'])
+
+  longs = []
+  shorts = []
+  total = []
+  for symbol,gap in get_open_price(tracking).items():
+    if gap>2:
+      longs.append(symbol)
+    if gap<-2:
+      shorts.append(symbol)
+      #print(symbol,round(gap,2))
+
+  total = longs + shorts
+
+  return total 
 if __name__ == '__main__':
 
+
+	#print(earning_tracking())
 	multiprocessing.freeze_support()
 	processor()
 
