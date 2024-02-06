@@ -666,11 +666,11 @@ class UI(pannel):
 		self.qs_subp3 = ttk.LabelFrame(self.qs_subtab,text="")
 		self.qs_subp4 = ttk.LabelFrame(self.qs_subtab,text="")
 		self.qs_subp5 = ttk.LabelFrame(self.qs_subtab,text="")
+
 		#self.custom_algo_pannel.place(x=0,y=0,height=950,width=350)
-
 		#self.quick_spread_pannel.place(x=0,y=0,height=950,width=350)
-		self.qs_subtab.add(self.qs_subp1,text="SPY")
 
+		self.qs_subtab.add(self.qs_subp1,text="SPY")
 		self.qs_subtab.add(self.qs_subp2,text="QQQ")
 		self.qs_subtab.add(self.qs_subp3,text="GLD")
 		self.qs_subtab.add(self.qs_subp4,text="MISC")

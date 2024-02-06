@@ -151,8 +151,6 @@ class S(BaseHTTPRequestHandler):
 
 					if "Infos" in stream_data:
 						infos = find_between(stream_data,"Infos=(",")") 
-								
-
 						for i in infos.split(","):
 
 							if "=" in i:
@@ -184,6 +182,7 @@ class S(BaseHTTPRequestHandler):
 					ratio = find_between(stream_data,"Ratio=",",")
 					passive = find_between(stream_data,"Passive=",",")
 
+					info = {}
 
 
 					d={}
@@ -194,6 +193,16 @@ class S(BaseHTTPRequestHandler):
 					d['ratio'] = [int(i) for i in ratio.split(":")]
 					d['passive'] = int(passive)
 
+
+					if "Infos" in stream_data:
+						infos = find_between(stream_data,"Infos=(",")") 
+						for i in infos.split(","):
+
+							if "=" in i:
+								a,b = i.split("=")
+								#info[a] = int(b)
+								d[a] =int(b)
+								
 					self.send_pair(d)
 			except Exception as e:
 				print("HTTP SERVER processing message failure",e)
