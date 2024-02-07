@@ -612,11 +612,11 @@ class UI(pannel):
 
 		fxixpev = {"name":"FXIXPEV","symbol":["FXI.AM","XPEV.NQ"],"ratio":[2,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		
-		spyxlk = {"name":"SPYXLK","symbol":["SPY.AM","XLK.AM"],"ratio":[10,-18],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		spyxlc = {"name":"SPYXLC","symbol":["SPY.AM","XLC.AM"],"ratio":[10,-49],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		spyxli = {"name":"SPYXLI","symbol":["SPY.AM","XLI.AM"],"ratio":[10,-36],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		spyxlu = {"name":"SPYXLU","symbol":["SPY.AM","XLU.AM"],"ratio":[10,-46],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		spyxly = {"name":"SPYXLY","symbol":["SPY.AM","XLY.AM"],"ratio":[10,-24],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyxlk = {"name":"XLKSPY","symbol":["XLK.AM","SPY.AM"],"ratio":[-18,10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyxlc = {"name":"XLCSPY","symbol":["XLC.AM","SPY.AM"],"ratio":[-49,10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyxli = {"name":"XLISPY","symbol":["XLI.AM","SPY.AM"],"ratio":[-36,10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyxlu = {"name":"XLUSPY","symbol":["XLU.AM","SPY.AM"],"ratio":[-46,10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyxly = {"name":"XLYSPY","symbol":["XLY.AM","SPY.AM"],"ratio":[-24,10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 	
 		#total = [spyqqq,gldslv,tlsaqqq,smhqqq,gdxgdxj]
 		AMDNVDA = {"name":"NVDAAMD","symbol":["NVDA.NQ","AMD.NQ"],"ratio":[3,-9],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
@@ -1523,6 +1523,7 @@ class UI(pannel):
 				total[algo] = 0
 
 		return total
+
 
 	def order_confirmation(self,basket_name,orders):
 
