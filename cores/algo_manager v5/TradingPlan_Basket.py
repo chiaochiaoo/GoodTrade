@@ -41,6 +41,8 @@ class TradingPlan_Basket:
 
 		self.clone_able =True 
 
+		self.clone_number = 1
+
 		self.one_shot_algo = False
 
 		
@@ -943,8 +945,9 @@ class TradingPlan_Basket:
 		#basket_name,orders,risk,aggresive,info
 
 		if self.clone_able:
-			self.manager.apply_basket_cmd(self.algo_name+"_c",self.current_shares,5,False,self.info)
-
+			self.manager.apply_basket_cmd(self.algo_name+"_c"+str(self.clone_number),self.current_shares,5,False,self.info)
+			self.clone_number+=1
+			
 	def update_displays(self):
 
 
