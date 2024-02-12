@@ -128,6 +128,15 @@ def create_tab(tab_name):
 
         model =  quick_model(name,model,historical_plus,historical_minus)
 
+    elif tab_name =="QCCNXT":
+        name = "QCCNXT"
+        model =  {'QQQ.NQ': 16, 'MSTR.NQ': -1, 'COIN.NQ': -4, 'MARA.NQ': -23, 'RIOT.NQ': -21, 'SQ.NQ': -8, }
+        historical_plus = [0.0,0.0,0.0]
+        historical_minus =[-0.0,-0.0,-0.0]
+
+
+        model =  quick_model(name,model,historical_plus,historical_minus)
+
     elif tab_name =="QEV":
         name = "QEV"
         model =  {'QQQ.NQ': 4, 'TSLA.NQ': -1, 'NIO.NY': -29, 'LCID.NQ': -33, 'RIVN.NQ': -5}
@@ -303,7 +312,7 @@ try:
     notebook = ttk.Notebook(root)
 
     # Create 5 tabs
-    tabs = [ "QFAANG","QEV","QBT","OBQ","NQG"]# "Last Minute", "Tab 5"#"MRQ1", "MRQ2", #"OBQ", #"OBQ" #
+    tabs = [ "QFAANG","QEV","QBT","QCCNXT"]# "Last Minute", "Tab 5"#"MRQ1", "MRQ2", #"OBQ", #"OBQ" #
 
     for tab_name in tabs:
         create_tab(tab_name)
