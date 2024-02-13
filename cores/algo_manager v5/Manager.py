@@ -706,8 +706,9 @@ class Manager:
 
 				## flat ### each symbol send flattening. 
 
-				for symbol,data in self.symbol_data.items():
-					data.ppro_flatten()
+				# for symbol,data in self.symbol_data.items():
+				# 	data.ppro_flatten()
+				
 				MOC_flat= True 
 
 			if ts>MOC_pairing_timer and moc_pair_release==False:
