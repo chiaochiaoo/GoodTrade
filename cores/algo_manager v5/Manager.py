@@ -588,24 +588,15 @@ class Manager:
 			ts = now.hour*3600 + now.minute*60 + now.second
 
 
-			# if ts>=MOO_as_is and MOO_as_is_exit==False :
-
-			# 	with self.baskets_lock:
-			# 		for name,basket in self.baskets.items():
-			# 			if "IMB" in name and "AM" in name:
-			# 				self.algo_as_is(name)
-			# 	# for any basket has name IMB. as is. 
-			# 	MOO_as_is_exit= True 
-
 			if ts>=MOO_exit_timer_AM and MOO_exit_AM==False :
 
 				total_moo_exit = {}
 
 				with self.baskets_lock:
-			 		for name,basket in self.baskets.items():
-			 			if "IMB" in name and "AM" in name:
-			 				self.algo_as_is(name)
-			 	time.sleep(10)
+					for name,basket in self.baskets.items():
+						if "IMB" in name and "AM" in name:
+							self.algo_as_is(name)
+				time.sleep(10)
 
 				target = ".AM"
 				for symbol,data in self.symbol_data.items():
@@ -625,10 +616,10 @@ class Manager:
 				total_moo_exit = {}
 
 				with self.baskets_lock:
-			 		for name,basket in self.baskets.items():
-			 			if "IMB" in name and "NQ" in name:
-			 				self.algo_as_is(name)
-			 	time.sleep(10)
+						for name,basket in self.baskets.items():
+							if "IMB" in name and "NQ" in name:
+								self.algo_as_is(name)
+				time.sleep(10)
 
 				target = ".NQ"
 				for symbol,data in self.symbol_data.items():
@@ -646,6 +637,13 @@ class Manager:
 			if ts>=MOO_exit_timer_NY and MOO_exit_NY==False :
 
 				total_moo_exit = {}
+
+				with self.baskets_lock:
+					for name,basket in self.baskets.items():
+						if "IMB" in name and "NY" in name:
+							self.algo_as_is(name)
+				time.sleep(10)
+
 				target = ".NY"
 				for symbol,data in self.symbol_data.items():
 					if target in symbol:
