@@ -249,7 +249,6 @@ class Manager:
 
 		self.concept_record,self.monthly = self.take_records_concept()
 
-
 		self.gateway = 0
 
 		######
@@ -261,14 +260,10 @@ class Manager:
 		self.moo_algos = {}
 		self.moo_lock = threading.Lock()
 
-		#print(self.total_record)
 		self.shutdown=False
 
 		self.symbol_inspection_lock = threading.Lock()
 		self.symbol_inspection_start = True
-
-		# handl = threading.Thread(target=self.symbols_inspection,daemon=True)
-		# handl.start()
 
 		good = threading.Thread(target=self.goodtrade_in, daemon=True)
 		good.start()
@@ -280,12 +275,7 @@ class Manager:
 		timer.start()
 
 		self.pipe_ppro_out.send(["Register","QQQ.NQ"])
-		# self.pipe_ppro_out.send(["Register","SPY.AM"])
-		#self.pipe_ppro_out.send(["Register","SQQQ.NQ"])
 
-		#self.apply_basket_cmd("OB1",{"SPY":1,},1,1)
-#
-	#data part, UI part
 
 	def shutdown_all_threads(self):
 
@@ -517,7 +507,7 @@ class Manager:
 							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Buy%20ARCX%20MOO%20OnOpen&shares="+str(share)
 						else:
 							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Buy NSDQ MOO Regular OnOpen&shares="+str(share)
-					c+=1 
+					c=2 
 
 					### TEST BLOCK. MARKET IN AND OUT.
 				else:
@@ -550,13 +540,28 @@ class Manager:
 		MOO_as_is = 566*60
 		MOO_as_is_exit =False 
 
-		MOO_exit_timer = 567*60 #ts+19 #
-		MOO_exit = False 
- 
 
-		Moo_enter_timer = 566*60+50 #569*60+10  #ts+20
-		Moo_enter = False 
+		##########################################################
+		MOO_exit_timer_NQ = 567*60 #ts+19 #
+		MOO_exit_NQ = False 
 
+		MOO_exit_timer_NY = 567*60+30 #ts+19 #
+		MOO_exit_NY= False 
+
+		MOO_exit_timer_AM = 569*60+30 #ts+19 #
+		MOO_exit_AM = False 
+
+
+		Moo_enter_timer_NQ = 566*60+30 #569*60+10  #ts+20 558*60+10 #
+		Moo_enter_NQ = False 
+
+		Moo_enter_timer_NY = 566*60+40 #569*60+10  #ts+20558*60+15 
+		Moo_enter_NY = False 
+
+		Moo_enter_timer_AM = 568*60+50 #569*60+10  #558*60+20
+		Moo_enter_AM = False
+
+		##########################################################
 
 		MOO_pair_timer = 570*60+20 #ts+25 #
 		MOO_pair = False 
@@ -583,45 +588,123 @@ class Manager:
 			ts = now.hour*3600 + now.minute*60 + now.second
 
 
-			if ts>=MOO_as_is and MOO_as_is_exit==False :
+			# if ts>=MOO_as_is and MOO_as_is_exit==False :
 
-				with self.baskets_lock:
-					for name,basket in self.baskets.items():
-						if "IMB" in name:
-							self.algo_as_is(name)
-				# for any basket has name IMB. as is. 
-				MOO_as_is_exit= True 
+			# 	with self.baskets_lock:
+			# 		for name,basket in self.baskets.items():
+			# 			if "IMB" in name and "AM" in name:
+			# 				self.algo_as_is(name)
+			# 	# for any basket has name IMB. as is. 
+			# 	MOO_as_is_exit= True 
 
-			if ts>=MOO_exit_timer and MOO_exit==False :
+			if ts>=MOO_exit_timer_AM and MOO_exit_AM==False :
 
 				total_moo_exit = {}
 
-				for symbol,data in self.symbol_data.items():
-					share = data.get_all_moo_exit()*-1
+				with self.baskets_lock:
+			 		for name,basket in self.baskets.items():
+			 			if "IMB" in name and "AM" in name:
+			 				self.algo_as_is(name)
+			 	time.sleep(10)
 
-					if share!=0:
-						total_moo_exit[symbol] = share
+				target = ".AM"
+				for symbol,data in self.symbol_data.items():
+					if target in symbol:
+						share = data.get_all_moo_exit()*-1
+
+						if share!=0:
+							total_moo_exit[symbol] = share
 
 				log_print("Timer: timer triggered for MOO Exit:",total_moo_exit)
 
 				self.send_moo(total_moo_exit)
 
-				MOO_exit = True 
+				MOO_exit_AM = True 
+			if ts>=MOO_exit_timer_NQ and MOO_exit_NQ==False :
 
-			if ts>=Moo_enter_timer and Moo_enter==False :
+				total_moo_exit = {}
 
+				with self.baskets_lock:
+			 		for name,basket in self.baskets.items():
+			 			if "IMB" in name and "NQ" in name:
+			 				self.algo_as_is(name)
+			 	time.sleep(10)
+
+				target = ".NQ"
+				for symbol,data in self.symbol_data.items():
+					if target in symbol:
+						share = data.get_all_moo_exit()*-1
+
+						if share!=0:
+							total_moo_exit[symbol] = share
+
+				log_print("Timer: timer triggered for MOO Exit:",total_moo_exit)
+
+				self.send_moo(total_moo_exit)
+
+				MOO_exit_NQ = True 
+			if ts>=MOO_exit_timer_NY and MOO_exit_NY==False :
+
+				total_moo_exit = {}
+				target = ".NY"
+				for symbol,data in self.symbol_data.items():
+					if target in symbol:
+						share = data.get_all_moo_exit()*-1
+
+						if share!=0:
+							total_moo_exit[symbol] = share
+
+				log_print("Timer: timer triggered for MOO Exit:",total_moo_exit)
+
+				self.send_moo(total_moo_exit)
+
+				MOO_exit_NY = True 
+			if ts>=Moo_enter_timer_NQ and Moo_enter_NQ==False :
 
 				total_moo_enter = {}
+				target = ".NQ"
+				for symbol,data in self.symbol_data.items():
+
+					if target in symbol:
+						share = data.get_all_moo_enter()
+
+						if share!=0:
+							total_moo_enter[symbol] = share
+
+				log_print("Timer: timer triggered for MOO Enter",target,total_moo_enter)
+				self.send_moo(total_moo_enter)
+				Moo_enter_NQ = True 
+
+			if ts>=Moo_enter_timer_NY and Moo_enter_NY==False :
+
+				total_moo_enter = {}
+				target = ".NY"
 
 				for symbol,data in self.symbol_data.items():
-					share = data.get_all_moo_enter()
+					if target in symbol:
+						share = data.get_all_moo_enter()
 
-					if share!=0:
-						total_moo_enter[symbol] = share
+						if share!=0:
+							total_moo_enter[symbol] = share
 
-				log_print("Timer: timer triggered for MOO Enter",total_moo_enter)
+				log_print("Timer: timer triggered for MOO Enter",target,total_moo_enter)
 				self.send_moo(total_moo_enter)
-				Moo_enter = True 
+				Moo_enter_NY = True 
+
+			if ts>=Moo_enter_timer_AM and Moo_enter_AM==False :
+
+				total_moo_enter = {}
+				target = ".AM"
+				for symbol,data in self.symbol_data.items():
+					if target in symbol:
+						share = data.get_all_moo_enter()
+
+						if share!=0:
+							total_moo_enter[symbol] = share
+
+				log_print("Timer: timer triggered for MOO Enter",target,total_moo_enter)
+				self.send_moo(total_moo_enter)
+				Moo_enter_AM = True 
 
 			if ts>=MOO_pair_timer and MOO_pair == False:
 
