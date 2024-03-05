@@ -812,7 +812,7 @@ class TradingPlan_Basket:
 		
 
 		for symbol,item in self.symbols.items():
-			self.submit_expected_shares(symbol,self.aggresive_exit)
+			self.submit_expected_shares(symbol,0,self.aggresive_exit)
 
 
 		self.flatten_order=True
