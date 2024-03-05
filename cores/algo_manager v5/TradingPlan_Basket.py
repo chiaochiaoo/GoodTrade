@@ -98,6 +98,10 @@ class TradingPlan_Basket:
 			self.sliperage_control = True 
 			self.spread_limit = int(abs(info["Spreadlimit"]))
 
+		self.aggresive_exit = False
+		if "Aggresive_exit" in info:
+			self.aggresive_exit = True 
+
 		log_print(algo_name,"  profit & risk : ",self.profit,self.stop)
 		#### BANED SYMBOL
 
@@ -788,7 +792,6 @@ class TradingPlan_Basket:
 	def rejection_handling(self,symbol):
 
 
-
 		self.expected_shares[symbol] = 0
 		self.banned.append(symbol)
 
@@ -805,11 +808,11 @@ class TradingPlan_Basket:
 		# else:
 
 		#self.deactive()
-		log_print(self.source,self.algo_name," flattening")
+		log_print(self.source,self.algo_name," flattening, aggresive:",self.aggresive_exit)
 		
 
 		for symbol,item in self.symbols.items():
-			self.submit_expected_shares(symbol,0)
+			self.submit_expected_shares(symbol,self.aggresive_exit)
 
 
 		self.flatten_order=True
