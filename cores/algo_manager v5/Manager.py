@@ -558,7 +558,7 @@ class Manager:
 		Moo_enter_timer_NY = 566*60+40 #569*60+10  #ts+20558*60+15 
 		Moo_enter_NY = False 
 
-		Moo_enter_timer_AM = 568*60+50 #569*60+10  #558*60+20
+		Moo_enter_timer_AM = 569*60+20 #569*60+10  #558*60+20
 		Moo_enter_AM = False
 
 		##########################################################
