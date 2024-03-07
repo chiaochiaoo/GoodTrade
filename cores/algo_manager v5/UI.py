@@ -630,11 +630,13 @@ class UI(pannel):
 	
 		spygbtc = {"name":"GBTCSPY","symbol":["GBTC.AM","SPY.AM"],"ratio":[21,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 	
+		tqqqgbtc = {"name":"TQQQGBTC","symbol":["TQQQ.NQ","GBTC.AM"],"ratio":[20,-15],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+	
 
 		spy = [spyqqq,spytlt,spyuso,spygdx,spyiwm]
 		spy2 = [spyijr,spybitq,spygbtc]
 		etf = [spyxlk,spyxlc,spyxli,spyxlu,spyxly]
-		qqq = [smhqqq,xleqqq,] #arkkqqq
+		qqq = [smhqqq,xleqqq,tqqqgbtc] #arkkqqq
 		gld = [gldslv,gdxgdxj,gdxgld,silslv]
 		misc =[fxixpev,AMDNVDA,DISNFLX,JETSXLE]
 
