@@ -67,7 +67,7 @@ class UI(pannel):
 		
 		self.tk_labels=['Strategy',"Status","Updates" , "MaxU", "MinU", "U", "R", "WR", "MR", "TR", 'flatten', 'log']
 
-		self.algo_limit = 100
+		self.algo_limit = 200
 		
 		# infos = {
 		# 'Strategy':tradingplan.algo_name, \
