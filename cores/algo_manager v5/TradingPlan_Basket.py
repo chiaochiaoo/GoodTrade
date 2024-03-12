@@ -753,7 +753,6 @@ class TradingPlan_Basket:
 	def reduce_one_half(self):
 
 
-
 		coefficient = 2 
 		minimal = 0.5
 
@@ -762,10 +761,10 @@ class TradingPlan_Basket:
 			for symbol,item in self.symbols.items():
 				if symbol in self.original_positions:
 					if self.current_shares[symbol]!=0:
-						if abs(self.current_shares[symbol])<=abs(self.current_shares[symbol]//coefficient): # set to 0
+						if abs(self.current_shares[symbol])<=abs(self.original_positions[symbol]//coefficient): # set to 0
 							self.submit_expected_shares(symbol,0)
 						else:
-							self.submit_expected_shares(symbol,self.current_shares[symbol]-self.current_shares[symbol]//coefficient)
+							self.submit_expected_shares(symbol,self.current_shares[symbol]-self.original_positions[symbol]//coefficient)
 
 	def reduce_one_third(self):
 
@@ -777,10 +776,10 @@ class TradingPlan_Basket:
 			for symbol,item in self.symbols.items():
 				if symbol in self.original_positions:
 					if self.current_shares[symbol]!=0:
-						if abs(self.current_shares[symbol])<=abs(self.current_shares[symbol]//coefficient): # set to 0
+						if abs(self.current_shares[symbol])<=abs(self.original_positions[symbol]//coefficient): # set to 0
 							self.submit_expected_shares(symbol,0)
 						else:
-							self.submit_expected_shares(symbol,self.current_shares[symbol]-self.current_shares[symbol]//coefficient)
+							self.submit_expected_shares(symbol,self.current_shares[symbol]-self.original_positions[symbol]//coefficient)
 
 	def reduce_one_quarter(self):
 
@@ -794,10 +793,10 @@ class TradingPlan_Basket:
 			for symbol,item in self.symbols.items():
 				if symbol in self.original_positions:
 					if self.current_shares[symbol]!=0:
-						if abs(self.current_shares[symbol])<=abs(self.current_shares[symbol]//coefficient): # set to 0
+						if abs(self.current_shares[symbol])<=abs(self.original_positions[symbol]//coefficient): # set to 0
 							self.submit_expected_shares(symbol,0)
 						else:
-							self.submit_expected_shares(symbol,self.current_shares[symbol]-self.current_shares[symbol]//coefficient)
+							self.submit_expected_shares(symbol,self.current_shares[symbol]-self.original_positions[symbol]//coefficient)
 
 	def increase_one_quarter(self):
 
