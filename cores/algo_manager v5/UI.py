@@ -1179,9 +1179,9 @@ class UI(pannel):
 		"WR":tradingplan.tkvars[WR], \
 		"MR":tradingplan.tkvars[MR], \
 		"TR":tradingplan.tkvars[TR], \
-		"-25%":"",\
-		"-50%":"",\
-		"+25%":"",\
+		"-25%":tradingplan.tkvars[MULTIPLIER],\
+		"-50%":tradingplan.tkvars[MULTIPLIER],\
+		"+25%":tradingplan.tkvars[MULTIPLIER],\
 		'flatten':"",\
 		}
 
@@ -1228,15 +1228,15 @@ class UI(pannel):
 				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.flatten_cmd
 
 			elif label_name =="-25%":
-
+				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
 				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.reduce_one_quarter
 
 			elif label_name =="-50%":
-
+				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
 				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.reduce_one_half
 
 			elif label_name =="+25%":
-
+				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
 				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.increase_one_quarter
 				#self.tk_labels_single[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command=tradingplan.flatten_cmd)
 			else:
