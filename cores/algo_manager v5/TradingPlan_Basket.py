@@ -206,6 +206,9 @@ class TradingPlan_Basket:
 		self.data[ESTRISK] = float(risk)
 		self.tkvars[ESTRISK].set(float(risk))
 
+		self.data[MULTIPLIER]=1
+		self.tkvars[MULTIPLIER].set(1)
+
 		wr,mr,tr = self.manager.get_record(self.algo_name)
 
 		self.tkvars[WR].set(wr)
