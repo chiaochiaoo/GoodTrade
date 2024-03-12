@@ -55,7 +55,7 @@ WR = "WR"
 MR = "MR"
 TR = "TR"
 
-MULTIPLIER = "Multiplier"
+ALGO_MULTIPLIER = "Multiplier"
 
 SYMBOL1_SHARE = "Symbol1_share"
 SYMBOL2_SHARE = "Symbol2_share"

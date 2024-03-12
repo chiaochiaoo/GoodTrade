@@ -1179,9 +1179,9 @@ class UI(pannel):
 		"WR":tradingplan.tkvars[WR], \
 		"MR":tradingplan.tkvars[MR], \
 		"TR":tradingplan.tkvars[TR], \
-		"-25%":tradingplan.tkvars[MULTIPLIER],\
-		"-50%":tradingplan.tkvars[MULTIPLIER],\
-		"+25%":tradingplan.tkvars[MULTIPLIER],\
+		"-25%":tradingplan.tkvars[ALGO_MULTIPLIER],\
+		"-50%":tradingplan.tkvars[ALGO_MULTIPLIER],\
+		"+25%":tradingplan.tkvars[ALGO_MULTIPLIER],\
 		'flatten':"",\
 		}
 
