@@ -526,10 +526,10 @@ class UI(pannel):
 		self.badsymbol_pannel.place(x=860,y=10,height=50,width=300)
 
 		self.performance_pannel = ttk.LabelFrame(self.root,text="Performance") 
-		self.performance_pannel.place(x=360,y=70,height=260,width=900)
+		self.performance_pannel.place(x=360,y=70,height=260,width=950)
 
 		self.deployment_panel = ttk.LabelFrame(self.root,text="Strategy Deployment") 
-		self.deployment_panel.place(x=360,y=260,height=700,width=900)
+		self.deployment_panel.place(x=360,y=260,height=700,width=950)
 
 		self.init_system_pannel()
 		self.init_performance_pannel()
@@ -1574,7 +1574,7 @@ if __name__ == '__main__':
 
 	root = tk.Tk() 
 	root.title("GoodTrade Algo Manager v5") 
-	root.geometry("1280x780")
+	root.geometry("1380x780")
 	UI(root)
 	# root.minsize(1600, 1000)
 	# root.maxsize(1800, 1200)
