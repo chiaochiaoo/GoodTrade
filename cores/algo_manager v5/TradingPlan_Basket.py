@@ -765,11 +765,11 @@ class TradingPlan_Basket:
 				self.tkvars[ALGO_MULTIPLIER].set(round(self.tkvars[ALGO_MULTIPLIER].get()-minimal,2))
 				for symbol,item in self.symbols.items():
 					if symbol in self.original_positions:
-						if self.current_shares[symbol]!=0:
-							if abs(self.current_shares[symbol])<=abs(self.original_positions[symbol]//coefficient): # set to 0
+						if self.expected_shares[symbol]!=0:
+							if abs(self.expected_shares[symbol])<=abs(self.original_positions[symbol]//coefficient): # set to 0
 								self.submit_expected_shares(symbol,0)
 							else:
-								self.submit_expected_shares(symbol,self.current_shares[symbol]-self.original_positions[symbol]//coefficient)
+								self.submit_expected_shares(symbol,self.expected_shares[symbol]-self.original_positions[symbol]//coefficient)
 
 	def reduce_one_third(self):
 
@@ -784,11 +784,11 @@ class TradingPlan_Basket:
 				self.tkvars[ALGO_MULTIPLIER].set(round(self.tkvars[ALGO_MULTIPLIER].get()-minimal,2))
 				for symbol,item in self.symbols.items():
 					if symbol in self.original_positions:
-						if self.current_shares[symbol]!=0:
-							if abs(self.current_shares[symbol])<=abs(self.original_positions[symbol]//coefficient): # set to 0
+						if self.expected_shares[symbol]!=0:
+							if abs(self.expected_shares[symbol])<=abs(self.original_positions[symbol]//coefficient): # set to 0
 								self.submit_expected_shares(symbol,0)
 							else:
-								self.submit_expected_shares(symbol,self.current_shares[symbol]-self.original_positions[symbol]//coefficient)
+								self.submit_expected_shares(symbol,self.expected_shares[symbol]-self.original_positions[symbol]//coefficient)
 
 	def reduce_one_quarter(self):
 
@@ -799,17 +799,18 @@ class TradingPlan_Basket:
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second 
 
+		#self.expected_shares
 		if ts-self.operation_timer>5:
 			self.operation_timer = ts 
 			if self.tkvars[ALGO_MULTIPLIER].get()>=minimal:
 				self.tkvars[ALGO_MULTIPLIER].set(round(self.tkvars[ALGO_MULTIPLIER].get()-minimal,2))
 				for symbol,item in self.symbols.items():
 					if symbol in self.original_positions:
-						if self.current_shares[symbol]!=0:
-							if abs(self.current_shares[symbol])<=abs(self.original_positions[symbol]//coefficient): # set to 0
+						if self.expected_shares[symbol]!=0:
+							if abs(self.expected_shares[symbol])<=abs(self.original_positions[symbol]//coefficient): # set to 0
 								self.submit_expected_shares(symbol,0)
 							else:
-								self.submit_expected_shares(symbol,self.current_shares[symbol]-self.original_positions[symbol]//coefficient)
+								self.submit_expected_shares(symbol,self.expected_shares[symbol]-self.original_positions[symbol]//coefficient)
 
 	def increase_one_quarter(self):
 
@@ -819,11 +820,14 @@ class TradingPlan_Basket:
 		if ts-self.operation_timer>5:
 			self.operation_timer = ts 
 			minimal = 0.25
+
+			# self.expected_shares
+			# 
 			if self.tkvars[ALGO_MULTIPLIER].get()>=0:
 				self.tkvars[ALGO_MULTIPLIER].set(round(self.tkvars[ALGO_MULTIPLIER].get()+minimal,2))
 				for symbol,item in self.symbols.items():
 					if symbol in self.original_positions:
-						self.submit_expected_shares(symbol,self.current_shares[symbol]+self.original_positions[symbol]//4)
+						self.submit_expected_shares(symbol,self.expected_shares[symbol]+self.original_positions[symbol]//4)
 
 
 	def reduce_one_third_aggresive(self):
