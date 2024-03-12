@@ -470,8 +470,9 @@ class UI(pannel):
 						"WR":7,\
 						"MR":7,\
 						"TR":7,\
-						"-30%":7,\
+						"-25%":7,\
 						"-50%":7,\
+						"+25%":7,\
 						"flatten":8,\
 						}
 		self.width = list(self.labels.values())
@@ -1178,8 +1179,9 @@ class UI(pannel):
 		"WR":tradingplan.tkvars[WR], \
 		"MR":tradingplan.tkvars[MR], \
 		"TR":tradingplan.tkvars[TR], \
-		"-30%":"",\
+		"-25%":"",\
 		"-50%":"",\
+		"+25%":"",\
 		'flatten':"",\
 		}
 
@@ -1225,14 +1227,17 @@ class UI(pannel):
 
 				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.flatten_cmd
 
-			elif label_name =="-30%":
+			elif label_name =="-25%":
 
-				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.reduce_one_third
+				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.reduce_one_quarter
 
 			elif label_name =="-50%":
 
 				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.reduce_one_half
 
+			elif label_name =="+25%":
+
+				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.increase_one_quarter
 				#self.tk_labels_single[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command=tradingplan.flatten_cmd)
 			else:
 				if str(type(info[j]))=="<class 'tkinter.StringVar'>" or str(type(info[j]))=="<class 'tkinter.DoubleVar'>":

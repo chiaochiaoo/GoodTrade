@@ -115,6 +115,8 @@ class TradingPlan_Basket:
 		self.current_shares = {}
 		self.current_request = {}
 		self.maximum_manual = {}
+
+		self.original_positions = {}
 		self.current_request_timer ={}
 		####################################################################################
 
@@ -262,6 +264,11 @@ class TradingPlan_Basket:
 
 	def modify_maximum_manual(self,symbol,share):
 		self.maximum_manual[symbol] = share
+
+	def add_to_original_position(self,symbol_name,share):
+
+		if symbol_name not in self.original_positions:
+			self.original_positions[symbol_name] = share 
 
 	def register_symbol(self,symbol_name,symbol):
 
@@ -473,6 +480,8 @@ class TradingPlan_Basket:
 				self.incremental_state[symbol] = False
 
 				self.expected_shares[symbol] = shares
+
+				self.add_to_original_position(symbol,shares)
 				self.recalculate_current_request(symbol)
 				self.reset_incremental_data(symbol)
 				
@@ -742,6 +751,16 @@ class TradingPlan_Basket:
 
 		for symbol,item in self.symbols.items():
 			self.submit_expected_shares(symbol,self.current_shares[symbol]-self.current_shares[symbol]//3)
+
+	def reduce_one_quarter(self):
+		for symbol,item in self.symbols.items():
+			self.submit_expected_shares(symbol,self.current_shares[symbol]-self.current_shares[symbol]//4)
+
+	def increase_one_quarter(self):
+		for symbol,item in self.symbols.items():
+			if symbol in self.original_positions:
+				self.submit_expected_shares(symbol,self.current_shares[symbol]+self.original_positions[symbol]//4)
+
 	def reduce_one_third_aggresive(self):
 
 		for symbol,item in self.symbols.items():
