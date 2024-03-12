@@ -152,7 +152,7 @@ class TradingPlan_Basket:
 
 		self.last_ts = 0
 		
-		self.numeric_labels = [ESTRISK,UNREAL,REALIZED,UNREAL_MAX,UNREAL_MIN,WR,MR,TR,MULTIPLIER]
+		self.numeric_labels = [ESTRISK,UNREAL,REALIZED,UNREAL_MAX,UNREAL_MIN,WR,MR,TR,ALGO_MULTIPLIER]
 
 		self.string_labels = [MIND,STATUS,POSITION,RISK_RATIO]
 
@@ -206,8 +206,8 @@ class TradingPlan_Basket:
 		self.data[ESTRISK] = float(risk)
 		self.tkvars[ESTRISK].set(float(risk))
 
-		self.data[MULTIPLIER]=1
-		self.tkvars[MULTIPLIER].set(1)
+		self.data[ALGO_MULTIPLIER]=1
+		self.tkvars[ALGO_MULTIPLIER].set(1)
 
 		wr,mr,tr = self.manager.get_record(self.algo_name)
 
@@ -757,8 +757,8 @@ class TradingPlan_Basket:
 		coefficient = 2 
 		minimal = 0.5
 
-		if self.tkvars[MULTIPLIER].get()>=minimal:
-			self.tkvars[MULTIPLIER].set(round(self.tkvars[MULTIPLIER].get()-minimal,2))
+		if self.tkvars[ALGO_MULTIPLIER].get()>=minimal:
+			self.tkvars[ALGO_MULTIPLIER].set(round(self.tkvars[ALGO_MULTIPLIER].get()-minimal,2))
 			for symbol,item in self.symbols.items():
 				if symbol in self.original_positions:
 					if self.current_shares[symbol]!=0:
@@ -772,8 +772,8 @@ class TradingPlan_Basket:
 		coefficient = 3 
 		minimal = 0.3 
 
-		if self.tkvars[MULTIPLIER].get()>=minimal:
-			self.tkvars[MULTIPLIER].set(round(self.tkvars[MULTIPLIER].get()-minimal,2))
+		if self.tkvars[ALGO_MULTIPLIER].get()>=minimal:
+			self.tkvars[ALGO_MULTIPLIER].set(round(self.tkvars[ALGO_MULTIPLIER].get()-minimal,2))
 			for symbol,item in self.symbols.items():
 				if symbol in self.original_positions:
 					if self.current_shares[symbol]!=0:
@@ -789,8 +789,8 @@ class TradingPlan_Basket:
 		coefficient = 4 
 		minimal = 0.25
 
-		if self.tkvars[MULTIPLIER].get()>=minimal:
-			self.tkvars[MULTIPLIER].set(round(self.tkvars[MULTIPLIER].get()-minimal,2))
+		if self.tkvars[ALGO_MULTIPLIER].get()>=minimal:
+			self.tkvars[ALGO_MULTIPLIER].set(round(self.tkvars[ALGO_MULTIPLIER].get()-minimal,2))
 			for symbol,item in self.symbols.items():
 				if symbol in self.original_positions:
 					if self.current_shares[symbol]!=0:
@@ -802,8 +802,8 @@ class TradingPlan_Basket:
 	def increase_one_quarter(self):
 
 		minimal = 0.25
-		if self.tkvars[MULTIPLIER].get()>=0:
-			self.tkvars[MULTIPLIER].set(round(self.tkvars[MULTIPLIER].get()+minimal,2))
+		if self.tkvars[ALGO_MULTIPLIER].get()>=0:
+			self.tkvars[ALGO_MULTIPLIER].set(round(self.tkvars[ALGO_MULTIPLIER].get()+minimal,2))
 			for symbol,item in self.symbols.items():
 				if symbol in self.original_positions:
 					self.submit_expected_shares(symbol,self.current_shares[symbol]+self.original_positions[symbol]//4)
@@ -879,7 +879,7 @@ class TradingPlan_Basket:
 		for symbol,item in self.symbols.items():
 			self.submit_expected_shares(symbol,0,self.aggresive_exit)
 
-		self.tkvars[MULTIPLIER].set(0)
+		self.tkvars[ALGO_MULTIPLIER].set(0)
 		self.flatten_order=True
 
 	""" Deployment initialization """
