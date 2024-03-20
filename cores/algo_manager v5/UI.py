@@ -613,7 +613,7 @@ class UI(pannel):
 
 		fxixpev = {"name":"FXIXPEV","symbol":["FXI.AM","XPEV.NQ"],"ratio":[2,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		
-		spyxlk = {"name":"XLKSPY","symbol":["XLK.AM","SPY.AM"],"ratio":[18,10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyxlk = {"name":"XLKSPY","symbol":["XLK.AM","SPY.AM"],"ratio":[18,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		spyxlc = {"name":"XLCSPY","symbol":["XLC.AM","SPY.AM"],"ratio":[49,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		spyxli = {"name":"XLISPY","symbol":["XLI.AM","SPY.AM"],"ratio":[36,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		spyxlu = {"name":"XLUSPY","symbol":["XLU.AM","SPY.AM"],"ratio":[46,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
@@ -634,14 +634,19 @@ class UI(pannel):
 		tqqqgbtc = {"name":"TQQQGBTC","symbol":["TQQQ.NQ","GBTC.AM"],"ratio":[20,-15],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 	
 
+		unguso = {"name":"UNGUSO","symbol":["UNG.AM","USO.AM"],"ratio":[63,-25],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+	
+		tltief = {"name":"TLTIEF","symbol":["TLT.NQ","IEF.NQ"],"ratio":[50,-107],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+	
 		spy = [spyqqq,spytlt,spyuso,spygdx,spyiwm]
 		spy2 = [spyijr,spybitq,spygbtc]
 		etf = [spyxlk,spyxlc,spyxli,spyxlu,spyxly]
 		qqq = [smhqqq,xleqqq,tqqqgbtc] #arkkqqq
 		gld = [gldslv,gdxgdxj,gdxgld,silslv]
 		misc =[fxixpev,AMDNVDA,DISNFLX,JETSXLE]
+		comm = [unguso,tltief]
 
-		total = [spy,spy2,qqq,gld,misc,etf]
+		total = [spy,spy2,qqq,gld,misc,etf,comm]
 		
 		self.qs = {}
 		for j in total:
@@ -654,19 +659,10 @@ class UI(pannel):
 		c=1
 		t=2
 
-
 		ttk.Button(self.quick_spread_pannel, text="Save",command=self.save_quick_spread).grid(sticky="w",column=1,row=1)
-
 
 		style = ttk.Style()
 		style.configure("BW.yellow", background="yellow")
-
-
-		#l1 = ttk.Label(text="Test", style="BW.TLabel")
-
-		# for key,val, in labels.items():
-		# 	ttk.Label(self.quick_spread_pannel, text=key,width=val).grid(sticky="w",column=c,row=1)
-		# 	c+=1
 
 		self.qs_subtab = ttk.Notebook(self.quick_spread_pannel)
 		#self.qs_subtab.place(x=0,rely=0.05,relheight=1,relwidth=1)
@@ -678,6 +674,7 @@ class UI(pannel):
 		self.qs_subp3 = ttk.LabelFrame(self.qs_subtab,text="")
 		self.qs_subp4 = ttk.LabelFrame(self.qs_subtab,text="")
 		self.qs_subp5 = ttk.LabelFrame(self.qs_subtab,text="")
+		self.qs_subp6 = ttk.LabelFrame(self.qs_subtab,text="")
 
 		#self.custom_algo_pannel.place(x=0,y=0,height=950,width=350)
 		#self.quick_spread_pannel.place(x=0,y=0,height=950,width=350)
@@ -688,6 +685,7 @@ class UI(pannel):
 		self.qs_subtab.add(self.qs_subp3,text="GLD")
 		self.qs_subtab.add(self.qs_subp4,text="MISC")
 		self.qs_subtab.add(self.qs_subp5,text="AM")
+		self.qs_subtab.add(self.qs_subp6,text="COMM")
 
 		x = 0 
 
@@ -707,7 +705,8 @@ class UI(pannel):
 
 			elif x==5:
 				tab = self.qs_subp5
-
+			elif x==6:
+				tab = self.qs_subp6
 			for i in j:
 
 				c=1
