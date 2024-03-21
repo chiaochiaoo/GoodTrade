@@ -174,11 +174,15 @@ class Manager:
 		self.cmd_text = tk.StringVar(value="Status:")
 
 
+		self.disaster_mode = tk.BooleanVar(value=0)
+
 		self.ta_moc = tk.BooleanVar(value=0)
 		self.moc_1559 = tk.BooleanVar(value=0)
 		self.moc_1601 = tk.BooleanVar(value=0)
 
 		self.ui = UI(root,self,self.receiving_signals,self.cmd_text)
+
+		self.ui_root = root
 
 		m=self.receiving_signals.trace('w', lambda *_: self.receiving())
 
@@ -333,34 +337,40 @@ class Manager:
 	def symbols_inspection(self):
 
 		# HERE I NEED. A. HARD LIMIT.... 40 ??? 
-		if self.symbol_inspection_lock.locked()==False and self.symbol_inspection_start==True:
 
-			# if self.total_difference !=0:
-			# 	self.pipe_ppro_out.send([CANCELALL])
+		if self.disaster_mode.get()!=False:
+			self.ui_root.config(bg='white')
+			if self.symbol_inspection_lock.locked()==False and self.symbol_inspection_start==True:
 
-			# self.total_difference = 0
-			time.sleep(0.5)
-			# residue.
-			# if residue is 0. no more cancel. 
-			with self.symbol_inspection_lock:
-				symbols = list(self.symbol_data.values())
-				c= 0
-				for val in symbols:
+				# if self.total_difference !=0:
+				# 	self.pipe_ppro_out.send([CANCELALL])
 
-					try:
-						c+=val.symbol_inspection()
-						#self.total_difference+=abs(val.get_difference())
-						if c>=30:
-							break
-							log_print("ORDERING LIMIT REACHED.")
-					except Exception as e:
-						PrintException(e,"inspection error")
+				# self.total_difference = 0
+				time.sleep(0.5)
+				# residue.
+				# if residue is 0. no more cancel. 
+				with self.symbol_inspection_lock:
+					symbols = list(self.symbol_data.values())
+					c= 0
+					for val in symbols:
 
-				self.total_difference = c 
+						try:
+							c+=val.symbol_inspection()
+							#self.total_difference+=abs(val.get_difference())
+							if c>=30:
+								break
+								log_print("ORDERING LIMIT REACHED.")
+						except Exception as e:
+							PrintException(e,"inspection error")
 
-			#log_print("Manager: performing symbols inspection compelte, total difference:",self.total_difference, "order counts:",c)
+					self.total_difference = c 
+
+				#log_print("Manager: performing symbols inspection compelte, total difference:",self.total_difference, "order counts:",c)
+			else:
+				log_print("Manager: previous symbols inspection not finished. skip.")
 		else:
-			log_print("Manager: previous symbols inspection not finished. skip.")
+			log_print("Manager: DISASTER MODE INIT")
+			self.ui_root.config(bg='red')
 
 
 	def algo_as_is(self,algo_name):

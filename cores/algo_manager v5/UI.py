@@ -202,6 +202,17 @@ class UI(pannel):
 
 
 		row +=1
+
+		ttk.Label(self.system_pannel, text="Disaster mode:").grid(sticky="w",column=1,row=row,padx=10)
+
+		try:
+			ttk.Checkbutton(self.system_pannel, variable=self.manager.disaster_mode).grid(sticky="w",column=2,row=row)
+		except:
+			pass 
+
+
+
+		row +=1
 		ttk.Label(self.system_pannel, text="Maximum Risk:").grid(sticky="w",column=1,row=row,padx=10)
 		self.risk_amount = tk.Entry(self.system_pannel,textvariable=self.risk_timer,width=7)
 		self.risk_amount.grid(sticky="w",column=2,row=row,padx=10)
@@ -226,14 +237,6 @@ class UI(pannel):
 		# tk.Entry(self.system_pannel,textvariable=self.user_phone,width=7).grid(sticky="w",column=2,row=row,padx=10)
 
 
-		# row +=1
-
-		# ttk.Label(self.system_pannel, text="TA-MOC:").grid(sticky="w",column=1,row=row,padx=10)
-
-		# try:
-		# 	ttk.Checkbutton(self.system_pannel, variable=self.manager.ta_moc).grid(sticky="w",column=2,row=row)
-		# except:
-		# 	pass 
 
 
 		# row +=1
@@ -1574,6 +1577,7 @@ if __name__ == '__main__':
 	root = tk.Tk() 
 	root.title("GoodTrade Algo Manager v5") 
 	root.geometry("1380x780")
+
 	UI(root)
 	# root.minsize(1600, 1000)
 	# root.maxsize(1800, 1200)
