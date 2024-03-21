@@ -338,7 +338,7 @@ class Manager:
 
 		# HERE I NEED. A. HARD LIMIT.... 40 ??? 
 
-		if self.disaster_mode.get()!=False:
+		if self.disaster_mode.get()!=1:
 			self.ui_root.config(bg='light grey')
 			if self.symbol_inspection_lock.locked()==False and self.symbol_inspection_start==True:
 
