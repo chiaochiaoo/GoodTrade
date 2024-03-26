@@ -331,7 +331,8 @@ class UI(pannel):
 		self.sizeTraded = tk.IntVar()
 
 
-
+		self.weeklyTotal = tk.IntVar(value=1)
+		self.monthlyTotal = tk.IntVar(value=1)
 
 
 
@@ -435,14 +436,14 @@ class UI(pannel):
 		self.t2.grid(sticky="w",column=col,row=1)
 		self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.sizeTraded)
 		self.t2_.grid(sticky="w",column=col,row=2)
-
+		#weeklyTotal
 		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
 		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=4)
 
 		col +=1 
 		self.t2 = ttk.Button(self.performance_pannel, text="WeeklyTotal:")
 		self.t2.grid(sticky="w",column=col,row=1)
-		self.t2_ = ttk.Button(self.performance_pannel, text="0")
+		self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.weeklyTotal)
 		self.t2_.grid(sticky="w",column=col,row=2)
 
 		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
@@ -453,7 +454,7 @@ class UI(pannel):
 		col +=1 
 		self.t2 = ttk.Button(self.performance_pannel, text="MonthlyTotal:")
 		self.t2.grid(sticky="w",column=col,row=1)
-		self.t2_ = ttk.Button(self.performance_pannel,text="0")
+		self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.monthlyTotal)
 		self.t2_.grid(sticky="w",column=col,row=2)
 
 		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)

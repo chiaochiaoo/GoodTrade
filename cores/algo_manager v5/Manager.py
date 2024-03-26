@@ -251,7 +251,15 @@ class Manager:
 		self.monthly_record = self.take_records(20)
 		self.total_record = self.take_records(200)
 
-		self.concept_record,self.monthly = self.take_records_concept()
+		self.concept_record,self.monthly,self.nets = self.take_records_concept()
+
+
+		#
+		print(sum(self.nets[-5:]),sum(self.nets[-21:]),self.nets[-10:])
+
+		self.ui.weeklyTotal.set(int(sum(self.nets[-5:])))
+
+		self.ui.monthlyTotal.set(int(sum(self.nets[-21:])))
 
 		self.gateway = 0
 
@@ -1116,7 +1124,9 @@ class Manager:
 					positions = d[1]
 					user = d[2]
 
-					
+					now = datetime.now()
+					ts = now.hour*60 + now.minute
+
 					self.current_positions = positions
 
 					self.ui.user.set(user)
@@ -1140,9 +1150,16 @@ class Manager:
 						rec = threading.Thread(target=self.record_update,daemon=True)
 						rec.start()
 
-					if count%300==0:
-
+					if count%10==0 and ts>=959:
 						self.periodical_status()
+
+					# if count%10==0 and ts==960:
+					# 	self.periodical_status()
+
+					if count%300==0:
+						if ts>=500 and ts<959:
+
+							self.periodical_status()
 
 				except Exception as e:
 					PrintException(e, " POSITION UPDATE ERROR")
@@ -1389,10 +1406,7 @@ class Manager:
 
 	def periodical_status(self):
 
-		now = datetime.now()
-		ts = now.hour*60 + now.minute
 
-		if ts>=500 and ts<=980:
 			user = self.ui.user.get()
 			subject = "User Status:"+user
 			body = "User Status."  + self.stringfy(self.current_summary) + self.output_active_tps() +self.stringfy(self.current_positions)
@@ -1544,6 +1558,7 @@ class Manager:
 
 		monthly = {}
 		### MATCHING EACH ###
+		nets = []
 		try:
 			for i in self.record_files[-300:]:
 				with open("../../algo_records/"+i+'.json') as f:
@@ -1562,6 +1577,8 @@ class Manager:
 				else:
 					if "total" in data:
 							monthly[month] += data["total"]["unrealizedPlusNet"]
+
+				nets.append(data['total']['unrealizedPlusNet'])#unrealizedPlusNe
 						
 		except	Exception	as e:
 			PrintException(e,"take_records error")   
@@ -1574,7 +1591,7 @@ class Manager:
 
 		#log_print(concept)
 
-		return concept,monthly
+		return concept,monthly,nets
 
 
 	def take_records(self,x):
