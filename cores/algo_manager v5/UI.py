@@ -333,6 +333,9 @@ class UI(pannel):
 		self.weeklyTotal = tk.IntVar(value=1)
 		self.monthlyTotal = tk.IntVar(value=1)
 
+		self.weeklySR = tk.DoubleVar(value=1)
+		self.monthlySR = tk.DoubleVar(value=1)
+
 		self.u_winning = tk.DoubleVar()
 		self.u_winning_min = tk.DoubleVar()
 		self.u_winning_max = tk.DoubleVar()

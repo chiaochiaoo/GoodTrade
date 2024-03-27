@@ -1150,14 +1150,14 @@ class Manager:
 						rec = threading.Thread(target=self.record_update,daemon=True)
 						rec.start()
 
-					if count%10==0 and ts>=959:
+					if count%10==0 and ts>=959 and ts<=961:
 						self.periodical_status()
 
 					# if count%10==0 and ts==960:
 					# 	self.periodical_status()
 
 					if count%300==0:
-						if ts>=500 and ts<959:
+						if ts>=500 and ts<965:
 
 							self.periodical_status()
 
