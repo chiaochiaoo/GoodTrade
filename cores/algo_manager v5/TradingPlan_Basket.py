@@ -194,7 +194,7 @@ class TradingPlan_Basket:
 
 	def print_positions(self):
 
-		log_print(self.source,self.name," expected:",self.expected_shares ," current:",self.current_shares," requested:",self.current_request)
+		log_print(self.source,self.name," expected:",self.expected_shares ," current:",self.current_shares," requested:",self.current_request,' avg price',self.average_price)
 
 	def init_data(self,risk):
 
