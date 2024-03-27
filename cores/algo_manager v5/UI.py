@@ -330,12 +330,8 @@ class UI(pannel):
 		self.fees = tk.DoubleVar()
 		self.sizeTraded = tk.IntVar()
 
-
 		self.weeklyTotal = tk.IntVar(value=1)
 		self.monthlyTotal = tk.IntVar(value=1)
-
-
-
 
 		self.u_winning = tk.DoubleVar()
 		self.u_winning_min = tk.DoubleVar()
@@ -1209,7 +1205,7 @@ class UI(pannel):
 
 			elif label_name == STATUS:
 				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j] 
-				#self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.cancle_deployment
+				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.print_positions
 				#= tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command=tradingplan.cancle_deployment)
 
 			elif label_name==SELECTED:

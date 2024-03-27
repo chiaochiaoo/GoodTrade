@@ -192,6 +192,10 @@ class TradingPlan_Basket:
 
 			log_print(self.source," Initializing:, Manual flattable:",self.manual_flattable," Inspectable:",self.inspectable)
 
+	def print_positions(self):
+
+		log_print(self.source,self.name," expected:",self.expected_shares ," current:",self.current_shares," requested:",self.current_request)
+
 	def init_data(self,risk):
 
 		for i in self.numeric_labels:
