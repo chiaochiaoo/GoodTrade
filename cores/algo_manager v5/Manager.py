@@ -37,7 +37,7 @@ import json
 
 # from Tester import *
 from httpserver import *
-from psutil import process_iter
+
 import psutil
 
 try:
@@ -46,6 +46,8 @@ except ImportError:
 	import pip
 	pip.main(['install', 'psutil'])
 	import psutil
+
+from psutil import process_iter
 
 #May this class bless by the Deus Mechanicus.
 
