@@ -641,8 +641,10 @@ class UI(pannel):
 	
 		tltief = {"name":"TLTIEF","symbol":["TLT.NQ","IEF.NQ"],"ratio":[50,-107],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 	
+		spymsmo = {"name":"MSOSSPY","symbol":["MSOS.AM","SPY.AM"],"ratio":[66,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+	
 		spy = [spyqqq,spytlt,spyuso,spygdx,spyiwm]
-		spy2 = [spyijr,spybitq,spygbtc]
+		spy2 = [spyijr,spybitq,spygbtc,spymsmo]
 		etf = [spyxlk,spyxlc,spyxli,spyxlu,spyxly]
 		qqq = [smhqqq,xleqqq,tqqqgbtc] #arkkqqq
 		gld = [gldslv,gdxgdxj,gdxgld,silslv]
