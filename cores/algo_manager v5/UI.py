@@ -330,11 +330,11 @@ class UI(pannel):
 		self.fees = tk.DoubleVar()
 		self.sizeTraded = tk.IntVar()
 
+		self.weeklyTotal = tk.IntVar(value=1)
+		self.monthlyTotal = tk.IntVar(value=1)
 
-
-
-
-
+		self.weeklySR = tk.DoubleVar(value=1)
+		self.monthlySR = tk.DoubleVar(value=1)
 
 		self.u_winning = tk.DoubleVar()
 		self.u_winning_min = tk.DoubleVar()
@@ -435,14 +435,14 @@ class UI(pannel):
 		self.t2.grid(sticky="w",column=col,row=1)
 		self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.sizeTraded)
 		self.t2_.grid(sticky="w",column=col,row=2)
-
+		#weeklyTotal
 		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
 		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=4)
 
 		col +=1 
 		self.t2 = ttk.Button(self.performance_pannel, text="WeeklyTotal:")
 		self.t2.grid(sticky="w",column=col,row=1)
-		self.t2_ = ttk.Button(self.performance_pannel, text="0")
+		self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.weeklyTotal)
 		self.t2_.grid(sticky="w",column=col,row=2)
 
 		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
@@ -453,7 +453,7 @@ class UI(pannel):
 		col +=1 
 		self.t2 = ttk.Button(self.performance_pannel, text="MonthlyTotal:")
 		self.t2.grid(sticky="w",column=col,row=1)
-		self.t2_ = ttk.Button(self.performance_pannel,text="0")
+		self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.monthlyTotal)
 		self.t2_.grid(sticky="w",column=col,row=2)
 
 		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
@@ -1210,7 +1210,7 @@ class UI(pannel):
 
 			elif label_name == STATUS:
 				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j] 
-				#self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.cancle_deployment
+				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.print_positions
 				#= tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command=tradingplan.cancle_deployment)
 
 			elif label_name==SELECTED:
