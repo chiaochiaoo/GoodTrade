@@ -397,6 +397,7 @@ class quick_model(model):
 				cmdstr+="Profit="+str(int(self.profit.get()))+","
 			if self.stop.get()>0:	
 				cmdstr+="Stop="+str(int(self.profit.get()))+","
+			cmdstr+="Aggresive_exit=1,"
 			cmdstr+=")"
 			print(cmdstr)
 			requests.get(cmdstr)
@@ -421,6 +422,8 @@ class quick_model(model):
 				cmdstr+="Profit="+str(int(self.profit.get()))+","
 			if self.stop.get()>0:	
 				cmdstr+="Stop="+str(int(self.stop.get()))+","
+
+			cmdstr+="Aggresive_exit=1,"
 			cmdstr+=")"
 			print(cmdstr)
 			requests.get(cmdstr)

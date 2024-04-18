@@ -587,7 +587,7 @@ class Manager:
 		MOO_pair = False 
 
 
-		MOC_send_out_timer = 958*60+30 #958*60+50
+		MOC_send_out_timer = 958*60+40 #958*60+50
 		#MOC_send_out_timer = 948*60
 
 		MOC_1559_timer = 959*60
