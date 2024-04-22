@@ -25,7 +25,7 @@ def find_between(data, first, last):
 
 PRICE = "Price"
 
-fill_timer = 120
+fill_timer = 60
 
 
 class Symbol:
