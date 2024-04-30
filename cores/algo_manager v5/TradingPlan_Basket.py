@@ -91,6 +91,15 @@ class TradingPlan_Basket:
 		if "Timer" in info:
 			self.timer = int(info["Timer"])
 
+		self.upclone_trigger = 0 
+		self.downclone_trigger = 0 
+		self.cloned = False 
+
+		if  "Upclone" in info:
+			self.upclone_trigger = int(info['Upclone'])
+		if  "Downclone" in info:
+			self.downclone_trigger = int(info['Downclone'])
+
 		self.sliperage_control = False 
 		self.spread_limit = 0
 
@@ -194,7 +203,7 @@ class TradingPlan_Basket:
 
 	def print_positions(self):
 
-		log_print(self.source,self.name," expected:",self.expected_shares ," current:",self.current_shares," requested:",self.current_request,' avg price',self.average_price)
+		log_print(self.source,self.name,self.inspectable,self.cloned,self.upclone_trigger,self.downclone_trigger," expected:",self.expected_shares ," current:",self.current_shares," requested:",self.current_request,' avg price',self.average_price)
 
 	def init_data(self,risk):
 
@@ -1003,7 +1012,24 @@ class TradingPlan_Basket:
 				self.stop = 0.1
 				log_print(self.source,self.algo_name,"BREAK EVEN")
 
+		if self.upclone_trigger>1 and total_unreal>self.upclone_trigger and self.cloned==False:
 
+
+			log_print(self.source,self.algo_name,"Up Cloning:",self.upclone_trigger)
+
+			self.cloned = True 
+			self.info['Upclone'] = 0
+			self.info['Downclone'] = 0
+			self.clone_cmd()
+
+		if self.downclone_trigger<-1 and total_unreal<self.downclone_trigger and self.cloned==False:
+
+			log_print(self.source,self.algo_name,"Down Cloning:",self.downclone_trigger)
+			self.cloned = True 
+
+			self.info['Upclone'] = 0
+			self.info['Downclone'] = 0
+			self.clone_cmd()
 
 		self.data[UNREAL] = round(total_unreal,2)
 		self.tkvars[UNREAL].set(self.data[UNREAL])
