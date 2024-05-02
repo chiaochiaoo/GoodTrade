@@ -257,7 +257,7 @@ class Manager:
 
 
 		#
-		print(sum(self.nets[-5:]),sum(self.nets[-21:]),self.nets[-10:])
+		print(sum(self.nets[-5:]),sum(self.nets[-21:]),self.nets[-21:])
 
 		self.ui.weeklyTotal.set(int(sum(self.nets[-5:])))
 
@@ -364,6 +364,7 @@ class Manager:
 					c= 0
 					for val in symbols:
 
+						#print("inspecting:",val)
 						try:
 							c+=val.symbol_inspection()
 							#self.total_difference+=abs(val.get_difference())
@@ -583,7 +584,7 @@ class Manager:
 
 		##########################################################
 
-		MOO_pair_timer = 570*60+20 #ts+25 #
+		MOO_pair_timer = 570*60+20 #ts+25 # #529*60#
 		MOO_pair = False 
 
 
@@ -603,10 +604,13 @@ class Manager:
 
 		c = 0 
 		log_print("Timer: functional and counting")
+		checkmts  = 0
+		mts = 0
 		while True:
 			now = datetime.now()
 			ts = now.hour*3600 + now.minute*60 + now.second
 
+			mts = now.hour*60 + now.minute 
 
 			if ts>=MOO_exit_timer_AM and MOO_exit_AM==False :
 
@@ -822,6 +826,10 @@ class Manager:
 				moc_pair_release=True
 
 			#print('current:',ts)
+
+			if mts!=checkmts:
+				checkmts = mts
+				log_print("Timer current: ",mts)
 			time.sleep(3)
 
 		log_print("Timer: completed")
@@ -1303,15 +1311,13 @@ class Manager:
 
 		### GET THE NEWEST . THEN UPDATE IT ###
 
-		with self.get_symbol_price_lock:
-			now = datetime.now()
-			sts = now.hour*3600 + now.minute*60 + now.second 
+		try:
+			with self.get_symbol_price_lock:
+				now = datetime.now()
+				sts = now.hour*3600 + now.minute*60 + now.second 
 
-
-			if sts>self.last_price_ts+2:
-				try:
+				if sts>self.last_price_ts+2:
 					with self.get_price_lock:
-
 						r = "https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?include_otc=false&apiKey=ezY3uX1jsxve3yZIbw2IjbNi5X7uhp1H"
 
 						r = requests.get(r)
@@ -1339,12 +1345,9 @@ class Manager:
 
 						self.real_time_ts = cur_ts
 						self.last_price_ts = sts 
-						#log_print("Price update complete.")				
-							#log_print("Manager: price update complete.. symbols:",len(symbols),x,symbol,self.symbols_short[symbol],self.symbol_data[self.symbols_short[symbol]].get_bid())
-				except	Exception	as e:
-					PrintException("Updating prices error",e)
 
-
+		except Exception	as e:
+			PrintException("Updating prices error",e)
 	def get_position(self,ticker):
 
 		if ticker in self.current_positions:
