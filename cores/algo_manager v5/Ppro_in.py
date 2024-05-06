@@ -283,14 +283,17 @@ def read_summary(pipe):
 						content = file.readlines()
 
 					# Calculate the index to delete up to
-					half_index = len(content) // 2
-					print("summary file length:",len(content))
-					# Delete the first half of the content
-					del content[:half_index]
-					print("new summary file length:",len(content))
-					# Open the file for writing
-					with open(file_location, 'w') as file:
-						file.writelines(content)
+
+					if len(content)>100:
+
+						half_index = len(content) // 10
+						log_print("summary file length:",len(content))
+						# Delete the first half of the content
+						del content[:-half_index]
+						log_print("new summary file length:",len(content))
+						# Open the file for writing
+						with open(file_location, 'w') as file:
+							file.writelines(content)
 					
 					#os.remove(file_location)
 					# with open(file_location, 'w') as creating_new_csv_file: 
