@@ -279,12 +279,24 @@ def read_summary(pipe):
 			log_print("summary file located.")
 			if file_found==False:
 				try:
-					pass
+					with open(file_location, 'r') as file:
+						content = file.readlines()
+
+					# Calculate the index to delete up to
+					half_index = len(content) // 2
+					print("summary file length:",len(content))
+					# Delete the first half of the content
+					del content[:half_index]
+					print("new summary file length:",len(content))
+					# Open the file for writing
+					with open(file_location, 'w') as file:
+						file.writelines(content)
+					
 					#os.remove(file_location)
 					# with open(file_location, 'w') as creating_new_csv_file: 
-  					# 	pass 
-				except:
-					pass
+					# 	pass 
+				except Exception as e:
+					print("Shorting file error:,",e)
 				file_found = True 
 			else:
 
@@ -714,27 +726,27 @@ def decode_l1_(stream_data,pipe,writer,l1data):
 		writer.writerow([symbol,mili_ts,bid,ask])
 
 def force_close_port(port, process_name=None):
-    """Terminate a process that is bound to a port.
-    
-    The process name can be set (eg. python), which will
-    ignore any other process that doesn't start with it.
-    """
-    for proc in psutil.process_iter():
-        for conn in proc.connections():
-            if conn.laddr[1] == port:
-                #Don't close if it belongs to SYSTEM
-                #On windows using .username() results in AccessDenied
-                #TODO: Needs testing on other operating systems
-                try:
-                    proc.username()
-                except psutil.AccessDenied:
-                    pass
-                else:
-                    if process_name is None or proc.name().startswith(process_name):
-                        try:
-                            proc.kill()
-                        except (psutil.NoSuchProcess, psutil.AccessDenied):
-                            pass 
+	"""Terminate a process that is bound to a port.
+	
+	The process name can be set (eg. python), which will
+	ignore any other process that doesn't start with it.
+	"""
+	for proc in psutil.process_iter():
+		for conn in proc.connections():
+			if conn.laddr[1] == port:
+				#Don't close if it belongs to SYSTEM
+				#On windows using .username() results in AccessDenied
+				#TODO: Needs testing on other operating systems
+				try:
+					proc.username()
+				except psutil.AccessDenied:
+					pass
+				else:
+					if process_name is None or proc.name().startswith(process_name):
+						try:
+							proc.kill()
+						except (psutil.NoSuchProcess, psutil.AccessDenied):
+							pass 
 
 
 #https://financialmodelingprep.com/api/v3/quote-short/AAPL,MSFT,AMZN,CSCO,INTC?apikey=a901e6d3dd9c97c657d40a2701374d2a
