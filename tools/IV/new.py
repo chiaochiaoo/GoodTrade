@@ -92,7 +92,8 @@ class processor:
 				now = datetime.now()
 				ts = now.hour*60 + now.minute
 
-				if (ts >=525 and ts<=530) or (ts>935 and ts<940):
+				# this is the timezone
+				if (ts >=525 and ts<=560) or (ts>935 and ts<940):
 					k = 0 
 					self.registered = False 
 					self.termination = False 
@@ -101,7 +102,7 @@ class processor:
 
 				if k>1 and self.registered==False:
 
-					earning_list = earning_tracking()
+					
 
 					force_close_port(4135)
 					postbody = "http://localhost:8080/SetOutput?symbol=*.NQ,*.AM,*.NY&feedtype=IMBALANCE&output=4135&status=on"
@@ -231,12 +232,13 @@ def writer(receive_pipe):
 	now = datetime.now()
 	ts = now.hour*60 + now.minute
 
-
+	earning_list = earning_tracking()
+	
 	file = ""
 	if ts<800:
-		file = "saves/M_"+datetime.now().strftime("%m-%d")+".csv"
+		file = "saves/M_"+datetime.now().strftime("%y-%m-%d")+".csv"
 	else:
-		file = "saves/N_"+datetime.now().strftime("%m-%d")+".csv"
+		file = "saves/N_"+datetime.now().strftime("%y-%m-%d")+".csv"
 
 	print("Writer functional",file)
 
