@@ -14,7 +14,235 @@ import pickle
 import os
 import pandas as pd
 
+import pandas as pd
+import numpy as np
+import requests
+import json
+import datetime
+import itertools
+from io import StringIO
 
+
+
+
+def process_symbol_data(symbol,df,ndf):
+  ########## PROCESS ##################
+
+  df['symbol'] = symbol
+
+  df['pc'] = df['close'].shift(1)
+  df['po'] = df['open'].shift(1)
+
+  df['log_ret'] = np.log(df['close']) - np.log(df['open'])
+
+  df['std_14d'] = df['log_ret'].rolling(14).std().shift(1)
+  df['std_30d'] = df['log_ret'].rolling(30).std().shift(1)
+  df['std_60d'] = df['log_ret'].rolling(60).std().shift(1)
+
+  df['gain_norm_60d'] = df['log_ret']/df['std_60d']
+  df['pgain_norm_60d'] = df['log_ret'].shift(1)/df['std_60d']
+
+  df['p2gain_norm_60d'] = (df['log_ret'].shift(1)+df['log_ret'].shift(2))/df['std_60d']
+  df['gap_norm_60d'] =  (np.log(df['open']) - np.log(df['pc']))/df['std_60d']
+  df['utg_norm_60d'] =  (np.log(df['open']) - np.log(df['po']))/df['std_60d']
+
+  df['std_14_rps'] = df['pc']*df['std_14d']
+  df['std_30_rps'] = df['pc']*df['std_30d']
+  df['std_60_rps'] = df['pc']*df['std_60d']
+
+  # df['bw_relv'] = df['volume']/df['volume'].shift(1).rolling(10).mean()
+  # df['m_relv'] = df['volume']/df['volume'].shift(1).rolling(20).mean()
+  # df['q_relv'] = df['volume']/df['volume'].shift(1).rolling(60).mean()
+  # df['hy_relv'] = df['volume']/df['volume'].shift(1).rolling(120).mean()
+  # df['y_relv'] = df['volume']/df['volume'].shift(1).rolling(252).mean()
+
+  if len(ndf)!=0:
+    l =ndf['open'].to_numpy().reshape(len(df),len(ndf)//len(df))
+    # v = ndf['acc_vol'].to_numpy().reshape(len(df),len(ndf)//len(df))
+    # bv = ndf['volume'].to_numpy().reshape(len(df),len(ndf)//len(df))
+    ts = [945, 946, 947, 948, 949, 950, 951, 952, 953, 954, 955,956, 957, 958, 959, 960]
+    com = ["g"+str(i) for i in ts]
+
+    df[com] = l[:len(df)]
+
+    # v_part = ["accv"+str(i) for i in ts]
+    # df[v_part] = v
+
+    # bv_part = ["bv"+str(i) for i in ts]
+    # df[bv_part] = bv
+
+  df['itc'] = np.log(df['g950']) - np.log(df['g960'])
+  df['itc_std'] = df['itc'].rolling(60).std().shift(1)
+
+  df['itc_rps'] = df['pc']*df['itc_std']
+
+  df = df[['day','symbol','open','itc_std','itc_rps']]
+
+  # for i in [0,1,2,3,4,5,6,7,8]:
+  #   df['imb'+str(i)] = 0
+    # df['95095'+str(i)+'g'] = (np.log(df['g95'+str(i)]) - np.log(df['g950']))/df['itc_std']
+    # df['itc95'+str(i)+'g'] = (np.log(df['close']) - np.log(df['g95'+str(i)]))/df['itc_std']
+  return df.iloc[-1]
+
+def get_symbol_data(symbol):
+
+  days = 90
+
+  postbody = "http://api.kibot.com/?action=history&symbol="+symbol+"&interval="+str(10)+"&period="+str(days)+"&regular=1&user=sajali26@hotmail.com&password=guupu4upu"
+  r= requests.post(postbody)
+
+  ndf  = pd.read_csv(StringIO(r.text),names=["day","time","open","high","low","close","volume"])
+
+  ndf = ndf.loc[ndf['time']=="15:50"]
+
+  df =ndf
+  df['itc'] = np.log(df['close']) - np.log(df['open'])
+  df['itc_std'] = df['itc'].rolling(60).std().shift(1)
+  df['pc'] = df['close'].shift(1)
+  df['itc_rps'] = df['pc']*df['itc_std']
+
+  return df.iloc[-1]['itc_rps']
+def get_symbol_data_TO(symbol):
+
+  total = []
+
+  #print(days)
+  days=120
+  for i in range(days//5):
+
+    start = datetime.datetime.today() - datetime.timedelta(days=6*i)
+    end = start - datetime.timedelta(days=5)
+
+    start = start.strftime('%Y-%m-%d')
+    end = end.strftime('%Y-%m-%d')
+
+    postbody = "https://financialmodelingprep.com/api/v3/historical-chart/5min/"+symbol+"?from="+end+"&to="+start+"&apikey=a901e6d3dd9c97c657d40a2701374d2a"
+
+    r= requests.get(postbody)
+
+    d = json.loads(r.text)
+    d = pd.DataFrame.from_dict(d)
+    total.append(d)
+
+  d = pd.concat(total)
+
+  d['date'] = pd.to_datetime(d['date'])
+  d['time'] = d['date'].dt.strftime('%H:%M')
+  d = d.sort_values(by=['date']).reset_index(drop=True)
+
+  d = d.loc[d['time']=="15:45"]
+
+  d['itc'] = np.log(d['close']) - np.log(d['open'])
+  d['itc_std'] = d['itc'].rolling(60).std().shift(1)
+  d['itc_rps'] = d['open']*d['itc_std']
+
+  return d
+
+def sending_close_algo(algo,symbols):
+
+    cmdstr =  "https://tnv.ngrok.io/Basket="+algo+",Order=*"
+
+    for symbol,share in symbols.items():
+      cmdstr += symbol+str(int(share))+","
+
+    cmdstr= cmdstr[:-1]
+    cmdstr+="*"
+
+    #print(cmdstr)
+    requests.get(cmdstr)
+    #print(cmdstr)
+    return cmdstr
+
+def long_algo(df,name,risk):
+
+  orders = {}
+  df['share'] = (risk//df['itc_std']).astype(int)
+
+  for symbol,row in df.iterrows():
+
+    share = row['share']
+    orders[symbol] = share 
+
+  sending_close_algo(name,orders)
+
+
+def short_algo(df,name,risk):
+
+  orders = {}
+  df['share'] = (-risk//df['itc_std']).astype(int)
+
+  for symbol,row in df.iterrows():
+    share = row['share']
+    orders[symbol] = share 
+
+  sending_close_algo(name,orders)
+
+def update_imbalance(symbol,ts,v,side,cts,df,update):
+
+  if side =="S":
+    v = -v
+    
+  # update cur.
+  if symbol in update:
+    update[symbol] = v 
+
+  #print(ts,cts)
+  # check global event
+  if ts>cts:
+    print("cts:",cts)
+
+    if cts in df:
+      df[cts] = list(update.values())
+      algo(cts,df)
+
+      keys =df.index.to_list()
+
+      for key in keys:
+        update[key] = 0
+
+      #display(df)
+    cts=ts
+
+    df.to_csv("imb_test.csv")
+  
+  return cts
+  
+def algo(cts,df):
+
+  # if 15:50 more than up or down 0.5m , take it
+  risk = 5
+  select = df.loc[df[cts]>250000]
+
+  name = "DC"+str(cts)
+  if len(select)>0:
+    #print("select",long_algo(select,risk))
+    name+="L_"
+    long_algo(select,name,risk)
+    
+
+  select = df.loc[df[cts]<-250000]
+
+  if len(select)>0:
+    #print("select",short_algo(select,risk))
+    name+="S_"
+    short_algo(select,name,risk)
+
+def init_close_df(symbols):
+  d= {}
+
+  for symbol in symbols:
+
+    d[symbol] = {}
+    sym = symbol.split(".")[0]
+    d[symbol]['itc_std'] = get_symbol_data(sym)
+    if symbol[-2:]=="TO":
+      d[symbol]['itc_std'] =get_symbol_data_TO(symbol)
+    
+    for i in [950,951,952,953,954,955,956,957,958,959]:
+      d[symbol][i] = 0
+
+  df = pd.DataFrame.from_dict(d,orient='index')
+  return df
 
 def find_between(data, first, last):
 	try:
@@ -163,9 +391,6 @@ class processor:
 		self.f.close()
 
 
-
-
-
 def force_close_port(port, process_name=None):
 	"""Terminate a process that is bound to a port.
 	
@@ -191,10 +416,7 @@ def force_close_port(port, process_name=None):
 							pass 
 
 
-
-
 def writer(receive_pipe):
-
 
 	nyse_long = []
 	nyse_short = []
@@ -244,15 +466,26 @@ def writer(receive_pipe):
 
 	print("earning list:",earning_list)
 
-	### if morning 
-
-	### if night 
-
 	coefficient = 1
 
 	prev_time = 0
 
 	moo_release = False
+
+	############ DF BLOCK ################################
+
+	update = {}
+	symbols = ['QQQ.NQ','TQQQ.NQ','UVXY.AM','SQQQ.NQ','SPY.AM',"XLY.AM", "XLC.AM", "XLP.AM" ,"XLE.AM" ,"XLF.AM", "XLV.AM", "XLI.AM", "XLB.AM", "XLRE.AM", "XLK.AM", "XLU.AM"]
+
+	df = init_close_df(symbols)
+
+	keys =df.index.to_list()
+	for key in keys:
+	  update[key] = 0
+
+	cts = 950
+
+	########################################################
 
 	with open(file, 'a+',newline='') as csvfile2:
 		writer = csv.writer(csvfile2)
@@ -287,8 +520,12 @@ def writer(receive_pipe):
 
 				size = float(find_between(r,"Volume=",","))
 				time_ = timestamp_seconds(find_between(r, "MarketTime=", ","))
+
 				side = find_between(r,"Side=",",")
 
+				if time_>57000:
+					ts = int(time_//60)
+					cts = update_imbalance(symbol,ts,size,side,cts,df,update)
 
 				# 09:25
 				if time_>=33900 and time_ <= 33930 and symbol[-2:]=="NQ":
