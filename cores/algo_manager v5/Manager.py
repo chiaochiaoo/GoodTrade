@@ -257,7 +257,7 @@ class Manager:
 
 
 		#
-		print(sum(self.nets[-5:]),sum(self.nets[-21:]),self.nets[-21:])
+		print(sum(self.nets[-5:]),sum(self.nets[-21:]),self.nets[-20:])
 
 		self.ui.weeklyTotal.set(int(sum(self.nets[-5:])))
 
@@ -579,7 +579,7 @@ class Manager:
 		Moo_enter_timer_NY = 566*60+40 #569*60+10  #ts+20558*60+15 
 		Moo_enter_NY = False 
 
-		Moo_enter_timer_AM = 569*60+20 #569*60+10  #558*60+20
+		Moo_enter_timer_AM = 569*60+45 #569*60+10  #558*60+20
 		Moo_enter_AM = False
 
 		##########################################################
@@ -623,7 +623,9 @@ class Manager:
 				time.sleep(10)
 
 				target = ".AM"
-				for symbol,data in self.symbol_data.items():
+
+				out = self.symbol_data.copy()
+				for symbol,data in out.items():
 					if target in symbol:
 						share = data.get_all_moo_exit()*-1
 
@@ -646,7 +648,8 @@ class Manager:
 				time.sleep(10)
 
 				target = ".NQ"
-				for symbol,data in self.symbol_data.items():
+				out = self.symbol_data.copy()
+				for symbol,data in out.items():
 					if target in symbol:
 						share = data.get_all_moo_exit()*-1
 
@@ -669,7 +672,8 @@ class Manager:
 				time.sleep(10)
 
 				target = ".NY"
-				for symbol,data in self.symbol_data.items():
+				out = self.symbol_data.copy()
+				for symbol,data in out.items():
 					if target in symbol:
 						share = data.get_all_moo_exit()*-1
 
@@ -685,7 +689,8 @@ class Manager:
 
 				total_moo_enter = {}
 				target = ".NQ"
-				for symbol,data in self.symbol_data.items():
+				out = self.symbol_data.copy()
+				for symbol,data in out.items():
 
 					if target in symbol:
 						share = data.get_all_moo_enter()
@@ -702,7 +707,8 @@ class Manager:
 				total_moo_enter = {}
 				target = ".NY"
 
-				for symbol,data in self.symbol_data.items():
+				out = self.symbol_data.copy()
+				for symbol,data in out.items():
 					if target in symbol:
 						share = data.get_all_moo_enter()
 
@@ -717,7 +723,8 @@ class Manager:
 
 				total_moo_enter = {}
 				target = ".AM"
-				for symbol,data in self.symbol_data.items():
+				out = self.symbol_data.copy()
+				for symbol,data in out.items():
 					if target in symbol:
 						share = data.get_all_moo_enter()
 
@@ -1441,7 +1448,7 @@ class Manager:
 
 		sender = 'algomanagertnv@gmail.com'
 		password = 'myvjbplswvsvktau'
-		recipients = ['chiao@selectvantage.com']
+		recipients = ['algomanagertnv@gmail.com']
 
 		msg = MIMEText(body)
 		msg['Subject'] = subject
@@ -1462,7 +1469,7 @@ class Manager:
 
 		sender = 'algomanagertnv@gmail.com'
 		password = 'myvjbplswvsvktau'
-		recipients = ['chiao@selectvantage.com','zenvoidsun@gmail.com','andrew@selectvantage.com']
+		recipients = ['algomanagertnv@gmail.com','zenvoidsun@gmail.com','andrew@selectvantage.com']
 
 
 		subject = "Rejection Alert:"+user +" : "+str(self.rejection_count)
@@ -1476,7 +1483,7 @@ class Manager:
 			return 
 		sender = 'algomanagertnv@gmail.com'
 		password = 'myvjbplswvsvktau'
-		recipients = ['chiao@selectvantage.com','andrew@selectvantage.com','zenvoidsun@gmail.com']
+		recipients = ['algomanagertnv@gmail.com','andrew@selectvantage.com','zenvoidsun@gmail.com']
 
 
 		user = self.ui.user.get()
