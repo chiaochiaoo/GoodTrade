@@ -1,4 +1,4 @@
-TICKHOLD
+DC
 TickClose
 TCV2
 Tick_RG_v1: Algo will at most enter 3 time. Exit only via MOC.
