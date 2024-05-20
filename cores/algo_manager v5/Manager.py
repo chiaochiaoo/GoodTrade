@@ -62,7 +62,6 @@ from psutil import process_iter
 TEST = True
 
 
-
 def request(post):
 	#print("sending ",post)
 	try:
@@ -90,10 +89,7 @@ except ImportError:
 	from email.mime.multipart import MIMEMultipart
 	from email.mime.application import MIMEApplication
 
-
-
 # Email configuration
-
 
 CONNECTED  ="Connected"
 # DISCONNECTED = "Disconnec"
@@ -107,7 +103,6 @@ class Manager:
 		self.root = root
 
 		self.termination = False
-
 
 		self.system_enable = False 
 
@@ -278,6 +273,8 @@ class Manager:
 
 		self.symbol_inspection_lock = threading.Lock()
 		self.symbol_inspection_start = True
+
+		self.close_timer = 0
 
 		good = threading.Thread(target=self.goodtrade_in, daemon=True)
 		good.start()
@@ -836,6 +833,7 @@ class Manager:
 
 			if mts!=checkmts:
 				checkmts = mts
+				self.close_timer = mts
 				log_print("Timer current: ",mts)
 			time.sleep(3)
 
@@ -1421,7 +1419,7 @@ class Manager:
 
 			user = self.ui.user.get()
 			subject = "User Status:"+user
-			body = "User Status."  + self.stringfy(self.current_summary) + self.output_active_tps() +self.stringfy(self.current_positions)
+			body = "User Status:" +str(self.close_timer) + self.stringfy(self.current_summary) + self.output_active_tps() +self.stringfy(self.current_positions)
 
 			self.send_email_admin(subject,body)	
 
