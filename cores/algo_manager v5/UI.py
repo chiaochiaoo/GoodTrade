@@ -473,7 +473,7 @@ class UI(pannel):
 						"WR":7,\
 						"MR":7,\
 						"TR":7,\
-						"-25%":7,\
+						"-90%":7,\
 						"-50%":7,\
 						"+25%":7,\
 						"flatten":8,\
@@ -1184,7 +1184,7 @@ class UI(pannel):
 		"WR":tradingplan.tkvars[WR], \
 		"MR":tradingplan.tkvars[MR], \
 		"TR":tradingplan.tkvars[TR], \
-		"-25%":tradingplan.tkvars[ALGO_MULTIPLIER],\
+		"-90%":tradingplan.tkvars[ALGO_MULTIPLIER],\
 		"-50%":tradingplan.tkvars[ALGO_MULTIPLIER],\
 		"+25%":tradingplan.tkvars[ALGO_MULTIPLIER],\
 		'flatten':"",\
@@ -1232,9 +1232,9 @@ class UI(pannel):
 
 				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.flatten_cmd
 
-			elif label_name =="-25%":
+			elif label_name =="-90%":
 				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
-				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.reduce_one_quarter
+				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.reduce_ninety
 
 			elif label_name =="-50%":
 				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
