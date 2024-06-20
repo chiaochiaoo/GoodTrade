@@ -140,7 +140,7 @@ class Manager:
 
 		self.manage_lock = 0
 
-		self.algo_limit = 100
+		self.algo_limit = 199
 
 		self.spread_check = {}
 		self.real_time_ts = 0
@@ -469,6 +469,9 @@ class Manager:
 					self.baskets[basket_name].deploy()
 				else:
 					return 
+
+			else:
+				log_print(basket_name," exceeding algo limit.")
 
 		if self.baskets[basket_name].shut_down==False:
 			for symbol,value in orders.items():
