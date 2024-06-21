@@ -276,6 +276,9 @@ class Manager:
 		self.moo_algos = {}
 		self.moo_lock = threading.Lock()
 
+
+		self.total_moc_nq = {}
+
 		self.shutdown=False
 
 		self.symbol_inspection_lock = threading.Lock()
@@ -476,7 +479,7 @@ class Manager:
 		if self.baskets[basket_name].shut_down==False:
 			for symbol,value in orders.items():
 
-				if "." in symbol and symbol not in self.bad_symbols:
+				if "." in symbol and symbol not in self.bad_symbols and symbol not in self.total_moc_nq:
 					log_print("Manager: Applying basket command",symbol,value)
 					if symbol not in self.symbol_data:
 						self.symbol_data[symbol] = Symbol(self,symbol,self.pipe_ppro_out)  #register in Symbol.
@@ -761,8 +764,8 @@ class Manager:
 
 			if ts>=MOC_send_out_timer_NQ and MOC_NQ == False:
 
-				total_moc_nq = {}
-
+				#total_moc_nq = {}
+				self.total_moc_nq = {}
 				for name,basket in self.baskets.items():
 					if "NQ" in name:
 						self.algo_as_is(name)
@@ -775,7 +778,7 @@ class Manager:
 					reque = ""
 					if ticker[-2:]=="NQ":
 
-						total_moc_nq[ticker] = share
+						self.total_moc_nq[ticker] = share
 
 						if share<0:
 							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=NSDQ Buy NSDQ MOC DAY&shares="+str(abs(share))
@@ -836,41 +839,19 @@ class Manager:
 							elif share>0:
 								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ROSN Sell->Short RosenblattDQuoteClose MOC DAY&shares="+str(share)
 						elif ticker[-2:]=="AM":
+
 							if share<0:
 								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Buy ARCX MOC DAY&shares="+str(abs(share))
 							elif share>0:
 								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Sell->Short ARCX MOC DAY&shares="+str(share)
-						## add the NQ block. cal the difference. 
-						# elif ticker[-2:]=="NQ":
 
-						# 	if ticker in total_moc_nq:
+						elif ticker[-2:]=="NQ":
 
-						# 		if share>0:
-
-						# 			if share<total_moc_nq[ticker]:
-						# 				log_print("ERROR:",ticker," INSUFFICIENT SHARES.")
-						# 			else:
-						# 				share_difference = share - total_moc_nq[ticker]
-						# 				share_difference = 0
-						# 		else:
-
-						# 			if share<total_moc_nq[ticker]:
-						# 				log_print("ERROR:",ticker," INSUFFICIENT SHARES.")
-						# 				share_difference = 0
-						# 			else:
-						# 				share_difference = share - total_moc_nq[ticker]
-
-						# 		if share_difference!=0:
-						# 			if share<0:
-						# 				reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Buy ARCX MOC DAY&shares="+str(abs(share_difference))
-						# 			elif share>0:
-						# 				reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Sell->Short ARCX MOC DAY&shares="+str(share_difference)							
-
-						# 	else:
-						# 		if share<0:
-						# 			reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Buy ARCX MOC DAY&shares="+str(abs(share))
-						# 		elif share>0:
-						# 			reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Sell->Short ARCX MOC DAY&shares="+str(share)
+							if ticker not in self.total_moc_nq:
+								if share<0:
+									reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Buy ARCX MOC DAY&shares="+str(abs(share))
+								elif share>0:
+									reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Sell->Short ARCX MOC DAY&shares="+str(share)
 
 						if reque!="":
 							try:
