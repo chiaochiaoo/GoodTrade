@@ -825,6 +825,29 @@ class TradingPlan_Basket:
 							else:
 								self.submit_expected_shares(symbol,self.expected_shares[symbol]-self.original_positions[symbol]//coefficient)
 
+	def reduce_ninety(self):
+
+
+
+		coefficient = 0.9 
+		minimal = 0.9
+		now = datetime.now()
+		ts = now.hour*3600 + now.minute*60 + now.second 
+
+		#self.expected_shares
+		if ts-self.operation_timer>5:
+			self.operation_timer = ts 
+
+			#### collapse. ### ?
+			if self.tkvars[ALGO_MULTIPLIER].get()>=minimal:
+				self.tkvars[ALGO_MULTIPLIER].set(round(self.tkvars[ALGO_MULTIPLIER].get()-0.9,2))
+				for symbol,item in self.symbols.items():
+					if symbol in self.original_positions:
+						if self.expected_shares[symbol]!=0:
+							if abs(self.expected_shares[symbol])<=abs(int(self.original_positions[symbol]*coefficient)): # set to 0
+								self.submit_expected_shares(symbol,0)
+							else:
+								self.submit_expected_shares(symbol,self.expected_shares[symbol]-int(self.original_positions[symbol]*coefficient))
 	def increase_one_quarter(self):
 
 		now = datetime.now()

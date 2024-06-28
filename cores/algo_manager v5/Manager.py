@@ -140,7 +140,7 @@ class Manager:
 
 		self.manage_lock = 0
 
-		self.algo_limit = 100
+		self.algo_limit = 199
 
 		self.spread_check = {}
 		self.real_time_ts = 0
@@ -248,7 +248,7 @@ class Manager:
 		self.monthly_record = self.take_records(20)
 		self.total_record = self.take_records(200)
 
-		self.concept_record,self.monthly,self.nets = self.take_records_concept()
+		self.concept_record,self.monthly,self.nets,mm,mq,cm,cq= self.take_records_concept()
 
 
 		#
@@ -257,6 +257,13 @@ class Manager:
 		self.ui.weeklyTotal.set(int(sum(self.nets[-5:])))
 
 		self.ui.monthlyTotal.set(int(sum(self.nets[-21:])))
+		self.ui.quarterlyTotal.set(int(sum(self.nets[-63:])))
+
+		self.ui.monthly_commision.set("Fees:"+str(cm))
+		self.ui.quarterly_commision.set("Fees:"+str(cq))
+
+		self.ui.monthly_manual.set("Manual:"+str(mm))
+		self.ui.quarterly_manual.set("Manual:"+str(mq))
 
 		self.gateway = 0
 
@@ -268,6 +275,9 @@ class Manager:
 
 		self.moo_algos = {}
 		self.moo_lock = threading.Lock()
+
+
+		self.total_moc_nq = {}
 
 		self.shutdown=False
 
@@ -463,10 +473,13 @@ class Manager:
 				else:
 					return 
 
+			else:
+				log_print(basket_name," exceeding algo limit.")
+
 		if self.baskets[basket_name].shut_down==False:
 			for symbol,value in orders.items():
 
-				if "." in symbol and symbol not in self.bad_symbols:
+				if "." in symbol and symbol not in self.bad_symbols and symbol not in self.total_moc_nq:
 					log_print("Manager: Applying basket command",symbol,value)
 					if symbol not in self.symbol_data:
 						self.symbol_data[symbol] = Symbol(self,symbol,self.pipe_ppro_out)  #register in Symbol.
@@ -585,8 +598,13 @@ class Manager:
 		MOO_pair = False 
 
 
-		MOC_send_out_timer = 958*60+40 #958*60+50
-		#MOC_send_out_timer = 948*60
+		MOC_send_out_timer_NQ = 954*60+30 #954*60+30 
+
+		MOC_send_out_timer = 958*60+40 #958*60+40 #958*60+50
+
+
+		
+		MOC_NQ = False 
 
 		MOC_1559_timer = 959*60
 		#MOC_1559_timer = MOC_send_out_timer+30
@@ -742,6 +760,42 @@ class Manager:
 						trade.turn_on_inspection()
 
 				MOO_pair = True 
+
+
+			if ts>=MOC_send_out_timer_NQ and MOC_NQ == False:
+
+				#total_moc_nq = {}
+				self.total_moc_nq = {}
+				for name,basket in self.baskets.items():
+					if "NQ" in name:
+						self.algo_as_is(name)
+
+				total_moc = self.current_positions.copy()
+
+				
+				for ticker in total_moc.keys():
+					share = total_moc[ticker][1]
+					reque = ""
+					if ticker[-2:]=="NQ":
+
+						self.total_moc_nq[ticker] = share
+
+						if share<0:
+							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=NSDQ Buy NSDQ MOC DAY&shares="+str(abs(share))
+						elif share>0:
+							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=NSDQ Sell->Short NSDQ MOC DAY&shares="+str(share)
+
+						if reque!="":
+							try:
+								log_print("Sending" ,reque)
+								req = threading.Thread(target=request, args=(reque,),daemon=True)
+								req.start()
+							except Exception as e:
+								PrintException(e)
+
+
+				MOC_NQ = True 
+
 			if ts>=MOC_send_out_timer and moc_release==False:
 
 				########################################################################################################################
@@ -767,16 +821,16 @@ class Manager:
 					if self.moc_1601.get():
 						mul+=1 
 
-					# ### if 59 on, half, if 01 on half. ###
-					# for symbol,data in self.symbol_data.items():
-					# 	total_moc[symbol] = [symbol,int(data.get_all_future_remaining()//mul)]
 
 					total_moc = self.current_positions
 
 					log_print(mul,total_moc)
 
-					reque = ""
+					
 					for ticker in total_moc.keys():
+
+						reque = ""
+						
 						share = total_moc[ticker][1]
 
 						if ticker[-2:]=="NY":
@@ -784,11 +838,20 @@ class Manager:
 								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ROSN Buy RosenblattDQuoteClose MOC DAY&shares="+str(abs(share))
 							elif share>0:
 								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ROSN Sell->Short RosenblattDQuoteClose MOC DAY&shares="+str(share)
-						else:
+						elif ticker[-2:]=="AM":
+
 							if share<0:
 								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Buy ARCX MOC DAY&shares="+str(abs(share))
 							elif share>0:
 								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Sell->Short ARCX MOC DAY&shares="+str(share)
+
+						elif ticker[-2:]=="NQ":
+
+							if ticker not in self.total_moc_nq:
+								if share<0:
+									reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Buy ARCX MOC DAY&shares="+str(abs(share))
+								elif share>0:
+									reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Sell->Short ARCX MOC DAY&shares="+str(share)
 
 						if reque!="":
 							try:
@@ -1569,25 +1632,42 @@ class Manager:
 		monthly = {}
 		### MATCHING EACH ###
 		nets = []
+
+		algo_daily = {}
+		commisions = []
+
 		try:
 			for i in self.record_files[-300:]:
+
+				month = i[:7]
+
 				with open("../../algo_records/"+i+'.json') as f:
 					data = json.load(f)
 				for key,items in data["algos"].items():
 					###
 
+					if i not in algo_daily:
+						algo_daily[i]=float(items)
+					else:
+						algo_daily[i]+=float(items)
+
 					for k in concept.keys():
 						if k == key[:len(k)]:
 							concept[k] += float(items)
 
-				month = i[:7]
+				if i not in algo_daily:
+					algo_daily[i] = 0
+				
 				if month not in monthly:
 					if "total" in data:
-							monthly[month] = data["total"]["unrealizedPlusNet"]
+						monthly[month] = data["total"]["unrealizedPlusNet"]
+						#comm_montly[month] = data['total']['fees']
 				else:
 					if "total" in data:
-							monthly[month] += data["total"]["unrealizedPlusNet"]
+						monthly[month] += data["total"]["unrealizedPlusNet"]
+						#comm_montly[month] += data['total']['fees']
 
+				commisions.append(data['total']['fees'])
 				nets.append(data['total']['unrealizedPlusNet'])#unrealizedPlusNe
 						
 		except	Exception	as e:
@@ -1596,12 +1676,22 @@ class Manager:
 		for key in concept.keys():
 			concept[key] = round(concept[key],2)
 
+
 		for key in monthly.keys():
 			monthly[key] = round(monthly[key],2)
 
-		#log_print(concept)
 
-		return concept,monthly,nets
+		#log_print(concept)
+		algo_daily = list(algo_daily.values())
+		
+
+		manual_m = int(sum(algo_daily[-21:])-sum(commisions[-21:])-sum(nets[-21:]))
+		manual_q = int(sum(algo_daily[-63:])-sum(commisions[-63:])-sum(nets[-63:]))
+		
+		commision_m = int(sum(commisions[-21:]))
+		commision_q = int(sum(commisions[-63:]))
+
+		return concept,monthly,nets,manual_m,manual_q,commision_m,commision_q
 
 
 	def take_records(self,x):

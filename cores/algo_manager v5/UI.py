@@ -332,6 +332,16 @@ class UI(pannel):
 
 		self.weeklyTotal = tk.IntVar(value=1)
 		self.monthlyTotal = tk.IntVar(value=1)
+		self.quarterlyTotal = tk.IntVar(value=1)
+
+		self.weekly_algo = tk.StringVar()
+		self.monthly_manual = tk.StringVar()
+		self.quarterly_manual = tk.StringVar()
+
+
+		self.weekly_commision = tk.StringVar()
+		self.monthly_commision = tk.StringVar()
+		self.quarterly_commision = tk.StringVar()
 
 		self.weeklySR = tk.DoubleVar(value=1)
 		self.monthlySR = tk.DoubleVar(value=1)
@@ -379,14 +389,14 @@ class UI(pannel):
 
 
 
-		col +=1 
-		self.t2 = ttk.Button(self.performance_pannel, text="Risk:")
-		self.t2.grid(sticky="w",column=col,row=1)
-		self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.current_total_risk)
-		self.t2_.grid(sticky="w",column=col,row=2)
+		# col +=1 
+		# self.t2 = ttk.Button(self.performance_pannel, text="Risk:")
+		# self.t2.grid(sticky="w",column=col,row=1)
+		# self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.current_total_risk)
+		# self.t2_.grid(sticky="w",column=col,row=2)
 
-		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
-		ttk.Button(self.performance_pannel, textvariable=self.max_risk).grid(sticky="w",column=col,row=4)
+		# ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
+		# ttk.Button(self.performance_pannel, textvariable=self.max_risk).grid(sticky="w",column=col,row=4)
 
 
 		col +=1 
@@ -412,32 +422,47 @@ class UI(pannel):
 
 
 
-		col +=1 
-		self.t2 = ttk.Button(self.performance_pannel, text="Trades:")
-		self.t2.grid(sticky="w",column=col,row=1)
-		self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.trade_count)
-		self.t2_.grid(sticky="w",column=col,row=2)
+		# col +=1 
+		# self.t2 = ttk.Button(self.performance_pannel, text="Trades:")
+		# self.t2.grid(sticky="w",column=col,row=1)
+		# self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.trade_count)
+		# self.t2_.grid(sticky="w",column=col,row=2)
 
-		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
-		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=4)
+		# ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
+		# ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=4)
 
-		col +=1 
-		self.t2 = ttk.Button(self.performance_pannel, text="fees:")
-		self.t2.grid(sticky="w",column=col,row=1)
-		self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.fees)
-		self.t2_.grid(sticky="w",column=col,row=2)
+		# col +=1 
+		# self.t2 = ttk.Button(self.performance_pannel, text="fees:")
+		# self.t2.grid(sticky="w",column=col,row=1)
+		# self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.fees)
+		# self.t2_.grid(sticky="w",column=col,row=2)
 
-		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
-		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=4)
+		# ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
+		# ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=4)
 
-		col +=1 
-		self.t2 = ttk.Button(self.performance_pannel, text="SizeTraded:")
-		self.t2.grid(sticky="w",column=col,row=1)
-		self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.sizeTraded)
-		self.t2_.grid(sticky="w",column=col,row=2)
-		#weeklyTotal
-		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
-		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=4)
+		# col +=1 
+		# self.t2 = ttk.Button(self.performance_pannel, text="SizeTraded:")
+		# self.t2.grid(sticky="w",column=col,row=1)
+		# self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.sizeTraded)
+		# self.t2_.grid(sticky="w",column=col,row=2)
+		# #weeklyTotal
+		# ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
+		# ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=4)
+
+
+
+		# self.weeklyTotal = tk.IntVar(value=1)
+		# self.monthlyTotal = tk.IntVar(value=1)
+		# self.quarterlyTotal = tk.IntVar(value=1)
+
+		# self.weekly_algo = tk.StringVar()
+		# self.monthly_algo = tk.StringVar()
+		# self.quarterly_algo = tk.StringVar()
+
+
+		# self.weekly_commision = tk.StringVar()
+		# self.monthly_commision = tk.StringVar()
+		# self.quarterly_commision = tk.StringVar()
 
 		col +=1 
 		self.t2 = ttk.Button(self.performance_pannel, text="WeeklyTotal:")
@@ -456,10 +481,21 @@ class UI(pannel):
 		self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.monthlyTotal)
 		self.t2_.grid(sticky="w",column=col,row=2)
 
-		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
-		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=4)
+		ttk.Button(self.performance_pannel, textvariable=self.monthly_commision).grid(sticky="w",column=col,row=3)
+		ttk.Button(self.performance_pannel, textvariable=self.monthly_manual).grid(sticky="w",column=col,row=4)
 
-		# row +=1 
+
+
+		col +=1 
+		self.t2 = ttk.Button(self.performance_pannel, text="QuarterTotal:")
+		self.t2.grid(sticky="w",column=col,row=1)
+		self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.quarterlyTotal)
+		self.t2_.grid(sticky="w",column=col,row=2)
+
+		ttk.Button(self.performance_pannel, textvariable=self.quarterly_commision).grid(sticky="w",column=col,row=3)
+		ttk.Button(self.performance_pannel, textvariable=self.quarterly_manual).grid(sticky="w",column=col,row=4)
+
+
 
 	def init_deployment_pannel(self):
 
@@ -473,7 +509,7 @@ class UI(pannel):
 						"WR":7,\
 						"MR":7,\
 						"TR":7,\
-						"-25%":7,\
+						"-90%":7,\
 						"-50%":7,\
 						"+25%":7,\
 						"flatten":8,\
@@ -624,7 +660,7 @@ class UI(pannel):
 	
 		#total = [spyqqq,gldslv,tlsaqqq,smhqqq,gdxgdxj]
 		AAPLQQQ = {"name":"AAPLQQQ","symbol":["AAPL.NQ","QQQ.NQ"],"ratio":[24,-13],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		AMDNVDA = {"name":"QQQNVDA","symbol":["QQQ.NQ","NVDA.NQ"],"ratio":[26,-3],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		AMDNVDA = {"name":"NVDAQQQ","symbol":["NVDA.NQ","QQQ.NQ"],"ratio":[30,-26],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		DISNFLX = {"name":"DISNFLX","symbol":["DIS.NY","NFLX.NQ"],"ratio":[29,-5],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		
 		JETSXLE = {"name":"JETSXLE","symbol":["JETS.AM","XLE.AM"],"ratio":[41,-12],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
@@ -1184,7 +1220,7 @@ class UI(pannel):
 		"WR":tradingplan.tkvars[WR], \
 		"MR":tradingplan.tkvars[MR], \
 		"TR":tradingplan.tkvars[TR], \
-		"-25%":tradingplan.tkvars[ALGO_MULTIPLIER],\
+		"-90%":tradingplan.tkvars[ALGO_MULTIPLIER],\
 		"-50%":tradingplan.tkvars[ALGO_MULTIPLIER],\
 		"+25%":tradingplan.tkvars[ALGO_MULTIPLIER],\
 		'flatten':"",\
@@ -1232,9 +1268,9 @@ class UI(pannel):
 
 				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.flatten_cmd
 
-			elif label_name =="-25%":
+			elif label_name =="-90%":
 				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
-				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.reduce_one_quarter
+				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.reduce_ninety
 
 			elif label_name =="-50%":
 				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
