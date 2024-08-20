@@ -65,7 +65,9 @@ class UI(pannel):
 		
 		self.tk_labels=['Strategy',"Status","Updates" , "MaxU", "MinU", "U", "R", "WR", "MR", "TR", 'flatten', 'log']
 
-		self.algo_limit = 200
+		self.algo_limit = 200 - 3
+
+		self.algo_counts = 0
 		
 		# infos = {
 		# 'Strategy':tradingplan.algo_name, \
@@ -99,7 +101,7 @@ class UI(pannel):
 
 		self.tklabels_list = []
 
-		self.algo_counts = 0
+		
 
 		self.risk_timer = tk.DoubleVar(value=300)
 
@@ -128,7 +130,7 @@ class UI(pannel):
 
 		self.algo_count_number = tk.IntVar(value=0)
 		self.active_algo_count_number = tk.IntVar(value=0)
-		
+
 		self.algo_number = 0
 
 		self.position_count = tk.IntVar(value=0)

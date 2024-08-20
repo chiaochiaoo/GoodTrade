@@ -1288,7 +1288,7 @@ class Manager:
 
 						### depends on the active. 
 
-						if count%4==0:
+						if count%(2*(self.ui.active_algo_count_number.get()//100+1))==0:
 							self.check_all_pnl()
 					self.system_check()
 				except Exception as e :
