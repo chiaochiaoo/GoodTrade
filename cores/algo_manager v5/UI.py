@@ -5,8 +5,6 @@ from UI_custom_algo import *
 import time
 
 
-
-
 try:
 	from ttkwidgets.frames import Tooltip
 except ImportError:
@@ -129,6 +127,8 @@ class UI(pannel):
 		self.ppro_api_status.set("Disconnected")
 
 		self.algo_count_number = tk.IntVar(value=0)
+		self.active_algo_count_number = tk.IntVar(value=0)
+		
 		self.algo_number = 0
 
 		self.position_count = tk.IntVar(value=0)
@@ -189,9 +189,16 @@ class UI(pannel):
 
 
 		row +=1
-		self.al = ttk.Label(self.system_pannel, text="Algo Count::")
+		self.al = ttk.Label(self.system_pannel, text="Total Algo Count::")
 		self.al.grid(sticky="w",column=1,row=row,padx=10)
 		self.algo_count_ = ttk.Label(self.system_pannel,  textvariable=self.algo_count_number)
+		self.algo_count_.grid(sticky="w",column=2,row=row,padx=10)
+
+
+		row +=1
+		self.al = ttk.Label(self.system_pannel, text="Active Algo Count::")
+		self.al.grid(sticky="w",column=1,row=row,padx=10)
+		self.algo_count_ = ttk.Label(self.system_pannel,  textvariable=self.active_algo_count_number)
 		self.algo_count_.grid(sticky="w",column=2,row=row,padx=10)
 
 		row +=1

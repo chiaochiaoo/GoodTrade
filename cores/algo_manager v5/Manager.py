@@ -327,12 +327,14 @@ class Manager:
 
 	def check_all_pnl(self):
 		tps = list(self.baskets.keys())
+		count = 0
 		for tp in tps:
 			# if it is still running.
-
 			if self.baskets[tp].get_flatten_order()!=True:
+				count+=1
 				self.baskets[tp].check_pnl()
 
+		self.ui.active_algo_count_number.set(count)
 
 	def set_gateway(self):
 
