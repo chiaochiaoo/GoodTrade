@@ -45,7 +45,7 @@ class TradingPlan_Basket:
 
 		self.one_shot_algo = False
 
-		
+		self.shutdown = False
 		self.terminated = False 
 
 		self.manually_added = False 
