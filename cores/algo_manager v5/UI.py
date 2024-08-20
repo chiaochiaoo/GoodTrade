@@ -1105,8 +1105,6 @@ class UI(pannel):
 
 	def init_entry_pannel(self):
 
-
-
 		infos = {}
 		for key in self.labels.keys():
 			infos[key] = ""
@@ -1192,6 +1190,9 @@ class UI(pannel):
 
 				l = self.basket_label_count
 				row_number = l-1 #info[1]
+
+
+				### here, insert the top of the list, do a search program.
 			
 			self.create_basket_entry(tradingplan, row_number)
 

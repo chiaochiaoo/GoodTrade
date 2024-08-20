@@ -582,7 +582,8 @@ class TradingPlan_Basket:
 				log_print("HOLDING UPDATE ERROR")
 
 		self.data[REALIZED] = round(self.data[REALIZED],2)
-		#self.manager.new_record(self)
+		self.tkvars[REALIZED].set(str(self.data[REALIZED]))
+		self.tkvars[UNREAL].set(str(self.data[UNREAL]))
 
 	def notify_holding_change(self,symbol):
 		pass 
