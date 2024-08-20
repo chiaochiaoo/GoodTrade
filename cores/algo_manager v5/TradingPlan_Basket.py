@@ -1126,6 +1126,7 @@ class TradingPlan_Basket:
 
 		if self.flatten_order==True:
 			self.shutdown()
+			self.mark_algo_status(DONE)
 
 	def mark_algo_status(self,status):
 
