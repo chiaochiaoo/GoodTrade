@@ -717,7 +717,7 @@ class TradingPlan_Basket:
 				if sum(self.current_shares.values())==0 : #and self.one_shot_algo
 					### COMPLETELY FLAT. ###
 					self.flatten_order = True 
-					self.terminated = True 
+					#self.terminated = True 
 
 					log_print(self.source,self.algo_name,"NOW MANUUAL FLAT.")
 
@@ -1088,8 +1088,8 @@ class TradingPlan_Basket:
 			self.manager.apply_basket_cmd(self.algo_name+"_c"+str(self.clone_number),self.current_shares,100,False,self.info)
 			self.clone_number+=1
 
-	def shutdown(self):
-		self.shutdown = True 
+
+		
 
 	def get_algo_status(self):
 		return self.shutdown
@@ -1125,7 +1125,7 @@ class TradingPlan_Basket:
 			self.tklabels[REALIZED]["background"] = STRONGRED
 
 		if self.flatten_order==True:
-			self.shutdown()
+			self.shutdown = True
 			self.mark_algo_status(DONE)
 
 	def mark_algo_status(self,status):
