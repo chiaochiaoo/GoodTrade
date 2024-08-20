@@ -330,7 +330,7 @@ class Manager:
 		count = 0
 		for tp in tps:
 			# if it is still running.
-			if self.baskets[tp].get_flatten_order()!=True:
+			if self.baskets[tp].get_algo_status()!=True:
 				count+=1
 				self.baskets[tp].check_pnl()
 

@@ -1077,8 +1077,6 @@ class TradingPlan_Basket:
 
 		self.update_displays()
 
-	def shutdown(self):
-		self.shutdown = True 
 
 	def clone_cmd(self):
 
@@ -1089,6 +1087,13 @@ class TradingPlan_Basket:
 		if self.clone_able:
 			self.manager.apply_basket_cmd(self.algo_name+"_c"+str(self.clone_number),self.current_shares,100,False,self.info)
 			self.clone_number+=1
+
+	def shutdown(self):
+		self.shutdown = True 
+
+	def get_algo_status(self):
+		return self.shutdown
+
 
 	def update_displays(self):
 
@@ -1118,6 +1123,9 @@ class TradingPlan_Basket:
 			self.tklabels[REALIZED]["background"] = STRONGGREEN
 		elif self.data[REALIZED]<0:
 			self.tklabels[REALIZED]["background"] = STRONGRED
+
+		if self.flatten_order==True:
+			self.shutdown()
 
 	def mark_algo_status(self,status):
 
