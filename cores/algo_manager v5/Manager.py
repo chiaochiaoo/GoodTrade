@@ -328,7 +328,10 @@ class Manager:
 	def check_all_pnl(self):
 		tps = list(self.baskets.keys())
 		for tp in tps:
-			self.baskets[tp].check_pnl()
+			# if it is still running.
+
+			if self.get_flatten_order()!=True:
+				self.baskets[tp].check_pnl()
 
 
 	def set_gateway(self):
@@ -1270,7 +1273,11 @@ class Manager:
 
 						self.ui.update_performance(data)
 
-						self.check_all_pnl()
+
+						### depends on the active. 
+
+						if count%4==0:
+							self.check_all_pnl()
 					self.system_check()
 				except Exception as e :
 					PrintException(e, " Updating Summary Problem")
