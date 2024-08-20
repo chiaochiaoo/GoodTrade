@@ -330,7 +330,7 @@ class Manager:
 		for tp in tps:
 			# if it is still running.
 
-			if self.get_flatten_order()!=True:
+			if self.baskets[tp].get_flatten_order()!=True:
 				self.baskets[tp].check_pnl()
 
 
