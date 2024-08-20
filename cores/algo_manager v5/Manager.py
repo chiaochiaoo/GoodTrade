@@ -341,7 +341,7 @@ class Manager:
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second
 
-		log_print("Manager check pnl last period:",ts-self.last_pnl_check)
+		#log_print("Manager check pnl last period:",ts-self.last_pnl_check)
 
 		self.last_pnl_check= ts 
 
@@ -1288,7 +1288,7 @@ class Manager:
 
 						### depends on the active. 
 
-						if count%(2*(self.ui.active_algo_count_number.get()//100+1))==0:
+						if count%(3*(self.ui.active_algo_count_number.get()//100+1))==0:
 							self.check_all_pnl()
 					self.system_check()
 				except Exception as e :
