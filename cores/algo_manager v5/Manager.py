@@ -341,7 +341,7 @@ class Manager:
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second
 
-		log_print("Manager check pnl last period:"ts-self.last_pnl_check)
+		log_print("Manager check pnl last period:",ts-self.last_pnl_check)
 
 		self.last_pnl_check= ts 
 
