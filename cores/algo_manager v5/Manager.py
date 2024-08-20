@@ -146,6 +146,8 @@ class Manager:
 		self.real_time_ts = 0
 		self.last_price_ts = 0
 
+		self.last_pnl_check = 0
+
 		""" POSITION DATA """
 
 		# no need to use lock. everytime need to read. just obtain copy. 
@@ -335,6 +337,14 @@ class Manager:
 				self.baskets[tp].check_pnl()
 
 		self.ui.active_algo_count_number.set(count)
+
+		now = datetime.now()
+		ts = now.hour*3600 + now.minute*60 + now.second
+
+		log_print("Manager check pnl last period:"ts-self.last_pnl_check)
+
+		self.last_pnl_check= ts 
+
 
 	def set_gateway(self):
 
