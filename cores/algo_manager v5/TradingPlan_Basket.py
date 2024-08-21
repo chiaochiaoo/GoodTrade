@@ -1093,11 +1093,8 @@ class TradingPlan_Basket:
 			self.manager.apply_basket_cmd(self.algo_name+"_c"+str(self.clone_number),self.current_shares,100,False,self.info)
 			self.clone_number+=1
 
-
-		
 	def get_algo_status(self):
 		return self.shutdown
-
 
 	def update_displays(self):
 
@@ -1136,7 +1133,8 @@ class TradingPlan_Basket:
 
 		if status == DEPLOYED:
 			#self.input_lock(True)
-			self.tklabels[STATUS]["background"] = LIGHTYELLOW
+			#self.tklabels[STATUS]["background"] = LIGHTYELLOW
+			self.tklabels[STATUS]["background"] = DEFAULT
 
 		elif status == RUNNING:
 			self.tklabels[STATUS]["background"] = GREEN
@@ -1160,5 +1158,6 @@ class TradingPlan_Basket:
 	def deploy(self):
 
 
-		self.data[STATUS] = DEPLOYED
-		self.tkvars[STATUS].set(DEPLOYED)
+		#self.data[STATUS] = DEPLOYED
+		# self.tkvars[STATUS].set(DEPLOYED)
+		self.mark_algo_status(DEPLOYED)

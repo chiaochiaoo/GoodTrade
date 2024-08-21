@@ -153,12 +153,6 @@ class UI(pannel):
 
 		self.algo_count_string.set("Activated Algos:"+str(self.algo_count_number))
 
-		# row = 1
-		# self.main = ttk.Label(self.system_pannel, text="Main:")
-		# self.main.grid(sticky="w",column=1,row=row,padx=10)
-		
-		# self.main_status = ttk.Label(self.system_pannel, textvariable=self.main_app_status)
-		# self.main_status.grid(sticky="w",column=2,row=row)
 
 		row = 1
 		self.system = ttk.Label(self.system_pannel, text="SYSTEM:")
@@ -228,45 +222,7 @@ class UI(pannel):
 
 		self.risk_set = ttk.Button(self.system_pannel, text="Set Risk",command=self.set_risk)
 		self.risk_set.grid(sticky="w",column=3,row=row)
-		#,command=self.manager.terminateGT
-		# row +=1
-		# self.timerc = ttk.Label(self.system_pannel, text="User Email:")
-		# self.timerc.grid(sticky="w",column=1,row=row,padx=10)
 
-
-		# ttk.Label(self.system_pannel, text="User Email:").grid(sticky="w",column=1,row=row,padx=10)
-		# tk.Entry(self.system_pannel,textvariable=self.user_email,width=7).grid(sticky="w",column=2,row=row,padx=10)
-
-
-		# row +=1
-		# self.timerc = ttk.Label(self.system_pannel, text="User Phone:")
-		# self.timerc.grid(sticky="w",column=1,row=row,padx=10)
-
-		# ttk.Label(self.system_pannel, text="User Phone:").grid(sticky="w",column=1,row=row,padx=10)
-		# tk.Entry(self.system_pannel,textvariable=self.user_phone,width=7).grid(sticky="w",column=2,row=row,padx=10)
-
-
-
-
-		# row +=1
-
-		# ttk.Label(self.system_pannel, text="1559-MOC:").grid(sticky="w",column=1,row=row,padx=10)
-
-		# try:
-		# 	ttk.Checkbutton(self.system_pannel, variable=self.manager.ta_moc).grid(sticky="w",column=2,row=row)
-		# except:
-		# 	pass 
-
-		# row +=1
-
-		# ttk.Label(self.system_pannel, text="1601-MOC:").grid(sticky="w",column=1,row=row,padx=10)
-
-		# try:
-		# 	ttk.Checkbutton(self.system_pannel, variable=self.manager.ta_moc).grid(sticky="w",column=2,row=row)
-		# except:
-		# 	pass 
-		# self.deconstruct = ttk.Button(self.system_pannel, text="Terminate GT",command=self.manager.terminateGT)#,command=self.deploy_all_stoporders)
-		# self.deconstruct.grid(sticky="w",column=1,row=5)
 
 	def set_risk(self):
 
@@ -429,49 +385,6 @@ class UI(pannel):
 		ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
 		ttk.Button(self.performance_pannel, textvariable=self.exposure_max).grid(sticky="w",column=col,row=4)
 
-
-
-		# col +=1 
-		# self.t2 = ttk.Button(self.performance_pannel, text="Trades:")
-		# self.t2.grid(sticky="w",column=col,row=1)
-		# self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.trade_count)
-		# self.t2_.grid(sticky="w",column=col,row=2)
-
-		# ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
-		# ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=4)
-
-		# col +=1 
-		# self.t2 = ttk.Button(self.performance_pannel, text="fees:")
-		# self.t2.grid(sticky="w",column=col,row=1)
-		# self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.fees)
-		# self.t2_.grid(sticky="w",column=col,row=2)
-
-		# ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
-		# ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=4)
-
-		# col +=1 
-		# self.t2 = ttk.Button(self.performance_pannel, text="SizeTraded:")
-		# self.t2.grid(sticky="w",column=col,row=1)
-		# self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.sizeTraded)
-		# self.t2_.grid(sticky="w",column=col,row=2)
-		# #weeklyTotal
-		# ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
-		# ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=4)
-
-
-
-		# self.weeklyTotal = tk.IntVar(value=1)
-		# self.monthlyTotal = tk.IntVar(value=1)
-		# self.quarterlyTotal = tk.IntVar(value=1)
-
-		# self.weekly_algo = tk.StringVar()
-		# self.monthly_algo = tk.StringVar()
-		# self.quarterly_algo = tk.StringVar()
-
-
-		# self.weekly_commision = tk.StringVar()
-		# self.monthly_commision = tk.StringVar()
-		# self.quarterly_commision = tk.StringVar()
 
 		col +=1 
 		self.t2 = ttk.Button(self.performance_pannel, text="WeeklyTotal:")
@@ -1193,6 +1106,7 @@ class UI(pannel):
 
 
 				### here, insert the top of the list, do a search program.
+				row_number = self.find_empty_spot()
 			
 			self.create_basket_entry(tradingplan, row_number)
 
@@ -1200,6 +1114,16 @@ class UI(pannel):
 
 			self.rebind(self.dev_canvas,self.deployment_frame)
 			tradingplan.update_displays()
+
+	def find_empty_spot(self):
+
+
+		for i in range(0,self.algo_limit):
+			status = self.tk_labels_basket[i][STATUS]['text']
+			if status=="" or status==DONE:
+				print(i,"is free")
+
+				return i 
 
 	def create_basket_entry(self,tradingplan,symbol):
 
