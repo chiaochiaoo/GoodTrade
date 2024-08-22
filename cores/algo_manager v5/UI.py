@@ -1106,7 +1106,9 @@ class UI(pannel):
 
 
 				### here, insert the top of the list, do a search program.
-				row_number = self.find_empty_spot()
+
+				if row_number>20:
+					row_number = self.find_empty_spot()
 			
 			self.create_basket_entry(tradingplan, row_number)
 
