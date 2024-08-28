@@ -7,7 +7,7 @@ from constant import *
 from Util_functions import *
 import csv
 from datetime import datetime
-
+import re
 import multiprocessing
 
 from psutil import process_iter
@@ -208,6 +208,9 @@ def periodical_check(pipe,port):
 					positions = get_current_positions()
 
 					### 3. send request for summary PNL
+
+					if c%5==0:
+						log_print(get_current_orders())
 					threading_request("http://127.0.0.1:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity")
 
 
@@ -398,6 +401,33 @@ def read_summary(pipe):
 			time.sleep(2)
 
 
+def get_current_orders():
+
+	global user
+	user = "QIAOSUN"
+	try:
+		d = {}
+		p="http://127.0.0.1:8080/GetOpenOrders?user="+user
+		r= requests.get(p)
+
+		description_pattern = re.compile(r'description="([^"]+)"')
+		matches = description_pattern.findall(r.text)
+
+
+		#log_print("Ppro_in:, get positions:",d)
+		for i in matches:
+			if i not in d:
+				d[i] = 1
+			else:
+				d[i] +=1
+		return d
+	except Exception as e:
+		PrintException(e)
+		return {}
+
+
+
+# print(get_current_orders())
 
 def get_current_positions():
 
