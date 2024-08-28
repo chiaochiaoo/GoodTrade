@@ -404,7 +404,7 @@ def read_summary(pipe):
 def get_current_orders():
 
 	global user
-	user = "QIAOSUN"
+	#user = "QIAOSUN"
 	try:
 		d = {}
 		p="http://127.0.0.1:8080/GetOpenOrders?user="+user
