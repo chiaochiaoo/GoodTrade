@@ -204,6 +204,14 @@ class UI(pannel):
 		self.algo_count_.grid(sticky="w",column=2,row=row,padx=10)
 
 
+
+		row +=1
+		self.ol = ttk.Label(self.system_pannel, text="Orders Count::")
+		self.ol.grid(sticky="w",column=1,row=row,padx=10)
+		# self.algo_count_ = ttk.Label(self.system_pannel,  textvariable=self.position_count)
+		# self.algo_count_.grid(sticky="w",column=2,row=row,padx=10)
+
+
 		row +=1
 
 		ttk.Label(self.system_pannel, text="Disaster mode:").grid(sticky="w",column=1,row=row,padx=10)
@@ -458,7 +466,7 @@ class UI(pannel):
 	def init_pannel(self):
 
 		self.sub_pannel = ttk.LabelFrame(self.root,text="") 
-		self.sub_pannel.place(x=0,y=180,height=950,width=350)
+		self.sub_pannel.place(x=0,y=250,height=950,width=350)
 
 		self.SUB_TAB = ttk.Notebook(self.sub_pannel)
 		self.SUB_TAB.place(x=0,rely=0.00,relheight=1,width=640)
@@ -475,7 +483,7 @@ class UI(pannel):
 		# self.TNV_TAB.place(x=0,rely=0.01,relheight=1,width=640)
 
 		self.system_pannel = ttk.LabelFrame(self.root,text="System")
-		self.system_pannel.place(x=10,y=10,height=160,width=350)
+		self.system_pannel.place(x=10,y=10,height=250,width=350)
 
 		self.control_pannel = ttk.LabelFrame(self.root,text="Control") 
 		self.control_pannel.place(x=360,y=10,height=50,width=300)
