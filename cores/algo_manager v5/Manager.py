@@ -491,29 +491,30 @@ class Manager:
 			else:
 				log_print(basket_name," exceeding algo limit.")
 
-		if self.baskets[basket_name].shut_down==False:
-			for symbol,value in orders.items():
+		if basket_name in self.baskets:
+			if self.baskets[basket_name].shut_down==False:
+				for symbol,value in orders.items():
 
-				if "." in symbol and symbol not in self.bad_symbols and symbol not in self.total_moc_nq:
-					log_print("Manager: Applying basket command",symbol,value)
-					if symbol not in self.symbol_data:
-						self.symbol_data[symbol] = Symbol(self,symbol,self.pipe_ppro_out)  #register in Symbol.
-						self.symbols.append(symbol)
-						self.symbols_short[symbol[:-3]] = symbol
+					if "." in symbol and symbol not in self.bad_symbols and symbol not in self.total_moc_nq:
+						log_print("Manager: Applying basket command",symbol,value)
+						if symbol not in self.symbol_data:
+							self.symbol_data[symbol] = Symbol(self,symbol,self.pipe_ppro_out)  #register in Symbol.
+							self.symbols.append(symbol)
+							self.symbols_short[symbol[:-3]] = symbol
 
-					self.baskets[basket_name].register_symbol(symbol,self.symbol_data[symbol])
+						self.baskets[basket_name].register_symbol(symbol,self.symbol_data[symbol])
 
-					## now , submit the request.
+						## now , submit the request.
 
-					if "TA" in info:
-						if info['TA']>30:
-							self.baskets[basket_name].submit_incremental_expected(symbol,value,info['TA'],aggresive)
+						if "TA" in info:
+							if info['TA']>30:
+								self.baskets[basket_name].submit_incremental_expected(symbol,value,info['TA'],aggresive)
+							else:
+								self.baskets[basket_name].submit_expected_shares(symbol,value,aggresive)
 						else:
 							self.baskets[basket_name].submit_expected_shares(symbol,value,aggresive)
 					else:
-						self.baskets[basket_name].submit_expected_shares(symbol,value,aggresive)
-				else:
-					log_print("Manager: Wrong Ticker format or BANNED:",symbol)
+						log_print("Manager: Wrong Ticker format or BANNED:",symbol)
 		else:
 			log_print(basket_name,"already shutdown")
 
