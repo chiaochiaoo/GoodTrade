@@ -1081,6 +1081,7 @@ class TradingPlan_Basket:
 		if self.flatten_order==True and sum(self.current_shares.values())==0:
 			self.shutdown = True
 			self.tkvars[UNREAL].set(0)
+			self.tklabels[UNREAL]["background"] =DEFAULT
 			self.mark_algo_status(DONE)
 
 
