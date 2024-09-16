@@ -65,7 +65,7 @@ class UI(pannel):
 		
 		self.tk_labels=['Strategy',"Status","Updates" , "MaxU", "MinU", "U", "R", "WR", "MR", "TR", 'flatten', 'log']
 
-		self.algo_limit = 200 - 3
+		self.algo_limit = 220 #102 #200 -3
 
 		self.algo_counts = 0
 		
@@ -1077,53 +1077,60 @@ class UI(pannel):
 
 	def create_new_single_entry(self,tradingplan,single,row_number):
 
-		if single=="Single":
 
-			if row_number==None:
-				l = self.single_label_count
-				row_number = l-1 
+		try:
+			if single=="Single":
 
-
-			self.create_single_entry(tradingplan, row_number)
-
-			self.single_label_count +=1
-			self.rebind(self.dev_canvas,self.deployment_frame)
-
-			tradingplan.update_displays()
-
-		elif single=="Pair":
-
-			#print("XXXXXXXXXXXXXXX using row number",row_number,self.pair_label_count)
-			if row_number==None:
-				l = self.pair_label_count
-				row_number = l-1 
-
-			self.create_pair_entry(tradingplan, row_number)
-
-			self.pair_label_count +=1
-
-			self.rebind(self.dev_canvas,self.deployment_frame)
-			tradingplan.update_displays()
-
-		elif single=="Basket":
-
-			if row_number==None:
-
-				l = self.basket_label_count
-				row_number = l-1 #info[1]
+				if row_number==None:
+					l = self.single_label_count
+					row_number = l-1 
 
 
-				### here, insert the top of the list, do a search program.
+				self.create_single_entry(tradingplan, row_number)
 
-				if row_number>100:
-					row_number = self.find_empty_spot()
-			
-			self.create_basket_entry(tradingplan, row_number)
+				self.single_label_count +=1
+				self.rebind(self.dev_canvas,self.deployment_frame)
 
-			self.basket_label_count +=1
+				tradingplan.update_displays()
 
-			self.rebind(self.dev_canvas,self.deployment_frame)
-			tradingplan.update_displays()
+			elif single=="Pair":
+
+				#print("XXXXXXXXXXXXXXX using row number",row_number,self.pair_label_count)
+				if row_number==None:
+					l = self.pair_label_count
+					row_number = l-1 
+
+				self.create_pair_entry(tradingplan, row_number)
+
+				self.pair_label_count +=1
+
+				self.rebind(self.dev_canvas,self.deployment_frame)
+				tradingplan.update_displays()
+
+			elif single=="Basket":
+
+				if row_number==None:
+
+					l = self.basket_label_count
+					row_number = l-1 #info[1]
+
+
+					### here, insert the top of the list, do a search program.
+
+					if row_number>(self.algo_limit//2):
+						row_number = self.find_empty_spot()
+				
+				self.create_basket_entry(tradingplan, row_number)
+
+				self.basket_label_count +=1
+
+				self.rebind(self.dev_canvas,self.deployment_frame)
+				tradingplan.update_displays()
+
+			return True 
+		except Exception as e:
+			PrintException("UI ERROR:,",e)
+			return False 
 
 	def find_empty_spot(self):
 

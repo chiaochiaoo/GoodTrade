@@ -140,7 +140,7 @@ class Manager:
 
 		self.manage_lock = 0
 
-		self.algo_limit = 199
+		self.algo_limit = 200 #199
 
 		self.spread_check = {}
 		self.real_time_ts = 0
@@ -341,7 +341,7 @@ class Manager:
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second
 
-		#log_print("Manager check pnl last period:",ts-self.last_pnl_check)
+		log_print("Manager check pnl last period:",ts-self.last_pnl_check,"active algo:",count)
 
 		self.last_pnl_check= ts 
 
@@ -422,44 +422,45 @@ class Manager:
 	
 		if pair not in self.baskets:
 
-			if self.ui.basket_label_count<self.algo_limit:
+			if self.ui.active_algo_count_number.get()<self.algo_limit-10:
 				self.baskets[pair] = TradingPlan_Pair(pair,risk,self,d)
 				self.ui.create_new_single_entry(self.baskets[pair],"Basket",None)
 
 				self.baskets[pair].deploy()
 		
 
-		if self.baskets[pair].shut_down==False:
+		if basket_name in self.baskets:
+			if self.baskets[pair].shut_down==False:
 
-			if d['symbol1'] not in self.bad_symbols and d['symbol2'] not in self.bad_symbols:
-			
+				if d['symbol1'] not in self.bad_symbols and d['symbol2'] not in self.bad_symbols:
+				
 
-				if d['symbol1']  not in self.symbol_data:
-					self.symbol_data[d['symbol1']] = Symbol(self,d['symbol1'],self.pipe_ppro_out)  #register in Symbol.
-					self.symbols.append(d['symbol1'])
-					self.symbols_short[d['symbol1'][:-3]] = d['symbol1']
+					if d['symbol1']  not in self.symbol_data:
+						self.symbol_data[d['symbol1']] = Symbol(self,d['symbol1'],self.pipe_ppro_out)  #register in Symbol.
+						self.symbols.append(d['symbol1'])
+						self.symbols_short[d['symbol1'][:-3]] = d['symbol1']
 
-				self.baskets[pair].register_symbol(d['symbol1'],self.symbol_data[d['symbol1']])
+					self.baskets[pair].register_symbol(d['symbol1'],self.symbol_data[d['symbol1']])
 
-				if d['symbol2']  not in self.symbol_data:
-					self.symbol_data[d['symbol2']] = Symbol(self,d['symbol2'],self.pipe_ppro_out)  #register in Symbol.
-					self.symbols.append(d['symbol2'])
-					self.symbols_short[d['symbol2'][:-3]] = d['symbol2']
+					if d['symbol2']  not in self.symbol_data:
+						self.symbol_data[d['symbol2']] = Symbol(self,d['symbol2'],self.pipe_ppro_out)  #register in Symbol.
+						self.symbols.append(d['symbol2'])
+						self.symbols_short[d['symbol2'][:-3]] = d['symbol2']
 
-				self.baskets[pair].register_symbol(d['symbol2'],self.symbol_data[d['symbol2']])
+					self.baskets[pair].register_symbol(d['symbol2'],self.symbol_data[d['symbol2']])
 
-				## now , submit the request.
+					## now , submit the request.
 
 
-				self.baskets[pair].submit_expected_pair(d['amount'],d['passive'],d['timer'])
+					self.baskets[pair].submit_expected_pair(d['amount'],d['passive'],d['timer'])
 
-				## INSTANT INSPECTION if passive.
-				if d['passive']:
-					self.symbol_data[d['symbol1']].symbol_inspection()
+					## INSTANT INSPECTION if passive.
+					if d['passive']:
+						self.symbol_data[d['symbol1']].symbol_inspection()
 
-					self.total_difference+=1
-			else:
-				log_print("Manager: Wrong Ticker format or BANNED:",d)
+						self.total_difference+=1
+				else:
+					log_print("Manager: Wrong Ticker format or BANNED:",d)
 		else:
 			log_print(d,"already shutdown")
 
@@ -467,8 +468,8 @@ class Manager:
 
 		if basket_name not in self.baskets:
 
-			# print("REGISTERING")
-			if self.ui.basket_label_count<self.algo_limit:
+			# print("REGISTERING") #self.ui.basket_label_count<
+			if self.ui.active_algo_count_number.get()<self.algo_limit-10:
 
 				# print("REGISTERING good")
 
@@ -481,10 +482,15 @@ class Manager:
 						break
 
 				if check:
+				
 					self.baskets[basket_name] = TradingPlan_Basket(basket_name,risk,self,info)
-					self.ui.create_new_single_entry(self.baskets[basket_name],"Basket",None)
+					ui_created = self.ui.create_new_single_entry(self.baskets[basket_name],"Basket",None)
 
-					self.baskets[basket_name].deploy()
+					if ui_created:
+						self.ui.active_algo_count_number.set(self.ui.active_algo_count_number.get()+1)
+						self.baskets[basket_name].deploy()
+					else:
+						log_print("Error, Unable to create UI for ",basket_name)
 				else:
 					return 
 
