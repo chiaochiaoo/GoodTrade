@@ -113,10 +113,11 @@ def breakdown_order(symbol,share,break_price):
 
 def buy_market_order(symbol,share):
 
-	#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=EDGX Buy ROUC Market DAY&shares='+str(share)
-	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Buy ARCX Market DAY&shares='+str(share)
-	#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=NSDQ Buy SCAN Market DAY&shares='+str(share)
-
+	if ".TO" in symbol:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=CX2 Buy SMART Market Broker DAY&shares='+str(share)
+	else:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=EDGX Buy ROUC Market DAY&shares='+str(share)
+		#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Buy ARCX Market DAY&shares='+str(share)
 
 	sucess='buy market order success on'+symbol
 	failure="Error buy order on"+symbol
@@ -128,8 +129,11 @@ def buy_market_order(symbol,share):
 
 def sell_market_order(symbol,share):
 
-
-	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(share)
+	if ".TO" in symbol:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=CX2 Sell->Short SMART Market Broker DAY&shares='+str(share)
+	else:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=EDGX Sell->Short ROUC Market DAY&shares='+str(share)
+		#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(share)
 	#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=NSDQ Sell->Short SCAN Market DAY&shares='+str(share)
 	#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=EDGX Sell->Short ROUC Market DAY&shares='+str(share)
 	sucess='sell market order success on'+symbol
@@ -172,28 +176,34 @@ def sell_limit_order(symbol, price,share,gateway=0):
 	else:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit Visible DAY&shares='+str(share)
 
-
 	sucess='sell limit order success on '+symbol
 	failure="Error sell limit order on "+symbol
 
 	return r,sucess,failure
 
+# AEQN Buy AequitasLIT Limit Near Broker DAY
+# AEQN Sell->Short AequitasLIT Limit Near Broker DAY
+# CX2 Buy SMART Market Broker DAY
+# CX2 Sell->Short SMART Market Broker DAY
+# TSX Buy SweepSOR MOC ANON DAY
+# TSX Sell->Short SweepSOR MOC ANON DAY
 
-def passive_buy(symbol	,share,offset,gateway):
+def passive_buy(symbol,share,offset,gateway):
 
-	
-
-	if gateway ==0:
-		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Buy MEMX Limit Near Visible DAY&shares='+str(share)
-	#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit DAY BookOnly&shares='+str(share)
-	elif gateway ==1:
-		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=ARCA Buy ARCX Limit Near DAY&shares='+str(share)
-	elif gateway ==2:
-		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=BATS Buy Parallel-2D Limit Near DAY&shares='+str(share)
-	elif gateway ==3:
-		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=EDGA Buy ROUC Limit Near DAY&shares='+str(share)
+	if ".TO" in symbol:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=AEQN Buy AequitasLIT Limit Near Broker DAY&shares='+str(share)
 	else:
-		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=ARCA Buy ARCX Limit Near DAY&shares='+str(share)
+		if gateway ==0:
+			r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Buy MEMX Limit Near Visible DAY&shares='+str(share)
+		#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit DAY BookOnly&shares='+str(share)
+		elif gateway ==1:
+			r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=ARCA Buy ARCX Limit Near DAY&shares='+str(share)
+		elif gateway ==2:
+			r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=BATS Buy Parallel-2D Limit Near DAY&shares='+str(share)
+		elif gateway ==3:
+			r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=EDGA Buy ROUC Limit Near DAY&shares='+str(share)
+		else:
+			r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=ARCA Buy ARCX Limit Near DAY&shares='+str(share)
 
 	sucess='passive buy limit order success on '+symbol
 	failure="Error passive buy limit order on "+symbol
@@ -202,28 +212,28 @@ def passive_buy(symbol	,share,offset,gateway):
 
 def passive_sell(symbol	,share,offset,gateway):
 
-
-
 	# MEMX Sell->Short MEMX Limit Visible DAY PostOnly
 	# BATS Sell->Short BATSPostOnly Limit DAY
 	#	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Sell->Short MEMX Pegged Near DAY MidPoint&shares='+str(share)
-	if gateway ==0:
-		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Sell->Short MEMX Limit Near Visible DAY&shares='+str(share)
-	#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit DAY BookOnly&shares='+str(share)
-	elif gateway ==1:
-		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=ARCA Sell->Short ARCX Limit Near DAY&shares='+str(share)
-	elif gateway ==2:
-		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=BATS Sell->Short Parallel-2D Limit Near DAY&shares='+str(share)
-	elif gateway ==3:
-		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=EDGA Sell->Short ROUC Limit Near DAY&shares='+str(share)
+	if ".TO" in symbol:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=AEQN Sell->Short AequitasLIT Limit Near Broker DAY&shares='+str(share)
 	else:
-		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Sell->Short MEMX Limit Near Visible DAY&shares='+str(share)
+		if gateway ==0:
+			r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Sell->Short MEMX Limit Near Visible DAY&shares='+str(share)
+		#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit DAY BookOnly&shares='+str(share)
+		elif gateway ==1:
+			r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=ARCA Sell->Short ARCX Limit Near DAY&shares='+str(share)
+		elif gateway ==2:
+			r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=BATS Sell->Short Parallel-2D Limit Near DAY&shares='+str(share)
+		elif gateway ==3:
+			r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=EDGA Sell->Short ROUC Limit Near DAY&shares='+str(share)
+		else:
+			r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Sell->Short MEMX Limit Near Visible DAY&shares='+str(share)
 
 	sucess='passive sell limit order success on '+symbol
 	failure="Error passive sell limit order on "+symbol
 
 	return r,sucess,failure
-
 
 
 def buy_aggressive_limit_order(symbol,share,ask):
@@ -239,9 +249,12 @@ def buy_aggressive_limit_order(symbol,share,ask):
 		ask = round((ask+0.2),2)
 		#ARCA Buy ARCX Limit Near DAY Reserve
 
+	#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(ask)+'&ordername=ARCA Buy ARCX Limit IOC&shares='+str(share)
 
-	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(ask)+'&ordername=ARCA Buy ARCX Limit IOC&shares='+str(share)
-	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&priceadjust=0.05&ordername=ARCA Buy ARCX Limit Near IOC&shares='+str(share)
+	if ".TO" in symbol:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&priceadjust=0.05&ordername=AEQN Buy AequitasLIT Limit Near Broker DAY&shares='+str(share)
+	else:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&priceadjust=0.05&ordername=ARCA Buy ARCX Limit Near IOC&shares='+str(share)
 	sucess='Agrresive limit buy order success on'+symbol
 	failure="Error buy order on"+symbol
 
@@ -260,9 +273,12 @@ def short_aggressive_limit_order(symbol,share,bid):
 	elif bid>100:
 		bid = round((bid-0.2),2)
 
-	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(bid)+'&ordername=ARCA Sell->Short ARCX Limit IOC&shares='+str(share)
+	#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice='+str(bid)+'&ordername=ARCA Sell->Short ARCX Limit IOC&shares='+str(share)
 
-	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&priceadjust=-0.05&ordername=ARCA Sell->Short ARCX Limit Near IOC&shares='+str(share)
+	if ".TO" in symbol:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&priceadjust=-0.05&ordername=AEQN Sell->Short AequitasLIT Limit Near Broker DAY&shares='+str(share)
+	else:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&priceadjust=-0.05&ordername=ARCA Sell->Short ARCX Limit Near IOC&shares='+str(share)
 
 	sucess='Aggresive limit sell order success on'+symbol
 	failure="Error buy order on"+symbol
@@ -370,21 +386,21 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 				symbol = d[1]
 				request_str,sucess_str,failure_str = register_web(symbol,port)
 
-			elif type_ == BUY:
+			# elif type_ == BUY:
 
-				symbol = d[1]
-				share = d[2]
-				rationale = d[3]
+			# 	symbol = d[1]
+			# 	share = d[2]
+			# 	rationale = d[3]
 
-				request_str,sucess_str,failure_str=buy_market_order(symbol,share)
-				is_order = True
-			elif type_ ==SELL:
+			# 	request_str,sucess_str,failure_str=buy_market_order(symbol,share)
+			# 	is_order = True
+			# elif type_ ==SELL:
 
-				symbol = d[1]
-				share = d[2]
-				rationale = d[3]
-				request_str,sucess_str,failure_str=sell_market_order(symbol,share)
-				is_order = True
+			# 	symbol = d[1]
+			# 	share = d[2]
+			# 	rationale = d[3]
+			# 	request_str,sucess_str,failure_str=sell_market_order(symbol,share)
+			# 	is_order = True
 			elif type_ == PASSIVEBUY:
 
 				symbol = d[1]
@@ -401,21 +417,21 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 				gateway = d[4]
 				request_str,sucess_str,failure_str=passive_sell(symbol,share,offset,gateway)
 				is_order = True
-			elif type_ ==BREAKUPBUY:
-				symbol = d[1]
-				share = d[2]
-				stop = d[3]
+			# elif type_ ==BREAKUPBUY:
+			# 	symbol = d[1]
+			# 	share = d[2]
+			# 	stop = d[3]
 
-				request_str,sucess_str,failure_str=breakup_order(symbol,share,stop)
-				is_order = True
-			elif type_ ==BREAKDOWNSELL:
+			# 	request_str,sucess_str,failure_str=breakup_order(symbol,share,stop)
+			# 	is_order = True
+			# elif type_ ==BREAKDOWNSELL:
 
-				symbol = d[1]
-				share = d[2]
-				stop = d[3]
+			# 	symbol = d[1]
+			# 	share = d[2]
+			# 	stop = d[3]
 
-				request_str,sucess_str,failure_str=breakdown_order(symbol,share,stop)
-				is_order = True
+			# 	request_str,sucess_str,failure_str=breakdown_order(symbol,share,stop)
+			# 	is_order = True
 			elif type_ ==IOCBUY:
 				symbol = d[1]
 				share = d[2]
@@ -442,25 +458,25 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 				else:
 					request_str,sucess_str,failure_str=sell_market_order(symbol,share)
 				is_order = True
-			elif type_ == LIMITBUY:
+			# elif type_ == LIMITBUY:
 
-				symbol = d[1]
-				price = round(d[2],2)
-				share = d[3]
-				gateway = d[4]
-				rationale = d[5]
-				request_str,sucess_str,failure_str=buy_limit_order(symbol,price,share,gateway)
-				is_order = True
-			elif type_ == LIMITSELL:
+			# 	symbol = d[1]
+			# 	price = round(d[2],2)
+			# 	share = d[3]
+			# 	gateway = d[4]
+			# 	rationale = d[5]
+			# 	request_str,sucess_str,failure_str=buy_limit_order(symbol,price,share,gateway)
+			# 	is_order = True
+			# elif type_ == LIMITSELL:
 
-				symbol = d[1]
-				price = round(d[2],2)
-				share = d[3]
-				gateway = d[4]
-				rationale = d[5]
+			# 	symbol = d[1]
+			# 	price = round(d[2],2)
+			# 	share = d[3]
+			# 	gateway = d[4]
+			# 	rationale = d[5]
 
-				request_str,sucess_str,failure_str=sell_limit_order(symbol,price,share,gateway)
-				is_order = True
+			# 	request_str,sucess_str,failure_str=sell_limit_order(symbol,price,share,gateway)
+			# 	is_order = True
 			elif type_ == CANCEL:
 
 				symbol = d[1]
@@ -592,10 +608,14 @@ def cancel_stoporder(id_):
 
 
 
+# symbol = "XIU.TO"
+# offset=0.0
+# share = 10 
+# r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=AEQN Buy AequitasLIT Limit Near Broker DAY&shares='+str(share)
 
 # request_number = 32718
 # req = "http://127.0.0.1:8080/GetOrderNumber?requestid="+str(request_number)
-# r = requests.post(req)
+# r = requests.post(r)
 
 # print(r.text)
 
