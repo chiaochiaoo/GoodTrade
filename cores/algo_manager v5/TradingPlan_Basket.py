@@ -1080,6 +1080,7 @@ class TradingPlan_Basket:
 
 		if self.flatten_order==True and sum(self.current_shares.values())==0:
 			self.shutdown = True
+			self.tkvars[UNREAL].set(0)
 			self.mark_algo_status(DONE)
 
 
@@ -1095,6 +1096,7 @@ class TradingPlan_Basket:
 
 	def get_algo_status(self):
 		return self.shutdown
+
 
 	def update_displays(self):
 
