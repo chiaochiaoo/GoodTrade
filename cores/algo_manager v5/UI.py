@@ -1115,7 +1115,7 @@ class UI(pannel):
 
 				### here, insert the top of the list, do a search program.
 
-				if row_number>50:
+				if row_number>100:
 					row_number = self.find_empty_spot()
 			
 			self.create_basket_entry(tradingplan, row_number)
@@ -1207,7 +1207,6 @@ class UI(pannel):
 
 				#self.tk_labels_single[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command= lambda tp=tradingplan:adjust_stop(tp))
 
-
 			elif label_name =="flatten":
 
 				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.flatten_cmd
@@ -1239,9 +1238,7 @@ class UI(pannel):
 
 			tradingplan.tklabels[label_name] = self.tk_labels_basket[symbol][label_name]
 
-
 		tradingplan.algo_ui_id = symbol
-
 
 	def recreate_labels(self):
 
@@ -1311,7 +1308,6 @@ class UI(pannel):
 	
 
 	def custom_algo_init(self):
-
 
 		self.TNV_TAB = ttk.Notebook(self.custom_algo_pannel)
 		self.TNV_TAB.place(x=0,rely=0.01,relheight=1,width=640)
