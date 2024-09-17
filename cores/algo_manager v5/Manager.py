@@ -429,7 +429,7 @@ class Manager:
 				self.baskets[pair].deploy()
 		
 
-		if basket_name in self.baskets:
+		if pair in self.baskets:
 			if self.baskets[pair].shut_down==False:
 
 				if d['symbol1'] not in self.bad_symbols and d['symbol2'] not in self.bad_symbols:
