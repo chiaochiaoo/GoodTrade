@@ -549,7 +549,7 @@ class UI(pannel):
 
 		self.single_label_count = 1
 		for i in l:
-			self.create_new_single_entry(self.baskets[pair],i,None)
+			self.create_new_single_entry(i,"Basket",None)
 
 	### NOW HOW DO I ITERATE THROUGH ALL THE???
 
@@ -561,7 +561,7 @@ class UI(pannel):
 
 		self.single_label_count = 1
 		for i in l:
-			self.create_new_single_entry(self.baskets[pair],i,None)
+			self.create_new_single_entry(i,"Basket",None)
 		
 
 
