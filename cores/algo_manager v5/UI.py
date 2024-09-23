@@ -520,11 +520,11 @@ class UI(pannel):
 
 		# reset button
 		c=1
-		ttk.Button(self.filter_pannel, text="Only Running",command=self.show_running_only).grid(sticky="w",column=c,row=1)
+		ttk.Button(self.filter_pannel, text="Only Running",command=self.show_running_only,state= "disabled").grid(sticky="w",column=c,row=1)
 		# filter button 
 
 		c+=1
-		ttk.Button(self.filter_pannel, text="Only Done",command=self.show_done_only).grid(sticky="w",column=c,row=1)
+		ttk.Button(self.filter_pannel, text="Only Done",command=self.show_done_only,state= "disabled").grid(sticky="w",column=c,row=1)
 
 		# c+=1
 		# ttk.Button(self.filter_pannel, text="Only QS",command=self.save_quick_spread).grid(sticky="w",column=c,row=1)
@@ -538,7 +538,7 @@ class UI(pannel):
 		tk.Entry(self.filter_pannel,textvariable=self.strategy_filter,width=20).grid(sticky="w",column=c,row=1)	
 
 		c+=1
-		ttk.Button(self.filter_pannel, text="Filter",command=self.show_selected_only).grid(sticky="w",column=c,row=1)
+		ttk.Button(self.filter_pannel, text="Filter",command=self.show_selected_only,state= "disabled").grid(sticky="w",column=c,row=1)
 
 
 	def show_selected_only(self):
@@ -1096,6 +1096,9 @@ class UI(pannel):
 		# self.algo_deploy = ttk.Button(self.config2, text="Apply All",command=self.manager.set_all_tp)#,command=self.deploy_all_stoporders)
 		# self.algo_deploy.grid(sticky="w",column=2,row=1,padx=10)
 		# #self.algo_deploy.place(x=5,y=25)
+
+	def refresh_entry_pannel(self):
+		pass 
 
 	def init_entry_pannel(self):
 
