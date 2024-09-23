@@ -525,6 +525,18 @@ class Manager:
 			log_print(basket_name,"already shutdown")
 
 
+	def return_selected_algo(self,symbol):
+
+		tps = list(self.baskets.keys())
+		count = 0
+		l = []
+		for tp in tps:
+			# if it is still running.
+			if self.baskets[tp].have_symbol(symbol)==True:
+				l.append(self.baskets[tp])
+
+		return l[:190]
+
 	def return_running_algo(self):
 
 		tps = list(self.baskets.keys())
@@ -532,7 +544,7 @@ class Manager:
 		l = []
 		for tp in tps:
 			# if it is still running.
-			if self.baskets[tp].get_algo_status()==True:
+			if self.baskets[tp].is_it_done()==True:
 				l.append(self.baskets[tp])
 
 		return l[:190]
@@ -548,7 +560,7 @@ class Manager:
 				l.append(self.baskets[tp])
 
 		return l[:190]
-		
+
 	def send_moo(self,dic):
 		now = datetime.now()
 		ts = now.hour*60 + now.minute

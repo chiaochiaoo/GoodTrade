@@ -288,6 +288,12 @@ class TradingPlan_Basket:
 		if symbol_name not in self.original_positions:
 			self.original_positions[symbol_name] = share 
 
+	def have_symbol(self,symbol_name):
+
+		if symbol_name not in self.current_shares:
+			return False 
+		else:
+			return self.current_shares[symbol_name]!=0
 	def register_symbol(self,symbol_name,symbol):
 
 		if symbol_name not in self.symbols:
@@ -1158,6 +1164,8 @@ class TradingPlan_Basket:
 		self.tklabels[MIND]["background"]=color
 
 
+	def is_it_done(self):
+		return self.tklabels[STATUS]==DONE
 	def deploy(self):
 
 

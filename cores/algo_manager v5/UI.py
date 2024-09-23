@@ -538,7 +538,21 @@ class UI(pannel):
 		tk.Entry(self.filter_pannel,textvariable=self.strategy_filter,width=20).grid(sticky="w",column=c,row=1)	
 
 		c+=1
-		ttk.Button(self.filter_pannel, text="Filter",command=self.save_quick_spread).grid(sticky="w",column=c,row=1)
+		ttk.Button(self.filter_pannel, text="Filter",command=self.show_selected_only).grid(sticky="w",column=c,row=1)
+
+
+	def show_selected_only(self):
+
+		l = self.manager.return_selected_algo(self.strategy_filter.get())
+
+		# reset the numbers. 
+
+		self.init_entry_pannel()
+		self.basket_label_count = 1
+
+		# REFRESH?
+		for i in l:
+			self.create_new_single_entry(i,"Basket",None)
 
 	def show_running_only(self):
 
