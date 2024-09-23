@@ -547,7 +547,10 @@ class UI(pannel):
 
 		# reset the numbers. 
 
-		self.single_label_count = 1
+		self.init_entry_pannel()
+		self.basket_label_count = 1
+
+		# REFRESH?
 		for i in l:
 			self.create_new_single_entry(i,"Basket",None)
 
@@ -559,7 +562,8 @@ class UI(pannel):
 
 		# reset the numbers. 
 
-		self.single_label_count = 1
+		self.init_entry_pannel()
+		self.basket_label_count = 1
 		for i in l:
 			self.create_new_single_entry(i,"Basket",None)
 		
