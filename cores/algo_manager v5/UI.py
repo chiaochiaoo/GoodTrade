@@ -462,7 +462,6 @@ class UI(pannel):
 		self.rebind(self.dev_canvas,self.deployment_frame)
 
 		self.recreate_labels()
-
 	def init_pannel(self):
 
 		self.sub_pannel = ttk.LabelFrame(self.root,text="") 
@@ -495,19 +494,75 @@ class UI(pannel):
 		self.badsymbol_pannel.place(x=860,y=10,height=50,width=300)
 
 		self.performance_pannel = ttk.LabelFrame(self.root,text="Performance") 
-		self.performance_pannel.place(x=360,y=70,height=260,width=950)
+		self.performance_pannel.place(x=360,y=70,height=200,width=950)
+
+		self.filter_pannel = ttk.LabelFrame(self.root,text="Strategy Filter") 
+		self.filter_pannel.place(x=360,y=200,height=60,width=950)
 
 		self.deployment_panel = ttk.LabelFrame(self.root,text="Strategy Deployment") 
 		self.deployment_panel.place(x=360,y=260,height=700,width=950)
 
 		self.init_system_pannel()
 		self.init_performance_pannel()
+
+		self.init_strategy_filter()
 		self.init_deployment_pannel()
 		self.init_control_pannel()
 
 		self.init_gateway()
 		self.init_bad_symbol_pannel()
 		self.init_quick_spread()
+
+
+	def init_strategy_filter(self):
+
+		self.strategy_filter = tk.StringVar()
+
+		# reset button
+		c=1
+		ttk.Button(self.filter_pannel, text="Only Running",command=self.show_running_only).grid(sticky="w",column=c,row=1)
+		# filter button 
+
+		c+=1
+		ttk.Button(self.filter_pannel, text="Only Done",command=self.show_done_only).grid(sticky="w",column=c,row=1)
+
+		# c+=1
+		# ttk.Button(self.filter_pannel, text="Only QS",command=self.save_quick_spread).grid(sticky="w",column=c,row=1)
+
+		# current filter. 
+		c+=1
+		tk.Label(self.filter_pannel, text="Symbol Filter:").grid(sticky="w",column=c,row=1)
+
+		# row 1 entry
+		c+=1
+		tk.Entry(self.filter_pannel,textvariable=self.strategy_filter,width=20).grid(sticky="w",column=c,row=1)	
+
+		c+=1
+		ttk.Button(self.filter_pannel, text="Filter",command=self.save_quick_spread).grid(sticky="w",column=c,row=1)
+
+	def show_running_only(self):
+
+
+		l = self.manager.return_running_algo()
+
+		# reset the numbers. 
+
+		self.single_label_count = 1
+		for i in l:
+			self.create_new_single_entry(self.baskets[pair],i,None)
+
+	### NOW HOW DO I ITERATE THROUGH ALL THE???
+
+	def show_done_only(self):
+
+		l = self.manager.return_done_algo()
+
+		# reset the numbers. 
+
+		self.single_label_count = 1
+		for i in l:
+			self.create_new_single_entry(self.baskets[pair],i,None)
+		
 
 
 	def save_quick_spread(self):
