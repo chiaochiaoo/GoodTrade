@@ -122,6 +122,7 @@ def create_tab(tab_name):
     elif tab_name =="QFAANG":
         name = "QFAANG"
         model =  {'QQQ.NQ': 25, 'AAPL.NQ': -10, 'AMZN.NQ': -10, 'MSFT.NQ': -4, 'META.NQ': -3, 'GOOG.NQ': -9, }
+        model =  {'QQQ.NQ': 17, 'AAPL.NQ': -7, 'AMZN.NQ': -7, 'MSFT.NQ': -4, 'META.NQ': -1, 'GOOG.NQ': -9, }
         historical_plus = [0.0,0.0,0.0]
         historical_minus =[-0.0,-0.0,-0.0]
 
@@ -130,7 +131,7 @@ def create_tab(tab_name):
 
     elif tab_name =="QCCNXT":
         name = "QCCNXT"
-        model =  {'QQQ.NQ': 16, 'MSTR.NQ': -1, 'COIN.NQ': -4, 'MARA.NQ': -23, 'RIOT.NQ': -21, 'SQ.NY': -8, }
+        model =  {'QQQ.NQ': 17, 'MSTR.NQ': -1, 'COIN.NQ': -2, 'MARA.NQ': -21, 'RIOT.NQ': -51, 'SQ.NY': -13, }
         historical_plus = [0.0,0.0,0.0]
         historical_minus =[-0.0,-0.0,-0.0]
 
@@ -141,7 +142,7 @@ def create_tab(tab_name):
 
         name = "BUTILS"
 
-        model =  {'SPY.AM': 16, 'NEE.NY': -11, 'SO.NY': -15, 'DUK.NY': -12, 'SRE.NY': -13, 'AEP.NQ': -12, }
+        model =  {'SPY.AM': 24, 'NEE.NY': -19, 'SO.NY': -23, 'DUK.NY': -22, 'SRE.NY': -23, 'AEP.NQ': -16, }
         historical_plus = [0.0,0.0,0.0]
         historical_minus =[-0.0,-0.0,-0.0]
 
@@ -149,7 +150,7 @@ def create_tab(tab_name):
 
     elif tab_name =="QEV":
         name = "QEV"
-        model =  {'QQQ.NQ': 4, 'TSLA.NQ': -1, 'NIO.NY': -29, 'LCID.NQ': -33, 'RIVN.NQ': -5}
+        model =  {'QQQ.NQ': 17, 'TSLA.NQ': -2, 'NIO.NY': -104, 'LCID.NQ': -127, 'RIVN.NQ': -59}
         historical_plus =[0.0,0.0,0.0]
         historical_minus =[-0.0,-0.0,-0.0]
 
@@ -157,7 +158,7 @@ def create_tab(tab_name):
 
     elif tab_name =="QBT":
         name = "QBT"
-        model =  {'QQQ.NQ': 11, 'MARA.NQ': -20, 'RIOT.NQ': -22, 'COIN.NQ': -4, }
+        model =  {'QQQ.NQ': 17, 'MARA.NQ': -35, 'RIOT.NQ': -86, 'COIN.NQ': -4, }
         historical_plus =[0.0,0.0,0.0]
         historical_minus =[-0.0,-0.0,-0.0]
 
