@@ -675,9 +675,9 @@ class UI(pannel):
 		# DISNFLX = {"name":"DISNFLX","symbol":["DIS.NY","NFLX.NQ"],"ratio":[29,-5],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		# JETSXLE = {"name":"JETSXLE","symbol":["JETS.AM","XLE.AM"],"ratio":[41,-12],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 	
-		spyfxi = {"name":"FXISPY","symbol":["FXI.AM","SPY.AM"],"ratio":[160,-12],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		fxifutu = {"name":"FXIFUTU","symbol":["FXI.AM","FUTU.NQ"],"ratio":[160,-19],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		fxipdd = {"name":"FXIPDD","symbol":["FXI.AM","PDD.NQ"],"ratio":[160,-13],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyfxi = {"name":"FXISPY","symbol":["FXI.AM","SPY.AM"],"ratio":[80,-6],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		fxifutu = {"name":"FXIFUTU","symbol":["FXI.AM","FUTU.NQ"],"ratio":[80,-9],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		fxipdd = {"name":"FXIPDD","symbol":["FXI.AM","PDD.NQ"],"ratio":[80,-6],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 	
 
 
