@@ -653,8 +653,7 @@ class UI(pannel):
 		
 		#drivqqq = {"name":"DRIVQQQ","symbol":["DRIV.NQ","QQQ.NQ"],"ratio":[12,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 
-		fxixpev = {"name":"FXIXPEV","symbol":["FXI.AM","XPEV.NQ"],"ratio":[2,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		
+
 		spyxlk = {"name":"XLKSPY","symbol":["XLK.AM","SPY.AM"],"ratio":[18,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		spyxlc = {"name":"XLCSPY","symbol":["XLC.AM","SPY.AM"],"ratio":[49,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		spyxli = {"name":"XLISPY","symbol":["XLI.AM","SPY.AM"],"ratio":[36,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
@@ -664,18 +663,24 @@ class UI(pannel):
 		#total = [spyqqq,gldslv,tlsaqqq,smhqqq,gdxgdxj]
 		AAPLQQQ = {"name":"AAPLQQQ","symbol":["AAPL.NQ","QQQ.NQ"],"ratio":[24,-13],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 		AMDNVDA = {"name":"NVDAQQQ","symbol":["NVDA.NQ","QQQ.NQ"],"ratio":[30,-26],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		DISNFLX = {"name":"DISNFLX","symbol":["DIS.NY","NFLX.NQ"],"ratio":[29,-5],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		
-		JETSXLE = {"name":"JETSXLE","symbol":["JETS.AM","XLE.AM"],"ratio":[41,-12],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-	
+
 		spyijr = {"name":"IJRSPY","symbol":["IJR.AM","SPY.AM"],"ratio":[22,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 	
 		spybitq = {"name":"BITQSPY","symbol":["BITQ.AM","SPY.AM"],"ratio":[42,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 	
 		spygbtc = {"name":"GBTCSPY","symbol":["GBTC.AM","SPY.AM"],"ratio":[21,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 	
-		tqqqgbtc = {"name":"TQQQGBTC","symbol":["TQQQ.NQ","GBTC.AM"],"ratio":[20,-15],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		# tqqqgbtc = {"name":"TQQQGBTC","symbol":["TQQQ.NQ","GBTC.AM"],"ratio":[20,-15],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		# fxixpev = {"name":"FXIXPEV","symbol":["FXI.AM","XPEV.NQ"],"ratio":[2,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		# DISNFLX = {"name":"DISNFLX","symbol":["DIS.NY","NFLX.NQ"],"ratio":[29,-5],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		# JETSXLE = {"name":"JETSXLE","symbol":["JETS.AM","XLE.AM"],"ratio":[41,-12],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 	
+		spyfxi = {"name":"FXISPY","symbol":["FXI.AM","SPY.AM"],"ratio":[160,-12],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		fxifutu = {"name":"FXIFUTU","symbol":["FXI.AM","FUTU.NQ"],"ratio":[160,-19],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		fxipdd = {"name":"FXIPDD","symbol":["FXI.AM","PDD.NQ"],"ratio":[160,-13],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+	
+
+
 
 		unguso = {"name":"UNGUSO","symbol":["UNG.AM","USO.AM"],"ratio":[63,-25],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
 	
@@ -688,7 +693,7 @@ class UI(pannel):
 		etf = [spyxlk,spyxlc,spyxli,spyxlu,spyxly]
 		qqq = [smhqqq,AAPLQQQ,AMDNVDA,xleqqq,] #arkkqqq
 		gld = [gldslv,gdxgdxj,gdxgld,silslv]
-		misc =[fxixpev,tqqqgbtc,DISNFLX,JETSXLE]
+		misc =[spyfxi,fxifutu,fxipdd]
 		comm = [unguso,tltief]
 
 		total = [spy,spy2,qqq,gld,misc,etf,comm]
