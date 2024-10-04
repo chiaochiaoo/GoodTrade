@@ -287,6 +287,9 @@ class Symbol:
 				remaining+= self.tradingplans[tp].get_current_expected(self.symbol_name)
 			if "D2D" ==  self.tradingplans[tp].get_algoname()[:3]:
 				remaining+= self.tradingplans[tp].get_current_expected(self.symbol_name)
+
+			if "AW" ==self.tradingplans[tp].get_algoname()[:3]:
+				remaining+= self.tradingplans[tp].get_current_expected(self.symbol_name)
 		log_print(self.symbol_name,"get all moo enter: expect to have:",remaining)
 
 		return remaining
