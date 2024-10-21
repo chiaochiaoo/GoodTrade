@@ -500,7 +500,7 @@ class UI(pannel):
 		self.filter_pannel.place(x=360,y=200,height=60,width=950)
 
 		self.deployment_panel = ttk.LabelFrame(self.root,text="Strategy Deployment") 
-		self.deployment_panel.place(x=360,y=260,height=700,width=950)
+		self.deployment_panel.place(x=360,y=260,height=950,width=950)
 
 		self.init_system_pannel()
 		self.init_performance_pannel()
@@ -1643,8 +1643,8 @@ if __name__ == '__main__':
 
 	root = tk.Tk() 
 	root.title("GoodTrade Algo Manager v5") 
-	root.geometry("1380x780")
-
+	#root.geometry("1380x780")
+	root.geometry("1570x1280")
 	UI(root)
 	# root.minsize(1600, 1000)
 	# root.maxsize(1800, 1200)
