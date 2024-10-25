@@ -186,10 +186,13 @@ class TradingPlan_Basket:
 				self.inspectable = False
 				self.one_shot_algo = True 
 
-			if "AW_" == self.algo_name[:3]:
+			if "AW" == self.algo_name[:2]:
 				self.inspectable = False 
 				self.one_shot_algo = True 
 
+			if "AP" == self.algo_name[:2]:
+				self.inspectable = False 
+				self.one_shot_algo = True 
 			if "OB" == self.algo_name[:2]:
 				self.inspectable = False
 				self.one_shot_algo = True 
