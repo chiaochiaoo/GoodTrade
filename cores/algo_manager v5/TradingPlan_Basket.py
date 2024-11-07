@@ -1000,7 +1000,7 @@ class TradingPlan_Basket:
 			log_print(self.source,self.algo_name,"TIME IS UP",ts,self.timer)
 			self.flatten_cmd()
 
-		if self.profit!=0 and self.manually_added==False and self.flatten_order!=True:
+		if self.profit!=0 and self.manually_added==False and self.flatten_order!=True and ts<=955:
 
 			# if total_unreal>self.profit :
 			# 	log_print(self.source, self.algo_name, " MEET PROFIT TARGET",self.profit)
@@ -1039,7 +1039,7 @@ class TradingPlan_Basket:
 
 			else:
 				pass 
-		if self.stop!=0 and self.flatten_order!=True:
+		if self.stop!=0 and self.flatten_order!=True and ts<=955:
 			if total_unreal*-1 > self.stop:
 				log_print(self.source, self.algo_name, " MEET STOP ",self.stop)
 				self.flatten_cmd()
