@@ -49,7 +49,6 @@ def hide_tooltip(event,root):
     root.withdraw()
 
 
-
 class UI(pannel):
 	def __init__(self,root,manager=None,receiving_signals=None,cmd_text=None):
 
@@ -86,7 +85,6 @@ class UI(pannel):
 		# 'flatten':"",\
 		# 'log':""}
 
-
 		self.tk_labels_single = {}
 
 		self.tk_labels_pair = {}
@@ -101,10 +99,7 @@ class UI(pannel):
 
 		self.tklabels_list = []
 
-		
-
 		self.risk_timer = tk.DoubleVar(value=300)
-
 
 		self.custom_algo = None 
 
@@ -222,7 +217,6 @@ class UI(pannel):
 			pass 
 
 
-
 		row +=1
 		ttk.Label(self.system_pannel, text="Maximum Risk:").grid(sticky="w",column=1,row=row,padx=10)
 		self.risk_amount = tk.Entry(self.system_pannel,textvariable=self.risk_timer,width=7)
@@ -255,7 +249,6 @@ class UI(pannel):
 
 		if d['net']<self.net_min.get():
 			self.net_min.set(d['net'])
-
 
 		self.total_u.set(d['unrealized'] )
 
@@ -429,7 +422,7 @@ class UI(pannel):
 
 	def init_deployment_pannel(self):
 
-		self.labels = {"Strategy":25,\
+		self.labels = {"Strategy":40,\
 						"Status":8,\
 						#"Updates":5,\
 						"MaxU":8,\
@@ -494,13 +487,13 @@ class UI(pannel):
 		self.badsymbol_pannel.place(x=860,y=10,height=50,width=300)
 
 		self.performance_pannel = ttk.LabelFrame(self.root,text="Performance") 
-		self.performance_pannel.place(x=360,y=70,height=200,width=950)
+		self.performance_pannel.place(x=360,y=70,height=200,width=1200)
 
 		self.filter_pannel = ttk.LabelFrame(self.root,text="Strategy Filter") 
-		self.filter_pannel.place(x=360,y=200,height=60,width=950)
+		self.filter_pannel.place(x=360,y=200,height=60,width=1200)
 
 		self.deployment_panel = ttk.LabelFrame(self.root,text="Strategy Deployment") 
-		self.deployment_panel.place(x=360,y=260,height=950,width=950)
+		self.deployment_panel.place(x=360,y=260,height=950,width=1200)
 
 		self.init_system_pannel()
 		self.init_performance_pannel()
