@@ -791,6 +791,10 @@ class TradingPlan_Basket:
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second 
 
+		if self.break_even!=True:
+			self.break_even=False
+			self.break_even_amount=1
+
 		if ts-self.operation_timer>5:
 			self.operation_timer = ts 
 			if self.tkvars[ALGO_MULTIPLIER].get()>=minimal:
@@ -824,6 +828,11 @@ class TradingPlan_Basket:
 
 	def reduce_one_quarter(self):
 
+
+
+		if self.break_even!=True:
+			self.break_even=False
+			self.break_even_amount=2
 
 
 		coefficient = 4 
@@ -983,12 +992,16 @@ class TradingPlan_Basket:
 				if val>0:
 					total_unreal +=  ((cur_stock_price - self.average_price[symbol])-0.01) * abs(self.current_shares[symbol])  #self.data[AVERAGE_PRICE]-price
 					check[symbol] = [cur_stock_price,self.average_price[symbol],self.current_shares[symbol],((cur_stock_price - self.average_price[symbol])-0.01) * abs(self.current_shares[symbol])]
-					#log_print(self.algo_name,symbol,"avg price",self.average_price[symbol],"cur price",cur_stock_price,"share",val,"result", (cur_stock_price - self.average_price[symbol]) * abs(self.current_shares[symbol]))
+
+					# if ".TO" in symbol:
+					# 	log_print(self.algo_name,symbol,"avg price",self.average_price[symbol],"cur price",cur_stock_price,"share",val,"result", (cur_stock_price - self.average_price[symbol]) * abs(self.current_shares[symbol]))
 				else:
 					cur_stock_price = self.symbols[symbol].get_price()
 					total_unreal +=  ((self.average_price[symbol] - cur_stock_price)-0.01) * abs(self.current_shares[symbol]) #self.data[AVERAGE_PRICE]-price
 					check[symbol] = [cur_stock_price,self.average_price[symbol],self.current_shares[symbol],((self.average_price[symbol] - cur_stock_price)-0.01) * abs(self.current_shares[symbol])]
-					#log_print(self.algo_name,symbol,"avg price",self.average_price[symbol],"cur price",cur_stock_price,"share",val,"result",(self.average_price[symbol] - cur_stock_price) * abs(self.current_shares[symbol]))
+					
+					# if ".TO" in symbol:
+					# 	log_print(self.algo_name,symbol,"avg price",self.average_price[symbol],"cur price",cur_stock_price,"share",val,"result",(self.average_price[symbol] - cur_stock_price) * abs(self.current_shares[symbol]))
 		
 		# self.display_count +=1
 
