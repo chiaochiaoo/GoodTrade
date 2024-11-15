@@ -610,295 +610,6 @@ class UI(pannel):
 		except Exception as e:
 			print(e)
 
-	def init_quick_spread(self):
-
-		labels =		{"entry":4,\
-						"button":5,\
-						"checker":8,\
-						"long_label":8,\
-						"short_label":4,\
-					
-		}
-
-
-		self.spread_timer = 0
-
-		spyqqq = {"name":"SPYQQQ","symbol":["SPY.AM","QQQ.NQ"],"ratio":[1,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		gldslv = {"name":"GLDSLV","symbol":["GLD.AM","SLV.AM"],"ratio":[1,-4],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		spytlt = {"name":"TLTSPY","symbol":["TLT.NQ","SPY.AM"],"ratio":[4,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		spyuso = {"name":"SPYUSO","symbol":["SPY.AM","USO.AM"],"ratio":[1,-3],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		
-		spygdx = {"name":"GDXSPY","symbol":["GDX.AM","SPY.AM"],"ratio":[6,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		spyiwm = {"name":"SPYIWM","symbol":["SPY.AM","IWM.AM"],"ratio":[10,-12],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-			
-		#tlsaqqq = {"name":"TSLAQQQ","symbol":["TSLA.NQ","QQQ.NQ"],"ratio":[1,-2],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		smhqqq = {"name":"SMHQQQ","symbol":["SMH.NQ","QQQ.NQ"],"ratio":[17,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-	
-		gdxgdxj = {"name":"GDXGDXJ","symbol":["GDX.AM","GDXJ.AM"],"ratio":[10,-7],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		gdxgld = {"name":"GDXGLD","symbol":["GDX.AM","GLD.AM"],"ratio":[2,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		
-		silslv = {"name":"SLVSLI","symbol":["SLV.AM","SIL.AM"],"ratio":[8,-5],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-				
-
-		xleqqq = {"name":"XLEQQQ","symbol":["XLE.AM","QQQ.NQ"],"ratio":[7,-2],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		
-		arkkqqq = {"name":"ARKKQQQ","symbol":["ARKK.AM","QQQ.NQ"],"ratio":[4,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		
-		#drivqqq = {"name":"DRIVQQQ","symbol":["DRIV.NQ","QQQ.NQ"],"ratio":[12,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-
-
-		spyxlk = {"name":"XLKSPY","symbol":["XLK.AM","SPY.AM"],"ratio":[18,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		spyxlc = {"name":"XLCSPY","symbol":["XLC.AM","SPY.AM"],"ratio":[49,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		spyxli = {"name":"XLISPY","symbol":["XLI.AM","SPY.AM"],"ratio":[36,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		spyxlu = {"name":"XLUSPY","symbol":["XLU.AM","SPY.AM"],"ratio":[55,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		spyxly = {"name":"XLYSPY","symbol":["XLY.AM","SPY.AM"],"ratio":[24,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-	
-		#total = [spyqqq,gldslv,tlsaqqq,smhqqq,gdxgdxj]
-		AAPLQQQ = {"name":"AAPLQQQ","symbol":["AAPL.NQ","QQQ.NQ"],"ratio":[24,-13],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		AMDNVDA = {"name":"NVDAQQQ","symbol":["NVDA.NQ","QQQ.NQ"],"ratio":[30,-26],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-
-		spyijr = {"name":"IJRSPY","symbol":["IJR.AM","SPY.AM"],"ratio":[22,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-	
-		spybitq = {"name":"BITQSPY","symbol":["BITQ.AM","SPY.AM"],"ratio":[42,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-	
-		spygbtc = {"name":"GBTCSPY","symbol":["GBTC.AM","SPY.AM"],"ratio":[21,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-	
-		# tqqqgbtc = {"name":"TQQQGBTC","symbol":["TQQQ.NQ","GBTC.AM"],"ratio":[20,-15],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		# fxixpev = {"name":"FXIXPEV","symbol":["FXI.AM","XPEV.NQ"],"ratio":[2,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		# DISNFLX = {"name":"DISNFLX","symbol":["DIS.NY","NFLX.NQ"],"ratio":[29,-5],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		# JETSXLE = {"name":"JETSXLE","symbol":["JETS.AM","XLE.AM"],"ratio":[41,-12],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-	
-		spyfxi = {"name":"FXISPY","symbol":["FXI.AM","SPY.AM"],"ratio":[80,-6],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		fxifutu = {"name":"FXIFUTU","symbol":["FXI.AM","FUTU.NQ"],"ratio":[80,-9],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-		fxipdd = {"name":"FXIPDD","symbol":["FXI.AM","PDD.NQ"],"ratio":[80,-6],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-	
-
-
-
-		unguso = {"name":"UNGUSO","symbol":["UNG.AM","USO.AM"],"ratio":[63,-25],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-	
-		tltief = {"name":"TLTIEF","symbol":["TLT.NQ","IEF.NQ"],"ratio":[50,-107],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-	
-		spymsmo = {"name":"MSOSSPY","symbol":["MSOS.AM","SPY.AM"],"ratio":[66,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
-	
-		spy = [spyqqq,spytlt,spyuso,spygdx,spyiwm]
-		spy2 = [spyijr,spybitq,spygbtc,spymsmo]
-		etf = [spyxlk,spyxlc,spyxli,spyxlu,spyxly]
-		qqq = [smhqqq,AAPLQQQ,AMDNVDA,xleqqq,] #arkkqqq
-		gld = [gldslv,gdxgdxj,gdxgld,silslv]
-		misc =[spyfxi,fxifutu,fxipdd]
-		comm = [unguso,tltief]
-
-		total = [spy,spy2,qqq,gld,misc,etf,comm]
-		
-		self.qs = {}
-		for j in total:
-			for i in j:
-				self.qs[i['name']] = i
-
-
-		self.load_quick_spread()
-
-		c=1
-		t=2
-
-		ttk.Button(self.quick_spread_pannel, text="Save",command=self.save_quick_spread).grid(sticky="w",column=1,row=1)
-
-		style = ttk.Style()
-		style.configure("BW.yellow", background="yellow")
-
-		self.qs_subtab = ttk.Notebook(self.quick_spread_pannel)
-		#self.qs_subtab.place(x=0,rely=0.05,relheight=1,relwidth=1)
-		self.qs_subtab.grid(column=1,row=2)
-
-		self.qs_subp1 = ttk.LabelFrame(self.qs_subtab,text="") 
-		self.qs_subp1b = ttk.LabelFrame(self.qs_subtab,text="") 
-		self.qs_subp2 = ttk.LabelFrame(self.qs_subtab,text="")
-		self.qs_subp3 = ttk.LabelFrame(self.qs_subtab,text="")
-		self.qs_subp4 = ttk.LabelFrame(self.qs_subtab,text="")
-		self.qs_subp5 = ttk.LabelFrame(self.qs_subtab,text="")
-		self.qs_subp6 = ttk.LabelFrame(self.qs_subtab,text="")
-
-		#self.custom_algo_pannel.place(x=0,y=0,height=950,width=350)
-		#self.quick_spread_pannel.place(x=0,y=0,height=950,width=350)
-
-		self.qs_subtab.add(self.qs_subp1,text="SPY")
-		self.qs_subtab.add(self.qs_subp1b,text="SPY2")
-		self.qs_subtab.add(self.qs_subp2,text="QQQ")
-		self.qs_subtab.add(self.qs_subp3,text="GLD")
-		self.qs_subtab.add(self.qs_subp4,text="MISC")
-		self.qs_subtab.add(self.qs_subp5,text="AM")
-		self.qs_subtab.add(self.qs_subp6,text="COMM")
-
-		x = 0 
-
-		for j in total:
-
-			if x==0:
-				tab = self.qs_subp1
-			elif x==1:
-				tab = self.qs_subp1b
-			elif x==2:
-				tab = self.qs_subp2
-			elif x==3:
-				tab = self.qs_subp3	
-
-			elif x==4:
-				tab = self.qs_subp4
-
-			elif x==5:
-				tab = self.qs_subp5
-			elif x==6:
-				tab = self.qs_subp6
-			for i in j:
-
-				c=1
-				tk.Label(tab, text=i['name']+str(i['ratio'])).grid(sticky="w",column=c,row=t)
-				c+=1
-
-				tk.Label(tab, text=" ").grid(sticky="w",column=c,row=t)
-				c+=1
-
-				i['status_bar'] = tk.Label(tab, textvariable=i['status'])
-				i['status_bar'].grid(sticky="w",column=c,row=t)
-				c+=1
-
-
-
-				tk.Label(tab, text="TA:").grid(sticky="w",column=c,row=t)
-				c+=1
-
-				# row 1 entry
-				i['TA']=tk.Entry(tab,textvariable=i['timer'],width=labels['entry'])
-				#i['TA']["state"] = DISABLED
-				i['TA'].grid(sticky="w",column=c,row=t)	
-
-				c+=1
-				i["set_button"] =tk.Button(tab, text="CANCEL",command=lambda s=i: self.as_is(s),width=labels['button'])
-				i["set_button"].grid(sticky="w",column=c,row=t)
-				
-
-
-				t+=1 
-				c =1 
-
-				tk.Label(tab, text="SET LOCK:",).grid(sticky="w",column=c,row=t)
-				c+=1
-
-				tk.Checkbutton(tab,text=" ",variable=i['lock']).grid(sticky="w",column=c,row=t)
-				c+=1
-
-
-
-				# LOCK:
-				tk.Label(tab, text="Increment:").grid(sticky="w",column=c,row=t)
-				c+=1
-
-				# row 1 entry
-				i['set_entry']=tk.Entry(tab,textvariable=i['increment'],width=labels['entry'])
-				i['set_entry']["state"] = DISABLED
-				i['set_entry'].grid(sticky="w",column=c,row=t)	
-				c+=1
-
-				# row 1 set 
-
-				i["set_button"] =tk.Button(tab, text="SET",command=lambda s=i,side="direct": self.submit_spread(s,side),width=labels['button'])
-				i['set_button']["state"] = DISABLED
-				i["set_button"].grid(sticky="w",column=c,row=t)
-				c+=1
-
-				i["flat_button"] =tk.Button(tab, text="FLAT",command=lambda s=i,side="flat": self.submit_spread(s,side),width=labels['button'])
-				#i['flat_button']["state"] = DISABLED
-				i["flat_button"].grid(sticky="w",column=c,row=t)
-				c+=1
-
-
-				t+=1
-				c=1
-				# LOCK:
-				# tk.Label(self.quick_spread_pannel, text="SET LOCK:").grid(sticky="w",column=c,row=t)
-				# c+=1
-
-
-				tk.Label(tab, text="PASSIVE:").grid(sticky="w",column=c,row=t)
-				c+=1
-				# row 1 cheker 
-				i["passive_button"] = tk.Checkbutton(tab,text=" ",variable=i['passive'])
-				i['passive_button']["state"] = DISABLED
-				i['passive_button'].grid(sticky="w",column=c,row=t)
-				c+=1
-
-
-				tk.Label(tab, text="Holding:").grid(sticky="w",column=c,row=t)
-				c+=1
-
-				# row 1 entry
-				i['set_current']=tk.Entry(tab,textvariable=i['current'],width=labels['entry'])
-				i['set_current']["state"] = DISABLED
-				i['set_current'].grid(sticky="w",column=c,row=t)	
-				c+=1
-
-
-				# LOCK:
-				tk.Label(tab, text="Max:").grid(sticky="w",column=c,row=t)
-				c+=1
-
-				# row 1 entry
-				i['set_max']=tk.Entry(tab,textvariable=i['max'],width=labels['entry'])
-				i['set_max']["state"] = DISABLED
-				i['set_max'].grid(sticky="w",column=c,row=t)	
-				c+=1
-
-
-
-				# tk.Label(self.quick_spread_pannel, text="   ",width=5).grid(sticky="w",column=c,row=t)
-				# c+=1
-				# # row 1 flat 
-				# tk.Button(self.quick_spread_pannel, text="FLAT", bg="yellow",command=lambda s=i,side="flat": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
-				# c+=1
-
-
-
-				t+=1
-
-				c = 1
-
-				# LONG:
-				tk.Label(tab, text="LONG:").grid(sticky="w",column=c,row=t)
-				c+=1
-
-				tk.Button(tab, text="+",command=lambda s=i,side="long": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
-				c+=1
-				tk.Button(tab, text="-",command=lambda s=i,side="short": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
-				c+=1
-
-				#t+=1
-
-				#c = 1
-
-				# LONG:
-				tk.Label(tab, text="SHORT:").grid(sticky="w",column=c,row=t)
-				c+=1
-
-				tk.Button(tab, text="+",command=lambda s=i,side="short": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
-				c+=1
-				tk.Button(tab, text="-",command=lambda s=i,side="long": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
-				c+=1
-
-				
-				c=1
-				t+=1
-				tk.Label(tab, text="      ").grid(sticky="w",column=c,row=t)
-
-				i['lock'].trace("w", lambda *_, d=i: trace_func(d) )
-
-
-				t+=1
-				c+=1
-				## ADD TRACE
-
-
-			x+=1
 
 	def as_is(self,dic):
 
@@ -1631,6 +1342,295 @@ class UI(pannel):
 					
 		return False,None,0,0,1
 
+	def init_quick_spread(self):
+
+		labels =		{"entry":4,\
+						"button":5,\
+						"checker":8,\
+						"long_label":8,\
+						"short_label":4,\
+					
+		}
+
+
+		self.spread_timer = 0
+
+		spyqqq = {"name":"SPYQQQ","symbol":["SPY.AM","QQQ.NQ"],"ratio":[1,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		gldslv = {"name":"GLDSLV","symbol":["GLD.AM","SLV.AM"],"ratio":[1,-4],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spytlt = {"name":"TLTSPY","symbol":["TLT.NQ","SPY.AM"],"ratio":[4,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyuso = {"name":"SPYUSO","symbol":["SPY.AM","USO.AM"],"ratio":[1,-3],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		
+		spygdx = {"name":"GDXSPY","symbol":["GDX.AM","SPY.AM"],"ratio":[6,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyiwm = {"name":"SPYIWM","symbol":["SPY.AM","IWM.AM"],"ratio":[10,-12],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+			
+		#tlsaqqq = {"name":"TSLAQQQ","symbol":["TSLA.NQ","QQQ.NQ"],"ratio":[1,-2],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		smhqqq = {"name":"SMHQQQ","symbol":["SMH.NQ","QQQ.NQ"],"ratio":[17,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+	
+		gdxgdxj = {"name":"GDXGDXJ","symbol":["GDX.AM","GDXJ.AM"],"ratio":[10,-7],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		gdxgld = {"name":"GDXGLD","symbol":["GDX.AM","GLD.AM"],"ratio":[2,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		
+		silslv = {"name":"SLVSLI","symbol":["SLV.AM","SIL.AM"],"ratio":[8,-5],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+				
+
+		xleqqq = {"name":"XLEQQQ","symbol":["XLE.AM","QQQ.NQ"],"ratio":[7,-2],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		
+		arkkqqq = {"name":"ARKKQQQ","symbol":["ARKK.AM","QQQ.NQ"],"ratio":[4,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		
+		#drivqqq = {"name":"DRIVQQQ","symbol":["DRIV.NQ","QQQ.NQ"],"ratio":[12,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+
+
+		spyxlk = {"name":"XLKSPY","symbol":["XLK.AM","SPY.AM"],"ratio":[18,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyxlc = {"name":"XLCSPY","symbol":["XLC.AM","SPY.AM"],"ratio":[49,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyxli = {"name":"XLISPY","symbol":["XLI.AM","SPY.AM"],"ratio":[36,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyxlu = {"name":"XLUSPY","symbol":["XLU.AM","SPY.AM"],"ratio":[55,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		spyxly = {"name":"XLYSPY","symbol":["XLY.AM","SPY.AM"],"ratio":[24,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+	
+		#total = [spyqqq,gldslv,tlsaqqq,smhqqq,gdxgdxj]
+		AAPLQQQ = {"name":"AAPLQQQ","symbol":["AAPL.NQ","QQQ.NQ"],"ratio":[24,-13],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		AMDNVDA = {"name":"NVDAQQQ","symbol":["NVDA.NQ","QQQ.NQ"],"ratio":[30,-26],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+
+		spyijr = {"name":"IJRSPY","symbol":["IJR.AM","SPY.AM"],"ratio":[22,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+	
+		spybitq = {"name":"BITQSPY","symbol":["BITQ.AM","SPY.AM"],"ratio":[42,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+	
+		spygbtc = {"name":"GBTCSPY","symbol":["GBTC.AM","SPY.AM"],"ratio":[21,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+	
+		# tqqqgbtc = {"name":"TQQQGBTC","symbol":["TQQQ.NQ","GBTC.AM"],"ratio":[20,-15],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		# fxixpev = {"name":"FXIXPEV","symbol":["FXI.AM","XPEV.NQ"],"ratio":[2,-1],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		# DISNFLX = {"name":"DISNFLX","symbol":["DIS.NY","NFLX.NQ"],"ratio":[29,-5],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		# JETSXLE = {"name":"JETSXLE","symbol":["JETS.AM","XLE.AM"],"ratio":[41,-12],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+	
+		spyfxi = {"name":"FXISPY","symbol":["FXI.AM","SPY.AM"],"ratio":[80,-6],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		fxifutu = {"name":"FXIFUTU","symbol":["FXI.AM","FUTU.NQ"],"ratio":[80,-9],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+		fxipdd = {"name":"FXIPDD","symbol":["FXI.AM","PDD.NQ"],"ratio":[80,-6],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+	
+
+
+
+		unguso = {"name":"UNGUSO","symbol":["UNG.AM","USO.AM"],"ratio":[63,-25],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+	
+		tltief = {"name":"TLTIEF","symbol":["TLT.NQ","IEF.NQ"],"ratio":[50,-107],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+	
+		spymsmo = {"name":"MSOSSPY","symbol":["MSOS.AM","SPY.AM"],"ratio":[66,-10],"status":tk.StringVar(value="Status:"),"timer":tk.IntVar(),"current":tk.IntVar(),"increment":tk.IntVar(value=1),"lock":tk.IntVar(value=0),"max":tk.IntVar(value=100),"passive":tk.IntVar(value=0)}
+	
+		spy = [spyqqq,spytlt,spyuso,spygdx,spyiwm]
+		spy2 = [spyijr,spybitq,spygbtc,spymsmo]
+		etf = [spyxlk,spyxlc,spyxli,spyxlu,spyxly]
+		qqq = [smhqqq,AAPLQQQ,AMDNVDA,xleqqq,] #arkkqqq
+		gld = [gldslv,gdxgdxj,gdxgld,silslv]
+		misc =[spyfxi,fxifutu,fxipdd]
+		comm = [unguso,tltief]
+
+		total = [spy,spy2,qqq,gld,misc,etf,comm]
+		
+		self.qs = {}
+		for j in total:
+			for i in j:
+				self.qs[i['name']] = i
+
+
+		self.load_quick_spread()
+
+		c=1
+		t=2
+
+		ttk.Button(self.quick_spread_pannel, text="Save",command=self.save_quick_spread).grid(sticky="w",column=1,row=1)
+
+		style = ttk.Style()
+		style.configure("BW.yellow", background="yellow")
+
+		self.qs_subtab = ttk.Notebook(self.quick_spread_pannel)
+		#self.qs_subtab.place(x=0,rely=0.05,relheight=1,relwidth=1)
+		self.qs_subtab.grid(column=1,row=2)
+
+		self.qs_subp1 = ttk.LabelFrame(self.qs_subtab,text="") 
+		self.qs_subp1b = ttk.LabelFrame(self.qs_subtab,text="") 
+		self.qs_subp2 = ttk.LabelFrame(self.qs_subtab,text="")
+		self.qs_subp3 = ttk.LabelFrame(self.qs_subtab,text="")
+		self.qs_subp4 = ttk.LabelFrame(self.qs_subtab,text="")
+		self.qs_subp5 = ttk.LabelFrame(self.qs_subtab,text="")
+		self.qs_subp6 = ttk.LabelFrame(self.qs_subtab,text="")
+
+		#self.custom_algo_pannel.place(x=0,y=0,height=950,width=350)
+		#self.quick_spread_pannel.place(x=0,y=0,height=950,width=350)
+
+		self.qs_subtab.add(self.qs_subp1,text="SPY")
+		self.qs_subtab.add(self.qs_subp1b,text="SPY2")
+		self.qs_subtab.add(self.qs_subp2,text="QQQ")
+		self.qs_subtab.add(self.qs_subp3,text="GLD")
+		self.qs_subtab.add(self.qs_subp4,text="MISC")
+		self.qs_subtab.add(self.qs_subp5,text="AM")
+		self.qs_subtab.add(self.qs_subp6,text="COMM")
+
+		x = 0 
+
+		for j in total:
+
+			if x==0:
+				tab = self.qs_subp1
+			elif x==1:
+				tab = self.qs_subp1b
+			elif x==2:
+				tab = self.qs_subp2
+			elif x==3:
+				tab = self.qs_subp3	
+
+			elif x==4:
+				tab = self.qs_subp4
+
+			elif x==5:
+				tab = self.qs_subp5
+			elif x==6:
+				tab = self.qs_subp6
+			for i in j:
+
+				c=1
+				tk.Label(tab, text=i['name']+str(i['ratio'])).grid(sticky="w",column=c,row=t)
+				c+=1
+
+				tk.Label(tab, text=" ").grid(sticky="w",column=c,row=t)
+				c+=1
+
+				i['status_bar'] = tk.Label(tab, textvariable=i['status'])
+				i['status_bar'].grid(sticky="w",column=c,row=t)
+				c+=1
+
+
+
+				tk.Label(tab, text="TA:").grid(sticky="w",column=c,row=t)
+				c+=1
+
+				# row 1 entry
+				i['TA']=tk.Entry(tab,textvariable=i['timer'],width=labels['entry'])
+				#i['TA']["state"] = DISABLED
+				i['TA'].grid(sticky="w",column=c,row=t)	
+
+				c+=1
+				i["set_button"] =tk.Button(tab, text="CANCEL",command=lambda s=i: self.as_is(s),width=labels['button'])
+				i["set_button"].grid(sticky="w",column=c,row=t)
+				
+
+
+				t+=1 
+				c =1 
+
+				tk.Label(tab, text="SET LOCK:",).grid(sticky="w",column=c,row=t)
+				c+=1
+
+				tk.Checkbutton(tab,text=" ",variable=i['lock']).grid(sticky="w",column=c,row=t)
+				c+=1
+
+
+
+				# LOCK:
+				tk.Label(tab, text="Increment:").grid(sticky="w",column=c,row=t)
+				c+=1
+
+				# row 1 entry
+				i['set_entry']=tk.Entry(tab,textvariable=i['increment'],width=labels['entry'])
+				i['set_entry']["state"] = DISABLED
+				i['set_entry'].grid(sticky="w",column=c,row=t)	
+				c+=1
+
+				# row 1 set 
+
+				i["set_button"] =tk.Button(tab, text="SET",command=lambda s=i,side="direct": self.submit_spread(s,side),width=labels['button'])
+				i['set_button']["state"] = DISABLED
+				i["set_button"].grid(sticky="w",column=c,row=t)
+				c+=1
+
+				i["flat_button"] =tk.Button(tab, text="FLAT",command=lambda s=i,side="flat": self.submit_spread(s,side),width=labels['button'])
+				#i['flat_button']["state"] = DISABLED
+				i["flat_button"].grid(sticky="w",column=c,row=t)
+				c+=1
+
+
+				t+=1
+				c=1
+				# LOCK:
+				# tk.Label(self.quick_spread_pannel, text="SET LOCK:").grid(sticky="w",column=c,row=t)
+				# c+=1
+
+
+				tk.Label(tab, text="PASSIVE:").grid(sticky="w",column=c,row=t)
+				c+=1
+				# row 1 cheker 
+				i["passive_button"] = tk.Checkbutton(tab,text=" ",variable=i['passive'])
+				i['passive_button']["state"] = DISABLED
+				i['passive_button'].grid(sticky="w",column=c,row=t)
+				c+=1
+
+
+				tk.Label(tab, text="Holding:").grid(sticky="w",column=c,row=t)
+				c+=1
+
+				# row 1 entry
+				i['set_current']=tk.Entry(tab,textvariable=i['current'],width=labels['entry'])
+				i['set_current']["state"] = DISABLED
+				i['set_current'].grid(sticky="w",column=c,row=t)	
+				c+=1
+
+
+				# LOCK:
+				tk.Label(tab, text="Max:").grid(sticky="w",column=c,row=t)
+				c+=1
+
+				# row 1 entry
+				i['set_max']=tk.Entry(tab,textvariable=i['max'],width=labels['entry'])
+				i['set_max']["state"] = DISABLED
+				i['set_max'].grid(sticky="w",column=c,row=t)	
+				c+=1
+
+
+
+				# tk.Label(self.quick_spread_pannel, text="   ",width=5).grid(sticky="w",column=c,row=t)
+				# c+=1
+				# # row 1 flat 
+				# tk.Button(self.quick_spread_pannel, text="FLAT", bg="yellow",command=lambda s=i,side="flat": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
+				# c+=1
+
+
+
+				t+=1
+
+				c = 1
+
+				# LONG:
+				tk.Label(tab, text="LONG:").grid(sticky="w",column=c,row=t)
+				c+=1
+
+				tk.Button(tab, text="+",command=lambda s=i,side="long": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
+				c+=1
+				tk.Button(tab, text="-",command=lambda s=i,side="short": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
+				c+=1
+
+				#t+=1
+
+				#c = 1
+
+				# LONG:
+				tk.Label(tab, text="SHORT:").grid(sticky="w",column=c,row=t)
+				c+=1
+
+				tk.Button(tab, text="+",command=lambda s=i,side="short": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
+				c+=1
+				tk.Button(tab, text="-",command=lambda s=i,side="long": self.submit_spread(s,side),width=labels['button']).grid(sticky="w",column=c,row=t)
+				c+=1
+
+				
+				c=1
+				t+=1
+				tk.Label(tab, text="      ").grid(sticky="w",column=c,row=t)
+
+				i['lock'].trace("w", lambda *_, d=i: trace_func(d) )
+
+
+				t+=1
+				c+=1
+				## ADD TRACE
+
+
+			x+=1
 
 if __name__ == '__main__':
 
