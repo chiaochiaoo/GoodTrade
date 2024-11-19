@@ -293,6 +293,7 @@ class Symbol:
 
 			if "AP" ==self.tradingplans[tp].get_algoname()[:2]:
 				remaining+= self.tradingplans[tp].get_current_expected(self.symbol_name)
+				
 		log_print(self.symbol_name,"get all moo enter: expect to have:",remaining)
 
 		return remaining
@@ -767,9 +768,6 @@ class Symbol:
 					self.tradingplans[tp].algo_as_is()
 
 			### discrepancy added. 
-
-
-
 
 	def cancel_all(self):
 

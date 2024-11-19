@@ -209,6 +209,9 @@ class TradingPlan_Basket:
 				self.manual_flattable = True 
 				self.one_shot_algo = True
 
+			if "AP_" in self.algo_name:
+				self.manual_flattable = True 
+				self.one_shot_algo = True
 
 
 			log_print(self.source," Initializing:, Manual flattable:",self.manual_flattable," Inspectable:",self.inspectable)
@@ -1157,6 +1160,8 @@ class TradingPlan_Basket:
 		elif self.data[REALIZED]>0:
 			self.tklabels[REALIZED]["background"] = STRONGGREEN
 		elif self.data[REALIZED]<0:
+
+
 			self.tklabels[REALIZED]["background"] = STRONGRED
 
 	def mark_algo_status(self,status):
