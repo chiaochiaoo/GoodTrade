@@ -127,6 +127,8 @@ class TradingPlan_Basket:
 
 		self.original_positions = {}
 		self.current_request_timer ={}
+
+		self.rejection_counts = {}
 		####################################################################################
 
 		self.incremental_state = {}
@@ -209,9 +211,9 @@ class TradingPlan_Basket:
 				self.manual_flattable = True 
 				self.one_shot_algo = True
 
-			if "AP_" in self.algo_name:
-				self.manual_flattable = True 
-				self.one_shot_algo = True
+			# if "AP_" in self.algo_name:
+			# 	# self.manual_flattable = True 
+			# 	self.one_shot_algo = True
 
 
 			log_print(self.source," Initializing:, Manual flattable:",self.manual_flattable," Inspectable:",self.inspectable)
@@ -944,10 +946,16 @@ class TradingPlan_Basket:
 	def rejection_handling(self,symbol):
 
 
-		self.expected_shares[symbol] = 0
-		self.banned.append(symbol)
+		if symbol not in self.rejection_counts:
+			self.rejection_counts[symbol] = 1
+		else:
+			self.rejection_counts[symbol] +=1
 
-		log_print(self.source," BANNED:",symbol)
+		if self.rejection_counts[symbol]>5:
+			self.expected_shares[symbol] = 0
+			self.banned.append(symbol)
+
+			log_print(self.source," BANNED:",symbol)
 
 	def get_flatten_order(self):
 
@@ -1016,7 +1024,7 @@ class TradingPlan_Basket:
 			log_print(self.source,self.algo_name,"TIME IS UP",ts,self.timer)
 			self.flatten_cmd()
 
-		if self.profit!=0 and self.manually_added==False and self.flatten_order!=True and ts<=955:
+		if self.profit!=0 and self.manually_added==False and self.flatten_order!=True and ts<=950:
 
 			# if total_unreal>self.profit :
 			# 	log_print(self.source, self.algo_name, " MEET PROFIT TARGET",self.profit)
@@ -1055,7 +1063,7 @@ class TradingPlan_Basket:
 
 			else:
 				pass 
-		if self.stop!=0 and self.flatten_order!=True and ts<=955:
+		if self.stop!=0 and self.flatten_order!=True and ts<=950:
 			if total_unreal*-1 > self.stop:
 				log_print(self.source, self.algo_name, " MEET STOP ",self.stop)
 				self.flatten_cmd()
