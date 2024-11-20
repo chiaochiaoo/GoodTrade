@@ -1276,7 +1276,7 @@ class Manager:
 					req = threading.Thread(target=self.get_symbol_price, daemon=True)
 					req.start()
 
-					if count%4==0:# and count%20!=0:
+					if count%6==0:# and count%20!=0:
 
 						if self.symbol_inspection_start:
 							handl = threading.Thread(target=self.symbols_inspection,daemon=True)
