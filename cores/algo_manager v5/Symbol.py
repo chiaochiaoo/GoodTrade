@@ -74,7 +74,9 @@ class Symbol:
 		self.have_pending_orders = False 
 
 		self.bid_change = False 
-		self.ask_change = False 
+		self.ask_change = False
+
+
 		"""
 		UPGRADED PARTS
 
@@ -108,6 +110,8 @@ class Symbol:
 		self.market_out = 0
 
 		self.current_imbalance = 0
+
+		self.fill_time_remianing = 0
 
 		# plus, minus, all the updates, all go here. 
 		# 1. on adding shares
@@ -150,7 +154,7 @@ class Symbol:
 
 		self.data[TIMESTAMP] = ts
 
-		self.data['SPREAD'] = ask-bid 
+		#self.data['SPREAD'] = ask-bid 
 		
 		# if self.data[BID]!=bid:
 		# 	self.bid_change = True 
@@ -335,9 +339,11 @@ class Symbol:
 
 			self.data[ASK] = ask
 			self.data[BID] = bid
+
+			self.data['SPREAD'] = round(ask-bid,2)
 			self.data[TIMESTAMP] = ts
 
-			log_print(self.symbol_name,self.data[BID],self.bid_change,self.data[ASK],self.ask_change)
+			log_print(self.symbol_name,"SPREAD:",self.data['SPREAD'],self.data[BID],self.bid_change,self.data[ASK],self.ask_change)
 
 			return 
 		except Exception as e:
@@ -451,6 +457,8 @@ class Symbol:
 			if self.tradingplans[tp].get_inspectable():
 				current_shares +=  self.tradingplans[tp].get_current_share(self.symbol_name)
 
+
+				self.fill_time_remianing = round((ts-self.tradingplans[tp].get_request_time(self.symbol_name))/fill_timer,2)
 
 				if ts-self.tradingplans[tp].get_request_time(self.symbol_name)>fill_timer:
 					expired+=self.tradingplans[tp].get_current_request(self.symbol_name)
@@ -659,10 +667,10 @@ class Symbol:
 		skip = True 
 
 		if self.aggresive_only!=True and ts<57500:
-			if self.action==PASSIVEBUY and self.bid_change==True:
+			if self.action==PASSIVEBUY and (self.bid_change==True or self.data['SPREAD']>0.05):
 				self.ppro_out.send([CANCEL,self.symbol_name]) 
 				skip = False 
-			elif self.action==PASSIVESELL and self.ask_change==True:
+			elif self.action==PASSIVESELL and (self.ask_change==True or self.data['SPREAD']>0.05):
 				self.ppro_out.send([CANCEL,self.symbol_name])
 				skip = False 
 
@@ -671,7 +679,7 @@ class Symbol:
 
 			# else:
 				
-			# 	skip = False 
+			# 	skip = False ☺
 		# if self.aggresive_only!=True and ts<57500:
 		# 	self.ppro_out.send([CANCEL,self.symbol_name]) 
 
@@ -685,6 +693,10 @@ class Symbol:
 		# self.ppro_out.send([CANCEL,self.symbol_name])
 		# time.sleep(0.3)
 
+		## self.fill_time_remianing
+		log_print(self.source,self.symbol_name,self.action,self.difference,"fill timer:",self.fill_time_remianing)
+
+		## if 
 
 		if self.difference!=0 and self.holding_update==False :
 
@@ -702,7 +714,22 @@ class Symbol:
 				self.sent_orders = True 
 			else:
 				if not skip and total!=0:
-					self.ppro_out.send([self.action,self.symbol_name,total,0,self.manager.gateway])
+
+					###### ADJUST THE spread
+					adjustment = 0 
+
+					if self.data['SPREAD']>0.01:
+						adjustment = round((self.fill_time_remianing)*self.data['SPREAD'],2) # % of spread.
+
+						if adjustment <0.01:
+							adjustment = 0.01 
+
+					if self.action==PASSIVESELL:
+						adjustment = adjustment*-1
+						
+					log_print(self.source,self.symbol_name,"orders:","fill timer:",self.fill_time_remianing,"spread:",self.data['SPREAD'],"adjustment:",adjustment)
+
+					self.ppro_out.send([self.action,self.symbol_name,total,adjustment,self.manager.gateway])
 					self.sent_orders = True 
 				# else:
 				# 	log_print(self.source,self.symbol_name,"NO CHANGE DETECTED, skipping.")
