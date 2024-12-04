@@ -676,6 +676,8 @@ class Manager:
 		#MOC_flat_timer = MOC_send_out_timer+90
 		MOC_flat = False 
 
+		PROGRAM_SHUT = 970 *60
+		
 		c = 0 
 		log_print("Timer: functional and counting")
 		checkmts  = 0
@@ -685,6 +687,10 @@ class Manager:
 			ts = now.hour*3600 + now.minute*60 + now.second
 
 			mts = now.hour*60 + now.minute 
+
+			if ts>= PROGRAM_SHUT:
+
+				self.root.destroy()
 
 			if ts>=MOO_exit_timer_AM and MOO_exit_AM==False :
 
