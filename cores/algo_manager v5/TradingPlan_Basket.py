@@ -111,6 +111,10 @@ class TradingPlan_Basket:
 		if "Aggresive_exit" in info:
 			self.aggresive_exit = True 
 
+		self.reusable = False 
+		if "Reusable" in info:
+			self.reusable = True 
+
 		log_print(algo_name,"  profit & risk : ",self.profit,self.stop)
 		#### BANED SYMBOL
 
@@ -738,7 +742,7 @@ class TradingPlan_Basket:
 					PrintException(e,"Basket Holding Update Error:"+self.source+symbol)
 				self.calculate_avg_price(symbol)
 
-				if sum(self.current_shares.values())==0 : #and self.one_shot_algo
+				if sum(self.current_shares.values())==0 and self.reusable==False: #and self.one_shot_algo
 					### COMPLETELY FLAT. ###
 					self.flatten_order = True 
 					#self.terminated = True 
