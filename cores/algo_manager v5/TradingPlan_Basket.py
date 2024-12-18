@@ -1124,7 +1124,7 @@ class TradingPlan_Basket:
 
 		self.update_displays()
 
-		if self.flatten_order==True and sum(self.current_shares.values())==0:
+		if self.flatten_order==True and sum(self.current_shares.values())==0 and self.reusable==False:
 			self.shutdown = True
 			self.tkvars[UNREAL].set(0)
 			self.tklabels[UNREAL]["background"] =DEFAULT
