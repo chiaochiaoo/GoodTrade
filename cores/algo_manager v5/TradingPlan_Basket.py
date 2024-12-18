@@ -224,7 +224,7 @@ class TradingPlan_Basket:
 
 	def print_positions(self):
 
-		log_print(self.source,self.name,self.inspectable,self.cloned,self.upclone_trigger,self.downclone_trigger," expected:",self.expected_shares ," current:",self.current_shares," requested:",self.current_request,' avg price',self.average_price)
+		log_print(self.source,self.name,self.inspectable,self.cloned,self.flatten_order,self.upclone_trigger,self.downclone_trigger," expected:",self.expected_shares ," current:",self.current_shares," requested:",self.current_request,' avg price',self.average_price)
 
 	def init_data(self,risk):
 
@@ -667,41 +667,16 @@ class TradingPlan_Basket:
 
 				log_print(self.source,self.algo_name,symbol,"Loading up :incmonig,",share,"want",self.expected_shares[symbol]," now have",self.current_shares[symbol],"return",ret, "prev avg",prev_price,"cur price",self.average_price[symbol])
 
+				if sum(self.current_shares.values())==0 and self.reusable==False: #and self.one_shot_algo
+					### COMPLETELY FLAT. ###
+					self.flatten_order = True 
+					#self.terminated = True 
+
+					log_print(self.source,self.algo_name,"NOW HOLD 0")
+
 				return ret
 
 		else:
-
-			### MANUAL CONTROL SIDE ###
-			# change = False 
-			# if self.manual_addable and self.flatten_order!=True and abs(self.self.current_shares[symbol])<50: ### NEED ON SAME SIDE. AND LESS THAN THE LIMIT. 
-			# 	if self.expected_shares[symbol]*share>=0:
-
-			# 		### WHATS THE MAXIUM TO ADD??? Infinity.
-
-			# 		remaining_room = abs(self.maximum_manual[symbol]) - abs(self.current_shares[symbol])
-
-
-			# 		if abs(remaining_room)>=abs(share): # EATS EVERYTHING 
-			# 			self.expected_shares[symbol] += share 
-			# 			self.current_shares[symbol] += share 
-
-			# 			share_added = share
-			# 			ret = 0 
-
-			# 		else:
-			# 			sign = np.sign(share)
-			# 			self.expected_shares[symbol] += remaining_room*sign 
-			# 			self.current_shares[symbol] += remaining_room*sign 
-
-			# 			share_added = share
-			# 			ret = 0 
-
-			# 		change = True 
-
-			# 		self.manually_added = True
-
-			# 		log_print(self.source,self.algo_name,symbol,"Manual Loading UP :incmonig,",share," now have",self.current_shares[symbol],"return",ret)
-
 			change = False 
 			if self.manual_flattable: ### NEED ON DIFF SIDE
 				if self.expected_shares[symbol]*share<=0:
@@ -747,7 +722,7 @@ class TradingPlan_Basket:
 					self.flatten_order = True 
 					#self.terminated = True 
 
-					log_print(self.source,self.algo_name,"NOW MANUUAL FLAT.")
+					log_print(self.source,self.algo_name,"NOW HOLD NOTHING")
 
 				return ret 
 
@@ -1111,16 +1086,6 @@ class TradingPlan_Basket:
 		if self.data[UNREAL_MAX]<self.data[UNREAL]:
 			self.data[UNREAL_MAX] = self.data[UNREAL]
 			self.tkvars[UNREAL_MAX].set(self.data[UNREAL_MAX])
-
-		# log_print("Tradingplan: ",self.algo_name, " Unreal",total_unreal,"Avg",self.average_price,"Shares:",self.current_shares,"Stock prices",self.stock_price)
-
-		#log_print("cheking unreal",self.data[UNREAL] , "target",self.data[ESTRISK]*-1)
-		# if self.data[UNREAL]<self.data[ESTRISK]*-1:
-
-		# 	log_print("TradingPlan Risk Excceded, unreal",self.data[UNREAL] , "risk",self.data[ESTRISK]*-1)
-		# 	self.flatten_cmd()
-		# 	self.mark_algo_status(DONE)
-		# 	self.shut_down = True
 
 		self.update_displays()
 
