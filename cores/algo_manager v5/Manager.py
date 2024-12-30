@@ -175,6 +175,9 @@ class Manager:
 
 		self.disaster_mode = tk.BooleanVar(value=0)
 
+
+		self.subdollar_check = tk.BooleanVar(value=1)
+
 		self.ta_moc = tk.BooleanVar(value=0)
 		self.moc_1559 = tk.BooleanVar(value=0)
 		self.moc_1601 = tk.BooleanVar(value=0)
@@ -182,6 +185,8 @@ class Manager:
 		self.ui = UI(root,self,self.receiving_signals,self.cmd_text)
 
 		self.ui_root = root
+
+		self.sub_dollar_stocks = []
 
 		m=self.receiving_signals.trace('w', lambda *_: self.receiving())
 
@@ -481,8 +486,28 @@ class Manager:
 						check = True 
 						break
 
+				### check sub dollars 
+
+				if self.subdollar_check.get()==True:
+
+					#http://10.29.10.143/api/Symbol/basicdata/SPY,QQQ?chartPeriod=1&chartType=M
+					#self.sub_dollar_stocks
+					for symbol,share in orders.items():
+						log_print("init:",symbol,symbol[:-3],share)
+
+						if symbol[:-3] in self.sub_dollar_stocks:
+							#log_print("cecece")
+							if orders[symbol]>0 and orders[symbol]<500:
+								orders[symbol] = 500 
+							elif orders[symbol]<0 and orders[symbol]>-500:
+								orders[symbol] = 500
+
+							log_print("adjusted:",symbol,orders[symbol])
+
+
 				if check:
 				
+
 					self.baskets[basket_name] = TradingPlan_Basket(basket_name,risk,self,info)
 					ui_created = self.ui.create_new_single_entry(self.baskets[basket_name],"Basket",None)
 
@@ -677,7 +702,7 @@ class Manager:
 		MOC_flat = False 
 
 		PROGRAM_SHUT = 970 *60
-		
+
 		c = 0 
 		log_print("Timer: functional and counting")
 		checkmts  = 0
@@ -1453,6 +1478,7 @@ class Manager:
 				now = datetime.now()
 				sts = now.hour*3600 + now.minute*60 + now.second 
 
+				self.sub_dollar_stocks = []
 				if sts>self.last_price_ts+2:
 					with self.get_price_lock:
 						r = "https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?include_otc=false&apiKey=ezY3uX1jsxve3yZIbw2IjbNi5X7uhp1H"
@@ -1478,7 +1504,12 @@ class Manager:
 
 							spread = i['lastQuote']['P']-i['lastQuote']['p']
 							self.spread_check[i['ticker']] = spread
-						self.real_time_ts
+
+
+							if i['lastQuote']['p']>0 and i['lastQuote']['p']<=1:
+								self.sub_dollar_stocks.append(i['ticker'])
+						
+						#print(self.sub_dollar_stocks)
 
 						self.real_time_ts = cur_ts
 						self.last_price_ts = sts 
@@ -1563,6 +1594,7 @@ class Manager:
 
 		self.send_email_admin(subject,body)
 
+	
 	def online_alert(self):
 
 		user = self.ui.user.get()
