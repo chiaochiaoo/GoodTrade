@@ -206,6 +206,14 @@ class UI(pannel):
 		# self.algo_count_ = ttk.Label(self.system_pannel,  textvariable=self.position_count)
 		# self.algo_count_.grid(sticky="w",column=2,row=row,padx=10)
 
+		row +=1
+
+		ttk.Label(self.system_pannel, text="Subdollar 500MIN:").grid(sticky="w",column=1,row=row,padx=10)
+
+		try:
+			ttk.Checkbutton(self.system_pannel, variable=self.manager.subdollar_check).grid(sticky="w",column=2,row=row)
+		except:
+			pass 
 
 		row +=1
 
