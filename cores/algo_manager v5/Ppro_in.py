@@ -218,7 +218,7 @@ def periodical_check(pipe,port):
 					#############################THIS PART IS MOVED TO MANAGER #############################################################
 
 					# symbols = list(positions.keys())
-					# symbols = [i[:-3] for i in symbols]
+					# symbols = [i for i in symbols if ".TO"]
 
 					# if c%2==0:
 					# 	req = threading.Thread(target=get_symbol_price,args=(symbols,pipe,lock,), daemon=True)
@@ -346,8 +346,6 @@ def read_summary(pipe):
 										d['sizeTraded'] = int(sizeTraded)
 										
 										
-											
-
 										if cur_exp<1000000:
 											d["cur_exp"] = str(cur_exp//1000)+"k"
 										else:
