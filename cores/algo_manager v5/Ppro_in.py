@@ -199,7 +199,7 @@ def periodical_check(pipe,port):
 					if c%50==0:
 						#log_print("PPro in : periodcal new loop",cur_ts)
 						threading_request("http://127.0.0.1:8080/SetOutput?region=1&feedtype=OSTAT&output="+ str(port)+"&status=on") ## ORDER STATS.
-
+						threading_request("http://127.0.0.1:8080/SetOutput?region=2&feedtype=OSTAT&output="+ str(port)+"&status=on") ## ORDER STATS.
 					# ### 1. register OSTAT  
 					# if c%5==0:
 					# 	register_order_listener(port)
