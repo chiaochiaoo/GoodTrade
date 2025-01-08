@@ -667,7 +667,8 @@ class TradingPlan_Basket:
 
 				log_print(self.source,self.algo_name,symbol,"Loading up :incmonig,",share,"want",self.expected_shares[symbol]," now have",self.current_shares[symbol],"return",ret, "prev avg",prev_price,"cur price",self.average_price[symbol])
 
-				if sum(self.current_shares.values())==0 and self.reusable==False: #and self.one_shot_algo
+				 
+				if sum(abs(value) for value in self.current_shares.values())==0 and self.reusable==False: #and self.one_shot_algo
 					### COMPLETELY FLAT. ###
 					self.flatten_order = True 
 					#self.terminated = True 
@@ -717,7 +718,7 @@ class TradingPlan_Basket:
 					PrintException(e,"Basket Holding Update Error:"+self.source+symbol)
 				self.calculate_avg_price(symbol)
 
-				if sum(self.current_shares.values())==0 and self.reusable==False: #and self.one_shot_algo
+				if sum(abs(value) for value in self.current_shares.values())==0 and self.reusable==False: #and self.one_shot_algo
 					### COMPLETELY FLAT. ###
 					self.flatten_order = True 
 					#self.terminated = True 
@@ -1089,7 +1090,7 @@ class TradingPlan_Basket:
 
 		self.update_displays()
 
-		if self.flatten_order==True and sum(self.current_shares.values())==0 and self.reusable==False:
+		if self.flatten_order==True and sum(abs(value) for value in self.current_shares.values())==0 and self.reusable==False:
 			self.shutdown = True
 			self.tkvars[UNREAL].set(0)
 			self.tklabels[UNREAL]["background"] =DEFAULT
