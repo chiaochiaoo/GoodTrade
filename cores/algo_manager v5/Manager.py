@@ -69,7 +69,6 @@ def request(post):
 	except:
 		print(post, "failed")
 
-
 try:
 	import smtplib
 except ImportError:
@@ -688,6 +687,13 @@ class Manager:
 
 
 		
+
+		#############################################################
+
+		MOC_EU = False 
+		MOC_EU_timer = 691*60 #625*60 #
+
+		#################################################################
 		MOC_NQ = False 
 
 		MOC_1559_timer = 959*60
@@ -851,6 +857,27 @@ class Manager:
 
 				MOO_pair = True 
 
+			if ts>=MOC_EU_timer and MOC_EU == False:
+
+				for name,basket in self.baskets.items():
+					if "EURO" in name:
+						self.algo_as_is(name)
+				# mark it . set it 0.
+
+				reque = "http://127.0.0.1:8080/Flatten?symbol=*.PA"
+				req = threading.Thread(target=request, args=(reque,),daemon=True)
+				req.start()
+
+				log_print("EURO CLOSING",ts)
+
+				# for name,basket in self.baskets.items():
+				# 	basket.flatten_cmd()
+				for name,basket in self.baskets.items():
+					if "EURO" in name:
+						#self.algo_as_is(name)
+						basket.flatten_cmd()
+
+				MOC_EU = True 
 
 			if ts>=MOC_send_out_timer_NQ and MOC_NQ == False:
 
