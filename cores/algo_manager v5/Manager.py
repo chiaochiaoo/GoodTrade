@@ -862,6 +862,8 @@ class Manager:
 				for name,basket in self.baskets.items():
 					if "EURO" in name:
 						self.algo_as_is(name)
+						basket.turn_off_inspection()
+						#turn_off_insepction
 				# mark it . set it 0.
 
 				reque = "http://127.0.0.1:8080/Flatten?symbol=*.PA"
@@ -870,11 +872,11 @@ class Manager:
 
 				log_print("EURO CLOSING",ts)
 
-				# for name,basket in self.baskets.items():
-				# 	basket.flatten_cmd()
+				
 				for name,basket in self.baskets.items():
 					if "EURO" in name:
 						#self.algo_as_is(name)
+						#print("flattening:",name)
 						basket.flatten_cmd()
 
 				MOC_EU = True 
