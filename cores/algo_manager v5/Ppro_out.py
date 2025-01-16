@@ -158,7 +158,7 @@ def buy_market_order(symbol,share):
 
 	if ".TO" in symbol:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=TSX Buy SweepSOR Market ANON DAY&shares='+str(share)
-	elif '.PA' in symbol:
+	elif ".PA" in symbol or ".BR" in symbol or ".LS" in symbol or ".AS" in symbol:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=TRQS Buy TRQSPARIS Market DAY&shares='+str(share)
 	else:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=EDGX Buy ROUC Market DAY&shares='+str(share)
@@ -176,7 +176,7 @@ def sell_market_order(symbol,share):
 
 	if ".TO" in symbol:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=TSX Sell->Short SweepSOR Market ANON DAY&shares='+str(share)
-	elif '.PA' in symbol:
+	elif ".PA" in symbol or ".BR" in symbol or ".LS" in symbol or ".AS" in symbol:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=TRQS Sell TRQSPARIS Market DAY&shares='+str(share)
 	else:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=EDGX Sell->Short ROUC Market DAY&shares='+str(share)
@@ -194,7 +194,7 @@ def passive_buy(symbol,share,offset,gateway):
 
 	if ".TO" in symbol:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=TSX Buy SweepSOR Limit Near ANON DAY&shares='+str(share)
-	elif ".PA" in symbol:																												#TRQS Buy TRQSPARIS Limit Near DAY
+	elif ".PA" in symbol or ".BR" in symbol or ".LS" in symbol or ".AS" in symbol:																												#TRQS Buy TRQSPARIS Limit Near DAY
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=TRQS Buy TRQSPARIS Limit Near DAY&shares='+str(share)
 	else:
 		if gateway ==0:
@@ -222,7 +222,7 @@ def passive_sell(symbol	,share,offset,gateway):
 	#	r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Sell->Short MEMX Pegged Near DAY MidPoint&shares='+str(share)
 	if ".TO" in symbol:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=TSX Sell->Short SweepSOR Limit Near ANON DAY&shares='+str(share)
-	elif ".PA" in symbol:
+	elif ".PA" in symbol or ".BR" in symbol or ".LS" in symbol or ".AS" in symbol:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=TRQS Sell TRQSPARIS Limit Near DAY&shares='+str(share)
 	else:
 		if gateway ==0:

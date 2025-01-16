@@ -691,7 +691,7 @@ class Manager:
 		#############################################################
 
 		MOC_EU = False 
-		MOC_EU_timer = 691*60 #625*60 #
+		MOC_EU_timer = 691*60 #625*60 #795*60#
 
 		#################################################################
 		MOC_NQ = False 
@@ -870,6 +870,17 @@ class Manager:
 				req = threading.Thread(target=request, args=(reque,),daemon=True)
 				req.start()
 
+				reque = "http://127.0.0.1:8080/Flatten?symbol=*.BR"
+				req = threading.Thread(target=request, args=(reque,),daemon=True)
+				req.start()
+
+				reque = "http://127.0.0.1:8080/Flatten?symbol=*.AS"
+				req = threading.Thread(target=request, args=(reque,),daemon=True)
+				req.start()
+
+				reque = "http://127.0.0.1:8080/Flatten?symbol=*.LS"
+				req = threading.Thread(target=request, args=(reque,),daemon=True)
+				req.start()
 				log_print("EURO CLOSING",ts)
 
 				
