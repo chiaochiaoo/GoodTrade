@@ -26,3 +26,4 @@ algo_records/
 tnv_viewer/test.py
 tools/Realtime_Stocks_Eval/logs_server/
 cores/algo_manager v5/test.py
+market/
