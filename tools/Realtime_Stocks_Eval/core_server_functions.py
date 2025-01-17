@@ -650,11 +650,13 @@ symbols = []
 
 #symbols = ["AAPL"]
 postbody = "https://financialmodelingprep.com/api/v3/sp500_constituent?apikey=a901e6d3dd9c97c657d40a2701374d2a"
+postbody =  "https://financialmodelingprep.com/api/v3/nasdaq_constituent?apikey=a901e6d3dd9c97c657d40a2701374d2a"
 r= requests.get(postbody)
 d = json.loads(r.text)
 for i in d:
   symbols.append(i['symbol'])
 
+# symbols = ["SPY","QQQ","MSFT"]
 total = {}
 total['server_name'] = "Server"
 total['symbols']  = symbols
