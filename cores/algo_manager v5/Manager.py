@@ -568,9 +568,10 @@ class Manager:
 		l = []
 		for tp in tps:
 			# if it is still running.
-			if self.baskets[tp].is_it_done()==True:
-				l.append(self.baskets[tp])
+			if self.baskets[tp].is_it_done()!=True:
+				l.append(tp)
 
+		print("running algos:",l)
 		return l[:190]
 
 	def return_done_algo(self):
@@ -580,9 +581,10 @@ class Manager:
 		l = []
 		for tp in tps:
 			# if it is still running.
-			if self.baskets[tp].get_algo_status()!=True:
-				l.append(self.baskets[tp])
+			if self.baskets[tp].is_it_done()==True:
+				l.append(tp)
 
+		print("done algos:",l)
 		return l[:190]
 
 	def send_moo(self,dic):
@@ -685,8 +687,6 @@ class Manager:
 
 		MOC_send_out_timer = 958*60+40 #958*60+40 #958*60+50
 
-
-		
 
 		#############################################################
 

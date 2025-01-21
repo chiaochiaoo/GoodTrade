@@ -77,6 +77,10 @@ class Symbol:
 		self.ask_change = False
 
 
+		# self.symbol_dead_line = 959 
+
+		# if ".PA" in self.symbol_name:
+		# 	self.symbol_inspection
 		"""
 		UPGRADED PARTS
 
@@ -135,7 +139,6 @@ class Symbol:
 	def turn_off_insepction(self):
 		self.enabled_insepction = False 
 
-
 	def init_data(self):
 
 		for i in self.numeric_labels:
@@ -185,7 +188,6 @@ class Symbol:
 		"""
 		For both load and unload
 		"""
-
 
 		if not self.inspection_lock.locked():
 			#log_print(self.symbol_name,"Inspecting:")

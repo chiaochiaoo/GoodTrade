@@ -1173,7 +1173,8 @@ class TradingPlan_Basket:
 
 
 	def is_it_done(self):
-		return self.tklabels[STATUS]==DONE
+		print(self.name,self.tkvars[STATUS].get(),self.tkvars[STATUS].get()==DONE)
+		return self.tkvars[STATUS].get()==DONE
 	def deploy(self):
 
 
