@@ -167,8 +167,10 @@ def create_database_model(symbol,folder_path):
 			d['atr'] = atr 
 			d['db_processed'] = 1
 
-
-			h,l = grab_pmb_hl(symbol)
+			try:
+				h,l = grab_pmb_hl(symbol)
+			except:
+				h,l = 0,0
 
 			d['pm_high'] = h
 			d['pm_low'] = l
@@ -678,9 +680,9 @@ total['algos'] = []
 
 
 
-for s in symbols:
+# for s in symbols:
 
-	print(s,grab_pmb_hl(s))
+# 	print(s,grab_pmb_hl(s))
 
 
 #total['symbols'] =["SPY","QQQ","AAPL"]
