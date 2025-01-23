@@ -528,11 +528,11 @@ class UI(pannel):
 		c+=1
 		ttk.Button(self.filter_pannel, text="Only Done",command=self.show_done_only).grid(sticky="w",column=c,row=1)
 
-		c+=1
-		ttk.Button(self.filter_pannel, text="Clone Winning",command=self.show_done_only,state= "disabled").grid(sticky="w",column=c,row=1)
+		# c+=1
+		# ttk.Button(self.filter_pannel, text="Clone Winning",command=self.show_done_only,state= "disabled").grid(sticky="w",column=c,row=1)
 
-		c+=1
-		ttk.Button(self.filter_pannel, text="Clone Losing",command=self.show_done_only,state= "disabled").grid(sticky="w",column=c,row=1)
+		# c+=1
+		# ttk.Button(self.filter_pannel, text="Clone Losing",command=self.show_done_only,state= "disabled").grid(sticky="w",column=c,row=1)
 
 		# c+=1
 		# ttk.Button(self.filter_pannel, text="Only QS",command=self.save_quick_spread).grid(sticky="w",column=c,row=1)
