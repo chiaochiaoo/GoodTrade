@@ -31,6 +31,19 @@ import warnings
 warnings.simplefilter('error', RuntimeWarning)
 
 
+
+
+directorys = ["market",'logs_server']
+
+for directory in directorys:
+	if not os.path.exists(directory):
+		os.makedirs(directory)
+		print(f"Directory '{directory}' created.")
+else:
+		print(f"Directory '{directory}' already exists.")
+
+
+
 SERVER = "logs_server"
 ALGO ="logs_algo"
 MAIN_FRAME = "Main"
@@ -650,7 +663,7 @@ symbols = []
 
 #symbols = ["AAPL"]
 postbody = "https://financialmodelingprep.com/api/v3/sp500_constituent?apikey=a901e6d3dd9c97c657d40a2701374d2a"
-postbody =  "https://financialmodelingprep.com/api/v3/nasdaq_constituent?apikey=a901e6d3dd9c97c657d40a2701374d2a"
+#postbody =  "https://financialmodelingprep.com/api/v3/nasdaq_constituent?apikey=a901e6d3dd9c97c657d40a2701374d2a"
 r= requests.get(postbody)
 d = json.loads(r.text)
 for i in d:
