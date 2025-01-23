@@ -99,8 +99,11 @@ class UI(pannel):
 
 		self.tklabels_list = []
 
+		self.deploy_list = []
+
 		self.risk_timer = tk.DoubleVar(value=300)
 
+		self.empty = tk.StringVar(value="")
 		self.custom_algo = None 
 
 		self.init_pannel()
@@ -115,10 +118,8 @@ class UI(pannel):
 		self.main_app_status = tk.StringVar()
 		self.main_app_status.set("")
 
-	
 		self.user = tk.StringVar()
 		self.user.set("DISCONNECTED")
-
 
 		self.ppro_api_status = tk.StringVar()
 		self.ppro_api_status.set("Disconnected")
@@ -521,11 +522,11 @@ class UI(pannel):
 
 		# reset button
 		c=1
-		ttk.Button(self.filter_pannel, text="Only Running",command=self.show_running_only,state= "disabled").grid(sticky="w",column=c,row=1)
+		ttk.Button(self.filter_pannel, text="Only Running",command=self.show_running_only).grid(sticky="w",column=c,row=1)
 		# filter button 
 
 		c+=1
-		ttk.Button(self.filter_pannel, text="Only Done",command=self.show_done_only,state= "disabled").grid(sticky="w",column=c,row=1)
+		ttk.Button(self.filter_pannel, text="Only Done",command=self.show_done_only).grid(sticky="w",column=c,row=1)
 
 		c+=1
 		ttk.Button(self.filter_pannel, text="Clone Winning",command=self.show_done_only,state= "disabled").grid(sticky="w",column=c,row=1)
@@ -568,12 +569,29 @@ class UI(pannel):
 
 		# reset the numbers. 
 
-		self.init_entry_pannel()
-		self.basket_label_count = 1
+		#self.init_entry_pannel()
+		
+
+
+		# l is the name.
+
+		# for strategy,basket in self.manager.baskets.items():
+		# 	if strategy not in l:
+		# 		self.evict_entry(basket.algo_ui_id)
 
 		# REFRESH?
+		for i in range(0,self.algo_count_number.get()+2):
+
+			#print("evicting,",i)
+			self.evict_entry(i)
+
+
+		self.basket_label_count = 1
 		for i in l:
-			self.create_new_single_entry(i,"Basket",None)
+			#print(i,self.basket_label_count)
+			self.create_new_single_entry(self.manager.baskets[i],"Basket",None)
+
+
 
 	### NOW HOW DO I ITERATE THROUGH ALL THE???
 
@@ -581,13 +599,16 @@ class UI(pannel):
 
 		l = self.manager.return_done_algo()
 
-		# reset the numbers. 
+		for i in range(0,self.algo_count_number.get()+2):
+			self.evict_entry(i)
 
-		self.init_entry_pannel()
+
 		self.basket_label_count = 1
 		for i in l:
-			self.create_new_single_entry(i,"Basket",None)
-		
+			#print(i,self.basket_label_count)
+			self.create_new_single_entry(self.manager.baskets[i],"Basket",None)
+
+
 
 
 	def save_quick_spread(self):
@@ -916,6 +937,7 @@ class UI(pannel):
 
 					### here, insert the top of the list, do a search program.
 
+					#
 					if row_number>(self.algo_limit//2):
 						row_number = self.find_empty_spot()
 				
@@ -941,10 +963,70 @@ class UI(pannel):
 
 				return i 
 
+
+	def evict_entry(self,symbol):
+		infos = {
+		'Strategy':"", \
+		"Status":self.empty,\
+		"MaxU": self.empty,\
+		"MinU": self.empty,\
+		UNREAL:self.empty, \
+		REALIZED:self.empty, \
+		"WR":self.empty, \
+		"MR":self.empty, \
+		"TR":self.empty, \
+		"-90%":self.empty,\
+		"-50%":self.empty,\
+		"+25%":self.empty,\
+		'flatten':"",\
+		}
+
+		info = list(infos.values())
+		labels = list(infos.keys())	
+
+		for j in range(len(info)):
+			label_name = labels[j]
+			if label_name == "Strategy":
+				self.tk_labels_basket[symbol][label_name]["text"] = info[j] 
+
+
+			elif label_name == STATUS:
+				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j] 
+				self.tk_labels_basket[symbol][label_name]["background"] = DEFAULT
+
+			elif label_name==SELECTED:
+				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
+				 
+			elif label_name =="MIND":
+				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
+
+			elif label_name =="Stop":
+				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
+
+			elif label_name =="-90%":
+				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
+
+			elif label_name =="-50%":
+				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
+			elif label_name =="+25%":
+				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
+
+			else:
+				if str(type(info[j]))=="<class 'tkinter.StringVar'>" or str(type(info[j]))=="<class 'tkinter.DoubleVar'>":
+					self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
+					self.tk_labels_basket[symbol][label_name]["background"] = DEFAULT
+					#self.tk_labels_single[symbol][label_name]=tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j])
+				else:
+					#print(self.tk_labels_single[symbol])
+					self.tk_labels_basket[symbol][label_name]["text"] = info[j]
+					self.tk_labels_basket[symbol][label_name]["background"] = DEFAULT
+
+
 	def create_basket_entry(self,tradingplan,symbol):
 
-		self.algo_count_number.set(self.algo_count_number.get()+1)
-
+		if tradingplan.algo_name not in self.deploy_list:
+			self.algo_count_number.set(self.algo_count_number.get()+1)
+			self.deploy_list.append(tradingplan.algo_name)
 		# self.labels = {"Strategy":8,\
 		# 				"Status":10,\
 		# 				"Updates":15,\
@@ -998,6 +1080,7 @@ class UI(pannel):
 			elif label_name == STATUS:
 				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j] 
 				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.print_positions
+				self.tk_labels_basket[symbol][label_name]["background"] = DEFAULT
 				#= tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command=tradingplan.cancle_deployment)
 
 			elif label_name==SELECTED:
@@ -1036,6 +1119,7 @@ class UI(pannel):
 				else:
 					#print(self.tk_labels_single[symbol])
 					self.tk_labels_basket[symbol][label_name]["text"] = info[j]
+					self.tk_labels_basket[symbol][label_name]["background"] = DEFAULT
 					#self.tk_labels_single[symbol][label_name]=tk.Button(self.deployment_frame ,text=info[j],width=self.width[j])
 			# try:
 			# 	self.label_default_configure(self.tk_labels_single[symbol][label_name])
