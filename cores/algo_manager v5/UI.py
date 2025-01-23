@@ -67,6 +67,11 @@ class UI(pannel):
 		self.algo_limit = 220 #102 #200 -3
 
 		self.algo_counts = 0
+
+
+		self.sort_timer = 0
+		self.sort_reverse_real = True 
+		self.sort_reverse_unreal = True 
 		
 		# infos = {
 		# 'Strategy':tradingplan.algo_name, \
@@ -464,6 +469,7 @@ class UI(pannel):
 		self.rebind(self.dev_canvas,self.deployment_frame)
 
 		self.recreate_labels()
+
 	def init_pannel(self):
 
 		self.sub_pannel = ttk.LabelFrame(self.root,text="") 
@@ -529,6 +535,10 @@ class UI(pannel):
 		ttk.Button(self.filter_pannel, text="Only Done",command=self.show_done_only).grid(sticky="w",column=c,row=1)
 
 		# c+=1
+		# ttk.Button(self.filter_pannel, text="Only Done",command=self.show_done_only).grid(sticky="w",column=c,row=1)
+
+
+		# c+=1
 		# ttk.Button(self.filter_pannel, text="Clone Winning",command=self.show_done_only,state= "disabled").grid(sticky="w",column=c,row=1)
 
 		# c+=1
@@ -567,19 +577,6 @@ class UI(pannel):
 
 		l = self.manager.return_running_algo()
 
-		# reset the numbers. 
-
-		#self.init_entry_pannel()
-		
-
-
-		# l is the name.
-
-		# for strategy,basket in self.manager.baskets.items():
-		# 	if strategy not in l:
-		# 		self.evict_entry(basket.algo_ui_id)
-
-		# REFRESH?
 		for i in range(0,self.algo_count_number.get()+2):
 
 			#print("evicting,",i)
@@ -588,7 +585,6 @@ class UI(pannel):
 
 		self.basket_label_count = 1
 		for i in l:
-			#print(i,self.basket_label_count)
 			self.create_new_single_entry(self.manager.baskets[i],"Basket",None)
 
 
@@ -955,7 +951,6 @@ class UI(pannel):
 
 	def find_empty_spot(self):
 
-
 		for i in range(0,self.algo_limit):
 			status = self.tk_labels_basket[i][STATUS]['text']
 			if status=="" or status==DONE:
@@ -988,18 +983,13 @@ class UI(pannel):
 			label_name = labels[j]
 			if label_name == "Strategy":
 				self.tk_labels_basket[symbol][label_name]["text"] = info[j] 
-
-
 			elif label_name == STATUS:
 				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j] 
 				self.tk_labels_basket[symbol][label_name]["background"] = DEFAULT
-
 			elif label_name==SELECTED:
 				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
-				 
 			elif label_name =="MIND":
 				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
-
 			elif label_name =="Stop":
 				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
 
@@ -1066,11 +1056,9 @@ class UI(pannel):
 
 		log_print(self.tk_labels_basket[symbol].keys())
 		for j in range(len(info)):
-			#"symbol","algo_status","description","break_at","position","act_r/est_r","stoplevel","average_price","shares","pxtgt1","pxtgt1","pxtgt1","unrealized_pshr","unrealized","realized"
-			
+
 			label_name = labels[j]
-			#print(symbol,label_name,j,info,self.tk_labels_basket[symbol].keys())
-			#print(self.tk_labels_single[symbol])
+
 			if label_name == "Strategy":
 				self.tk_labels_basket[symbol][label_name]["text"] = info[j] 
 				#self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.clone_cmd
@@ -1146,6 +1134,92 @@ class UI(pannel):
 			self.b.configure(highlightbackground="#d9d9d9")
 			self.b.configure(highlightcolor="black")
 			self.b.grid(row=1, column=i)
+
+			
+			if l[i] =="UNREAL":
+				print("creating:",l[i])
+
+				self.b["command"] = self.sort_by_unrealize
+			elif l[i] == "REALIZED":
+				print("creating:",l[i])
+				self.b["command"] = self.sort_by_realize
+
+	def get_current_display(self):
+
+		all_strat = []
+
+		for symbol in range(0,self.algo_limit):
+			if self.tk_labels_basket[symbol]['Strategy']['text']!="":
+				all_strat.append(self.tk_labels_basket[symbol]['Strategy']['text'])
+
+		all_strat = list(set(all_strat))
+
+		print(all_strat)
+
+		return all_strat
+
+
+	def sort_by_unrealize(self):
+
+		## whatever is being shown right now. ##
+		l = self.get_current_display()
+
+
+		### toggle ###
+
+		#
+		data = {}
+
+		for i in l:
+			data[i] = self.manager.baskets[i].data[UNREAL]
+
+		if self.sort_reverse_unreal:
+			l = [key for key, value in sorted(data.items(), key=lambda item: item[1], reverse=True)]
+			self.sort_reverse_unreal = False 
+		else:
+			l = [key for key, value in sorted(data.items(), key=lambda item: item[1], reverse=False)]
+			self.sort_reverse_unreal = True
+		
+		# self.sort_timer = 0
+		# self.sort_reverse_real = True 
+		# self.sort_reverse_unreal = True 
+
+
+		for i in range(0,self.algo_count_number.get()+2):
+			#print("evicting,",i)
+			self.evict_entry(i)
+
+		self.basket_label_count = 1
+		for i in l:
+			self.create_new_single_entry(self.manager.baskets[i],"Basket",None)
+
+	def sort_by_realize(self):
+
+		l = self.get_current_display()
+
+
+		data = {}
+
+		for i in l:
+			data[i] = self.manager.baskets[i].data[REALIZED]
+
+		if self.sort_reverse_unreal:
+			l = [key for key, value in sorted(data.items(), key=lambda item: item[1], reverse=True)]
+			self.sort_reverse_unreal = False 
+		else:
+			l = [key for key, value in sorted(data.items(), key=lambda item: item[1], reverse=False)]
+			self.sort_reverse_unreal = True
+
+
+		for i in range(0,self.algo_count_number.get()+2):
+
+			#print("evicting,",i)
+			self.evict_entry(i)
+
+
+		self.basket_label_count = 1
+		for i in l:
+			self.create_new_single_entry(self.manager.baskets[i],"Basket",None)
 
 
 	def order_ui_creation(self,info):
