@@ -489,6 +489,8 @@ class Manager:
 
 				if self.subdollar_check.get()==True:
 
+
+					log_print(self.sub_dollar_stocks)
 					#http://10.29.10.143/api/Symbol/basicdata/SPY,QQQ?chartPeriod=1&chartType=M
 					#self.sub_dollar_stocks
 					for symbol,share in orders.items():
@@ -496,6 +498,7 @@ class Manager:
 
 						if symbol[:-3] in self.sub_dollar_stocks:
 							#log_print("cecece")
+							log_print("modifying",symbol[:-3])
 							if orders[symbol]>0 and orders[symbol]<500:
 								orders[symbol] = 500 
 							elif orders[symbol]<0 and orders[symbol]>-500:
@@ -1518,7 +1521,7 @@ class Manager:
 				now = datetime.now()
 				sts = now.hour*3600 + now.minute*60 + now.second 
 
-				self.sub_dollar_stocks = []
+				#self.sub_dollar_stocks = []
 				if sts>self.last_price_ts+2:
 					with self.get_price_lock:
 						r = "https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?include_otc=false&apiKey=ezY3uX1jsxve3yZIbw2IjbNi5X7uhp1H"
@@ -1546,7 +1549,7 @@ class Manager:
 							self.spread_check[i['ticker']] = spread
 
 
-							if i['lastQuote']['p']>0 and i['lastQuote']['p']<=1:
+							if i['lastQuote']['p']>0 and i['lastQuote']['p']<=1 and i['ticker'] not in self.sub_dollar_stocks:
 								self.sub_dollar_stocks.append(i['ticker'])
 						
 						#print(self.sub_dollar_stocks)
