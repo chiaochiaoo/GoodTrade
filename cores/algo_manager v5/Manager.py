@@ -502,7 +502,7 @@ class Manager:
 							if orders[symbol]>0 and orders[symbol]<500:
 								orders[symbol] = 500 
 							elif orders[symbol]<0 and orders[symbol]>-500:
-								orders[symbol] = 500
+								orders[symbol] = -500
 
 							log_print("adjusted:",symbol,orders[symbol])
 
