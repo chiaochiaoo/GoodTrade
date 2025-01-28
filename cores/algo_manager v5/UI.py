@@ -131,7 +131,7 @@ class UI(pannel):
 
 		self.algo_count_number = tk.IntVar(value=0)
 		self.active_algo_count_number = tk.IntVar(value=0)
-
+		self.current_display_count = 0
 		self.algo_number = 0
 
 		self.position_count = tk.IntVar(value=0)
@@ -572,40 +572,52 @@ class UI(pannel):
 		for i in l:
 			self.create_new_single_entry(i,"Basket",None)
 
+
+
 	def show_running_only(self):
 
+		try:
+			l = self.manager.return_running_algo()
 
-		l = self.manager.return_running_algo()
+			for i in range(0,self.current_display_count):
 
-		for i in range(0,self.algo_count_number.get()+2):
-
-			#print("evicting,",i)
-			self.evict_entry(i)
+				#print("evicting,",i)
+				self.evict_entry(i)
 
 
-		self.basket_label_count = 1
-		for i in l:
-			self.create_new_single_entry(self.manager.baskets[i],"Basket",None)
+			self.current_display_count = 0
+			self.basket_label_count = 1
+			for i in l:
+				self.create_new_single_entry(self.manager.baskets[i],"Basket",None)
 
+			# for basket in self.manager.baskets.keys():
+			# 	print(basket,self.manager.baskets[basket].display)
+		except Exception as e:
+			PrintException(e,"show_running_only error")
+			
 
 
 	### NOW HOW DO I ITERATE THROUGH ALL THE???
 
 	def show_done_only(self):
 
-		l = self.manager.return_done_algo()
+		try:
+			l = self.manager.return_done_algo()
 
-		for i in range(0,self.algo_count_number.get()+2):
-			self.evict_entry(i)
-
-
-		self.basket_label_count = 1
-		for i in l:
-			#print(i,self.basket_label_count)
-			self.create_new_single_entry(self.manager.baskets[i],"Basket",None)
+			for i in range(0,self.current_display_count):
+				self.evict_entry(i)
 
 
+			self.current_display_count = 0
+			self.basket_label_count = 1
+			for i in l:
+				#print(i,self.basket_label_count)
+				self.create_new_single_entry(self.manager.baskets[i],"Basket",None)
 
+			# for basket in self.manager.baskets.keys():
+			# 	print(basket,self.manager.baskets[basket].display)
+		except Exception as e:
+			PrintException(e,"Show done only error")
 
 	def save_quick_spread(self):
 
@@ -907,6 +919,7 @@ class UI(pannel):
 				self.single_label_count +=1
 				self.rebind(self.dev_canvas,self.deployment_frame)
 
+				tradingplan.turn_on_display()
 				tradingplan.update_displays()
 
 			elif single=="Pair":
@@ -916,11 +929,13 @@ class UI(pannel):
 					l = self.pair_label_count
 					row_number = l-1 
 
+				self.current_display_count +=1
 				self.create_pair_entry(tradingplan, row_number)
 
 				self.pair_label_count +=1
 
 				self.rebind(self.dev_canvas,self.deployment_frame)
+				tradingplan.turn_on_display()
 				tradingplan.update_displays()
 
 			elif single=="Basket":
@@ -941,7 +956,10 @@ class UI(pannel):
 
 				self.basket_label_count +=1
 
+				self.current_display_count +=1
+
 				self.rebind(self.dev_canvas,self.deployment_frame)
+				tradingplan.turn_on_display()
 				tradingplan.update_displays()
 
 			return True 
@@ -1014,9 +1032,11 @@ class UI(pannel):
 
 	def create_basket_entry(self,tradingplan,symbol):
 
+
 		if tradingplan.algo_name not in self.deploy_list:
 			self.algo_count_number.set(self.algo_count_number.get()+1)
 			self.deploy_list.append(tradingplan.algo_name)
+
 		# self.labels = {"Strategy":8,\
 		# 				"Status":10,\
 		# 				"Updates":15,\
@@ -1054,7 +1074,6 @@ class UI(pannel):
 		info = list(infos.values())
 		labels = list(infos.keys())	
 
-		log_print(self.tk_labels_basket[symbol].keys())
 		for j in range(len(info)):
 
 			label_name = labels[j]

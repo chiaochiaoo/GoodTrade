@@ -32,7 +32,7 @@ class TradingPlan_Basket:
 		
 		self.shut_down = False
 
-		#self.symbol.set_tradingplan(self)
+		self.display = False 
 
 		self.manager = Manager
 
@@ -265,8 +265,10 @@ class TradingPlan_Basket:
 
 		return self.manual_flattable
 
-
-
+	def turn_on_display(self):
+		self.display = True 
+	def turn_off_display(self):
+		self.display = False 
 	def get_algoname(self):
 
 		return self.algo_name #get_inspectable
@@ -1088,7 +1090,8 @@ class TradingPlan_Basket:
 			self.data[UNREAL_MAX] = self.data[UNREAL]
 			self.tkvars[UNREAL_MAX].set(self.data[UNREAL_MAX])
 
-		self.update_displays()
+		if self.display:
+			self.update_displays()
 
 		if self.flatten_order==True and sum(abs(value) for value in self.current_shares.values())==0 and self.reusable==False:
 			self.shutdown = True
@@ -1112,7 +1115,6 @@ class TradingPlan_Basket:
 
 
 	def update_displays(self):
-
 
 		#self.tkvars[SIZE_IN].set(str(self.data[CURRENT_SHARE])+"/"+str(self.data[TARGET_SHARE]))
 		self.tkvars[REALIZED].set(str(self.data[REALIZED]))
@@ -1138,8 +1140,6 @@ class TradingPlan_Basket:
 		elif self.data[REALIZED]>0:
 			self.tklabels[REALIZED]["background"] = STRONGGREEN
 		elif self.data[REALIZED]<0:
-
-
 			self.tklabels[REALIZED]["background"] = STRONGRED
 
 	def mark_algo_status(self,status):

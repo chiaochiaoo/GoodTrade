@@ -490,7 +490,7 @@ class Manager:
 				if self.subdollar_check.get()==True:
 
 
-					log_print(self.sub_dollar_stocks)
+					#log_print(self.sub_dollar_stocks)
 					#http://10.29.10.143/api/Symbol/basicdata/SPY,QQQ?chartPeriod=1&chartType=M
 					#self.sub_dollar_stocks
 					for symbol,share in orders.items():
@@ -559,6 +559,7 @@ class Manager:
 		l = []
 		for tp in tps:
 			# if it is still running.
+			self.baskets[tp].turn_off_display()
 			if self.baskets[tp].have_symbol(symbol)==True:
 				l.append(self.baskets[tp])
 
@@ -571,6 +572,7 @@ class Manager:
 		l = []
 		for tp in tps:
 			# if it is still running.
+			self.baskets[tp].turn_off_display()
 			if self.baskets[tp].is_it_done()!=True:
 				l.append(tp)
 
@@ -584,6 +586,7 @@ class Manager:
 		l = []
 		for tp in tps:
 			# if it is still running.
+			self.baskets[tp].turn_off_display()
 			if self.baskets[tp].is_it_done()==True:
 				l.append(tp)
 
