@@ -279,13 +279,6 @@ class UI(pannel):
 		self.exposure.set(d['cur_exp'])
 		self.exposure_max.set(d['max_exp'])
 
-				# d['fees'] = fees
-				# d['trades'] = trades
-				# d['sizeTraded'] = sizeTraded
-				# d['unrealizedPlusNet'] = unrealizedPlusNet
-				# d['timestamp'] = ts
-				# d['unrealized'] = unrealized	
-
 	def init_performance_pannel(self):
 
 		self.net = tk.DoubleVar()
@@ -302,7 +295,6 @@ class UI(pannel):
 		self.current_total_risk = tk.DoubleVar()
 		self.max_risk = tk.DoubleVar()
 
-		#self.position_count = tk.IntVar()
 		self.position_count_max = tk.IntVar()
 
 		self.trade_count = tk.IntVar()
@@ -343,8 +335,6 @@ class UI(pannel):
 		self.x3 = ttk.Button(self.performance_pannel, text="Max:")
 		self.x3.grid(sticky="w",column=1,row=4,padx=3)
 
-
-
 		col = 1
 		col +=1 
 		self.t2 = ttk.Button(self.performance_pannel, text="Net:")
@@ -365,18 +355,6 @@ class UI(pannel):
 
 		ttk.Button(self.performance_pannel, textvariable=self.total_u_min).grid(sticky="w",column=col,row=3)
 		ttk.Button(self.performance_pannel, textvariable=self.total_u_max).grid(sticky="w",column=col,row=4)
-
-
-
-
-		# col +=1 
-		# self.t2 = ttk.Button(self.performance_pannel, text="Risk:")
-		# self.t2.grid(sticky="w",column=col,row=1)
-		# self.t2_ = ttk.Button(self.performance_pannel, textvariable=self.current_total_risk)
-		# self.t2_.grid(sticky="w",column=col,row=2)
-
-		# ttk.Button(self.performance_pannel, text="").grid(sticky="w",column=col,row=3)
-		# ttk.Button(self.performance_pannel, textvariable=self.max_risk).grid(sticky="w",column=col,row=4)
 
 
 		col +=1 
@@ -420,7 +398,6 @@ class UI(pannel):
 
 		ttk.Button(self.performance_pannel, textvariable=self.monthly_commision).grid(sticky="w",column=col,row=3)
 		ttk.Button(self.performance_pannel, textvariable=self.monthly_manual).grid(sticky="w",column=col,row=4)
-
 
 
 		col +=1 
@@ -481,9 +458,7 @@ class UI(pannel):
 		self.quick_spread_pannel = ttk.LabelFrame(self.SUB_TAB,text="") 
 
 		self.custom_algo_pannel = ttk.LabelFrame(self.SUB_TAB,text="") 
-		#self.custom_algo_pannel.place(x=0,y=0,height=950,width=350)
 
-		#self.quick_spread_pannel.place(x=0,y=0,height=950,width=350)
 		self.SUB_TAB.add(self.custom_algo_pannel,text="AlgoAuthorization")
 		self.SUB_TAB.add(self.quick_spread_pannel,text="QuickSpread")
 		# self.TNV_TAB = ttk.Notebook(self.custom_algo_pannel)
@@ -573,22 +548,38 @@ class UI(pannel):
 			self.create_new_single_entry(i,"Basket",None)
 
 
+	def count_current(self):
+
+		c = 0 
+
+		for symbol in self.tk_labels_basket.keys():
+			if self.tk_labels_basket[symbol]['Strategy']["text"]!="":
+				c+=1
+
+		self.current_display_count = c 
+		log_print("current count:",self.current_display_count)
 
 	def show_running_only(self):
 
 		try:
-			l = self.manager.return_running_algo()
 
-			for i in range(0,self.current_display_count):
+			now = datetime.now()
+			ts = now.hour*3600 + now.minute*60 + now.second
 
-				#print("evicting,",i)
-				self.evict_entry(i)
+			if ts>self.sort_timer+5:
+				self.sort_timer = ts 
 
+				l = self.manager.return_running_algo()[:self.algo_limit]
 
-			self.current_display_count = 0
-			self.basket_label_count = 1
-			for i in l:
-				self.create_new_single_entry(self.manager.baskets[i],"Basket",None)
+				self.count_current()
+				for i in range(0,self.current_display_count):
+
+					#print("evicting,",i)
+					self.evict_entry(i)
+
+				self.basket_label_count = 1
+				for i in l:
+					self.create_new_single_entry(self.manager.baskets[i],"Basket",None)
 
 			# for basket in self.manager.baskets.keys():
 			# 	print(basket,self.manager.baskets[basket].display)
@@ -596,26 +587,28 @@ class UI(pannel):
 			PrintException(e,"show_running_only error")
 			
 
-
-	### NOW HOW DO I ITERATE THROUGH ALL THE???
-
 	def show_done_only(self):
 
 		try:
-			l = self.manager.return_done_algo()
 
-			for i in range(0,self.current_display_count):
-				self.evict_entry(i)
+			now = datetime.now()
+			ts = now.hour*3600 + now.minute*60 + now.second
+
+			if ts>self.sort_timer+5:
+				self.sort_timer = ts 
+
+				l = self.manager.return_done_algo()[:self.algo_limit]
+
+				self.count_current()
+				for i in range(0,self.current_display_count):
+					self.evict_entry(i)
 
 
-			self.current_display_count = 0
-			self.basket_label_count = 1
-			for i in l:
-				#print(i,self.basket_label_count)
-				self.create_new_single_entry(self.manager.baskets[i],"Basket",None)
+				self.basket_label_count = 1
+				for i in l:
+					#print(i,self.basket_label_count)
+					self.create_new_single_entry(self.manager.baskets[i],"Basket",None)
 
-			# for basket in self.manager.baskets.keys():
-			# 	print(basket,self.manager.baskets[basket].display)
 		except Exception as e:
 			PrintException(e,"Show done only error")
 
@@ -834,8 +827,6 @@ class UI(pannel):
 		self.all_mana = tk.StringVar(value=FIBO)
 		tk.OptionMenu(self.config, self.all_mana, *sorted(self.management_plan_options)).grid(sticky="w",column=3,row=row+5,padx=10)
 
-
-
 		# self.config2 = ttk.LabelFrame(self.config) 
 		# self.config2.place(x=0,y=160,height=100,width=210)
 		# self.algo_deploy = ttk.Button(self.config2, text="Apply Slctd",command=self.manager.set_selected_tp)#,command=self.manager.set_all_tp)
@@ -905,7 +896,6 @@ class UI(pannel):
 
 	def create_new_single_entry(self,tradingplan,single,row_number):
 
-
 		try:
 			if single=="Single":
 
@@ -929,7 +919,6 @@ class UI(pannel):
 					l = self.pair_label_count
 					row_number = l-1 
 
-				self.current_display_count +=1
 				self.create_pair_entry(tradingplan, row_number)
 
 				self.pair_label_count +=1
@@ -949,14 +938,13 @@ class UI(pannel):
 					### here, insert the top of the list, do a search program.
 
 					#
-					if row_number>(self.algo_limit//2):
-						row_number = self.find_empty_spot()
+					# if row_number>(self.algo_limit//2):
+					# 	row_number = self.find_empty_spot()
 				
 				self.create_basket_entry(tradingplan, row_number)
 
 				self.basket_label_count +=1
 
-				self.current_display_count +=1
 
 				self.rebind(self.dev_canvas,self.deployment_frame)
 				tradingplan.turn_on_display()
@@ -1165,6 +1153,8 @@ class UI(pannel):
 
 	def get_current_display(self):
 
+
+
 		all_strat = []
 
 		for symbol in range(0,self.algo_limit):
@@ -1181,64 +1171,70 @@ class UI(pannel):
 	def sort_by_unrealize(self):
 
 		## whatever is being shown right now. ##
-		l = self.get_current_display()
 
+		now = datetime.now()
+		ts = now.hour*3600 + now.minute*60 + now.second
 
-		### toggle ###
+		if ts>self.sort_timer+5:
+			self.sort_timer = ts 
 
-		#
-		data = {}
+			l = self.get_current_display()
 
-		for i in l:
-			data[i] = self.manager.baskets[i].data[UNREAL]
+			data = {}
 
-		if self.sort_reverse_unreal:
-			l = [key for key, value in sorted(data.items(), key=lambda item: item[1], reverse=True)]
-			self.sort_reverse_unreal = False 
-		else:
-			l = [key for key, value in sorted(data.items(), key=lambda item: item[1], reverse=False)]
-			self.sort_reverse_unreal = True
-		
-		# self.sort_timer = 0
-		# self.sort_reverse_real = True 
-		# self.sort_reverse_unreal = True 
+			for i in l:
+				data[i] = self.manager.baskets[i].data[UNREAL]
 
+			if self.sort_reverse_unreal:
+				l = [key for key, value in sorted(data.items(), key=lambda item: item[1], reverse=True)]
+				self.sort_reverse_unreal = False 
+			else:
+				l = [key for key, value in sorted(data.items(), key=lambda item: item[1], reverse=False)]
+				self.sort_reverse_unreal = True
+			
 
-		for i in range(0,self.algo_count_number.get()+2):
-			#print("evicting,",i)
-			self.evict_entry(i)
+			self.count_current()
+			for i in range(0,self.current_display_count):
+				#print("evicting,",i)
+				self.evict_entry(i)
 
-		self.basket_label_count = 1
-		for i in l:
-			self.create_new_single_entry(self.manager.baskets[i],"Basket",None)
+			self.basket_label_count = 1
+			for i in l:
+				self.create_new_single_entry(self.manager.baskets[i],"Basket",None)
 
 	def sort_by_realize(self):
 
-		l = self.get_current_display()
+		now = datetime.now()
+		ts = now.hour*3600 + now.minute*60 + now.second
+
+		if ts>self.sort_timer+5:
+			self.sort_timer = ts 
+
+			l = self.get_current_display()
+
+			data = {}
+
+			for i in l:
+				data[i] = self.manager.baskets[i].data[REALIZED]
+
+			if self.sort_reverse_unreal:
+				l = [key for key, value in sorted(data.items(), key=lambda item: item[1], reverse=True)]
+				self.sort_reverse_unreal = False 
+			else:
+				l = [key for key, value in sorted(data.items(), key=lambda item: item[1], reverse=False)]
+				self.sort_reverse_unreal = True
 
 
-		data = {}
+			self.count_current()
+			for i in range(0,self.current_display_count):
 
-		for i in l:
-			data[i] = self.manager.baskets[i].data[REALIZED]
-
-		if self.sort_reverse_unreal:
-			l = [key for key, value in sorted(data.items(), key=lambda item: item[1], reverse=True)]
-			self.sort_reverse_unreal = False 
-		else:
-			l = [key for key, value in sorted(data.items(), key=lambda item: item[1], reverse=False)]
-			self.sort_reverse_unreal = True
+				#print("evicting,",i)
+				self.evict_entry(i)
 
 
-		for i in range(0,self.algo_count_number.get()+2):
-
-			#print("evicting,",i)
-			self.evict_entry(i)
-
-
-		self.basket_label_count = 1
-		for i in l:
-			self.create_new_single_entry(self.manager.baskets[i],"Basket",None)
+			self.basket_label_count = 1
+			for i in l:
+				self.create_new_single_entry(self.manager.baskets[i],"Basket",None)
 
 
 	def order_ui_creation(self,info):
