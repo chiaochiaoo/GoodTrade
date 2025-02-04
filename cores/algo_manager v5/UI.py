@@ -566,7 +566,7 @@ class UI(pannel):
 			now = datetime.now()
 			ts = now.hour*3600 + now.minute*60 + now.second
 
-			if ts>self.sort_timer+5:
+			if ts>self.sort_timer+2:
 				self.sort_timer = ts 
 
 				l = self.manager.return_running_algo()[:self.algo_limit]
@@ -594,7 +594,7 @@ class UI(pannel):
 			now = datetime.now()
 			ts = now.hour*3600 + now.minute*60 + now.second
 
-			if ts>self.sort_timer+5:
+			if ts>self.sort_timer+2:
 				self.sort_timer = ts 
 
 				l = self.manager.return_done_algo()[:self.algo_limit]
@@ -1175,7 +1175,7 @@ class UI(pannel):
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second
 
-		if ts>self.sort_timer+5:
+		if ts>self.sort_timer+2:
 			self.sort_timer = ts 
 
 			l = self.get_current_display()
@@ -1207,7 +1207,7 @@ class UI(pannel):
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second
 
-		if ts>self.sort_timer+5:
+		if ts>self.sort_timer+2:
 			self.sort_timer = ts 
 
 			l = self.get_current_display()
