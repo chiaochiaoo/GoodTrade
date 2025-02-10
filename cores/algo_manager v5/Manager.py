@@ -663,7 +663,7 @@ class Manager:
 
 
 		##########################################################
-		MOO_exit_timer_NQ = 567*60 #ts+19 #
+		MOO_exit_timer_NQ = 567*60+30 #ts+19 #
 		MOO_exit_NQ = False 
 
 		MOO_exit_timer_NY = 567*60+30 #ts+19 #
