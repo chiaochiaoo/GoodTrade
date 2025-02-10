@@ -171,9 +171,7 @@ class Manager:
 		self.receiving_signals = tk.BooleanVar(value=True)
 		self.cmd_text = tk.StringVar(value="Status:")
 
-
 		self.disaster_mode = tk.BooleanVar(value=0)
-
 
 		self.subdollar_check = tk.BooleanVar(value=1)
 
@@ -545,6 +543,7 @@ class Manager:
 							else:
 								self.baskets[basket_name].submit_expected_shares(symbol,value,aggresive)
 						else:
+							### add that timer to it,here, whatever it is, deplayed by 1 second. ###
 							self.baskets[basket_name].submit_expected_shares(symbol,value,aggresive)
 					else:
 						log_print("Manager: Wrong Ticker format or BANNED:",symbol)
@@ -857,9 +856,9 @@ class Manager:
 				### ALL INSPECTION NOW TURN ON.
 				log_print("Timer: pair timer initiated")
 
-				with self.baskets_lock:
-					for trade in list(self.baskets.values()):
-						trade.turn_on_inspection()
+				# with self.baskets_lock:
+				# 	for trade in list(self.baskets.values()):
+				# 		trade.turn_on_inspection()
 
 				MOO_pair = True 
 
