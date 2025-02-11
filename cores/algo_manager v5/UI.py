@@ -1098,10 +1098,10 @@ class UI(pannel):
 
 			elif label_name =="MaxU":
 				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
-				self.tk_labels_basket[symbol][label_name].bind("<Double-1>", lambda event:  tradingplan.turn_on_inspection())
+				#self.tk_labels_basket[symbol][label_name].bind("<Double-1>", lambda event:  tradingplan.turn_on_inspection())
 			elif label_name =="MinU":
 				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
-				self.tk_labels_basket[symbol][label_name].bind("<Double-1>", lambda event:  tradingplan.turn_off_inspection())
+				#self.tk_labels_basket[symbol][label_name].bind("<Double-1>", lambda event:  tradingplan.turn_off_inspection())
 			elif label_name =="flatten":
 
 				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.flatten_cmd
