@@ -880,7 +880,37 @@ class TradingPlan_Basket:
 					if symbol in self.original_positions:
 						self.submit_expected_shares(symbol,self.expected_shares[symbol]+self.original_positions[symbol]//4)
 
+	def round_to_100(self):
+		now = datetime.now()
+		ts = now.hour*3600 + now.minute*60 + now.second 
 
+		if ts-self.operation_timer>5:
+			self.operation_timer = ts 
+
+			# turn off stop and profit.
+			self.stop = 0 
+			self.profit = 0
+			for symbol,item in self.symbols.items():
+				if symbol in self.original_positions:
+					if self.original_positions[symbol]>0 and self.original_positions[symbol]<100:
+						self.submit_expected_shares(symbol,100)
+					elif self.original_positions[symbol]<0 and self.original_positions[symbol]>-100:
+						self.submit_expected_shares(symbol,-100)
+
+	def cancel(self):
+
+		### 
+		self.turn_off_inspection()
+		self.tkvars[STATUS].set(DONE)
+
+		for symbol in self.symbols.keys():
+			with self.read_lock[symbol]:
+				self.current_shares[symbol] = 0
+				self.current_shares[symbol] = 0
+				#if self.expected_shares[symbol] != self.current_shares[symbol]:
+
+
+		### clear position? 
 	def reduce_one_third_aggresive(self):
 
 		for symbol,item in self.symbols.items():
@@ -961,6 +991,8 @@ class TradingPlan_Basket:
 		self.flatten_order=True
 
 	""" Deployment initialization """
+
+
 
 	def check_pnl(self):
 
