@@ -856,9 +856,14 @@ class Manager:
 				### ALL INSPECTION NOW TURN ON.
 				log_print("Timer: pair timer initiated")
 
+				with self.baskets_lock:
+					for trade in list(self.baskets.values()):
+						trade.turn_on_inspection()
+
 				# with self.baskets_lock:
-				# 	for trade in list(self.baskets.values()):
-				# 		trade.turn_on_inspection()
+				# 	for name,basket in self.baskets.items():
+				# 		if "IMB" not in name:
+				# 			self.turn_on_inspection()
 
 				MOO_pair = True 
 
