@@ -413,7 +413,8 @@ class UI(pannel):
 
 	def init_deployment_pannel(self):
 
-		self.labels = {"Strategy":40,\
+		self.labels = {"CANCEL":8,\
+						"Strategy":40,\
 						"Status":8,\
 						#"Updates":5,\
 						"MaxU":8,\
@@ -426,7 +427,9 @@ class UI(pannel):
 						"-90%":7,\
 						"-50%":7,\
 						"+25%":7,\
+						"R100":7,\
 						"flatten":8,\
+						
 						}
 		self.width = list(self.labels.values())
 
@@ -1041,6 +1044,7 @@ class UI(pannel):
 		#self.algo_count_number.set(self.algo_count_number.get()+1)
 
 		infos = {
+		'CANCEL':"",\
 		'Strategy':tradingplan.algo_name, \
 		"Status":tradingplan.tkvars[STATUS],\
 		"MaxU": tradingplan.tkvars[UNREAL_MAX],\
@@ -1053,6 +1057,7 @@ class UI(pannel):
 		"-90%":tradingplan.tkvars[ALGO_MULTIPLIER],\
 		"-50%":tradingplan.tkvars[ALGO_MULTIPLIER],\
 		"+25%":tradingplan.tkvars[ALGO_MULTIPLIER],\
+		"R100":"",\
 		'flatten':"",\
 		}
 
@@ -1091,6 +1096,12 @@ class UI(pannel):
 
 				#self.tk_labels_single[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command= lambda tp=tradingplan:adjust_stop(tp))
 
+			elif label_name =="MaxU":
+				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
+				#self.tk_labels_basket[symbol][label_name].bind("<Double-1>", lambda event:  tradingplan.turn_on_inspection())
+			elif label_name =="MinU":
+				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
+				#self.tk_labels_basket[symbol][label_name].bind("<Double-1>", lambda event:  tradingplan.turn_off_inspection())
 			elif label_name =="flatten":
 
 				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.flatten_cmd
@@ -1107,6 +1118,12 @@ class UI(pannel):
 				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
 				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.increase_one_quarter
 				#self.tk_labels_single[symbol][label_name] =tk.Button(self.deployment_frame ,textvariable=info[j],width=self.width[j],command=tradingplan.flatten_cmd)
+			elif label_name =="R100":
+				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
+				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.round_to_100	
+			elif label_name =="CANCEL":
+				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
+				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.cancel	
 			else:
 				if str(type(info[j]))=="<class 'tkinter.StringVar'>" or str(type(info[j]))=="<class 'tkinter.DoubleVar'>":
 					self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
@@ -1504,6 +1521,7 @@ class UI(pannel):
 				total[algo] = 0
 
 		return total
+
 
 
 	def order_confirmation(self,basket_name,orders):
