@@ -25,7 +25,7 @@ def find_between(data, first, last):
 
 PRICE = "Price"
 
-fill_timer = 60
+fill_timer = 30
 
 
 class Symbol:
@@ -454,6 +454,9 @@ class Symbol:
 		expired =0
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second
+
+
+		# if within 5 cents. below 1 $. 
 
 		for tp in tps:
 			if self.tradingplans[tp].get_inspectable():
