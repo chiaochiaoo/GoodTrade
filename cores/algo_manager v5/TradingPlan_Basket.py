@@ -894,8 +894,10 @@ class TradingPlan_Basket:
 				if symbol in self.original_positions:
 					if self.original_positions[symbol]>0 and self.original_positions[symbol]<100:
 						self.submit_expected_shares(symbol,100)
+						self.original_positions[symbol] = 100
 					elif self.original_positions[symbol]<0 and self.original_positions[symbol]>-100:
 						self.submit_expected_shares(symbol,-100)
+						self.original_positions[symbol] = -100
 
 	def cancel(self):
 
