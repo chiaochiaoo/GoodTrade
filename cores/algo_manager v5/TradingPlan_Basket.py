@@ -776,7 +776,7 @@ class TradingPlan_Basket:
 
 
 	def reduce_one_half(self):
-
+		self.turn_on_inspection()
 		coefficient = 2 
 		minimal = 0.5
 		now = datetime.now()
@@ -799,7 +799,7 @@ class TradingPlan_Basket:
 								self.submit_expected_shares(symbol,self.expected_shares[symbol]-self.original_positions[symbol]//coefficient)
 
 	def reduce_one_third(self):
-
+		self.turn_on_inspection()
 		coefficient = 3 
 		minimal = 0.3 
 		now = datetime.now()
@@ -820,7 +820,7 @@ class TradingPlan_Basket:
 	def reduce_one_quarter(self):
 
 
-
+		self.turn_on_inspection()
 		if self.break_even!=True:
 			self.break_even=False
 			self.break_even_amount=2
@@ -871,7 +871,7 @@ class TradingPlan_Basket:
 
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second 
-
+		self.turn_on_inspection()
 		if ts-self.operation_timer>5:
 			self.operation_timer = ts 
 			minimal = 0.25

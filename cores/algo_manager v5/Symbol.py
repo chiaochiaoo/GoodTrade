@@ -710,7 +710,7 @@ class Symbol:
 		# time.sleep(0.3)
 
 		## self.fill_time_remianing
-		log_print(self.source,self.symbol_name,self.action,self.difference,fill_timer,"fill timer:",self.fill_time_remianing)
+		log_print(self.source,self.symbol_name,self.action,self.difference,self.fill_timer,"fill timer:",self.fill_time_remianing)
 
 		## if 
 
