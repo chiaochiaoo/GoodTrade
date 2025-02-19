@@ -510,7 +510,7 @@ class Manager:
 
 							log_print("Manager:",basket_name,symbol," Not in ")
 
-							
+
 				check = False 
 
 				for j,i in orders.items():
@@ -518,6 +518,9 @@ class Manager:
 					if i!=0:
 						check = True 
 						break
+
+				#NSDQ Buy NSDQ MOO Regular OnOpen
+				#NSDQ Sell->Short NSDQ MOO Regular OnOpen
 
 				if check:
 				
@@ -551,6 +554,17 @@ class Manager:
 
 						## now , submit the request.
 
+						if "HALT" in basket_name:
+							for symbol,share in orders.items():
+
+								if share<0:
+									reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Sell->Short NSDQ MOO Regular OnOpen&shares="+str(abs(share))
+								elif share>0:
+									reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Buy NSDQ MOO Regular OnOpen&shares="+str(share)
+
+								req = threading.Thread(target=request, args=(reque,),daemon=True)
+								req.start() 
+						
 						if "TA" in info:
 							if info['TA']>30:
 								self.baskets[basket_name].submit_incremental_expected(symbol,value,info['TA'],aggresive)

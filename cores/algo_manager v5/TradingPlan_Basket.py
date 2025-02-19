@@ -218,9 +218,13 @@ class TradingPlan_Basket:
 			# if "AP_" in self.algo_name:
 			# 	# self.manual_flattable = True 
 			# 	self.one_shot_algo = True
+			
+		else:
 
+			if "HALT" in self.algo_name:
+				self.inspectable = False 
 
-			log_print(self.source," Initializing:, Manual flattable:",self.manual_flattable," Inspectable:",self.inspectable)
+		log_print(self.source," Initializing:, Manual flattable:",self.manual_flattable," Inspectable:",self.inspectable)
 
 	def print_positions(self):
 
@@ -991,6 +995,7 @@ class TradingPlan_Basket:
 
 		self.tkvars[ALGO_MULTIPLIER].set(0)
 		self.flatten_order=True
+		self.turn_on_inspection()
 
 	""" Deployment initialization """
 

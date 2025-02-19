@@ -25,7 +25,7 @@ def find_between(data, first, last):
 
 PRICE = "Price"
 
-fill_timer = 30
+
 
 
 class Symbol:
@@ -76,7 +76,7 @@ class Symbol:
 		self.bid_change = False 
 		self.ask_change = False
 
-
+		self.fill_timer = 30
 		# self.symbol_dead_line = 959 
 
 		# if ".PA" in self.symbol_name:
@@ -461,22 +461,22 @@ class Symbol:
 		### depending on the spread. 
 
 		if self.data['SPREAD']>0.1:
-			fill_timer = 60 
+			self.fill_timer = 60 
 
 		if self.data['SPREAD']<0.05:
-			fill_timer = 30 
+			self.fill_timer = 30 
 
 		if self.data['SPREAD']<0.03:
-			fill_timer = 20
+			self.fill_timer = 20
 
 		for tp in tps:
 			if self.tradingplans[tp].get_inspectable():
 				current_shares +=  self.tradingplans[tp].get_current_share(self.symbol_name)
 
 
-				self.fill_time_remianing = round((ts-self.tradingplans[tp].get_request_time(self.symbol_name))/fill_timer,2)
+				self.fill_time_remianing = round((ts-self.tradingplans[tp].get_request_time(self.symbol_name))/self.fill_timer,2)
 
-				if ts-self.tradingplans[tp].get_request_time(self.symbol_name)>fill_timer:
+				if ts-self.tradingplans[tp].get_request_time(self.symbol_name)>self.fill_timer:
 					expired+=self.tradingplans[tp].get_current_request(self.symbol_name)
 
 		return current_shares,expired
