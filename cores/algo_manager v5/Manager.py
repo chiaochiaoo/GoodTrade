@@ -174,6 +174,7 @@ class Manager:
 		self.disaster_mode = tk.BooleanVar(value=0)
 
 		self.subdollar_check = tk.BooleanVar(value=1)
+		self.nq_only = tk.BooleanVar(value=0)
 
 		self.ta_moc = tk.BooleanVar(value=0)
 		self.moc_1559 = tk.BooleanVar(value=0)
@@ -184,6 +185,7 @@ class Manager:
 		self.ui_root = root
 
 		self.sub_dollar_stocks = []
+		self.nq_trader_stocks = []
 
 		m=self.receiving_signals.trace('w', lambda *_: self.receiving())
 
@@ -475,13 +477,7 @@ class Manager:
 
 				# print("REGISTERING good")
 
-				check = False 
 
-				for j,i in orders.items():
-
-					if i!=0:
-						check = True 
-						break
 
 				### check sub dollars 
 
@@ -489,7 +485,7 @@ class Manager:
 
 
 					#log_print(self.sub_dollar_stocks)
-					#http://10.29.10.143/api/Symbol/basicdata/SPY,QQQ?chartPeriod=1&chartType=M
+
 					#self.sub_dollar_stocks
 					for symbol,share in orders.items():
 						log_print("init:",symbol,symbol[:-3],share)
@@ -504,6 +500,24 @@ class Manager:
 
 							log_print("adjusted:",symbol,orders[symbol])
 
+
+				if self.nq_only.get()==True:
+
+					for symbol,share in orders.items():
+
+						if symbol[:-3] not in self.nq_trader_stocks:
+							orders[symbol] = 0 
+
+							log_print("Manager:",basket_name,symbol," Not in ")
+
+							
+				check = False 
+
+				for j,i in orders.items():
+
+					if i!=0:
+						check = True 
+						break
 
 				if check:
 				
@@ -1567,6 +1581,15 @@ class Manager:
 
 						self.real_time_ts = cur_ts
 						self.last_price_ts = sts 
+
+			r = 'http://10.29.10.143/api/NasdaqTrader/getnsdqtrader?chartPeriod=2&chartType=m'
+			r = requests.get(r)
+			nq_trader = []
+			for i in json.loads(r.text):
+				nq_trader.append(i['symbol'])
+
+			self.nq_trader_stocks = nq_trader
+
 
 		except Exception	as e:
 			PrintException("Updating prices error",e)
