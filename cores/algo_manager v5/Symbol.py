@@ -458,6 +458,17 @@ class Symbol:
 
 		# if within 5 cents. below 1 $. 
 
+		### depending on the spread. 
+
+		if self.data['SPREAD']>0.1:
+			fill_timer = 60 
+
+		if self.data['SPREAD']<0.05:
+			fill_timer = 30 
+
+		if self.data['SPREAD']<0.03:
+			fill_timer = 20
+
 		for tp in tps:
 			if self.tradingplans[tp].get_inspectable():
 				current_shares +=  self.tradingplans[tp].get_current_share(self.symbol_name)
@@ -699,7 +710,7 @@ class Symbol:
 		# time.sleep(0.3)
 
 		## self.fill_time_remianing
-		log_print(self.source,self.symbol_name,self.action,self.difference,"fill timer:",self.fill_time_remianing)
+		log_print(self.source,self.symbol_name,self.action,self.difference,fill_timer,"fill timer:",self.fill_time_remianing)
 
 		## if 
 
