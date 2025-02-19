@@ -758,8 +758,7 @@ class Symbol:
 			#lets add a bit of delay to it. 
 
 		log_print(self.source,self.symbol_name,action,share)
-		# self.ppro_out.send([CANCEL,self.symbol_name])
-		# time.sleep(0.3)
+
 
 		if self.difference!=0:
 			self.ppro_out.send([self.action,self.symbol_name,abs(self.difference),0])
