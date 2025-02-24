@@ -169,7 +169,7 @@ class TradingPlan_Basket:
 		
 		self.numeric_labels = [ESTRISK,UNREAL,REALIZED,UNREAL_MAX,UNREAL_MIN,WR,MR,TR,ALGO_MULTIPLIER]
 
-		self.string_labels = [MIND,STATUS,POSITION,RISK_RATIO]
+		self.string_labels = [MIND,STATUS,POSITION,RISK_RATIO,"break_even"]
 
 		self.bool_labels= [SELECTED]
 
@@ -248,6 +248,8 @@ class TradingPlan_Basket:
 
 		self.data[ALGO_MULTIPLIER]=1
 		self.tkvars[ALGO_MULTIPLIER].set(1)
+
+		self.tkvars['break_even'].set('-')
 
 		wr,mr,tr = self.manager.get_record(self.algo_name)
 
@@ -774,6 +776,20 @@ class TradingPlan_Basket:
 		self.symbols[[symbol]].expecting_marketorder()
 		self.notify_request(symbol)
 
+	def break_even_function(self):
+
+		print('click lick')
+
+		self.turn_on_inspection()
+		if self.data[UNREAL]>0:
+			self.break_even = True 
+
+			self.tkvars['break_even'].set('Y')
+			self.stop = 0.1
+			log_print(self.source,self.algo_name,"Break even activated")
+		else:
+			log_print(self.source,self.algo_name,"Break even failed")
+
 
 	def reduce_one_half(self):
 		self.turn_on_inspection()
@@ -1069,6 +1085,7 @@ class TradingPlan_Basket:
 				# self.stop = self.profit2 - self.profit
 
 				self.break_even = True 
+				self.tkvars['break_even'].set('Y')
 				self.profit2 =  total_unreal+self.data[REALIZED]
 
 				self.trail_stop = self.profit2 - self.profit1*0.5 
@@ -1096,6 +1113,7 @@ class TradingPlan_Basket:
 		if self.break_even==False:
 			if total_unreal>self.break_even_amount:
 				self.break_even = True 
+				self.tkvars['break_even'].set('Y')
 				self.stop = 0.1
 				log_print(self.source,self.algo_name,"BREAK EVEN")
 

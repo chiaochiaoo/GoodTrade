@@ -434,6 +434,7 @@ class UI(pannel):
 						"WR":7,\
 						"MR":7,\
 						"TR":7,\
+						"BR":7,\
 						"-90%":7,\
 						"-50%":7,\
 						"+25%":7,\
@@ -989,6 +990,7 @@ class UI(pannel):
 		"WR":self.empty, \
 		"MR":self.empty, \
 		"TR":self.empty, \
+		"BR":self.empty,\
 		"-90%":self.empty,\
 		"-50%":self.empty,\
 		"+25%":self.empty,\
@@ -1064,6 +1066,7 @@ class UI(pannel):
 		"WR":tradingplan.tkvars[WR], \
 		"MR":tradingplan.tkvars[MR], \
 		"TR":tradingplan.tkvars[TR], \
+		"BR":tradingplan.tkvars['break_even'],\
 		"-90%":tradingplan.tkvars[ALGO_MULTIPLIER],\
 		"-50%":tradingplan.tkvars[ALGO_MULTIPLIER],\
 		"+25%":tradingplan.tkvars[ALGO_MULTIPLIER],\
@@ -1131,6 +1134,9 @@ class UI(pannel):
 			elif label_name =="R100":
 				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
 				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.round_to_100	
+			elif label_name =="BR":
+				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
+				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.break_even_function
 			elif label_name =="CANCEL":
 				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
 				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.cancel	
