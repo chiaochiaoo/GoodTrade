@@ -625,7 +625,7 @@ class Manager:
 		ts = now.hour*60 + now.minute
 
 		c =0
-
+		#ts=569
 		with self.moo_lock:
 			for symbol,share in dic.items():
 				
@@ -647,15 +647,16 @@ class Manager:
 					# 	else:
 					# 		reque =  "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+'&priceadjust='+str(offset)+'&ordername=ARCA%20Buy%20ARCX%20LOO%20Far%20OnOpen&shares='+str(abs(share))
 										
-						if c%2==0:
-							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Sell->Short%20ARCX%20MOO%20OnOpen&shares="+str(abs(share))
-						else:
+	
+						if ".NQ" in symbol:
 							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Sell->Short NSDQ MOO Regular OnOpen&shares="+str(abs(share))
-					else:
-						if c%2==0:
-							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Buy%20ARCX%20MOO%20OnOpen&shares="+str(share)
 						else:
+							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Sell->Short%20ARCX%20MOO%20OnOpen&shares="+str(abs(share))
+					else:
+						if ".NQ" in symbol:
 							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Buy NSDQ MOO Regular OnOpen&shares="+str(share)
+						else:
+							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Buy%20ARCX%20MOO%20OnOpen&shares="+str(share)
 					c=2 
 
 					### TEST BLOCK. MARKET IN AND OUT.
@@ -843,6 +844,10 @@ class Manager:
 							total_moo_enter[symbol] = share
 
 				log_print("Timer: timer triggered for MOO Enter",target,total_moo_enter)
+
+
+				# total_moo_enter["AAPL.NQ"]=3
+				# total_moo_enter["SPY.AM"]=2
 				self.send_moo(total_moo_enter)
 				Moo_enter_NQ = True 
 
@@ -858,7 +863,8 @@ class Manager:
 
 						if share!=0:
 							total_moo_enter[symbol] = share
-
+				# total_moo_enter["AAPL.NQ"]=3
+				# total_moo_enter["SPY.AM"]=2
 				log_print("Timer: timer triggered for MOO Enter",target,total_moo_enter)
 				self.send_moo(total_moo_enter)
 				Moo_enter_NY = True 
@@ -1406,8 +1412,8 @@ class Manager:
 					# if count%10==0 and ts==960:
 					# 	self.periodical_status()
 
-					if count%300==0:
-						if ts>=500 and ts<965:
+					if count%200==0:
+						if ts>=420 and ts<965:
 
 							self.periodical_status()
 
