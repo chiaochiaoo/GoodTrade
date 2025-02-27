@@ -423,7 +423,7 @@ class UI(pannel):
 
 	def init_deployment_pannel(self):
 
-		self.labels = {"CANCEL":8,\
+		self.labels = {"CANCEL":6,\
 						"Strategy":40,\
 						"Status":8,\
 						#"Updates":5,\
@@ -434,11 +434,11 @@ class UI(pannel):
 						"WR":7,\
 						"MR":7,\
 						"TR":7,\
-						"BR":7,\
-						"-90%":7,\
-						"-50%":7,\
-						"+25%":7,\
-						"R100":7,\
+						"BR":6,\
+						"-90%":6,\
+						"-50%":6,\
+						"+25%":6,\
+						"R100":6,\
 						"flatten":8,\
 						
 						}
@@ -491,13 +491,13 @@ class UI(pannel):
 		self.badsymbol_pannel.place(x=860,y=10,height=50,width=300)
 
 		self.performance_pannel = ttk.LabelFrame(self.root,text="Performance") 
-		self.performance_pannel.place(x=360,y=70,height=200,width=1200)
+		self.performance_pannel.place(x=360,y=70,height=200,width=1300)
 
 		self.filter_pannel = ttk.LabelFrame(self.root,text="Strategy Filter") 
-		self.filter_pannel.place(x=360,y=200,height=60,width=1200)
+		self.filter_pannel.place(x=360,y=200,height=60,width=1300)
 
 		self.deployment_panel = ttk.LabelFrame(self.root,text="Strategy Deployment") 
-		self.deployment_panel.place(x=360,y=260,height=950,width=1200)
+		self.deployment_panel.place(x=360,y=260,height=950,width=1300)
 
 		self.init_system_pannel()
 		self.init_performance_pannel()
