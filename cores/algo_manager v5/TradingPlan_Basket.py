@@ -66,6 +66,8 @@ class TradingPlan_Basket:
 		self.profit_tier = 0
 
 		self.info = info
+
+
 		if "Profit" in info:
 			self.profit = int(abs(info["Profit"]))
 			self.profit1= self.profit
@@ -95,6 +97,10 @@ class TradingPlan_Basket:
 		self.downclone_trigger = 0 
 		self.cloned = False 
 
+		if "Clone" in info:
+			self.cloned = True 
+		self.info['Clone'] = True 
+		
 		if  "Upclone" in info:
 			self.upclone_trigger = int(info['Upclone'])
 		if  "Downclone" in info:
@@ -866,14 +872,14 @@ class TradingPlan_Basket:
 
 		## make sure it's a winnign trade. 
 
-		if self.data[UNREAL]>0 and self.cloned==False:
+		if self.data[UNREAL]>3 and self.cloned==False:
 			self.reduce_one_quarter()
 
 
 	def add_to_winners(self):
 
 		## make sure it's a winning trade.
-		if self.data[UNREAL]>0 and self.cloned==False:
+		if self.data[UNREAL]>3 and self.cloned==False:
 			self.increase_one_quarter()
 	def increase_one_quarter(self):
 
