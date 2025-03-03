@@ -493,10 +493,10 @@ class UI(pannel):
 		self.performance_pannel = ttk.LabelFrame(self.root,text="Performance") 
 		self.performance_pannel.place(x=360,y=70,height=200,width=1300)
 
-		self.filter_pannel = ttk.LabelFrame(self.root,text="Strategy Filter") 
+		self.filter_pannel = ttk.LabelFrame(self.root,text="Algorithms Management") 
 		self.filter_pannel.place(x=360,y=200,height=60,width=1300)
 
-		self.deployment_panel = ttk.LabelFrame(self.root,text="Strategy Deployment") 
+		self.deployment_panel = ttk.LabelFrame(self.root,text="Algorithms Deployment") 
 		self.deployment_panel.place(x=360,y=260,height=950,width=1300)
 
 		self.init_system_pannel()
@@ -523,6 +523,15 @@ class UI(pannel):
 		c+=1
 		ttk.Button(self.filter_pannel, text="Only Done",command=self.show_done_only).grid(sticky="w",column=c,row=1)
 
+
+		# c+=1
+		# ttk.Button(self.filter_pannel, text="+ 25% to L",command=self.add_to_winners).grid(sticky="w",column=c,row=1)
+
+
+		# c+=1
+		# ttk.Button(self.filter_pannel, text="- 25% to L",command=self.add_to_winners).grid(sticky="w",column=c,row=1)
+
+
 		# c+=1
 		# ttk.Button(self.filter_pannel, text="Only Done",command=self.show_done_only).grid(sticky="w",column=c,row=1)
 
@@ -540,12 +549,22 @@ class UI(pannel):
 		c+=1
 		tk.Label(self.filter_pannel, text="Symbol Filter:").grid(sticky="w",column=c,row=1)
 
+
+
+
 		# row 1 entry
 		c+=1
 		tk.Entry(self.filter_pannel,textvariable=self.strategy_filter,width=20).grid(sticky="w",column=c,row=1)	
 
 		c+=1
 		ttk.Button(self.filter_pannel, text="Filter",command=self.show_selected_only,state= "disabled").grid(sticky="w",column=c,row=1)
+		c+=1
+		ttk.Button(self.filter_pannel, text="+ 25% to W",command=self.add_to_winners).grid(sticky="w",column=c,row=1)
+
+
+		c+=1
+		ttk.Button(self.filter_pannel, text="- 25% to W",command=self.sub_to_winners).grid(sticky="w",column=c,row=1)
+
 
 
 	def show_selected_only(self):
@@ -573,6 +592,30 @@ class UI(pannel):
 		self.current_display_count = c 
 		log_print("current count:",self.current_display_count)
 
+	def add_to_winners(self):
+
+		now = datetime.now()
+		ts = now.hour*3600 + now.minute*60 + now.second
+
+		if ts>self.sort_timer+1:
+			self.sort_timer = ts 
+
+			l = self.manager.return_running_algo()[:self.algo_limit]
+			for i in l:
+				self.manager.baskets[i].add_to_winners()
+
+	def sub_to_winners(self):
+
+		now = datetime.now()
+		ts = now.hour*3600 + now.minute*60 + now.second
+
+		if ts>self.sort_timer+1:
+			self.sort_timer = ts 
+
+			l = self.manager.return_running_algo()[:self.algo_limit]
+
+			for i in l:
+				self.manager.baskets[i].sub_to_winners()
 	def show_running_only(self):
 
 		try:

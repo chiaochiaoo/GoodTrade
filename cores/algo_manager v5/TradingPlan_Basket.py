@@ -833,32 +833,6 @@ class TradingPlan_Basket:
 							else:
 								self.submit_expected_shares(symbol,self.expected_shares[symbol]-self.original_positions[symbol]//coefficient)
 
-	def reduce_one_quarter(self):
-
-
-		self.turn_on_inspection()
-		if self.break_even!=True:
-			self.break_even=False
-			self.break_even_amount=2
-
-
-		coefficient = 4 
-		minimal = 0.25
-		now = datetime.now()
-		ts = now.hour*3600 + now.minute*60 + now.second 
-
-		#self.expected_shares
-		if ts-self.operation_timer>5:
-			self.operation_timer = ts 
-			if self.tkvars[ALGO_MULTIPLIER].get()>=minimal:
-				self.tkvars[ALGO_MULTIPLIER].set(round(self.tkvars[ALGO_MULTIPLIER].get()-minimal,2))
-				for symbol,item in self.symbols.items():
-					if symbol in self.original_positions:
-						if self.expected_shares[symbol]!=0:
-							if abs(self.expected_shares[symbol])<=abs(self.original_positions[symbol]//coefficient): # set to 0
-								self.submit_expected_shares(symbol,0)
-							else:
-								self.submit_expected_shares(symbol,self.expected_shares[symbol]-self.original_positions[symbol]//coefficient)
 
 	def reduce_ninety(self):
 
@@ -883,6 +857,24 @@ class TradingPlan_Basket:
 								self.submit_expected_shares(symbol,0)
 							else:
 								self.submit_expected_shares(symbol,self.expected_shares[symbol]-int(self.original_positions[symbol]*coefficient))
+	
+
+
+
+
+	def sub_to_winners(self):
+
+		## make sure it's a winnign trade. 
+
+		if self.data[UNREAL]>0:
+			self.reduce_one_quarter()
+
+
+	def add_to_winners(self):
+
+		## make sure it's a winning trade.
+		if self.data[UNREAL]>0:
+			self.increase_one_quarter()
 	def increase_one_quarter(self):
 
 		now = datetime.now()
@@ -899,6 +891,32 @@ class TradingPlan_Basket:
 				for symbol,item in self.symbols.items():
 					if symbol in self.original_positions:
 						self.submit_expected_shares(symbol,self.expected_shares[symbol]+self.original_positions[symbol]//4)
+
+	def reduce_one_quarter(self):
+
+		self.turn_on_inspection()
+		if self.break_even!=True:
+			self.break_even=False
+			self.break_even_amount=2
+
+
+		coefficient = 4 
+		minimal = 0.25
+		now = datetime.now()
+		ts = now.hour*3600 + now.minute*60 + now.second 
+
+		#self.expected_shares
+		if ts-self.operation_timer>5:
+			self.operation_timer = ts 
+			if self.tkvars[ALGO_MULTIPLIER].get()>=minimal:
+				self.tkvars[ALGO_MULTIPLIER].set(round(self.tkvars[ALGO_MULTIPLIER].get()-minimal,2))
+				for symbol,item in self.symbols.items():
+					if symbol in self.original_positions:
+						if self.expected_shares[symbol]!=0:
+							if abs(self.expected_shares[symbol])<=abs(self.original_positions[symbol]//coefficient): # set to 0
+								self.submit_expected_shares(symbol,0)
+							else:
+								self.submit_expected_shares(symbol,self.expected_shares[symbol]-self.original_positions[symbol]//coefficient)
 
 	def round_to_100(self):
 		now = datetime.now()
