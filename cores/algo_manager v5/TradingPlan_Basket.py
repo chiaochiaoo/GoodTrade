@@ -866,14 +866,14 @@ class TradingPlan_Basket:
 
 		## make sure it's a winnign trade. 
 
-		if self.data[UNREAL]>0:
+		if self.data[UNREAL]>0 and self.cloned==False:
 			self.reduce_one_quarter()
 
 
 	def add_to_winners(self):
 
 		## make sure it's a winning trade.
-		if self.data[UNREAL]>0:
+		if self.data[UNREAL]>0 and self.cloned==False:
 			self.increase_one_quarter()
 	def increase_one_quarter(self):
 
