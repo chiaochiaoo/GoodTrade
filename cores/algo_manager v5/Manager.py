@@ -929,6 +929,11 @@ class Manager:
 				reque = "http://127.0.0.1:8080/Flatten?symbol=*.MI"
 				req = threading.Thread(target=request, args=(reque,),daemon=True)
 				req.start()
+
+				reque = "http://127.0.0.1:8080/Flatten?symbol=*.DE"
+				req = threading.Thread(target=request, args=(reque,),daemon=True)
+				req.start()
+				
 				log_print("EURO CLOSING",ts)
 
 				
