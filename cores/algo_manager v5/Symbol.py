@@ -474,7 +474,7 @@ class Symbol:
 				current_shares +=  self.tradingplans[tp].get_current_share(self.symbol_name)
 
 
-				self.fill_time_remianing = round((ts-self.tradingplans[tp].get_request_time(self.symbol_name))/self.fill_timer,2)
+				self.fill_time_remianing = min(round((ts-self.tradingplans[tp].get_request_time(self.symbol_name))/self.fill_timer,2),1)
 
 				if ts-self.tradingplans[tp].get_request_time(self.symbol_name)>self.fill_timer:
 					expired+=self.tradingplans[tp].get_current_request(self.symbol_name)
