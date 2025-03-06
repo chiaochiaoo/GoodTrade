@@ -471,15 +471,16 @@ class Symbol:
 
 		#self.fill_time_remianing = min(round((ts-self.tradingplans[tp].get_request_time(self.symbol_name))/self.fill_timer,2),1)
 
-		cur_time = 9999999999
+		cur_time = 0
+
 		for tp in tps:
 			if self.tradingplans[tp].get_inspectable():
 				current_shares +=  self.tradingplans[tp].get_current_share(self.symbol_name)
 
-				if self.tradingplans[tp].get_request_time(self.symbol_name)<cur_time:
+				if self.tradingplans[tp].get_request_time(self.symbol_name)>cur_time:
 					cur_time = self.tradingplans[tp].get_request_time(self.symbol_name)
 
-				print(self.source,self.symbol_name,tp, "fill timer",round((ts-self.tradingplans[tp].get_request_time(self.symbol_name))/self.fill_timer,2))
+				log_print(self.source,self.symbol_name,tp, "fill timer",round((ts-self.tradingplans[tp].get_request_time(self.symbol_name))/self.fill_timer,2))
 
 				if ts-self.tradingplans[tp].get_request_time(self.symbol_name)>self.fill_timer:
 					expired+=self.tradingplans[tp].get_current_request(self.symbol_name)
