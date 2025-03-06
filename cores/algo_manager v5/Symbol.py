@@ -469,15 +469,23 @@ class Symbol:
 		if self.data['SPREAD']<0.03:
 			self.fill_timer = 20
 
+		#self.fill_time_remianing = min(round((ts-self.tradingplans[tp].get_request_time(self.symbol_name))/self.fill_timer,2),1)
+
+		cur_time = 9999999999
 		for tp in tps:
 			if self.tradingplans[tp].get_inspectable():
 				current_shares +=  self.tradingplans[tp].get_current_share(self.symbol_name)
 
+				if self.tradingplans[tp].get_request_time(self.symbol_name)<cur_time:
+					cur_time = self.tradingplans[tp].get_request_time(self.symbol_name)
 
-				self.fill_time_remianing = round((ts-self.tradingplans[tp].get_request_time(self.symbol_name))/self.fill_timer,2)
+				print(self.source,self.symbol_name,tp, "fill timer",round((ts-self.tradingplans[tp].get_request_time(self.symbol_name))/self.fill_timer,2))
 
 				if ts-self.tradingplans[tp].get_request_time(self.symbol_name)>self.fill_timer:
 					expired+=self.tradingplans[tp].get_current_request(self.symbol_name)
+
+		self.fill_time_remianing = round((ts-cur_time)/self.fill_timer,2)
+
 
 		return current_shares,expired
 
