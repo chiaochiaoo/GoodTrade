@@ -1470,7 +1470,7 @@ class Manager:
 				symbol = data["symbol"]
 				side = data["side"]
 
-				log_print(symbol,"rejected on ",side)
+				log_print(symbol,"rejected on ",side,data)
 				try:
 					if symbol in self.symbol_data:
 						self.symbol_data[symbol].rejection_message(side)
