@@ -480,7 +480,7 @@ class Symbol:
 				if self.tradingplans[tp].get_request_time(self.symbol_name)>cur_time:
 					cur_time = self.tradingplans[tp].get_request_time(self.symbol_name)
 
-				log_print(self.source,self.symbol_name,tp, "fill timer",round((ts-self.tradingplans[tp].get_request_time(self.symbol_name))/self.fill_timer,2))
+				#log_print(self.source,self.symbol_name,tp, "fill timer",round((ts-self.tradingplans[tp].get_request_time(self.symbol_name))/self.fill_timer,2))
 
 				if ts-self.tradingplans[tp].get_request_time(self.symbol_name)>self.fill_timer:
 					expired+=self.tradingplans[tp].get_current_request(self.symbol_name)
