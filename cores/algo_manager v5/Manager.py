@@ -908,7 +908,6 @@ class Manager:
 						self.algo_as_is(name)
 						basket.turn_off_inspection()
 						print("Turning off insepction on:",name)
-						#turn_off_insepction
 				# mark it . set it 0.
 
 				reque = "http://127.0.0.1:8080/Flatten?symbol=*.PA"

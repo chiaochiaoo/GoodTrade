@@ -127,14 +127,10 @@ class Symbol:
 
 		self.init_data()
 		
-	def turn_on_aggresive_only(self):
-		self.aggresive_only = True 
 
-	def turn_off_aggresive_only(self):
-		self.aggresive_only = False 
 
-	def turn_off_insepction(self):
-		self.enabled_insepction = False 
+	##### DATA PART #####
+
 
 	def init_data(self):
 
@@ -143,11 +139,10 @@ class Symbol:
 			
 		for i in self.tech_indicators:
 			self.data[i] = 0
-
-	def register_tradingplan(self,name,tradingplan):
-
-		self.tradingplans[name] = tradingplan
-
+	def update_stockprices(self,tps):
+		
+		for tp in tps:
+			self.tradingplans[tp].update_stockprices(self.symbol_name,self.get_bid())
 	def update_price(self,price,bid,ask,ts):
 
 		self.data[PRICE] = price
@@ -168,19 +163,82 @@ class Symbol:
 
 		# self.data[ASK] = ask
 		# self.data[BID] = bid
+	def get_ts(self):
+		now = datetime.now()
+		timestamp = now.hour*3600 + now.minute*60 + now.second
+
+		return timestamp
+	def l1_update_module(self):
+
+		pass 
+
+		### tell the system if there is any bid ask changes since last time.
+
+		try:
+			postbody = "http://127.0.0.1:8080/GetLv1?symbol=" + self.symbol_name 
+
+			r= requests.get(postbody)
+
+			stream_data = r.text
+
+			bid = float(find_between(stream_data, "BidPrice=\"", "\""))
+			ask = float(find_between(stream_data, "AskPrice=\"", "\""))
+			ts = find_between(stream_data, "MarketTime=\"", "\"")
+
+
+			if self.data[BID]!=bid:
+				self.bid_change = True 
+			else:
+				self.bid_change = False 
+
+
+			if self.data[ASK]!=ask:
+				self.ask_change = True 
+			else:
+				self.ask_change = False 
+
+			self.data[ASK] = ask
+			self.data[BID] = bid
+
+			self.data['SPREAD'] = round(ask-bid,2)
+			self.data[TIMESTAMP] = ts
+
+			log_print(self.symbol_name,"SPREAD:",self.data['SPREAD'],self.data[BID],self.bid_change,self.data[ASK],self.ask_change)
+
+			return 
+		except Exception as e:
+
+			PrintException(self.symbol_name,"Init L1 Update")
+
+			self.ask_change = True 
+			self.bid_change = True 
+	def get_price(self):
+		return self.data[PRICE]
+
+	def get_bid(self):
+		return self.data[BID]
+
+	def get_ask(self):
+		return self.data[ASK]
 
 	def instant_inspection(self):
 
 		self.just_had_instant_inspection= True 
 		self.symbol_inspection()
 
-	def get_ts(self):
-		now = datetime.now()
-		timestamp = now.hour*3600 + now.minute*60 + now.second
 
-		return timestamp
+	def symbol_insepction(self):
 
-	def symbol_inspection(self):
+		if not self.inspection_lock.locked():
+			#log_print(self.symbol_name,"Inspecting:")
+			with self.inspection_lock:
+
+				tps = list(self.tradingplans.keys())
+				self.update_stockprices(tps)
+
+
+
+	def symbol_inspection_old(self):
 
 		"""
 		For both load and unload
@@ -243,11 +301,73 @@ class Symbol:
 			return 0 
 
 
-	def update_stockprices(self,tps):
+
+
+
+
+	### TP DATA PART ###
+
+	def get_all_current(self,tps):
+
+		current_shares = 0
+		expired =0
+		now = datetime.now()
+		ts = now.hour*3600 + now.minute*60 + now.second
+
+
+		# if within 5 cents. below 1 $. 
+
+		### depending on the spread. 
+
+		if self.data['SPREAD']>0.1:
+			self.fill_timer = 60 
+
+		if self.data['SPREAD']<0.05:
+			self.fill_timer = 30 
+
+		if self.data['SPREAD']<0.03:
+			self.fill_timer = 20
+
+		#self.fill_time_remianing = min(round((ts-self.tradingplans[tp].get_request_time(self.symbol_name))/self.fill_timer,2),1)
+
+		cur_time = 0
+
+		for tp in tps:
+			if self.tradingplans[tp].get_inspectable():
+				current_shares +=  self.tradingplans[tp].get_current_share(self.symbol_name)
+
+				if self.tradingplans[tp].get_request_time(self.symbol_name)>cur_time:
+					cur_time = self.tradingplans[tp].get_request_time(self.symbol_name)
+
+				#log_print(self.source,self.symbol_name,tp, "fill timer",round((ts-self.tradingplans[tp].get_request_time(self.symbol_name))/self.fill_timer,2))
+
+				if ts-self.tradingplans[tp].get_request_time(self.symbol_name)>self.fill_timer:
+					expired+=self.tradingplans[tp].get_current_request(self.symbol_name)
+
+		self.fill_time_remianing = round((ts-cur_time)/self.fill_timer,2)
+
+
+		return current_shares,expired
+
+	def get_all_expected(self,tps):
+
+		"""
+		Doesnt matter if the TP is running or not, having request or not. it runs through. 
+		The less the parameter, the more generalizability 
+		"""
+		self.expected = 0
 		
 		for tp in tps:
-			self.tradingplans[tp].update_stockprices(self.symbol_name,self.get_bid())
+			### ONLY IF TP is inspectable. 
 
+			if self.tradingplans[tp].get_inspectable():
+				self.expected +=  self.tradingplans[tp].get_current_expected(self.symbol_name)
+
+		return self.expected
+
+	def register_tradingplan(self,name,tradingplan):
+
+		self.tradingplans[name] = tradingplan
 
 	def get_all_future_remaining(self):
 
@@ -301,56 +421,16 @@ class Symbol:
 
 		return remaining
 
-	
 	def as_is(self):
 
-		pass 
+		# tell all register trading plan the state as is. 
+		tps = list(self.tradingplans.keys())
 
+		#### FOR THE TP TRYING TO START THE POSITION. IGNORE. 
+		for tp in tps:
+			if self.tradingplans[tp].having_request(self.symbol_name) and self.tradingplans[tp].get_holdings(self.symbol_name)!=0:
+				self.tradingplans[tp].algo_as_is() 
 
-	def l1_update_module(self):
-
-		pass 
-
-		### tell the system if there is any bid ask changes since last time.
-
-		try:
-			postbody = "http://127.0.0.1:8080/GetLv1?symbol=" + self.symbol_name 
-
-			r= requests.get(postbody)
-
-			stream_data = r.text
-
-			bid = float(find_between(stream_data, "BidPrice=\"", "\""))
-			ask = float(find_between(stream_data, "AskPrice=\"", "\""))
-			ts = find_between(stream_data, "MarketTime=\"", "\"")
-
-
-			if self.data[BID]!=bid:
-				self.bid_change = True 
-			else:
-				self.bid_change = False 
-
-
-			if self.data[ASK]!=ask:
-				self.ask_change = True 
-			else:
-				self.ask_change = False 
-
-			self.data[ASK] = ask
-			self.data[BID] = bid
-
-			self.data['SPREAD'] = round(ask-bid,2)
-			self.data[TIMESTAMP] = ts
-
-			log_print(self.symbol_name,"SPREAD:",self.data['SPREAD'],self.data[BID],self.bid_change,self.data[ASK],self.ask_change)
-
-			return 
-		except Exception as e:
-
-			PrintException(self.symbol_name,e)
-
-		self.ask_change = True 
-		self.bid_change = True 
 
 
 	def calc_total_imbalances(self,tps):
@@ -445,63 +525,6 @@ class Symbol:
 
 		"""
 
-	def get_all_current(self,tps):
-
-		current_shares = 0
-		expired =0
-		now = datetime.now()
-		ts = now.hour*3600 + now.minute*60 + now.second
-
-
-		# if within 5 cents. below 1 $. 
-
-		### depending on the spread. 
-
-		if self.data['SPREAD']>0.1:
-			self.fill_timer = 60 
-
-		if self.data['SPREAD']<0.05:
-			self.fill_timer = 30 
-
-		if self.data['SPREAD']<0.03:
-			self.fill_timer = 20
-
-		#self.fill_time_remianing = min(round((ts-self.tradingplans[tp].get_request_time(self.symbol_name))/self.fill_timer,2),1)
-
-		cur_time = 0
-
-		for tp in tps:
-			if self.tradingplans[tp].get_inspectable():
-				current_shares +=  self.tradingplans[tp].get_current_share(self.symbol_name)
-
-				if self.tradingplans[tp].get_request_time(self.symbol_name)>cur_time:
-					cur_time = self.tradingplans[tp].get_request_time(self.symbol_name)
-
-				log_print(self.source,self.symbol_name,tp, "fill timer",round((ts-self.tradingplans[tp].get_request_time(self.symbol_name))/self.fill_timer,2))
-
-				if ts-self.tradingplans[tp].get_request_time(self.symbol_name)>self.fill_timer:
-					expired+=self.tradingplans[tp].get_current_request(self.symbol_name)
-
-		self.fill_time_remianing = round((ts-cur_time)/self.fill_timer,2)
-
-
-		return current_shares,expired
-
-	def get_all_expected(self,tps):
-
-		"""
-		Doesnt matter if the TP is running or not, having request or not. it runs through. 
-		The less the parameter, the more generalizability 
-		"""
-		self.expected = 0
-		
-		for tp in tps:
-			### ONLY IF TP is inspectable. 
-
-			if self.tradingplans[tp].get_inspectable():
-				self.expected +=  self.tradingplans[tp].get_current_expected(self.symbol_name)
-
-		return self.expected
 
 	def check_all_incrementals(self,tps):
 
@@ -510,7 +533,6 @@ class Symbol:
 
 		for tp in tps:
 			self.tradingplans[tp].check_incremental(self.symbol_name,ts)
-
 
 	def get_difference(self):
 		return self.difference
@@ -567,14 +589,37 @@ class Symbol:
 
 			
 		#log_print("holding update - releasing lock")
-		log_print("Symbol",self.symbol_name," holding update:",price,share)
+		#log_print("Symbol",self.symbol_name," holding update:",price,share)
 		self.holding_update = True 
 
-		hold_fill = threading.Thread(target=self.holdings_fill,daemon=True)
-		hold_fill.start()
+		# hold_fill = threading.Thread(target=self.holdings_fill,daemon=True)
+		# hold_fill.start()
+
+	def incoming_shares_calculate(self):
+
+
+		## return the shares,avg price, and clear
+
+		with self.incoming_shares_lock:
+
+			total_shares = sum(self.incoming_shares.values())
+
+			if total_shares == 0:
+				avg_price = 0  # Avoid division by zero
+			else:
+				avg_price = sum(price * shares for price, shares in self.incoming_shares.items()) / total_shares
+
+			self.incoming_shares = {}
+
+
+			return total_shares,avg_price
+
 
 	def holdings_fill(self):
 
+		"""
+		now hold fill does nothing but give avg price and the shares. 
+		"""
 		if not self.fill_lock.locked():
 			with self.fill_lock:
 
@@ -585,70 +630,70 @@ class Symbol:
 					time.sleep(0.1)
 					self.order_processing_timer	-=0.1
 
-				total_tp = list(self.tradingplans.keys())
+				# total_tp = list(self.tradingplans.keys())
 
 
-				now = datetime.now()
-				ts = now.hour*3600 + now.minute*60+ now.second
+				# now = datetime.now()
+				# ts = now.hour*3600 + now.minute*60+ now.second
 
-				tps = []
+				# tps = []
 
-				tps = {}
+				# tps = {}
 
-				for tp in total_tp:
-					if self.tradingplans[tp].get_inspectable():
-						request_time = ts-self.tradingplans[tp].get_request_time(self.symbol_name)
-						tps[tp] =request_time
+				# for tp in total_tp:
+				# 	if self.tradingplans[tp].get_inspectable():
+				# 		request_time = ts-self.tradingplans[tp].get_request_time(self.symbol_name)
+				# 		tps[tp] =request_time
 
-				for tp in total_tp: #EVERYTHING ELSE.
-					if tp not in tps:
-						request_time = ts-self.tradingplans[tp].get_request_time(self.symbol_name)
-						tps[tp] =request_time
+				# for tp in total_tp: #EVERYTHING ELSE.
+				# 	if tp not in tps:
+				# 		request_time = ts-self.tradingplans[tp].get_request_time(self.symbol_name)
+				# 		tps[tp] =request_time
 
-				sorted_dict = dict(sorted(tps.items(), reverse=True))
-				tps = list(sorted_dict.keys())
+				# sorted_dict = dict(sorted(tps.items(), reverse=True))
+				# tps = list(sorted_dict.keys())
 
-				if len(tps)!=len(total_tp):
-					log_print(self.source,self.symbol_name,"WARNING, WARNING. TP ORDERS UNMATCH.",total_tp,sorted_dict,)
-
-
-				with self.incoming_shares_lock:
-
-					#for each piece feed it.. to the requested.
-
-					log_print(self.source,self.symbol_name," holding processing total:",sum(self.incoming_shares.values()))
-
-					remaining = 0
-					for price,share in self.incoming_shares.items():
-
-						share_difference = share
-
-						### HERE I SHOULD MAKE PRIORITIZATION. NON_MANUAL, NON INSPECTABLE LAST. 
-						for tp in tps:
-							share_difference = self.tradingplans[tp].request_fufill(self.symbol_name,share_difference,price)
-
-							self.tradingplans[tp].notify_holding_change(self.symbol_name)
-							if share_difference==0:
-								break
-
-						if share_difference!=0:
-							remaining += share_difference
-
-					######################################SECONDARY REQUEST FILL #########################################################################
+				# if len(tps)!=len(total_tp):
+				# 	log_print(self.source,self.symbol_name,"WARNING, WARNING. TP ORDERS UNMATCH.",total_tp,sorted_dict,)
 
 
-					######################################################################################################################################
+				# with self.incoming_shares_lock:
 
-					self.incoming_shares = {}
+				# 	#for each piece feed it.. to the requested.
 
-					if remaining!=0:
+				# 	log_print(self.source,self.symbol_name," holding processing total:",sum(self.incoming_shares.values()))
+
+				# 	remaining = 0
+				# 	for price,share in self.incoming_shares.items():
+
+				# 		share_difference = share
+
+				# 		### HERE I SHOULD MAKE PRIORITIZATION. NON_MANUAL, NON INSPECTABLE LAST. 
+				# 		for tp in tps:
+				# 			share_difference = self.tradingplans[tp].request_fufill(self.symbol_name,share_difference,price)
+
+				# 			self.tradingplans[tp].notify_holding_change(self.symbol_name)
+				# 			if share_difference==0:
+				# 				break
+
+				# 		if share_difference!=0:
+				# 			remaining += share_difference
+
+				# 	######################################SECONDARY REQUEST FILL #########################################################################
+
+
+				# 	######################################################################################################################################
+
+				# 	self.incoming_shares = {}
+
+				# 	if remaining!=0:
 						
-						self.current_imbalance += remaining
+				# 		self.current_imbalance += remaining
 
-						if self.current_imbalance!=0:
-							log_print(self.source,self.symbol_name," Unmatched incoming shares: ",remaining, "total imblance:",self.current_imbalance ," USER INTERVENTION? SYSTEM VIOLATION!")
-						else:
-							log_print(self.source,self.symbol_name," account holding restored.")
+				# 		if self.current_imbalance!=0:
+				# 			log_print(self.source,self.symbol_name," Unmatched incoming shares: ",remaining, "total imblance:",self.current_imbalance ," USER INTERVENTION? SYSTEM VIOLATION!")
+				# 		else:
+				# 			log_print(self.source,self.symbol_name," account holding restored.")
 
 
 				now = datetime.now()
@@ -656,9 +701,10 @@ class Symbol:
 				self.order_processing_timer = 0
 				self.symbol_inspection()
 		else:
-			if self.order_processing_timer<0.2:
-				self.order_processing_timer=0.2
-			
+			if self.order_processing_timer<0.3:
+				self.order_processing_timer=0.3
+	
+	
 	def cancel_request(self):
 
 		now = datetime.now()
@@ -769,14 +815,7 @@ class Symbol:
 		if self.difference!=0:
 			self.ppro_out.send([self.action,self.symbol_name,abs(self.difference),0])
 
-	def get_price(self):
-		return self.data[PRICE]
 
-	def get_bid(self):
-		return self.data[BID]
-
-	def get_ask(self):
-		return self.data[ASK]
 
 	def rejection_message(self,side):
 
@@ -837,7 +876,6 @@ class Symbol:
 
 			self.market_out = shares
 			self.holding_update = True
-
 
 	# deprecated 
 	def calc_inspection_differences(self,tps):
@@ -901,9 +939,94 @@ class Symbol:
 					if share_difference	==0:
 						break
 
-
 		self.previous_shares,self.previous_avgprice = self.current_shares, self.current_avgprice
-
 
 	def ppro_flatten(self):
 		self.ppro_out.send([FLATTEN,self.symbol_name])
+
+	# def holdings_fill(self):
+
+	# 	if not self.fill_lock.locked():
+	# 		with self.fill_lock:
+
+	# 			#first wait for few seconds. 
+	# 			time.sleep(0.2)
+
+	# 			while self.order_processing_timer>0:
+	# 				time.sleep(0.1)
+	# 				self.order_processing_timer	-=0.1
+
+	# 			total_tp = list(self.tradingplans.keys())
+
+
+	# 			now = datetime.now()
+	# 			ts = now.hour*3600 + now.minute*60+ now.second
+
+	# 			tps = []
+
+	# 			tps = {}
+
+	# 			for tp in total_tp:
+	# 				if self.tradingplans[tp].get_inspectable():
+	# 					request_time = ts-self.tradingplans[tp].get_request_time(self.symbol_name)
+	# 					tps[tp] =request_time
+
+	# 			for tp in total_tp: #EVERYTHING ELSE.
+	# 				if tp not in tps:
+	# 					request_time = ts-self.tradingplans[tp].get_request_time(self.symbol_name)
+	# 					tps[tp] =request_time
+
+	# 			sorted_dict = dict(sorted(tps.items(), reverse=True))
+	# 			tps = list(sorted_dict.keys())
+
+	# 			if len(tps)!=len(total_tp):
+	# 				log_print(self.source,self.symbol_name,"WARNING, WARNING. TP ORDERS UNMATCH.",total_tp,sorted_dict,)
+
+
+	# 			with self.incoming_shares_lock:
+
+	# 				#for each piece feed it.. to the requested.
+
+	# 				log_print(self.source,self.symbol_name," holding processing total:",sum(self.incoming_shares.values()))
+
+	# 				remaining = 0
+	# 				for price,share in self.incoming_shares.items():
+
+	# 					share_difference = share
+
+	# 					### HERE I SHOULD MAKE PRIORITIZATION. NON_MANUAL, NON INSPECTABLE LAST. 
+	# 					for tp in tps:
+	# 						share_difference = self.tradingplans[tp].request_fufill(self.symbol_name,share_difference,price)
+
+	# 						self.tradingplans[tp].notify_holding_change(self.symbol_name)
+	# 						if share_difference==0:
+	# 							break
+
+	# 					if share_difference!=0:
+	# 						remaining += share_difference
+
+	# 				######################################SECONDARY REQUEST FILL #########################################################################
+
+
+	# 				######################################################################################################################################
+
+	# 				self.incoming_shares = {}
+
+	# 				if remaining!=0:
+						
+	# 					self.current_imbalance += remaining
+
+	# 					if self.current_imbalance!=0:
+	# 						log_print(self.source,self.symbol_name," Unmatched incoming shares: ",remaining, "total imblance:",self.current_imbalance ," USER INTERVENTION? SYSTEM VIOLATION!")
+	# 					else:
+	# 						log_print(self.source,self.symbol_name," account holding restored.")
+
+
+	# 			now = datetime.now()
+	# 			self.last_order_timestamp = now.hour*3600 + now.minute*60 + now.second
+	# 			self.order_processing_timer = 0
+	# 			self.symbol_inspection()
+	# 	else:
+	# 		if self.order_processing_timer<0.4:
+	# 			self.order_processing_timer=0.4
+	# 	
