@@ -118,6 +118,9 @@ class Symbol:
 		self.regulating_phase = False 
 
 
+		### INSPECTION VARIABLES
+
+		self.inspection_complete = False 
 		self.tp_homeo = True 
 		self.symbol_homeo = True 
 
@@ -258,12 +261,19 @@ class Symbol:
 
 				self.inspection_timestamp = ts
 
+				self.inspection_complete = False 
+
 				self.orders_checking_phase()
 				self.status_checking_phase(tps)
 
-				if self.difference==0 and self.tp_homeo==True and self.ppro_homeo==True:
-
+				if self.inspection_complete==True:
 					return 1 
+
+
+				if self.tp_homeo==True
+					self.regulating_check_phase(tps)
+
+
 				self.regulating_check_phase(tps)
 
 				self.distribution_phase(tps)
@@ -348,19 +358,26 @@ class Symbol:
 		else:
 			self.ppro_homeo = False 
 
+		log_print(self.source,self.symbol_name,f"Shares change {self.tp_difference} Tp homeo: {self.tp_homeo} Ppro homeo: {self.ppro_homeo}  ")
 
+		if self.tp_difference==0 and self.tp_homeo==True and self.ppro_homeo==True:
+			self.inspection_complete = True 
 
 	def regulating_check_phase(self,tps):
 
 		"""
 		Must ensure self.current_shares = self.tp. 
 		if not then do not continue. 
+
+		this will only go through if self.tp == True. 
+		there could be share differences. 
 		"""
 
-		self.tp_current_shares,self.expired = self.get_all_current(tps)
+		if self.ppro_homeo!=True:
+
 
 	
-		if self.distributional_shares ==0 and self.tp_homeo == True:
+		if self.distributional_shares ==0:
 			if self.current_shares !=self.tp_current_shares:
 				self.request = self.current_shares - self.tp_current_shares
 				self.regulating_shares =self.request
