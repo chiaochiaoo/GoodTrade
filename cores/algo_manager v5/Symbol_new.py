@@ -27,7 +27,7 @@ PRICE = "Price"
 
 
 
-
+DEBUG_MODE = True 
 class Symbol:
 
 	#Symbol class tracks every data related to the symbol. Output it in a dictionary form.
@@ -107,6 +107,9 @@ class Symbol:
 		self.request = 0
 
 
+		self.tp_difference = 0
+
+
 
 		self.distributional_shares = 0
 		self.distributional_shares_prices = 0
@@ -114,6 +117,9 @@ class Symbol:
 
 		self.regulating_phase = False 
 
+
+		self.tp_homeo = True 
+		self.symbol_homeo = True 
 
 		self.action=""
 
@@ -135,6 +141,8 @@ class Symbol:
 		self.tradingplans = {}
 
 		self.init_data()
+
+		log_print(self.source,self.symbol_name," New symbol system init")
 		
 
 
@@ -234,7 +242,7 @@ class Symbol:
 
 
 	### INSPECTION MOUDULE ###
-	def symbol_insepction(self):
+	def symbol_inspection(self):
 
 		if not self.inspection_lock.locked():
 
@@ -251,13 +259,17 @@ class Symbol:
 				self.inspection_timestamp = ts
 
 				self.orders_checking_phase()
-				
-				self.regulating_phase(tps)
+				self.status_checking_phase(tps)
 
-				self.distribution_phase()
+				if self.difference==0 and self.tp_homeo==True and self.ppro_homeo==True:
+
+					return 1 
+				self.regulating_check_phase(tps)
+
+				self.distribution_phase(tps)
 
 
-				self.aggregating_phase()
+				self.aggregating_phase(tps)
 
 
 				if self.request!=0:
@@ -273,6 +285,8 @@ class Symbol:
 		else:
 			log_print(self.symbol_name,"Inspection LOCKED")
 			return 0 
+
+
 	def orders_checking_phase(self):
 
 		"""
@@ -309,10 +323,34 @@ class Symbol:
 		self.distributional_shares = self.difference
 		self.distributional_shares_prices = avg_price
 
-
 		self.previous_shares = self.current_shares
 
-	def regulating_phase(self,tps):
+
+		# check tp homeo.
+
+		if DEBUG_MODE:
+			log_print(self.source,self.symbol_name, "Debugging order checking",self.current_shares,self.distributional_shares,self.distributional_shares_prices)
+
+	def status_checking_phase(self,tps):
+
+		self.tp_current_shares,self.expired = self.get_all_current(tps)
+		self.expected = self.get_all_expected(tps)
+		self.tp_difference = self.expected - self.tp_current_shares 
+
+
+		if self.tp_difference==0:
+			self.tp_homeo = True
+		else:
+			self.tp_homeo = False  
+
+		if self.current_shares==self.tp_current_shares:
+			self.ppro_homeo = True 
+		else:
+			self.ppro_homeo = False 
+
+
+
+	def regulating_check_phase(self,tps):
 
 		"""
 		Must ensure self.current_shares = self.tp. 
@@ -322,14 +360,17 @@ class Symbol:
 		self.tp_current_shares,self.expired = self.get_all_current(tps)
 
 	
-		if self.current_shares !=self.tp_current_shares:
-			self.request = self.current_shares - self.tp_current_shares
-			self.regulating_shares =self.request
-			self.regulating_phase = True  
-			log_print(self.source,self.symbol_name," Discrepancy on Symbol. Adjusting shares first.",self.regulating_shares )
-
+		if self.distributional_shares ==0 and self.tp_homeo == True:
+			if self.current_shares !=self.tp_current_shares:
+				self.request = self.current_shares - self.tp_current_shares
+				self.regulating_shares =self.request
+				self.regulating_phase = True  
+				log_print(self.source,self.symbol_name," Discrepancy on Symbol. Adjusting shares first.",self.regulating_shares )
 		else:
 			self.regulating_phase = False 
+
+		if DEBUG_MODE:
+			log_print(self.source,self.symbol_name, "regulating phase:",self.regulating_phase)
 
 	def pairing_phase(self):
 
@@ -351,9 +392,12 @@ class Symbol:
 		if self.regulating_phase == False:
 			self.tp_current_shares,self.expired = self.get_all_current(tps)
 			self.expected = self.get_all_expected(tps)
-			self.request = self.tp_current_shares - self.tp_current_shares
+			self.request =  self.expected - self.tp_current_shares
 
-	def distribution_phase(self):
+		if DEBUG_MODE:
+			log_print(self.source,self.symbol_name, "have",self.tp_current_shares," want",self.expired," request",self.request)
+
+	def distribution_phase(self,tps):
 
 
 		"""
@@ -364,7 +408,7 @@ class Symbol:
 		OUTPUT: orders
 		"""
 
-		if self.distributional_shares!=0 and self.regulating_phase == False:
+		if self.distributional_shares!=0:
 
 			## check if this is the regulating shares needned. 
 
@@ -379,22 +423,22 @@ class Symbol:
 			ts = now.hour*3600 + now.minute*60+ now.second
 
 
-			tps = {}
-
-			for tp in total_tp:
-				if self.tradingplans[tp].get_inspectable():
-					request_time = ts-self.tradingplans[tp].get_request_time(self.symbol_name)
-					tps[tp] =request_time
-
-			for tp in total_tp: #EVERYTHING ELSE.
-				if tp not in tps:
-					request_time = ts-self.tradingplans[tp].get_request_time(self.symbol_name)
-					tps[tp] =request_time
-
-			sorted_dict = dict(sorted(tps.items(), reverse=True))
-			tps = list(sorted_dict.keys())
+			tps_ = {}
 
 			for tp in tps:
+				if self.tradingplans[tp].get_inspectable():
+					request_time = ts-self.tradingplans[tp].get_request_time(self.symbol_name)
+					tps_[tp] =request_time
+
+			for tp in tps: #EVERYTHING ELSE.
+				if tp not in tps:
+					request_time = ts-self.tradingplans[tp].get_request_time(self.symbol_name)
+					tps_[tp] =request_time
+
+			sorted_dict = dict(sorted(tps_.items(), reverse=True))
+			tps_ = list(sorted_dict.keys())
+
+			for tp in tps_:
 				self.distributional_shares = self.tradingplans[tp].request_fufill(self.symbol_name,self.distributional_shares,self.distributional_shares_prices	)
 
 				if self.distributional_shares ==0:
@@ -960,72 +1004,6 @@ class Symbol:
 					time.sleep(0.1)
 					self.order_processing_timer	-=0.1
 
-				# total_tp = list(self.tradingplans.keys())
-
-
-				# now = datetime.now()
-				# ts = now.hour*3600 + now.minute*60+ now.second
-
-				# tps = []
-
-				# tps = {}
-
-				# for tp in total_tp:
-				# 	if self.tradingplans[tp].get_inspectable():
-				# 		request_time = ts-self.tradingplans[tp].get_request_time(self.symbol_name)
-				# 		tps[tp] =request_time
-
-				# for tp in total_tp: #EVERYTHING ELSE.
-				# 	if tp not in tps:
-				# 		request_time = ts-self.tradingplans[tp].get_request_time(self.symbol_name)
-				# 		tps[tp] =request_time
-
-				# sorted_dict = dict(sorted(tps.items(), reverse=True))
-				# tps = list(sorted_dict.keys())
-
-				# if len(tps)!=len(total_tp):
-				# 	log_print(self.source,self.symbol_name,"WARNING, WARNING. TP ORDERS UNMATCH.",total_tp,sorted_dict,)
-
-
-				# with self.incoming_shares_lock:
-
-				# 	#for each piece feed it.. to the requested.
-
-				# 	log_print(self.source,self.symbol_name," holding processing total:",sum(self.incoming_shares.values()))
-
-				# 	remaining = 0
-				# 	for price,share in self.incoming_shares.items():
-
-				# 		share_difference = share
-
-				# 		### HERE I SHOULD MAKE PRIORITIZATION. NON_MANUAL, NON INSPECTABLE LAST. 
-				# 		for tp in tps:
-				# 			share_difference = self.tradingplans[tp].request_fufill(self.symbol_name,share_difference,price)
-
-				# 			self.tradingplans[tp].notify_holding_change(self.symbol_name)
-				# 			if share_difference==0:
-				# 				break
-
-				# 		if share_difference!=0:
-				# 			remaining += share_difference
-
-				# 	######################################SECONDARY REQUEST FILL #########################################################################
-
-
-				# 	######################################################################################################################################
-
-				# 	self.incoming_shares = {}
-
-				# 	if remaining!=0:
-						
-				# 		self.current_imbalance += remaining
-
-				# 		if self.current_imbalance!=0:
-				# 			log_print(self.source,self.symbol_name," Unmatched incoming shares: ",remaining, "total imblance:",self.current_imbalance ," USER INTERVENTION? SYSTEM VIOLATION!")
-				# 		else:
-				# 			log_print(self.source,self.symbol_name," account holding restored.")
-
-
 				now = datetime.now()
 				self.last_order_timestamp = now.hour*3600 + now.minute*60 + now.second
 				self.order_processing_timer = 0
@@ -1271,89 +1249,3 @@ class Symbol:
 	def ppro_flatten(self):
 		self.ppro_out.send([FLATTEN,self.symbol_name])
 
-	# def holdings_fill(self):
-
-	# 	if not self.fill_lock.locked():
-	# 		with self.fill_lock:
-
-	# 			#first wait for few seconds. 
-	# 			time.sleep(0.2)
-
-	# 			while self.order_processing_timer>0:
-	# 				time.sleep(0.1)
-	# 				self.order_processing_timer	-=0.1
-
-	# 			total_tp = list(self.tradingplans.keys())
-
-
-	# 			now = datetime.now()
-	# 			ts = now.hour*3600 + now.minute*60+ now.second
-
-	# 			tps = []
-
-	# 			tps = {}
-
-	# 			for tp in total_tp:
-	# 				if self.tradingplans[tp].get_inspectable():
-	# 					request_time = ts-self.tradingplans[tp].get_request_time(self.symbol_name)
-	# 					tps[tp] =request_time
-
-	# 			for tp in total_tp: #EVERYTHING ELSE.
-	# 				if tp not in tps:
-	# 					request_time = ts-self.tradingplans[tp].get_request_time(self.symbol_name)
-	# 					tps[tp] =request_time
-
-	# 			sorted_dict = dict(sorted(tps.items(), reverse=True))
-	# 			tps = list(sorted_dict.keys())
-
-	# 			if len(tps)!=len(total_tp):
-	# 				log_print(self.source,self.symbol_name,"WARNING, WARNING. TP ORDERS UNMATCH.",total_tp,sorted_dict,)
-
-
-	# 			with self.incoming_shares_lock:
-
-	# 				#for each piece feed it.. to the requested.
-
-	# 				log_print(self.source,self.symbol_name," holding processing total:",sum(self.incoming_shares.values()))
-
-	# 				remaining = 0
-	# 				for price,share in self.incoming_shares.items():
-
-	# 					share_difference = share
-
-	# 					### HERE I SHOULD MAKE PRIORITIZATION. NON_MANUAL, NON INSPECTABLE LAST. 
-	# 					for tp in tps:
-	# 						share_difference = self.tradingplans[tp].request_fufill(self.symbol_name,share_difference,price)
-
-	# 						self.tradingplans[tp].notify_holding_change(self.symbol_name)
-	# 						if share_difference==0:
-	# 							break
-
-	# 					if share_difference!=0:
-	# 						remaining += share_difference
-
-	# 				######################################SECONDARY REQUEST FILL #########################################################################
-
-
-	# 				######################################################################################################################################
-
-	# 				self.incoming_shares = {}
-
-	# 				if remaining!=0:
-						
-	# 					self.current_imbalance += remaining
-
-	# 					if self.current_imbalance!=0:
-	# 						log_print(self.source,self.symbol_name," Unmatched incoming shares: ",remaining, "total imblance:",self.current_imbalance ," USER INTERVENTION? SYSTEM VIOLATION!")
-	# 					else:
-	# 						log_print(self.source,self.symbol_name," account holding restored.")
-
-
-	# 			now = datetime.now()
-	# 			self.last_order_timestamp = now.hour*3600 + now.minute*60 + now.second
-	# 			self.order_processing_timer = 0
-	# 			self.symbol_inspection()
-	# 	else:
-	# 		if self.order_processing_timer<0.4:
-	# 			self.order_processing_timer=0.4
-	# 	
