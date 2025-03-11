@@ -1963,11 +1963,60 @@ class Manager:
 	####### SIMULATION PANNEL ########
 
 	def sim1(self):
-		pass
+
+		name = 'SIM1'
+		orders = {'QQQ.NQ':10}
+		risk = 0 
+		aggresive = False 
+		info = {}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info)
+
 	def sim2(self):
-		pass 
+
+		name1 = 'SIM2-1'
+		orders1 = {'QQQ.NQ':10}
+		risk = 0 
+		aggresive = False 
+		info = {}
+		self.apply_basket_cmd(name1,orders1,risk,aggresive,info)
+ 
+ 		name1 = 'SIM2-2'
+		orders1 = {'SPY.AM':10}
+		risk = 0 
+		aggresive = False 
+		info = {}
+		self.apply_basket_cmd(name1,orders1,risk,aggresive,info)
+ 
 	def sim3(self):
-		pass
+
+		name1 = 'SIM3-1'
+		orders1 = {'QQQ.NQ':10}
+		risk = 0 
+		aggresive = False 
+		info = {}
+		self.apply_basket_cmd(name1,orders1,risk,aggresive,info)
+ 
+ 		name1 = 'SIM3-2'
+		orders1 = {'SPY.AM':10}
+		risk = 0 
+		aggresive = False 
+		info = {}
+		self.apply_basket_cmd(name1,orders1,risk,aggresive,info)
+ 
+  		name1 = 'SIM3-3'
+		orders1 = {'QQQ.NQ':5}
+		risk = 0 
+		aggresive = False 
+		info = {}
+		self.apply_basket_cmd(name1,orders1,risk,aggresive,info)
+
+  		name1 = 'SIM3-4'
+		orders1 = {'SPY.AM':-5}
+		risk = 0 
+		aggresive = False 
+		info = {}
+		self.apply_basket_cmd(name1,orders1,risk,aggresive,info)
+		
 	def sim4(self):
 		pass 
 	def sim5(self):
