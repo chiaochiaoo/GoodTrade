@@ -1979,8 +1979,8 @@ class Manager:
 		aggresive = False 
 		info = {}
 		self.apply_basket_cmd(name1,orders1,risk,aggresive,info)
- 
- 		name1 = 'SIM2-2'
+
+		name1 = 'SIM2-2'
 		orders1 = {'SPY.AM':10}
 		risk = 0 
 		aggresive = False 
@@ -1995,28 +1995,28 @@ class Manager:
 		aggresive = False 
 		info = {}
 		self.apply_basket_cmd(name1,orders1,risk,aggresive,info)
- 
- 		name1 = 'SIM3-2'
+
+		name1 = 'SIM3-2'
 		orders1 = {'SPY.AM':10}
 		risk = 0 
 		aggresive = False 
 		info = {}
 		self.apply_basket_cmd(name1,orders1,risk,aggresive,info)
- 
-  		name1 = 'SIM3-3'
+
+		name1 = 'SIM3-3'
 		orders1 = {'QQQ.NQ':5}
 		risk = 0 
 		aggresive = False 
 		info = {}
 		self.apply_basket_cmd(name1,orders1,risk,aggresive,info)
 
-  		name1 = 'SIM3-4'
+		name1 = 'SIM3-4'
 		orders1 = {'SPY.AM':-5}
 		risk = 0 
 		aggresive = False 
 		info = {}
 		self.apply_basket_cmd(name1,orders1,risk,aggresive,info)
-		
+
 	def sim4(self):
 		pass 
 	def sim5(self):
