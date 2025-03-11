@@ -374,8 +374,16 @@ class Symbol:
 		if self.ppro_homeo!=True:
 			self.request = self.current_shares - self.tp_current_shares
 			self.regulating_shares =self.request
+
+
+			if self.regulating_shares == self.distributional_shares:
+				log_print(self.source,self.symbol_name," returning normal.")
+				self.regulating_shares = 0 
+				self.distributional_shares = 0 
+
+
 			log_print(self.source,self.symbol_name," Discrepancy on Symbol. Adjusting shares first.",self.regulating_shares)
-			
+
 		# if self.distributional_shares ==0:
 		# 	if self.current_shares !=self.tp_current_shares:
 		# 		self.request = self.current_shares - self.tp_current_shares
@@ -426,11 +434,6 @@ class Symbol:
 		if self.distributional_shares!=0:
 
 			## check if this is the regulating shares needned. 
-
-			if self.regulating_shares == self.distributional_shares:
-				log_print(self.source,self.symbol_name," returning normal.")
-				self.regulating_shares = 0 
-				self.distributional_shares = 0 
 
 			total_tp = list(self.tradingplans.keys())
 
