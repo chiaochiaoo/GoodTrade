@@ -459,6 +459,8 @@ class Symbol:
 			tps_ = list(sorted_dict.keys())
 
 			for tp in tps_:
+
+				print(self.source,self.symbol_name,"checking ",tp, self.tradingplans[tp].get_current_request(self.symbol_name))
 				self.distributional_shares = self.tradingplans[tp].request_fufill(self.symbol_name,self.distributional_shares,self.distributional_shares_prices	)
 
 				if self.distributional_shares ==0:
