@@ -445,13 +445,13 @@ class Symbol:
 
 			tps_ = {}
 
-			for tp in tps:
+			for tp in total_tp:
 				if self.tradingplans[tp].get_inspectable():
 					request_time = ts-self.tradingplans[tp].get_request_time(self.symbol_name)
 					tps_[tp] =request_time
 
-			for tp in tps: #EVERYTHING ELSE.
-				if tp not in tps:
+			for tp in total_tp: #EVERYTHING ELSE.
+				if tp not in tps_:
 					request_time = ts-self.tradingplans[tp].get_request_time(self.symbol_name)
 					tps_[tp] =request_time
 
