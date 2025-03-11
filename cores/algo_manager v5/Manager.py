@@ -2,7 +2,6 @@ from pannel import *
 from tkinter import ttk
 import tkinter as tk 
 from Symbol import *
-
 from TradingPlan_Basket import *
 from TradingPlan_Pair import *
 
@@ -1981,7 +1980,7 @@ class Manager:
 		self.apply_basket_cmd(name1,orders1,risk,aggresive,info)
 
 		name1 = 'SIM2-2'
-		orders1 = {'SPY.AM':10}
+		orders1 = {'SPY.AM':-10}
 		risk = 0 
 		aggresive = False 
 		info = {}
@@ -1990,39 +1989,97 @@ class Manager:
 	def sim3(self):
 
 		name1 = 'SIM3-1'
-		orders1 = {'QQQ.NQ':10}
+		orders1 = {'IWM.AM':10}
 		risk = 0 
 		aggresive = False 
 		info = {}
 		self.apply_basket_cmd(name1,orders1,risk,aggresive,info)
 
 		name1 = 'SIM3-2'
-		orders1 = {'SPY.AM':10}
+		orders1 = {'VOO.AM':10}
 		risk = 0 
 		aggresive = False 
 		info = {}
 		self.apply_basket_cmd(name1,orders1,risk,aggresive,info)
 
 		name1 = 'SIM3-3'
-		orders1 = {'QQQ.NQ':5}
+		orders1 = {'IWM.AM':5}
 		risk = 0 
 		aggresive = False 
 		info = {}
 		self.apply_basket_cmd(name1,orders1,risk,aggresive,info)
 
 		name1 = 'SIM3-4'
-		orders1 = {'SPY.AM':-5}
+		orders1 = {'VOO.AM':-5}
 		risk = 0 
 		aggresive = False 
 		info = {}
 		self.apply_basket_cmd(name1,orders1,risk,aggresive,info)
 
 	def sim4(self):
-		pass 
+
+		"""
+		Aggresive , 1 position
+		"""
+		name = 'SIM4'
+		orders = {'QLD.NQ':10}
+		risk = 0 
+		aggresive = True 
+		info = {}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
+
 	def sim5(self):
-		pass
+		"""
+		Aggresive , 2 position
+		"""
+
+		name = 'SIM5-1'
+		orders = {'QQQM.NQ':10}
+		risk = 0 
+		aggresive = True 
+		info = {}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
+
+		name = 'SIM5-2'
+		orders = {'QQQJ.NQ':-5}
+		risk = 0 
+		aggresive = True 
+		info = {}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
+
 	def sim6(self):
-		pass 
+		"""
+		Aggresive , 4 position
+		""" 
+		name = 'SIM6-1'
+		orders = {'TQQQ.NQ':10}
+		risk = 0 
+		aggresive = True 
+		info = {}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
+
+		name = 'SIM6-2'
+		orders = {'SQQQ.NQ':10}
+		risk = 0 
+		aggresive = True 
+		info = {}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
+		name = 'SIM6-3'
+		orders = {'TQQQ.NQ':5}
+		risk = 0 
+		aggresive = True 
+		info = {}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
+
+		name = 'SIM6-4'
+		orders = {'SQQQ.NQ':-5}
+		risk = 0 
+		aggresive = True 
+		info = {}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
+
+
+
 	def sim7(self):
 		pass
 	def sim8(self):
