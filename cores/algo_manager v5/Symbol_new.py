@@ -627,6 +627,9 @@ class Symbol:
 		tps = list(sorted_dict.keys())
 
 		for tp in tps:
+
+
+			print(self.source,self.symbol_name,"checking ",tp, self.tradingplans[tp].get_current_request(self.symbol_name))
 			self.difference = self.tradingplans[tp].request_fufill(self.symbol_name,self.difference,avg_price)
 
 			if self.difference ==0:
