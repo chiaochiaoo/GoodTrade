@@ -270,16 +270,14 @@ class Symbol:
 					return 1 
 
 
-				if self.tp_homeo==True
+				if self.tp_homeo==True:
 					self.regulating_check_phase(tps)
 
-
-				self.regulating_check_phase(tps)
-
-				self.distribution_phase(tps)
-
-
-				self.aggregating_phase(tps)
+				else:
+					if self.distributional_shares!=0:
+						self.distribution_phase(tps)
+		
+					self.aggregating_phase(tps)
 
 
 				if self.request!=0:
@@ -374,20 +372,21 @@ class Symbol:
 		"""
 
 		if self.ppro_homeo!=True:
-
-
-	
-		if self.distributional_shares ==0:
-			if self.current_shares !=self.tp_current_shares:
-				self.request = self.current_shares - self.tp_current_shares
-				self.regulating_shares =self.request
-				self.regulating_phase = True  
-				log_print(self.source,self.symbol_name," Discrepancy on Symbol. Adjusting shares first.",self.regulating_shares )
-		else:
-			self.regulating_phase = False 
+			self.request = self.current_shares - self.tp_current_shares
+			self.regulating_shares =self.request
+			log_print(self.source,self.symbol_name," Discrepancy on Symbol. Adjusting shares first.",self.regulating_shares)
+			
+		# if self.distributional_shares ==0:
+		# 	if self.current_shares !=self.tp_current_shares:
+		# 		self.request = self.current_shares - self.tp_current_shares
+		# 		self.regulating_shares =self.request
+		# 		self.regulating_phase = True  
+		# 		log_print(self.source,self.symbol_name," Discrepancy on Symbol. Adjusting shares first.",self.regulating_shares )
+		# else:
+		# 	self.regulating_phase = False 
 
 		if DEBUG_MODE:
-			log_print(self.source,self.symbol_name, "regulating phase:",self.regulating_phase)
+			log_print(self.source,self.symbol_name, "regulating phase:",self.regulating_shares)
 
 	def pairing_phase(self):
 
@@ -406,10 +405,9 @@ class Symbol:
 		STEP 2. SEND OUT MISSING SHARES. 
 		"""
 
-		if self.regulating_phase == False:
-			self.tp_current_shares,self.expired = self.get_all_current(tps)
-			self.expected = self.get_all_expected(tps)
-			self.request =  self.expected - self.tp_current_shares
+		self.tp_current_shares,self.expired = self.get_all_current(tps)
+		self.expected = self.get_all_expected(tps)
+		self.request =  self.expected - self.tp_current_shares
 
 		if DEBUG_MODE:
 			log_print(self.source,self.symbol_name, "have",self.tp_current_shares," want",self.expired," request",self.request)
