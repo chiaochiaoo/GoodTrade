@@ -229,6 +229,8 @@ class Symbol:
 
 			self.ask_change = True 
 			self.bid_change = True 
+
+
 	def get_price(self):
 		return self.data[PRICE]
 
@@ -372,7 +374,7 @@ class Symbol:
 		"""
 
 		if self.ppro_homeo!=True:
-			self.request = self.current_shares - self.tp_current_shares
+			self.request = self.tp_current_shares-self.current_shares
 			self.regulating_shares =self.request
 
 
