@@ -358,7 +358,7 @@ class Symbol:
 		else:
 			self.ppro_homeo = False 
 
-		log_print(self.source,self.symbol_name,f"Shares change {self.tp_difference} Tp homeo: {self.tp_homeo} Ppro homeo: {self.ppro_homeo}  ")
+		log_print(self.source,self.symbol_name,f"Shares change {self.tp_difference} Tp balance: {self.tp_homeo} Ppro balance: {self.ppro_homeo}  ")
 
 		if self.tp_difference==0 and self.tp_homeo==True and self.ppro_homeo==True:
 			self.inspection_complete = True 
