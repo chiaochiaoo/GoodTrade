@@ -745,6 +745,8 @@ class Symbol:
 
 		self.fill_time_remianing = round((ts-cur_time)/self.fill_timer,2)
 
+		self.fill_time_remianing = min(self.fill_time_remianing,1)
+
 
 		return current_shares,expired
 
