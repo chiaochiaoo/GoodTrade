@@ -473,8 +473,13 @@ class UI(pannel):
 
 		self.custom_algo_pannel = ttk.LabelFrame(self.SUB_TAB,text="") 
 
+		self.tms_pannel = ttk.LabelFrame(self.SUB_TAB,text="") 
+
 		self.SUB_TAB.add(self.custom_algo_pannel,text="AlgoAuthorization")
 		self.SUB_TAB.add(self.quick_spread_pannel,text="QuickSpread")
+
+		self.SUB_TAB.add(self.tms_pannel,text="TMS Simulation")
+
 		# self.TNV_TAB = ttk.Notebook(self.custom_algo_pannel)
 		# self.TNV_TAB.place(x=0,rely=0.01,relheight=1,width=640)
 
@@ -510,6 +515,7 @@ class UI(pannel):
 		self.init_bad_symbol_pannel()
 		self.init_quick_spread()
 
+		self.init_tms_simulation()
 
 	def init_strategy_filter(self):
 
@@ -1361,7 +1367,43 @@ class UI(pannel):
 
 		self.rebind(self.dev_canvas,self.deployment_frame)
 	
+	def init_tms_simulation(self):
 
+		c=1
+
+		ttk.Button(self.tms_pannel, text="Sim 1 1 Passive",command=self.manager.sim1).grid(sticky="w",column=1,row=1)
+		c+=1
+		ttk.Button(self.tms_pannel, text="Sim 2 2 Passive",command=self.manager.sim2).grid(sticky="w",column=1,row=c)
+		c+=1
+		ttk.Button(self.tms_pannel, text="Sim 3 3 Passive (div)",command=self.manager.sim3).grid(sticky="w",column=1,row=c)
+		c+=1
+		ttk.Button(self.tms_pannel, text="Sim 4 1 Aggressive",command=self.manager.sim4).grid(sticky="w",column=1,row=c)
+		c+=1
+		ttk.Button(self.tms_pannel, text="Sim 5 2 Aggressive",command=self.manager.sim5).grid(sticky="w",column=1,row=c)
+		c+=1
+
+		ttk.Button(self.tms_pannel, text="Sim 6 3 Aggresive (div)",command=self.manager.sim6).grid(sticky="w",column=1,row=c)
+		c+=1
+		ttk.Button(self.tms_pannel, text="Sim 7 MOO in",command=self.manager.sim7).grid(sticky="w",column=1,row=c)
+		c+=1
+		ttk.Button(self.tms_pannel, text="Sim 8 MOO out",command=self.manager.sim8).grid(sticky="w",column=1,row=c)
+		c+=1
+		ttk.Button(self.tms_pannel, text="Sim 9 MOC out",command=self.manager.sim9).grid(sticky="w",column=1,row=c)
+		c+=1
+
+		ttk.Button(self.tms_pannel, text="Sim 9 EURO MOC out",command=self.manager.sim9b).grid(sticky="w",column=1,row=c)
+		c+=1
+
+		ttk.Button(self.tms_pannel, text="Sim 10 init failutre",command=self.manager.sim10).grid(sticky="w",column=1,row=c)
+		c+=1
+		ttk.Button(self.tms_pannel, text="Sim 11 unable to get out position",command=self.manager.sim11).grid(sticky="w",column=1,row=c)
+		c+=1
+		ttk.Button(self.tms_pannel, text="Sim 12 accidental flat",command=self.manager.sim12).grid(sticky="w",column=1,row=c)
+		c+=1
+		ttk.Button(self.tms_pannel, text="Sim 13 accidental more shares",command=self.manager.sim13).grid(sticky="w",column=1,row=c)
+		c+=1
+		ttk.Button(self.tms_pannel, text="Sim 14 accidental less shares",command=self.manager.sim14).grid(sticky="w",column=1,row=c)
+		c+=1
 	def custom_algo_init(self):
 
 		self.TNV_TAB = ttk.Notebook(self.custom_algo_pannel)
