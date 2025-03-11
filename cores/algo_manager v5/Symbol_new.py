@@ -278,7 +278,7 @@ class Symbol:
 					if self.get_bid()!=0:
 						# no.2 pair off diff side. need.. hmm price .....!!!
 						self.pair_off(tps)
-						
+
 					return 1 
 
 
@@ -363,10 +363,10 @@ class Symbol:
 		else:
 			self.ppro_homeo = False 
 
-		log_print(self.source,self.symbol_name,f"Shares change {self.tp_difference} Tp balance: {self.tp_homeo} Ppro balance: {self.ppro_homeo}  ")
-
 		if self.tp_difference==0 and self.tp_homeo==True and self.ppro_homeo==True:
 			self.inspection_complete = True 
+
+		log_print(self.source,self.symbol_name,f"Shares change {self.tp_difference} Tp balance: {self.tp_homeo} Ppro balance: {self.ppro_homeo}  Inspection Complete {self.inspection_complete}")
 
 	def regulating_check_phase(self,tps):
 
@@ -947,7 +947,7 @@ class Symbol:
 	def pair_off(self,tps):
 
 
-		
+		print(self.source,self.symbol_name	," Pairing off check")
 		want = []
 
 		for tp in tps:
@@ -974,7 +974,7 @@ class Symbol:
 
 			for tp in tps: 
 				if self.tradingplans[tp].get_inspectable():
-					long_pair_off = self.tradingplans[tp].request_fufill(self.symbol_name,long_pair_off,self.data[BID])
+					long_pair_off = self.tradingplans[tp].request_fufill(self.symbol_name,long_pair_off,self.data[ASK])
 					if long_pair_off<=0:
 						break
 
@@ -984,7 +984,7 @@ class Symbol:
 					if short_pair_off>=0:
 						break
 
-			log_print(self.source,self.symbol_name	,"pair off,",want," amount", long_pair_off,short_pair_off)
+			log_print(self.source,self.symbol_name	,"pair off,",want," amount", long_pair_off,short_pair_off,self.data[BID])
 
 	def holdings_update(self,price,share):
 
