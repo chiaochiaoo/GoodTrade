@@ -2,6 +2,7 @@ from pannel import *
 from tkinter import ttk
 import tkinter as tk 
 from Symbol import *
+
 from TradingPlan_Basket import *
 from TradingPlan_Pair import *
 
@@ -1989,28 +1990,28 @@ class Manager:
 	def sim3(self):
 
 		name1 = 'SIM3-1'
-		orders1 = {'IWM.AM':10}
+		orders1 = {'IWM.AM':15}
 		risk = 0 
 		aggresive = False 
 		info = {}
 		self.apply_basket_cmd(name1,orders1,risk,aggresive,info)
 
 		name1 = 'SIM3-2'
-		orders1 = {'VOO.AM':10}
+		orders1 = {'VOO.AM':-15}
 		risk = 0 
 		aggresive = False 
 		info = {}
 		self.apply_basket_cmd(name1,orders1,risk,aggresive,info)
 
 		name1 = 'SIM3-3'
-		orders1 = {'IWM.AM':5}
+		orders1 = {'IWM.AM':-5}
 		risk = 0 
 		aggresive = False 
 		info = {}
 		self.apply_basket_cmd(name1,orders1,risk,aggresive,info)
 
 		name1 = 'SIM3-4'
-		orders1 = {'VOO.AM':-5}
+		orders1 = {'VOO.AM':5}
 		risk = 0 
 		aggresive = False 
 		info = {}
@@ -2052,27 +2053,27 @@ class Manager:
 		Aggresive , 4 position
 		""" 
 		name = 'SIM6-1'
-		orders = {'TQQQ.NQ':10}
+		orders = {'TQQQ.NQ':15}
 		risk = 0 
 		aggresive = True 
 		info = {}
 		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
 
 		name = 'SIM6-2'
-		orders = {'SQQQ.NQ':10}
+		orders = {'SQQQ.NQ':-15}
 		risk = 0 
 		aggresive = True 
 		info = {}
 		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
 		name = 'SIM6-3'
-		orders = {'TQQQ.NQ':5}
+		orders = {'TQQQ.NQ':-5}
 		risk = 0 
 		aggresive = True 
 		info = {}
 		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
 
 		name = 'SIM6-4'
-		orders = {'SQQQ.NQ':-5}
+		orders = {'SQQQ.NQ':5}
 		risk = 0 
 		aggresive = True 
 		info = {}

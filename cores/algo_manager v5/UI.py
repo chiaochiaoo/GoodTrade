@@ -1377,14 +1377,14 @@ class UI(pannel):
 			c+=1
 			ttk.Button(self.tms_pannel, text="Sim 2: 2 Passive QQQ 10 SPY -10",command=self.manager.sim2).grid(sticky="w",column=1,row=c)
 			c+=1
-			ttk.Button(self.tms_pannel, text="Sim 3: 3 Passive (div) IWM 10,5 VOO 10,-5",command=self.manager.sim3).grid(sticky="w",column=1,row=c)
+			ttk.Button(self.tms_pannel, text="Sim 3: 3 Passive (div) IWM 15,-5 VOO -15,5",command=self.manager.sim3).grid(sticky="w",column=1,row=c)
 			c+=1
 			ttk.Button(self.tms_pannel, text="Sim 4: 1 Aggressive QLD 10",command=self.manager.sim4).grid(sticky="w",column=1,row=c)
 			c+=1
 			ttk.Button(self.tms_pannel, text="Sim 5: 2 Aggressive QQQM 10 QQJ -5",command=self.manager.sim5).grid(sticky="w",column=1,row=c)
 			c+=1
 
-			ttk.Button(self.tms_pannel, text="Sim 6: 3 Aggresive (div) TQQQ 10,5, SQQQ 10,-5",command=self.manager.sim6).grid(sticky="w",column=1,row=c)
+			ttk.Button(self.tms_pannel, text="Sim 6: 3 Aggresive (div) TQQQ 15,-5, SQQQ -15,5",command=self.manager.sim6).grid(sticky="w",column=1,row=c)
 			c+=1
 			ttk.Button(self.tms_pannel, text="Sim 7: MOO in",command=self.manager.sim7).grid(sticky="w",column=1,row=c)
 			c+=1
