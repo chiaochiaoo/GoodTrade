@@ -330,7 +330,6 @@ class Manager:
 		log_print("Manager Updating Risk:",risk_)
 		self.set_risk = int(risk_)
 
-
 	def check_all_pnl(self):
 		tps = list(self.baskets.keys())
 		count = 0
@@ -348,7 +347,6 @@ class Manager:
 		log_print("Manager check pnl last period:",ts-self.last_pnl_check,"active algo:",count)
 
 		self.last_pnl_check= ts 
-
 
 	def set_gateway(self):
 
@@ -408,7 +406,6 @@ class Manager:
 		else:
 			log_print("Manager: DISASTER MODE INIT")
 			self.ui_root.config(bg='red')
-
 
 	def algo_as_is(self,algo_name):
 
@@ -577,7 +574,6 @@ class Manager:
 						log_print("Manager: Wrong Ticker format or BANNED:",symbol)
 		else:
 			log_print(basket_name,"already shutdown")
-
 
 	def return_selected_algo(self,symbol):
 
@@ -1669,7 +1665,6 @@ class Manager:
 
 		return msg
 
-
 	def output_active_tps(self):
 
 		msg = ""
@@ -1696,7 +1691,6 @@ class Manager:
 
 		self.send_email_admin(subject,body)
 
-	
 	def online_alert(self):
 
 		user = self.ui.user.get()
@@ -1826,7 +1820,6 @@ class Manager:
 		except	Exception	as e:
 			PrintException(e,"record loading error")
 
-
 	def take_records_concept(self):
 		### COUNT ALL EXISTING CONCEPT ###.
 
@@ -1895,7 +1888,6 @@ class Manager:
 		commision_q = int(sum(commisions[-63:]))
 
 		return concept,monthly,nets,manual_m,manual_q,commision_m,commision_q
-
 
 	def take_records(self,x):
 		
@@ -1967,6 +1959,39 @@ class Manager:
 			PrintException(e,"record error")
 		# 	now = datetime.now()
 		# 	ts = now.hour*3600 + now.minute*60 + now.second
+
+	####### SIMULATION PANNEL ########
+
+	def sim1(self):
+		pass
+	def sim2(self):
+		pass 
+	def sim3(self):
+		pass
+	def sim4(self):
+		pass 
+	def sim5(self):
+		pass
+	def sim6(self):
+		pass 
+	def sim7(self):
+		pass
+	def sim8(self):
+		pass 
+	def sim9(self):
+		pass
+	def sim9b(self):
+		pass
+	def sim10(self):
+		pass 
+	def sim11(self):
+		pass 
+	def sim12(self):
+		pass
+	def sim13(self):
+		pass 
+	def sim14(self):
+		pass 
 
 def force_close_port(port, process_name=None):
 	"""Terminate a process that is bound to a port.

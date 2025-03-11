@@ -1406,8 +1406,8 @@ class UI(pannel):
 			c+=1
 			ttk.Button(self.tms_pannel, text="Sim 14 accidental less shares",command=self.manager.sim14).grid(sticky="w",column=1,row=c)
 			c+=1
-		except:
-			pass
+		except Exception as e:
+			print(e)
 	def custom_algo_init(self):
 
 		self.TNV_TAB = ttk.Notebook(self.custom_algo_pannel)
