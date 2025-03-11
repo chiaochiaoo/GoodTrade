@@ -271,13 +271,14 @@ class Symbol:
 				if self.inspection_complete==True:
 					return 1 
 
+				if self.distributional_shares!=0:
+					self.distribution_phase(tps)
 
 				if self.tp_homeo==True:
 					self.regulating_check_phase(tps)
 
 				else:
-					if self.distributional_shares!=0:
-						self.distribution_phase(tps)
+
 		
 					self.aggregating_phase(tps)
 
