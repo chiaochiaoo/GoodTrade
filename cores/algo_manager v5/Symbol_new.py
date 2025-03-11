@@ -274,6 +274,11 @@ class Symbol:
 				self.status_checking_phase(tps)
 
 				if self.inspection_complete==True:
+
+					if self.get_bid()!=0:
+						# no.2 pair off diff side. need.. hmm price .....!!!
+						self.pair_off(tps)
+						
 					return 1 
 
 
@@ -940,6 +945,8 @@ class Symbol:
 		return self.difference
 
 	def pair_off(self,tps):
+
+
 		
 		want = []
 
