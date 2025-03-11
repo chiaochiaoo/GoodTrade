@@ -266,22 +266,21 @@ class Symbol:
 				self.inspection_complete = False 
 
 				self.orders_checking_phase()
+				#self.status_checking_phase(tps)
+
+				if self.distributional_shares!=0:
+					self.distribution_phase(tps)
+
 				self.status_checking_phase(tps)
 
 				if self.inspection_complete==True:
 					return 1 
 
-				if self.distributional_shares!=0:
-					self.distribution_phase(tps)
 
 				if self.tp_homeo==True:
 					self.regulating_check_phase(tps)
-
 				else:
-
-		
 					self.aggregating_phase(tps)
-
 
 				if self.request!=0:
 					self.ordering_phase()
