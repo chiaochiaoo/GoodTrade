@@ -96,7 +96,7 @@ class Symbol:
 		self.total_expected = 0
 
 
-		self.rejections = {}
+		self.rejections = []
 
 		"""
 
@@ -118,6 +118,7 @@ class Symbol:
 		self.regulating_phase = False 
 
 
+		self.rejection_counts = 0
 		### INSPECTION VARIABLES
 
 		self.inspection_complete = False 
@@ -131,6 +132,8 @@ class Symbol:
 		self.current_imbalance = 0
 
 		self.fill_time_remianing = 0
+
+		self.sms_ts = 0
 
 		# plus, minus, all the updates, all go here. 
 		# 1. on adding shares
@@ -344,7 +347,7 @@ class Symbol:
 		# check tp homeo.
 
 		if DEBUG_MODE:
-			log_print(self.source,self.symbol_name, "Debugging order checking",self.current_shares,self.distributional_shares,self.distributional_shares_prices)
+			log_print(self.source,self.symbol_name, "Debugging order checking", " Current ",self.current_shares, "Incoming ",self.distributional_shares)
 
 	def status_checking_phase(self,tps):
 
@@ -366,7 +369,7 @@ class Symbol:
 		if self.tp_difference==0 and self.tp_homeo==True and self.ppro_homeo==True:
 			self.inspection_complete = True 
 
-		log_print(self.source,self.symbol_name,f"Shares change {self.tp_difference} Tp balance: {self.tp_homeo} Ppro balance: {self.ppro_homeo}  Inspection Complete {self.inspection_complete}")
+		log_print(self.source,self.symbol_name,f"Shares change {self.tp_difference} Expect: {self.expected} Tp balance: {self.tp_homeo} Ppro balance: {self.ppro_homeo}  Inspection Complete {self.inspection_complete}")
 
 	def regulating_check_phase(self,tps):
 
@@ -465,7 +468,7 @@ class Symbol:
 
 			for tp in tps_:
 
-				print(self.source,self.symbol_name,"checking ",tp, self.tradingplans[tp].get_current_request(self.symbol_name))
+				log_print(self.source,self.symbol_name,"checking ",tp, self.tradingplans[tp].get_current_request(self.symbol_name))
 				self.distributional_shares = self.tradingplans[tp].request_fufill(self.symbol_name,self.distributional_shares,self.distributional_shares_prices	)
 
 				if self.distributional_shares ==0:
@@ -496,7 +499,16 @@ class Symbol:
 		3. 
 		"""
 
+		self.recent_rejection_check()
 
+		if self.rejection_counts>=2:
+			log_print(self.source,self.symbol_name," too much recent rejection detected. wait 1.")
+			return 
+
+		if self.market_out!=0:
+			self.market_out = 0
+			log_print(self.source,self.symbol_name, " just marked out. wait 1")
+			return 
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second
 
@@ -566,151 +578,6 @@ class Symbol:
 
 
 	#######################################
-
-
-	def distribution_phase2(self):
-
-		"""
-		get the shares to TP.
-
-		Dealing with the missmatching here is critical. 
-		"""
-
-		incoming_shares,avg_price = self.incoming_shares_calculate()  #shares received.
-
-		self.current_avgprice,self.current_shares = self.manager.get_position(self.symbol_name)   #current shares 
-		self.difference = self.current_shares - self.previous_shares
-
-		### THIS IS WHAT NEEDS TO BE DISTRIBUTED. if does not match, make a note. F ppro api.   THIS IS TO MATCH THE ORDERS. 
-
-		if self.difference!=incoming_shares:
-			log_print(self.source,self.symbol_name," DISCREPANCY : holding shares does not matching, ppro :", self.difference," incoming orders",incoming_shares, " Wait 0.1")
-
-			### reguest to update again.
-			time.sleep(1)
-			self.current_avgprice,self.current_shares = self.manager.get_position(self.symbol_name)
-			self.difference = self.current_shares - self.previous_shares
-			incoming_shares,avg_price = self.incoming_shares_calculate()
-
-			if abs(self.difference)>abs(incoming_shares):
-				log_print(self.source,self.symbol_name," DISCREPANCY : Missing OSTATS :", self.difference," incoming orders",incoming_shares, "Proceed")
-			else:
-				log_print(self.source,self.symbol_name," DISCREPANCY : More Fills but PPro update deplay :", self.difference," incoming orders",incoming_shares, " wait 0.1")
-
-				time.sleep(1)
-				self.current_avgprice,self.current_shares = self.manager.get_position(self.symbol_name)
-				self.difference = self.current_shares - self.previous_shares
-				incoming_shares,avg_price = self.incoming_shares_calculate()
-
-		if self.difference!=incoming_shares:
-			log_print(self.source,self.symbol_name," DISCREPANCY : PPRO POSITION and OSTATS NOT MATCHING. PROCEED.")
-
-		with self.incoming_shares_lock:
-			self.incoming_shares = {}
-
-
-		### now distribute the shares gained with TPs. ###
-
-		total_tp = list(self.tradingplans.keys())
-
-		now = datetime.now()
-		ts = now.hour*3600 + now.minute*60+ now.second
-
-
-		tps = {}
-
-		for tp in total_tp:
-			if self.tradingplans[tp].get_inspectable():
-				request_time = ts-self.tradingplans[tp].get_request_time(self.symbol_name)
-				tps[tp] =request_time
-
-		for tp in total_tp: #EVERYTHING ELSE.
-			if tp not in tps:
-				request_time = ts-self.tradingplans[tp].get_request_time(self.symbol_name)
-				tps[tp] =request_time
-
-		sorted_dict = dict(sorted(tps.items(), reverse=True))
-		tps = list(sorted_dict.keys())
-
-		for tp in tps:
-
-
-			print(self.source,self.symbol_name,"checking ",tp, self.tradingplans[tp].get_current_request(self.symbol_name))
-			self.difference = self.tradingplans[tp].request_fufill(self.symbol_name,self.difference,avg_price)
-
-			if self.difference ==0:
-				break
-
-		## if there is any non-distributed shares left ##
-
-		if self.difference!=0:
-			log_print(self.source,self.symbol_name," unable to distribute all shares:",self.difference)
-
-
-
-		self.previous_shares = self.current_shares
-
-	def symbol_inspection_old(self):
-
-		"""
-		For both load and unload
-		"""
-
-		if not self.inspection_lock.locked():
-			#log_print(self.symbol_name,"Inspecting:")
-			with self.inspection_lock:
-				# timestamp = self.get_ts()
-				# while (timestamp - self.last_order_timestamp<=2) or (timestamp -self.inspection_timestamp<=2):
-				# 	log_print(self.symbol_name,"inspection: inspection wait:",timestamp - self.last_order_timestamp,timestamp -self.inspection_timestamp)
-				# 	time.sleep(1)
-				# 	timestamp = self.get_ts()
-
-				
-				tps = list(self.tradingplans.keys())
-				self.update_stockprices(tps)
-
-				# CRITICAL SECTION. 
-				with self.incoming_shares_lock:
-
-
-					self.check_all_incrementals(tps)
-
-					if self.get_bid()!=0:
-						# no.2 pair off diff side. need.. hmm price .....!!!
-						self.pair_off(tps)
-
-
-					# no.3 pair orders. fill it in. 
-					#self.calc_inspection_differences(tps)
-
-
-					# no.4 get all current imbalance
-					self.calc_total_imbalances(tps)
-
-				now = datetime.now()
-				ts = now.hour*3600 + now.minute*60 + now.second
-
-				# Check again if there is any update. if there is, call it off. 
-
-				if self.difference==0:
-					self.sent_orders= False 
-
-				if self.holding_update==False:
-					if self.difference!=0 and ts<=57590:
-						self.inspection_timestamp = ts
-						self.deploy_orders(ts)
-						return 1
-
-					else:
-						self.action = ""
-				else:
-					#log_print(self.symbol_name," holding change detected. skipping ordering. estimate difference:",self.difference)
-					self.holding_update=False 
-
-			return 0
-		else:
-			log_print(self.symbol_name,"Inspection LOCKED")
-			return 0 
 
 
 	### TP DATA PART ###
@@ -946,8 +813,8 @@ class Symbol:
 
 	def pair_off(self,tps):
 
-		if DEBUG_MODE:
-			print(self.source,self.symbol_name	," Pairing off check")
+		# if DEBUG_MODE:
+		# 	print(self.source,self.symbol_name	," Pairing off check")
 		want = []
 
 		for tp in tps:
@@ -1161,6 +1028,12 @@ class Symbol:
 		if self.difference!=0:
 			self.ppro_out.send([self.action,self.symbol_name,abs(self.difference),0])
 
+	def recent_rejection_check(self):
+		now = datetime.now()
+		timestamp = now.hour*60 + now.minute 
+		
+		self.rejection_counts =  sum(1 for num in self.rejections if num > timestamp-2)
+
 	def rejection_message(self,side):
 
 		now = datetime.now()
@@ -1175,30 +1048,40 @@ class Symbol:
 
 		tps = list(self.tradingplans.keys())
 
-		#### FOR THE TP TRYING TO START THE POSITION. IGNORE. 
+		#### FOR THE TP TRYING TO START THE POSITION. IGNORE.  
 		for tp in tps:
 			if self.tradingplans[tp].having_request(self.symbol_name) and self.tradingplans[tp].get_holdings(self.symbol_name)==0:
 		 		self.tradingplans[tp].rejection_handling(self.symbol_name)
 
 		####### BUT IF IT IS DISCREPANCY? ##### ADD IT TO THE TP.  OR IGNORE? ####
 
+		self.rejections.append(timestamp)
 
-		if timestamp not in self.rejections:
-			self.rejections[timestamp] = 1 
-		else:
-			self.rejections[timestamp] +=1
+		self.recent_rejection_check()
 
-		if self.rejections[timestamp] >=3:
+		log_print(self.source,self.symbol_name," rejection detected. total:",len(self.rejections)," last 2:", self.rejection_counts)
+
+		if self.rejection_counts >=2:
 
 			### all tp as is.
 			tps = list(self.tradingplans.keys())
 
 			#### FOR THE TP TRYING TO START THE POSITION. IGNORE. 
+			log_print(self.source,self.symbol_name,'setting request tp as is')
+
+			affected = []
 			for tp in tps:
 				if self.tradingplans[tp].having_request(self.symbol_name) and self.tradingplans[tp].get_holdings(self.symbol_name)!=0:
-					self.tradingplans[tp].algo_as_is()
+					self.tradingplans[tp].algo_as_is(self.symbol_name)
+					affected.append(tp)
 
+			if timestamp != self.sms_ts:
+
+				self.manager.sms_alert(f'{self.symbol_name} \n Affected strategies: {str(affected)} \n Holdings: {str(self.current_shares)}')
+				self.sms_ts = timestamp
 			### discrepancy added. 
+
+
 
 	def cancel_all(self):
 
