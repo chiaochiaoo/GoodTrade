@@ -275,9 +275,9 @@ class Symbol:
 
 				if self.inspection_complete==True:
 
-					if self.get_bid()!=0:
+					#if self.get_bid()!=0:
 						# no.2 pair off diff side. need.. hmm price .....!!!
-						self.pair_off(tps)
+					self.pair_off(tps)
 
 					return 1 
 
@@ -946,8 +946,8 @@ class Symbol:
 
 	def pair_off(self,tps):
 
-
-		print(self.source,self.symbol_name	," Pairing off check")
+		if DEBUG_MODE:
+			print(self.source,self.symbol_name	," Pairing off check")
 		want = []
 
 		for tp in tps:
@@ -963,6 +963,11 @@ class Symbol:
 				n+=abs(i)
 		long_pair_off = min(p,n)
 
+		pairing_price = self.distributional_shares_prices
+
+		if pairing_price==0:
+			pairing_price = self.data[PRICE]
+
 		if long_pair_off>0:	
 
 			#log_print(self.source,self.symbol_name	,"pair off,",want," amount", long_pair_off,short_pair_off)
@@ -974,17 +979,17 @@ class Symbol:
 
 			for tp in tps: 
 				if self.tradingplans[tp].get_inspectable():
-					long_pair_off = self.tradingplans[tp].request_fufill(self.symbol_name,long_pair_off,self.data[ASK])
+					long_pair_off = self.tradingplans[tp].request_fufill(self.symbol_name,long_pair_off,pairing_price)
 					if long_pair_off<=0:
 						break
 
 			for tp in tps: 
 				if self.tradingplans[tp].get_inspectable():
-					short_pair_off = self.tradingplans[tp].request_fufill(self.symbol_name,short_pair_off,self.data[BID])
+					short_pair_off = self.tradingplans[tp].request_fufill(self.symbol_name,short_pair_off,pairing_price)
 					if short_pair_off>=0:
 						break
 
-			log_print(self.source,self.symbol_name	,"pair off,",want," amount", long_pair_off,short_pair_off,self.data[BID])
+			log_print(self.source,self.symbol_name	,"pair off,",want," amount", long_pair_off,short_pair_off,pairing_price)
 
 	def holdings_update(self,price,share):
 
