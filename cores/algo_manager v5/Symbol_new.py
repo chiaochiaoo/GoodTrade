@@ -96,6 +96,7 @@ class Symbol:
 		self.total_expected = 0
 
 
+		self.regulating_shares = 0
 		self.rejections = []
 
 		"""
@@ -369,7 +370,7 @@ class Symbol:
 		if self.tp_difference==0 and self.tp_homeo==True and self.ppro_homeo==True:
 			self.inspection_complete = True 
 
-		log_print(self.source,self.symbol_name,f"Shares change {self.tp_difference} Expect: {self.expected} Tp balance: {self.tp_homeo} Ppro balance: {self.ppro_homeo}  Inspection Complete {self.inspection_complete}")
+		log_print(self.source,self.symbol_name,f"Shares change {self.tp_difference} TP: {self.tp_current_shares} PPRO {self.current_shares} Expect: {self.expected} Tp balance: {self.tp_homeo} Ppro balance: {self.ppro_homeo}  Inspection Complete {self.inspection_complete}")
 
 	def regulating_check_phase(self,tps):
 
@@ -380,31 +381,33 @@ class Symbol:
 		this will only go through if self.tp == True. 
 		there could be share differences. 
 		"""
-
+		proceed = True 
 		if self.ppro_homeo!=True:
-			self.request = self.tp_current_shares-self.current_shares
-			self.regulating_shares =self.request
 
 
-			if self.regulating_shares == self.distributional_shares:
-				log_print(self.source,self.symbol_name," returning normal.")
-				self.regulating_shares = 0 
-				self.distributional_shares = 0 
+			for tp in tps:
+				if self.tradingplans[tp].get_inspectable()==False:
+					log_print(self.source,self.symbol_name," latent tp detected. skip regulating.")
+					proceed = False
+					break
+			### need to check if all are good to go.
+
+			if proceed:
+				self.request = self.tp_current_shares-self.current_shares
+				self.regulating_shares =self.request
 
 
-			log_print(self.source,self.symbol_name," Discrepancy on Symbol. Adjusting shares first.",self.regulating_shares)
+				if self.regulating_shares == self.distributional_shares:
+					log_print(self.source,self.symbol_name," returning normal.")
+					self.regulating_shares = 0 
+					self.distributional_shares = 0 
 
-		# if self.distributional_shares ==0:
-		# 	if self.current_shares !=self.tp_current_shares:
-		# 		self.request = self.current_shares - self.tp_current_shares
-		# 		self.regulating_shares =self.request
-		# 		self.regulating_phase = True  
-		# 		log_print(self.source,self.symbol_name," Discrepancy on Symbol. Adjusting shares first.",self.regulating_shares )
-		# else:
-		# 	self.regulating_phase = False 
 
-		if DEBUG_MODE:
-			log_print(self.source,self.symbol_name, "regulating phase:",self.regulating_shares)
+				log_print(self.source,self.symbol_name," Discrepancy on Symbol. Adjusting shares first.",self.regulating_shares)
+
+
+				if DEBUG_MODE:
+					log_print(self.source,self.symbol_name, "regulating phase:",self.regulating_shares)
 
 	def pairing_phase(self):
 
@@ -587,6 +590,7 @@ class Symbol:
 		current_shares = 0
 		expired =0
 		now = datetime.now()
+
 		ts = now.hour*3600 + now.minute*60 + now.second
 
 
@@ -1072,7 +1076,7 @@ class Symbol:
 			affected = []
 			for tp in tps:
 				if self.tradingplans[tp].having_request(self.symbol_name) and self.tradingplans[tp].get_holdings(self.symbol_name)!=0:
-					self.tradingplans[tp].algo_as_is(self.symbol_name)
+					self.tradingplans[tp].algo_as_is()
 					affected.append(tp)
 
 			if timestamp != self.sms_ts:
