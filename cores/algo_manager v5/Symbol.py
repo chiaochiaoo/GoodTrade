@@ -750,6 +750,9 @@ class Symbol:
 						if adjustment <0.01:
 							adjustment = 0.01 
 
+						if adjustment>3:
+							adjustment = 3
+
 					if self.action==PASSIVESELL:
 						adjustment = adjustment*-1
 						
