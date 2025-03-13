@@ -27,7 +27,7 @@ PRICE = "Price"
 
 
 
-DEBUG_MODE = True 
+DEBUG_MODE = False 
 class Symbol:
 
 	#Symbol class tracks every data related to the symbol. Output it in a dictionary form.
@@ -253,6 +253,10 @@ class Symbol:
 	### INSPECTION MOUDULE ###
 	def symbol_inspection(self):
 
+		"""
+		If an order is placed. return 1, else then 0.
+		"""
+
 		if not self.inspection_lock.locked():
 
 			with self.inspection_lock:
@@ -283,7 +287,7 @@ class Symbol:
 						# no.2 pair off diff side. need.. hmm price .....!!!
 					self.pair_off(tps)
 
-					return 1 
+					return 0 
 
 
 				if self.tp_homeo==True:
@@ -291,11 +295,9 @@ class Symbol:
 				else:
 					self.aggregating_phase(tps)
 
-				if self.request!=0:
-					self.ordering_phase()
+				if self.request!=0 and self.manager.open_order_check==True and ts<=57540:
+					return self.ordering_phase()
 
-
-				return 1
 				#####   AGGRAGATING PHASE   #####
 
 
@@ -506,12 +508,12 @@ class Symbol:
 
 		if self.rejection_counts>=2:
 			log_print(self.source,self.symbol_name," too much recent rejection detected. wait 1.")
-			return 
+			return 0
 
 		if self.market_out!=0:
 			self.market_out = 0
 			log_print(self.source,self.symbol_name, " just marked out. wait 1")
-			return 
+			return 0
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second
 
@@ -573,13 +575,16 @@ class Symbol:
 
 					self.ppro_out.send([self.action,self.symbol_name,total,adjustment,self.manager.gateway])
 					self.sent_orders = True 
+
+
+			return 1
 				# else:
 				# 	log_print(self.source,self.symbol_name,"NO CHANGE DETECTED, skipping.")
 
 		# handl = threading.Thread(target=self.threading_order,daemon=True)
 		# handl.start()
 
-
+		return 0
 	#######################################
 
 
