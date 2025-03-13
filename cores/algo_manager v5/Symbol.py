@@ -745,6 +745,10 @@ class Symbol:
 					adjustment = 0 
 
 					if self.data['SPREAD']>0.01:
+
+						if self.fill_time_remianing>1:
+							self.fill_time_remianing=1
+							
 						adjustment = round((self.fill_time_remianing)*self.data['SPREAD'],2) # % of spread.
 
 						if adjustment <0.01:
