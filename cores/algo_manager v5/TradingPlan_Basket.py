@@ -1008,14 +1008,6 @@ class TradingPlan_Basket:
 		# else:
 		# 	self.rejection_counts[symbol] +=1
 
-		if symbol not in self.rejection_counts:
-			self.rejection_counts[symbol] = 1
-		else:
-			self.rejection_counts[symbol] +=1
-
-		if self.rejection_counts[symbol]>1:
-			self.expected_shares[symbol] = 0
-			self.banned.append(symbol)
 		# if self.rejection_counts[symbol]>1:
 		self.expected_shares[symbol] = 0
 		self.banned.append(symbol)
