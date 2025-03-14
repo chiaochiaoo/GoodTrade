@@ -1,4 +1,5 @@
 from Symbol import *
+# from Symbol_new import *
 #from Triggers import *
 # from Strategy import *
 # from Strategy_Management import *
@@ -563,10 +564,8 @@ class TradingPlan_Basket:
 					self.expected_shares[symbol] = self.current_shares[symbol]
 					self.current_request[symbol] = 0
 
-					## IF THERE IS REQUEST> CANCEL IT.
-
-					self.symbols[symbol].cancel_request()
-
+				## IF THERE IS REQUEST> CANCEL IT.
+				self.symbols[symbol].cancel_request()
 
 	def recalculate_current_request(self,symbol):
 		diff = self.expected_shares[symbol] - self.current_shares[symbol]
@@ -1032,6 +1031,8 @@ class TradingPlan_Basket:
 		for symbol,item in self.symbols.items():
 			self.submit_expected_shares(symbol,0,self.aggresive_exit)
 
+			self.expected_shares[symbol] = 0
+			self.recalculate_current_request(symbol)
 		self.tkvars[ALGO_MULTIPLIER].set(0)
 		self.flatten_order=True
 		self.turn_on_inspection()

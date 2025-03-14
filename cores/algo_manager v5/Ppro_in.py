@@ -166,6 +166,7 @@ def periodical_check(pipe,port):
 
 	c = 0
 
+	open_order_count = 0
 	status = False 
 	while True:
 		
@@ -210,7 +211,12 @@ def periodical_check(pipe,port):
 					### 3. send request for summary PNL
 
 					if c%5==0:
-						log_print(get_current_orders())
+						accepted_orders = get_current_orders()
+						log_print(accepted_orders)
+
+						if 'Accepted' in accepted_orders:
+							open_order_count = accepted_orders['Accepted']
+
 					threading_request("http://127.0.0.1:8080/Get?type=tool&tool=Summary_1&key=NCSA%20Equity")
 
 
@@ -240,7 +246,7 @@ def periodical_check(pipe,port):
 
 					### RETURN BUS. 
 					c+=1
-					pipe.send([POSITION_UPDATE,positions,user])
+					pipe.send([POSITION_UPDATE,positions,user,open_order_count])
 
 		except Exception as e:
 			PrintException(e,"periodical_check error ")

@@ -1398,6 +1398,8 @@ class UI(pannel):
 
 			ttk.Button(self.tms_pannel, text="Sim 10: init failutre",command=self.manager.sim10).grid(sticky="w",column=1,row=c)
 			c+=1
+			ttk.Button(self.tms_pannel, text="Sim 10b: symbol order checking under rejection",command=self.manager.sim10b).grid(sticky="w",column=1,row=c)
+			c+=1
 			ttk.Button(self.tms_pannel, text="Sim 11: unable to get out position",command=self.manager.sim11).grid(sticky="w",column=1,row=c)
 			c+=1
 			ttk.Button(self.tms_pannel, text="Sim 12: accidental flat",command=self.manager.sim12).grid(sticky="w",column=1,row=c)
@@ -1405,6 +1407,10 @@ class UI(pannel):
 			ttk.Button(self.tms_pannel, text="Sim 13: accidental more shares",command=self.manager.sim13).grid(sticky="w",column=1,row=c)
 			c+=1
 			ttk.Button(self.tms_pannel, text="Sim 14: accidental less shares",command=self.manager.sim14).grid(sticky="w",column=1,row=c)
+			c+=1
+			ttk.Button(self.tms_pannel, text="Sim 15: missing ostats",command=self.manager.sim15).grid(sticky="w",column=1,row=c)
+			c+=1
+			ttk.Button(self.tms_pannel, text="Sim 16: ppro disconnect",command=self.manager.sim16).grid(sticky="w",column=1,row=c)
 			c+=1
 		except Exception as e:
 			print(e)
