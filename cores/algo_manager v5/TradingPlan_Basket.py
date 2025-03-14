@@ -1003,6 +1003,10 @@ class TradingPlan_Basket:
 	# need to know which symbol got rejected. cancel the request. 
 	def rejection_handling(self,symbol):
 
+		# if symbol not in self.rejection_counts:
+		# 	self.rejection_counts[symbol] = 1
+		# else:
+		# 	self.rejection_counts[symbol] +=1
 
 		if symbol not in self.rejection_counts:
 			self.rejection_counts[symbol] = 1
@@ -1012,8 +1016,12 @@ class TradingPlan_Basket:
 		if self.rejection_counts[symbol]>1:
 			self.expected_shares[symbol] = 0
 			self.banned.append(symbol)
+		# if self.rejection_counts[symbol]>1:
+		self.expected_shares[symbol] = 0
+		self.banned.append(symbol)
 
 			log_print(self.source," BANNED:",symbol)
+		log_print(self.source," BANNED:",symbol)
 
 	def get_flatten_order(self):
 
