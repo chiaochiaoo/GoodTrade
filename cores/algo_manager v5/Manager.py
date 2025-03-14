@@ -2,7 +2,6 @@ from pannel import *
 from tkinter import ttk
 import tkinter as tk 
 from Symbol import *
-
 from TradingPlan_Basket import *
 from TradingPlan_Pair import *
 
@@ -47,6 +46,13 @@ except ImportError:
 	pip.main(['install', 'psutil'])
 	import psutil
 
+try:
+	from twilio.rest import Client
+except ImportError:
+	import pip
+	pip.main(['install','twilio'])
+	from twilio.rest import Client
+
 from psutil import process_iter
 
 #May this class bless by the Deus Mechanicus.
@@ -60,6 +66,9 @@ from psutil import process_iter
 
 
 TEST = True
+
+
+
 
 
 def request(post):
@@ -139,6 +148,11 @@ class Manager:
 
 		self.manage_lock = 0
 
+		self.open_order_count = 0
+		self.current_position_number = 0
+		self.open_order_check = True
+
+
 		self.algo_limit = 200 #199
 
 		self.spread_check = {}
@@ -148,6 +162,8 @@ class Manager:
 		self.last_pnl_check = 0
 
 		""" POSITION DATA """
+
+		self.OSTAT_MULTIPLIER = 1 
 
 		# no need to use lock. everytime need to read. just obtain copy. 
 
@@ -372,6 +388,8 @@ class Manager:
 
 		# HERE I NEED. A. HARD LIMIT.... 40 ??? 
 
+		# inspection on halt when self.open_order_count exceeds a limit. 
+
 		if self.disaster_mode.get()!=1:
 			self.ui_root.config(bg='light grey')
 			if self.symbol_inspection_lock.locked()==False and self.symbol_inspection_start==True:
@@ -383,24 +401,31 @@ class Manager:
 				time.sleep(0.5)
 				# residue.
 				# if residue is 0. no more cancel. 
-				with self.symbol_inspection_lock:
-					symbols = list(self.symbol_data.values())
-					c= 0
-					for val in symbols:
 
-						#print("inspecting:",val)
-						try:
-							c+=val.symbol_inspection()
-							#self.total_difference+=abs(val.get_difference())
-							if c>=30:
-								break
-								log_print("ORDERING LIMIT REACHED.")
-						except Exception as e:
-							PrintException(e,"inspection error")
+				if self.open_order_count> (len(self.symbol_data)*2+5):
+					log_print("Manager:","existing order amount exceed expection.", self.open_order_count," limit: ",len(self.symbol_data)*2+5)
+					self.open_order_check = False 
+				else:
+					self.open_order_check = True
+					with self.symbol_inspection_lock:
+						symbols = list(self.symbol_data.values())
+						c= 0
+						for val in symbols:
 
-					self.total_difference = c 
+							#print("inspecting:",val)
+							try:
+								c+=val.symbol_inspection()
+								#self.total_difference+=abs(val.get_difference())
+								if c>=30:
+									log_print("ORDERING LIMIT REACHED.")
+									break
+									
+							except Exception as e:
+								PrintException(e,"inspection error")
 
-				#log_print("Manager: performing symbols inspection compelte, total difference:",self.total_difference, "order counts:",c)
+						self.total_difference = c 
+
+				log_print("Manager: performing symbols inspection compelte total inspected",len(self.symbol_data)," total orders sent:",self.total_difference, "open order counts:",self.open_order_count)
 			else:
 				log_print("Manager: previous symbols inspection not finished. skip.")
 		else:
@@ -1381,14 +1406,22 @@ class Manager:
 					positions = d[1]
 					user = d[2]
 
+					open_order_count = d[3]
+
 					now = datetime.now()
 					ts = now.hour*60 + now.minute
 
 					self.current_positions = positions
 
+
+					self.open_order_count = open_order_count
+
 					self.ui.user.set(user)
 					self.ui.position_count.set(len(self.current_positions))
 					self.ui.account_status["background"] =self.ui.deployment_frame.cget("background")
+
+
+					
 					#log_print("Position updates:",len(positions),positions)
 
 					count +=1 
@@ -1479,6 +1512,9 @@ class Manager:
 				if self.rejection_count%5==0:
 					self.rejection_alert(self.ui.user.get())
 
+				if self.rejection_count>10:
+					self.disaster_mode.set(1)
+
 			elif d[0] =="shutdown":
 				break
 
@@ -1492,7 +1528,11 @@ class Manager:
 				side = data["side"]
 
 				## HERE. Append it to the new symbol warehouse system. 
-				log_print("Manager: Holding update:",symbol,price,shares,side)
+				#log_print("Manager: Holding update:",symbol,price,shares,side)
+
+				#print("OSTATS:",self.OSTAT_MULTIPLIER)
+
+				shares = int(shares*self.OSTAT_MULTIPLIER)
 
 				try:
 					if symbol in self.symbols:
@@ -1673,6 +1713,15 @@ class Manager:
 				msg+=basket+" : " + str(val.data[UNREAL]) + " | " + str(val.data[REALIZED]) +"   "+ str(val.current_shares)+ "\n"
 
 		return msg 
+
+	def sms_alert(self,msg):
+
+		account_sid = 'AC9d09d6560c043d9a6eb4c1fd5e4feaa4'
+		auth_token = '51d34b023cce28fd67d14f846584baa3'
+		client = Client(account_sid, auth_token)
+
+		msg = "GoodTrade Algo Manager: \n" + " User "+self.ui.user.get()+ " algo issue with \n" + msg
+		message = client.messages.create(from_='+12542683847',body=msg,to='+16475151630')
 
 	def periodical_status(self):
 
@@ -2023,7 +2072,7 @@ class Manager:
 		Aggresive , 1 position
 		"""
 		name = 'SIM4'
-		orders = {'QLD.NQ':10}
+		orders = {'QLD.AM':10}
 		risk = 0 
 		aggresive = True 
 		info = {}
@@ -2082,23 +2131,172 @@ class Manager:
 
 
 	def sim7(self):
+		### MOO in
 		pass
+
+		
 	def sim8(self):
+		### MOO out
 		pass 
+
+		
 	def sim9(self):
+		### MOC out
 		pass
+
+		
 	def sim9b(self):
+		### MOC EURO OUT
 		pass
+
 	def sim10(self):
-		pass 
+
+		# init failure 
+		name = 'SIM - Init Failutre'
+		orders = {'FART.NQ':10}
+		risk = 0 
+		aggresive = False 
+		info = {}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
+
+
+	def sim10b(self):
+
+		# init failure 
+		name = 'SIM - Symbol Order Checking'
+		orders = {'AAL.NQ':10}
+		risk = 0 
+		aggresive = True 
+		info = {}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
+		rec = threading.Thread(target=self.sim10b_leg2,daemon=True)
+		rec.start()
+
+	def sim10b_leg2(self):
+		name = 'SIM - Symbol Order Checking'
+		time.sleep(5)
+		#
+		reque = "http://127.0.0.1:8080/ExecuteOrder?symbol=AAL.NQ&limitprice=0&ordername=ARCA%20Buy%20ARCX%20Limit%20DAY&shares=10"
+		requests.post(reque)
+
+		reque = "http://127.0.0.1:8080/ExecuteOrder?symbol=AAL.NQ&limitprice=0&ordername=ARCA%20Buy%20ARCX%20Limit%20DAY&shares=10"
+		requests.post(reque)
+
+		time.sleep(5)
+		self.baskets[name].flatten_cmd()
+
 	def sim11(self):
+
+		# unable to get out 
 		pass 
+
+		name = 'SIM - Position Managing Failure:AAL'
+		orders = {'AAL.NQ':10}
+		risk = 0 
+		aggresive = True 
+		info = {}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
+
+		#### ??? ####
+		rec = threading.Thread(target=self.sim11_leg2,daemon=True)
+		rec.start()
+		
+	def sim11_leg2(self):
+
+		name = 'SIM - Position Managing Failure:AAL'
+		time.sleep(10)
+		#
+		reque = "http://127.0.0.1:8080/ExecuteOrder?symbol=AAL.NQ&limitprice=0&ordername=ARCA%20Buy%20ARCX%20Limit%20DAY&shares=10"
+		requests.post(reque)
+
+		self.baskets[name].flatten_cmd()
+
+		time.sleep(0.5)
+		reque = "http://127.0.0.1:8080/ExecuteOrder?symbol=AAL.NQ&limitprice=0&ordername=ARCA%20Buy%20ARCX%20Limit%20DAY&shares=10"
+		requests.post(reque)
+
+		time.sleep(0.5)
+		reque = "http://127.0.0.1:8080/ExecuteOrder?symbol=AAL.NQ&limitprice=0&ordername=ARCA%20Buy%20ARCX%20Limit%20DAY&shares=10"
+		requests.post(reque)
+
+		
+
 	def sim12(self):
-		pass
+
+		# accidental flat 
+		
+		name = 'SIM - Position Order Failure AAPL'
+		orders = {'AAPL.NQ':10}
+		risk = 0 
+		aggresive = True 
+		info = {}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
+
+		self.pipe_ppro_out.send([FLATTEN,'AAPL.NQ'])
+
+
 	def sim13(self):
-		pass 
+
+		# accidental more shares 
+		name = 'SIM - unintended bigger position AMD'
+		orders = {'AMD.NQ':10}
+		risk = 0 
+		aggresive = True 
+		info = {}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
+
+		self.pipe_ppro_out.send([IOCBUY,'AMD.NQ',abs(5),0]) 
+
 	def sim14(self):
-		pass 
+		
+		# accidental less shares 
+		name = 'SIM - unintended bigger position NVDA'
+		orders = {'NVDA.NQ':10}
+		risk = 0 
+		aggresive = True 
+		info = {}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
+
+		self.pipe_ppro_out.send([IOCSELL,'NVDA.NQ',abs(5),0]) 
+
+	def sim15(self):
+		
+		# missing ostats
+		
+
+		self.OSTAT_MULTIPLIER = 0.5
+
+		name = 'SIM - missing OSTATS VOO'
+		orders = {'VOO.AM':30,'IWM.AM':-30}
+		risk = 0 
+		aggresive = True 
+		info = {}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
+
+		rec = threading.Thread(target=self.sim15_step2,daemon=True)
+		rec.start()
+
+	def sim15_step2(self):
+		time.sleep(5)
+		name = 'SIM - missing OSTATS VOO'
+		self.baskets[name].flatten_cmd()
+
+		time.sleep(5)
+
+		self.OSTAT_MULTIPLIER = 1
+
+	def sim16(self):
+		
+		# ppro disconnect
+
+		name = 'SIM - missing OSTATS VOO'
+		orders = {'VOO.AM':30,'IWM.AM':-30}
+		risk = 0 
+		aggresive = True 
+		info = {}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
+
+		### ### ### POSITION UPDATE IS THE KEY. 
 
 def force_close_port(port, process_name=None):
 	"""Terminate a process that is bound to a port.
@@ -2154,7 +2352,7 @@ if __name__ == '__main__':
 
 
 	root = tk.Tk()
-	root.title("SelectTrade Algo Manager v5 b4")
+	root.title("SelectTrade Algo Manager v5 b5")
 	#root.geometry("1350x1080")
 	root.geometry("1570x1280")
 	
