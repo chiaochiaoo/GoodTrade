@@ -1012,7 +1012,6 @@ class TradingPlan_Basket:
 		self.expected_shares[symbol] = 0
 		self.banned.append(symbol)
 
-			log_print(self.source," BANNED:",symbol)
 		log_print(self.source," BANNED:",symbol)
 
 	def get_flatten_order(self):
