@@ -1512,7 +1512,7 @@ class Manager:
 				if self.rejection_count%5==0:
 					self.rejection_alert(self.ui.user.get())
 
-				if self.rejection_count>10:
+				if self.rejection_count>20:
 					self.disaster_mode.set(1)
 
 			elif d[0] =="shutdown":
