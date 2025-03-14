@@ -321,6 +321,7 @@ def buy_aggressive_limit_order(symbol,share,ask):
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&priceadjust=0.05&ordername=AEQN Buy AequitasLIT Limit Near Broker DAY&shares='+str(share)
 	else:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&priceadjust=0.05&ordername=ARCA Buy ARCX Limit Near IOC&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&priceadjust=0&ordername=ARCA Buy ARCX Limit Far IOC&shares='+str(share)
 	sucess='Agrresive limit buy order success on'+symbol
 	failure="Error buy order on"+symbol
 
@@ -345,7 +346,7 @@ def short_aggressive_limit_order(symbol,share,bid):
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&priceadjust=-0.05&ordername=AEQN Sell->Short AequitasLIT Limit Near Broker DAY&shares='+str(share)
 	else:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&priceadjust=-0.05&ordername=ARCA Sell->Short ARCX Limit Near IOC&shares='+str(share)
-
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&priceadjust=0&ordername=ARCA Sell->Short ARCX Limit Far IOC&shares='+str(share)
 	sucess='Aggresive limit sell order success on'+symbol
 	failure="Error buy order on"+symbol
 
