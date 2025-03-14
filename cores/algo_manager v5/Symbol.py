@@ -100,6 +100,7 @@ class Symbol:
 
 		self.rejections = {}
 
+		self.total_rejection = 0
 		"""
 
 
@@ -231,8 +232,10 @@ class Symbol:
 				if self.holding_update==False:
 					if self.difference!=0 and ts<=57590:
 						self.inspection_timestamp = ts
-						self.deploy_orders(ts)
-						return 1
+
+						if self.total_rejection<=2:
+							self.deploy_orders(ts)
+							return 1
 
 					else:
 						self.action = ""
@@ -752,6 +755,9 @@ class Symbol:
 		else:
 			self.rejections[timestamp] +=1
 
+
+		self.total_rejection+=1
+
 		if self.rejections[timestamp] >=2:
 
 			### all tp as is.
@@ -763,6 +769,8 @@ class Symbol:
 					self.tradingplans[tp].algo_as_is()
 
 			### discrepancy added. 
+
+			###
 
 	def cancel_all(self):
 
