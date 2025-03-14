@@ -816,7 +816,7 @@ class Symbol:
 		else:
 			self.rejections[timestamp] +=1
 
-		if self.rejections[timestamp] >=3:
+		if self.rejections[timestamp] >=2:
 
 			### all tp as is.
 			tps = list(self.tradingplans.keys())
