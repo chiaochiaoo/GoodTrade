@@ -1087,7 +1087,7 @@ class Symbol:
 					self.tradingplans[tp].algo_as_is()
 					affected.append(tp)
 
-			if timestamp != self.sms_ts:
+			if timestamp != self.sms_ts and self.rejection_counts >=2:
 
 				self.manager.sms_alert(f'{self.symbol_name} \n Affected strategies: {str(affected)} \n Holdings: {str(self.current_shares)}')
 				self.sms_ts = timestamp
