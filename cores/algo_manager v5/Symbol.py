@@ -262,7 +262,7 @@ class Symbol:
 			with self.inspection_lock:
 
 				tps = list(self.tradingplans.keys())
-
+				self.request = 0
 
 				#####   DISTRIBUTION PHASE   #####
 
@@ -432,8 +432,8 @@ class Symbol:
 		self.expected = self.get_all_expected(tps)
 		self.request =  self.expected - self.tp_current_shares
 
-		if DEBUG_MODE:
-			log_print(self.source,self.symbol_name, "have",self.tp_current_shares," want",self.expired," request",self.request)
+		#if DEBUG_MODE:
+		log_print(self.source,self.symbol_name, "have",self.tp_current_shares," want",self.expired," request",self.request)
 
 	def distribution_phase(self,tps):
 
