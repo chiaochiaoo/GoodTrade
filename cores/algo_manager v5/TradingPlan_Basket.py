@@ -1035,7 +1035,7 @@ class TradingPlan_Basket:
 			self.recalculate_current_request(symbol)
 		self.tkvars[ALGO_MULTIPLIER].set(0)
 		self.flatten_order=True
-		self.turn_on_inspection()
+		#self.turn_on_inspection()
 
 	""" Deployment initialization """
 
