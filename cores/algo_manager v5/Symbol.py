@@ -262,7 +262,7 @@ class Symbol:
 			with self.inspection_lock:
 
 				tps = list(self.tradingplans.keys())
-				self.request = 0
+
 
 				#####   DISTRIBUTION PHASE   #####
 
@@ -290,6 +290,8 @@ class Symbol:
 					return 0 
 
 
+				self.request = 0
+				
 				if self.tp_homeo==True:
 					self.regulating_check_phase(tps)
 				else:
