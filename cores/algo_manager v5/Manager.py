@@ -1509,8 +1509,9 @@ class Manager:
 
 				self.rejection_count+=1
 				log_print("Rejection count:",self.rejection_count)
-				# if self.rejection_count%5==0:
-				# 	self.rejection_alert(self.ui.user.get())
+				
+				if self.rejection_count%5==0:
+					self.rejection_alert(self.ui.user.get())
 
 				# if self.rejection_count>20:
 				# 	self.disaster_mode.set(1)
