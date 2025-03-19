@@ -206,7 +206,9 @@ class TradingPlan_Basket:
 			if "AP" == self.algo_name[:2]:
 				self.inspectable = False 
 				self.one_shot_algo = True 
+
 			if "OB" == self.algo_name[:2]:
+
 				self.inspectable = False
 				self.one_shot_algo = True 
 
@@ -229,6 +231,15 @@ class TradingPlan_Basket:
 		else:
 
 			if "HALT" in self.algo_name:
+				self.inspectable = False 
+
+			if "TEST_MOO_IN" in self.algo_name:
+				self.inspectable = False 
+
+			if "TEST_MOO_OUT" in self.algo_name:
+				self.manual_flattable = True
+
+			if "TEST_MOC_OUT" in self.algo_name:
 				self.inspectable = False 
 
 		log_print(self.source," Initializing:, Manual flattable:",self.manual_flattable," Inspectable:",self.inspectable)
@@ -619,7 +630,7 @@ class TradingPlan_Basket:
 				
 				#self.manager.new_record(self)
 			else:
-				log_print("HOLDING UPDATE ERROR")
+				log_print("HOLDING UPDATE ERROR",symbol,share_added,price)
 
 		self.data[REALIZED] = round(self.data[REALIZED],2)
 		self.tkvars[REALIZED].set(str(self.data[REALIZED]))
