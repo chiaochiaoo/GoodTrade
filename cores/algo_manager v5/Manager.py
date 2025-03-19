@@ -2231,7 +2231,7 @@ class Manager:
 		rec = threading.Thread(target=self.sim10b_leg2,daemon=True)
 		rec.start()
 
-	def sim1☺0b_leg2(self):
+	def sim10b_leg2(self):
 		name = 'SIM - Symbol Order Checking'
 		time.sleep(5)
 		#
