@@ -584,7 +584,7 @@ def ppro_request(request_str,sucess_str,failure_str,symbol,pipe,is_order):
 
 						log_print("Rejected:",symbol)
 
-						#pipe.send(["order rejected",data])
+						pipe.send(["order rejected",data])
 
 
 					# elif "Pending" in r.text or "Filled" in r.text or "Accepted" in r.text:
