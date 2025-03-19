@@ -1509,7 +1509,7 @@ class Manager:
 
 				self.rejection_count+=1
 				log_print("Rejection count:",self.rejection_count)
-				
+
 				if self.rejection_count%5==0:
 					self.rejection_alert(self.ui.user.get())
 
@@ -2133,23 +2133,72 @@ class Manager:
 
 	def sim7(self):
 		### MOO in
-		pass
+		
 
-		# moo in 
 
-		name = 'SIM6-4'
-		orders = {'SQQQ.NQ':5}
+		# if "TEST_MOO_IN" in self.algo_name:
+		# 	self.inspectable = False 
+
+		# if "TEST_MOO_OUT" in self.algo_name:
+		# 	self.inspectable = False 
+
+		# if "TEST_MOC_OUT" in self.algo_name:
+		# 	self.inspectable = False 
+
+		name = 'SIM7-TEST_MOO_IN'
+		orders = {'QQQ.NQ':50}
 		risk = 0 
-		aggresive = True 
+		aggresive = False 
 		info = {}
 		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
+		rec = threading.Thread(target=self.sim7_leg2,daemon=True)
+		rec.start()
+
+	def sim7_leg2(self):
+
+		time.sleep(10)
+
+		reque = "http://127.0.0.1:8080/ExecuteOrder?symbol=QQQ.NQ&ordername=ARCA Buy ARCX Market DAY&shares=55"
+		requests.post(reque)
+		name = 'SIM7-TEST_MOO_IN'
+		time.sleep(10)
+		self.baskets[name].turn_on_inspection()
 
 
 	def sim8(self):
-		### MOO out
-		pass 
-		# moo out 
-		
+
+
+		name = 'SIM8-TEST_MOO_OUT'
+		orders = {'SPY.AM':-50}
+		risk = 0 
+		aggresive = True 
+		info = {}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info)
+
+
+		name = 'SIM8-TEST_MOO_OUT2'
+		orders = {'VOO.AM':-50}
+		risk = 0 
+		aggresive = True 
+		info = {}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info)
+
+
+		rec = threading.Thread(target=self.sim8_leg2,daemon=True)
+		rec.start()
+
+	def sim8_leg2(self):
+
+		time.sleep(5)
+
+		reque = "http://127.0.0.1:8080/ExecuteOrder?symbol=SPY.AM&ordername=ARCA Buy ARCX Market DAY&shares=55"
+		requests.post(reque)
+
+		reque = "http://127.0.0.1:8080/ExecuteOrder?symbol=VOO.AM&ordername=ARCA Buy ARCX Market DAY&shares=50"
+		requests.post(reque)
+		#self.baskets[name].turn_on_inspection()
+
+
 	def sim9(self):
 		### MOC out
 		pass
@@ -2182,7 +2231,7 @@ class Manager:
 		rec = threading.Thread(target=self.sim10b_leg2,daemon=True)
 		rec.start()
 
-	def sim10b_leg2(self):
+	def sim1☺0b_leg2(self):
 		name = 'SIM - Symbol Order Checking'
 		time.sleep(5)
 		#
