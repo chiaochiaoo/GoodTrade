@@ -188,7 +188,7 @@ class Manager:
 		self.cmd_text = tk.StringVar(value="Status:")
 
 		self.disaster_mode = tk.BooleanVar(value=0)
-
+		self.stop_more_algos = tk.BooleanVar(value=0)
 		self.subdollar_check = tk.BooleanVar(value=1)
 		self.nq_only = tk.BooleanVar(value=0)
 
@@ -1258,7 +1258,7 @@ class Manager:
 
 						# stop,
 
-					if self.net > self.set_risk*-1 and self.system_enable:
+					if self.net > self.set_risk*-1 and self.system_enable and self.stop_more_algos.get()==False and self.disaster_mode.get()==False:
 						if confirmation:
 							#log_print("basket update:",d)
 							#log_print(d[1],confirmation,orders,risk,aggresive)
@@ -1509,8 +1509,8 @@ class Manager:
 
 				self.rejection_count+=1
 				log_print("Rejection count:",self.rejection_count)
-				if self.rejection_count%5==0:
-					self.rejection_alert(self.ui.user.get())
+				# if self.rejection_count%5==0:
+				# 	self.rejection_alert(self.ui.user.get())
 
 				# if self.rejection_count>20:
 				# 	self.disaster_mode.set(1)
@@ -2134,16 +2134,25 @@ class Manager:
 		### MOO in
 		pass
 
-		
+		# moo in 
+
+		name = 'SIM6-4'
+		orders = {'SQQQ.NQ':5}
+		risk = 0 
+		aggresive = True 
+		info = {}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
+
+
 	def sim8(self):
 		### MOO out
 		pass 
-
+		# moo out 
 		
 	def sim9(self):
 		### MOC out
 		pass
-
+		# moc out 
 		
 	def sim9b(self):
 		### MOC EURO OUT
@@ -2296,7 +2305,22 @@ class Manager:
 		info = {}
 		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
 
+
 		### ### ### POSITION UPDATE IS THE KEY. 
+	def sim17(self):
+
+		reque = "http://127.0.0.1:8080/ExecuteOrder?symbol=MRNA.NQ&ordername=ARCA Buy ARCX Market DAY&shares=10"
+		requests.post(reque)
+
+
+		time.sleep(1)
+		name = 'SIM - already an position'
+		orders = {'MRNA.NQ':20}
+		risk = 0 
+		aggresive = False 
+		info = {}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
+
 
 def force_close_port(port, process_name=None):
 	"""Terminate a process that is bound to a port.

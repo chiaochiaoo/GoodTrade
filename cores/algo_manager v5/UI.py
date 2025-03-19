@@ -240,7 +240,15 @@ class UI(pannel):
 		except:
 			pass 
 
+		row +=1
 
+		ttk.Label(self.system_pannel, text="Stop Taking More Algos:").grid(sticky="w",column=1,row=row,padx=10)
+
+		try:
+			ttk.Checkbutton(self.system_pannel, variable=self.manager.stop_more_algos).grid(sticky="w",column=2,row=row)
+		except:
+			pass 
+			
 		row +=1
 		ttk.Label(self.system_pannel, text="Maximum Risk:").grid(sticky="w",column=1,row=row,padx=10)
 		self.risk_amount = tk.Entry(self.system_pannel,textvariable=self.risk_timer,width=7)
@@ -1411,6 +1419,9 @@ class UI(pannel):
 			ttk.Button(self.tms_pannel, text="Sim 15: missing ostats",command=self.manager.sim15).grid(sticky="w",column=1,row=c)
 			c+=1
 			ttk.Button(self.tms_pannel, text="Sim 16: ppro disconnect",command=self.manager.sim16).grid(sticky="w",column=1,row=c)
+			c+=1
+
+			ttk.Button(self.tms_pannel, text="Sim 17: already an position exist",command=self.manager.sim17).grid(sticky="w",column=1,row=c)
 			c+=1
 		except Exception as e:
 			print(e)
