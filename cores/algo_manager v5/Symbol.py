@@ -92,6 +92,7 @@ class Symbol:
 		self.theoritical_shares = 0
 
 		self.tp_current_shares = 0 
+		self.tp_total_current_shares = 0
 		self.current_avgprice = 0
 		self.total_expected = 0
 
@@ -234,7 +235,6 @@ class Symbol:
 			self.ask_change = True 
 			self.bid_change = True 
 
-
 	def get_price(self):
 		return self.data[PRICE]
 
@@ -274,7 +274,6 @@ class Symbol:
 				self.inspection_complete = False 
 
 				self.orders_checking_phase()
-				#self.status_checking_phase(tps)
 
 				if self.distributional_shares!=0:
 					self.distribution_phase(tps)
@@ -282,17 +281,13 @@ class Symbol:
 				self.status_checking_phase(tps)
 
 				if self.inspection_complete==True:
-
-					#if self.get_bid()!=0:
-						# no.2 pair off diff side. need.. hmm price .....!!!
 					self.pair_off(tps)
 
 					return 0 
 
-
 				self.request = 0
 				
-				if self.tp_homeo==True:
+				if self.ppro_homeo!=True:
 					self.regulating_check_phase(tps)
 				else:
 					self.aggregating_phase(tps)
@@ -354,95 +349,11 @@ class Symbol:
 		if DEBUG_MODE:
 			log_print(self.source,self.symbol_name, "Debugging order checking", " Current ",self.current_shares, "Incoming ",self.distributional_shares)
 
-	def status_checking_phase(self,tps):
-
-		self.tp_current_shares,self.expired = self.get_all_current(tps)
-		self.expected = self.get_all_expected(tps)
-		self.tp_difference = self.expected - self.tp_current_shares 
-
-
-		if self.tp_difference==0:
-			self.tp_homeo = True
-		else:
-			self.tp_homeo = False  
-
-		if self.current_shares==self.tp_current_shares:
-			self.ppro_homeo = True 
-		else:
-			self.ppro_homeo = False 
-
-		if self.tp_difference==0 and self.tp_homeo==True and self.ppro_homeo==True:
-			self.inspection_complete = True 
-
-		log_print(self.source,self.symbol_name,f"Shares change {self.tp_difference} TP: {self.tp_current_shares} PPRO {self.current_shares} Expect: {self.expected} Tp balance: {self.tp_homeo} Ppro balance: {self.ppro_homeo}  Inspection Complete {self.inspection_complete}")
-
-	def regulating_check_phase(self,tps):
-
-		"""
-		Must ensure self.current_shares = self.tp. 
-		if not then do not continue. 
-
-		this will only go through if self.tp == True. 
-		there could be share differences. 
-		"""
-		proceed = True 
-		if self.ppro_homeo!=True:
-
-
-			for tp in tps:
-				if self.tradingplans[tp].get_inspectable()==False:
-					log_print(self.source,self.symbol_name," latent tp detected. skip regulating.")
-					proceed = False
-					break
-			### need to check if all are good to go.
-
-			if proceed:
-				self.request = self.tp_current_shares-self.current_shares
-				self.regulating_shares =self.request
-
-
-				if self.regulating_shares == self.distributional_shares:
-					log_print(self.source,self.symbol_name," returning normal.")
-					self.regulating_shares = 0 
-					self.distributional_shares = 0 
-
-
-				log_print(self.source,self.symbol_name," Discrepancy on Symbol. Adjusting shares first.",self.regulating_shares)
-
-
-				if DEBUG_MODE:
-					log_print(self.source,self.symbol_name, "regulating phase:",self.regulating_shares)
-
-	def pairing_phase(self):
-
-		"""
-
-		"""
-		pass 
-
-	def aggregating_phase(self,tps):
-
-		"""
-		find out how many orders need to go out.
-
-		STEP 1, CHECK IF PPRO==TP.CUR , if not ,adjust that first.
-
-		STEP 2. SEND OUT MISSING SHARES. 
-		"""
-
-		self.tp_current_shares,self.expired = self.get_all_current(tps)
-		self.expected = self.get_all_expected(tps)
-		self.request =  self.expected - self.tp_current_shares
-
-		#if DEBUG_MODE:
-		log_print(self.source,self.symbol_name, "have",self.tp_current_shares," want",self.expired," request",self.request)
-
 	def distribution_phase(self,tps):
 
 
 		"""
 		INPUT: distributional
-
 
 		>>> PAIRING? <<<
 		OUTPUT: orders
@@ -488,6 +399,85 @@ class Symbol:
 
 
 			self.distributional_remaining_shares	= self.distributional_shares
+
+	def status_checking_phase(self,tps):
+
+		self.tp_current_shares,self.expired,self.tp_total_current_shares = self.get_all_current(tps)
+
+		self.expected = self.get_all_expected(tps)
+
+		self.tp_difference = self.expected - self.tp_current_shares 
+
+
+		if self.tp_difference==0:
+			self.tp_homeo = True
+		else:
+			self.tp_homeo = False  
+
+		if self.current_shares==self.tp_total_current_shares:
+			self.ppro_homeo = True 
+		else:
+			self.ppro_homeo = False 
+
+		if self.tp_difference==0 and self.tp_homeo==True and self.ppro_homeo==True:
+			self.inspection_complete = True 
+
+		log_print(self.source,self.symbol_name,f"Shares change {self.tp_difference} TP: {self.tp_total_current_shares,self.tp_current_shares} PPRO {self.current_shares} Expect: {self.expected} Tp balance: {self.tp_homeo} Ppro balance: {self.ppro_homeo}  Inspection Complete {self.inspection_complete}")
+
+	def regulating_check_phase(self,tps):
+
+		"""
+		Must ensure self.current_shares = self.tp. 
+		if not then do not continue. 
+
+		this will only go through if self.tp == True. 
+		there could be share differences. 
+		"""
+		proceed = True 
+		if self.ppro_homeo!=True:
+
+
+			if proceed:
+				self.request = self.tp_total_current_shares-self.current_shares
+				self.regulating_shares =self.request
+
+
+				if self.regulating_shares == self.distributional_shares:
+					log_print(self.source,self.symbol_name," returning normal.")
+					self.regulating_shares = 0 
+					self.distributional_shares = 0 
+
+
+				log_print(self.source,self.symbol_name," Discrepancy on Symbol. Adjusting shares first.",self.regulating_shares)
+
+
+				if DEBUG_MODE:
+					log_print(self.source,self.symbol_name, "regulating phase:",self.regulating_shares)
+
+	def pairing_phase(self):
+
+		"""
+
+		"""
+		pass 
+
+	def aggregating_phase(self,tps):
+
+		"""
+		find out how many orders need to go out.
+
+		STEP 1, CHECK IF PPRO==TP.CUR , if not ,adjust that first.
+
+		STEP 2. SEND OUT MISSING SHARES. 
+		"""
+
+		self.tp_current_shares,self.expired,self.tp_total_current_shares = self.get_all_current(tps)
+		self.expected = self.get_all_expected(tps)
+		self.request =  self.expected - self.tp_current_shares
+
+		#if DEBUG_MODE:
+		log_print(self.source,self.symbol_name, "have",self.tp_current_shares," want",self.expired," request",self.request)
+
 
 	def ordering_phase(self):
 
@@ -595,6 +585,7 @@ class Symbol:
 	def get_all_current(self,tps):
 
 		current_shares = 0
+		total_current_shares = 0
 		expired =0
 		now = datetime.now()
 
@@ -622,21 +613,20 @@ class Symbol:
 		for tp in tps:
 			if self.tradingplans[tp].get_inspectable():
 				current_shares +=  self.tradingplans[tp].get_current_share(self.symbol_name)
-
+				
 				if self.tradingplans[tp].get_request_time(self.symbol_name)>cur_time:
 					cur_time = self.tradingplans[tp].get_request_time(self.symbol_name)
-
-				#log_print(self.source,self.symbol_name,tp, "fill timer",round((ts-self.tradingplans[tp].get_request_time(self.symbol_name))/self.fill_timer,2))
 
 				if ts-self.tradingplans[tp].get_request_time(self.symbol_name)>self.fill_timer:
 					expired+=self.tradingplans[tp].get_current_request(self.symbol_name)
 
+			total_current_shares += self.tradingplans[tp].get_current_share(self.symbol_name)
 		self.fill_time_remianing = round((ts-cur_time)/self.fill_timer,2)
 
 		self.fill_time_remianing = min(self.fill_time_remianing,1)
 
 
-		return current_shares,expired
+		return current_shares,expired,total_current_shares
 
 	def get_all_expected(self,tps):
 
@@ -720,97 +710,6 @@ class Symbol:
 			if self.tradingplans[tp].having_request(self.symbol_name) and self.tradingplans[tp].get_holdings(self.symbol_name)!=0:
 				self.tradingplans[tp].algo_as_is() 
 
-	def calc_total_imbalances(self,tps):
-
-		### STAGE 1. JUST UPDATE THE TPs. 
-		self.current_avgprice,current_shares = self.manager.get_position(self.symbol_name)
-		self.current_shares,self.expired = self.get_all_current(tps)
-		self.expected = self.get_all_expected(tps)
-		self.difference = self.expected - self.current_shares 
-
-
-		### ISSUE: lagging imblance issue later occur. i need to reset it when it's GOOD. ###
-
-		### OK NEW SYSTEM.
-
-		### ONLY HANDLE IMBALNCE WHEN -> TP-EXPECT == PPRO-EXPECT. THERE IS NO IMBLANCE RESET.
-
-		
-
-		if self.difference==0 and self.current_imbalance!=0:
-
-			if self.current_imbalance + self.current_shares == current_shares:
-				log_print(self.source,self.symbol_name," inspection discrepancy: discrepancy matched. ",self.current_imbalance,current_shares-self.current_shares)
-				self.difference += self.current_imbalance * -1
-
-		if self.difference!=0:
-			log_print(self.source,self.symbol_name,"Current:",self.current_shares,"Expected:",self.expected,"Difference:",self.difference,"Expired:",self.expired)
-		######################################################################################
-
-		### need at least 3 seconds delay.
-
-		### STAGE 2. ONLY if TPs are taken care off.
-
-		### FOUR cases. 
-		### 1. ppro indicate over fill and holdings not detected. -> potential MISSING orders notification. -> ppro_true then recalibrate. 
-		### 2. holding detect there is a problem, but ppro side and tps are all ok. -> sync error? RESET if ppro_true. 
-		### 3. ppro indicate over fill, and holdings also detect over fill, they match. -> update self.difference 
-		###	4. 																They don't match.  -> wait for ppro_true then recalibrate. 
-		### 
-
-		"""
-
-		ppro_true = False 
-		if current_shares == self.previous_shares:
-			ppro_true = True 
-		self.previous_shares = current_shares
-
-		recalibrate = False 
-		shares_matched = False 
-
-		if current_shares==self.current_shares:
-			shares_matched = True 
-
-		
-		# if self.difference!=0:
-		# 	log_print(self.source,self.symbol_name," inspection complete, expected",self.expected,\
-		# 		" have",self.current_shares,\
-		# 		" deploying:",self.difference,\
-		# 		"holding imbalance,",self.current_imbalance,\
-		# 		"ppro shares matchd:",shares_matched)
-
-
-		if self.difference==0 and ppro_true: # i now know i can trust the ppro share is true.. ? NO!!!???/
-
-
-			# IF THERE IS A PROBLEM. 
-			if shares_matched!=True or self.current_imbalance!=0:
-
-				#log_print(self.source,self.symbol_name," inspection discrepancy:"," PPRO:",current_shares," TPs:",self.current_shares, " account imbalance:",self.current_imbalance)
-
-				if shares_matched==True and self.current_imbalance!=0:
-					self.current_imbalance = 0 
-					#log_print(self.source,self.symbol_name," inspection discrepancy: ppro matched but holding says imbalance. delusional? reset.")
-
-				if shares_matched!=True: # I CAN SAFELY ASSUME THERE IS A PROBLEM. 
-
-					#only 2 cases. matched, or not matched. 
-
-					### RULE OF THUMB. ONLY ADJUST WHEN BOTH TPS & PPRO agree with the imbalances. 
-
-					if self.current_imbalance == current_shares-self.current_shares:
-						log_print(self.source,self.symbol_name," inspection discrepancy: discrepancy matched. ",self.current_imbalance,current_shares-self.current_shares)
-						self.difference += self.current_imbalance * -1
-					else:
-						pass 
-						### IF it's a actively manged, bypass this?    ###
-						###                                            ###
-						##################################################
-						self.difference += (current_shares-self.current_shares) * -1
-						#log_print(self.source,self.symbol_name," inspection discrepancy: discrepancy UNMATCHED potential missing order fills. ",self.current_imbalance,current_shares-self.current_shares)
-						self.current_imbalance = current_shares-self.current_shares
-
-		"""
 
 	def check_all_incrementals(self,tps):
 
@@ -885,9 +784,6 @@ class Symbol:
 		#log_print("Symbol",self.symbol_name," holding update:",price,share)
 		self.holding_update = True 
 
-		# hold_fill = threading.Thread(target=self.holdings_fill,daemon=True)
-		# hold_fill.start()
-
 	def incoming_shares_calculate(self):
 
 
@@ -907,28 +803,6 @@ class Symbol:
 
 			return total_shares,avg_price
 
-	def holdings_fill(self):
-
-		"""
-		now hold fill does nothing but give avg price and the shares. 
-		"""
-		if not self.fill_lock.locked():
-			with self.fill_lock:
-
-				#first wait for few seconds. 
-				time.sleep(0.2)
-
-				while self.order_processing_timer>0:
-					time.sleep(0.1)
-					self.order_processing_timer	-=0.1
-
-				now = datetime.now()
-				self.last_order_timestamp = now.hour*3600 + now.minute*60 + now.second
-				self.order_processing_timer = 0
-				self.symbol_inspection()
-		else:
-			if self.order_processing_timer<0.3:
-				self.order_processing_timer=0.3
 	
 	def cancel_request(self):
 
@@ -940,95 +814,6 @@ class Symbol:
 			### NEED TO KNOW IF. HMM .
 			self.ppro_out.send([CANCEL,self.symbol_name])	
 
-	def deploy_orders(self,ts):
-
-		# I NEED TO ADD A MECHANISM ON THIS
-		# If passive orders still don't full fill the request everything within some minutes
-		# Cancel all the requests. (or market in )
-
-		# ALL ORDERS AT ONCE. # First clear previous order. 
-		# if there might be already an order: #
-
-
-		if self.difference>0:
-			self.action = PASSIVEBUY
-		else:
-			self.action = PASSIVESELL
-
-		self.l1_update_module()
-
-		skip = True 
-
-		if self.aggresive_only!=True and ts<57500:
-			if self.action==PASSIVEBUY and (self.bid_change==True or self.data['SPREAD']>0.05):
-				self.ppro_out.send([CANCEL,self.symbol_name]) 
-				skip = False 
-			elif self.action==PASSIVESELL and (self.ask_change==True or self.data['SPREAD']>0.05):
-				self.ppro_out.send([CANCEL,self.symbol_name])
-				skip = False 
-
-		if self.sent_orders==False:
-			skip = False 
-
-			# else:
-				
-			# 	skip = False ☺
-		# if self.aggresive_only!=True and ts<57500:
-		# 	self.ppro_out.send([CANCEL,self.symbol_name]) 
-
-
-		time.sleep(0.1)
-
-			#price = self.get_ask()
-			#coefficient = 1
-
-		#log_print(self.source,self.symbol_name,self.action,self.difference)
-		# self.ppro_out.send([CANCEL,self.symbol_name])
-		# time.sleep(0.3)
-
-		## self.fill_time_remianing
-		log_print(self.source,self.symbol_name,self.action,self.difference,self.fill_timer,"fill timer:",self.fill_time_remianing)
-
-		## if 
-
-		if self.difference!=0 and self.holding_update==False :
-
-			total = abs(self.difference-self.expired)
-			if total>=500:
-				total = 500
-				log_print(self.source,self.symbol_name,self.action," adjusted to 500 instead of",self.difference)
-
-			if self.expired!=0:
-				self.ppro_out.send([CANCEL,self.symbol_name]) 
-				time.sleep(0.1)
-				self.immediate_request(self.expired)
-			if self.aggresive_only==True or ts>57500: ### LAST 100 seconds market only.
-				self.immediate_request(self.difference)
-				self.sent_orders = True 
-			else:
-				if not skip and total!=0:
-
-					###### ADJUST THE spread
-					adjustment = 0 
-
-					if self.data['SPREAD']>0.01:
-						adjustment = round((self.fill_time_remianing)*self.data['SPREAD'],2) # % of spread.
-
-						if adjustment <0.01:
-							adjustment = 0.01 
-
-					if self.action==PASSIVESELL:
-						adjustment = adjustment*-1
-						
-					log_print(self.source,self.symbol_name,"orders:","fill timer:",self.fill_time_remianing,"spread:",self.data['SPREAD'],"adjustment:",adjustment)
-
-					self.ppro_out.send([self.action,self.symbol_name,total,adjustment,self.manager.gateway])
-					self.sent_orders = True 
-				# else:
-				# 	log_print(self.source,self.symbol_name,"NO CHANGE DETECTED, skipping.")
-
-		# handl = threading.Thread(target=self.threading_order,daemon=True)
-		# handl.start()
 
 	def threading_order(self):
 
@@ -1087,7 +872,7 @@ class Symbol:
 					self.tradingplans[tp].algo_as_is()
 					affected.append(tp)
 
-			if timestamp != self.sms_ts and self.rejection_counts >=2:
+			if timestamp != self.sms_ts and self.rejection_counts >=3:
 
 				self.manager.sms_alert(f'{self.symbol_name} \n Affected strategies: {str(affected)} \n Holdings: {str(self.current_shares)}')
 				self.sms_ts = timestamp
@@ -1115,70 +900,6 @@ class Symbol:
 
 			self.market_out = shares
 			self.holding_update = True
-
-	# deprecated 
-	def calc_inspection_differences(self,tps):
-
-		share_difference = self.current_shares - self.previous_shares
-
-
-		if share_difference!=0:
-
-			avg_price = 0
-			with self.incoming_shares_lock:
-				total = sum(list(self.incoming_shares.values()))
-				#avg = mean(list(self.incoming_shares.keys()))`
-
-				if total!=0:
-
-					c=0
-					for key,item in self.incoming_shares.items():
-						c+=key*item
-
-					avg_price = c/total
-
-				self.incoming_shares = {}
-
-			if total>share_difference:
-				log_print(self.source,self.symbol_name," having MORE orders than actual share difference.",share_difference," orders:",total)
-			elif total<share_difference:
-				log_print(self.source,self.symbol_name," having LESS orders than actual share difference.",share_difference," orders:",total)
-				#? not enough?
-			else:
-				log_print(self.source,self.symbol_name," having share differences:",share_difference, " total:",total)
-
-
-			### Construct a share_difference with avg price. 
-
-			# LOADING MORE
-			if abs(self.current_shares) > abs(self.previous_shares):
-
-				# if orders not enough. manually calculate it. 
-				if avg_price!=0:
-					share_price = avg_price
-				else:
-					#### DONT USE THIS. DEPRECATED. ### NO MORE AVG PRICE BECAUSE INACCURACY. 
-					share_price =  self.get_bid() #(abs(self.current_shares)*self.current_avgprice - abs(self.previous_shares)*self.previous_avgprice)/abs(share_difference)
-
-				for tp in tps:
-					share_difference = self.tradingplans[tp].request_fufill(self.symbol_name,share_difference,share_price)
-						#feeeeed
-					if share_difference	==0:
-						break
-			else:
-
-				if avg_price!=0:
-					share_price = avg_price
-				else:
-					share_price = self.get_bid()
-
-				for tp in tps:
-					share_difference = self.tradingplans[tp].request_fufill(self.symbol_name,share_difference,share_price)
-						#feeeeed
-					if share_difference	==0:
-						break
-
-		self.previous_shares,self.previous_avgprice = self.current_shares, self.current_avgprice
 
 	def ppro_flatten(self):
 		self.ppro_out.send([FLATTEN,self.symbol_name])
