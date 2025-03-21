@@ -1431,14 +1431,24 @@ class Manager:
 
 					if count%6==0:# and count%20!=0:
 
-						if self.symbol_inspection_start:
-							handl = threading.Thread(target=self.symbols_inspection,daemon=True)
-							handl.start()
-						else:
-							log_print("inspection wait one")
+						try:
+							if self.symbol_inspection_start:
+								handl = threading.Thread(target=self.symbols_inspection,daemon=True)
+								handl.start()
+							else:
+								log_print("inspection wait one")
 
-						rec = threading.Thread(target=self.record_update,daemon=True)
-						rec.start()
+						
+							threading_active= threading.active_count()
+
+							if threading_active<10:
+								rec = threading.Thread(target=self.record_update,daemon=True)
+								rec.start()
+
+
+							log_print("Manager: total threading count:",threading_active)
+						except Exception as e:
+							log_print("inspection error, ",e)
 
 					if count%10==0 and ts>=959 and ts<=961:
 						self.periodical_status()
