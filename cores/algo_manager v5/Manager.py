@@ -1697,6 +1697,8 @@ class Manager:
 			d.adjusting_risk()
 			d.update_displays()
 
+
+
 	def stringfy(self,dic):
 
 		msg = "\n"
@@ -1715,6 +1717,28 @@ class Manager:
 		msg+="\n"
 
 		return msg
+
+	def stringfy_position(self,dic):
+
+		msg = "\n"
+
+		dic =  dict(sorted(dic.items(), key=lambda item: item[1], reverse=True))
+		for key,item in dic.items():
+
+			msg +=str(key)+":"
+			try:
+
+				msg+=str(item.get()) +"\n"
+
+			except:
+
+				msg+=str(item)+"\n"
+
+		msg+="\n"
+
+		return msg
+
+
 
 	def output_active_tps(self):
 
@@ -1739,7 +1763,7 @@ class Manager:
 
 			user = self.ui.user.get()
 			subject = "User Status:"+user
-			body = "User Status:" +str(self.close_timer) + self.stringfy(self.current_summary) + self.output_active_tps() +self.stringfy(self.current_positions)
+			body = "User Status:" +str(self.close_timer) + self.stringfy(self.current_summary) + self.output_active_tps() +self.stringfy_position(self.current_positions)
 
 			self.send_email_admin(subject,body)	
 
