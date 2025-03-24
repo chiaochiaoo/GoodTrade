@@ -1722,7 +1722,7 @@ class Manager:
 
 		msg = "\n"
 
-		dic =  dict(sorted(dic.items(), key=lambda item: abs(item[1]), reverse=True))
+		dic =  dict(sorted(dic.items(), key=lambda item: item[1], reverse=True))
 		for key,item in dic.items():
 
 			msg +=str(key)+":"
