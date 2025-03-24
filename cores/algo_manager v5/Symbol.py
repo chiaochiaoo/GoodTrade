@@ -563,7 +563,7 @@ class Symbol:
 					if self.action==PASSIVESELL:
 						adjustment = adjustment*-1
 						
-					log_print(self.source,self.symbol_name,"orders:","fill timer:",self.fill_time_remianing,"spread:",self.data['SPREAD'],"adjustment:",adjustment)
+					log_print(self.source,self.symbol_name,"orders:","fill timer:",self.fill_time_remianing," fill time limit",self.fill_timer,"spread:",self.data['SPREAD'],"adjustment:",adjustment)
 
 					self.ppro_out.send([self.action,self.symbol_name,total,adjustment,self.manager.gateway])
 					self.sent_orders = True 
@@ -604,6 +604,9 @@ class Symbol:
 
 		if self.data['SPREAD']<0.03:
 			self.fill_timer = 20
+
+		if now.hour*60+now.minute<570:
+			self.fill_timer = 10
 
 
 		#self.fill_time_remianing = min(round((ts-self.tradingplans[tp].get_request_time(self.symbol_name))/self.fill_timer,2),1)
