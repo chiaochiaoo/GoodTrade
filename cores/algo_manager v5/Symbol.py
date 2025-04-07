@@ -605,7 +605,7 @@ class Symbol:
 		if self.data['SPREAD']<0.03:
 			self.fill_timer = 20
 
-		if now.hour*60+now.minute<575:
+		if now.hour*60+now.minute<575 or now.hour*60+now.minute>950:
 			self.fill_timer = 10
 
 
