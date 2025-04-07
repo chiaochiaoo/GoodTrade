@@ -248,7 +248,7 @@ class UI(pannel):
 			ttk.Checkbutton(self.system_pannel, variable=self.manager.stop_more_algos).grid(sticky="w",column=2,row=row)
 		except:
 			pass 
-			
+
 		row +=1
 		ttk.Label(self.system_pannel, text="Maximum Risk:").grid(sticky="w",column=1,row=row,padx=10)
 		self.risk_amount = tk.Entry(self.system_pannel,textvariable=self.risk_timer,width=7)
@@ -448,7 +448,7 @@ class UI(pannel):
 						"+25%":6,\
 						"R100":6,\
 						"flatten":8,\
-						
+						"a-flatten":8,\
 						}
 		self.width = list(self.labels.values())
 
@@ -1052,6 +1052,7 @@ class UI(pannel):
 		"-50%":self.empty,\
 		"+25%":self.empty,\
 		'flatten':"",\
+		"a-flatten":"",
 		}
 
 		info = list(infos.values())
@@ -1097,18 +1098,6 @@ class UI(pannel):
 			self.algo_count_number.set(self.algo_count_number.get()+1)
 			self.deploy_list.append(tradingplan.algo_name)
 
-		# self.labels = {"Strategy":8,\
-		# 				"Status":10,\
-		# 				"Updates":15,\
-		# 				"MaxU":7,\
-		# 				"MinU":7,\
-		# 				"U":7,\
-		# 				"R":7,\
-		# 				"WR":7,\
-		# 				"MR":7,\
-		# 				"TR":7,\
-		# 				"flatten":8,\
-		# 				"log":8}
 
 		#self.algo_count_number.set(self.algo_count_number.get()+1)
 
@@ -1129,6 +1118,7 @@ class UI(pannel):
 		"+25%":tradingplan.tkvars[ALGO_MULTIPLIER],\
 		"R100":"",\
 		'flatten':"",\
+		"a-flatten":"",
 		}
 
 		#link the global variable 
@@ -1176,6 +1166,9 @@ class UI(pannel):
 
 				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.flatten_cmd
 
+			elif label_name =="a-flatten":
+
+				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.flatten_cmd_aggresive
 			elif label_name =="-90%":
 				self.tk_labels_basket[symbol][label_name]["textvariable"] = info[j]
 				self.tk_labels_basket[symbol][label_name]["command"] = tradingplan.reduce_ninety

@@ -891,6 +891,7 @@ class TradingPlan_Basket:
 		## make sure it's a winning trade.
 		if self.data[UNREAL]>3 and self.cloned==False:
 			self.increase_one_quarter()
+
 	def increase_one_quarter(self):
 
 		now = datetime.now()
@@ -1030,18 +1031,12 @@ class TradingPlan_Basket:
 
 	def flatten_cmd(self):
 		
-		# if self.tkvars[STATUS].get()==PENDING:
-		# 	self.cancel_algo()
-		# else:
-
-		#self.deactive()
 
 		log_print(self.source,self.algo_name," flattening, aggresive:",self.aggresive_exit)
 		
 
 		for symbol,item in self.symbols.items():
 			self.submit_expected_shares(symbol,0,self.aggresive_exit)
-
 			self.expected_shares[symbol] = 0
 			self.recalculate_current_request(symbol)
 		self.tkvars[ALGO_MULTIPLIER].set(0)
@@ -1050,6 +1045,19 @@ class TradingPlan_Basket:
 
 	""" Deployment initialization """
 
+
+
+	def flatten_cmd_aggresive(self):
+		self.aggresive_exit = True
+		log_print(self.source,self.algo_name," flattening, aggresive:",self.aggresive_exit)
+
+		for symbol,item in self.symbols.items():
+			self.submit_expected_shares(symbol,0,self.aggresive_exit)
+			self.expected_shares[symbol] = 0
+			self.recalculate_current_request(symbol)
+		self.tkvars[ALGO_MULTIPLIER].set(0)
+		self.flatten_order=True
+		#self.turn_on_inspection()
 
 
 	def check_pnl(self):
