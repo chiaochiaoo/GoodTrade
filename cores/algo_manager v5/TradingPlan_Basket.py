@@ -826,9 +826,9 @@ class TradingPlan_Basket:
 					if symbol in self.original_positions:
 						if self.expected_shares[symbol]!=0:
 							if abs(self.expected_shares[symbol])<=abs(self.original_positions[symbol]//coefficient): # set to 0
-								self.submit_expected_shares(symbol,0)
+								self.submit_expected_shares(symbol,0,1)
 							else:
-								self.submit_expected_shares(symbol,self.expected_shares[symbol]-self.original_positions[symbol]//coefficient)
+								self.submit_expected_shares(symbol,self.expected_shares[symbol]-self.original_positions[symbol]//coefficient,1)
 
 	def reduce_one_third(self):
 		self.turn_on_inspection()
