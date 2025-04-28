@@ -571,7 +571,7 @@ class UI(pannel):
 		tk.Entry(self.filter_pannel,textvariable=self.strategy_filter,width=20).grid(sticky="w",column=c,row=1)	
 
 		c+=1
-		ttk.Button(self.filter_pannel, text="Filter",command=self.show_selected_only,state= "disabled").grid(sticky="w",column=c,row=1)
+		ttk.Button(self.filter_pannel, text="Filter",command=self.show_selected_only).grid(sticky="w",column=c,row=1)
 		c+=1
 		ttk.Button(self.filter_pannel, text="+ 25% to W",command=self.add_to_winners).grid(sticky="w",column=c,row=1)
 
@@ -583,16 +583,41 @@ class UI(pannel):
 
 	def show_selected_only(self):
 
-		l = self.manager.return_selected_algo(self.strategy_filter.get())
+		# l = self.manager.return_selected_algo(self.strategy_filter.get())
 
-		# reset the numbers. 
+		# # reset the numbers. 
 
-		self.init_entry_pannel()
-		self.basket_label_count = 1
+		# self.init_entry_pannel()
+		# self.basket_label_count = 1
 
-		# REFRESH?
-		for i in l:
-			self.create_new_single_entry(i,"Basket",None)
+		# # REFRESH?
+		# for i in l:
+		# 	self.create_new_single_entry(i,"Basket",None)
+			
+		try:
+
+			now = datetime.now()
+			ts = now.hour*3600 + now.minute*60 + now.second
+
+			if ts>self.sort_timer+2:
+				self.sort_timer = ts 
+
+				l = self.manager.return_selected_algo(self.strategy_filter.get())
+
+				self.count_current()
+				for i in range(0,self.current_display_count):
+
+					#print("evicting,",i)
+					self.evict_entry(i)
+
+				self.basket_label_count = 1
+				for i in l:
+					self.create_new_single_entry(self.manager.baskets[i],"Basket",None)
+
+			# for basket in self.manager.baskets.keys():
+			# 	print(basket,self.manager.baskets[basket].display)
+		except Exception as e:
+			PrintException(e,"show_running_only error")
 
 
 	def count_current(self):
