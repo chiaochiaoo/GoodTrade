@@ -609,7 +609,7 @@ class Manager:
 			# if it is still running.
 			self.baskets[tp].turn_off_display()
 			if self.baskets[tp].have_symbol(symbol)==True:
-				l.append(self.baskets[tp])
+				l.append(tp)
 
 		return l[:190]
 

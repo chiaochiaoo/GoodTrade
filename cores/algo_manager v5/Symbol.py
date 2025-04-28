@@ -389,6 +389,7 @@ class Symbol:
 				log_print(self.source,self.symbol_name,"checking ",tp, self.tradingplans[tp].get_current_request(self.symbol_name))
 				self.distributional_shares = self.tradingplans[tp].request_fufill(self.symbol_name,self.distributional_shares,self.distributional_shares_prices	)
 
+				self.tradingplans[tp].notify_holding_change(self.symbol_name)
 				if self.distributional_shares ==0:
 					break
 
@@ -907,3 +908,5 @@ class Symbol:
 	def ppro_flatten(self):
 		self.ppro_out.send([FLATTEN,self.symbol_name])
 
+	def turn_on_aggresive_only(self):
+		self.aggresive_only = True 

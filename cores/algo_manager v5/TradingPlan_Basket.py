@@ -219,6 +219,10 @@ class TradingPlan_Basket:
 			if "IMB_MOO" in self.algo_name:
 				self.manual_flattable = True 
 				self.one_shot_algo = True
+
+			if "IMB_AM" in self.algo_name:
+				self.manual_flattable = True 
+				self.one_shot_algo = True			
 				
 			if "MO_" in self.algo_name:
 				self.manual_flattable = True 
@@ -513,7 +517,6 @@ class TradingPlan_Basket:
 					log_print(self.source,self.algo_name," incrementally expect",symbol,shares,"expect: ",shares," in:",time_takes, "increments:",increments,'interval',self.incremental_expected_shares_intervals[symbol])
 
 
-					##########
 
 	def submit_expected_shares(self,symbol,shares,aggresive=0):
 
@@ -1024,6 +1027,10 @@ class TradingPlan_Basket:
 		self.banned.append(symbol)
 
 		log_print(self.source," BANNED:",symbol)
+
+		## set the rest to 0 also.
+
+		self.flatten_cmd()
 
 	def get_flatten_order(self):
 
