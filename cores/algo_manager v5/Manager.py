@@ -608,7 +608,7 @@ class Manager:
 		for tp in tps:
 			# if it is still running.
 			self.baskets[tp].turn_off_display()
-			if self.baskets[tp].have_symbol(symbol)==True:
+			if self.baskets[tp].contain_symbol(symbol)==True:
 				l.append(tp)
 
 		return l[:190]

@@ -347,9 +347,11 @@ class TradingPlan_Basket:
 			return self.current_shares[symbol_name]!=0
 
 	def contain_symbol(self,symbol_name):
-
+		symbol_name = symbol_name.upper()
 		for i in self.current_shares.keys():
-			if symbol_name in i:
+			
+			if symbol_name == i.split('.')[0]:
+
 				return True 
 
 		return False 
