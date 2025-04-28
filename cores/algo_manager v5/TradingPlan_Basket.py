@@ -345,6 +345,14 @@ class TradingPlan_Basket:
 			return False 
 		else:
 			return self.current_shares[symbol_name]!=0
+
+	def contain_symbol(self,symbol_name):
+
+		for i in self.current_shares.keys():
+			if symbol_name in i:
+				return True 
+
+		return False 
 	def register_symbol(self,symbol_name,symbol):
 
 		if symbol_name not in self.symbols:
