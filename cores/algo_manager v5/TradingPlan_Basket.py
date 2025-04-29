@@ -626,6 +626,7 @@ class TradingPlan_Basket:
 
 	def holding_update(self,symbol,share_added,price):
 
+		self.manager.log_trade(self.algo_name,symbol,share_added,price)
 		if share_added<0:
 			price=price*-1
 
