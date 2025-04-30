@@ -675,6 +675,8 @@ class Symbol:
 		for tp in tps:
 			if "IMB_MOO" in  self.tradingplans[tp].get_algoname():
 				remaining+= self.tradingplans[tp].get_current_share(self.symbol_name)
+			if "IMB_AM" in  self.tradingplans[tp].get_algoname():
+				remaining+= self.tradingplans[tp].get_current_share(self.symbol_name)
 			if "MO_" in  self.tradingplans[tp].get_algoname():
 				remaining+= self.tradingplans[tp].get_current_share(self.symbol_name)
 

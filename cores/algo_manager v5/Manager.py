@@ -319,6 +319,47 @@ class Manager:
 
 		self.pipe_ppro_out.send(["Register","QQQ.NQ"])
 
+		self.trade_logger_init()
+
+
+	def trade_logger_init(self):
+
+		self.folder = '../../trade_records'
+		self.lock = threading.Lock()
+		self.fieldnames = ['algo', 'time', 'symbol', 'shares', 'price']
+
+		# Ensure directory exists
+		os.makedirs(self.folder, exist_ok=True)
+
+		# Generate dated filename
+		date_str = datetime.now().strftime("%Y-%m-%d")
+		self.tradefilename = os.path.join(self.folder, f"{date_str}.csv")
+
+		# Open file and prepare writer
+		file_exists = os.path.isfile(self.tradefilename)
+		self.tradefile = open(self.tradefilename, mode='a', newline='', buffering=1)  # line-buffered
+		self.tradewriter = csv.DictWriter(self.tradefile, fieldnames=self.fieldnames)
+
+		if not file_exists:
+			self.tradewriter.writeheader()
+
+		print('trade log:',self.tradefilename)
+
+		# self.log_trade('test',"SPY",10,512)
+		# self.log_trade('test',"QQQ",-10,512)
+	def log_trade(self, algo, symbol, shares, price):
+		with self.lock:
+			self.tradewriter.writerow({
+				'algo': algo,
+				'time': datetime.now().isoformat(),
+				'symbol': symbol,
+				'shares': shares,
+				'price': price
+			})
+			self.tradefile.flush()
+
+	def close(self):
+		self.tradefile.close()
 
 	def shutdown_all_threads(self):
 
@@ -738,7 +779,7 @@ class Manager:
 		MOO_pair = False 
 
 
-		MOC_send_out_timer_NQ = 954*60+45 #954*60+30 
+		MOC_send_out_timer_NQ = 1059*60+45 #954*60+30 
 
 		MOC_send_out_timer = 958*60+40 #958*60+40 #958*60+50
 
@@ -2486,7 +2527,7 @@ if __name__ == '__main__':
 	# root.maxsize(1800, 1200)
 
 	root.mainloop()
-
+	manager.close()
 	ppro_out.send(["shutdown"])
 
 	ppro_pipe_end.send(["shutdown"])
