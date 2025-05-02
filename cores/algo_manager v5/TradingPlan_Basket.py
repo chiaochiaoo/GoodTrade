@@ -533,7 +533,7 @@ class TradingPlan_Basket:
 		spread = round(self.manager.get_spread(symbol[:-3]),2)
 		sliperage = abs(round(shares*spread,2))
 
-		log_print(self.source,self.algo_name,"expect",symbol,shares," aggresive ", aggresive,"spread",spread,'slipperage',sliperage,"current have",self.current_shares[symbol])
+		log_print(self.source,self.algo_name,"expect",symbol,shares," aggressive ", aggresive,"spread",spread,'slippage',slippage,"current have",self.current_shares[symbol])
 
 		##################################################################################################
 		##############     I THINK THIS IS WHY. ORDER STILL PROCESS UNTIL 1600   #########################
