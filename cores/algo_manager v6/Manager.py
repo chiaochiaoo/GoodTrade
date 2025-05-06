@@ -292,14 +292,13 @@ class Manager:
 		self.gateway = 0
 
 		######
-
 		self.get_price_lock = threading.Lock()
 		######
+
 		self.moo_orders = {}
 
 		self.moo_algos = {}
 		self.moo_lock = threading.Lock()
-
 
 		self.total_moc_nq = {}
 
@@ -427,6 +426,15 @@ class Manager:
 			self.gateway = 3
 			self.ui.set_gateway["text"] = "Set Change:EDGA"
 
+		elif  self.ui.gateway.get()=="MEMX-P":
+
+			self.gateway = 4
+			self.ui.set_gateway["text"] = "Set Change:MEMX-P"
+
+		elif  self.ui.gateway.get()=="ARCA-P":
+
+			self.gateway = 5
+			self.ui.set_gateway["text"] = "Set Change:ARCA-P"
 	def symbols_inspection(self):
 
 		# HERE I NEED. A. HARD LIMIT.... 40 ??? 
@@ -633,7 +641,7 @@ class Manager:
 								self.symbols_short[symbol[:-3]] = symbol
 
 								self.baskets[basket_name].register_symbol(symbol,self.symbol_data[symbol])
-								self.baskets[basket_name].update_ratio(symbol,share_lot)
+								self.baskets[basket_name].update_ratio(symbol,value)
 						### NOW APPLY THE STANDARD LOT TO ... symbol? tp? ###
 				else:
 					for symbol,value in orders.items():
@@ -1480,9 +1488,20 @@ class Manager:
 			elif d[0] =="msg":
 				log_print("msg:",d[1])
 
+			# elif d[0] == ORDER_UPDATE:
+
+			# 	try:
+
+			# 	except Exception as e:
+			# 		PrintException(e, " POSITION UPDATE ERROR")
 			elif d[0] == POSITION_UPDATE:
 
 
+
+				# try:
+
+				# except Exception as e:
+				# 	PrintException(e, " POSITION UPDATE ERROR")
 				try:
 					positions = d[1]
 					user = d[2]
@@ -1492,7 +1511,7 @@ class Manager:
 					now = datetime.now()
 					ts = now.hour*60 + now.minute
 
-					self.current_positions = positions
+					#self.current_positions = positions
 
 
 					self.open_order_count = open_order_count
@@ -1501,8 +1520,6 @@ class Manager:
 					self.ui.position_count.set(len(self.current_positions))
 					self.ui.account_status["background"] =self.ui.deployment_frame.cget("background")
 
-
-					
 					#log_print("Position updates:",len(positions),positions)
 
 					count +=1 
@@ -1511,14 +1528,12 @@ class Manager:
 					req.start()
 
 					if count%5==0:# and count%20!=0:
-
 						try:
 							if self.symbol_inspection_start:
 								handl = threading.Thread(target=self.symbols_inspection,daemon=True)
 								handl.start()
 							else:
 								log_print("inspection wait one")
-
 						
 							threading_active= threading.active_count()
 
@@ -1526,22 +1541,21 @@ class Manager:
 								rec = threading.Thread(target=self.record_update,daemon=True)
 								rec.start()
 
-
 							log_print("Manager: total threading count:",threading_active)
 						except Exception as e:
 							log_print("inspection error, ",e)
 
-					if count%10==0 and ts>=959 and ts<=961:
-						self.periodical_status()
-
-					# if count%10==0 and ts==960:
-					# 	self.periodical_status()
-
-					if count%200==0:
-						if ts>=420 and ts<965:
-
+					if (ts>=565) and (ts<=570):
+						if count%20==0:
 							self.periodical_status()
 
+					if (ts>=959 and ts<=960):
+						if count%10==0:
+							self.periodical_status()
+
+					if ts>=420 and ts<965:
+						if count%200==0:
+							self.periodical_status()
 				except Exception as e:
 					PrintException(e, " POSITION UPDATE ERROR")
 
@@ -1613,50 +1627,21 @@ class Manager:
 
 			elif d[0] =="order confirm":  ### IN USE. 
 
-				data = d[1]
-				symbol = data["symbol"]
-				price = data["price"]
-				shares = data["shares"]
-				#side = data["side"]
-
-				## HERE. Append it to the new symbol warehouse system. 
-				#log_print("Manager: Holding update:",symbol,price,shares,side)
-
-				#print("OSTATS:",self.OSTAT_MULTIPLIER)
-
-				shares = int(shares)
-
 				try:
+					data = d[1]
+					symbol = data["symbol"]
+					price = data["price"]
+					shares = int(data["shares"])
+					total = int(data['total'])
+
+					self.current_positions[symbol] = total
+
+					print("positions:",self.current_positions)
 					if symbol in self.symbols:
 						self.symbol_data[symbol].holdings_update(price,shares)
-						# if side == LONG:
-						# 	self.symbol_data[symbol].holdings_update(price,shares)
-
-						# elif side == SHORT:
-						# 	self.symbol_data[symbol].holdings_update(price,-shares)
 
 				except	Exception	as e:
 					PrintException(e,"Order confim error")
-
-			elif d[0] =="order update": ### DEPRECATED. 
-				data = d[1]
-				symbol = data["symbol"]
-				bid = data["bid"]
-				ask = data["ask"]
-				ts = data["timestamp"]
-
-				# here I update the symbol instead. 
-				# and then the symbol update each of the tradingplan bound to it. 
-
-				#print(symbol,bid,ask,ts)
-
-				try:
-					if symbol in self.symbols:
-						self.symbol_data[symbol].update_price(bid,ask,ts)
-				except	Exception	as e:
-					PrintException(e,"Order update error")
-				# if symbol in self.tradingplan:
-				# 	self.tradingplan[symbol].ppro_update_price(bid,ask,ts)
 
 
 	def get_spread(self,symbol):
@@ -1729,7 +1714,7 @@ class Manager:
 		if ticker in self.current_positions:
 			return self.current_positions[ticker]
 		else:
-			return (0,0)
+			return 0
 
 	def set_all_tp(self):
 
@@ -2466,7 +2451,32 @@ class Manager:
 		info = {}
 		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
 
+	def sim18(self):
 
+		name = 'AUTO_PAIR_AMM_SQQQ'
+		orders = {'SQQQ.NQ':10}
+		risk = 0 
+		aggresive = False 
+		info = {'MAX':10,'MIN':0,'INTERVAL':10}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
+
+	def sim19(self):
+
+		name = 'AUTO_PAIR_AMM_SQQQ_TQQQ'
+		orders = {'SQQQ.NQ':14,'TQQQ.NQ':10}
+		risk = 0 
+		aggresive = False 
+		info = {'MAX':10,'MIN':0,'INTERVAL':10}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
+
+	def sim20(self):
+
+		name = 'AUTO_PAIR_AMM_RWMIWM'
+		orders = {'RWM.AM':90,'IWM.AM':10}
+		risk = 0 
+		aggresive = False 
+		info = {'MAX':10,'MIN':0,'INTERVAL':10}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
 def force_close_port(port, process_name=None):
 	"""Terminate a process that is bound to a port.
 	

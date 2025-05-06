@@ -41,9 +41,9 @@ class TradingPlan_AMM(TradingPlan_Basket):
 		self.core_symbol = symbol
 
 		try:
-			maxlot = int(abs(self.info["MAXLOT"]))
+			maxlot = int(abs(self.info["MAX"]))
 
-			minlot = int(abs(self.info["MINLOT"]))
+			minlot = int(abs(self.info["MIN"]))
 
 			interval = int(self.info['INTERVAL'])
 
@@ -62,12 +62,17 @@ class TradingPlan_AMM(TradingPlan_Basket):
 
 		# use the ratio to update all else. 
 
+		log_print(self.source," core share update:",share, " current pair:",self.current_coefficient,self.ratio)
 		for symbol,share in self.ratio.items():
 
 			if symbol != self.core_symbol:
-				self.submit_expected_shares(symbol,int(share*self.current_coefficient),True)
 
-		log_print(self.source,"Update:",self.current_shares[self.core_symbol],self.current_coefficient,self.expected_shares)
+				if self.current_coefficient==0:
+					self.submit_expected_shares(symbol,0,False)
+				else:
+					self.submit_expected_shares(symbol,int(share*self.current_coefficient),False)
+
+		log_print(self.source,"core share update:",self.current_shares[self.core_symbol],self.current_coefficient,self.expected_shares)
 
 	def get_homeo(self):
 
@@ -88,15 +93,6 @@ class TradingPlan_AMM(TradingPlan_Basket):
 		if symbol == self.core_symbol:
 			self.symbols[self.core_symbol].update_standard_lot(share)
 
-	def submit_expected_pair(self,amount,passive):
-
-		self.symbols[self.symbol2].turn_on_aggresive_only()
-
-		if passive:
-			self.submit_expected_shares(self.symbol1,amount*self.ratio[0],False)
-		else:
-			self.submit_expected_shares(self.symbol1,amount*self.ratio[0],True)
-
 
 	def notify_holding_change(self,symbol):
 
@@ -116,7 +112,7 @@ class TradingPlan_AMM(TradingPlan_Basket):
 
 		self.symbols[self.core_symbol].flatten_mode = True 
 		self.flatten_order=True
-		# log_print(self.source,self.algo_name," flattening, aggresive:",self.aggresive_exit)
+		log_print(self.source,self.algo_name," flattening, aggresive:",self.aggresive_exit)
 
 		# for symbol,item in self.symbols.items():
 		# 	self.submit_expected_shares(symbol,0,self.aggresive_exit)

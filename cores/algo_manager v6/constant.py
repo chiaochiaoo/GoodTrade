@@ -231,6 +231,11 @@ PASSIVESHORT = "PASSIVESHORT"
 PASSIVEBUY = "Passivebuy"
 PASSIVESELL = "Passivesell"
 
+
+PASSIVEBUY_L = "Passivebuy_L"
+PASSIVESELL_L = "Passivesell_L"
+
+
 IOCBUY = "IoCBuy"
 IOCSELL = "IoCSell"
 

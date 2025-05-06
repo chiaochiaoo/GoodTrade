@@ -313,7 +313,9 @@ class Symbol:
 
 		incoming_shares,avg_price = self.incoming_shares_calculate()  #shares received.
 
-		self.current_avgprice,self.current_shares = self.manager.get_position(self.symbol_name)   #current shares 
+		self.current_shares = self.manager.get_position(self.symbol_name)   #current shares 
+
+		print("CHECKING",self.current_shares,incoming_shares)
 		self.difference = self.current_shares - self.previous_shares
 
 		if self.difference!=incoming_shares:
@@ -327,7 +329,7 @@ class Symbol:
 				Note: here i can impment a immediate managerial update. 
 				"""
 				time.sleep(1)
-				self.current_avgprice,self.current_shares = self.manager.get_position(self.symbol_name)
+				self.current_shares = self.manager.get_position(self.symbol_name)
 				self.difference = self.current_shares - self.previous_shares
 				incoming_shares,avg_price = self.incoming_shares_calculate()		
 

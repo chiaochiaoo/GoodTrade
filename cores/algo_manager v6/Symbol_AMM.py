@@ -193,7 +193,7 @@ class Symbol_AMM(Symbol):
 
 		incoming_shares,avg_price = self.incoming_shares_calculate()  #shares received.
 
-		self.current_avgprice,self.current_shares = self.manager.get_position(self.symbol_name)   #current shares 
+		self.current_shares = self.manager.get_position(self.symbol_name)   #current shares 
 		self.difference = self.current_shares - self.previous_shares
 
 		if self.difference!=incoming_shares:
@@ -207,7 +207,7 @@ class Symbol_AMM(Symbol):
 				Note: here i can impment a immediate managerial update. 
 				"""
 				time.sleep(1)
-				self.current_avgprice,self.current_shares = self.manager.get_position(self.symbol_name)
+				self.current_shares = self.manager.get_position(self.symbol_name)
 				self.difference = self.current_shares - self.previous_shares
 				incoming_shares,avg_price = self.incoming_shares_calculate()		
 
@@ -231,14 +231,21 @@ class Symbol_AMM(Symbol):
 
 	def flatten_phase(self):
 
-		if self.current_shares<0:
-			self.action = PASSIVEBUY
-		else:
-			self.action = PASSIVESELL
+		if self.current_shares!=0:
+			if self.current_shares<0:
+				self.action = PASSIVEBUY
 
-		self.ppro_out.send([CANCEL,self.symbol_name]) # only cancel previous order!
+				if self.bid_change==True:
+					self.ppro_out.send([CANCEL,self.symbol_name]) # only cancel previous order!
+					self.ppro_out.send([self.action,self.symbol_name,abs(self.current_shares),0,self.manager.gateway])
 
-		self.ppro_out.send([self.action,self.symbol_name,abs(self.current_shares),0,self.manager.gateway])
+			else:
+				self.action = PASSIVESELL
+
+				if self.ask_change==True:
+					self.ppro_out.send([CANCEL,self.symbol_name]) # only cancel previous order!
+					self.ppro_out.send([self.action,self.symbol_name,abs(self.current_shares),0,self.manager.gateway])
+
 
 	def ordering_phase(self):
 
@@ -280,12 +287,12 @@ class Symbol_AMM(Symbol):
 			skip = False 
 
 
-		if not skip and self.can_bid:
-			self.ppro_out.send([PASSIVEBUY,self.symbol_name,self.standard_lot,0,self.manager.gateway])
-			self.ppro_out.send([PASSIVEBUY,self.symbol_name,self.standard_lot,0.01,self.manager.gateway])
-		if not skip and self.can_ask:
-			self.ppro_out.send([PASSIVESELL,self.symbol_name,self.standard_lot,0,self.manager.gateway])
-			self.ppro_out.send([PASSIVESELL,self.symbol_name,self.standard_lot,0.01,self.manager.gateway])
+		if not skip and self.can_bid and self.data[BID]!=0:
+			self.ppro_out.send([PASSIVEBUY_L,self.symbol_name,self.standard_lot,round(self.data[BID],2),self.manager.gateway])
+			self.ppro_out.send([PASSIVEBUY_L,self.symbol_name,self.standard_lot,round(self.data[BID]-0.01,2),self.manager.gateway])
+		if not skip and self.can_ask and self.data[ASK]!=0:
+			self.ppro_out.send([PASSIVESELL_L,self.symbol_name,self.standard_lot,round(self.data[ASK],2),self.manager.gateway])
+			self.ppro_out.send([PASSIVESELL_L,self.symbol_name,self.standard_lot,round(self.data[ASK]+0.01,2),self.manager.gateway])
 
 		if self.request>0:
 			self.action = PASSIVEBUY

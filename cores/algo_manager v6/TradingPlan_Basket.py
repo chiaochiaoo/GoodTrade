@@ -556,6 +556,10 @@ class TradingPlan_Basket:
 			aggresive = 0 
 			log_print(self.source,self.algo_name,symbol," spread too high. aggresive off")
 
+		if shares==0:
+			self.expected_shares[symbol] = shares
+			self.add_to_original_position(symbol,shares)
+			self.recalculate_current_request(symbol)
 
 		if symbol not in self.banned and self.flatten_order!=True and check:
 			with self.read_lock[symbol]:

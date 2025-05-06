@@ -837,6 +837,8 @@ class UI(pannel):
 			"ARCA",
 			"BATS",
 			"EDGA",
+			"MEMX-P",
+			"ARCA-P",
 		]
 
 
@@ -1411,6 +1413,13 @@ class UI(pannel):
 			c+=1
 
 			ttk.Button(self.tms_pannel, text="Sim 6: 3 Aggresive (div) TQQQ 15,-5, SQQQ -15,5",command=self.manager.sim6).grid(sticky="w",column=1,row=c)
+			c+=1
+
+			ttk.Button(self.tms_pannel, text="SIM: MM: SQQQ",command=self.manager.sim18).grid(sticky="w",column=1,row=c)
+			c+=1
+			ttk.Button(self.tms_pannel, text="SIM: AMM : SQQQTQQQ",command=self.manager.sim19).grid(sticky="w",column=1,row=c)
+			c+=1
+			ttk.Button(self.tms_pannel, text="SIM: AMM : RWM/IWM",command=self.manager.sim20).grid(sticky="w",column=1,row=c)
 			c+=1
 			ttk.Button(self.tms_pannel, text="Sim 7: MOO in",command=self.manager.sim7).grid(sticky="w",column=1,row=c)
 			c+=1

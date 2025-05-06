@@ -31,6 +31,7 @@ summary_being_read = False
 POSITION_UPDATE = "Position Update"
 SYMBOL_UPDATE = "Symbol Update"
 SUMMARY_UPDATE  = "Summary update"
+ORDER_UPDATE = "Order Update"
 
 def open_file():
 
@@ -845,14 +846,14 @@ def flush_expired_buffers(now_ms,pipe):
 						ostat_price = fill_info["price"]
 					print(latest_fills,fill_info,now_ms-ostat_fill_time_ms)
 
-
 				final_price = ostat_price if ostat_price is not None else approx_fill_price
 				data ={}
 				data["symbol"]= symbol
-				# data["side"]= side
+
 				data["price"]= float(final_price)
 				data["shares"]= int(vol_diff)
 				data["timestamp"]= now_ms
+				data['total'] = new['volume']
 				pipe.send(["order confirm",data])
 				
 				print(f"[{symbol}] Volume Change: {vol_diff}, Fill Price: {round(final_price, 4)},{ostat_price},{approx_fill_price}")
@@ -867,6 +868,7 @@ def flush_expired_buffers(now_ms,pipe):
 				temp_positions.pop(symbol, None)
 				symbol_buffers.pop(symbol, None)
 
+	#pipe.send(["order confirm",current_positions])
 def track_position_changes(pipe):
 
 	global user 
@@ -940,21 +942,6 @@ def register_ostat_output(port=9999):
 		#print(f"[OSTAT] Feed registered on port {port}")
 	except Exception as e:
 		print(f"[OSTAT ERROR] {e}")
-
-def ostat_listener(port=9999):
-	register_ostat_output(port)
-	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	sock.bind(('localhost', port))
-	print("[OSTAT LISTENER] Active")
-
-	while True:
-		try:
-			stream_data, _ = sock.recvfrom(4096)
-			decode_ostat(stream_data.decode("utf-8", errors="ignore"))
-		except Exception as e:
-			print(f"[OSTAT ERROR] {e}")
-
-
 
 
 def api_checker(pipe,port):
@@ -1084,17 +1071,17 @@ def Ppro_in_v6(port,pipe):
 
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 	
-	multiprocessing.freeze_support()
+# 	multiprocessing.freeze_support()
 
-	port =4609
+# 	port =4609
 
-	ppro_in, ppro_pipe_end = multiprocessing.Pipe()
+# 	ppro_in, ppro_pipe_end = multiprocessing.Pipe()
 
-	ppro_in_manager = multiprocessing.Process(name="ppro in",target=Ppro_in_v6, args=(port,ppro_pipe_end),daemon=True)
-	ppro_in_manager.daemon=True
-	ppro_in_manager.start()
-	while True:
-		d = ppro_in.recv()
-		print(d)
+# 	ppro_in_manager = multiprocessing.Process(name="ppro in",target=Ppro_in_v6, args=(port,ppro_pipe_end),daemon=True)
+# 	ppro_in_manager.daemon=True
+# 	ppro_in_manager.start()
+# 	while True:
+# 		d = ppro_in.recv()
+# 		print(d)

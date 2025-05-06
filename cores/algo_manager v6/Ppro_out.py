@@ -248,6 +248,10 @@ def passive_buy(symbol,share,offset,gateway):
 			r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=BATS Buy Parallel-2D Limit Near DAY&shares='+str(share)
 		elif gateway ==3:
 			r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=EDGA Buy ROUC Limit Near DAY&shares='+str(share)
+		elif gateway ==4:
+			r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Buy MEMX Limit Near Visible DAY PostOnly&shares='+str(share)
+		elif gateway ==5:
+			r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=ARCA Buy ARCX Limit Near DAY PostOnly&shares='+str(share)
 		else:
 			r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=ARCA Buy ARCX Limit Near DAY&shares='+str(share)
 
@@ -256,6 +260,51 @@ def passive_buy(symbol,share,offset,gateway):
 
 	return r,sucess,failure
 
+def passive_buy_l(symbol,share,price,gateway):
+
+	if gateway ==0:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit Visible DAY&shares='+str(share)
+	#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit DAY BookOnly&shares='+str(share)
+	elif gateway ==1:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Buy ARCX Limit DAY&shares='+str(share)
+	elif gateway ==2:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=BATS Buy Parallel-2D Limit Near DAY&shares='+str(share)
+	elif gateway ==3:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=EDGA Buy ROUC Limit DAY&shares='+str(share)
+	elif gateway ==4:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit Visible DAY PostOnly&shares='+str(share)
+	elif gateway ==5:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Buy ARCX Limit DAY PostOnly&shares='+str(share)
+	else:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Buy ARCX Limit DAY&shares='+str(share)
+
+	sucess='passive buy limit order success on '+symbol
+	failure="Error passive buy limit order on "+symbol
+
+	return r,sucess,failure
+
+def passive_sell_l(symbol,share,price,gateway):
+
+	if gateway ==0:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit Visible DAY&shares='+str(share)
+	#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit DAY BookOnly&shares='+str(share)
+	elif gateway ==1:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price)+'&ordername=ARCA Sell->Short ARCX Limit DAY&shares='+str(share)
+	elif gateway ==2:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=BATS Sell->Short Parallel-2D Limit DAY&shares='+str(share)
+	elif gateway ==3:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=EDGA Sell->Short ROUC Limit DAY&shares='+str(share)
+	elif gateway ==4:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price)+'&ordername=MEMX Sell->Short MEMX Limit Visible DAY PostOnly&shares='+str(share)
+	elif gateway ==5:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=ARCA Sell->Short ARCX Limit DAY PostOnly&shares='+str(share)
+	else:
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit Visible DAY&shares='+str(share)
+		#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit DAY BookOnly&shares='+str(share)
+	sucess='passive sell limit order success on '+symbol
+	failure="Error passive sell limit order on "+symbol
+
+	return r,sucess,failure
 
 def passive_sell(symbol	,share,offset,gateway):
 
@@ -290,9 +339,13 @@ def passive_sell(symbol	,share,offset,gateway):
 			r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=BATS Sell->Short Parallel-2D Limit Near DAY&shares='+str(share)
 		elif gateway ==3:
 			r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=EDGA Sell->Short ROUC Limit Near DAY&shares='+str(share)
+		elif gateway ==4:
+			r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Sell->Short MEMX Limit Near Visible DAY PostOnly&shares='+str(share)
+		elif gateway ==5:
+			r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=ARCA Sell->Short ARCX Limit Near DAY PostOnly&shares='+str(share)
 		else:
 			r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(0.01) +'&priceadjust='+str(offset)+'&ordername=MEMX Sell->Short MEMX Limit Near Visible DAY&shares='+str(share)
-
+		#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit DAY BookOnly&shares='+str(share)
 	sucess='passive sell limit order success on '+symbol
 	failure="Error passive sell limit order on "+symbol
 
@@ -450,6 +503,22 @@ def Ppro_out(pipe,port,pipe_status): #a sperate process. GLOBALLY.
 				request_str,sucess_str,failure_str=passive_sell(symbol,share,offset,gateway)
 				is_order = True
 
+			elif type_ == PASSIVEBUY_L:
+
+				symbol = d[1]
+				share = d[2]
+				price = d[3]
+				gateway = d[4]
+				request_str,sucess_str,failure_str=passive_buy_l(symbol,share,price,gateway)
+				is_order = True
+			elif type_ == PASSIVESELL_L:
+
+				symbol = d[1]
+				share = d[2]
+				price = d[3]
+				gateway = d[4]
+				request_str,sucess_str,failure_str=passive_sell_l(symbol,share,price,gateway)
+				is_order = True
 			# elif type_ ==BREAKUPBUY:
 			# 	symbol = d[1]
 			# 	share = d[2]
