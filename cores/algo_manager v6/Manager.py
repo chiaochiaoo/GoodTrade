@@ -1067,7 +1067,7 @@ class Manager:
 
 				
 				for ticker in total_moc.keys():
-					share = total_moc[ticker][1]
+					share = total_moc[ticker]
 					reque = ""
 					if ticker[-2:]=="NQ":
 
@@ -1124,7 +1124,7 @@ class Manager:
 
 						reque = ""
 						
-						share = total_moc[ticker][1]
+						share = total_moc[ticker]
 
 						if ticker[-2:]=="NY":
 							if share<0:
@@ -2463,7 +2463,7 @@ class Manager:
 	def sim19(self):
 
 		name = 'AUTO_PAIR_AMM_SQQQ_TQQQ'
-		orders = {'SQQQ.NQ':14,'TQQQ.NQ':10}
+		orders = {'SQQQ.NQ':22,'TQQQ.NQ':10}
 		risk = 0 
 		aggresive = False 
 		info = {'MAX':10,'MIN':0,'INTERVAL':10}
