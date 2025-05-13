@@ -1419,6 +1419,8 @@ class UI(pannel):
 			c+=1
 			ttk.Button(self.tms_pannel, text="SIM: AMM : SQQQTQQQ",command=self.manager.sim19).grid(sticky="w",column=1,row=c)
 			c+=1
+			ttk.Button(self.tms_pannel, text="SIM: AMM : SQQQTQQQ-AGG",command=self.manager.sim19b).grid(sticky="w",column=1,row=c)
+			c+=1
 			ttk.Button(self.tms_pannel, text="SIM: AMM : RWM/IWM",command=self.manager.sim20).grid(sticky="w",column=1,row=c)
 			c+=1
 			ttk.Button(self.tms_pannel, text="Sim 7: MOO in",command=self.manager.sim7).grid(sticky="w",column=1,row=c)

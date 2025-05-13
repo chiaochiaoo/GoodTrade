@@ -287,6 +287,7 @@ class Symbol:
 
 				self.request = 0
 				
+				log_print(self.source,self.symbol_name," insepcting",self.current_shares)
 				if self.ppro_homeo!=True:
 					self.regulating_check_phase(tps)
 				else:
@@ -315,7 +316,7 @@ class Symbol:
 
 		self.current_shares = self.manager.get_position(self.symbol_name)   #current shares 
 
-		print("CHECKING",self.current_shares,incoming_shares)
+		#print("CHECKING",self.current_shares,incoming_shares)
 		self.difference = self.current_shares - self.previous_shares
 
 		if self.difference!=incoming_shares:

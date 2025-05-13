@@ -26,7 +26,7 @@ class TradingPlan_AMM(TradingPlan_Basket):
 
 		super().__init__(algo_name,risk,Manager)
 
-		log_print("TP working?")
+		log_print("TP working AMM",info)
 		self.source = "TP AMM: "
 
 		self.ratio = {}
@@ -35,6 +35,11 @@ class TradingPlan_AMM(TradingPlan_Basket):
 		self.core_symbol = ''
 
 		self.info = info
+
+
+		self.aggresive= False 
+		if 'AGGRESIVE' in info:
+			self.aggresive = True
 
 	def register_core_symbol(self,symbol):
 
@@ -48,6 +53,9 @@ class TradingPlan_AMM(TradingPlan_Basket):
 			interval = int(self.info['INTERVAL'])
 
 			self.symbols[self.core_symbol].set_limits(maxlot,minlot,interval)
+
+			if self.aggresive ==True:
+				self.symbols[self.core_symbol].flop_mode = False 
 		except Exception as e:
 			PrintException(e," AMM fail")
 
@@ -70,9 +78,9 @@ class TradingPlan_AMM(TradingPlan_Basket):
 				if self.current_coefficient==0:
 					self.submit_expected_shares(symbol,0,False)
 				else:
-					self.submit_expected_shares(symbol,int(share*self.current_coefficient),False)
+					self.submit_expected_shares(symbol,int(share*self.current_coefficient),self.aggresive)
 
-		log_print(self.source,"core share update:",self.current_shares[self.core_symbol],self.current_coefficient,self.expected_shares)
+		log_print(self.source,"core share update:",self.current_shares[self.core_symbol],self.current_coefficient,'expect: ',self.expected_shares,' current:',self.current_shares)
 
 	def get_homeo(self):
 
@@ -112,7 +120,7 @@ class TradingPlan_AMM(TradingPlan_Basket):
 
 		self.symbols[self.core_symbol].flatten_mode = True 
 		self.flatten_order=True
-		log_print(self.source,self.algo_name," flattening, aggresive:",self.aggresive_exit)
+		log_print(self.source,self.algo_name,self.core_symbol," flattening, aggresive:",self.aggresive_exit)
 
 		# for symbol,item in self.symbols.items():
 		# 	self.submit_expected_shares(symbol,0,self.aggresive_exit)

@@ -2469,6 +2469,17 @@ class Manager:
 		info = {'MAX':10,'MIN':0,'INTERVAL':10}
 		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
 
+
+	def sim19b(self):
+
+		name = 'AUTO_PAIR_AMM_SQQQ_TQQQ'
+		orders = {'SQQQ.NQ':22,'TQQQ.NQ':10}
+		risk = 0 
+		aggresive = False 
+		info = {'MAX':10,'MIN':0,'INTERVAL':10,'AGGRESIVE':1}
+		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
+
+
 	def sim20(self):
 
 		name = 'AUTO_PAIR_AMM_RWMIWM'

@@ -161,20 +161,33 @@ def buy_market_order(symbol,share):
 
 	elif ".PA" in symbol:																												
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=TRQS Buy TRQSPARIS Market DAY&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ERNX Buy PARIS Market DAY&shares='+str(share)
 	elif ".AS" in symbol:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=TRQS Buy TRQSAMSTERDAM Market DAY&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ERNX Buy AMSTERDAM Market DAY&shares='+str(share)
 	elif ".BR" in symbol:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=TRQS Buy TRQSBRUSSELS Market DAY&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ERNX Buy BRUSSELS Market DAY&shares='+str(share)
 	elif ".LS" in symbol:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=TRQS Buy TRQSLISBON Market DAY&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ERNX Buy LISBON Market DAY&shares='+str(share)
 	elif ".MI" in symbol:#
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=TRQS Buy TRQSMILAN Market DAY&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=MILA Buy MILAN Market DAY&shares='+str(share)
+
+
 	elif ".DE" in symbol:#TRQS Buy TRQSXETRA Limit DAY
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=TRQS Buy TRQSXETRA Market DAY&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=XETR Buy XETRA Market DAY&shares='+str(share)
+
 	elif ".CH" in symbol:#TRQS Buy TRQSCOPENHAGEN Limit DAY #TRQS Buy TRQXSWISS Limit DAY
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=TRQS Buy TRQXSWISS Market DAY&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=SWX Buy Swiss Market DAY&shares='+str(share)
+
 	elif ".CO" in symbol:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=TRQS Buy TRQSCOPENHAGEN Market DAY&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=NORX Buy COPENHAGEN Market DAY&shares='+str(share)
+
 	else:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=EDGX Buy ROUC Market DAY&shares='+str(share)
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Buy ARCX Market DAY&shares='+str(share)
@@ -193,20 +206,30 @@ def sell_market_order(symbol,share):
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=TSX Sell->Short SweepSOR Market ANON DAY&shares='+str(share)
 	elif ".PA" in symbol:																												
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=TRQS Sell TRQSPARIS Market DAY&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ERNX Sell PARIS Market DAY&shares='+str(share)
 	elif ".AS" in symbol:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=TRQS Sell TRQSAMSTERDAM Market DAY&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ERNX Sell AMSTERDAM Market DAY&shares='+str(share)
 	elif ".BR" in symbol:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=TRQS Sell TRQSBRUSSELS Market DAY&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ERNX Sell BRUSSELS Market DAY&shares='+str(share)
 	elif ".LS" in symbol:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=TRQS Sell TRQSLISBON Market DAY&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ERNX Sell LISBON Market DAY&shares='+str(share)
 	elif ".MI" in symbol:																												
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=TRQS Sell TRQSMILAN Market DAY&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=MILA Sell MILAN Market DAY&shares='+str(share)
 	elif ".DE" in symbol:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=TRQS Sell TRQSXETRA Market DAY&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=XETR Sell XETRA Market DAY&shares='+str(share)
 	elif ".CH" in symbol:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=TRQS Sell TRQXSWISS Market DAY&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=SWX Sell Swiss Market DAY&shares='+str(share)
+
 	elif ".CO" in symbol:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=TRQS Sell TRQSCOPENHAGEN Market DAY&shares='+str(share)
+		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=NORX Sell COPENHAGEN Market DAY&shares='+str(share)
+		
 	else:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=EDGX Sell->Short ROUC Market DAY&shares='+str(share)
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&ordername=ARCA Sell->Short ARCX Market DAY&shares='+str(share)
@@ -262,6 +285,7 @@ def passive_buy(symbol,share,offset,gateway):
 
 def passive_buy_l(symbol,share,price,gateway):
 
+	price = f"{price:.2f}"
 	if gateway ==0:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Buy MEMX Limit Visible DAY&shares='+str(share)
 	#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit DAY BookOnly&shares='+str(share)
@@ -285,6 +309,7 @@ def passive_buy_l(symbol,share,price,gateway):
 
 def passive_sell_l(symbol,share,price,gateway):
 
+	price = f"{price:.2f}"
 	if gateway ==0:
 		r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit Visible DAY&shares='+str(share)
 	#r = 'http://127.0.0.1:8080/ExecuteOrder?symbol='+str(symbol)+'&limitprice=' + str(price) +'&ordername=MEMX Sell->Short MEMX Limit DAY BookOnly&shares='+str(share)
