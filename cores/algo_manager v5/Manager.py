@@ -779,7 +779,7 @@ class Manager:
 		MOO_pair = False 
 
 
-		MOC_send_out_timer_NQ = 1059*60+45 #954*60+30 
+		MOC_send_out_timer_NQ = 954*60+40  #1059*60+45 #954*60+30 
 
 		MOC_send_out_timer = 958*60+40 #958*60+40 #958*60+50
 
