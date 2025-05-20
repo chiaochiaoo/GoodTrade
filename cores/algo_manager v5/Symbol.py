@@ -281,6 +281,7 @@ class Symbol:
 				self.status_checking_phase(tps)
 
 				if self.inspection_complete==True:
+					self.market_out = 0
 					self.pair_off(tps)
 
 					return 0 
@@ -507,6 +508,7 @@ class Symbol:
 			self.market_out = 0
 			log_print(self.source,self.symbol_name, " just marked out. wait 1")
 			return 0
+
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second
 
