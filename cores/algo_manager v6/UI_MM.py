@@ -238,17 +238,19 @@ class UI(pannel):
 		self.ticker_var.set('DEMO.TO')
 		self.load_ticker_tab()
 
-	def load_ticker_tab(self):
+	def load_ticker_tab(self, force=True):
 		ticker = self.ticker_var.get().strip()
 		if not ticker:
 			return
 
 		# Load or create TickerMM
-		if os.path.exists(f"configs/{ticker}.json"):
+		if os.path.exists(f"configs/{ticker}.json") and not force:
 			mm = TickerMM(ticker)
 		else:
 			mm = TickerMM(ticker, override=True)
 			mm.save()
+
+		self.mm = mm
 
 		# Create new tab
 		tab = ttk.Frame(self.marketmaking_notebook)
@@ -257,7 +259,7 @@ class UI(pannel):
 		# --- Step 1: Group schema entries by section ---
 		sections = {}
 		for entry in CONFIG_SCHEMA:
-			sec = entry.get("section", "macro")
+			sec = entry.get("section", "status")
 			sections.setdefault(sec, []).append(entry)
 
 		section_frames = {}
@@ -265,53 +267,62 @@ class UI(pannel):
 
 		for sec_name, entries in sections.items():
 			# Section title
-			label_text = sec_name.upper() + " SECTION"
-			ttk.Label(tab, text=label_text, font=("Segoe UI", 10, "bold")).grid(
-				row=row_counter, column=0, columnspan=FIELDS_PER_ROW * 2, sticky="w", pady=(10, 5), padx=10
-			)
+			collapsible = CollapsibleSection(tab, title=sec_name.upper())
+			collapsible.grid(row=row_counter, column=0, columnspan=FIELDS_PER_ROW * 2, sticky="w", padx=10)
 
-			# Section container
-			section_frame = ttk.Frame(tab)
-			section_frame.grid(row=row_counter + 1, column=0, columnspan=FIELDS_PER_ROW * 2, sticky="w", padx=10)
+			section_frame = collapsible.content  # actual frame for widgets
+			section_frames[sec_name] = section_frame
 			section_frames[sec_name] = section_frame
 
 			row_counter += 2
 
-			row = 0
-			col = 0
+			row_tracker = {}  # row -> current column count
+
 			for entry in entries:
 				name = entry["name"]
 				label = entry["label"]
 				if name == "Ticker":
 					continue
 
-				# Label
-				ttk.Label(section_frame, text=f"{label}:").grid(
-					row=row, column=col * 2, sticky="e", padx=5, pady=5
-				)
-
-				# Entry / Combobox
-				var = mm.vars[name][0]
+				entry_type = entry["type"]
+				readonly = entry.get("readonly", False)
 				options = entry.get("options")
+				var = mm.vars[name][0] if name in mm.vars else None
 
-				if options:
-					widget = ttk.Combobox(section_frame, textvariable=var, values=options, state="readonly", width=14)
+				row = entry.get("row", 0)
+				col = row_tracker.get(row, 0)
+
+				if entry_type == "button":
+					# Button takes 1 cell directly
+					cmd_name = entry.get("command")
+					cmd_func = self.button_commands.get(cmd_name)
+					widget = ttk.Button(section_frame, text=label, command=cmd_func)
+					widget.grid(row=row, column=col, sticky="w", padx=5, pady=5)
+					row_tracker[row] = col + 1
 				else:
-					widget = ttk.Entry(section_frame, textvariable=var, width=14)
-					if name == "cur_inv":
-						widget.configure(state="readonly")
+					# Label
+					ttk.Label(section_frame, text=f"{label}:").grid(
+						row=row, column=col * 2, sticky="e", padx=5, pady=5
+					)
+					# Widget
+					if readonly:
+						widget = ttk.Entry(section_frame, textvariable=var, state="readonly")
+					elif entry_type == "bool":
+						widget = ttk.Checkbutton(section_frame, variable=var)
+					elif options:
+						widget = ttk.Combobox(section_frame, textvariable=var, values=options, state="readonly", width=14)
+					else:
+						widget = ttk.Entry(section_frame, textvariable=var, width=14)
 
-				widget.grid(row=row, column=col * 2 + 1, sticky="w", padx=5, pady=5)
+					widget.grid(row=row, column=col * 2 + 1, sticky="w", padx=5, pady=5)
+					row_tracker[row] = col + 1
 
-				col += 1
-				if col == FIELDS_PER_ROW:
-					row += 1
-					col = 0
-
-		# Save Button
+		# Save Button at the bottom of the last section
 		ttk.Button(tab, text="Save", command=mm.save).grid(
 			row=row_counter + 10, column=0, columnspan=FIELDS_PER_ROW * 2, pady=15, padx=10, sticky="w"
 		)
+
+
 	def set_risk(self):
 
 		try:

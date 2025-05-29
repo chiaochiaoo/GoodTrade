@@ -8,32 +8,105 @@ from tkinter import ttk
 import os
 
 
+STATUS = "status"
+SETTINGS = "settings"
+PRICE_ZONES = "price zones"
+MANAGEMENT = "Management"
+RESTRICTIVE_MODE = "Restrictive Mode"
+OPENING_MODE = "Opening Mode"
+AGGRESIVE_MODE = 'Aggresive Mode'
+VOLUME_MODE = 'Volume Mode'
+
 # === Step 1: Central Config Schema ===
 CONFIG_SCHEMA = [
-    {"name": "Ticker",      "label": "Ticker",            "type": "string", "section": "status", "row": 0, "col": 0},
-    
+    {"name": "Ticker",      "label": "Ticker",            "section": STATUS, "type": "string", "row": 0},
+    {"name": "Status",      "label": "Status",            "section": STATUS, "type": "string", "row": 0, "default": "Pending", "readonly": True},
+    {"name": "cur_inv",     "label": "Current Inventory", "section": STATUS, "type": "int",    "row": 0, "readonly": True},
+    {"name": "unrealized",  "label": "Unreal",            "section": STATUS, "type": "float",  "row": 0},
+    {"name": "realized",    "label": "Real",              "section": STATUS, "type": "float",  "row": 0},
 
-    {"name": "Status",      "label": "Status",            "type": "string",  "default":"Pending","section": "status", "readonly":True,"row": 0, "col": 1},
-    {"name": "ticksize",    "label": "Tick Size",         "type": "float",  "section": "status", "row": 0, "col": 2},
-    {"name": "cur_inv",     "label": "Current Inventory", "type": "int",    "section": "status", "row": 0, "col": 3,"readonly":True,},
-    {"name": "unrealized",  "label": "Unreal",            "type": "float",  "section": "status", "row": 0, "col": 4},
-    {"name": "realized",    "label": "Real",              "type": "float",  "section": "status", "row": 0, "col": 5},
-    {"name": "start_btn",   "label": "Start Strategy",     "type": "button", "section": "status","row": 1,"col": 1,"command": "start_strategy"},
 
-    {"name": "boardlot",    "label": "Board Lot",         "type": "int",    "section": "settings", "row": 0, "col": 0},
-    {"name": "MAX_INV",     "label": "Max Inventory",     "type": "int",    "section": "settings", "row": 0, "col": 1},
+    {"name": "d_enabled",     "label": "Default Mode",      "section": STATUS, "type": "bool",   "row": 1},
+    {"name": "r_enabled",     "label": "Restrictive Mode", "section": STATUS, "type": "bool",   "row": 1},
+    {"name": "a_enabled",     "label": "Aggresive Mode",      "section": STATUS, "type": "bool",   "row": 1},
+    {"name": "o_enabled",    "label": "Opening Enabled",      "section": STATUS, "type": "bool",   "row": 1},
 
-    {"name": "bidmult",     "label": "Bid Mult",          "type": "int",    "default": 1, "section": "settings", "row": 0, "col": 2},
-    {"name": "askmult",     "label": "Ask Mult",          "type": "int",    "default": 1, "section": "settings", "row": 0, "col": 3},
 
-    {"name": "PssVenue",    "label": "Passive Venue",     "type": "string", "options": ["T1", "T2", "T3"], "section": "settings", "row": 1, "col": 0},
-    {"name": "AggVenue",    "label": "Aggressive Venue",  "type": "string", "options": ["T1", "T2", "T3"], "section": "settings", "row": 1, "col": 1},
-    {"name": "OpnVenue",    "label": "Open Venue",        "type": "string", "options": ["T1", "T2", "T3"], "section": "settings", "row": 1, "col": 2},
 
-    {"name": "Res",         "label": "Restrictive Enabled",       "type": "bool",   "section": "Restrictive Mode", "row": 0, "col": 0},
-    {"name": "res_unreal",  "label": "Unreal Condition",         "type": "float",   "section": "Restrictive Mode", "row": 0, "col": 1},
-    {"name": "res_cond",         "label": "Other Condition",       "type": "float",   "section": "Restrictive Mode", "row": 0, "col": 2}
+    {"name": "adj_Spread",  "label": "Adj Spread",        "section": STATUS, "type": "float",  "row": 2, "default": 0.01},
+
+
+
+
+
+
+    {"name": "boardlot",    "label": "Board Lot",         "section": SETTINGS, "type": "int",    "row": 0},
+    {"name": "ticksize",    "label": "Tick Size",         "section": SETTINGS, "type": "float",  "row": 0},
+    {"name": "MAX_INV",     "label": "Max Inventory",     "section": SETTINGS, "type": "int",    "row": 0},
+    {"name": "maxLoss",     "label": "Max Loss",          "section": SETTINGS, "type": "int",    "row": 0},
+    {"name": "email_alert", "label": "Email Alert",       "section": SETTINGS, "type": "bool",   "row": 0},
+    {"name": "defaultVenue","label": "Default Venue",     "section": SETTINGS, "type": "string", "row": 1, "options": ["T1", "T2", "T3"]},
+    {"name": "bidmult",     "label": "Glb Bid Mult",      "section": SETTINGS, "type": "int",    "row": 1, "default": 1},
+    {"name": "askmult",     "label": "Glb Ask Mult",      "section": SETTINGS, "type": "int",    "row": 1, "default": 1},
+
+    {"name": "start_btn",   "label": "Start Strategy",    "section": MANAGEMENT, "type": "button", "row": 1, "command": "start_strategy"},
+    {"name": "stop_btn",    "label": "Stop Strategy",     "section": MANAGEMENT, "type": "button", "row": 1, "command": "start_strategy"},
+    {"name": "reserve_bidmult", "label": "Rsv Bid Mult",  "section": PRICE_ZONES, "type": "int", "row": 0, "default": 0},
+    {"name": "reserve_askmult", "label": "Rsv Ask Mult",  "section": PRICE_ZONES, "type": "int", "row": 0, "default": 0},
+    {"name": "buyzone1",    "label": "Buy Zone1",         "section": PRICE_ZONES, "type": "int", "row": 1, "default": 0},
+    {"name": "buyzone2",    "label": "Buy Zone2",         "section": PRICE_ZONES, "type": "int", "row": 1, "default": 0},
+    {"name": "buyzone3",    "label": "Buy Zone3",         "section": PRICE_ZONES, "type": "int", "row": 1, "default": 0},
+    {"name": "sellzone1",   "label": "Sell Zone1",        "section": PRICE_ZONES, "type": "int", "row": 2, "default": 0},
+    {"name": "sellzone2",   "label": "Sell Zone2",        "section": PRICE_ZONES, "type": "int", "row": 2, "default": 0},
+    {"name": "sellzone3",   "label": "Sell Zone3",        "section": PRICE_ZONES, "type": "int", "row": 2, "default": 0},
+    {"name": "loadData",    "label": "Load Data",         "section": PRICE_ZONES, "type": "button", "row": 3},
+
+
+    {"name": "r_enabled",         "label": "Restrictive Enabled", "section": RESTRICTIVE_MODE, "type": "bool",   "row": 0},
+
+    {"name": "r_nbbo",      "label": "Post on L1 ask",    "section": RESTRICTIVE_MODE, "type": "bool",   "row": 0},
+    {"name": "r_bidmult",   "label": "Bid Mult",           "section": RESTRICTIVE_MODE, "type": "int",  "row": 0, "default": 1},
+    {"name": "r_askmult",   "label": "Ask Mult",          "section": RESTRICTIVE_MODE, "type": "int",  "row": 0, "default": 1},
+    # {"name": "PssVenue",    "label": "Passive Venue",     "section": RESTRICTIVE_MODE, "type": "string", "row": 2, "options": ["T1", "T2", "T3"]},
+    # {"name": "AggVenue",    "label": "Aggressive Venue",  "section": RESTRICTIVE_MODE, "type": "string", "row": 2, "options": ["T1", "T2", "T3"]},
+    # {"name": "OpnVenue",    "label": "Open Venue",        "section": RESTRICTIVE_MODE, "type": "string", "row": 2, "options": ["T1", "T2", "T3"]},
+
+
+
+    {"name": "o_enabled",    "label": "Opening Enabled",      "section": OPENING_MODE, "type": "bool",   "row": 0},
+    {"name": "o_bidmult",   "label": "Bid Mult",           "section": OPENING_MODE, "type": "int",  "row": 0, "default": 1},
+    {"name": "o_askmult",   "label": "Ask Mult",          "section": OPENING_MODE, "type": "int",  "row": 0, "default": 1},
+
+
+    {"name": "a_enabled",     "label": "Aggresive Enabled",      "section": AGGRESIVE_MODE, "type": "bool",   "row": 0},
+
+    {"name": "a_action",    "label": "Aggresive Action",  "section": AGGRESIVE_MODE, "type": "string", "row": 0, "options": ["Buy", "Sell"],'default':'Buy'},
+    {"name": "a_type",    "label": "Target Volume By",  "section": AGGRESIVE_MODE, "type": "string", "row": 0, "options": ["Size", "Percentage"],'default':'Size'},
+
+    {"name": "a_bidmult",   "label": "Bid Mult",           "section": AGGRESIVE_MODE, "type": "int",  "row": 1, "default": 1},
+    {"name": "a_askmult",   "label": "Ask Mult",          "section": AGGRESIVE_MODE, "type": "int",  "row": 1, "default": 1},
+
+
+    {"name": "a_size",       "label": "Total Size",          "section": AGGRESIVE_MODE, "type": "int",  "row": 2, "default": 100},
+    {"name": "a_percentage",   "label": "% Volume Target",          "section": AGGRESIVE_MODE, "type": "float",  "row": 2, "default": 0.05},
+    {"name": "a_duration",   "label": "Total Duration(Min)",          "section": AGGRESIVE_MODE, "type": "int",  "row": 2, "default": 60},
+    {"name": "a_Venue",    "label": "Aggressive Venue",  "section": AGGRESIVE_MODE, "type": "string", "row": 1, "options": ["T1", "T2", "T3"]},
+    {"name": "v_hitalert",   "label": "Hit Notification",          "section": AGGRESIVE_MODE, "type": "bool",  "row": 0, "default": 1},
+
+
+
+
 ]
+
+
+MODE_CHECKBOXES = [
+    'd_enabled',
+    "r_enabled",         # Restrictive Mode
+    "o_enabled",          # Opening Mode
+    "a_enabled",         # Aggressive Mode
+]
+
+
 # === Step 2: Dynamic TickerConfig Class ===
 TYPE_MAP = {
     "string": str,
@@ -42,11 +115,25 @@ TYPE_MAP = {
     "bool": bool,
     "button": None 
 }
-fields_spec = [
-    (entry["name"], TYPE_MAP[entry["type"]], field(default=entry.get("default", TYPE_MAP[entry["type"]]())))
-    for entry in CONFIG_SCHEMA
-    if entry["type"] in TYPE_MAP and TYPE_MAP[entry["type"]] is not None
-]
+
+# Deduplicate names when creating dataclass fields
+used_names = set()
+fields_spec = []
+
+for entry in CONFIG_SCHEMA:
+    name = entry["name"]
+    typ = entry["type"]
+
+    if typ not in TYPE_MAP or TYPE_MAP[typ] is None:
+        continue  # skip unsupported types like button
+
+    if name in used_names:
+        continue  # skip duplicates
+
+    used_names.add(name)
+    py_type = TYPE_MAP[typ]
+    default_val = entry.get("default", py_type())
+    fields_spec.append((name, py_type, field(default=default_val)))
 
 TickerConfig = make_dataclass("TickerConfig", fields_spec)
 
@@ -63,12 +150,37 @@ def config_load(ticker, folder="configs"):
     with open(path, "r") as f:
         data = json.load(f)
     return TickerConfig(**data)
-
 # Attach methods
 TickerConfig.save = config_save
 TickerConfig.load = config_load
 FIELDS_PER_ROW= 6
 # === Step 3: TickerMM Class with tkinter Variables ===
+
+class CollapsibleSection(ttk.Frame):
+    def __init__(self, parent, title="", *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+
+        self.showing = tk.BooleanVar(value=True)
+
+        # Title row with toggle button
+        self.toggle_button = ttk.Checkbutton(
+            self, text=f"▼ {title}", variable=self.showing,
+            command=self.toggle, style="Toolbutton"
+        )
+        self.toggle_button.grid(row=0, column=0, sticky="w", pady=(10, 0))
+
+        # Container for child widgets
+        self.content = ttk.Frame(self)
+        self.content.grid(row=1, column=0, sticky="w")
+
+    def toggle(self):
+        if self.showing.get():
+            self.toggle_button.configure(text=self.toggle_button.cget("text").replace("▶", "▼"))
+            self.content.grid()
+        else:
+            self.toggle_button.configure(text=self.toggle_button.cget("text").replace("▼", "▶"))
+            self.content.grid_remove()
+
 class TickerMM:
     def __init__(self, ticker: str, folder="configs", override=False, **override_values):
         self.vars = {}
@@ -156,7 +268,7 @@ class TickerUI(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Ticker Config UI")
-        self.geometry("1400x400")
+        self.geometry("1400x1000")
         self.mm = None  # TickerMM instance
 
         self.entries = {}  # { name: Entry widget }
@@ -195,9 +307,17 @@ class TickerUI(tk.Tk):
         self.marketmaking_notebook.place(x=0,rely=0,relheight=1,relwidth=1)
 
         self.ticker_var.set('DEM')
-        self.load_ticker_tab()
+        self.load_ticker_tab(False)
 
-    def load_ticker_tab(self,force=True):
+    def on_mode_toggle(self, changed_name):
+        # Ensure only one mode checkbox is True
+        for name in MODE_CHECKBOXES:
+            if name != changed_name:
+                var, _ = self.mm.vars.get(name, (None, None))
+                if var:
+                    var.set(0)
+
+    def load_ticker_tab(self, force=True):
         ticker = self.ticker_var.get().strip()
         if not ticker:
             return
@@ -218,7 +338,7 @@ class TickerUI(tk.Tk):
         # --- Step 1: Group schema entries by section ---
         sections = {}
         for entry in CONFIG_SCHEMA:
-            sec = entry.get("section", "macro")
+            sec = entry.get("section", "status")
             sections.setdefault(sec, []).append(entry)
 
         section_frames = {}
@@ -226,17 +346,16 @@ class TickerUI(tk.Tk):
 
         for sec_name, entries in sections.items():
             # Section title
-            label_text = sec_name.upper() 
-            ttk.Label(tab, text=label_text, font=("Segoe UI", 10, "bold")).grid(
-                row=row_counter, column=0, columnspan=FIELDS_PER_ROW * 2, sticky="w", pady=(10, 5), padx=10
-            )
+            collapsible = CollapsibleSection(tab, title=sec_name.upper())
+            collapsible.grid(row=row_counter, column=0, columnspan=FIELDS_PER_ROW * 2, sticky="w", padx=10)
 
-            # Section container
-            section_frame = ttk.Frame(tab)
-            section_frame.grid(row=row_counter + 1, column=0, columnspan=FIELDS_PER_ROW * 2, sticky="w", padx=10)
+            section_frame = collapsible.content  # actual frame for widgets
+            section_frames[sec_name] = section_frame
             section_frames[sec_name] = section_frame
 
             row_counter += 2
+
+            row_tracker = {}  # row -> current column count
 
             for entry in entries:
                 name = entry["name"]
@@ -247,45 +366,41 @@ class TickerUI(tk.Tk):
                 entry_type = entry["type"]
                 readonly = entry.get("readonly", False)
                 options = entry.get("options")
-
-                # Only bind var if the entry is not a button
                 var = mm.vars[name][0] if name in mm.vars else None
 
-                # Use explicit row/col layout from schema
                 row = entry.get("row", 0)
-                col = entry.get("col", 0)
+                col = row_tracker.get(row, 0)
 
-                # Label
-                if entry_type != "button":
+                if entry_type == "button":
+                    # Button takes 1 cell directly
+                    cmd_name = entry.get("command")
+                    cmd_func = self.button_commands.get(cmd_name)
+                    widget = ttk.Button(section_frame, text=label, command=cmd_func)
+                    widget.grid(row=row, column=col, sticky="w", padx=5, pady=5)
+                    row_tracker[row] = col + 1
+                else:
+                    # Label
                     ttk.Label(section_frame, text=f"{label}:").grid(
                         row=row, column=col * 2, sticky="e", padx=5, pady=5
                     )
-
-                readonly = entry.get("readonly", False)
-
-                # If read-only, show as label
-                #print(name,readonly,var.get())
-                if readonly:
-                    widget = ttk.Entry(section_frame, textvariable=var)
-                    widget.configure(state="readonly")
-                else:
-                    if entry_type == "bool":
-                        widget = ttk.Checkbutton(section_frame, variable=var)
+                    # Widget
+                    if readonly:
+                        widget = ttk.Entry(section_frame, textvariable=var, state="readonly")
+                    elif entry_type == "bool":
+                        if name in MODE_CHECKBOXES:
+                            widget = ttk.Checkbutton(section_frame, variable=var, command=lambda n=name: self.on_mode_toggle(n))
+                        else:
+                            widget = ttk.Checkbutton(section_frame, variable=var)
                     elif options:
                         widget = ttk.Combobox(section_frame, textvariable=var, values=options, state="readonly", width=14)
-
-                    elif entry_type == "button":
-                        cmd_name = entry.get("command")
-                        cmd_func = self.button_commands.get(cmd_name)
-                        widget = ttk.Button(section_frame, text=label, command=cmd_func)
                     else:
                         widget = ttk.Entry(section_frame, textvariable=var, width=14)
-                if readonly:
-                    widget.configure(state="readonly")
-                widget.grid(row=row, column=col * 2 + 1, sticky="w", padx=5, pady=5)
+
+                    widget.grid(row=row, column=col * 2 + 1, sticky="w", padx=5, pady=5)
+                    row_tracker[row] = col + 1
 
         # Save Button at the bottom of the last section
-        ttk.Button(tab, text="Save", command=mm.save).grid(
+        ttk.Button(tab, text="Save", command=lambda: self.mm.save()).grid(
             row=row_counter + 10, column=0, columnspan=FIELDS_PER_ROW * 2, pady=15, padx=10, sticky="w"
         )
 
