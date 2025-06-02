@@ -779,7 +779,7 @@ class Manager:
 
 		##########################################################
 
-		MOO_pair_timer = 570*60+20 #ts+25 # #529*60#
+		MOO_pair_timer = 575*60+20 # 570*60+20 #ts+25 # #529*60#
 		MOO_pair = False 
 
 
@@ -1540,8 +1540,12 @@ class Manager:
 
 						### depends on the active. 
 
-						if count%(3*(self.ui.active_algo_count_number.get()//100+1))==0:
-							self.check_all_pnl()
+						#if count%(3*(self.ui.active_algo_count_number.get()//100+1))==0:
+							#self.check_all_pnl()
+
+						# if count%3==0:
+						# 	self.check_all_pnl()
+
 					self.system_check()
 				except Exception as e :
 					PrintException(e, " Updating Summary Problem")
@@ -1707,6 +1711,7 @@ class Manager:
 
 			self.nq_trader_stocks = nq_trader
 
+			self.check_all_pnl()
 
 		except Exception	as e:
 			PrintException("Updating prices error",e)

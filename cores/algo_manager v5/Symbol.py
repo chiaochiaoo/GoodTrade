@@ -148,6 +148,10 @@ class Symbol:
 		#self.tradingplan_lock = threading.Lock()
 		self.tradingplans = {}
 
+
+		self.poly_bid =0
+		self.poly_ask = 0
+
 		self.init_data()
 
 		log_print(self.source,self.symbol_name," New symbol system init")
@@ -183,8 +187,9 @@ class Symbol:
 		# else:
 		# 	self.ask_change = False 
 
-		# self.data[ASK] = ask
-		# self.data[BID] = bid
+		self.poly_ask = ask
+		self.poly_bid = bid
+
 	def get_ts(self):
 		now = datetime.now()
 		timestamp = now.hour*3600 + now.minute*60 + now.second
@@ -238,6 +243,11 @@ class Symbol:
 	def get_price(self):
 		return self.data[PRICE]
 
+	def get_poly_bid(self):
+		return self.poly_bid
+
+	def get_poly_ask(self):
+		return self.poly_ask
 	def get_bid(self):
 		return self.data[BID]
 
