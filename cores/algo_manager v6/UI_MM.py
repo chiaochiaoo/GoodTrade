@@ -73,22 +73,6 @@ class UI(pannel):
 		self.sort_reverse_real = True 
 		self.sort_reverse_unreal = True 
 		
-		# infos = {
-		# 'Strategy':tradingplan.algo_name, \
-		# STATUS:tradingplan.tkvars[STATUS],\
-		# MIND: tradingplan.tkvars[MIND],\
-
-		# ESTRISK:tradingplan.tkvars[ESTRISK], \
-
-		# UNREAL_MAX: tradingplan.tkvars[UNREAL_MAX],\
-		# UNREAL_MIN: tradingplan.tkvars[UNREAL_MIN],\
-		# UNREAL:tradingplan.tkvars[UNREAL], \
-		# REALIZED:tradingplan.tkvars[REALIZED], \
-		# WR:tradingplan.tkvars[WR], \
-		# MR:tradingplan.tkvars[MR], \
-		# TR:tradingplan.tkvars[TR], \
-		# 'flatten':"",\
-		# 'log':""}
 
 		self.tk_labels_single = {}
 
@@ -111,12 +95,24 @@ class UI(pannel):
 		self.empty = tk.StringVar(value="")
 		self.custom_algo = None 
 
+
+		self.button_commands = {
+			"start_strategy": self.start_strategy,
+			"stop_strategy": self.stop_strategy,
+			# Add more as needed
+		}
+		
 		self.init_pannel()
 
 		#self.init_entry_pannel()
 
 		# self.custom_algo_init()
 
+	def start_strategy(self):
+		print(f"[{self.mm.ticker}] Strategy started")
+
+	def stop_strategy(self):
+		print(f"[{self.mm.ticker}] Strategy stopped")
 
 	def init_system_pannel(self):
 
@@ -219,13 +215,6 @@ class UI(pannel):
 			pass 
 
 
-		row +=1
-		ttk.Label(self.system_pannel, text="Maximum Risk:").grid(sticky="w",column=1,row=row,padx=10)
-		self.risk_amount = tk.Entry(self.system_pannel,textvariable=self.risk_timer,width=7)
-		self.risk_amount.grid(sticky="w",column=2,row=row,padx=10)
-
-		self.risk_set = ttk.Button(self.system_pannel, text="Set Risk",command=self.set_risk)
-		self.risk_set.grid(sticky="w",column=3,row=row)
 
 		row +=1
 		ttk.Label(self.system_pannel, text="Ticker:").grid(row=row, column=1,  sticky="w",padx=10)
@@ -237,6 +226,15 @@ class UI(pannel):
 
 		self.ticker_var.set('DEMO.TO')
 		self.load_ticker_tab()
+
+
+	def on_mode_toggle(self, changed_name):
+		# Ensure only one mode checkbox is True
+		for name in MODE_CHECKBOXES:
+			if name != changed_name:
+				var, _ = self.mm.vars.get(name, (None, None))
+				if var:
+					var.set(0)
 
 	def load_ticker_tab(self, force=True):
 		ticker = self.ticker_var.get().strip()
@@ -308,7 +306,10 @@ class UI(pannel):
 					if readonly:
 						widget = ttk.Entry(section_frame, textvariable=var, state="readonly")
 					elif entry_type == "bool":
-						widget = ttk.Checkbutton(section_frame, variable=var)
+						if name in MODE_CHECKBOXES:
+							widget = ttk.Checkbutton(section_frame, variable=var, command=lambda n=name: self.on_mode_toggle(n))
+						else:
+							widget = ttk.Checkbutton(section_frame, variable=var)
 					elif options:
 						widget = ttk.Combobox(section_frame, textvariable=var, values=options, state="readonly", width=14)
 					else:
@@ -318,21 +319,10 @@ class UI(pannel):
 					row_tracker[row] = col + 1
 
 		# Save Button at the bottom of the last section
-		ttk.Button(tab, text="Save", command=mm.save).grid(
+		ttk.Button(tab, text="Save", command=lambda: self.mm.save()).grid(
 			row=row_counter + 10, column=0, columnspan=FIELDS_PER_ROW * 2, pady=15, padx=10, sticky="w"
 		)
 
-
-	def set_risk(self):
-
-		try:
-
-			risk_ = int(self.risk_amount.get())
-			self.risk_set["text"] = "Risk Set: "+str(risk_)
-			self.manager.set_risk(risk_)
-		except Exception as e:
-
-			print(e)
 
 
 	def update_performance(self,d):
