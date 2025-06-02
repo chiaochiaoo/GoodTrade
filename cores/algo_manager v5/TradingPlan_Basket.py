@@ -1098,7 +1098,7 @@ class TradingPlan_Basket:
 
 			bid = self.symbols[symbol].get_poly_bid()
 			ask =  self.symbols[symbol].get_poly_ask()
-			print(symbol,bid,ask,val)
+			#print(symbol,bid,ask,val)
 			if self.current_shares[symbol]!=0 and bid!=0 and ask!= 0 and self.average_price[symbol]!=0:
 
 				if val>0:
