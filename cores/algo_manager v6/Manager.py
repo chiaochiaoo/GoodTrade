@@ -752,11 +752,15 @@ class Manager:
 	
 						if ".NQ" in symbol:
 							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Sell->Short NSDQ MOO Regular OnOpen&shares="+str(abs(share))
+						elif ".NY" in symbol:
+							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=NYSE Sell->Short NYSE MOO OnOpen&shares="+str(abs(share))
 						else:
 							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Sell->Short%20ARCX%20MOO%20OnOpen&shares="+str(abs(share))
 					else:
 						if ".NQ" in symbol:
 							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=NSDQ Buy NSDQ MOO Regular OnOpen&shares="+str(share)
+						elif ".NY" in symbol:
+							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=NYSE Buy NYSE MOO OnOpen&shares="+str(abs(share))
 						else:
 							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+symbol+"&ordername=ARCA%20Buy%20ARCX%20MOO%20OnOpen&shares="+str(share)
 					c=2 
@@ -2453,8 +2457,8 @@ class Manager:
 
 	def sim18(self):
 
-		name = 'AUTO_PAIR_AMM_SQQQ'
-		orders = {'SQQQ.NQ':10}
+		name = 'AUTO_PAIR_AMM_SMST'
+		orders = {'SMST.NQ':340,'MSTR.NQ':2}
 		risk = 0 
 		aggresive = False 
 		info = {'MAX':10,'MIN':0,'INTERVAL':10}
@@ -2463,7 +2467,7 @@ class Manager:
 	def sim19(self):
 
 		name = 'AUTO_PAIR_AMM_SQQQ_TQQQ'
-		orders = {'SQQQ.NQ':22,'TQQQ.NQ':10}
+		orders = {'SQQQ.NQ':30,'TQQQ.NQ':10}
 		risk = 0 
 		aggresive = False 
 		info = {'MAX':10,'MIN':0,'INTERVAL':10}
@@ -2473,21 +2477,25 @@ class Manager:
 	def sim19b(self):
 
 		name = 'AUTO_PAIR_AMM_SQQQ_TQQQ'
-		orders = {'SQQQ.NQ':22,'TQQQ.NQ':10}
+		orders = {'SQQQ.NQ':30,'TQQQ.NQ':10}
 		risk = 0 
 		aggresive = False 
-		info = {'MAX':10,'MIN':0,'INTERVAL':10,'AGGRESIVE':1}
+		info = {'MAX':15,'MIN':0,'INTERVAL':20,'AGGRESIVE':1}
 		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
 
 
 	def sim20(self):
 
 		name = 'AUTO_PAIR_AMM_RWMIWM'
-		orders = {'RWM.AM':90,'IWM.AM':10}
+		orders = {'RWM.AM':103,'IWM.AM':10}
 		risk = 0 
 		aggresive = False 
-		info = {'MAX':10,'MIN':0,'INTERVAL':10}
+		info = {'MAX':15,'MIN':0,'INTERVAL':20,'AGGRESIVE':1}
 		self.apply_basket_cmd(name,orders,risk,aggresive,info) 
+
+
+
+
 def force_close_port(port, process_name=None):
 	"""Terminate a process that is bound to a port.
 	
