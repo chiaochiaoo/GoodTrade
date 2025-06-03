@@ -237,6 +237,8 @@ class UI(pannel):
 					var.set(0)
 
 	def load_ticker_tab(self, force=True):
+
+		
 		ticker = self.ticker_var.get().strip()
 		if not ticker:
 			return
