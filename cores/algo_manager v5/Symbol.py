@@ -195,6 +195,7 @@ class Symbol:
 		timestamp = now.hour*3600 + now.minute*60 + now.second
 
 		return timestamp
+		
 	def l1_update_module(self):
 
 		pass 

@@ -1703,11 +1703,11 @@ class Manager:
 						self.real_time_ts = cur_ts
 						self.last_price_ts = sts 
 
-			r = 'http://10.29.10.143/api/NasdaqTrader/getnsdqtrader?chartPeriod=2&chartType=m'
-			r = requests.get(r)
+			# r = 'http://10.29.10.143/api/NasdaqTrader/getnsdqtrader?chartPeriod=2&chartType=m'
+			# r = requests.get(r)
 			nq_trader = []
-			for i in json.loads(r.text):
-				nq_trader.append(i['symbol'])
+			# for i in json.loads(r.text):
+			# 	nq_trader.append(i['symbol'])
 
 			self.nq_trader_stocks = nq_trader
 
