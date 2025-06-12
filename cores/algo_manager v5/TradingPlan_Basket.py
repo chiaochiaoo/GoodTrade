@@ -926,9 +926,9 @@ class TradingPlan_Basket:
 	def reduce_one_quarter(self):
 
 		self.turn_on_inspection()
-		if self.break_even!=True:
-			self.break_even=False
-			self.break_even_amount=2
+		# if self.break_even!=True:
+		# 	self.break_even=False
+		# 	self.break_even_amount=2
 
 
 		coefficient = 4 
