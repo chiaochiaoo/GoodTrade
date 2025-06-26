@@ -67,8 +67,12 @@ def Ppro_in(port,pipe):
 	force_close_port(port)
 
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF,   16 * 1024 * 1024)
+
+	actual = sock.getsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF)
+
 	sock.bind((UDP_IP, UDP_PORT))
-	log_print("Ppro in moudule initializing")
+	log_print("Ppro in moudule initializing size",actual)
 	pipe.send(["msg","algo_ppro working"])
 	#sock.settimeout()
 	work = False
