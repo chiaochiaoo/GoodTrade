@@ -1290,6 +1290,17 @@ class Manager:
 
 				log_print("cmd received:",d)
 
+			elif d[0] =='cancel':
+
+
+				symbol = d[1]
+
+				try:
+					if symbol in self.symbol_data:
+						self.symbol_data[symbol].cancel_all_assotied_algos()
+				except Exception as e:
+					PrintException(e,"cancelation error.")
+
 			elif d[0] =="basket":
 
 				try:
@@ -1355,6 +1366,8 @@ class Manager:
 
 				except Exception as e:
 					PrintException(e,"Flatten error")
+
+
 			elif d[0] =="shutdown":
 				break
 

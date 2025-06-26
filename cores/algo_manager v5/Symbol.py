@@ -885,6 +885,7 @@ class Symbol:
 			#### FOR THE TP TRYING TO START THE POSITION. IGNORE. 
 			log_print(self.source,self.symbol_name,'setting request tp as is')
 
+			## this is the part that is erronous. it doesn't have holdings?  
 			affected = []
 			for tp in tps:
 				if self.tradingplans[tp].having_request(self.symbol_name) and self.tradingplans[tp].get_holdings(self.symbol_name)!=0:
@@ -898,6 +899,14 @@ class Symbol:
 			### discrepancy added. 
 
 
+
+	def cancel_all_assotied_algos(self):
+
+		log_print(self.source,self.symbol_name,' canceling all algoes.')
+		tps = list(self.tradingplans.keys())
+
+		for tp in tps:
+			self.tradingplans[tp].cancel()
 
 	def cancel_all(self):
 

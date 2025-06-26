@@ -971,6 +971,7 @@ class TradingPlan_Basket:
 	def cancel(self):
 
 		### 
+		log_print(self.source,self.algo_name,' canceled.')
 		self.turn_off_inspection()
 		self.tkvars[STATUS].set(DONE)
 

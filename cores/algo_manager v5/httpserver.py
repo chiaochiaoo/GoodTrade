@@ -129,6 +129,12 @@ class S(BaseHTTPRequestHandler):
 					if cmd == "FLATTEN":
 						self.flatten_basket(basket)
 
+				elif "Cancel" in stream_data:
+
+					symbol = find_between(stream_data,"Cancel=",",")
+
+					self.cancel_symbol(symbol)
+
 				elif "Basket" in stream_data:
 
 
@@ -212,6 +218,9 @@ class S(BaseHTTPRequestHandler):
 
 	def send_basket(self,basket_name,orders,info):
 		pipec.send(["basket",basket_name,orders,info])
+
+	def cancel_symbol(self,symbol):
+		pipec.send(['cancel',symbol])
 
 	def flatten_basket(self,basket_name):
 		pipec.send(["flatten",basket_name])
