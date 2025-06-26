@@ -977,7 +977,7 @@ class TradingPlan_Basket:
 		for symbol in self.symbols.keys():
 			with self.read_lock[symbol]:
 				self.current_shares[symbol] = 0
-				self.current_shares[symbol] = 0
+				self.expected_shares[symbol] = 0
 				#if self.expected_shares[symbol] != self.current_shares[symbol]:
 
 

@@ -512,7 +512,7 @@ class Symbol:
 		self.recent_rejection_check()
 
 		if self.rejection_counts>=2:
-			log_print(self.source,self.symbol_name," too much recent rejection detected. wait 1.")
+			log_print(self.source,self.symbol_name," too many recent rejection detected. wait 1.")
 			return 0
 
 		if self.market_out!=0:
