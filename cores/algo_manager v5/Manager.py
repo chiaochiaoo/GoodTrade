@@ -1824,11 +1824,11 @@ class Manager:
 	def periodical_status(self):
 
 
-			user = self.ui.user.get()
-			subject = "User Status:"+user
-			body = "User Status:" +str(self.close_timer) + self.stringfy(self.current_summary) + self.output_active_tps() +self.stringfy_position(self.current_positions)
+		user = self.ui.user.get()
+		subject = "User Status:"+user
+		body = "User Status:" +str(self.close_timer) + self.stringfy(self.current_summary) + self.output_active_tps() +self.stringfy_position(self.current_positions)
 
-			self.send_email_admin(subject,body)	
+		self.send_email_admin(subject,body)	
 
 	def disconnection_alert(self):
 
@@ -1841,7 +1841,12 @@ class Manager:
 	def online_alert(self):
 
 		user = self.ui.user.get()
-		subject = "Connection:"+user
+		hostname = socket.gethostname()
+
+		local_ip = socket.gethostbyname(hostname)
+
+		print("Local IP:", local_ip)
+		subject = "Connection:"+user+" "+str(local_ip)
 		body = "Connection.\n" +self.stringfy(self.current_positions)  + self.stringfy(self.current_summary) + "\n"+self.stringfy(self.concept_record)+"\n"+self.stringfy(self.monthly_record['total']) +"\n"+self.stringfy(self.total_record['total']) +"\n"+self.stringfy(self.monthly)
 
 		self.send_email_admin(subject,body)
