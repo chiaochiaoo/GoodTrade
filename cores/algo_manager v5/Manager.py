@@ -380,7 +380,7 @@ class Manager:
 			self.symbol_data[symbol].rejection_message("Short")
 
 
-		self.symbol_data[symbol].cancel_all()
+			self.symbol_data[symbol].cancel_all()
 		
 	def set_risk(self,risk_):
 
