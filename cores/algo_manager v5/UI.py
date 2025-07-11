@@ -37,16 +37,16 @@ def trace_func(d):
 
 
 def show_tooltip(event, widget,root,label,text):
-    x, y, _, _ = widget.bbox("insert")
-    x += widget.winfo_rootx() + 25
-    y += widget.winfo_rooty() - 25
-    
-    root.geometry("+{}+{}".format(x, y))
-    label.config(text=text)
-    root.deiconify()
+	x, y, _, _ = widget.bbox("insert")
+	x += widget.winfo_rootx() + 25
+	y += widget.winfo_rooty() - 25
+	
+	root.geometry("+{}+{}".format(x, y))
+	label.config(text=text)
+	root.deiconify()
 
 def hide_tooltip(event,root):
-    root.withdraw()
+	root.withdraw()
 
 
 class UI(pannel):
@@ -72,7 +72,12 @@ class UI(pannel):
 		self.sort_timer = 0
 		self.sort_reverse_real = True 
 		self.sort_reverse_unreal = True 
+
+
+
+		self.sort_toggle = ''
 		
+
 		# infos = {
 		# 'Strategy':tradingplan.algo_name, \
 		# STATUS:tradingplan.tkvars[STATUS],\
@@ -116,6 +121,16 @@ class UI(pannel):
 		self.init_entry_pannel()
 
 		self.custom_algo_init()
+
+
+
+		self.sorting_type = ''
+		self.sort_reverse_unreal = False 
+
+
+
+		self.sort_t = 0
+		self.auto_sort()
 
 
 	def init_system_pannel(self):
@@ -1255,9 +1270,95 @@ class UI(pannel):
 				print("creating:",l[i])
 
 				self.b["command"] = self.sort_by_unrealize
+
+				self.unreal_button = self.b
 			elif l[i] == "REALIZED":
 				print("creating:",l[i])
 				self.b["command"] = self.sort_by_realize
+				self.real_button = self.b
+
+	def sort_by_unrealize(self):
+
+		self.sort_t+=1
+		if self.sort_t%3==0:
+			self.sort_reverse_unreal=False
+			self.unreal_button['text'] = 'UNREAL-'
+			self.sorting_type ='UNREAL'
+		elif self.sort_t%3==1:
+			self.sort_reverse_unreal=True
+			self.unreal_button['text'] = 'UNREAL+'
+			self.sorting_type ='UNREAL'
+		else:
+			self.unreal_button['text'] = 'UNREAL'
+			self.sorting_type =''
+
+
+
+		
+
+
+		print('Sorting by',self.sorting_type,self.sort_reverse_unreal)
+
+		## YOU CAN TURN IT OFF.
+
+	def sort_by_realize(self):
+
+		# if self.sort_reverse_unreal:
+			
+		# else:
+		# 	self.sort_reverse_unreal=True 
+
+		# self.sorting_type ='REAL'
+
+		# print('Sorting by',self.sorting_type,self.sort_reverse_unreal)
+
+		# self.sort_t+=1
+
+		pass
+		
+	def auto_sort(self):
+
+		### need to get what to sort, and order.
+		now = datetime.now()
+		ts = now.hour*3600 + now.minute*60 + now.second
+
+		print('SORTING IN PROGRESS',self.sorting_type,self.sort_reverse_unreal)
+
+		self.root.after(4000, self.auto_sort)
+
+
+		l = self.get_current_display()
+
+		data = {}
+
+		for i in l:
+
+			if self.sorting_type=='UNREAL':
+				data[i] = self.manager.baskets[i].data[UNREAL]
+			elif self.sorting_type=='REAL':
+				data[i] = self.manager.baskets[i].data[REALIZED]
+			else:
+				return
+
+		if self.sort_reverse_unreal:
+			l = [key for key, value in sorted(data.items(), key=lambda item: item[1], reverse=True)]
+			#self.sort_reverse_unreal = False 
+		else:
+			l = [key for key, value in sorted(data.items(), key=lambda item: item[1], reverse=False)]
+			#self.sort_reverse_unreal = True
+		
+
+		self.count_current()
+		for i in range(0,self.current_display_count):
+			#print("evicting,",i)
+			self.evict_entry(i)
+
+		self.basket_label_count = 1
+		for i in l:
+			self.create_new_single_entry(self.manager.baskets[i],"Basket",None)
+
+
+
 
 	def get_current_display(self):
 
@@ -1276,73 +1377,73 @@ class UI(pannel):
 		return all_strat
 
 
-	def sort_by_unrealize(self):
+	# def sort_by_unrealize(self):
 
-		## whatever is being shown right now. ##
+	# 	## whatever is being shown right now. ##
 
-		now = datetime.now()
-		ts = now.hour*3600 + now.minute*60 + now.second
+	# 	now = datetime.now()
+	# 	ts = now.hour*3600 + now.minute*60 + now.second
 
-		if ts>self.sort_timer+2:
-			self.sort_timer = ts 
+	# 	if ts>self.sort_timer+2:
+	# 		self.sort_timer = ts 
 
-			l = self.get_current_display()
+	# 		l = self.get_current_display()
 
-			data = {}
+	# 		data = {}
 
-			for i in l:
-				data[i] = self.manager.baskets[i].data[UNREAL]
+	# 		for i in l:
+	# 			data[i] = self.manager.baskets[i].data[UNREAL]
 
-			if self.sort_reverse_unreal:
-				l = [key for key, value in sorted(data.items(), key=lambda item: item[1], reverse=True)]
-				self.sort_reverse_unreal = False 
-			else:
-				l = [key for key, value in sorted(data.items(), key=lambda item: item[1], reverse=False)]
-				self.sort_reverse_unreal = True
+	# 		if self.sort_reverse_unreal:
+	# 			l = [key for key, value in sorted(data.items(), key=lambda item: item[1], reverse=True)]
+	# 			self.sort_reverse_unreal = False 
+	# 		else:
+	# 			l = [key for key, value in sorted(data.items(), key=lambda item: item[1], reverse=False)]
+	# 			self.sort_reverse_unreal = True
 			
 
-			self.count_current()
-			for i in range(0,self.current_display_count):
-				#print("evicting,",i)
-				self.evict_entry(i)
+	# 		self.count_current()
+	# 		for i in range(0,self.current_display_count):
+	# 			#print("evicting,",i)
+	# 			self.evict_entry(i)
 
-			self.basket_label_count = 1
-			for i in l:
-				self.create_new_single_entry(self.manager.baskets[i],"Basket",None)
+	# 		self.basket_label_count = 1
+	# 		for i in l:
+	# 			self.create_new_single_entry(self.manager.baskets[i],"Basket",None)
 
-	def sort_by_realize(self):
+	# def sort_by_realize(self):
 
-		now = datetime.now()
-		ts = now.hour*3600 + now.minute*60 + now.second
+	# 	now = datetime.now()
+	# 	ts = now.hour*3600 + now.minute*60 + now.second
 
-		if ts>self.sort_timer+2:
-			self.sort_timer = ts 
+	# 	if ts>self.sort_timer+2:
+	# 		self.sort_timer = ts 
 
-			l = self.get_current_display()
+	# 		l = self.get_current_display()
 
-			data = {}
+	# 		data = {}
 
-			for i in l:
-				data[i] = self.manager.baskets[i].data[REALIZED]
+	# 		for i in l:
+	# 			data[i] = self.manager.baskets[i].data[REALIZED]
 
-			if self.sort_reverse_unreal:
-				l = [key for key, value in sorted(data.items(), key=lambda item: item[1], reverse=True)]
-				self.sort_reverse_unreal = False 
-			else:
-				l = [key for key, value in sorted(data.items(), key=lambda item: item[1], reverse=False)]
-				self.sort_reverse_unreal = True
-
-
-			self.count_current()
-			for i in range(0,self.current_display_count):
-
-				#print("evicting,",i)
-				self.evict_entry(i)
+	# 		if self.sort_reverse_unreal:
+	# 			l = [key for key, value in sorted(data.items(), key=lambda item: item[1], reverse=True)]
+	# 			self.sort_reverse_unreal = False 
+	# 		else:
+	# 			l = [key for key, value in sorted(data.items(), key=lambda item: item[1], reverse=False)]
+	# 			self.sort_reverse_unreal = True
 
 
-			self.basket_label_count = 1
-			for i in l:
-				self.create_new_single_entry(self.manager.baskets[i],"Basket",None)
+	# 		self.count_current()
+	# 		for i in range(0,self.current_display_count):
+
+	# 			#print("evicting,",i)
+	# 			self.evict_entry(i)
+
+
+	# 		self.basket_label_count = 1
+	# 		for i in l:
+	# 			self.create_new_single_entry(self.manager.baskets[i],"Basket",None)
 
 
 	def order_ui_creation(self,info):
@@ -1443,6 +1544,8 @@ class UI(pannel):
 			c+=1
 		except Exception as e:
 			print(e)
+
+
 	def custom_algo_init(self):
 
 		self.TNV_TAB = ttk.Notebook(self.custom_algo_pannel)
