@@ -1324,7 +1324,7 @@ class UI(pannel):
 
 		print('SORTING IN PROGRESS',self.sorting_type,self.sort_reverse_unreal)
 
-		self.root.after(4000, self.auto_sort)
+		self.root.after(5000, self.auto_sort)
 
 
 		l = self.get_current_display()
