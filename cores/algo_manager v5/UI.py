@@ -1322,9 +1322,10 @@ class UI(pannel):
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second
 
-		print('SORTING IN PROGRESS',self.sorting_type,self.sort_reverse_unreal)
+		wait = 5000+self.active_algo_count_number.get()*100
+		print('SORTING IN PROGRESS',self.sorting_type,self.sort_reverse_unreal,"next:",wait/1000)
 
-		self.root.after(5000, self.auto_sort)
+		self.root.after(wait, self.auto_sort)
 
 
 		l = self.get_current_display()
