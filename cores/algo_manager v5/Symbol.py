@@ -152,6 +152,8 @@ class Symbol:
 		self.poly_bid =0
 		self.poly_ask = 0
 
+		self.open_for_trading = True 
+
 		self.init_data()
 
 		log_print(self.source,self.symbol_name," New symbol system init")
@@ -212,7 +214,13 @@ class Symbol:
 			bid = float(find_between(stream_data, "BidPrice=\"", "\""))
 			ask = float(find_between(stream_data, "AskPrice=\"", "\""))
 			ts = find_between(stream_data, "MarketTime=\"", "\"")
+			state = find_between(stream_data,"InstrumentState=\"", "\"") 
 
+			if state =="Open":
+				self.open_for_trading=True
+			else:
+				self.open_for_trading=False 
+				log_print(self.symbol_name,"State:",state,self.open_for_trading)
 
 			if self.data[BID]!=bid:
 				self.bid_change = True 
@@ -304,7 +312,11 @@ class Symbol:
 				else:
 					self.aggregating_phase(tps)
 
-				if self.request!=0 and self.manager.open_order_check==True and ts<=57540:
+
+				if not self.open_for_trading:
+					self.l1_update_module()
+
+				if self.request!=0 and self.manager.open_order_check==True and ts<=57540 and self.open_for_trading:
 					return self.ordering_phase()
 
 				#####   AGGRAGATING PHASE   #####
