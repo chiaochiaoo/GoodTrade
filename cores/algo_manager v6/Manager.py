@@ -2559,7 +2559,7 @@ if __name__ == '__main__':
 
 
 	root = tk.Tk()
-	root.title("SelectTrade Algo Manager v6 a1")
+	root.title("SelectTrade Algo Manager v6 a2")
 	#root.geometry("1350x1080")
 	root.geometry("1800x1280")
 	
