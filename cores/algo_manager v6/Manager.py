@@ -1150,7 +1150,7 @@ class Manager:
 						mul+=1 
 
 
-					total_moc = self.current_positions
+					total_moc = self.current_positions.copy()
 
 					log_print(mul,total_moc)
 
@@ -1559,7 +1559,6 @@ class Manager:
 					now = datetime.now()
 					ts = now.hour*60 + now.minute
 
-					#self.current_positions = positions
 
 
 					self.open_order_count = open_order_count
