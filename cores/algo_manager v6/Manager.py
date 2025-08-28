@@ -465,11 +465,14 @@ class Manager:
 
 							#print("inspecting:",val)
 							try:
-								c+=val.symbol_inspection()
-								#self.total_difference+=abs(val.get_difference())
-								if c>=30:
-									log_print("ORDERING LIMIT REACHED.")
-									break
+								if val.get_moc()!=True:
+									c+=val.symbol_inspection()
+									#self.total_difference+=abs(val.get_difference())
+									if c>=30:
+										log_print("ORDERING LIMIT REACHED.")
+										break
+								else:
+									log_print("Manager:",val.symbol_name,' already moced. ignore inspection.')
 									
 							except Exception as e:
 								PrintException(e,"inspection error")
@@ -1073,6 +1076,9 @@ class Manager:
 				for ticker in total_moc.keys():
 					share = total_moc[ticker]
 					reque = ""
+
+					self.symbol_data[ticker].set_moc()
+
 					if ticker[-2:]=="NQ":
 
 						self.total_moc_nq[ticker] = share
@@ -1090,7 +1096,7 @@ class Manager:
 							except Exception as e:
 								PrintException(e)
 
-
+					
 				MOC_NQ = True 
 
 			if ts>=MOC_send_out_timer and moc_release==False:
@@ -1130,6 +1136,8 @@ class Manager:
 						
 						share = total_moc[ticker]
 
+						self.symbol_data[ticker].set_moc()
+
 						if ticker[-2:]=="NY":
 							if share<0:
 								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ROSN Buy RosenblattDQuoteClose MOC DAY&shares="+str(abs(share))
@@ -1158,6 +1166,7 @@ class Manager:
 							except Exception as e:
 								PrintException(e)
 
+						
 				moc_release=True
 
 

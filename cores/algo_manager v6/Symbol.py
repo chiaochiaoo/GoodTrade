@@ -137,6 +137,10 @@ class Symbol:
 
 		self.sms_ts = 0
 
+		self.moc = False 
+
+
+
 		# plus, minus, all the updates, all go here. 
 		# 1. on adding shares
 		# 2. on fullfilling. 
@@ -157,6 +161,13 @@ class Symbol:
 	##### DATA PART #####
 
 
+	def get_moc(self):
+		return self.moc
+
+	def set_moc(self):
+		self.moc=True
+
+		
 	def init_data(self):
 
 		for i in self.numeric_labels:
@@ -523,10 +534,10 @@ class Symbol:
 		skip = True 
 
 		if self.aggresive_only!=True and ts<57500:
-			if self.action==PASSIVEBUY and (self.bid_change==True or self.data['SPREAD']>0.05):
+			if self.action==PASSIVEBUY and (self.bid_change==True or self.data['SPREAD']>0.05) and self.get_moc()!=True:
 				self.ppro_out.send([CANCEL,self.symbol_name]) # only cancel previous order!
 				skip = False 
-			elif self.action==PASSIVESELL and (self.ask_change==True or self.data['SPREAD']>0.05):
+			elif self.action==PASSIVESELL and (self.ask_change==True or self.data['SPREAD']>0.05) and self.get_moc()!=True:
 				self.ppro_out.send([CANCEL,self.symbol_name]) # only cancel previous order!
 				skip = False 
 
@@ -818,7 +829,7 @@ class Symbol:
 		now = datetime.now()
 		ts = now.hour*3600 + now.minute*60 + now.second
 
-		if self.aggresive_only!=True and ts<57500:
+		if self.aggresive_only!=True and ts<57500 and self.get_moc()!=True:
 
 			### NEED TO KNOW IF. HMM .
 			self.ppro_out.send([CANCEL,self.symbol_name])	
