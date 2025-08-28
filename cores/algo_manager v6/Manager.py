@@ -1056,7 +1056,7 @@ class Manager:
 				
 				for name,basket in self.baskets.items():
 					if "EURO" in name:
-						#self.algo_as_is(name)
+
 						print("flattening:",name)
 						basket.flatten_cmd()
 
@@ -1068,9 +1068,15 @@ class Manager:
 
 				log_print("MOC NQ begins")
 				self.total_moc_nq = {}
-				for name,basket in self.baskets.items():
-					if "NQ" in name:
-						self.algo_as_is(name)
+
+
+				keys = list(self.baskets.keys())   # snapshot
+				for k in keys:
+				    basket = self.baskets.get(k)   # safe lookup
+				    if basket is None:
+				        continue   # key disappeared, skip
+				    if "NQ" in k:
+				        self.algo_as_is(k)
 
 				total_moc = self.current_positions.copy()
 
@@ -1079,11 +1085,14 @@ class Manager:
 					share = total_moc[ticker]
 					reque = ""
 
-					self.symbol_data[ticker].set_moc()
+					
 
 					if ticker[-2:]=="NQ":
 
 						self.total_moc_nq[ticker] = share
+
+						if ticker in self.symbol_data:
+							self.symbol_data[ticker].set_moc()
 
 						if share<0:
 							reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=NSDQ Buy NSDQ MOC DAY&shares="+str(abs(share))
@@ -1115,8 +1124,22 @@ class Manager:
 					
 					total_moc = {}
 
-					for name,basket in self.baskets.items():
-						self.algo_as_is(name)
+					# for name,basket in self.baskets.items():
+					# 	self.algo_as_is(name)
+
+					# Take a snapshot of just the keys (cheap and safe)
+					keys = list(self.baskets.keys())
+
+					for name in keys:
+					    # Use .get() so if another thread removed the key, we don’t crash
+					    basket = self.baskets.get(name)
+					    if basket is None:
+					        continue  # disappeared, skip
+
+					    try:
+					        self.algo_as_is(name)
+					    except Exception as e:
+					        PrintException(e, f"algo_as_is failed for basket={name}")
 
 					mul = 1 
 
@@ -1138,14 +1161,20 @@ class Manager:
 						
 						share = total_moc[ticker]
 
-						self.symbol_data[ticker].set_moc()
+
 
 						if ticker[-2:]=="NY":
+
+							if ticker in self.symbol_data:
+								self.symbol_data[ticker].set_moc()
+
 							if share<0:
 								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ROSN Buy RosenblattDQuoteClose MOC DAY&shares="+str(abs(share))
 							elif share>0:
 								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ROSN Sell->Short RosenblattDQuoteClose MOC DAY&shares="+str(share)
 						elif ticker[-2:]=="AM":
+							if ticker in self.symbol_data:
+								self.symbol_data[ticker].set_moc()
 
 							if share<0:
 								reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Buy ARCX MOC DAY&shares="+str(abs(share))
@@ -1155,6 +1184,10 @@ class Manager:
 						elif ticker[-2:]=="NQ":
 
 							if ticker not in self.total_moc_nq:
+
+								if ticker in self.symbol_data:
+									self.symbol_data[ticker].set_moc()
+
 								if share<0:
 									reque = "http://127.0.0.1:8080/ExecuteOrder?symbol="+ticker+"&ordername=ARCA Buy ARCX MOC DAY&shares="+str(abs(share))
 								elif share>0:
