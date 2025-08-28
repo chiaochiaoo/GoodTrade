@@ -1065,6 +1065,8 @@ class Manager:
 			if ts>=MOC_send_out_timer_NQ and MOC_NQ == False:
 
 				#total_moc_nq = {}
+
+				log_print("MOC NQ begins")
 				self.total_moc_nq = {}
 				for name,basket in self.baskets.items():
 					if "NQ" in name:
