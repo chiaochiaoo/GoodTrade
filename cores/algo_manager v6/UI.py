@@ -431,7 +431,8 @@ class UI(pannel):
 
 	def init_deployment_pannel(self):
 
-		self.labels = {"CANCEL":6,\
+		self.labels = {						"flatten":8,\
+						"a-flatten":8,\
 						"Strategy":40,\
 						"Status":8,\
 						#"Updates":5,\
@@ -447,8 +448,7 @@ class UI(pannel):
 						"-50%":6,\
 						"+25%":6,\
 						"R100":6,\
-						"flatten":8,\
-						"a-flatten":8,\
+						"CANCEL":6,\
 						}
 		self.width = list(self.labels.values())
 
@@ -1991,7 +1991,7 @@ class UI(pannel):
 if __name__ == '__main__':
 
 	root = tk.Tk() 
-	root.title("GoodTrade Algo Manager v5") 
+	root.title("GoodTrade Algo Manager v6") 
 	#root.geometry("1380x780")
 	root.geometry("1570x1280")
 	UI(root)
