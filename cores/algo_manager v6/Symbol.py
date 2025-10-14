@@ -552,9 +552,9 @@ class Symbol:
 		if self.request!=0 : #and self.holding_update==False 
 
 			total = abs(self.request-self.expired)
-			if total>=500:
-				total = 500
-				log_print(self.source,self.symbol_name,self.action," adjusted to 500 instead of",self.request)
+			if total>=5000:
+				total = 5000
+				log_print(self.source,self.symbol_name,self.action," adjusted to 5000 instead of",self.request)
 
 			if self.expired!=0:
 				self.ppro_out.send([CANCEL,self.symbol_name]) 
